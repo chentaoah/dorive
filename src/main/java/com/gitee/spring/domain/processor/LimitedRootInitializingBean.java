@@ -1,6 +1,7 @@
 package com.gitee.spring.domain.processor;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
@@ -14,7 +15,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import java.security.KeyPair;
+import javax.swing.filechooser.FileSystemView;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -72,9 +74,16 @@ public class LimitedRootInitializingBean implements ApplicationContextAware, Ini
     }
 
     public static void main(String[] args) {
-        KeyPair pair = SecureUtil.generateKeyPair("RSA");
-        System.out.println(Base64.encode(pair.getPrivate().getEncoded()));
-        System.out.println(Base64.encode(pair.getPublic().getEncoded()));
+//        KeyPair pair = SecureUtil.generateKeyPair("RSA");
+//        System.out.println(Base64.encode(pair.getPrivate().getEncoded()));
+//        System.out.println(Base64.encode(pair.getPublic().getEncoded()));
+        File desktopDir = FileSystemView.getFileSystemView().getHomeDirectory();
+        String desktopPath = desktopDir.getAbsolutePath();
+        String PRIVATE_KEY = FileUtil.readString(desktopPath + "\\PRIVATE_KEY.txt", "UTF-8");
+        String md5Str = "adf61045e9b5abb7d00d057ca6ff3ddf";
+        RSA rsa = new RSA(PRIVATE_KEY, null);
+        byte[] bytes = rsa.encrypt(md5Str, KeyType.PrivateKey);
+        System.out.println(Base64.encode(bytes));
     }
 
 }
