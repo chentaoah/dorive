@@ -60,9 +60,15 @@ public class LimitedRootInitializingBean implements ApplicationContextAware, Ini
     }
 
     private String decryptSign(String sign) {
-        RSA rsa = new RSA(null, PUBLIC_KEY);
-        byte[] bytes = rsa.decrypt(sign, KeyType.PublicKey);
-        return StrUtil.str(bytes, "UTF-8");
+        try {
+            RSA rsa = new RSA(null, PUBLIC_KEY);
+            byte[] bytes = rsa.decrypt(sign, KeyType.PublicKey);
+            return StrUtil.str(bytes, "UTF-8");
+
+        } catch (Exception e) {
+            logger.error("Decryption failed! Please check the configuration!");
+        }
+        return null;
     }
 
     public static void main(String[] args) {
