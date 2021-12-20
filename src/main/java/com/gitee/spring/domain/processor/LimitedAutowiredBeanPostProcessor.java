@@ -27,22 +27,21 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class LimitedAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
+public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
         implements MergedBeanDefinitionPostProcessor {
 
     protected final Log logger = LogFactory.getLog(getClass());
     private final Set<Class<? extends Annotation>> autowiredAnnotationTypes = new LinkedHashSet<>(4);
-    private final Map<String, String> domainPatternMapping = new ConcurrentHashMap<>(256);
+    private final Map<String, String> domainPatternMapping;
     private final AntPathMatcher antPathMatcher = new AntPathMatcher(".");
 
     @SuppressWarnings("unchecked")
-    public LimitedAnnotationBeanPostProcessor(Map<String, String> domainPatternMapping) {
-        this.domainPatternMapping.putAll(domainPatternMapping);
+    public LimitedAutowiredBeanPostProcessor(Map<String, String> domainPatternMapping) {
+        this.domainPatternMapping = domainPatternMapping;
         this.autowiredAnnotationTypes.add(Autowired.class);
-        this.autowiredAnnotationTypes.add(Value.class);
         try {
             this.autowiredAnnotationTypes.add((Class<? extends Annotation>)
-                    ClassUtils.forName("javax.inject.Inject", AutowiredAnnotationBeanPostProcessor.class.getClassLoader()));
+                    ClassUtils.forName("javax.inject.Inject", LimitedAutowiredBeanPostProcessor.class.getClassLoader()));
             logger.trace("JSR-330 'javax.inject.Inject' annotation found and supported for autowiring");
         } catch (ClassNotFoundException ex) {
             // JSR-330 API not available - simply skip.
@@ -98,8 +97,7 @@ public class LimitedAnnotationBeanPostProcessor extends InstantiationAwareBeanPo
         String fieldTypeDomain = findMatchedDomain(fieldTypeName);
 
         if (!Objects.equals(typeDomain, fieldTypeDomain)) {
-            String message = String.format("Injection of autowired dependencies failed for class [%s]."
-                            + " type: [%s], typeDomain: [%s], fieldTypeName: [%s], fieldTypeDomain: [%s]",
+            String message = String.format("Injection of autowired dependencies failed for class [%s]. type: [%s], typeDomain: [%s], fieldTypeName: [%s], fieldTypeDomain: [%s]",
                     clazz, typeName, typeDomain, fieldTypeName, fieldTypeDomain);
             throw new BeanCreationException(message);
         }
