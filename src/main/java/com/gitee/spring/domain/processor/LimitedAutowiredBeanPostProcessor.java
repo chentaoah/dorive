@@ -1,12 +1,11 @@
 package com.gitee.spring.domain.processor;
 
 import com.gitee.spring.domain.annotation.Root;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 import org.springframework.beans.factory.support.MergedBeanDefinitionPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -25,7 +24,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
         implements MergedBeanDefinitionPostProcessor {
@@ -90,11 +88,15 @@ public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPos
         if (field.getType().isAnnotationPresent(Root.class)) {
             return;
         }
-        String typeName = clazz.getName();
-        String typeDomain = findMatchedDomain(typeName);
 
         String fieldTypeName = field.getType().getName();
         String fieldTypeDomain = findMatchedDomain(fieldTypeName);
+        if (StringUtils.isBlank(fieldTypeDomain)) {
+            return;
+        }
+
+        String typeName = clazz.getName();
+        String typeDomain = findMatchedDomain(typeName);
 
         if (!Objects.equals(typeDomain, fieldTypeDomain)) {
             String message = String.format("Injection of autowired dependencies failed for class [%s]. type: [%s], typeDomain: [%s], fieldTypeName: [%s], fieldTypeDomain: [%s]",
