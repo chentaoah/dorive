@@ -87,12 +87,12 @@ public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPos
         if (field.getType().isAnnotationPresent(Root.class)) return;
 
         String fieldTypeName = field.getType().getName();
-        String fieldTypeDomain = findMatchedDomain(fieldTypeName);
+        String fieldTypeDomain = findDomainByPattern(fieldTypeName);
 
         if (StringUtils.isBlank(fieldTypeDomain)) return;
 
         String typeName = clazz.getName();
-        String typeDomain = findMatchedDomain(typeName);
+        String typeDomain = findDomainByPattern(typeName);
 
         if (StringUtils.isBlank(typeDomain)) {
             throwInjectionException(typeName, typeDomain, fieldTypeName, fieldTypeDomain);
@@ -104,7 +104,7 @@ public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPos
         }
     }
 
-    private String findMatchedDomain(String typeName) {
+    private String findDomainByPattern(String typeName) {
         DomainConfig domainConfig = CollUtil.findOne(domainConfigs, item -> antPathMatcher.match(item.getPattern(), typeName));
         return domainConfig != null ? domainConfig.getDomain() : null;
     }
