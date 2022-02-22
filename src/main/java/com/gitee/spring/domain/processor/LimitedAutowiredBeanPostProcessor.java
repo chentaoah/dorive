@@ -104,15 +104,15 @@ public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPos
         }
     }
 
+    private String findMatchedDomain(String typeName) {
+        DomainConfig domainConfig = CollUtil.findOne(domainConfigs, item -> antPathMatcher.match(item.getPattern(), typeName));
+        return domainConfig != null ? domainConfig.getDomain() : null;
+    }
+
     private void throwInjectionException(String typeName, String typeDomain, String fieldTypeName, String fieldTypeDomain) {
         String message = String.format("Injection of autowired dependencies failed! typeName: [%s], typeDomain: [%s], fieldTypeName: [%s], fieldTypeDomain: [%s]",
                 typeName, typeDomain, fieldTypeName, fieldTypeDomain);
         throw new BeanCreationException(message);
-    }
-
-    private String findMatchedDomain(String typeName) {
-        DomainConfig domainConfig = CollUtil.findOne(domainConfigs, item -> antPathMatcher.match(item.getPattern(), typeName));
-        return domainConfig != null ? domainConfig.getDomain() : null;
     }
 
 }
