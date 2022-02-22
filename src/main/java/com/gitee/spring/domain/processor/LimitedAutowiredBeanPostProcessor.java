@@ -2,7 +2,7 @@ package com.gitee.spring.domain.processor;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.spring.domain.annotation.Root;
-import com.gitee.spring.domain.config.entity.DomainConfig;
+import com.gitee.spring.domain.entity.DomainConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

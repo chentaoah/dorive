@@ -1,11 +1,10 @@
 package com.gitee.spring.domain.config;
 
-import com.gitee.spring.domain.config.entity.DomainConfig;
+import com.gitee.spring.domain.entity.DomainConfig;
 import com.gitee.spring.domain.processor.LimitedAutowiredBeanPostProcessor;
 import com.gitee.spring.domain.processor.LimitedRootInitializingBean;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +13,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
