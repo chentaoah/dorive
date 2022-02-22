@@ -53,7 +53,7 @@ public class LimitedRootInitializingBean implements ApplicationContextAware, Ini
 
     private String getRootServicesMd5Str(Map<String, Object> beans) {
         List<String> typeNames = new ArrayList<>();
-        domainPatternMapping.forEach((domain, pattern) -> typeNames.add(pattern));
+        domainPatternMapping.forEach((domain, pattern) -> typeNames.add(domain + ":" + pattern));
         beans.forEach((id, bean) -> typeNames.add(bean.getClass().getName()));
         String string = typeNames.stream().sorted().collect(Collectors.joining(", "));
         String md5Str = SecureUtil.md5(string);
