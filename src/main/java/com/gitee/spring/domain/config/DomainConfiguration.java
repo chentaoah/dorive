@@ -1,5 +1,6 @@
 package com.gitee.spring.domain.config;
 
+import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.entity.DomainConfig;
 import com.gitee.spring.domain.processor.LimitedAutowiredBeanPostProcessor;
 import com.gitee.spring.domain.processor.LimitedRootInitializingBean;
@@ -25,7 +26,9 @@ public class DomainConfiguration {
         Map<String, String> domainPatternMapping = Binder.get(environment)
                 .bind("spring.domains", Bindable.mapOf(String.class, String.class)).get();
         List<DomainConfig> domainConfigs = new ArrayList<>();
-        domainPatternMapping.forEach((domain, pattern) -> domainConfigs.add(new DomainConfig(domain, pattern)));
+        domainPatternMapping.forEach((domain, pattern) ->
+                StrUtil.splitTrim(pattern, ",").forEach(eachPattern ->
+                        domainConfigs.add(new DomainConfig(domain, eachPattern))));
         domainConfigs.sort((o1, o2) -> o2.getDomain().compareTo(o1.getDomain()));
         return new LimitedAutowiredBeanPostProcessor(domainConfigs);
     }
