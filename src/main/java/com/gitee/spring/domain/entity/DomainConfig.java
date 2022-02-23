@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class DomainConfig {
-    private String domain;
+    private String name;
     private String pattern;
+    private String protect;
 }

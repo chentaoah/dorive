@@ -106,7 +106,7 @@ public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPos
 
     private String findDomainByPattern(String typeName) {
         DomainConfig domainConfig = CollUtil.findOne(domainConfigs, item -> antPathMatcher.match(item.getPattern(), typeName));
-        return domainConfig != null ? domainConfig.getDomain() : null;
+        return domainConfig != null ? domainConfig.getName() : null;
     }
 
     private void throwInjectionException(String typeName, String typeDomain, String fieldTypeName, String fieldTypeDomain) {
