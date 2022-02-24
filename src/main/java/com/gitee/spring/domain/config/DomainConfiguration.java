@@ -18,7 +18,7 @@ import java.util.List;
 public class DomainConfiguration {
 
     @Bean
-    @ConditionalOnProperty("spring.domains")
+    @ConditionalOnProperty(prefix = "spring.domain", name = "enable", havingValue = "true")
     public LimitedAutowiredBeanPostProcessor limitedAnnotationBeanPostProcessor(Environment environment) {
         List<DomainConfig> domainConfigs = Binder.get(environment)
                 .bind("spring.domains", Bindable.listOf(DomainConfig.class)).get();
@@ -27,7 +27,7 @@ public class DomainConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty("spring.domains")
+    @ConditionalOnProperty(prefix = "spring.domain", name = "enable", havingValue = "true")
     public LimitedRootInitializingBean limitedRootInitializingBean(Environment environment) {
         List<DomainConfig> domainConfigs = Binder.get(environment)
                 .bind("spring.domains", Bindable.listOf(DomainConfig.class)).get();
