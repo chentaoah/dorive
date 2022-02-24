@@ -21,7 +21,7 @@ public class DomainConfiguration {
     @ConditionalOnProperty(prefix = "spring.domain", name = "enable", havingValue = "true")
     public LimitedAutowiredBeanPostProcessor limitedAnnotationBeanPostProcessor(Environment environment) {
         List<DomainConfig> domainConfigs = Binder.get(environment)
-                .bind("spring.domains", Bindable.listOf(DomainConfig.class)).get();
+                .bind("spring.domain.domains", Bindable.listOf(DomainConfig.class)).get();
         domainConfigs.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
         return new LimitedAutowiredBeanPostProcessor(domainConfigs);
     }
@@ -30,7 +30,7 @@ public class DomainConfiguration {
     @ConditionalOnProperty(prefix = "spring.domain", name = "enable", havingValue = "true")
     public LimitedRootInitializingBean limitedRootInitializingBean(Environment environment) {
         List<DomainConfig> domainConfigs = Binder.get(environment)
-                .bind("spring.domains", Bindable.listOf(DomainConfig.class)).get();
+                .bind("spring.domain.domains", Bindable.listOf(DomainConfig.class)).get();
         domainConfigs.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
         return new LimitedRootInitializingBean(domainConfigs);
     }
