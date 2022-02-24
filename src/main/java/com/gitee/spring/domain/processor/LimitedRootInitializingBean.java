@@ -3,8 +3,8 @@ package com.gitee.spring.domain.processor;
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.spring.domain.annotation.Root;
 import com.gitee.spring.domain.entity.DomainConfig;
+import com.gitee.spring.domain.util.AopUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.InitializingBean;
@@ -34,7 +34,7 @@ public class LimitedRootInitializingBean implements ApplicationContextAware, Ini
     public void afterPropertiesSet() {
         Map<String, Object> beans = applicationContext.getBeansWithAnnotation(Root.class);
         beans.forEach((id, bean) -> {
-            String className = AopUtils.getTargetClass(bean).getName();
+            String className = AopUtils.getAnnotatedClassName(bean, Root.class);
             DomainConfig domainConfig = findDomainByPattern(className);
             if (domainConfig != null && StringUtils.isNotBlank(domainConfig.getProtect())) {
                 if (antPathMatcher.match(domainConfig.getProtect(), className)) {
