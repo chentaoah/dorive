@@ -65,9 +65,9 @@ public class LimitedTypeDomainResolver implements TypeDomainResolver {
         }
     }
 
-    private void throwInjectionException(Class<?> type, DomainConfig domainConfig, Class<?> injectedType, DomainConfig injectedDomainConfig) {
+    private void throwInjectionException(Class<?> targetType, DomainConfig domainConfig, Class<?> injectedType, DomainConfig injectedDomainConfig) {
         String message = String.format("Injection of autowired dependencies failed! typeName: [%s], typeDomain: [%s], fieldTypeName: [%s], fieldTypeDomain: [%s]",
-                type.getName(), domainConfig != null ? domainConfig.getName() : null, injectedType.getName(), injectedDomainConfig.getName());
+                targetType.getName(), domainConfig != null ? domainConfig.getName() : null, injectedType.getName(), injectedDomainConfig.getName());
         throw new BeanCreationException(message);
     }
 
