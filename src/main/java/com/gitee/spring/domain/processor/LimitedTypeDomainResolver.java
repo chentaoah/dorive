@@ -13,11 +13,18 @@ import java.util.Objects;
 
 public class LimitedTypeDomainResolver implements TypeDomainResolver {
 
+    private final String scanPackage;
     private final List<DomainConfig> domainConfigs;
     private final AntPathMatcher antPathMatcher = new AntPathMatcher(".");
 
-    public LimitedTypeDomainResolver(List<DomainConfig> domainConfigs) {
+    public LimitedTypeDomainResolver(String scanPackage, List<DomainConfig> domainConfigs) {
+        this.scanPackage = scanPackage;
         this.domainConfigs = domainConfigs;
+    }
+
+    @Override
+    public boolean isUnderScanPackage(Class<?> typeToMatch) {
+        return antPathMatcher.match(scanPackage, typeToMatch.getName());
     }
 
     @Override
@@ -45,7 +52,7 @@ public class LimitedTypeDomainResolver implements TypeDomainResolver {
             throwInjectionException(targetType, null, injectedType, injectedDomainConfig);
         }
     }
-    
+
     @Override
     public void checkDomainRoot(Class<?> targetType) {
         DomainConfig domainConfig = resolveDomain(targetType);

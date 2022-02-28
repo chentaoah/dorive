@@ -6,6 +6,7 @@ import com.gitee.spring.domain.processor.LimitedAutowiredBeanPostProcessor;
 import com.gitee.spring.domain.processor.LimitedCglibSubclassingInstantiationStrategy;
 import com.gitee.spring.domain.processor.LimitedRootInitializingBean;
 import com.gitee.spring.domain.processor.LimitedTypeDomainResolver;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
@@ -37,10 +38,14 @@ public class DomainConfiguration implements ApplicationContextAware {
     @Bean
     @ConditionalOnProperty(prefix = "spring.domain", name = "enable", havingValue = "true")
     public TypeDomainResolver typeDomainResolver(Environment environment) {
+        String scanPackage = environment.getProperty("spring.domain.scan");
+        if (StringUtils.isBlank(scanPackage)) {
+            throw new RuntimeException("The configuration item could not be found! name: [spring.domain.scan]");
+        }
         List<DomainConfig> domainConfigs = Binder.get(environment)
                 .bind("spring.domain.domains", Bindable.listOf(DomainConfig.class)).get();
         domainConfigs.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
-        return new LimitedTypeDomainResolver(domainConfigs);
+        return new LimitedTypeDomainResolver(scanPackage, domainConfigs);
     }
 
     @Bean

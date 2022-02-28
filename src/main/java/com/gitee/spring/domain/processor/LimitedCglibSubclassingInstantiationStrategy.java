@@ -6,7 +6,6 @@ import org.springframework.beans.factory.support.CglibSubclassingInstantiationSt
 import org.springframework.beans.factory.support.RootBeanDefinition;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Type;
 
 public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassingInstantiationStrategy {
 
@@ -14,6 +13,21 @@ public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassi
 
     @Override
     public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Constructor<?> ctor, Object... args) {
+        tryGetResolverFromContext(owner);
+        if (typeDomainResolver != null) {
+            Class<?> resolvableType = (Class<?>) bd.getResolvableType().getType();
+            if (!isSpringFrameworkInternalType(resolvableType) && typeDomainResolver.isUnderScanPackage(resolvableType)) {
+                for (Class<?> parameterType : ctor.getParameterTypes()) {
+                    if (!isSpringFrameworkInternalType(parameterType) && typeDomainResolver.isUnderScanPackage(parameterType)) {
+                        typeDomainResolver.checkDomain(resolvableType, parameterType);
+                    }
+                }
+            }
+        }
+        return super.instantiate(bd, beanName, owner, ctor, args);
+    }
+
+    protected void tryGetResolverFromContext(BeanFactory owner) {
         if (typeDomainResolver == null) {
             synchronized (this) {
                 if (typeDomainResolver == null) {
@@ -21,11 +35,10 @@ public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassi
                 }
             }
         }
-        Type resolvableType = bd.getResolvableType().getType();
-        for (Class<?> parameterType : ctor.getParameterTypes()) {
-            typeDomainResolver.checkDomain((Class<?>) resolvableType, parameterType);
-        }
-        return super.instantiate(bd, beanName, owner, ctor, args);
+    }
+
+    protected boolean isSpringFrameworkInternalType(Class<?> typeToMatch) {
+        return typeToMatch.getName().startsWith("org.springframework.");
     }
 
 }
