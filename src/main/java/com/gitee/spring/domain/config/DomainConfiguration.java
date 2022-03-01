@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.config;
 
 import com.gitee.spring.domain.api.TypeDomainResolver;
-import com.gitee.spring.domain.entity.DomainConfig;
+import com.gitee.spring.domain.entity.DomainDefinition;
 import com.gitee.spring.domain.processor.LimitedAutowiredBeanPostProcessor;
 import com.gitee.spring.domain.processor.LimitedCglibSubclassingInstantiationStrategy;
 import com.gitee.spring.domain.processor.LimitedRootInitializingBean;
@@ -42,10 +42,10 @@ public class DomainConfiguration implements ApplicationContextAware {
         if (StringUtils.isBlank(scanPackage)) {
             throw new RuntimeException("The configuration item could not be found! name: [spring.domain.scan]");
         }
-        List<DomainConfig> domainConfigs = Binder.get(environment)
-                .bind("spring.domain.domains", Bindable.listOf(DomainConfig.class)).get();
-        domainConfigs.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
-        return new LimitedTypeDomainResolver(scanPackage, domainConfigs);
+        List<DomainDefinition> domainDefinitions = Binder.get(environment)
+                .bind("spring.domain.domains", Bindable.listOf(DomainDefinition.class)).get();
+        domainDefinitions.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
+        return new LimitedTypeDomainResolver(scanPackage, domainDefinitions);
     }
 
     @Bean

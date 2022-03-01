@@ -1,12 +1,12 @@
 package com.gitee.spring.domain.api;
 
-import com.gitee.spring.domain.entity.DomainConfig;
+import com.gitee.spring.domain.entity.DomainDefinition;
 
 public interface TypeDomainResolver {
 
     boolean isUnderScanPackage(Class<?> typeToMatch);
 
-    DomainConfig resolveDomain(Class<?> typeToMatch);
+    DomainDefinition resolveDomain(Class<?> typeToMatch);
 
     void checkDomain(Class<?> targetType, Class<?> injectedType);
 
