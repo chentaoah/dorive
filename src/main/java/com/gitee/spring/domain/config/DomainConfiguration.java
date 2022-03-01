@@ -11,6 +11,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -23,6 +24,7 @@ import java.util.List;
 
 @Order(-100)
 @Configuration
+@ConditionalOnProperty(prefix = "spring.domain", name = "enable", havingValue = "true")
 public class DomainConfiguration implements BeanFactoryPostProcessor {
 
     @Override
@@ -34,7 +36,7 @@ public class DomainConfiguration implements BeanFactoryPostProcessor {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "spring.domain", name = "enable", havingValue = "true")
+    @ConditionalOnMissingClass
     public TypeDomainResolver typeDomainResolver(Environment environment) {
         String scanPackage = environment.getProperty("spring.domain.scan");
         if (StringUtils.isBlank(scanPackage)) {
@@ -47,13 +49,13 @@ public class DomainConfiguration implements BeanFactoryPostProcessor {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "spring.domain", name = "enable", havingValue = "true")
+    @ConditionalOnMissingClass
     public LimitedAutowiredBeanPostProcessor limitedAnnotationBeanPostProcessor(TypeDomainResolver typeDomainResolver) {
         return new LimitedAutowiredBeanPostProcessor(typeDomainResolver);
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "spring.domain", name = "enable", havingValue = "true")
+    @ConditionalOnMissingClass
     public LimitedRootInitializingBean limitedRootInitializingBean(TypeDomainResolver typeDomainResolver) {
         return new LimitedRootInitializingBean(typeDomainResolver);
     }
