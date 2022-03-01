@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.processor;
+package com.gitee.spring.domain.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.spring.domain.annotation.Root;
@@ -11,13 +11,13 @@ import org.springframework.util.AntPathMatcher;
 import java.util.List;
 import java.util.Objects;
 
-public class LimitedTypeDomainResolver implements TypeDomainResolver {
+public class DefaultTypeDomainResolver implements TypeDomainResolver {
 
     private final String scanPackage;
     private final List<DomainDefinition> domainDefinitions;
     private final AntPathMatcher antPathMatcher = new AntPathMatcher(".");
 
-    public LimitedTypeDomainResolver(String scanPackage, List<DomainDefinition> domainDefinitions) {
+    public DefaultTypeDomainResolver(String scanPackage, List<DomainDefinition> domainDefinitions) {
         this.scanPackage = scanPackage;
         this.domainDefinitions = domainDefinitions;
     }

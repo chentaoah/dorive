@@ -5,7 +5,7 @@ import com.gitee.spring.domain.entity.DomainDefinition;
 import com.gitee.spring.domain.processor.LimitedAutowiredBeanPostProcessor;
 import com.gitee.spring.domain.processor.LimitedCglibSubclassingInstantiationStrategy;
 import com.gitee.spring.domain.processor.LimitedRootInitializingBean;
-import com.gitee.spring.domain.processor.LimitedTypeDomainResolver;
+import com.gitee.spring.domain.impl.DefaultTypeDomainResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -45,7 +45,7 @@ public class DomainConfiguration implements ApplicationContextAware {
         List<DomainDefinition> domainDefinitions = Binder.get(environment)
                 .bind("spring.domain.domains", Bindable.listOf(DomainDefinition.class)).get();
         domainDefinitions.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
-        return new LimitedTypeDomainResolver(scanPackage, domainDefinitions);
+        return new DefaultTypeDomainResolver(scanPackage, domainDefinitions);
     }
 
     @Bean
