@@ -8,13 +8,12 @@ import com.gitee.spring.domain.processor.LimitedRootInitializingBean;
 import com.gitee.spring.domain.impl.DefaultTypeDomainResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -24,13 +23,12 @@ import java.util.List;
 
 @Order(-100)
 @Configuration
-public class DomainConfiguration implements ApplicationContextAware {
+public class DomainConfiguration implements BeanFactoryPostProcessor {
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        AutowireCapableBeanFactory autowireCapableBeanFactory = applicationContext.getAutowireCapableBeanFactory();
-        if (autowireCapableBeanFactory instanceof AbstractAutowireCapableBeanFactory) {
-            AbstractAutowireCapableBeanFactory abstractAutowireCapableBeanFactory = (AbstractAutowireCapableBeanFactory) autowireCapableBeanFactory;
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        if (beanFactory instanceof AbstractAutowireCapableBeanFactory) {
+            AbstractAutowireCapableBeanFactory abstractAutowireCapableBeanFactory = (AbstractAutowireCapableBeanFactory) beanFactory;
             abstractAutowireCapableBeanFactory.setInstantiationStrategy(new LimitedCglibSubclassingInstantiationStrategy());
         }
     }
