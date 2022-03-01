@@ -53,6 +53,14 @@ public class DefaultTypeDomainResolver implements TypeDomainResolver {
         }
     }
 
+    protected void throwInjectionException(Class<?> targetType, DomainDefinition targetDomainDefinition,
+                                           Class<?> injectedType, DomainDefinition injectedDomainDefinition) {
+        String message = String.format("Injection of autowired dependencies failed! targetType: [%s], targetDomain: [%s], injectedType: [%s], injectedDomain: [%s]",
+                targetType.getName(), targetDomainDefinition != null ? targetDomainDefinition.getName() : null,
+                injectedType.getName(), injectedDomainDefinition.getName());
+        throw new BeanCreationException(message);
+    }
+
     @Override
     public void checkDomainRoot(Class<?> targetType) {
         DomainDefinition domainDefinition = resolveDomain(targetType);
@@ -63,14 +71,6 @@ public class DefaultTypeDomainResolver implements TypeDomainResolver {
                 throw new BeanCreationException(message);
             }
         }
-    }
-
-    protected void throwInjectionException(Class<?> targetType, DomainDefinition targetDomainDefinition,
-                                           Class<?> injectedType, DomainDefinition injectedDomainDefinition) {
-        String message = String.format("Injection of autowired dependencies failed! targetType: [%s], targetDomain: [%s], injectedType: [%s], injectedDomain: [%s]",
-                targetType.getName(), targetDomainDefinition != null ? targetDomainDefinition.getName() : null,
-                injectedType.getName(), injectedDomainDefinition.getName());
-        throw new BeanCreationException(message);
     }
 
 }
