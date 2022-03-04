@@ -7,15 +7,6 @@
     <artifactId>spring-domain</artifactId>
     <version>1.0.5</version>
 
-    <!-- maven deploy -->
-    <distributionManagement>
-        <repository>
-            <id>mymirror1</id>
-            <name>jds.mirror</name>
-            <url>http://mvn.jindashi.cn/nexus/content/repositories/releases/</url>
-        </repository>
-    </distributionManagement>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
