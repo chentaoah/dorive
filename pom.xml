@@ -10,6 +10,8 @@
 
     <modules>
         <module>spring-domain-injection</module>
+        <module>spring-domain-proxy</module>
+        <module>spring-domain-starter</module>
     </modules>
 
     <properties>
