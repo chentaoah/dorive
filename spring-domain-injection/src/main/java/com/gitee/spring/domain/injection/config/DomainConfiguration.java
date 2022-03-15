@@ -1,11 +1,11 @@
-package com.gitee.spring.domain.config;
+package com.gitee.spring.domain.injection.config;
 
-import com.gitee.spring.domain.api.TypeDomainResolver;
-import com.gitee.spring.domain.entity.DomainDefinition;
-import com.gitee.spring.domain.processor.LimitedAutowiredBeanPostProcessor;
-import com.gitee.spring.domain.processor.LimitedCglibSubclassingInstantiationStrategy;
-import com.gitee.spring.domain.processor.LimitedRootInitializingBean;
-import com.gitee.spring.domain.impl.DefaultTypeDomainResolver;
+import com.gitee.spring.domain.injection.api.TypeDomainResolver;
+import com.gitee.spring.domain.injection.entity.DomainDefinition;
+import com.gitee.spring.domain.injection.processor.LimitedAutowiredBeanPostProcessor;
+import com.gitee.spring.domain.injection.processor.LimitedCglibSubclassingInstantiationStrategy;
+import com.gitee.spring.domain.injection.processor.LimitedRootInitializingBean;
+import com.gitee.spring.domain.injection.impl.DefaultTypeDomainResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;

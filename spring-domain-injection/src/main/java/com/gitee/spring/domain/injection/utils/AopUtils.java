@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.util;
+package com.gitee.spring.domain.injection.utils;
 
 import java.lang.annotation.Annotation;
 

@@ -1,8 +1,8 @@
-package com.gitee.spring.domain.processor;
+package com.gitee.spring.domain.injection.processor;
 
-import com.gitee.spring.domain.annotation.Root;
-import com.gitee.spring.domain.api.TypeDomainResolver;
-import com.gitee.spring.domain.util.AopUtils;
+import com.gitee.spring.domain.injection.annotation.Root;
+import com.gitee.spring.domain.injection.api.TypeDomainResolver;
+import com.gitee.spring.domain.injection.utils.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;

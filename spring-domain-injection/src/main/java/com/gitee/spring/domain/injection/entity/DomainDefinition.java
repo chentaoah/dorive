@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.entity;
+package com.gitee.spring.domain.injection.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

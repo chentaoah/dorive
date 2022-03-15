@@ -1,6 +1,6 @@
-package com.gitee.spring.domain.api;
+package com.gitee.spring.domain.injection.api;
 
-import com.gitee.spring.domain.entity.DomainDefinition;
+import com.gitee.spring.domain.injection.entity.DomainDefinition;
 
 public interface TypeDomainResolver {
 

@@ -1,6 +1,6 @@
-package com.gitee.spring.domain.processor;
+package com.gitee.spring.domain.injection.processor;
 
-import com.gitee.spring.domain.api.TypeDomainResolver;
+import com.gitee.spring.domain.injection.api.TypeDomainResolver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;

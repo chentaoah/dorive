@@ -1,9 +1,9 @@
-package com.gitee.spring.domain.impl;
+package com.gitee.spring.domain.injection.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.spring.domain.annotation.Root;
-import com.gitee.spring.domain.api.TypeDomainResolver;
-import com.gitee.spring.domain.entity.DomainDefinition;
+import com.gitee.spring.domain.injection.annotation.Root;
+import com.gitee.spring.domain.injection.api.TypeDomainResolver;
+import com.gitee.spring.domain.injection.entity.DomainDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.util.AntPathMatcher;

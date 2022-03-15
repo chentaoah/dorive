@@ -1,6 +1,6 @@
-package com.gitee.spring.domain.processor;
+package com.gitee.spring.domain.injection.processor;
 
-import com.gitee.spring.domain.api.TypeDomainResolver;
+import com.gitee.spring.domain.injection.api.TypeDomainResolver;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.RootBeanDefinition;
