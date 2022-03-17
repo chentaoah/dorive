@@ -9,4 +9,10 @@
         <version>1.0.5</version>
     </parent>
     <artifactId>spring-domain-starter</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>spring-boot-starter-domain</module>
+    </modules>
+
 </project>
