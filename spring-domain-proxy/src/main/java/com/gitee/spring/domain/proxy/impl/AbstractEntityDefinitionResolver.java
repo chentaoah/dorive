@@ -3,6 +3,7 @@ package com.gitee.spring.domain.proxy.impl;
 import com.gitee.spring.domain.proxy.annotation.DomainEntity;
 import com.gitee.spring.domain.proxy.api.EntityAssembler;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
+import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
 import com.gitee.spring.domain.proxy.utils.ReflectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -25,6 +26,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
     protected ApplicationContext applicationContext;
     protected Class<?> entityClass;
     protected Constructor<?> constructor;
+    protected Map<String, EntityPropertyChain> entityPropertyChainMap = new LinkedHashMap<>();
     protected EntityDefinition rootEntityDefinition;
     protected Map<String, EntityDefinition> entityDefinitionMap = new LinkedHashMap<>();
 
@@ -39,27 +41,44 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         Type actualTypeArgument = ((ParameterizedType) Objects.requireNonNull(targetType)).getActualTypeArguments()[0];
         entityClass = (Class<?>) actualTypeArgument;
         constructor = ReflectUtils.getConstructor(entityClass, null);
-        visitEntityClass(entityClass, "/");
+        visitEntityClass(null, entityClass, "/");
+        entityDefinitionMap.values().forEach(entityDefinition -> {
+            EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
+            entityPropertyChain.newEntityProperty();
+        });
     }
 
-    protected void visitEntityClass(Class<?> entityClass, String accessPath) {
+    protected void visitEntityClass(Class<?> lastEntityClass, Class<?> entityClass, String accessPath) {
+        EntityPropertyChain entityPropertyChain = newEntityPropertyChain(lastEntityClass, entityClass, accessPath);
+
         AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(entityClass, DomainEntity.class);
         if (attributes != null) {
-            EntityDefinition entityDefinition = newEntityDefinition(entityClass, accessPath, attributes);
-            if ("/".equals(accessPath)) {
+            EntityDefinition entityDefinition = newEntityDefinition(entityPropertyChain, attributes);
+            if (lastEntityClass == null) {
                 rootEntityDefinition = entityDefinition;
             } else {
                 entityDefinitionMap.put(accessPath, entityDefinition);
             }
         }
+
         ReflectionUtils.doWithLocalFields(entityClass, field -> {
             Class<?> fieldEntityClass = field.getDeclaringClass();
             String newAccessPath = "/".equals(accessPath) ? accessPath + field.getName() : accessPath + "/" + field.getName();
-            visitEntityClass(fieldEntityClass, newAccessPath);
+            visitEntityClass(entityClass, fieldEntityClass, newAccessPath);
         });
     }
 
-    protected EntityDefinition newEntityDefinition(Class<?> entityClass, String accessPath, AnnotationAttributes attributes) {
+    protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass, Class<?> entityClass, String accessPath) {
+        if (lastEntityClass != null) {
+            String lastAccessPath = accessPath.substring(0, accessPath.lastIndexOf("/"));
+            EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
+            EntityPropertyChain entityPropertyChain = new EntityPropertyChain(lastEntityClass, entityClass, accessPath, lastEntityPropertyChain, null);
+            entityPropertyChainMap.put(accessPath, entityPropertyChain);
+        }
+        return null;
+    }
+
+    protected EntityDefinition newEntityDefinition(EntityPropertyChain entityPropertyChain, AnnotationAttributes attributes) {
         String name = attributes.getString("name");
         Class<?> assemblerClass = attributes.getClass("assembler");
         EntityAssembler entityAssembler;
@@ -68,12 +87,14 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         } else {
             entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
         }
+
         Class<?> mapperClass = attributes.getClass("mapper");
         Object mapper = null;
         if (mapperClass != Object.class) {
             mapper = applicationContext.getBean(mapperClass);
         }
-        return new EntityDefinition(entityClass, accessPath, attributes, null, entityAssembler, mapper);
+
+        return new EntityDefinition(entityPropertyChain, attributes, entityAssembler, mapper);
     }
 
     protected abstract Class<?> getTargetClass();

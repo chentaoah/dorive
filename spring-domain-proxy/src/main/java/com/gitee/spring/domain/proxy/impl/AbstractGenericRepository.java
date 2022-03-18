@@ -1,11 +1,12 @@
 package com.gitee.spring.domain.proxy.impl;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.proxy.api.EntityAccessor;
 import com.gitee.spring.domain.proxy.api.EntityAssembler;
+import com.gitee.spring.domain.proxy.api.EntityProperty;
 import com.gitee.spring.domain.proxy.api.IRepository;
 import com.gitee.spring.domain.proxy.entity.BoundedContext;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
+import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
 import com.gitee.spring.domain.proxy.utils.ReflectUtils;
 
 public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDefinitionResolver implements IRepository<E, PK> {
@@ -32,12 +33,17 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
         }
         if (rootEntity != null) {
             for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
-                EntityAccessor entityAccessor = entityDefinition.getEntityAccessor();
-                if (entityAccessor.checkRouteNull(rootEntity)) {
-                    EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
-                    Object entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, primaryKey);
-                    if (entity != null) {
-                        entityAccessor.setValue(rootEntity, entity);
+                EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
+                EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityProperty();
+                if (lastEntityProperty != null) {
+                    Object lastEntity = lastEntityProperty.getValue(rootEntity);
+                    if (lastEntity != null) {
+                        EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
+                        Object entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, primaryKey);
+                        if (entity != null) {
+                            EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
+                            entityProperty.setValue(rootEntity, entity);
+                        }
                     }
                 }
             }
@@ -61,9 +67,10 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
             }
         }
         for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
-            EntityAccessor entityAccessor = entityDefinition.getEntityAccessor();
-            if (entityAccessor.checkRouteNull(entity)) {
-                Object accessEntity = entityAccessor.getValue(entity);
+            EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
+            EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
+            Object accessEntity = entityProperty.getValue(entity);
+            if (accessEntity != null) {
                 EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
                 Object persistentObject = entityAssembler.disassemble(boundedContext, entity, entityDefinition, accessEntity);
                 if (persistentObject != null) {
