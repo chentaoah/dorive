@@ -1,13 +1,17 @@
 package com.gitee.spring.domain.proxy.api;
 
+import com.gitee.spring.domain.proxy.entity.BoundedContext;
+
 public interface IRepository<E, PK> {
+
+    E findByPrimaryKey(BoundedContext boundedContext, PK primaryKey);
 
     E findByPrimaryKey(PK primaryKey);
 
-    boolean insert(E entity);
+    void insert(E entity);
 
-    boolean update(E entity);
+    void update(E entity);
 
-    boolean delete(E entity);
+    void delete(E entity);
 
 }
