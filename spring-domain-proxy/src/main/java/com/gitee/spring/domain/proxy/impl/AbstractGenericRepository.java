@@ -31,17 +31,13 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
             rootEntity = newInstance(boundedContext, primaryKey);
         }
         if (rootEntity != null) {
-            String ignorePath = null;
             for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
-                String accessPath = entityDefinition.getAccessPath();
-                if (ignorePath == null || !accessPath.startsWith(ignorePath)) {
+                EntityAccessor entityAccessor = entityDefinition.getEntityAccessor();
+                if (entityAccessor.checkRouteNull(rootEntity)) {
                     EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
                     Object entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, primaryKey);
                     if (entity != null) {
-                        EntityAccessor entityAccessor = entityDefinition.getEntityAccessor();
                         entityAccessor.setValue(rootEntity, entity);
-                    } else {
-                        ignorePath = accessPath + "/";
                     }
                 }
             }
@@ -58,31 +54,23 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
         Assert.notNull(entity, "The entity cannot be null!");
         BoundedContext boundedContext = new BoundedContext();
         if (rootEntityDefinition != null) {
-            doHandleEntity(boundedContext, entity, rootEntityDefinition, consumer);
+            EntityAssembler entityAssembler = rootEntityDefinition.getEntityAssembler();
+            Object persistentObject = entityAssembler.disassemble(boundedContext, entity, rootEntityDefinition, entity);
+            if (persistentObject != null) {
+                consumer.accept(rootEntityDefinition.getMapper(), persistentObject);
+            }
         }
-        String ignorePath = null;
         for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
-            String accessPath = entityDefinition.getAccessPath();
-            if (ignorePath == null || !accessPath.startsWith(ignorePath)) {
-                if (!doHandleEntity(boundedContext, entity, entityDefinition, consumer)) {
-                    ignorePath = accessPath + "/";
+            EntityAccessor entityAccessor = entityDefinition.getEntityAccessor();
+            if (entityAccessor.checkRouteNull(entity)) {
+                Object accessEntity = entityAccessor.getValue(entity);
+                EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
+                Object persistentObject = entityAssembler.disassemble(boundedContext, entity, entityDefinition, accessEntity);
+                if (persistentObject != null) {
+                    consumer.accept(entityDefinition.getMapper(), persistentObject);
                 }
             }
         }
-    }
-
-    protected boolean doHandleEntity(BoundedContext boundedContext, E rootEntity, EntityDefinition entityDefinition, Consumer consumer) {
-        EntityAccessor entityAccessor = entityDefinition.getEntityAccessor();
-        Object entity = entityAccessor.getValue(rootEntity);
-        if (entity == null) {
-            return false;
-        }
-        EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
-        Object persistentObject = entityAssembler.disassemble(boundedContext, rootEntity, entityDefinition, entity);
-        if (persistentObject != null) {
-            consumer.accept(entityDefinition.getMapper(), persistentObject);
-        }
-        return true;
     }
 
     @Override
