@@ -17,9 +17,7 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public abstract class AbstractEntityDefinitionResolver implements ApplicationContextAware, InitializingBean {
 
@@ -59,11 +57,13 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                 entityDefinitionMap.put(accessPath, entityDefinition);
             }
         }
-        ReflectionUtils.doWithLocalFields(entityClass, field -> {
-            Class<?> fieldEntityClass = field.getDeclaringClass();
-            String newAccessPath = "/".equals(accessPath) ? accessPath + field.getName() : accessPath + "/" + field.getName();
-            visitEntityClass(entityClass, fieldEntityClass, newAccessPath, field.getName());
-        });
+        if (!filterEntityClass(entityClass)) {
+            ReflectionUtils.doWithLocalFields(entityClass, field -> {
+                Class<?> fieldEntityClass = field.getDeclaringClass();
+                String newAccessPath = "/".equals(accessPath) ? accessPath + field.getName() : accessPath + "/" + field.getName();
+                visitEntityClass(entityClass, fieldEntityClass, newAccessPath, field.getName());
+            });
+        }
     }
 
     protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass, Class<?> entityClass, String accessPath, String fieldName) {
@@ -84,14 +84,16 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         } else {
             entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
         }
-
         Class<?> mapperClass = attributes.getClass("mapper");
         Object mapper = null;
         if (mapperClass != Object.class) {
             mapper = applicationContext.getBean(mapperClass);
         }
-
         return new EntityDefinition(entityPropertyChain, attributes, entityAssembler, mapper);
+    }
+
+    protected boolean filterEntityClass(Class<?> entityClass) {
+        return Collection.class.isAssignableFrom(entityClass) || Map.class.isAssignableFrom(entityClass);
     }
 
     protected abstract Class<?> getTargetClass();
