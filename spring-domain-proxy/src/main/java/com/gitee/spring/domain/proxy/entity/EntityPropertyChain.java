@@ -11,16 +11,25 @@ public class EntityPropertyChain implements EntityProperty {
     private Class<?> lastEntityClass;
     private Class<?> entityClass;
     private String accessPath;
+    private String fieldName;
     private EntityProperty lastEntityProperty;
     private EntityProperty entityProperty;
 
-    public void newEntityProperty() {
-        if (lastEntityProperty instanceof EntityPropertyChain) {
-            ((EntityPropertyChain) lastEntityProperty).newEntityProperty();
-        }
+    public void initialize() {
         if (entityProperty == null) {
-            entityProperty = EntityPropertyFactory.newEntityProperty(lastEntityClass, entityClass);
+            entityProperty = EntityPropertyFactory.newEntityProperty(lastEntityClass, entityClass, fieldName);
+            if (lastEntityProperty instanceof EntityPropertyChain) {
+                ((EntityPropertyChain) lastEntityProperty).initialize();
+            }
         }
+    }
+
+    @Override
+    public Object getValue(Object entity) {
+        if (lastEntityProperty != null) {
+            entity = lastEntityProperty.getValue(entity);
+        }
+        return entity != null ? entityProperty.getValue(entity) : null;
     }
 
     @Override
@@ -33,11 +42,4 @@ public class EntityPropertyChain implements EntityProperty {
         }
     }
 
-    @Override
-    public Object getValue(Object entity) {
-        if (lastEntityProperty != null) {
-            entity = lastEntityProperty.getValue(entity);
-        }
-        return entity != null ? entityProperty.getValue(entity) : null;
-    }
 }

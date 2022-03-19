@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
-public @interface DomainEntity {
+public @interface Entity {
 
     @AliasFor("assembler")
     Class<?> value() default Object.class;

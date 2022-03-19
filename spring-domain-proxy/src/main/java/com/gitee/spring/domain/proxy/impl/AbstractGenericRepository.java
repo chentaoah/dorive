@@ -31,20 +31,19 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
         } else {
             rootEntity = newInstance(boundedContext, primaryKey);
         }
-        if (rootEntity != null) {
-            for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
-                EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
-                EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityProperty();
-                if (lastEntityProperty != null) {
-                    Object lastEntity = lastEntityProperty.getValue(rootEntity);
-                    if (lastEntity != null) {
-                        EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
-                        Object entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, primaryKey);
-                        if (entity != null) {
-                            EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
-                            entityProperty.setValue(rootEntity, entity);
-                        }
-                    }
+        if (rootEntity == null) {
+            return null;
+        }
+        for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
+            EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
+            EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityProperty();
+            Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
+            if (lastEntity != null) {
+                EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
+                Object entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, primaryKey);
+                if (entity != null) {
+                    EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
+                    entityProperty.setValue(rootEntity, entity);
                 }
             }
         }
@@ -102,7 +101,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
     protected abstract void doDelete(Object mapper, Object persistentObject);
 
     public interface Consumer {
-        void accept(Object target, Object param);
+        void accept(Object mapper, Object persistentObject);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.proxy.impl;
 
-import com.gitee.spring.domain.proxy.annotation.DomainEntity;
+import com.gitee.spring.domain.proxy.annotation.Entity;
 import com.gitee.spring.domain.proxy.api.EntityAssembler;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
@@ -41,17 +41,16 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         Type actualTypeArgument = ((ParameterizedType) Objects.requireNonNull(targetType)).getActualTypeArguments()[0];
         entityClass = (Class<?>) actualTypeArgument;
         constructor = ReflectUtils.getConstructor(entityClass, null);
-        visitEntityClass(null, entityClass, "/");
+        visitEntityClass(null, entityClass, "/", null);
         entityDefinitionMap.values().forEach(entityDefinition -> {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
-            entityPropertyChain.newEntityProperty();
+            entityPropertyChain.initialize();
         });
     }
 
-    protected void visitEntityClass(Class<?> lastEntityClass, Class<?> entityClass, String accessPath) {
-        EntityPropertyChain entityPropertyChain = newEntityPropertyChain(lastEntityClass, entityClass, accessPath);
-
-        AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(entityClass, DomainEntity.class);
+    protected void visitEntityClass(Class<?> lastEntityClass, Class<?> entityClass, String accessPath, String fieldName) {
+        EntityPropertyChain entityPropertyChain = newEntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName);
+        AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(entityClass, Entity.class);
         if (attributes != null) {
             EntityDefinition entityDefinition = newEntityDefinition(entityPropertyChain, attributes);
             if (lastEntityClass == null) {
@@ -60,22 +59,20 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                 entityDefinitionMap.put(accessPath, entityDefinition);
             }
         }
-
         ReflectionUtils.doWithLocalFields(entityClass, field -> {
             Class<?> fieldEntityClass = field.getDeclaringClass();
             String newAccessPath = "/".equals(accessPath) ? accessPath + field.getName() : accessPath + "/" + field.getName();
-            visitEntityClass(entityClass, fieldEntityClass, newAccessPath);
+            visitEntityClass(entityClass, fieldEntityClass, newAccessPath, field.getName());
         });
     }
 
-    protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass, Class<?> entityClass, String accessPath) {
-        if (lastEntityClass != null) {
-            String lastAccessPath = accessPath.substring(0, accessPath.lastIndexOf("/"));
-            EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
-            EntityPropertyChain entityPropertyChain = new EntityPropertyChain(lastEntityClass, entityClass, accessPath, lastEntityPropertyChain, null);
-            entityPropertyChainMap.put(accessPath, entityPropertyChain);
-        }
-        return null;
+    protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass, Class<?> entityClass, String accessPath, String fieldName) {
+        if (lastEntityClass == null) return null;
+        String lastAccessPath = accessPath.substring(0, accessPath.lastIndexOf("/"));
+        EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
+        EntityPropertyChain entityPropertyChain = new EntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName, lastEntityPropertyChain, null);
+        entityPropertyChainMap.put(accessPath, entityPropertyChain);
+        return entityPropertyChain;
     }
 
     protected EntityDefinition newEntityDefinition(EntityPropertyChain entityPropertyChain, AnnotationAttributes attributes) {
