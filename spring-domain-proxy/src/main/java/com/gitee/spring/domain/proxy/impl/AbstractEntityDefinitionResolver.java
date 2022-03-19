@@ -68,7 +68,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
 
     protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass, Class<?> entityClass, String accessPath, String fieldName) {
         if (lastEntityClass == null) return null;
-        String lastAccessPath = accessPath.substring(0, accessPath.lastIndexOf("/"));
+        String lastAccessPath = accessPath.lastIndexOf("/") > 0 ? accessPath.substring(0, accessPath.lastIndexOf("/")) : "/";
         EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
         EntityPropertyChain entityPropertyChain = new EntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName, lastEntityPropertyChain, null);
         entityPropertyChainMap.put(accessPath, entityPropertyChain);
