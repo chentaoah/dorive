@@ -1,11 +1,11 @@
 package com.gitee.spring.domain.proxy.impl;
 
+import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.proxy.annotation.Entity;
 import com.gitee.spring.domain.proxy.api.EntityAssembler;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
 import com.gitee.spring.domain.proxy.utils.ReflectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -17,9 +17,17 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.*;
 
 public abstract class AbstractEntityDefinitionResolver implements ApplicationContextAware, InitializingBean {
+
+    public static final String MAPPER_ATTRIBUTES = "mapper";
+    public static final String MANY_TO_ONE_ATTRIBUTES = "manyToOne";
+    public static final String USE_CONTEXT_ATTRIBUTES = "useContext";
+    public static final String QUERY_FIELD_ATTRIBUTES = "queryField";
+    public static final String QUERY_VALUE_ATTRIBUTES = "queryValue";
+    public static final String ASSEMBLER_ATTRIBUTES = "assembler";
 
     protected ApplicationContext applicationContext;
     protected Class<?> entityClass;
@@ -43,6 +51,8 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         entityDefinitionMap.values().forEach(entityDefinition -> {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             entityPropertyChain.initialize();
+            EntityPropertyChain queryValueEntityPropertyChain = entityDefinition.getQueryValueEntityPropertyChain();
+            queryValueEntityPropertyChain.initialize();
         });
     }
 
@@ -50,7 +60,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         EntityPropertyChain entityPropertyChain = newEntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName);
         AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(entityClass, Entity.class);
         if (attributes != null) {
-            EntityDefinition entityDefinition = newEntityDefinition(entityPropertyChain, attributes);
+            EntityDefinition entityDefinition = newEntityDefinition(entityPropertyChain, entityClass, attributes);
             if (lastEntityClass == null) {
                 rootEntityDefinition = entityDefinition;
             } else {
@@ -75,25 +85,35 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         return entityPropertyChain;
     }
 
-    protected EntityDefinition newEntityDefinition(EntityPropertyChain entityPropertyChain, AnnotationAttributes attributes) {
-        String name = attributes.getString("name");
-        Class<?> assemblerClass = attributes.getClass("assembler");
-        EntityAssembler entityAssembler;
-        if (StringUtils.isNotBlank(name)) {
-            entityAssembler = (EntityAssembler) applicationContext.getBean(name);
-        } else {
-            entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
+    protected EntityDefinition newEntityDefinition(EntityPropertyChain entityPropertyChain, Class<?> entityClass, AnnotationAttributes attributes) {
+        Class<?> mapperClass = attributes.getClass(MAPPER_ATTRIBUTES);
+        Object mapper = applicationContext.getBean(mapperClass);
+        Class<?> pojoClass = null;
+        TypeVariable<? extends Class<?>>[] typeVariables = mapperClass.getTypeParameters();
+        if (typeVariables.length > 0) {
+            pojoClass = typeVariables[0].getGenericDeclaration();
         }
-        Class<?> mapperClass = attributes.getClass("mapper");
-        Object mapper = null;
-        if (mapperClass != Object.class) {
-            mapper = applicationContext.getBean(mapperClass);
+
+        if (Collection.class.isAssignableFrom(entityClass) || Map.class.isAssignableFrom(entityClass)) {
+            attributes.put(MANY_TO_ONE_ATTRIBUTES, true);
         }
-        return new EntityDefinition(entityPropertyChain, attributes, entityAssembler, mapper);
+
+        EntityPropertyChain queryValueEntityPropertyChain = null;
+        if (entityPropertyChain != null && !attributes.getBoolean(USE_CONTEXT_ATTRIBUTES)) {
+            String queryValue = attributes.getString(QUERY_VALUE_ATTRIBUTES);
+            queryValueEntityPropertyChain = entityPropertyChainMap.get(queryValue);
+            Assert.notNull(queryValueEntityPropertyChain, "Query value location not available!");
+        }
+
+        Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTES);
+        EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
+
+        return new EntityDefinition(entityPropertyChain, entityClass, attributes, mapper, pojoClass, queryValueEntityPropertyChain, entityAssembler);
     }
 
     protected boolean filterEntityClass(Class<?> entityClass) {
-        return Collection.class.isAssignableFrom(entityClass) || Map.class.isAssignableFrom(entityClass);
+        String className = entityClass.getName();
+        return className.startsWith("java.lang.") || className.startsWith("java.util.");
     }
 
     protected abstract Class<?> getTargetClass();

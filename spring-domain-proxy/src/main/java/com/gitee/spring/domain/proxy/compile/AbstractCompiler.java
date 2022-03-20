@@ -50,7 +50,7 @@ public abstract class AbstractCompiler implements MyCompiler {
         String className = pkg != null && pkg.length() > 0 ? pkg + "." + cls : cls;
         try {
             return Class.forName(className, true, ClassLoaderUtils.getCallerClassLoader(getClass()));
-            
+
         } catch (ClassNotFoundException e) {
             if (!code.endsWith("}")) {
                 throw new IllegalStateException("The java code not endsWith \"}\", code: \n" + code + "\n");

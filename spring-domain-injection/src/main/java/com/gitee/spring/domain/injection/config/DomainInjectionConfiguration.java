@@ -25,7 +25,7 @@ import java.util.List;
 @Order(-100)
 @Configuration
 @ConditionalOnProperty(prefix = "spring.domain", name = "enable", havingValue = "true")
-public class DomainConfiguration implements BeanFactoryPostProcessor {
+public class DomainInjectionConfiguration implements BeanFactoryPostProcessor {
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {

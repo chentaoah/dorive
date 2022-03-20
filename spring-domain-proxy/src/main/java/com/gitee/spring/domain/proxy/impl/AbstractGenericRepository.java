@@ -8,6 +8,7 @@ import com.gitee.spring.domain.proxy.entity.BoundedContext;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
 import com.gitee.spring.domain.proxy.utils.ReflectUtils;
+import org.springframework.core.annotation.AnnotationAttributes;
 
 public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDefinitionResolver implements IRepository<E, PK> {
 
@@ -16,18 +17,16 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
         return AbstractGenericRepository.class;
     }
 
-    @SuppressWarnings("unchecked")
-    protected E newInstance(BoundedContext boundedContext, PK primaryKey) {
-        return (E) ReflectUtils.newInstance(constructor, null);
-    }
-
     @Override
     @SuppressWarnings("unchecked")
     public E findByPrimaryKey(BoundedContext boundedContext, PK primaryKey) {
-        E rootEntity;
+        E rootEntity = null;
         if (rootEntityDefinition != null) {
-            EntityAssembler entityAssembler = rootEntityDefinition.getEntityAssembler();
-            rootEntity = (E) entityAssembler.assemble(boundedContext, null, rootEntityDefinition, primaryKey);
+            Object persistentObject = doSelectByPrimaryKey(rootEntityDefinition.getMapper(), boundedContext, primaryKey);
+            if (persistentObject != null) {
+                EntityAssembler entityAssembler = rootEntityDefinition.getEntityAssembler();
+                rootEntity = (E) entityAssembler.assemble(boundedContext, null, rootEntityDefinition, persistentObject);
+            }
         } else {
             rootEntity = newInstance(boundedContext, primaryKey);
         }
@@ -39,20 +38,55 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
             EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityProperty();
             Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
             if (lastEntity != null) {
-                EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
-                Object entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, primaryKey);
-                if (entity != null) {
-                    EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
-                    entityProperty.setValue(rootEntity, entity);
+                AnnotationAttributes attributes = entityDefinition.getAttributes();
+                Object persistentObject = null;
+                if (attributes.getBoolean(USE_CONTEXT_ATTRIBUTES)) {
+                    persistentObject = doSelectByContext(entityDefinition.getMapper(), boundedContext,
+                            attributes.getBoolean(MANY_TO_ONE_ATTRIBUTES));
+                } else {
+                    EntityPropertyChain queryValueEntityPropertyChain = entityDefinition.getQueryValueEntityPropertyChain();
+                    Object queryValue = queryValueEntityPropertyChain.getValue(rootEntity);
+                    if (queryValue != null) {
+                        persistentObject = doSelectByQueryField(entityDefinition.getMapper(), boundedContext,
+                                attributes.getBoolean(MANY_TO_ONE_ATTRIBUTES), attributes.getString(QUERY_FIELD_ATTRIBUTES), queryValue);
+                    }
+                }
+                if (persistentObject != null) {
+                    EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
+                    Object entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObject);
+                    if (entity != null) {
+                        EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
+                        entityProperty.setValue(rootEntity, entity);
+                    }
                 }
             }
         }
         return rootEntity;
     }
 
+    @SuppressWarnings("unchecked")
+    protected E newInstance(BoundedContext boundedContext, PK primaryKey) {
+        return (E) ReflectUtils.newInstance(constructor, null);
+    }
+
     @Override
     public E findByPrimaryKey(PK primaryKey) {
         return findByPrimaryKey(new BoundedContext(), primaryKey);
+    }
+
+    @Override
+    public void insert(E entity) {
+        handleEntity(entity, this::doInsert);
+    }
+
+    @Override
+    public void update(E entity) {
+        handleEntity(entity, this::doUpdate);
+    }
+
+    @Override
+    public void delete(E entity) {
+        handleEntity(entity, this::doDelete);
     }
 
     protected void handleEntity(E entity, Consumer consumer) {
@@ -79,20 +113,11 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
         }
     }
 
-    @Override
-    public void insert(E entity) {
-        handleEntity(entity, this::doInsert);
-    }
+    protected abstract Object doSelectByPrimaryKey(Object mapper, BoundedContext boundedContext, PK primaryKey);
 
-    @Override
-    public void update(E entity) {
-        handleEntity(entity, this::doUpdate);
-    }
+    protected abstract Object doSelectByContext(Object mapper, BoundedContext boundedContext, boolean manyToOne);
 
-    @Override
-    public void delete(E entity) {
-        handleEntity(entity, this::doDelete);
-    }
+    protected abstract Object doSelectByQueryField(Object mapper, BoundedContext boundedContext, boolean manyToOne, String queryField, Object queryValue);
 
     protected abstract void doInsert(Object mapper, Object persistentObject);
 

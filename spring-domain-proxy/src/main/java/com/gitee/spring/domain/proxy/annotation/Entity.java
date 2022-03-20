@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.proxy.annotation;
 
-import org.springframework.core.annotation.AliasFor;
+import com.gitee.spring.domain.proxy.api.EntityAssembler;
 
 import java.lang.annotation.*;
 
@@ -10,15 +10,17 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Entity {
 
-    @AliasFor("assembler")
-    Class<?> value() default Object.class;
+    Class<?> mapper();
 
-    String name() default "";
+    boolean manyToOne() default false;
 
-    @AliasFor("value")
-    Class<?> assembler() default Object.class;
+    boolean userContext() default false;
 
-    Class<?> mapper() default Object.class;
+    String queryField() default "relationId";
+
+    String queryValue() default "/id";
+
+    Class<?> assembler() default EntityAssembler.class;
 
 }
 

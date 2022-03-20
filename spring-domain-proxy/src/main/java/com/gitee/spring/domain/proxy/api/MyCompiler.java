@@ -18,13 +18,13 @@ package com.gitee.spring.domain.proxy.api;
 
 public interface MyCompiler {
 
-	/**
-	 * Compile java source code.
-	 *
-	 * @param code        Java source code
-	 * @param classLoader classloader
-	 * @return Compiled class
-	 */
-	Class<?> compile(String code, ClassLoader classLoader);
+    /**
+     * Compile java source code.
+     *
+     * @param code        Java source code
+     * @param classLoader classloader
+     * @return Compiled class
+     */
+    Class<?> compile(String code, ClassLoader classLoader);
 
 }
