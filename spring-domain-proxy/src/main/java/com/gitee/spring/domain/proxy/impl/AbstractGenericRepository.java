@@ -7,6 +7,7 @@ import com.gitee.spring.domain.proxy.api.IRepository;
 import com.gitee.spring.domain.proxy.entity.BoundedContext;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
+import com.gitee.spring.domain.proxy.entity.RepositoryContext;
 import com.gitee.spring.domain.proxy.utils.ReflectUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
 
@@ -32,6 +33,11 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
         }
         if (rootEntity == null) {
             return null;
+        }
+        if (rootEntity instanceof RepositoryContext) {
+            RepositoryContext repositoryContext = (RepositoryContext) rootEntity;
+            repositoryContext.setRepository(this);
+            repositoryContext.setBoundedContext(boundedContext);
         }
         for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
