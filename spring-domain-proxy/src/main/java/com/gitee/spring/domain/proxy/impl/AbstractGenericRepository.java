@@ -75,28 +75,42 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
     }
 
     @Override
+    public void insert(BoundedContext boundedContext, E entity) {
+        handleEntity(boundedContext, entity, this::doInsert);
+    }
+
+    @Override
     public void insert(E entity) {
-        handleEntity(entity, this::doInsert);
+        insert(new BoundedContext(), entity);
+    }
+
+    @Override
+    public void update(BoundedContext boundedContext, E entity) {
+        handleEntity(boundedContext, entity, this::doUpdate);
     }
 
     @Override
     public void update(E entity) {
-        handleEntity(entity, this::doUpdate);
+        update(new BoundedContext(), entity);
+    }
+
+    @Override
+    public void delete(BoundedContext boundedContext, E entity) {
+        handleEntity(boundedContext, entity, this::doDelete);
     }
 
     @Override
     public void delete(E entity) {
-        handleEntity(entity, this::doDelete);
+        delete(new BoundedContext(), entity);
     }
 
-    protected void handleEntity(E entity, Consumer consumer) {
+    protected void handleEntity(BoundedContext boundedContext, E entity, Consumer consumer) {
         Assert.notNull(entity, "The entity cannot be null!");
-        BoundedContext boundedContext = new BoundedContext();
         if (rootEntityDefinition != null) {
             EntityAssembler entityAssembler = rootEntityDefinition.getEntityAssembler();
             Object persistentObject = entityAssembler.disassemble(boundedContext, entity, rootEntityDefinition, entity);
             if (persistentObject != null) {
-                consumer.accept(rootEntityDefinition.getMapper(), persistentObject);
+                consumer.accept(rootEntityDefinition.getMapper(), boundedContext, persistentObject);
             }
         }
         for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
@@ -107,7 +121,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
                 EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
                 Object persistentObject = entityAssembler.disassemble(boundedContext, entity, entityDefinition, accessEntity);
                 if (persistentObject != null) {
-                    consumer.accept(entityDefinition.getMapper(), persistentObject);
+                    consumer.accept(entityDefinition.getMapper(), boundedContext, persistentObject);
                 }
             }
         }
@@ -119,14 +133,14 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
 
     protected abstract Object doSelectByQueryField(Object mapper, BoundedContext boundedContext, boolean manyToOne, String queryField, Object queryValue);
 
-    protected abstract void doInsert(Object mapper, Object persistentObject);
+    protected abstract void doInsert(Object mapper, BoundedContext boundedContext, Object persistentObject);
 
-    protected abstract void doUpdate(Object mapper, Object persistentObject);
+    protected abstract void doUpdate(Object mapper, BoundedContext boundedContext, Object persistentObject);
 
-    protected abstract void doDelete(Object mapper, Object persistentObject);
+    protected abstract void doDelete(Object mapper, BoundedContext boundedContext, Object persistentObject);
 
     public interface Consumer {
-        void accept(Object mapper, Object persistentObject);
+        void accept(Object mapper, BoundedContext boundedContext, Object persistentObject);
     }
 
 }

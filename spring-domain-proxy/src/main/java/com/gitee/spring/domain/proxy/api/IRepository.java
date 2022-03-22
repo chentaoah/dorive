@@ -8,9 +8,15 @@ public interface IRepository<E, PK> {
 
     E findByPrimaryKey(PK primaryKey);
 
+    void insert(BoundedContext boundedContext, E entity);
+
     void insert(E entity);
 
+    void update(BoundedContext boundedContext, E entity);
+
     void update(E entity);
+
+    void delete(BoundedContext boundedContext, E entity);
 
     void delete(E entity);
 
