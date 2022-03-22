@@ -87,7 +87,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
 
     @Override
     public void insert(E entity) {
-        insert(new BoundedContext(), entity);
+        insert(getBoundedContext(entity), entity);
     }
 
     @Override
@@ -97,7 +97,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
 
     @Override
     public void update(E entity) {
-        update(new BoundedContext(), entity);
+        update(getBoundedContext(entity), entity);
     }
 
     @Override
@@ -107,7 +107,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
 
     @Override
     public void delete(E entity) {
-        delete(new BoundedContext(), entity);
+        delete(getBoundedContext(entity), entity);
     }
 
     protected void handleEntity(BoundedContext boundedContext, E entity, Consumer consumer) {
@@ -130,6 +130,14 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
                     consumer.accept(entityDefinition.getMapper(), boundedContext, persistentObject);
                 }
             }
+        }
+    }
+
+    protected BoundedContext getBoundedContext(E entity) {
+        if (entity instanceof RepositoryContext) {
+            return ((RepositoryContext) entity).getBoundedContext();
+        } else {
+            return new BoundedContext();
         }
     }
 
