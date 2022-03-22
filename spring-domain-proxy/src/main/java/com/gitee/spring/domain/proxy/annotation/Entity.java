@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.proxy.annotation;
 
-import com.gitee.spring.domain.proxy.api.EntityAssembler;
+import com.gitee.spring.domain.proxy.impl.DefaultEntityAssembler;
 
 import java.lang.annotation.*;
 
@@ -20,7 +20,7 @@ public @interface Entity {
 
     String queryValue() default "/id";
 
-    Class<?> assembler() default EntityAssembler.class;
+    Class<?> assembler() default DefaultEntityAssembler.class;
 
 }
 
