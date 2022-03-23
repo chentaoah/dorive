@@ -3,7 +3,6 @@ package com.gitee.spring.domain.proxy.impl;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.proxy.api.EntityAssembler;
 import com.gitee.spring.domain.proxy.api.EntityProperty;
-import com.gitee.spring.domain.proxy.api.IRepository;
 import com.gitee.spring.domain.proxy.entity.BoundedContext;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
@@ -11,12 +10,10 @@ import com.gitee.spring.domain.proxy.entity.RepositoryContext;
 import com.gitee.spring.domain.proxy.utils.ReflectUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
 
-public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDefinitionResolver implements IRepository<E, PK> {
+import java.util.Collections;
+import java.util.List;
 
-    @Override
-    protected Class<?> getTargetClass() {
-        return AbstractGenericRepository.class;
-    }
+public abstract class AbstractGenericRepository<E, PK> extends AbstractRepository<E, PK> {
 
     @Override
     @SuppressWarnings("unchecked")
@@ -31,9 +28,19 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
         } else {
             rootEntity = newInstance(boundedContext, primaryKey);
         }
-        if (rootEntity == null) {
-            return null;
+        if (rootEntity != null) {
+            handleRootEntity(boundedContext, rootEntity);
+            return rootEntity;
         }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected E newInstance(BoundedContext boundedContext, PK primaryKey) {
+        return (E) ReflectUtils.newInstance(constructor, null);
+    }
+
+    protected void handleRootEntity(BoundedContext boundedContext, E rootEntity) {
         if (rootEntity instanceof RepositoryContext) {
             RepositoryContext repositoryContext = (RepositoryContext) rootEntity;
             repositoryContext.setRepository(this);
@@ -67,50 +74,40 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
                 }
             }
         }
-        return rootEntity;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected E newInstance(BoundedContext boundedContext, PK primaryKey) {
-        return (E) ReflectUtils.newInstance(constructor, null);
     }
 
     @Override
-    public E findByPrimaryKey(PK primaryKey) {
-        return findByPrimaryKey(new BoundedContext(), primaryKey);
+    @SuppressWarnings("unchecked")
+    public List<E> findByExample(BoundedContext boundedContext, Object example) {
+        Assert.notNull(rootEntityDefinition, "Aggregation root is not annotated by @Entity, please use the [findByPrimaryKey] method.");
+        Object persistentObject = doSelectByExample(rootEntityDefinition.getMapper(), boundedContext, example);
+        if (persistentObject != null) {
+            EntityAssembler entityAssembler = rootEntityDefinition.getEntityAssembler();
+            List<E> rootEntities = (List<E>) entityAssembler.assemble(boundedContext, null, rootEntityDefinition, persistentObject);
+            for (E rootEntity : rootEntities) {
+                handleRootEntity(boundedContext, rootEntity);
+            }
+            return rootEntities;
+        }
+        return Collections.emptyList();
     }
 
     @Override
     public void insert(BoundedContext boundedContext, E entity) {
-        handleEntity(boundedContext, entity, this::doInsert);
-    }
-
-    @Override
-    public void insert(E entity) {
-        insert(getBoundedContext(entity), entity);
+        handleEntities(boundedContext, entity, this::doInsert);
     }
 
     @Override
     public void update(BoundedContext boundedContext, E entity) {
-        handleEntity(boundedContext, entity, this::doUpdate);
-    }
-
-    @Override
-    public void update(E entity) {
-        update(getBoundedContext(entity), entity);
+        handleEntities(boundedContext, entity, this::doUpdate);
     }
 
     @Override
     public void delete(BoundedContext boundedContext, E entity) {
-        handleEntity(boundedContext, entity, this::doDelete);
+        handleEntities(boundedContext, entity, this::doDelete);
     }
 
-    @Override
-    public void delete(E entity) {
-        delete(getBoundedContext(entity), entity);
-    }
-
-    protected void handleEntity(BoundedContext boundedContext, E entity, Consumer consumer) {
+    protected void handleEntities(BoundedContext boundedContext, E entity, Consumer consumer) {
         Assert.notNull(entity, "The entity cannot be null!");
         if (rootEntityDefinition != null) {
             EntityAssembler entityAssembler = rootEntityDefinition.getEntityAssembler();
@@ -133,15 +130,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractEntityDef
         }
     }
 
-    protected BoundedContext getBoundedContext(E entity) {
-        if (entity instanceof RepositoryContext) {
-            return ((RepositoryContext) entity).getBoundedContext();
-        } else {
-            return new BoundedContext();
-        }
-    }
-
     protected abstract Object doSelectByPrimaryKey(Object mapper, BoundedContext boundedContext, PK primaryKey);
+
+    protected abstract Object doSelectByExample(Object mapper, BoundedContext boundedContext, Object example);
 
     protected abstract Object doSelectByContext(Object mapper, BoundedContext boundedContext, boolean manyToOne);
 
