@@ -12,6 +12,8 @@ public @interface Entity {
 
     Class<?> mapper();
 
+    String[] ignoredOn() default {};
+
     boolean manyToOne() default false;
 
     boolean userContext() default false;

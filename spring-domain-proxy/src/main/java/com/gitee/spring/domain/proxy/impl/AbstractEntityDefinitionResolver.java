@@ -23,6 +23,7 @@ import java.util.*;
 public abstract class AbstractEntityDefinitionResolver implements ApplicationContextAware, InitializingBean {
 
     public static final String MAPPER_ATTRIBUTES = "mapper";
+    public static final String IGNORED_ON_ATTRIBUTES = "ignoredOn";
     public static final String MANY_TO_ONE_ATTRIBUTES = "manyToOne";
     public static final String USE_CONTEXT_ATTRIBUTES = "useContext";
     public static final String QUERY_FIELD_ATTRIBUTES = "queryField";

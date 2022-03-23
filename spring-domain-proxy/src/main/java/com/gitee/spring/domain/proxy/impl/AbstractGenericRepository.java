@@ -52,6 +52,12 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
             if (lastEntity != null) {
                 AnnotationAttributes attributes = entityDefinition.getAttributes();
+                String[] ignoredOnStrs = attributes.getStringArray(IGNORED_ON_ATTRIBUTES);
+                for (String ignoredOn : ignoredOnStrs) {
+                    if (boundedContext.containsKey(ignoredOn)) {
+                        return;
+                    }
+                }
                 Object persistentObject = null;
                 if (attributes.getBoolean(USE_CONTEXT_ATTRIBUTES)) {
                     persistentObject = doSelectByContext(entityDefinition.getMapper(), boundedContext,
