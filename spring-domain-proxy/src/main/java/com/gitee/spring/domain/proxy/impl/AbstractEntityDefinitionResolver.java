@@ -17,7 +17,6 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.*;
 
 public abstract class AbstractEntityDefinitionResolver implements ApplicationContextAware, InitializingBean {
@@ -45,10 +44,12 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
     @Override
     public void afterPropertiesSet() {
         Type targetType = ReflectUtils.getGenericSuperclass(this, getTargetClass());
-        Type actualTypeArgument = ((ParameterizedType) Objects.requireNonNull(targetType)).getActualTypeArguments()[0];
+        ParameterizedType parameterizedType = (ParameterizedType) targetType;
+        Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
         entityClass = (Class<?>) actualTypeArgument;
         constructor = ReflectUtils.getConstructor(entityClass, null);
-        visitEntityClass(null, entityClass, "/", null);
+        AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(entityClass, Entity.class);
+        visitEntityClass(null, entityClass, entityClass, attributes, "/", null);
         entityDefinitionMap.values().forEach(entityDefinition -> {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             entityPropertyChain.initialize();
@@ -57,11 +58,11 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         });
     }
 
-    protected void visitEntityClass(Class<?> lastEntityClass, Class<?> entityClass, String accessPath, String fieldName) {
+    protected void visitEntityClass(Class<?> lastEntityClass, Class<?> entityClass, Class<?> genericEntityClass,
+                                    AnnotationAttributes attributes, String accessPath, String fieldName) {
         EntityPropertyChain entityPropertyChain = newEntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName);
-        AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(entityClass, Entity.class);
         if (attributes != null) {
-            EntityDefinition entityDefinition = newEntityDefinition(entityPropertyChain, entityClass, attributes);
+            EntityDefinition entityDefinition = newEntityDefinition(entityPropertyChain, entityClass, genericEntityClass, attributes);
             if (lastEntityClass == null) {
                 rootEntityDefinition = entityDefinition;
             } else {
@@ -70,9 +71,16 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         }
         if (!filterEntityClass(entityClass)) {
             ReflectionUtils.doWithLocalFields(entityClass, field -> {
-                Class<?> fieldEntityClass = field.getDeclaringClass();
-                String newAccessPath = "/".equals(accessPath) ? accessPath + field.getName() : accessPath + "/" + field.getName();
-                visitEntityClass(entityClass, fieldEntityClass, newAccessPath, field.getName());
+                Class<?> fieldEntityClass = field.getType();
+                Class<?> fieldGenericEntityClass = fieldEntityClass;
+                if (Collection.class.isAssignableFrom(fieldEntityClass)) {
+                    ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+                    Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
+                    fieldGenericEntityClass = (Class<?>) actualTypeArgument;
+                }
+                AnnotationAttributes fieldAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(field, Entity.class);
+                String fieldAccessPath = "/".equals(accessPath) ? accessPath + field.getName() : accessPath + "/" + field.getName();
+                visitEntityClass(entityClass, fieldEntityClass, fieldGenericEntityClass, fieldAttributes, fieldAccessPath, field.getName());
             });
         }
     }
@@ -86,14 +94,15 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         return entityPropertyChain;
     }
 
-    protected EntityDefinition newEntityDefinition(EntityPropertyChain entityPropertyChain, Class<?> entityClass, AnnotationAttributes attributes) {
+    protected EntityDefinition newEntityDefinition(EntityPropertyChain entityPropertyChain,
+                                                   Class<?> entityClass,
+                                                   Class<?> genericEntityClass,
+                                                   AnnotationAttributes attributes) {
         Class<?> mapperClass = attributes.getClass(MAPPER_ATTRIBUTES);
         Object mapper = applicationContext.getBean(mapperClass);
-        Class<?> pojoClass = null;
-        TypeVariable<? extends Class<?>>[] typeVariables = mapperClass.getTypeParameters();
-        if (typeVariables.length > 0) {
-            pojoClass = typeVariables[0].getGenericDeclaration();
-        }
+        Type targetType = mapperClass.getGenericInterfaces()[0];
+        Type actualTypeArgument = ((ParameterizedType) Objects.requireNonNull(targetType)).getActualTypeArguments()[0];
+        Class<?> pojoClass = (Class<?>) actualTypeArgument;
 
         if (Collection.class.isAssignableFrom(entityClass) || Map.class.isAssignableFrom(entityClass)) {
             attributes.put(MANY_TO_ONE_ATTRIBUTES, true);
@@ -109,7 +118,8 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTES);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
 
-        return new EntityDefinition(entityPropertyChain, entityClass, attributes, mapper, pojoClass, queryValueEntityPropertyChain, entityAssembler);
+        return new EntityDefinition(entityPropertyChain, genericEntityClass,
+                attributes, mapper, pojoClass, queryValueEntityPropertyChain, entityAssembler);
     }
 
     protected boolean filterEntityClass(Class<?> entityClass) {

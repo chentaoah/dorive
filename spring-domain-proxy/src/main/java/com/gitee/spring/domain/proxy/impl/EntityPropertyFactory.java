@@ -17,7 +17,7 @@ public class EntityPropertyFactory {
     private static final Map<String, EntityProperty> generatedProxyCache = new LinkedHashMap<>();
 
     public static EntityProperty newEntityProperty(Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
-        String cacheKey = lastEntityClass.getTypeName() + ":" + entityClass.getTypeName();
+        String cacheKey = lastEntityClass.getTypeName() + ":" + entityClass.getTypeName() + ":" + fieldName;
         if (generatedProxyCache.containsKey(cacheKey)) {
             return generatedProxyCache.get(cacheKey);
         }

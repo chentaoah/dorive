@@ -4,9 +4,11 @@ import com.gitee.spring.domain.proxy.api.EntityProperty;
 import com.gitee.spring.domain.proxy.impl.EntityPropertyFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
+@ToString(exclude = "lastEntityProperty")
 public class EntityPropertyChain implements EntityProperty {
     private Class<?> lastEntityClass;
     private Class<?> entityClass;

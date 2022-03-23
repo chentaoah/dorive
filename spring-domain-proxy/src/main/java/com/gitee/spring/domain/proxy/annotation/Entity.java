@@ -16,7 +16,7 @@ public @interface Entity {
 
     boolean manyToOne() default false;
 
-    boolean userContext() default false;
+    boolean useContext() default false;
 
     String queryField() default "relationId";
 

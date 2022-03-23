@@ -11,7 +11,7 @@ import org.springframework.core.annotation.AnnotationAttributes;
 @AllArgsConstructor
 public class EntityDefinition {
     private EntityPropertyChain entityPropertyChain;
-    private Class<?> entityClass;
+    private Class<?> genericEntityClass;
     private AnnotationAttributes attributes;
     private Object mapper;
     private Class<?> pojoClass;

@@ -17,13 +17,13 @@ public class DefaultEntityAssembler implements EntityAssembler {
             if (!list.isEmpty()) {
                 List<Object> entities = new ArrayList<>();
                 for (Object item : list) {
-                    Object entity = BeanUtil.copyProperties(item, entityDefinition.getEntityClass());
+                    Object entity = BeanUtil.copyProperties(item, entityDefinition.getGenericEntityClass());
                     entities.add(entity);
                 }
                 return entities;
             }
         } else {
-            return BeanUtil.copyProperties(persistentObject, entityDefinition.getEntityClass());
+            return BeanUtil.copyProperties(persistentObject, entityDefinition.getGenericEntityClass());
         }
         return null;
     }
