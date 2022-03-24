@@ -75,7 +75,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
                     Object entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObject);
                     if (entity != null) {
                         EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
-                        entityProperty.setValue(rootEntity, entity);
+                        entityProperty.setValue(lastEntity, entity);
                     }
                 }
             }
