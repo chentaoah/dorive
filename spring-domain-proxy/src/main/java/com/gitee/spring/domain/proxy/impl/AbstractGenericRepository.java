@@ -1,5 +1,6 @@
 package com.gitee.spring.domain.proxy.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.proxy.api.EntityAssembler;
 import com.gitee.spring.domain.proxy.api.EntityProperty;
@@ -100,7 +101,11 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
 
     @Override
     public void insert(BoundedContext boundedContext, E entity) {
-        handleEntities(boundedContext, entity, this::doInsert);
+        handleEntities(boundedContext, entity, (mapper, context, persistentObject) -> {
+            doInsert(mapper, context, persistentObject);
+            Object primaryKey = BeanUtil.getFieldValue(persistentObject, "id");
+            BeanUtil.setFieldValue(entity, "id", primaryKey);
+        });
     }
 
     @Override
