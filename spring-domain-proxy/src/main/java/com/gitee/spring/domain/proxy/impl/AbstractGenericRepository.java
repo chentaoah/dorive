@@ -124,11 +124,10 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         }
         for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
-            EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
-            Object accessEntity = entityProperty.getValue(entity);
-            if (accessEntity != null) {
+            Object targetEntity = entityPropertyChain.getValue(entity);
+            if (targetEntity != null) {
                 EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
-                Object persistentObject = entityAssembler.disassemble(boundedContext, entity, entityDefinition, accessEntity);
+                Object persistentObject = entityAssembler.disassemble(boundedContext, entity, entityDefinition, targetEntity);
                 if (persistentObject != null) {
                     consumer.accept(entityDefinition.getMapper(), boundedContext, persistentObject);
                 }
