@@ -1,7 +1,8 @@
 package com.gitee.spring.domain.proxy.impl;
 
-import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.proxy.annotation.Entity;
+import java.util.ArrayList;
+
+import com.gitee.spring.domain.proxy.annotation.*;
 import com.gitee.spring.domain.proxy.api.EntityAssembler;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
@@ -12,8 +13,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -24,10 +27,9 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
     public static final String MAPPER_ATTRIBUTES = "mapper";
     public static final String IGNORED_ON_ATTRIBUTES = "ignoredOn";
     public static final String MANY_TO_ONE_ATTRIBUTES = "manyToOne";
-    public static final String USE_CONTEXT_ATTRIBUTES = "useContext";
-    public static final String QUERY_FIELD_ATTRIBUTES = "queryField";
-    public static final String QUERY_VALUE_ATTRIBUTES = "queryValue";
     public static final String ASSEMBLER_ATTRIBUTES = "assembler";
+    public static final String FIELD_ATTRIBUTES = "field";
+    public static final String CONTEXT_ATTRIBUTES = "context";
 
     protected ApplicationContext applicationContext;
     protected Class<?> entityClass;
@@ -48,26 +50,66 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
         entityClass = (Class<?>) actualTypeArgument;
         constructor = ReflectUtils.getConstructor(entityClass, null);
-        AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(entityClass, Entity.class);
-        visitEntityClass(null, entityClass, entityClass, attributes, "/", null);
+
+        EntityAttributes entityAttributes = resolveEntityAttributes(entityClass);
+        visitEntityClass(null, entityClass, entityClass, entityAttributes, "/", null);
+
         entityDefinitionMap.values().forEach(entityDefinition -> {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             entityPropertyChain.initialize();
-            EntityPropertyChain queryValueEntityPropertyChain = entityDefinition.getQueryValueEntityPropertyChain();
-            queryValueEntityPropertyChain.initialize();
         });
+
+        orderedEntityDefinitions.forEach(entityDefinition -> {
+            for (AnnotationAttributes attributes : entityDefinition.getEntityAttributes().getObtainsAttributes()) {
+                String context = attributes.getString(CONTEXT_ATTRIBUTES);
+                if (context.startsWith("/")) {
+                    EntityPropertyChain contextEntityPropertyChain = entityPropertyChainMap.get(context);
+                    contextEntityPropertyChain.initialize();
+                }
+            }
+            for (AnnotationAttributes attributes : entityDefinition.getEntityAttributes().getJoinsAttributes()) {
+                String context = attributes.getString(CONTEXT_ATTRIBUTES);
+                if (context.startsWith("/")) {
+                    EntityPropertyChain contextEntityPropertyChain = entityPropertyChainMap.get(context);
+                    contextEntityPropertyChain.initialize();
+                }
+            }
+        });
+
+        orderedEntityDefinitions.sort(Comparator.comparingInt(o -> o.getEntityAttributes().getNumber(ORDER_ATTRIBUTES).intValue()));
     }
 
-    protected void visitEntityClass(Class<?> lastEntityClass, Class<?> entityClass, Class<?> genericEntityClass,
-                                    AnnotationAttributes attributes, String accessPath, String fieldName) {
-        EntityPropertyChain entityPropertyChain = newEntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName);
+    protected EntityAttributes resolveEntityAttributes(AnnotatedElement entityClass) {
+        AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(entityClass, Entity.class);
         if (attributes != null) {
-            EntityDefinition entityDefinition = newEntityDefinition(entityPropertyChain, entityClass, genericEntityClass, attributes);
+            Set<Obtain> obtainAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(entityClass, Obtain.class);
+            List<AnnotationAttributes> obtainsAttributes = new ArrayList<>();
+            for (Obtain obtainAnnotation : obtainAnnotations) {
+                obtainsAttributes.add(AnnotationUtils.getAnnotationAttributes(obtainAnnotation, false, false));
+            }
+
+            EntityAttributes entityAttributes = new EntityAttributes(attributes);
+            entityAttributes.setObtainsAttributes(obtainsAttributes);
+            return entityAttributes;
+        }
+        return null;
+    }
+
+    protected void visitEntityClass(Class<?> lastEntityClass,
+                                    Class<?> entityClass,
+                                    Class<?> genericEntityClass,
+                                    EntityAttributes entityAttributes,
+                                    String accessPath,
+                                    String fieldName) {
+        EntityPropertyChain entityPropertyChain = newEntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName);
+        if (entityAttributes != null) {
+            EntityDefinition entityDefinition = newEntityDefinition(entityPropertyChain, entityClass, genericEntityClass, entityAttributes);
             if (lastEntityClass == null) {
                 rootEntityDefinition = entityDefinition;
             } else {
                 entityDefinitionMap.put(accessPath, entityDefinition);
             }
+            orderedEntityDefinitions.add(entityDefinition);
         }
         if (!filterEntityClass(entityClass)) {
             ReflectionUtils.doWithLocalFields(entityClass, field -> {
@@ -78,14 +120,17 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                     Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
                     fieldGenericEntityClass = (Class<?>) actualTypeArgument;
                 }
-                AnnotationAttributes fieldAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(field, Entity.class);
+                EntityAttributes fieldEntityAttributes = resolveEntityAttributes(field);
                 String fieldAccessPath = "/".equals(accessPath) ? accessPath + field.getName() : accessPath + "/" + field.getName();
-                visitEntityClass(entityClass, fieldEntityClass, fieldGenericEntityClass, fieldAttributes, fieldAccessPath, field.getName());
+                visitEntityClass(entityClass, fieldEntityClass, fieldGenericEntityClass, fieldEntityAttributes, fieldAccessPath, field.getName());
             });
         }
     }
 
-    protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass, Class<?> entityClass, String accessPath, String fieldName) {
+    protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass,
+                                                         Class<?> entityClass,
+                                                         String accessPath,
+                                                         String fieldName) {
         if (lastEntityClass == null) return null;
         String lastAccessPath = accessPath.lastIndexOf("/") > 0 ? accessPath.substring(0, accessPath.lastIndexOf("/")) : "/";
         EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
@@ -97,29 +142,21 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
     protected EntityDefinition newEntityDefinition(EntityPropertyChain entityPropertyChain,
                                                    Class<?> entityClass,
                                                    Class<?> genericEntityClass,
-                                                   AnnotationAttributes attributes) {
-        Class<?> mapperClass = attributes.getClass(MAPPER_ATTRIBUTES);
+                                                   EntityAttributes entityAttributes) {
+        Class<?> mapperClass = entityAttributes.getClass(MAPPER_ATTRIBUTES);
         Object mapper = applicationContext.getBean(mapperClass);
         Type targetType = mapperClass.getGenericInterfaces()[0];
         Type actualTypeArgument = ((ParameterizedType) Objects.requireNonNull(targetType)).getActualTypeArguments()[0];
         Class<?> pojoClass = (Class<?>) actualTypeArgument;
 
         if (Collection.class.isAssignableFrom(entityClass) || Map.class.isAssignableFrom(entityClass)) {
-            attributes.put(MANY_TO_ONE_ATTRIBUTES, true);
+            entityAttributes.put(MANY_TO_ONE_ATTRIBUTES, true);
         }
 
-        EntityPropertyChain queryValueEntityPropertyChain = null;
-        if (entityPropertyChain != null && !attributes.getBoolean(USE_CONTEXT_ATTRIBUTES)) {
-            String queryValue = attributes.getString(QUERY_VALUE_ATTRIBUTES);
-            queryValueEntityPropertyChain = entityPropertyChainMap.get(queryValue);
-            Assert.notNull(queryValueEntityPropertyChain, "Query value location not available!");
-        }
-
-        Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTES);
+        Class<?> assemblerClass = entityAttributes.getClass(ASSEMBLER_ATTRIBUTES);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
 
-        return new EntityDefinition(entityPropertyChain, genericEntityClass,
-                attributes, mapper, pojoClass, queryValueEntityPropertyChain, entityAssembler);
+        return new EntityDefinition(entityPropertyChain, genericEntityClass, entityAttributes, mapper, pojoClass, entityAssembler);
     }
 
     protected boolean filterEntityClass(Class<?> entityClass) {

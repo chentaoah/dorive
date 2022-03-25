@@ -16,12 +16,6 @@ public @interface Entity {
 
     boolean manyToOne() default false;
 
-    boolean useContext() default false;
-
-    String queryField() default "relationId";
-
-    String queryValue() default "/id";
-
     Class<?> assembler() default DefaultEntityAssembler.class;
 
 }
