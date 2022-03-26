@@ -122,7 +122,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
                 Object persistentObject = entityAssembler.disassemble(boundedContext, entity, entityDefinition, targetEntity);
                 if (persistentObject != null) {
                     doInsert(entityDefinition.getMapper(), boundedContext, persistentObject);
-                    copyPrimaryKeyForEntity(entity, persistentObject);
+                    copyPrimaryKeyForEntity(targetEntity, persistentObject);
                 }
             }
         }
