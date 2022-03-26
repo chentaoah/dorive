@@ -27,9 +27,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         }
         if (rootEntity != null) {
             handleRootEntity(boundedContext, rootEntity);
-            return rootEntity;
         }
-        return null;
+        return rootEntity;
     }
 
     protected void handleRootEntity(BoundedContext boundedContext, E rootEntity) {
