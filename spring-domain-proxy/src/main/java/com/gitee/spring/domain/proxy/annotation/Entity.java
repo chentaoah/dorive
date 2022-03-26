@@ -18,5 +18,7 @@ public @interface Entity {
 
     Class<?> assembler() default DefaultEntityAssembler.class;
 
+    int order() default 0;
+
 }
 

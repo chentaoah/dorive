@@ -11,5 +11,6 @@ import org.springframework.core.annotation.AnnotationAttributes;
 public class BindingDefinition {
     private AnnotationAttributes attributes;
     private boolean fromContext;
-    private EntityPropertyChain bindEntityPropertyChain;
+    private boolean bindId;
+    private EntityPropertyChain boundEntityPropertyChain;
 }

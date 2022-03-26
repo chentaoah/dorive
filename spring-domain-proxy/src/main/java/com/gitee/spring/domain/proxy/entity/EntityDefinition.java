@@ -19,4 +19,5 @@ public class EntityDefinition {
     private Class<?> pojoClass;
     private EntityAssembler entityAssembler;
     private List<BindingDefinition> bindingDefinitions;
+    private BindingDefinition boundIdBindingDefinition;
 }

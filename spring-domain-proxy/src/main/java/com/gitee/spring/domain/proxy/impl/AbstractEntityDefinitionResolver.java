@@ -28,6 +28,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
     public static final String IGNORED_ON_ATTRIBUTES = "ignoredOn";
     public static final String MANY_TO_ONE_ATTRIBUTES = "manyToOne";
     public static final String ASSEMBLER_ATTRIBUTES = "assembler";
+    public static final String ORDER_ATTRIBUTES = "order";
     public static final String FIELD_ATTRIBUTES = "field";
     public static final String BIND_ATTRIBUTES = "bind";
 
@@ -37,6 +38,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
     protected Map<String, EntityPropertyChain> entityPropertyChainMap = new LinkedHashMap<>();
     protected EntityDefinition rootEntityDefinition;
     protected Map<String, EntityDefinition> entityDefinitionMap = new LinkedHashMap<>();
+    protected List<EntityDefinition> orderedEntityDefinitions = new ArrayList<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -55,16 +57,19 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(entityClass, Binding.class);
         visitEntityClass(null, entityClass, entityClass, attributes, bindingAnnotations, "/", null);
 
-        entityDefinitionMap.values().forEach(entityDefinition -> {
+        for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             entityPropertyChain.initialize();
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
-                    EntityPropertyChain bindEntityPropertyChain = bindingDefinition.getBindEntityPropertyChain();
-                    bindEntityPropertyChain.initialize();
+                    EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
+                    boundEntityPropertyChain.initialize();
                 }
             }
-        });
+        }
+
+        orderedEntityDefinitions.sort(Comparator.comparingInt(
+                entityDefinition -> entityDefinition.getAttributes().getNumber(ORDER_ATTRIBUTES).intValue()));
     }
 
     protected void visitEntityClass(Class<?> lastEntityClass,
@@ -74,13 +79,16 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                                     Set<Binding> bindingAnnotations,
                                     String accessPath,
                                     String fieldName) {
-        EntityPropertyChain entityPropertyChain = newEntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName);
-        if (attributes != null) {
-            EntityDefinition entityDefinition = newEntityDefinition(entityPropertyChain, entityClass, genericEntityClass, attributes, bindingAnnotations);
-            if (lastEntityClass == null) {
-                rootEntityDefinition = entityDefinition;
-            } else {
+        if (lastEntityClass == null && attributes != null) {
+            rootEntityDefinition = newEntityDefinition(null, entityClass, genericEntityClass, attributes, bindingAnnotations);
+            orderedEntityDefinitions.add(rootEntityDefinition);
+
+        } else if (lastEntityClass != null) {
+            EntityPropertyChain entityPropertyChain = newEntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName);
+            if (attributes != null) {
+                EntityDefinition entityDefinition = newEntityDefinition(entityPropertyChain, entityClass, genericEntityClass, attributes, bindingAnnotations);
                 entityDefinitionMap.put(accessPath, entityDefinition);
+                orderedEntityDefinitions.add(entityDefinition);
             }
         }
         if (!filterEntityClass(entityClass)) {
@@ -104,7 +112,6 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                                                          Class<?> entityClass,
                                                          String accessPath,
                                                          String fieldName) {
-        if (lastEntityClass == null) return null;
         String lastAccessPath = accessPath.lastIndexOf("/") > 0 ? accessPath.substring(0, accessPath.lastIndexOf("/")) : "/";
         EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
         EntityPropertyChain entityPropertyChain = new EntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName, lastEntityPropertyChain, null);
@@ -131,20 +138,36 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
 
         List<BindingDefinition> bindingDefinitions = new ArrayList<>();
+        BindingDefinition boundIdBindingDefinition = null;
         for (Binding bindingAnnotation : bindingAnnotations) {
             AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(bindingAnnotation, false, false);
-            String bind = bindingAttributes.getString(BIND_ATTRIBUTES);
-            if (bind.startsWith("/")) {
-                EntityPropertyChain bindEntityPropertyChain = entityPropertyChainMap.get(bind);
-                Assert.notNull(bindEntityPropertyChain, "Bound path not available!");
-                bindingDefinitions.add(new BindingDefinition(bindingAttributes, false, bindEntityPropertyChain));
-            } else {
-                bindingDefinitions.add(new BindingDefinition(bindingAttributes, true, null));
+            String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTES);
+            String bindAttribute = bindingAttributes.getString(BIND_ATTRIBUTES);
+
+            boolean isIdField = "id".equals(fieldAttribute);
+            boolean isFromContext = !bindAttribute.startsWith("/");
+            boolean isBindId = isIdField && !isFromContext;
+
+            EntityPropertyChain boundEntityPropertyChain = null;
+            if (!isFromContext) {
+                boundEntityPropertyChain = entityPropertyChainMap.get(bindAttribute);
+                Assert.notNull(boundEntityPropertyChain, "Bound path not available!");
+            }
+
+            BindingDefinition bindingDefinition = new BindingDefinition(bindingAttributes, isFromContext, isBindId, boundEntityPropertyChain);
+            bindingDefinitions.add(bindingDefinition);
+
+            if (isBindId) {
+                boundIdBindingDefinition = bindingDefinition;
             }
         }
 
+        if (boundIdBindingDefinition != null && attributes.getNumber(ORDER_ATTRIBUTES).intValue() == 0) {
+            attributes.put(ORDER_ATTRIBUTES, -1);
+        }
+
         return new EntityDefinition(entityPropertyChain, genericEntityClass, attributes,
-                mapper, pojoClass, entityAssembler, bindingDefinitions);
+                mapper, pojoClass, entityAssembler, bindingDefinitions, boundIdBindingDefinition);
     }
 
     protected boolean filterEntityClass(Class<?> entityClass) {
