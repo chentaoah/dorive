@@ -4,8 +4,8 @@ import java.lang.annotation.*;
 
 @Inherited
 @Documented
-@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Bindings {
 
     Binding[] value();

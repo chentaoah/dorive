@@ -1,9 +1,10 @@
 package com.gitee.spring.domain.proxy.impl;
 
-import java.util.ArrayList;
-
-import com.gitee.spring.domain.proxy.annotation.*;
+import cn.hutool.core.lang.Assert;
+import com.gitee.spring.domain.proxy.annotation.Binding;
+import com.gitee.spring.domain.proxy.annotation.Entity;
 import com.gitee.spring.domain.proxy.api.EntityAssembler;
+import com.gitee.spring.domain.proxy.entity.BindingDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
 import com.gitee.spring.domain.proxy.utils.ReflectUtils;
@@ -16,7 +17,6 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -29,7 +29,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
     public static final String MANY_TO_ONE_ATTRIBUTES = "manyToOne";
     public static final String ASSEMBLER_ATTRIBUTES = "assembler";
     public static final String FIELD_ATTRIBUTES = "field";
-    public static final String CONTEXT_ATTRIBUTES = "context";
+    public static final String BIND_ATTRIBUTES = "bind";
 
     protected ApplicationContext applicationContext;
     protected Class<?> entityClass;
@@ -51,65 +51,37 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         entityClass = (Class<?>) actualTypeArgument;
         constructor = ReflectUtils.getConstructor(entityClass, null);
 
-        EntityAttributes entityAttributes = resolveEntityAttributes(entityClass);
-        visitEntityClass(null, entityClass, entityClass, entityAttributes, "/", null);
+        AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(entityClass, Entity.class);
+        Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(entityClass, Binding.class);
+        visitEntityClass(null, entityClass, entityClass, attributes, bindingAnnotations, "/", null);
 
         entityDefinitionMap.values().forEach(entityDefinition -> {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             entityPropertyChain.initialize();
-        });
-
-        orderedEntityDefinitions.forEach(entityDefinition -> {
-            for (AnnotationAttributes attributes : entityDefinition.getEntityAttributes().getObtainsAttributes()) {
-                String context = attributes.getString(CONTEXT_ATTRIBUTES);
-                if (context.startsWith("/")) {
-                    EntityPropertyChain contextEntityPropertyChain = entityPropertyChainMap.get(context);
-                    contextEntityPropertyChain.initialize();
-                }
-            }
-            for (AnnotationAttributes attributes : entityDefinition.getEntityAttributes().getJoinsAttributes()) {
-                String context = attributes.getString(CONTEXT_ATTRIBUTES);
-                if (context.startsWith("/")) {
-                    EntityPropertyChain contextEntityPropertyChain = entityPropertyChainMap.get(context);
-                    contextEntityPropertyChain.initialize();
+            for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
+                if (!bindingDefinition.isFromContext()) {
+                    EntityPropertyChain bindEntityPropertyChain = bindingDefinition.getBindEntityPropertyChain();
+                    bindEntityPropertyChain.initialize();
                 }
             }
         });
-
-        orderedEntityDefinitions.sort(Comparator.comparingInt(o -> o.getEntityAttributes().getNumber(ORDER_ATTRIBUTES).intValue()));
-    }
-
-    protected EntityAttributes resolveEntityAttributes(AnnotatedElement entityClass) {
-        AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(entityClass, Entity.class);
-        if (attributes != null) {
-            Set<Obtain> obtainAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(entityClass, Obtain.class);
-            List<AnnotationAttributes> obtainsAttributes = new ArrayList<>();
-            for (Obtain obtainAnnotation : obtainAnnotations) {
-                obtainsAttributes.add(AnnotationUtils.getAnnotationAttributes(obtainAnnotation, false, false));
-            }
-
-            EntityAttributes entityAttributes = new EntityAttributes(attributes);
-            entityAttributes.setObtainsAttributes(obtainsAttributes);
-            return entityAttributes;
-        }
-        return null;
     }
 
     protected void visitEntityClass(Class<?> lastEntityClass,
                                     Class<?> entityClass,
                                     Class<?> genericEntityClass,
-                                    EntityAttributes entityAttributes,
+                                    AnnotationAttributes attributes,
+                                    Set<Binding> bindingAnnotations,
                                     String accessPath,
                                     String fieldName) {
         EntityPropertyChain entityPropertyChain = newEntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName);
-        if (entityAttributes != null) {
-            EntityDefinition entityDefinition = newEntityDefinition(entityPropertyChain, entityClass, genericEntityClass, entityAttributes);
+        if (attributes != null) {
+            EntityDefinition entityDefinition = newEntityDefinition(entityPropertyChain, entityClass, genericEntityClass, attributes, bindingAnnotations);
             if (lastEntityClass == null) {
                 rootEntityDefinition = entityDefinition;
             } else {
                 entityDefinitionMap.put(accessPath, entityDefinition);
             }
-            orderedEntityDefinitions.add(entityDefinition);
         }
         if (!filterEntityClass(entityClass)) {
             ReflectionUtils.doWithLocalFields(entityClass, field -> {
@@ -120,9 +92,10 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                     Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
                     fieldGenericEntityClass = (Class<?>) actualTypeArgument;
                 }
-                EntityAttributes fieldEntityAttributes = resolveEntityAttributes(field);
+                AnnotationAttributes fieldAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(field, Entity.class);
+                Set<Binding> fieldBindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(field, Binding.class);
                 String fieldAccessPath = "/".equals(accessPath) ? accessPath + field.getName() : accessPath + "/" + field.getName();
-                visitEntityClass(entityClass, fieldEntityClass, fieldGenericEntityClass, fieldEntityAttributes, fieldAccessPath, field.getName());
+                visitEntityClass(entityClass, fieldEntityClass, fieldGenericEntityClass, fieldAttributes, fieldBindingAnnotations, fieldAccessPath, field.getName());
             });
         }
     }
@@ -142,21 +115,36 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
     protected EntityDefinition newEntityDefinition(EntityPropertyChain entityPropertyChain,
                                                    Class<?> entityClass,
                                                    Class<?> genericEntityClass,
-                                                   EntityAttributes entityAttributes) {
-        Class<?> mapperClass = entityAttributes.getClass(MAPPER_ATTRIBUTES);
+                                                   AnnotationAttributes attributes,
+                                                   Set<Binding> bindingAnnotations) {
+        Class<?> mapperClass = attributes.getClass(MAPPER_ATTRIBUTES);
         Object mapper = applicationContext.getBean(mapperClass);
         Type targetType = mapperClass.getGenericInterfaces()[0];
         Type actualTypeArgument = ((ParameterizedType) Objects.requireNonNull(targetType)).getActualTypeArguments()[0];
         Class<?> pojoClass = (Class<?>) actualTypeArgument;
 
         if (Collection.class.isAssignableFrom(entityClass) || Map.class.isAssignableFrom(entityClass)) {
-            entityAttributes.put(MANY_TO_ONE_ATTRIBUTES, true);
+            attributes.put(MANY_TO_ONE_ATTRIBUTES, true);
         }
 
-        Class<?> assemblerClass = entityAttributes.getClass(ASSEMBLER_ATTRIBUTES);
+        Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTES);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
 
-        return new EntityDefinition(entityPropertyChain, genericEntityClass, entityAttributes, mapper, pojoClass, entityAssembler);
+        List<BindingDefinition> bindingDefinitions = new ArrayList<>();
+        for (Binding bindingAnnotation : bindingAnnotations) {
+            AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(bindingAnnotation, false, false);
+            String bind = bindingAttributes.getString(BIND_ATTRIBUTES);
+            if (bind.startsWith("/")) {
+                EntityPropertyChain bindEntityPropertyChain = entityPropertyChainMap.get(bind);
+                Assert.notNull(bindEntityPropertyChain, "Bound path not available!");
+                bindingDefinitions.add(new BindingDefinition(bindingAttributes, false, bindEntityPropertyChain));
+            } else {
+                bindingDefinitions.add(new BindingDefinition(bindingAttributes, true, null));
+            }
+        }
+
+        return new EntityDefinition(entityPropertyChain, genericEntityClass, attributes,
+                mapper, pojoClass, entityAssembler, bindingDefinitions);
     }
 
     protected boolean filterEntityClass(Class<?> entityClass) {

@@ -4,13 +4,12 @@ import java.lang.annotation.*;
 
 @Inherited
 @Documented
-@Target(ElementType.TYPE)
-@Repeatable(Bindings.class)
 @Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Binding {
 
     String field();
 
-    String bindField();
+    String bind();
 
 }
