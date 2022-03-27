@@ -120,55 +120,56 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null) {
-                boolean isCollection = targetEntity instanceof Collection;
-                boolean hasSinglePrimaryKey = !isCollection && BeanUtil.getFieldValue(targetEntity, "id") != null;
-                if (!hasSinglePrimaryKey) {
-                    getAssociationIdFromContext(entityDefinition, boundedContext, entity, targetEntity, isCollection);
-                    EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
-                    Object persistentObject = entityAssembler.disassemble(boundedContext, entity, entityDefinition, targetEntity);
-                    if (persistentObject != null) {
-                        doInsert(entityDefinition.getMapper(), boundedContext, persistentObject);
-                        if (!isCollection) {
-                            copyPrimaryKeyForEntity(targetEntity, persistentObject);
-                            hasSinglePrimaryKey = true;
-                        }
+                if (targetEntity instanceof Collection) {
+                    for (Object eachEntity : (Collection<?>) targetEntity) {
+                        insertSingleEntity(boundedContext, entity, entityDefinition, eachEntity);
                     }
-                }
-                if (hasSinglePrimaryKey) {
-                    setAssociationIdForAnotherEntity(entityDefinition, entity, targetEntity);
+                } else {
+                    Object primaryKey = insertSingleEntity(boundedContext, entity, entityDefinition, targetEntity);
+                    setAssociationIdForBoundEntity(entityDefinition, entity, primaryKey);
                 }
             }
         }
     }
 
-    @SuppressWarnings("unchecked")
-    protected void getAssociationIdFromContext(EntityDefinition entityDefinition, BoundedContext boundedContext,
-                                               Object rootEntity, Object entity, boolean isCollection) {
+    protected Object insertSingleEntity(BoundedContext boundedContext, Object rootEntity,
+                                        EntityDefinition entityDefinition, Object entity) {
+        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+        if (primaryKey == null) {
+            copyAssociationIdFromContext(boundedContext, rootEntity, entityDefinition, entity);
+            EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
+            Object persistentObject = entityAssembler.disassemble(boundedContext, rootEntity, entityDefinition, entity);
+            if (persistentObject != null) {
+                doInsert(entityDefinition.getMapper(), boundedContext, persistentObject);
+                primaryKey = copyPrimaryKeyForEntity(entity, persistentObject);
+            }
+        }
+        return primaryKey;
+    }
+
+    protected void copyAssociationIdFromContext(BoundedContext boundedContext, Object rootEntity,
+                                                EntityDefinition entityDefinition, Object entity) {
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
             Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
             if (boundValue instanceof Number) {
                 AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
                 String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTES);
-                if (isCollection) {
-                    Collection<Object> collection = (Collection<Object>) entity;
-                    collection.forEach(eachEntity -> BeanUtil.setFieldValue(eachEntity, fieldAttribute, boundValue));
-                } else {
-                    BeanUtil.setFieldValue(entity, fieldAttribute, boundValue);
-                }
+                BeanUtil.setFieldValue(entity, fieldAttribute, boundValue);
             }
         }
     }
 
-    protected void copyPrimaryKeyForEntity(Object entity, Object persistentObject) {
+    protected Object copyPrimaryKeyForEntity(Object entity, Object persistentObject) {
         Object primaryKey = BeanUtil.getFieldValue(persistentObject, "id");
         BeanUtil.setFieldValue(entity, "id", primaryKey);
+        return primaryKey;
     }
 
-    protected void setAssociationIdForAnotherEntity(EntityDefinition entityDefinition, Object rootEntity, Object entity) {
+    protected void setAssociationIdForBoundEntity(EntityDefinition entityDefinition, Object rootEntity, Object primaryKey) {
         BindingDefinition boundIdBindingDefinition = entityDefinition.getBoundIdBindingDefinition();
         if (boundIdBindingDefinition != null) {
             EntityPropertyChain boundEntityPropertyChain = boundIdBindingDefinition.getBoundEntityPropertyChain();
-            boundEntityPropertyChain.setValue(rootEntity, BeanUtil.getFieldValue(entity, "id"));
+            boundEntityPropertyChain.setValue(rootEntity, primaryKey);
         }
     }
 
