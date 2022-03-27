@@ -216,7 +216,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         }
     }
 
-    protected abstract Object doSelectByPrimaryKey(Object mapper, BoundedContext boundedContext, PK primaryKey);
+    protected abstract Object doSelectByPrimaryKey(Object mapper, BoundedContext boundedContext, Object primaryKey);
 
     protected abstract Object doSelectByExample(Object mapper, BoundedContext boundedContext, boolean manyToOne, Object example);
 
