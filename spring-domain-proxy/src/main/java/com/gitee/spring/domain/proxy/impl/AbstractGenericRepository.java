@@ -141,7 +141,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
                     }
                 } else {
                     Object primaryKey = insertSingleEntity(boundedContext, entity, entityDefinition, targetEntity);
-                    setAssociationIdForBoundEntity(entityDefinition, entity, primaryKey);
+                    setBoundIdForBoundEntity(entityDefinition, entity, primaryKey);
                 }
             }
         }
@@ -151,22 +151,22 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
                                         EntityDefinition entityDefinition, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey == null) {
-            copyAssociationIdFromContext(boundedContext, rootEntity, entityDefinition, entity);
+            getBoundValueFromContext(boundedContext, rootEntity, entityDefinition, entity);
             EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
             Object persistentObject = entityAssembler.disassemble(boundedContext, rootEntity, entityDefinition, entity);
             if (persistentObject != null) {
                 doInsert(entityDefinition.getMapper(), boundedContext, persistentObject);
-                primaryKey = copyPrimaryKeyForEntity(entity, persistentObject);
+                primaryKey = copyPrimaryKeyToEntity(entity, persistentObject);
             }
         }
         return primaryKey;
     }
 
-    protected void copyAssociationIdFromContext(BoundedContext boundedContext, Object rootEntity,
-                                                EntityDefinition entityDefinition, Object entity) {
+    protected void getBoundValueFromContext(BoundedContext boundedContext, Object rootEntity,
+                                            EntityDefinition entityDefinition, Object entity) {
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
             Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
-            if (boundValue instanceof Number) {
+            if (boundValue != null) {
                 AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
                 String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTES);
                 BeanUtil.setFieldValue(entity, fieldAttribute, boundValue);
@@ -174,13 +174,13 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         }
     }
 
-    protected Object copyPrimaryKeyForEntity(Object entity, Object persistentObject) {
+    protected Object copyPrimaryKeyToEntity(Object entity, Object persistentObject) {
         Object primaryKey = BeanUtil.getFieldValue(persistentObject, "id");
         BeanUtil.setFieldValue(entity, "id", primaryKey);
         return primaryKey;
     }
 
-    protected void setAssociationIdForBoundEntity(EntityDefinition entityDefinition, Object rootEntity, Object primaryKey) {
+    protected void setBoundIdForBoundEntity(EntityDefinition entityDefinition, Object rootEntity, Object primaryKey) {
         BindingDefinition boundIdBindingDefinition = entityDefinition.getBoundIdBindingDefinition();
         if (boundIdBindingDefinition != null) {
             EntityPropertyChain boundEntityPropertyChain = boundIdBindingDefinition.getBoundEntityPropertyChain();
