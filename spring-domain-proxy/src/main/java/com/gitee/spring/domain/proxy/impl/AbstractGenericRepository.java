@@ -120,9 +120,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null) {
-                Object primaryKey = BeanUtil.getFieldValue(targetEntity, "id");
-                if (primaryKey == null) {
-                    boolean isCollection = targetEntity instanceof Collection;
+                boolean isCollection = targetEntity instanceof Collection;
+                boolean hasSinglePrimaryKey = !isCollection && BeanUtil.getFieldValue(targetEntity, "id") != null;
+                if (!hasSinglePrimaryKey) {
                     getAssociationIdFromContext(entityDefinition, boundedContext, entity, targetEntity, isCollection);
                     EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
                     Object persistentObject = entityAssembler.disassemble(boundedContext, entity, entityDefinition, targetEntity);
@@ -130,9 +130,12 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
                         doInsert(entityDefinition.getMapper(), boundedContext, persistentObject);
                         if (!isCollection) {
                             copyPrimaryKeyForEntity(targetEntity, persistentObject);
-                            setAssociationIdForAnotherEntity(entityDefinition, entity, targetEntity);
+                            hasSinglePrimaryKey = true;
                         }
                     }
+                }
+                if (hasSinglePrimaryKey) {
+                    setAssociationIdForAnotherEntity(entityDefinition, entity, targetEntity);
                 }
             }
         }
