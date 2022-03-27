@@ -126,9 +126,17 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                                                    Set<Binding> bindingAnnotations) {
         Class<?> mapperClass = attributes.getClass(MAPPER_ATTRIBUTES);
         Object mapper = applicationContext.getBean(mapperClass);
-        Type targetType = mapperClass.getGenericInterfaces()[0];
-        Type actualTypeArgument = ((ParameterizedType) Objects.requireNonNull(targetType)).getActualTypeArguments()[0];
-        Class<?> pojoClass = (Class<?>) actualTypeArgument;
+
+        Class<?> pojoClass = null;
+        Type[] genericInterfaces = mapperClass.getGenericInterfaces();
+        if (genericInterfaces.length > 0) {
+            Type genericInterface = mapperClass.getGenericInterfaces()[0];
+            if (genericInterface instanceof ParameterizedType) {
+                ParameterizedType parameterizedType = (ParameterizedType) genericInterface;
+                Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
+                pojoClass = (Class<?>) actualTypeArgument;
+            }
+        }
 
         if (Collection.class.isAssignableFrom(entityClass) || Map.class.isAssignableFrom(entityClass)) {
             attributes.put(MANY_TO_ONE_ATTRIBUTES, true);

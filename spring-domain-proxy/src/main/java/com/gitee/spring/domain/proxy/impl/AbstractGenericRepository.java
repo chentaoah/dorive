@@ -120,15 +120,18 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null) {
-                boolean isCollection = targetEntity instanceof Collection;
-                getAssociationIdFromContext(entityDefinition, boundedContext, entity, targetEntity, isCollection);
-                EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
-                Object persistentObject = entityAssembler.disassemble(boundedContext, entity, entityDefinition, targetEntity);
-                if (persistentObject != null) {
-                    doInsert(entityDefinition.getMapper(), boundedContext, persistentObject);
-                    if (!isCollection) {
-                        copyPrimaryKeyForEntity(targetEntity, persistentObject);
-                        setAssociationIdForAnotherEntity(entityDefinition, entity, targetEntity);
+                Object primaryKey = BeanUtil.getFieldValue(targetEntity, "id");
+                if (primaryKey == null) {
+                    boolean isCollection = targetEntity instanceof Collection;
+                    getAssociationIdFromContext(entityDefinition, boundedContext, entity, targetEntity, isCollection);
+                    EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
+                    Object persistentObject = entityAssembler.disassemble(boundedContext, entity, entityDefinition, targetEntity);
+                    if (persistentObject != null) {
+                        doInsert(entityDefinition.getMapper(), boundedContext, persistentObject);
+                        if (!isCollection) {
+                            copyPrimaryKeyForEntity(targetEntity, persistentObject);
+                            setAssociationIdForAnotherEntity(entityDefinition, entity, targetEntity);
+                        }
                     }
                 }
             }
