@@ -15,23 +15,23 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     @Override
     @SuppressWarnings("unchecked")
     public E findByPrimaryKey(BoundedContext boundedContext, PK primaryKey) {
-        E rootEntity = null;
+        Object rootEntity = null;
         if (rootEntityDefinition != null) {
             Object persistentObject = doSelectByPrimaryKey(rootEntityDefinition.getMapper(), boundedContext, primaryKey);
             if (persistentObject != null) {
                 EntityAssembler entityAssembler = rootEntityDefinition.getEntityAssembler();
-                rootEntity = (E) entityAssembler.assemble(boundedContext, null, rootEntityDefinition, persistentObject);
+                rootEntity = entityAssembler.assemble(boundedContext, null, rootEntityDefinition, persistentObject);
             }
         } else {
-            rootEntity = (E) ReflectUtils.newInstance(constructor, null);
+            rootEntity = ReflectUtils.newInstance(constructor, null);
         }
         if (rootEntity != null) {
             handleRootEntity(boundedContext, rootEntity);
         }
-        return rootEntity;
+        return (E) rootEntity;
     }
 
-    protected void handleRootEntity(BoundedContext boundedContext, E rootEntity) {
+    protected void handleRootEntity(BoundedContext boundedContext, Object rootEntity) {
         if (rootEntity instanceof RepositoryContext) {
             RepositoryContext repositoryContext = (RepositoryContext) rootEntity;
             repositoryContext.setRepository(this);
@@ -119,11 +119,11 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         Object persistentObject = doSelectByExample(rootEntityDefinition.getMapper(), boundedContext, true, example);
         if (persistentObject != null) {
             EntityAssembler entityAssembler = rootEntityDefinition.getEntityAssembler();
-            List<E> rootEntities = (List<E>) entityAssembler.assemble(boundedContext, null, rootEntityDefinition, persistentObject);
-            for (E rootEntity : rootEntities) {
+            List<?> rootEntities = (List<?>) entityAssembler.assemble(boundedContext, null, rootEntityDefinition, persistentObject);
+            for (Object rootEntity : rootEntities) {
                 handleRootEntity(boundedContext, rootEntity);
             }
-            return rootEntities;
+            return (List<E>) rootEntities;
         }
         return Collections.emptyList();
     }
