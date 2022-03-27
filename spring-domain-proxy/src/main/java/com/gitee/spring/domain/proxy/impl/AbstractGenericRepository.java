@@ -182,7 +182,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
 
     protected void setBoundIdForBoundEntity(EntityDefinition entityDefinition, Object rootEntity, Object primaryKey) {
         BindingDefinition boundIdBindingDefinition = entityDefinition.getBoundIdBindingDefinition();
-        if (boundIdBindingDefinition != null) {
+        if (boundIdBindingDefinition != null && primaryKey != null) {
             EntityPropertyChain boundEntityPropertyChain = boundIdBindingDefinition.getBoundEntityPropertyChain();
             boundEntityPropertyChain.setValue(rootEntity, primaryKey);
         }
