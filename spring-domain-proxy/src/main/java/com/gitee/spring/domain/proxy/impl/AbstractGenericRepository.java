@@ -174,21 +174,12 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
 
     @Override
     public void update(BoundedContext boundedContext, E entity) {
-        handleEntities(boundedContext, entity, this::doUpdate);
-    }
-
-    @Override
-    public void delete(BoundedContext boundedContext, E entity) {
-        handleEntities(boundedContext, entity, this::doDelete);
-    }
-
-    protected void handleEntities(BoundedContext boundedContext, E entity, Consumer consumer) {
         Assert.notNull(entity, "The entity cannot be null!");
         if (rootEntityDefinition != null) {
             EntityAssembler entityAssembler = rootEntityDefinition.getEntityAssembler();
             Object persistentObject = entityAssembler.disassemble(boundedContext, entity, rootEntityDefinition, entity);
             if (persistentObject != null) {
-                consumer.accept(rootEntityDefinition.getMapper(), boundedContext, persistentObject);
+                doUpdate(rootEntityDefinition.getMapper(), boundedContext, persistentObject);
             }
         }
         for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
@@ -196,9 +187,30 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             Object targetEntity = entityPropertyChain.getValue(entity);
             if (targetEntity != null) {
                 EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
-                Object persistentObject = entityAssembler.disassemble(boundedContext, entity, entityDefinition, targetEntity);
+                Object persistentObject = entityAssembler.disassemble(boundedContext, entity, rootEntityDefinition, entity);
                 if (persistentObject != null) {
-                    consumer.accept(entityDefinition.getMapper(), boundedContext, persistentObject);
+                    doUpdate(entityDefinition.getMapper(), boundedContext, persistentObject);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void delete(BoundedContext boundedContext, E entity) {
+        Assert.notNull(entity, "The entity cannot be null!");
+        if (rootEntityDefinition != null) {
+            Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+            if (primaryKey != null) {
+                doDeleteByPrimaryKey(rootEntityDefinition.getMapper(), boundedContext, primaryKey);
+            }
+        }
+        for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
+            EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
+            Object targetEntity = entityPropertyChain.getValue(entity);
+            if (targetEntity != null) {
+                Object primaryKey = BeanUtil.getFieldValue(targetEntity, "id");
+                if (primaryKey != null) {
+                    doDeleteByPrimaryKey(entityDefinition.getMapper(), boundedContext, primaryKey);
                 }
             }
         }
@@ -212,10 +224,6 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
 
     protected abstract void doUpdate(Object mapper, BoundedContext boundedContext, Object persistentObject);
 
-    protected abstract void doDelete(Object mapper, BoundedContext boundedContext, Object persistentObject);
-
-    public interface Consumer {
-        void accept(Object mapper, BoundedContext boundedContext, Object persistentObject);
-    }
+    protected abstract void doDeleteByPrimaryKey(Object mapper, BoundedContext boundedContext, Object primaryKey);
 
 }
