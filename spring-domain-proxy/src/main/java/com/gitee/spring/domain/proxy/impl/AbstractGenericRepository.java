@@ -73,7 +73,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     }
 
     protected Map<String, Object> getQueryParamsFromContext(EntityDefinition entityDefinition, BoundedContext boundedContext, Object rootEntity) {
-        Map<String, Object> queryParams = new LinkedHashMap<>();
+        Map<String, Object> queryParams = new LinkedHashMap<>(4);
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
             Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
             if (boundValue != null) {
