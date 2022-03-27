@@ -138,7 +138,8 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
             }
         }
 
-        if (Collection.class.isAssignableFrom(entityClass) || Map.class.isAssignableFrom(entityClass)) {
+        boolean isCollection = Collection.class.isAssignableFrom(entityClass);
+        if (isCollection) {
             attributes.put(MANY_TO_ONE_ATTRIBUTES, true);
         }
 
@@ -174,7 +175,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
             attributes.put(ORDER_ATTRIBUTES, -1);
         }
 
-        return new EntityDefinition(entityPropertyChain, genericEntityClass, attributes,
+        return new EntityDefinition(entityPropertyChain, entityClass, isCollection, genericEntityClass, attributes,
                 mapper, pojoClass, entityAssembler, bindingDefinitions, boundIdBindingDefinition);
     }
 

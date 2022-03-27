@@ -50,11 +50,12 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
                 Object persistentObject = doSelectByExample(entityDefinition.getMapper(), boundedContext,
                         attributes.getBoolean(MANY_TO_ONE_ATTRIBUTES), queryParams);
                 if (persistentObject != null) {
-                    EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
-                    Object entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObject);
-                    if (entity != null) {
-                        EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
-                        entityProperty.setValue(lastEntity, entity);
+                    if (entityDefinition.isCollection()) {
+                        for (Object eachPersistentObject : (Collection<?>) persistentObject) {
+                            handleSingleEntity(boundedContext, rootEntity, entityDefinition, entityPropertyChain, lastEntity, eachPersistentObject);
+                        }
+                    } else {
+                        handleSingleEntity(boundedContext, rootEntity, entityDefinition, entityPropertyChain, lastEntity, persistentObject);
                     }
                 }
             }
@@ -97,6 +98,20 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         return boundValue;
     }
 
+    protected void handleSingleEntity(BoundedContext boundedContext,
+                                      Object rootEntity,
+                                      EntityDefinition entityDefinition,
+                                      EntityPropertyChain entityPropertyChain,
+                                      Object lastEntity,
+                                      Object persistentObject) {
+        EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
+        Object entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObject);
+        if (entity != null) {
+            EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
+            entityProperty.setValue(lastEntity, entity);
+        }
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public List<E> findByExample(BoundedContext boundedContext, Object example) {
@@ -120,7 +135,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null) {
-                if (targetEntity instanceof Collection) {
+                if (entityDefinition.isCollection()) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
                         insertSingleEntity(boundedContext, entity, entityDefinition, eachEntity);
                     }
@@ -176,44 +191,53 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     @Override
     public void update(BoundedContext boundedContext, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        if (rootEntityDefinition != null) {
-            EntityAssembler entityAssembler = rootEntityDefinition.getEntityAssembler();
-            Object persistentObject = entityAssembler.disassemble(boundedContext, entity, rootEntityDefinition, entity);
-            if (persistentObject != null) {
-                doUpdate(rootEntityDefinition.getMapper(), boundedContext, persistentObject);
-            }
-        }
-        for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
+        for (EntityDefinition entityDefinition : orderedEntityDefinitions) {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
-            Object targetEntity = entityPropertyChain.getValue(entity);
+            Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null) {
-                EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
-                Object persistentObject = entityAssembler.disassemble(boundedContext, entity, rootEntityDefinition, entity);
-                if (persistentObject != null) {
-                    doUpdate(entityDefinition.getMapper(), boundedContext, persistentObject);
+                if (entityDefinition.isCollection()) {
+                    for (Object eachEntity : (Collection<?>) targetEntity) {
+                        updateSingleEntity(boundedContext, entity, entityDefinition, eachEntity);
+                    }
+                } else {
+                    updateSingleEntity(boundedContext, entity, entityDefinition, targetEntity);
                 }
             }
+        }
+    }
+
+    protected void updateSingleEntity(BoundedContext boundedContext, Object rootEntity,
+                                      EntityDefinition entityDefinition, Object entity) {
+        EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
+        Object persistentObject = entityAssembler.disassemble(boundedContext, rootEntity, rootEntityDefinition, entity);
+        if (persistentObject != null) {
+            doUpdate(entityDefinition.getMapper(), boundedContext, persistentObject);
         }
     }
 
     @Override
     public void delete(BoundedContext boundedContext, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        if (rootEntityDefinition != null) {
-            Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-            if (primaryKey != null) {
-                doDeleteByPrimaryKey(rootEntityDefinition.getMapper(), boundedContext, primaryKey);
-            }
-        }
-        for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
+        for (EntityDefinition entityDefinition : orderedEntityDefinitions) {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
-            Object targetEntity = entityPropertyChain.getValue(entity);
+            Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null) {
-                Object primaryKey = BeanUtil.getFieldValue(targetEntity, "id");
-                if (primaryKey != null) {
-                    doDeleteByPrimaryKey(entityDefinition.getMapper(), boundedContext, primaryKey);
+                if (entityDefinition.isCollection()) {
+                    for (Object eachEntity : (Collection<?>) targetEntity) {
+                        deleteSingleEntity(boundedContext, entity, entityDefinition, eachEntity);
+                    }
+                } else {
+                    deleteSingleEntity(boundedContext, entity, entityDefinition, targetEntity);
                 }
             }
+        }
+    }
+
+    protected void deleteSingleEntity(BoundedContext boundedContext, Object rootEntity,
+                                      EntityDefinition entityDefinition, Object entity) {
+        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+        if (primaryKey != null) {
+            doDeleteByPrimaryKey(entityDefinition.getMapper(), boundedContext, primaryKey);
         }
     }
 
