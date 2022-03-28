@@ -91,7 +91,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             if (boundValue != null) {
                 AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
                 String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTES);
-                fieldAttribute = convertFieldAttribute(fieldAttribute);
+                fieldAttribute = convertFieldAttribute(entityDefinition, bindingDefinition, fieldAttribute);
                 queryParams.put(fieldAttribute, boundValue);
             }
         }
@@ -111,7 +111,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         return boundValue;
     }
 
-    protected String convertFieldAttribute(String fieldAttribute) {
+    protected String convertFieldAttribute(EntityDefinition entityDefinition, BindingDefinition bindingDefinition, String fieldAttribute) {
         return fieldAttribute;
     }
 
