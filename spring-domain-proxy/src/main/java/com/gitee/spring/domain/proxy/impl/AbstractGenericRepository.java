@@ -47,15 +47,27 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
                     continue;
                 }
                 Map<String, Object> queryParams = getQueryParamsFromContext(entityDefinition, boundedContext, rootEntity);
-                Object persistentObject = doSelectByExample(entityDefinition.getMapper(), boundedContext,
-                        attributes.getBoolean(MANY_TO_ONE_ATTRIBUTES), queryParams);
-                if (persistentObject != null) {
-                    if (entityDefinition.isCollection()) {
-                        for (Object eachPersistentObject : (Collection<?>) persistentObject) {
-                            handleSingleEntity(boundedContext, rootEntity, entityDefinition, entityPropertyChain, lastEntity, eachPersistentObject);
-                        }
+                List<?> persistentObjects = doSelectByExample(entityDefinition.getMapper(), boundedContext, queryParams);
+                if (persistentObjects != null && !persistentObjects.isEmpty()) {
+                    Object entity;
+                    EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
+                    if (attributes.getBoolean(MANY_TO_ONE_ATTRIBUTES)) {
+                        entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObjects);
                     } else {
-                        handleSingleEntity(boundedContext, rootEntity, entityDefinition, entityPropertyChain, lastEntity, persistentObject);
+                        if (entityDefinition.isCollection()) {
+                            List<Object> entities = new ArrayList<>();
+                            for (Object persistentObject : persistentObjects) {
+                                Object eachEntity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObject);
+                                entities.add(eachEntity);
+                            }
+                            entity = entities;
+                        } else {
+                            entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObjects.get(0));
+                        }
+                    }
+                    if (entity != null) {
+                        EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
+                        entityProperty.setValue(lastEntity, entity);
                     }
                 }
             }
@@ -98,30 +110,18 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         return boundValue;
     }
 
-    protected void handleSingleEntity(BoundedContext boundedContext,
-                                      Object rootEntity,
-                                      EntityDefinition entityDefinition,
-                                      EntityPropertyChain entityPropertyChain,
-                                      Object lastEntity,
-                                      Object persistentObject) {
-        EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
-        Object entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObject);
-        if (entity != null) {
-            EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
-            entityProperty.setValue(lastEntity, entity);
-        }
-    }
-
     @Override
     @SuppressWarnings("unchecked")
     public List<E> findByExample(BoundedContext boundedContext, Object example) {
         Assert.notNull(rootEntityDefinition, "Aggregation root is not annotated by @Entity, please use the [findByPrimaryKey] method.");
-        Object persistentObject = doSelectByExample(rootEntityDefinition.getMapper(), boundedContext, true, example);
-        if (persistentObject != null) {
+        List<?> persistentObjects = doSelectByExample(rootEntityDefinition.getMapper(), boundedContext, example);
+        if (persistentObjects != null && !persistentObjects.isEmpty()) {
+            List<Object> rootEntities = new ArrayList<>();
             EntityAssembler entityAssembler = rootEntityDefinition.getEntityAssembler();
-            List<?> rootEntities = (List<?>) entityAssembler.assemble(boundedContext, null, rootEntityDefinition, persistentObject);
-            for (Object rootEntity : rootEntities) {
+            for (Object persistentObject : persistentObjects) {
+                Object rootEntity = entityAssembler.assemble(boundedContext, null, rootEntityDefinition, persistentObject);
                 handleRootEntity(boundedContext, rootEntity);
+                rootEntities.add(rootEntity);
             }
             return (List<E>) rootEntities;
         }
@@ -243,7 +243,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
 
     protected abstract Object doSelectByPrimaryKey(Object mapper, BoundedContext boundedContext, Object primaryKey);
 
-    protected abstract Object doSelectByExample(Object mapper, BoundedContext boundedContext, boolean manyToOne, Object example);
+    protected abstract List<?> doSelectByExample(Object mapper, BoundedContext boundedContext, Object example);
 
     protected abstract void doInsert(Object mapper, BoundedContext boundedContext, Object persistentObject);
 

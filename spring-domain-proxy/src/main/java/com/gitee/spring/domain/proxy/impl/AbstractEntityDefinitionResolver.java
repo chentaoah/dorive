@@ -124,6 +124,8 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                                                    Class<?> genericEntityClass,
                                                    AnnotationAttributes attributes,
                                                    Set<Binding> bindingAnnotations) {
+        boolean isCollection = Collection.class.isAssignableFrom(entityClass);
+
         Class<?> mapperClass = attributes.getClass(MAPPER_ATTRIBUTES);
         Object mapper = applicationContext.getBean(mapperClass);
 
@@ -136,11 +138,6 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                 Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
                 pojoClass = (Class<?>) actualTypeArgument;
             }
-        }
-
-        boolean isCollection = Collection.class.isAssignableFrom(entityClass);
-        if (isCollection) {
-            attributes.put(MANY_TO_ONE_ATTRIBUTES, true);
         }
 
         Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTES);
