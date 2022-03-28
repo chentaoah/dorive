@@ -2,7 +2,6 @@ package com.gitee.spring.domain.proxy.impl;
 
 import com.gitee.spring.domain.proxy.api.IRepository;
 import com.gitee.spring.domain.proxy.entity.BoundedContext;
-import com.gitee.spring.domain.proxy.entity.RepositoryContext;
 
 import java.util.List;
 
@@ -25,26 +24,17 @@ public abstract class AbstractRepository<E, PK> extends AbstractEntityDefinition
 
     @Override
     public void insert(E entity) {
-        insert(getBoundedContext(entity), entity);
+        insert(new BoundedContext(), entity);
     }
 
     @Override
     public void update(E entity) {
-        update(getBoundedContext(entity), entity);
+        update(new BoundedContext(), entity);
     }
 
     @Override
     public void delete(E entity) {
-        delete(getBoundedContext(entity), entity);
-    }
-
-    protected BoundedContext getBoundedContext(E entity) {
-        BoundedContext boundedContext = null;
-        if (entity instanceof RepositoryContext) {
-            RepositoryContext repositoryContext = (RepositoryContext) entity;
-            boundedContext = repositoryContext.getBoundedContext();
-        }
-        return boundedContext == null ? new BoundedContext() : boundedContext;
+        delete(new BoundedContext(), entity);
     }
 
 }

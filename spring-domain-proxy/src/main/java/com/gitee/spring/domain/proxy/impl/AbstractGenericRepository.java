@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.proxy.api.EntityAssembler;
 import com.gitee.spring.domain.proxy.api.EntityProperty;
+import com.gitee.spring.domain.proxy.api.RepositoryAware;
 import com.gitee.spring.domain.proxy.entity.*;
 import com.gitee.spring.domain.proxy.utils.ReflectUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
@@ -32,11 +33,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     }
 
     protected void handleRootEntity(BoundedContext boundedContext, Object rootEntity) {
-        if (rootEntity instanceof RepositoryContext) {
-            RepositoryContext repositoryContext = (RepositoryContext) rootEntity;
-            repositoryContext.setRepository(this);
-            repositoryContext.setBoundedContext(boundedContext);
-        }
+        bindRepositoryForRootEntity(rootEntity);
         for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityProperty();
@@ -71,6 +68,12 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
                     }
                 }
             }
+        }
+    }
+
+    protected void bindRepositoryForRootEntity(Object rootEntity) {
+        if (rootEntity instanceof RepositoryAware) {
+            ((RepositoryAware) rootEntity).setRepository(this);
         }
     }
 
@@ -136,6 +139,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     @Override
     public void insert(BoundedContext boundedContext, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
+        bindRepositoryForRootEntity(entity);
         for (EntityDefinition entityDefinition : orderedEntityDefinitions) {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
@@ -198,6 +202,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     @Override
     public void update(BoundedContext boundedContext, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
+        bindRepositoryForRootEntity(entity);
         for (EntityDefinition entityDefinition : orderedEntityDefinitions) {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
@@ -225,6 +230,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     @Override
     public void delete(BoundedContext boundedContext, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
+        bindRepositoryForRootEntity(entity);
         for (EntityDefinition entityDefinition : orderedEntityDefinitions) {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
