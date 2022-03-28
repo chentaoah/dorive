@@ -91,6 +91,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             if (boundValue != null) {
                 AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
                 String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTES);
+                fieldAttribute = convertFieldAttribute(fieldAttribute);
                 queryParams.put(fieldAttribute, boundValue);
             }
         }
@@ -108,6 +109,10 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             boundValue = boundEntityPropertyChain.getValue(rootEntity);
         }
         return boundValue;
+    }
+
+    protected String convertFieldAttribute(String fieldAttribute) {
+        return fieldAttribute;
     }
 
     @Override
@@ -165,11 +170,13 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     protected void getBoundValueFromContext(BoundedContext boundedContext, Object rootEntity,
                                             EntityDefinition entityDefinition, Object entity) {
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
-            Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
-            if (boundValue != null) {
-                AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
-                String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTES);
-                BeanUtil.setFieldValue(entity, fieldAttribute, boundValue);
+            if (!bindingDefinition.isBindId()) {
+                Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
+                if (boundValue != null) {
+                    AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
+                    String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTES);
+                    BeanUtil.setFieldValue(entity, fieldAttribute, boundValue);
+                }
             }
         }
     }

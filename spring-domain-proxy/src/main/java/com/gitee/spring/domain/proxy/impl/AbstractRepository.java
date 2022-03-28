@@ -39,11 +39,12 @@ public abstract class AbstractRepository<E, PK> extends AbstractEntityDefinition
     }
 
     protected BoundedContext getBoundedContext(E entity) {
+        BoundedContext boundedContext = null;
         if (entity instanceof RepositoryContext) {
-            return ((RepositoryContext) entity).getBoundedContext();
-        } else {
-            return new BoundedContext();
+            RepositoryContext repositoryContext = (RepositoryContext) entity;
+            boundedContext = repositoryContext.getBoundedContext();
         }
+        return boundedContext == null ? new BoundedContext() : boundedContext;
     }
 
 }
