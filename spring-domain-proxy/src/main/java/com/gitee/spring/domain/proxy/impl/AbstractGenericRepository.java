@@ -221,7 +221,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     protected void updateSingleEntity(BoundedContext boundedContext, Object rootEntity,
                                       EntityDefinition entityDefinition, Object entity) {
         EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
-        Object persistentObject = entityAssembler.disassemble(boundedContext, rootEntity, rootEntityDefinition, entity);
+        Object persistentObject = entityAssembler.disassemble(boundedContext, rootEntity, entityDefinition, entity);
         if (persistentObject != null) {
             doUpdate(entityDefinition.getMapper(), boundedContext, persistentObject);
         }
