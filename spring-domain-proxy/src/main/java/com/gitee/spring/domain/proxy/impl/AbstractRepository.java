@@ -37,4 +37,11 @@ public abstract class AbstractRepository<E, PK> extends AbstractEntityDefinition
         delete(new BoundedContext(), entity);
     }
 
+    @Override
+    public void deleteByPrimaryKey(PK primaryKey) {
+        BoundedContext boundedContext = new BoundedContext();
+        E entity = findByPrimaryKey(boundedContext, primaryKey);
+        delete(boundedContext, entity);
+    }
+
 }

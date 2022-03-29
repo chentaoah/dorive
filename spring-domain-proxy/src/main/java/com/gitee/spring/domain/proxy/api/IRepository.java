@@ -26,4 +26,6 @@ public interface IRepository<E, PK> {
 
     void delete(E entity);
 
+    void deleteByPrimaryKey(PK primaryKey);
+
 }
