@@ -7,6 +7,7 @@ import com.gitee.spring.domain.proxy.api.EntityAssembler;
 import com.gitee.spring.domain.proxy.entity.BindingDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
+import com.gitee.spring.domain.proxy.utils.PathUtils;
 import com.gitee.spring.domain.proxy.utils.ReflectUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
@@ -112,7 +113,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                                                          Class<?> entityClass,
                                                          String accessPath,
                                                          String fieldName) {
-        String lastAccessPath = accessPath.lastIndexOf("/") > 0 ? accessPath.substring(0, accessPath.lastIndexOf("/")) : "/";
+        String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
         EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
         EntityPropertyChain entityPropertyChain = new EntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName, lastEntityPropertyChain, null);
         entityPropertyChainMap.put(accessPath, entityPropertyChain);

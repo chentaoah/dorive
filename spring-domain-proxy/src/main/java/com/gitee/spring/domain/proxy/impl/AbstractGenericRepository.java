@@ -39,32 +39,15 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityProperty();
             Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
             if (lastEntity != null) {
-                AnnotationAttributes attributes = entityDefinition.getAttributes();
-                if (!isMatchScenes(attributes, boundedContext)) {
-                    continue;
-                }
-                Map<String, Object> queryParams = getQueryParamsFromContext(entityDefinition, boundedContext, rootEntity);
-                List<?> persistentObjects = doSelectByExample(entityDefinition.getMapper(), boundedContext, queryParams);
-                if (persistentObjects != null && !persistentObjects.isEmpty()) {
-                    Object entity;
-                    EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
-                    if (attributes.getBoolean(MANY_TO_ONE_ATTRIBUTE)) {
-                        entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObjects);
-                    } else {
-                        if (entityDefinition.isCollection()) {
-                            List<Object> entities = new ArrayList<>();
-                            for (Object persistentObject : persistentObjects) {
-                                Object eachEntity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObject);
-                                entities.add(eachEntity);
-                            }
-                            entity = entities;
-                        } else {
-                            entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObjects.get(0));
+                if (isMatchScenes(entityDefinition, boundedContext)) {
+                    Map<String, Object> queryParams = getQueryParamsFromContext(entityDefinition, boundedContext, rootEntity);
+                    List<?> persistentObjects = doSelectByExample(entityDefinition.getMapper(), boundedContext, queryParams);
+                    if (persistentObjects != null && !persistentObjects.isEmpty()) {
+                        Object entity = assembleEntity(boundedContext, rootEntity, entityDefinition, persistentObjects);
+                        if (entity != null) {
+                            EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
+                            entityProperty.setValue(lastEntity, entity);
                         }
-                    }
-                    if (entity != null) {
-                        EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
-                        entityProperty.setValue(lastEntity, entity);
                     }
                 }
             }
@@ -77,7 +60,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         }
     }
 
-    protected boolean isMatchScenes(AnnotationAttributes attributes, BoundedContext boundedContext) {
+    protected boolean isMatchScenes(EntityDefinition entityDefinition, BoundedContext boundedContext) {
+        AnnotationAttributes attributes = entityDefinition.getAttributes();
         String[] sceneAttribute = attributes.getStringArray(SCENE_ATTRIBUTE);
         if (sceneAttribute.length == 0) {
             return true;
@@ -97,7 +81,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             if (boundValue != null) {
                 AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
                 String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
-                fieldAttribute = convertFieldAttribute(entityDefinition, bindingDefinition, fieldAttribute);
+                fieldAttribute = convertFieldName(entityDefinition, bindingDefinition, fieldAttribute);
                 queryParams.put(fieldAttribute, boundValue);
             }
         }
@@ -117,8 +101,30 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         return boundValue;
     }
 
-    protected String convertFieldAttribute(EntityDefinition entityDefinition, BindingDefinition bindingDefinition, String fieldAttribute) {
+    protected String convertFieldName(EntityDefinition entityDefinition, BindingDefinition bindingDefinition, String fieldAttribute) {
         return fieldAttribute;
+    }
+
+    protected Object assembleEntity(BoundedContext boundedContext, Object rootEntity,
+                                    EntityDefinition entityDefinition, List<?> persistentObjects) {
+        AnnotationAttributes attributes = entityDefinition.getAttributes();
+        EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
+        Object entity;
+        if (attributes.getBoolean(MANY_TO_ONE_ATTRIBUTE)) {
+            entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObjects);
+        } else {
+            if (entityDefinition.isCollection()) {
+                List<Object> entities = new ArrayList<>();
+                for (Object persistentObject : persistentObjects) {
+                    Object eachEntity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObject);
+                    entities.add(eachEntity);
+                }
+                entity = entities;
+            } else {
+                entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObjects.get(0));
+            }
+        }
+        return entity;
     }
 
     @Override
