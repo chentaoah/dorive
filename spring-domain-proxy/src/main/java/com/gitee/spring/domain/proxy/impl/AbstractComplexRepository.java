@@ -24,14 +24,14 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
     @Override
     public List<E> findByExample(BoundedContext boundedContext, Object example) {
         if (example instanceof ChainQuery) {
-            return findByChainQuery(boundedContext, example);
+            return findByChainQuery(boundedContext, (ChainQuery) example);
         }
         return super.findByExample(boundedContext, example);
     }
 
-    protected List<E> findByChainQuery(BoundedContext boundedContext, Object example) {
+    protected List<E> findByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery) {
         Map<String, Map<String, Object>> chainQueryContext = new LinkedHashMap<>();
-        for (ChainQuery.Criterion criterion : ((ChainQuery) example).getCriteria()) {
+        for (ChainQuery.Criterion criterion : chainQuery.getCriteria()) {
             EntityDefinition entityDefinition = classEntityDefinitionMap.get(criterion.getEntityClass());
             Assert.notNull(entityDefinition, "The entity definition does not exist!");
             Object mergedExample = mergeQueryParamsToExample(chainQueryContext, entityDefinition, criterion.getExample());
