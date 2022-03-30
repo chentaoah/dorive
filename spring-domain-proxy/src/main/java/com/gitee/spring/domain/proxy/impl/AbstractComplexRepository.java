@@ -33,7 +33,7 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
         Map<String, Map<String, Object>> chainQueryContext = new LinkedHashMap<>();
         for (ChainQuery.Criterion criterion : ((ChainQuery) example).getCriteria()) {
             EntityDefinition entityDefinition = classEntityDefinitionMap.get(criterion.getEntityClass());
-            Assert.notNull(entityDefinition, "There is no entity type!");
+            Assert.notNull(entityDefinition, "The entity definition does not exist!");
             Object mergedExample = mergeQueryParamsToExample(chainQueryContext, entityDefinition, criterion.getExample());
             List<?> persistentObjects = doSelectByExample(entityDefinition.getMapper(), boundedContext, mergedExample);
             Object entity = assembleEntity(boundedContext, null, entityDefinition, persistentObjects);
