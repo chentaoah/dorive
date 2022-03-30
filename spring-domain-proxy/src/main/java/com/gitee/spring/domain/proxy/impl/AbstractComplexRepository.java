@@ -34,8 +34,8 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
         for (ChainQuery.Criterion criterion : ((ChainQuery) example).getCriteria()) {
             EntityDefinition entityDefinition = classEntityDefinitionMap.get(criterion.getEntityClass());
             Assert.notNull(entityDefinition, "There is no entity type!");
-            Object criterionExample = mergeQueryParamsToExample(chainQueryContext, entityDefinition, criterion.getExample());
-            List<?> persistentObjects = doSelectByExample(entityDefinition.getMapper(), boundedContext, criterionExample);
+            Object mergedExample = mergeQueryParamsToExample(chainQueryContext, entityDefinition, criterion.getExample());
+            List<?> persistentObjects = doSelectByExample(entityDefinition.getMapper(), boundedContext, mergedExample);
             Object entity = assembleEntity(boundedContext, null, entityDefinition, persistentObjects);
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
