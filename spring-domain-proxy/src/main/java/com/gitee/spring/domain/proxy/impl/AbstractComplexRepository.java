@@ -20,16 +20,8 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
             classEntityDefinitionMap.put(entityDefinition.getEntityClass(), entityDefinition);
         }
     }
-
-    @Override
-    public List<E> findByExample(BoundedContext boundedContext, Object example) {
-        if (example instanceof ChainQuery) {
-            return findByChainQuery(boundedContext, (ChainQuery) example);
-        }
-        return super.findByExample(boundedContext, example);
-    }
-
-    protected List<E> findByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery) {
+    
+    public List<E> findByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery) {
         Map<String, Map<String, Object>> chainQueryContext = new LinkedHashMap<>();
         for (ChainQuery.Criterion criterion : chainQuery.getCriteria()) {
             EntityDefinition entityDefinition = classEntityDefinitionMap.get(criterion.getEntityClass());
@@ -59,9 +51,7 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
     }
 
     @SuppressWarnings("unchecked")
-    protected Object mergeQueryParamsToExample(Map<String, Map<String, Object>> chainQueryContext,
-                                               EntityDefinition entityDefinition,
-                                               Object example) {
+    protected Object mergeQueryParamsToExample(Map<String, Map<String, Object>> chainQueryContext, EntityDefinition entityDefinition, Object example) {
         EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
         String accessPath = entityPropertyChain.getAccessPath();
         if (chainQueryContext.containsKey(accessPath)) {
@@ -75,12 +65,8 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
     }
 
     @SuppressWarnings("unchecked")
-    protected void getQueryParamsFromEntity(Object entity,
-                                            String fieldAttribute,
-                                            Map<String, Map<String, Object>> chainQueryContext,
-                                            String accessPath,
-                                            boolean isCollection,
-                                            String fieldName) {
+    protected void getQueryParamsFromEntity(Object entity, String fieldAttribute, Map<String, Map<String, Object>> chainQueryContext,
+                                            String accessPath, boolean isCollection, String fieldName) {
         Object fieldValue = BeanUtil.getFieldValue(entity, fieldAttribute);
         if (fieldValue != null) {
             Map<String, Object> queryParams = chainQueryContext.computeIfAbsent(accessPath, key -> new LinkedHashMap<>());
