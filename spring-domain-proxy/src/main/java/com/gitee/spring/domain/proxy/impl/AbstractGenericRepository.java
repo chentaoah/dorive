@@ -39,8 +39,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityProperty();
             Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
             if (lastEntity != null) {
-                if (isMatchScenes(entityDefinition, boundedContext)) {
-                    Map<String, Object> queryParams = getQueryParamsFromContext(entityDefinition, boundedContext, rootEntity);
+                if (isMatchScenes(boundedContext, rootEntity, entityDefinition)) {
+                    Map<String, Object> queryParams = getQueryParamsFromContext(boundedContext, rootEntity, entityDefinition);
                     List<?> persistentObjects = doSelectByExample(entityDefinition.getMapper(), boundedContext, queryParams);
                     if (persistentObjects != null && !persistentObjects.isEmpty()) {
                         Object entity = assembleEntity(boundedContext, rootEntity, entityDefinition, persistentObjects);
@@ -60,7 +60,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         }
     }
 
-    protected boolean isMatchScenes(EntityDefinition entityDefinition, BoundedContext boundedContext) {
+    protected boolean isMatchScenes(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition) {
         AnnotationAttributes attributes = entityDefinition.getAttributes();
         String[] sceneAttribute = attributes.getStringArray(SCENE_ATTRIBUTE);
         if (sceneAttribute.length == 0) {
@@ -74,10 +74,10 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         return false;
     }
 
-    protected Map<String, Object> getQueryParamsFromContext(EntityDefinition entityDefinition, BoundedContext boundedContext, Object rootEntity) {
+    protected Map<String, Object> getQueryParamsFromContext(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition) {
         Map<String, Object> queryParams = new LinkedHashMap<>();
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
-            Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
+            Object boundValue = getBoundValue(boundedContext, rootEntity, bindingDefinition);
             if (boundValue != null) {
                 AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
                 String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
@@ -88,7 +88,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         return queryParams;
     }
 
-    protected Object getBoundValue(BindingDefinition bindingDefinition, BoundedContext boundedContext, Object rootEntity) {
+    protected Object getBoundValue(BoundedContext boundedContext, Object rootEntity, BindingDefinition bindingDefinition) {
         Object boundValue;
         if (bindingDefinition.isFromContext()) {
             AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
@@ -158,7 +158,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
                     }
                 } else {
                     Object primaryKey = insertSingleEntity(boundedContext, entity, entityDefinition, targetEntity);
-                    setBoundIdForBoundEntity(entityDefinition, entity, primaryKey);
+                    setBoundIdForBoundEntity(boundedContext, entity, entityDefinition, primaryKey);
                 }
             }
         }
@@ -181,7 +181,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     protected void getBoundValueFromContext(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition, Object entity) {
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
             if (!bindingDefinition.isBindId()) {
-                Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
+                Object boundValue = getBoundValue(boundedContext, rootEntity, bindingDefinition);
                 if (boundValue != null) {
                     AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
                     String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
@@ -197,7 +197,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         return primaryKey;
     }
 
-    protected void setBoundIdForBoundEntity(EntityDefinition entityDefinition, Object rootEntity, Object primaryKey) {
+    protected void setBoundIdForBoundEntity(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition, Object primaryKey) {
         BindingDefinition boundIdBindingDefinition = entityDefinition.getBoundIdBindingDefinition();
         if (boundIdBindingDefinition != null && primaryKey != null) {
             EntityPropertyChain boundEntityPropertyChain = boundIdBindingDefinition.getBoundEntityPropertyChain();
