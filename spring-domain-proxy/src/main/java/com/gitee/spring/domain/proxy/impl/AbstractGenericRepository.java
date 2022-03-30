@@ -40,7 +40,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
             if (lastEntity != null) {
                 AnnotationAttributes attributes = entityDefinition.getAttributes();
-                if (isIgnoreEntityDefinition(attributes, boundedContext)) {
+                if (!isMatchScenes(attributes, boundedContext)) {
                     continue;
                 }
                 Map<String, Object> queryParams = getQueryParamsFromContext(entityDefinition, boundedContext, rootEntity);
@@ -48,7 +48,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
                 if (persistentObjects != null && !persistentObjects.isEmpty()) {
                     Object entity;
                     EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
-                    if (attributes.getBoolean(MANY_TO_ONE_ATTRIBUTES)) {
+                    if (attributes.getBoolean(MANY_TO_ONE_ATTRIBUTE)) {
                         entity = entityAssembler.assemble(boundedContext, rootEntity, entityDefinition, persistentObjects);
                     } else {
                         if (entityDefinition.isCollection()) {
@@ -77,10 +77,13 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         }
     }
 
-    protected boolean isIgnoreEntityDefinition(AnnotationAttributes attributes, BoundedContext boundedContext) {
-        String[] ignoredOnStrs = attributes.getStringArray(IGNORED_ON_ATTRIBUTES);
-        for (String ignoredOn : ignoredOnStrs) {
-            if (boundedContext.containsKey(ignoredOn)) {
+    protected boolean isMatchScenes(AnnotationAttributes attributes, BoundedContext boundedContext) {
+        String[] sceneAttribute = attributes.getStringArray(SCENE_ATTRIBUTE);
+        if (sceneAttribute.length == 0) {
+            return true;
+        }
+        for (String scene : sceneAttribute) {
+            if (boundedContext.containsKey(scene)) {
                 return true;
             }
         }
@@ -93,7 +96,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
             if (boundValue != null) {
                 AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
-                String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTES);
+                String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
                 fieldAttribute = convertFieldAttribute(entityDefinition, bindingDefinition, fieldAttribute);
                 queryParams.put(fieldAttribute, boundValue);
             }
@@ -105,7 +108,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         Object boundValue;
         if (bindingDefinition.isFromContext()) {
             AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
-            String bindAttribute = bindingAttributes.getString(BIND_ATTRIBUTES);
+            String bindAttribute = bindingAttributes.getString(BIND_ATTRIBUTE);
             boundValue = boundedContext.get(bindAttribute);
         } else {
             EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
@@ -178,7 +181,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
                 Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
                 if (boundValue != null) {
                     AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
-                    String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTES);
+                    String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
                     BeanUtil.setFieldValue(entity, fieldAttribute, boundValue);
                 }
             }

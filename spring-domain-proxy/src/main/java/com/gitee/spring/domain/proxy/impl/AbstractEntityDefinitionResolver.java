@@ -24,13 +24,13 @@ import java.util.*;
 
 public abstract class AbstractEntityDefinitionResolver implements ApplicationContextAware, InitializingBean {
 
-    public static final String MAPPER_ATTRIBUTES = "mapper";
-    public static final String IGNORED_ON_ATTRIBUTES = "ignoredOn";
-    public static final String MANY_TO_ONE_ATTRIBUTES = "manyToOne";
-    public static final String ASSEMBLER_ATTRIBUTES = "assembler";
-    public static final String ORDER_ATTRIBUTES = "order";
-    public static final String FIELD_ATTRIBUTES = "field";
-    public static final String BIND_ATTRIBUTES = "bind";
+    public static final String MAPPER_ATTRIBUTE = "mapper";
+    public static final String SCENE_ATTRIBUTE = "scene";
+    public static final String MANY_TO_ONE_ATTRIBUTE = "manyToOne";
+    public static final String ASSEMBLER_ATTRIBUTE = "assembler";
+    public static final String ORDER_ATTRIBUTE = "order";
+    public static final String FIELD_ATTRIBUTE = "field";
+    public static final String BIND_ATTRIBUTE = "bind";
 
     protected ApplicationContext applicationContext;
     protected Class<?> entityClass;
@@ -69,7 +69,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         }
 
         orderedEntityDefinitions.sort(Comparator.comparingInt(
-                entityDefinition -> entityDefinition.getAttributes().getNumber(ORDER_ATTRIBUTES).intValue()));
+                entityDefinition -> entityDefinition.getAttributes().getNumber(ORDER_ATTRIBUTE).intValue()));
     }
 
     protected void visitEntityClass(Class<?> lastEntityClass,
@@ -126,7 +126,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                                                    Set<Binding> bindingAnnotations) {
         boolean isCollection = Collection.class.isAssignableFrom(entityClass);
 
-        Class<?> mapperClass = attributes.getClass(MAPPER_ATTRIBUTES);
+        Class<?> mapperClass = attributes.getClass(MAPPER_ATTRIBUTE);
         Object mapper = applicationContext.getBean(mapperClass);
 
         Class<?> pojoClass = null;
@@ -140,15 +140,15 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
             }
         }
 
-        Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTES);
+        Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTE);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
 
         List<BindingDefinition> bindingDefinitions = new ArrayList<>();
         BindingDefinition boundIdBindingDefinition = null;
         for (Binding bindingAnnotation : bindingAnnotations) {
             AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(bindingAnnotation, false, false);
-            String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTES);
-            String bindAttribute = bindingAttributes.getString(BIND_ATTRIBUTES);
+            String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
+            String bindAttribute = bindingAttributes.getString(BIND_ATTRIBUTE);
 
             boolean isIdField = "id".equals(fieldAttribute);
             boolean isFromContext = !bindAttribute.startsWith("/");
@@ -168,8 +168,8 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
             }
         }
 
-        if (boundIdBindingDefinition != null && attributes.getNumber(ORDER_ATTRIBUTES).intValue() == 0) {
-            attributes.put(ORDER_ATTRIBUTES, -1);
+        if (boundIdBindingDefinition != null && attributes.getNumber(ORDER_ATTRIBUTE).intValue() == 0) {
+            attributes.put(ORDER_ATTRIBUTE, -1);
         }
 
         return new EntityDefinition(entityPropertyChain, entityClass, isCollection, genericEntityClass, attributes,

@@ -12,7 +12,7 @@ public @interface Entity {
 
     Class<?> mapper();
 
-    String[] ignoredOn() default {};
+    String[] scene() default {};
 
     boolean manyToOne() default false;
 
