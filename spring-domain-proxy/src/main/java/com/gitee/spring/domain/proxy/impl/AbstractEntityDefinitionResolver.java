@@ -73,13 +73,8 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                 entityDefinition -> entityDefinition.getAttributes().getNumber(ORDER_ATTRIBUTE).intValue()));
     }
 
-    protected void visitEntityClass(Class<?> lastEntityClass,
-                                    Class<?> entityClass,
-                                    Class<?> genericEntityClass,
-                                    AnnotationAttributes attributes,
-                                    Set<Binding> bindingAnnotations,
-                                    String accessPath,
-                                    String fieldName) {
+    protected void visitEntityClass(Class<?> lastEntityClass, Class<?> entityClass, Class<?> genericEntityClass,
+                                    AnnotationAttributes attributes, Set<Binding> bindingAnnotations, String accessPath, String fieldName) {
         if (lastEntityClass == null && attributes != null) {
             rootEntityDefinition = newEntityDefinition(null, entityClass, genericEntityClass, attributes, bindingAnnotations);
             orderedEntityDefinitions.add(rootEntityDefinition);
@@ -109,10 +104,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         }
     }
 
-    protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass,
-                                                         Class<?> entityClass,
-                                                         String accessPath,
-                                                         String fieldName) {
+    protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass, Class<?> entityClass, String accessPath, String fieldName) {
         String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
         EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
         EntityPropertyChain entityPropertyChain = new EntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName, lastEntityPropertyChain, null);
@@ -120,11 +112,8 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         return entityPropertyChain;
     }
 
-    protected EntityDefinition newEntityDefinition(EntityPropertyChain entityPropertyChain,
-                                                   Class<?> entityClass,
-                                                   Class<?> genericEntityClass,
-                                                   AnnotationAttributes attributes,
-                                                   Set<Binding> bindingAnnotations) {
+    protected EntityDefinition newEntityDefinition(EntityPropertyChain entityPropertyChain, Class<?> entityClass, Class<?> genericEntityClass,
+                                                   AnnotationAttributes attributes, Set<Binding> bindingAnnotations) {
         boolean isCollection = Collection.class.isAssignableFrom(entityClass);
 
         Class<?> mapperClass = attributes.getClass(MAPPER_ATTRIBUTE);
