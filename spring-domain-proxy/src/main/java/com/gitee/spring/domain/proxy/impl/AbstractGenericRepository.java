@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.proxy.api.EntityAssembler;
 import com.gitee.spring.domain.proxy.api.EntityProperty;
+import com.gitee.spring.domain.proxy.api.EntitySelector;
 import com.gitee.spring.domain.proxy.api.RepositoryAware;
 import com.gitee.spring.domain.proxy.entity.*;
 import com.gitee.spring.domain.proxy.utils.ReflectUtils;
@@ -40,14 +41,11 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
             if (lastEntity != null) {
                 if (isMatchScenes(boundedContext, rootEntity, entityDefinition)) {
-                    Map<String, Object> queryParams = getQueryParamsFromContext(boundedContext, rootEntity, entityDefinition);
-                    List<?> persistentObjects = doSelectByExample(entityDefinition.getMapper(), boundedContext, queryParams);
-                    if (persistentObjects != null && !persistentObjects.isEmpty()) {
-                        Object entity = assembleEntity(boundedContext, rootEntity, entityDefinition, persistentObjects);
-                        if (entity != null) {
-                            EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
-                            entityProperty.setValue(lastEntity, entity);
-                        }
+                    EntitySelector entitySelector = entityDefinition.getEntitySelector();
+                    Object entity = entitySelector.select(this, boundedContext, rootEntity, entityDefinition);
+                    if (entity != null) {
+                        EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
+                        entityProperty.setValue(lastEntity, entity);
                     }
                 }
             }

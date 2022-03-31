@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.proxy.annotation.Binding;
 import com.gitee.spring.domain.proxy.annotation.Entity;
 import com.gitee.spring.domain.proxy.api.EntityAssembler;
+import com.gitee.spring.domain.proxy.api.EntitySelector;
 import com.gitee.spring.domain.proxy.entity.BindingDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
@@ -28,6 +29,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
     public static final String MAPPER_ATTRIBUTE = "mapper";
     public static final String SCENE_ATTRIBUTE = "scene";
     public static final String MANY_TO_ONE_ATTRIBUTE = "manyToOne";
+    public static final String SELECTOR_ATTRIBUTE = "selector";
     public static final String ASSEMBLER_ATTRIBUTE = "assembler";
     public static final String ORDER_ATTRIBUTE = "order";
     public static final String FIELD_ATTRIBUTE = "field";
@@ -130,6 +132,9 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
             }
         }
 
+        Class<?> selectorClass = attributes.getClass(SELECTOR_ATTRIBUTE);
+        EntitySelector entitySelector = (EntitySelector) applicationContext.getBean(selectorClass);
+
         Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTE);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
 
@@ -163,7 +168,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         }
 
         return new EntityDefinition(entityPropertyChain, entityClass, isCollection, genericEntityClass, attributes,
-                mapper, pojoClass, entityAssembler, bindingDefinitions, boundIdBindingDefinition);
+                mapper, pojoClass, entitySelector, entityAssembler, bindingDefinitions, boundIdBindingDefinition);
     }
 
     protected boolean filterEntityClass(Class<?> entityClass) {

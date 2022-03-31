@@ -1,6 +1,7 @@
 package com.gitee.spring.domain.proxy.annotation;
 
 import com.gitee.spring.domain.proxy.impl.DefaultEntityAssembler;
+import com.gitee.spring.domain.proxy.impl.DefaultEntitySelector;
 
 import java.lang.annotation.*;
 
@@ -15,6 +16,8 @@ public @interface Entity {
     String[] scene() default {};
 
     boolean manyToOne() default false;
+
+    Class<?> selector() default DefaultEntitySelector.class;
 
     Class<?> assembler() default DefaultEntityAssembler.class;
 
