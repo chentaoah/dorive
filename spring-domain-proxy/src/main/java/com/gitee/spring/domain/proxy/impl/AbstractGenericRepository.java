@@ -39,14 +39,12 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityProperty();
             Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
-            if (lastEntity != null) {
-                if (isMatchScenes(boundedContext, rootEntity, entityDefinition)) {
-                    EntitySelector entitySelector = entityDefinition.getEntitySelector();
-                    Object entity = entitySelector.select(this, boundedContext, rootEntity, entityDefinition);
-                    if (entity != null) {
-                        EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
-                        entityProperty.setValue(lastEntity, entity);
-                    }
+            if (lastEntity != null && isMatchScenes(boundedContext, rootEntity, entityDefinition)) {
+                EntitySelector entitySelector = entityDefinition.getEntitySelector();
+                Object entity = entitySelector.select(this, boundedContext, rootEntity, entityDefinition);
+                if (entity != null) {
+                    EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
+                    entityProperty.setValue(lastEntity, entity);
                 }
             }
         }
@@ -149,7 +147,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         for (EntityDefinition entityDefinition : orderedEntityDefinitions) {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
-            if (targetEntity != null) {
+            if (targetEntity != null && isMatchScenes(boundedContext, entity, entityDefinition)) {
                 if (entityDefinition.isCollection()) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
                         insertEntity(boundedContext, entity, entityDefinition, eachEntity);
@@ -210,7 +208,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         for (EntityDefinition entityDefinition : orderedEntityDefinitions) {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
-            if (targetEntity != null) {
+            if (targetEntity != null && isMatchScenes(boundedContext, entity, entityDefinition)) {
                 if (entityDefinition.isCollection()) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
                         updateEntity(boundedContext, entity, entityDefinition, eachEntity);
@@ -240,7 +238,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         for (EntityDefinition entityDefinition : orderedEntityDefinitions) {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
-            if (targetEntity != null) {
+            if (targetEntity != null && isMatchScenes(boundedContext, entity, entityDefinition)) {
                 if (entityDefinition.isCollection()) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
                         deleteEntity(boundedContext, entity, entityDefinition, eachEntity);
