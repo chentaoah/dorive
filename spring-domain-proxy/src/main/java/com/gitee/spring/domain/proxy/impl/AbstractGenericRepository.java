@@ -170,7 +170,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             Object persistentObject = entityAssembler.disassemble(boundedContext, rootEntity, entityDefinition, entity);
             if (persistentObject != null) {
                 doInsert(entityDefinition.getMapper(), boundedContext, persistentObject);
-                primaryKey = copyPrimaryKeyToEntity(entity, persistentObject);
+                primaryKey = copyPrimaryKeyForEntity(entity, persistentObject);
             }
         }
         return primaryKey;
@@ -189,7 +189,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         }
     }
 
-    protected Object copyPrimaryKeyToEntity(Object entity, Object persistentObject) {
+    protected Object copyPrimaryKeyForEntity(Object entity, Object persistentObject) {
         Object primaryKey = BeanUtil.getFieldValue(persistentObject, "id");
         BeanUtil.setFieldValue(entity, "id", primaryKey);
         return primaryKey;
