@@ -152,17 +152,17 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             if (targetEntity != null) {
                 if (entityDefinition.isCollection()) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
-                        insertSingleEntity(boundedContext, entity, entityDefinition, eachEntity);
+                        insertEntity(boundedContext, entity, entityDefinition, eachEntity);
                     }
                 } else {
-                    Object primaryKey = insertSingleEntity(boundedContext, entity, entityDefinition, targetEntity);
+                    Object primaryKey = insertEntity(boundedContext, entity, entityDefinition, targetEntity);
                     setBoundIdForBoundEntity(boundedContext, entity, entityDefinition, primaryKey);
                 }
             }
         }
     }
 
-    protected Object insertSingleEntity(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition, Object entity) {
+    protected Object insertEntity(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey == null) {
             getBoundValueFromContext(boundedContext, rootEntity, entityDefinition, entity);
@@ -213,16 +213,16 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             if (targetEntity != null) {
                 if (entityDefinition.isCollection()) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
-                        updateSingleEntity(boundedContext, entity, entityDefinition, eachEntity);
+                        updateEntity(boundedContext, entity, entityDefinition, eachEntity);
                     }
                 } else {
-                    updateSingleEntity(boundedContext, entity, entityDefinition, targetEntity);
+                    updateEntity(boundedContext, entity, entityDefinition, targetEntity);
                 }
             }
         }
     }
 
-    protected void updateSingleEntity(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition, Object entity) {
+    protected void updateEntity(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey != null) {
             EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
@@ -243,16 +243,16 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             if (targetEntity != null) {
                 if (entityDefinition.isCollection()) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
-                        deleteSingleEntity(boundedContext, entity, entityDefinition, eachEntity);
+                        deleteEntity(boundedContext, entity, entityDefinition, eachEntity);
                     }
                 } else {
-                    deleteSingleEntity(boundedContext, entity, entityDefinition, targetEntity);
+                    deleteEntity(boundedContext, entity, entityDefinition, targetEntity);
                 }
             }
         }
     }
 
-    protected void deleteSingleEntity(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition, Object entity) {
+    protected void deleteEntity(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey != null) {
             doDeleteByPrimaryKey(entityDefinition.getMapper(), boundedContext, primaryKey);
