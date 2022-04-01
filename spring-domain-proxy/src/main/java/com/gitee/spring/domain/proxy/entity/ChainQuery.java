@@ -20,6 +20,11 @@ public class ChainQuery {
         return this;
     }
 
+    public ChainQuery and(Class<?> entityClass) {
+        criteria.add(new Criterion(entityClass, null));
+        return this;
+    }
+
     @Data
     @AllArgsConstructor
     public static class Criterion {
