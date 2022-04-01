@@ -285,7 +285,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
 
     protected abstract Object doSelectPageByExample(Object mapper, BoundedContext boundedContext, Object example, Object page);
 
-    protected abstract List<?> getRecordsFromPage(Object dataPage);
+    protected abstract List<?> getRecordsFromPage(Object recordsPage);
 
     protected abstract Object newPageOfEntities(Object dataPage, List<Object> entities);
 
