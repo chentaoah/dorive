@@ -18,13 +18,13 @@ public abstract class AbstractRepository<E, PK> extends AbstractEntityDefinition
     }
 
     @Override
-    public List<E> findByExample(BoundedContext boundedContext, Object example) {
-        return findByExample(boundedContext, example, null);
+    public List<E> findByExample(Object example) {
+        return findByExample(new BoundedContext(), example);
     }
 
     @Override
-    public List<E> findByExample(Object example) {
-        return findByExample(new BoundedContext(), example);
+    public <T> T findPageByExample(Object example, Object page) {
+        return findPageByExample(new BoundedContext(), example, page);
     }
 
     @Override

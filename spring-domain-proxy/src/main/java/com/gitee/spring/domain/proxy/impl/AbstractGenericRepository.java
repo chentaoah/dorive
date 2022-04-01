@@ -129,20 +129,37 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<E> findByExample(BoundedContext boundedContext, Object example, Object page) {
+    public List<E> findByExample(BoundedContext boundedContext, Object example) {
         Assert.notNull(rootEntityDefinition, "Aggregation root is not annotated by @Entity, please use the [findByPrimaryKey] method.");
-        List<?> persistentObjects = doSelectByExample(rootEntityDefinition.getMapper(), boundedContext, example, page);
+        List<?> persistentObjects = doSelectByExample(rootEntityDefinition.getMapper(), boundedContext, example);
         if (persistentObjects != null && !persistentObjects.isEmpty()) {
-            List<Object> rootEntities = new ArrayList<>();
-            EntityAssembler entityAssembler = rootEntityDefinition.getEntityAssembler();
-            for (Object persistentObject : persistentObjects) {
-                Object rootEntity = entityAssembler.assemble(boundedContext, null, rootEntityDefinition, persistentObject);
-                handleRootEntity(boundedContext, rootEntity);
-                rootEntities.add(rootEntity);
-            }
-            return (List<E>) rootEntities;
+            return (List<E>) createRootEntities(boundedContext, persistentObjects);
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T findPageByExample(BoundedContext boundedContext, Object example, Object page) {
+        Assert.notNull(rootEntityDefinition, "Aggregation root is not annotated by @Entity, please use the [findByPrimaryKey] method.");
+        Object dataPage = doSelectPageByExample(rootEntityDefinition.getMapper(), boundedContext, example, page);
+        List<?> persistentObjects = getDataFromPage(dataPage);
+        if (persistentObjects != null && !persistentObjects.isEmpty()) {
+            List<Object> rootEntities = createRootEntities(boundedContext, persistentObjects);
+            return (T) newPageOfEntities(dataPage, rootEntities);
+        }
+        return null;
+    }
+
+    protected List<Object> createRootEntities(BoundedContext boundedContext, List<?> persistentObjects) {
+        EntityAssembler entityAssembler = rootEntityDefinition.getEntityAssembler();
+        List<Object> rootEntities = new ArrayList<>();
+        for (Object persistentObject : persistentObjects) {
+            Object rootEntity = entityAssembler.assemble(boundedContext, null, rootEntityDefinition, persistentObject);
+            handleRootEntity(boundedContext, rootEntity);
+            rootEntities.add(rootEntity);
+        }
+        return rootEntities;
     }
 
     @Override
@@ -264,7 +281,13 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
 
     protected abstract Object doSelectByPrimaryKey(Object mapper, BoundedContext boundedContext, Object primaryKey);
 
-    protected abstract List<?> doSelectByExample(Object mapper, BoundedContext boundedContext, Object example, Object page);
+    protected abstract List<?> doSelectByExample(Object mapper, BoundedContext boundedContext, Object example);
+
+    protected abstract Object doSelectPageByExample(Object mapper, BoundedContext boundedContext, Object example, Object page);
+
+    protected abstract List<?> getDataFromPage(Object dataPage);
+
+    protected abstract Object newPageOfEntities(Object dataPage, List<?> entities);
 
     protected abstract void doInsert(Object mapper, BoundedContext boundedContext, Object persistentObject);
 
