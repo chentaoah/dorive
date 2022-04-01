@@ -10,11 +10,11 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(exclude = "lastEntityProperty")
 public class EntityPropertyChain implements EntityProperty {
+    private EntityProperty lastEntityProperty;
+    private String accessPath;
     private Class<?> lastEntityClass;
     private Class<?> entityClass;
-    private String accessPath;
     private String fieldName;
-    private EntityProperty lastEntityProperty;
     private EntityProperty entityProperty;
 
     public void initialize() {

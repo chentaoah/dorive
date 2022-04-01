@@ -58,7 +58,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
 
         AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(entityClass, Entity.class);
         Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(entityClass, Binding.class);
-        visitEntityClass(null, entityClass, entityClass, attributes, bindingAnnotations, "/", null);
+        visitEntityClass("/", null, entityClass, null, entityClass, attributes, bindingAnnotations);
 
         for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
@@ -75,16 +75,16 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                 entityDefinition -> entityDefinition.getAttributes().getNumber(ORDER_ATTRIBUTE).intValue()));
     }
 
-    protected void visitEntityClass(Class<?> lastEntityClass, Class<?> entityClass, Class<?> genericEntityClass,
-                                    AnnotationAttributes attributes, Set<Binding> bindingAnnotations, String accessPath, String fieldName) {
+    protected void visitEntityClass(String accessPath, Class<?> lastEntityClass, Class<?> entityClass, String fieldName, Class<?> genericEntityClass,
+                                    AnnotationAttributes attributes, Set<Binding> bindingAnnotations) {
         if (lastEntityClass == null && attributes != null) {
-            rootEntityDefinition = newEntityDefinition(null, entityClass, genericEntityClass, attributes, bindingAnnotations);
+            rootEntityDefinition = newEntityDefinition(accessPath, null, entityClass, genericEntityClass, attributes, bindingAnnotations);
             orderedEntityDefinitions.add(rootEntityDefinition);
 
         } else if (lastEntityClass != null) {
-            EntityPropertyChain entityPropertyChain = newEntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName);
+            EntityPropertyChain entityPropertyChain = newEntityPropertyChain(accessPath, lastEntityClass, entityClass, fieldName);
             if (attributes != null) {
-                EntityDefinition entityDefinition = newEntityDefinition(entityPropertyChain, entityClass, genericEntityClass, attributes, bindingAnnotations);
+                EntityDefinition entityDefinition = newEntityDefinition(accessPath, entityPropertyChain, entityClass, genericEntityClass, attributes, bindingAnnotations);
                 entityDefinitionMap.put(accessPath, entityDefinition);
                 orderedEntityDefinitions.add(entityDefinition);
             }
@@ -101,21 +101,22 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                 AnnotationAttributes fieldAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(field, Entity.class);
                 Set<Binding> fieldBindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(field, Binding.class);
                 String fieldAccessPath = "/".equals(accessPath) ? accessPath + field.getName() : accessPath + "/" + field.getName();
-                visitEntityClass(entityClass, fieldEntityClass, fieldGenericEntityClass, fieldAttributes, fieldBindingAnnotations, fieldAccessPath, field.getName());
+                visitEntityClass(fieldAccessPath, entityClass, fieldEntityClass, field.getName(), fieldGenericEntityClass, fieldAttributes, fieldBindingAnnotations);
             });
         }
     }
 
-    protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass, Class<?> entityClass, String accessPath, String fieldName) {
+    protected EntityPropertyChain newEntityPropertyChain(String accessPath, Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
         String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
         EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
-        EntityPropertyChain entityPropertyChain = new EntityPropertyChain(lastEntityClass, entityClass, accessPath, fieldName, lastEntityPropertyChain, null);
+        EntityPropertyChain entityPropertyChain = new EntityPropertyChain(lastEntityPropertyChain, accessPath, lastEntityClass, entityClass, fieldName, null);
         entityPropertyChainMap.put(accessPath, entityPropertyChain);
         return entityPropertyChain;
     }
 
-    protected EntityDefinition newEntityDefinition(EntityPropertyChain entityPropertyChain, Class<?> entityClass, Class<?> genericEntityClass,
+    protected EntityDefinition newEntityDefinition(String accessPath, EntityPropertyChain entityPropertyChain, Class<?> entityClass, Class<?> genericEntityClass,
                                                    AnnotationAttributes attributes, Set<Binding> bindingAnnotations) {
+        boolean isRoot = entityPropertyChain == null;
         boolean isCollection = Collection.class.isAssignableFrom(entityClass);
 
         Class<?> mapperClass = attributes.getClass(MAPPER_ATTRIBUTE);
@@ -149,13 +150,18 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
             boolean isFromContext = !bindAttribute.startsWith("/");
             boolean isBindId = isIdField && !isFromContext;
 
+            String lastAccessPath = null;
+            String fieldName = null;
             EntityPropertyChain boundEntityPropertyChain = null;
             if (!isFromContext) {
+                lastAccessPath = PathUtils.getLastAccessPath(bindAttribute);
+                fieldName = PathUtils.getFieldName(bindAttribute);
                 boundEntityPropertyChain = entityPropertyChainMap.get(bindAttribute);
                 Assert.notNull(boundEntityPropertyChain, "Bound path not available!");
             }
 
-            BindingDefinition bindingDefinition = new BindingDefinition(bindingAttributes, isFromContext, isBindId, boundEntityPropertyChain);
+            BindingDefinition bindingDefinition = new BindingDefinition(
+                    bindingAttributes, isFromContext, isBindId, lastAccessPath, fieldName, boundEntityPropertyChain);
             bindingDefinitions.add(bindingDefinition);
 
             if (isBindId) {
@@ -167,7 +173,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
             attributes.put(ORDER_ATTRIBUTE, -1);
         }
 
-        return new EntityDefinition(entityPropertyChain, entityClass, isCollection, genericEntityClass, attributes,
+        return new EntityDefinition(accessPath, isRoot, entityPropertyChain, entityClass, isCollection, genericEntityClass, attributes,
                 mapper, pojoClass, entitySelector, entityAssembler, bindingDefinitions, boundIdBindingDefinition);
     }
 

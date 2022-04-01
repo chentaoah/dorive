@@ -11,9 +11,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class EntityDefinition {
+    private String accessPath;
+    private boolean root;
     private EntityPropertyChain entityPropertyChain;
     private Class<?> entityClass;
-    private boolean isCollection;
+    private boolean collection;
     private Class<?> genericEntityClass;
     private AnnotationAttributes attributes;
     private Object mapper;
