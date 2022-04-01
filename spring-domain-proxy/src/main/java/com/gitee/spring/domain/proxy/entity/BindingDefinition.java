@@ -10,7 +10,7 @@ public class BindingDefinition {
     private AnnotationAttributes attributes;
     private boolean fromContext;
     private boolean bindId;
-    private String lastAccessPath;
-    private String fieldName;
+    private String boundAccessPath;
+    private String boundFieldName;
     private EntityPropertyChain boundEntityPropertyChain;
 }

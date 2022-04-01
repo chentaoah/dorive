@@ -3,10 +3,12 @@ package com.gitee.spring.domain.proxy.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.proxy.entity.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationAttributes;
 
 import java.util.*;
 
+@Slf4j
 public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRepository<E, PK> {
 
     protected Map<Class<?>, EntityDefinition> classEntityDefinitionMap = new LinkedHashMap<>();
@@ -61,7 +63,7 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
             Object entity = assembleEntity(boundedContext, null, entityDefinition, persistentObjects);
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
-                    String bindAccessPath = bindingDefinition.getLastAccessPath();
+                    String bindAccessPath = bindingDefinition.getBoundAccessPath();
                     Object queryParams = chainQueryContext.get(bindAccessPath);
                     if (queryParams == null && "/".equals(bindAccessPath)) {
                         queryParams = newQueryParams(boundedContext, null, rootEntityDefinition);
@@ -70,7 +72,9 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
                     if (queryParams != null) {
                         AnnotationAttributes attributes = bindingDefinition.getAttributes();
                         Object fieldValue = collectFieldValues(entity, attributes.getString(FIELD_ATTRIBUTE));
-                        addToQueryParams(queryParams, bindingDefinition.getFieldName(), fieldValue);
+                        String boundFieldName = bindingDefinition.getBoundFieldName();
+                        addToQueryParams(queryParams, boundFieldName, fieldValue);
+                        log.debug("Add query parameter for entity! accessPath:[{}], fieldName:[{}], fieldValue:[{}]", bindAccessPath, boundFieldName, fieldValue);
                     }
                 }
             }
