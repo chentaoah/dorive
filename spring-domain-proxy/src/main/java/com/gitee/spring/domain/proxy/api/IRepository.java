@@ -10,6 +10,8 @@ public interface IRepository<E, PK> {
 
     E findByPrimaryKey(PK primaryKey);
 
+    List<E> findByExample(BoundedContext boundedContext, Object example, Object page);
+
     List<E> findByExample(BoundedContext boundedContext, Object example);
 
     List<E> findByExample(Object example);

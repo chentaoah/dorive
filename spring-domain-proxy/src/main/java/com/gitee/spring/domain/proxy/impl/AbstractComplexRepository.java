@@ -21,13 +21,13 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
         }
     }
 
-    public List<E> findByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery) {
+    public List<E> findByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery, Object page) {
         Map<String, Map<String, Object>> chainQueryContext = new LinkedHashMap<>();
         for (ChainQuery.Criterion criterion : chainQuery.getCriteria()) {
             EntityDefinition entityDefinition = classEntityDefinitionMap.get(criterion.getEntityClass());
             Assert.notNull(entityDefinition, "The entity definition does not exist!");
             Object mergedExample = mergeQueryParamsToExample(chainQueryContext, entityDefinition, criterion.getExample());
-            List<?> persistentObjects = doSelectByExample(entityDefinition.getMapper(), boundedContext, mergedExample);
+            List<?> persistentObjects = doSelectByExample(entityDefinition.getMapper(), boundedContext, mergedExample, null);
             Object entity = assembleEntity(boundedContext, null, entityDefinition, persistentObjects);
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
@@ -47,7 +47,7 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
                 }
             }
         }
-        return super.findByExample(boundedContext, chainQueryContext.get("/"));
+        return super.findByExample(boundedContext, chainQueryContext.get("/"), page);
     }
 
     @SuppressWarnings("unchecked")

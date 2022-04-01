@@ -124,9 +124,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<E> findByExample(BoundedContext boundedContext, Object example) {
+    public List<E> findByExample(BoundedContext boundedContext, Object example, Object page) {
         Assert.notNull(rootEntityDefinition, "Aggregation root is not annotated by @Entity, please use the [findByPrimaryKey] method.");
-        List<?> persistentObjects = doSelectByExample(rootEntityDefinition.getMapper(), boundedContext, example);
+        List<?> persistentObjects = doSelectByExample(rootEntityDefinition.getMapper(), boundedContext, example, page);
         if (persistentObjects != null && !persistentObjects.isEmpty()) {
             List<Object> rootEntities = new ArrayList<>();
             EntityAssembler entityAssembler = rootEntityDefinition.getEntityAssembler();
@@ -259,7 +259,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
 
     protected abstract Object doSelectByPrimaryKey(Object mapper, BoundedContext boundedContext, Object primaryKey);
 
-    protected abstract List<?> doSelectByExample(Object mapper, BoundedContext boundedContext, Object example);
+    protected abstract List<?> doSelectByExample(Object mapper, BoundedContext boundedContext, Object example, Object page);
 
     protected abstract void doInsert(Object mapper, BoundedContext boundedContext, Object persistentObject);
 
