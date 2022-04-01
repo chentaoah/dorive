@@ -74,6 +74,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
             }
             List<?> persistentObjects = doSelectByExample(entityDefinition.getMapper(), boundedContext, criterion.getExample());
             Object entity = assembleEntity(boundedContext, null, entityDefinition, persistentObjects);
+            log.debug("Query data is: {}", entity);
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
                     String boundAccessPath = bindingDefinition.getBoundAccessPath();
@@ -87,7 +88,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
                         AnnotationAttributes attributes = bindingDefinition.getAttributes();
                         Object fieldValue = collectFieldValues(entity, attributes.getString(FIELD_ATTRIBUTE));
                         addToQueryParams(queryParams, boundFieldName, fieldValue);
-                        log.debug("Add query parameter for entity! accessPath:{}, fieldName:{}, fieldValue:{}", boundAccessPath, boundFieldName, fieldValue);
+                        log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValue: {}", boundAccessPath, boundFieldName, fieldValue);
                     }
                 }
             }
