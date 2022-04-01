@@ -64,7 +64,8 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
                     String bindAccessPath = bindingDefinition.getLastAccessPath();
                     Object queryParams = chainQueryContext.get(bindAccessPath);
                     if (queryParams == null && "/".equals(bindAccessPath)) {
-                        queryParams = chainQueryContext.put("/", newQueryParams(boundedContext, null, rootEntityDefinition));
+                        queryParams = newQueryParams(boundedContext, null, rootEntityDefinition);
+                        chainQueryContext.put("/", queryParams);
                     }
                     if (queryParams != null) {
                         AnnotationAttributes attributes = bindingDefinition.getAttributes();
