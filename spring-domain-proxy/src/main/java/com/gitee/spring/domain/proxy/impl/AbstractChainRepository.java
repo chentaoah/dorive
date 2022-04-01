@@ -2,6 +2,7 @@ package com.gitee.spring.domain.proxy.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import com.gitee.spring.domain.proxy.api.ChainRepository;
 import com.gitee.spring.domain.proxy.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationAttributes;
@@ -9,7 +10,7 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import java.util.*;
 
 @Slf4j
-public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRepository<E, PK> {
+public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepository<E, PK> implements ChainRepository<E, ChainQuery> {
 
     protected Map<Class<?>, EntityDefinition> classEntityDefinitionMap = new LinkedHashMap<>();
 
@@ -22,6 +23,7 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
         }
     }
 
+    @Override
     public List<E> findByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery) {
         Map<String, Object> chainQueryContext = createChainQueryContext(boundedContext, chainQuery);
         executeChainQuery(boundedContext, chainQueryContext, chainQuery);
@@ -30,12 +32,23 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
         return super.findByExample(boundedContext, example);
     }
 
+    @Override
+    public List<E> findByChainQuery(ChainQuery chainQuery) {
+        return findByChainQuery(new BoundedContext(), chainQuery);
+    }
+
+    @Override
     public <T> T findPageByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery, Object page) {
         Map<String, Object> chainQueryContext = createChainQueryContext(boundedContext, chainQuery);
         executeChainQuery(boundedContext, chainQueryContext, chainQuery);
         Object example = chainQueryContext.get("/");
         Assert.notNull(example, "The query criteria of the root entity cannot be empty!");
         return super.findPageByExample(boundedContext, example, page);
+    }
+
+    @Override
+    public <T> T findPageByChainQuery(ChainQuery chainQuery, Object page) {
+        return findPageByChainQuery(new BoundedContext(), chainQuery, page);
     }
 
     protected Map<String, Object> createChainQueryContext(BoundedContext boundedContext, ChainQuery chainQuery) {
@@ -63,18 +76,18 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
             Object entity = assembleEntity(boundedContext, null, entityDefinition, persistentObjects);
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
-                    String bindAccessPath = bindingDefinition.getBoundAccessPath();
-                    Object queryParams = chainQueryContext.get(bindAccessPath);
-                    if (queryParams == null && "/".equals(bindAccessPath)) {
+                    String boundAccessPath = bindingDefinition.getBoundAccessPath();
+                    Object queryParams = chainQueryContext.get(boundAccessPath);
+                    if (queryParams == null && "/".equals(boundAccessPath)) {
                         queryParams = newQueryParams(boundedContext, null, rootEntityDefinition);
                         chainQueryContext.put("/", queryParams);
                     }
                     if (queryParams != null) {
+                        String boundFieldName = bindingDefinition.getBoundFieldName();
                         AnnotationAttributes attributes = bindingDefinition.getAttributes();
                         Object fieldValue = collectFieldValues(entity, attributes.getString(FIELD_ATTRIBUTE));
-                        String boundFieldName = bindingDefinition.getBoundFieldName();
                         addToQueryParams(queryParams, boundFieldName, fieldValue);
-                        log.debug("Add query parameter for entity! accessPath:[{}], fieldName:[{}], fieldValue:[{}]", bindAccessPath, boundFieldName, fieldValue);
+                        log.debug("Add query parameter for entity! accessPath:{}, fieldName:{}, fieldValue:{}", boundAccessPath, boundFieldName, fieldValue);
                     }
                 }
             }
