@@ -16,20 +16,24 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
         super.afterPropertiesSet();
         classEntityDefinitionMap.put(rootEntityDefinition.getGenericEntityClass(), rootEntityDefinition);
         for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
-            classEntityDefinitionMap.put(entityDefinition.getEntityClass(), entityDefinition);
+            classEntityDefinitionMap.put(entityDefinition.getGenericEntityClass(), entityDefinition);
         }
     }
 
     public List<E> findByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery) {
         Map<String, Object> chainQueryContext = createChainQueryContext(boundedContext, chainQuery);
         executeChainQuery(boundedContext, chainQueryContext, chainQuery);
-        return super.findByExample(boundedContext, chainQueryContext.get("/"));
+        Object example = chainQueryContext.get("/");
+        Assert.notNull(example, "The query criteria of the root entity cannot be empty!");
+        return super.findByExample(boundedContext, example);
     }
 
     public <T> T findPageByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery, Object page) {
         Map<String, Object> chainQueryContext = createChainQueryContext(boundedContext, chainQuery);
         executeChainQuery(boundedContext, chainQueryContext, chainQuery);
-        return super.findPageByExample(boundedContext, chainQueryContext.get("/"), page);
+        Object example = chainQueryContext.get("/");
+        Assert.notNull(example, "The query criteria of the root entity cannot be empty!");
+        return super.findPageByExample(boundedContext, example, page);
     }
 
     protected Map<String, Object> createChainQueryContext(BoundedContext boundedContext, ChainQuery chainQuery) {
@@ -43,9 +47,6 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
                 criterion.setExample(example);
             }
             chainQueryContext.put(entityDefinition.getAccessPath(), example);
-        }
-        if (!chainQueryContext.containsKey("/")) {
-            chainQueryContext.put("/", newQueryParams(boundedContext, null, rootEntityDefinition));
         }
         return chainQueryContext;
     }
@@ -62,6 +63,9 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
                 if (!bindingDefinition.isFromContext()) {
                     String bindAccessPath = bindingDefinition.getLastAccessPath();
                     Object queryParams = chainQueryContext.get(bindAccessPath);
+                    if (queryParams == null && "/".equals(bindAccessPath)) {
+                        queryParams = chainQueryContext.put("/", newQueryParams(boundedContext, null, rootEntityDefinition));
+                    }
                     if (queryParams != null) {
                         AnnotationAttributes attributes = bindingDefinition.getAttributes();
                         Object fieldValue = collectFieldValues(entity, attributes.getString(FIELD_ATTRIBUTE));
