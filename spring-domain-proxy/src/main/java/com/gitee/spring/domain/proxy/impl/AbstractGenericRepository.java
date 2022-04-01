@@ -287,7 +287,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
 
     protected abstract List<?> getRecordsFromPage(Object recordsPage);
 
-    protected abstract Object newPageOfEntities(Object dataPage, List<Object> entities);
+    protected abstract Object newPageOfEntities(Object recordsPage, List<Object> entities);
 
     protected abstract void doInsert(Object mapper, BoundedContext boundedContext, Object persistentObject);
 
