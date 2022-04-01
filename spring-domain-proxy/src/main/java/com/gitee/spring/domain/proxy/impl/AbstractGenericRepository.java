@@ -142,11 +142,11 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     @SuppressWarnings("unchecked")
     public <T> T findPageByExample(BoundedContext boundedContext, Object example, Object page) {
         Assert.notNull(rootEntityDefinition, "Aggregation root is not annotated by @Entity, please use the [findByPrimaryKey] method.");
-        Object dataPage = doSelectPageByExample(rootEntityDefinition.getMapper(), boundedContext, example, page);
-        List<?> persistentObjects = getDataFromPage(dataPage);
+        Object recordsPage = doSelectPageByExample(rootEntityDefinition.getMapper(), boundedContext, example, page);
+        List<?> persistentObjects = getRecordsFromPage(recordsPage);
         if (persistentObjects != null && !persistentObjects.isEmpty()) {
             List<Object> rootEntities = createRootEntities(boundedContext, persistentObjects);
-            return (T) newPageOfEntities(dataPage, rootEntities);
+            return (T) newPageOfEntities(recordsPage, rootEntities);
         }
         return null;
     }
@@ -285,7 +285,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
 
     protected abstract Object doSelectPageByExample(Object mapper, BoundedContext boundedContext, Object example, Object page);
 
-    protected abstract List<?> getDataFromPage(Object dataPage);
+    protected abstract List<?> getRecordsFromPage(Object dataPage);
 
     protected abstract Object newPageOfEntities(Object dataPage, List<Object> entities);
 
