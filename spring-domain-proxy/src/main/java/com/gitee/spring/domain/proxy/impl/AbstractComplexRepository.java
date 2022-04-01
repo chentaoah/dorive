@@ -22,61 +22,52 @@ public abstract class AbstractComplexRepository<E, PK> extends AbstractGenericRe
     }
 
     public List<E> findByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery, Object page) {
-        Map<String, Map<String, Object>> chainQueryContext = new LinkedHashMap<>();
+        Map<String, Object> chainQueryContext = new LinkedHashMap<>();
         for (ChainQuery.Criterion criterion : chainQuery.getCriteria()) {
             EntityDefinition entityDefinition = classEntityDefinitionMap.get(criterion.getEntityClass());
             Assert.notNull(entityDefinition, "The entity definition does not exist!");
-            Object mergedExample = mergeQueryParamsToExample(chainQueryContext, entityDefinition, criterion.getExample());
+
+            EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
+            String accessPath = entityPropertyChain.getAccessPath();
+
+            Object mergedExample = mergeQueryParamsToExample(entityDefinition, chainQueryContext.get(accessPath), criterion.getExample());
             List<?> persistentObjects = doSelectByExample(entityDefinition.getMapper(), boundedContext, mergedExample, null);
             Object entity = assembleEntity(boundedContext, null, entityDefinition, persistentObjects);
+
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
                     AnnotationAttributes attributes = bindingDefinition.getAttributes();
                     String fieldAttribute = attributes.getString(FIELD_ATTRIBUTE);
                     String bindAttribute = attributes.getString(BIND_ATTRIBUTE);
-                    String accessPath = PathUtils.getLastAccessPath(bindAttribute);
-                    String fieldName = PathUtils.getFieldName(bindAttribute);
-                    fieldName = convertFieldName(entityDefinition, bindingDefinition, fieldName);
+                    String bindAccessPath = PathUtils.getLastAccessPath(bindAttribute);
+                    String bindFieldName = PathUtils.getFieldName(bindAttribute);
+
+                    Object fieldValue;
                     if (entity instanceof Collection) {
+                        List<Object> fieldValues = new ArrayList<>();
                         for (Object eachEntity : (Collection<?>) entity) {
-                            getQueryParamsFromEntity(chainQueryContext, eachEntity, fieldAttribute, accessPath, fieldName, true);
+                            Object eachFieldValue = BeanUtil.getFieldValue(eachEntity, fieldAttribute);
+                            fieldValues.add(eachFieldValue);
                         }
+                        fieldValue = fieldValues;
                     } else {
-                        getQueryParamsFromEntity(chainQueryContext, entity, fieldAttribute, accessPath, fieldName, false);
+                        fieldValue = BeanUtil.getFieldValue(entity, fieldAttribute);
                     }
+
+                    Object queryParams = chainQueryContext.get(bindAccessPath);
+                    if (queryParams == null) {
+                        queryParams = newQueryParams(boundedContext, null, entityDefinition);
+                        chainQueryContext.put(bindAccessPath, queryParams);
+                    }
+                    addToQueryParams(queryParams, bindFieldName, fieldValue);
                 }
             }
         }
         return super.findByExample(boundedContext, chainQueryContext.get("/"), page);
     }
 
-    @SuppressWarnings("unchecked")
-    protected Object mergeQueryParamsToExample(Map<String, Map<String, Object>> chainQueryContext, EntityDefinition entityDefinition, Object example) {
-        EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
-        String accessPath = entityPropertyChain.getAccessPath();
-        if (chainQueryContext.containsKey(accessPath)) {
-            Map<String, Object> queryParamsInContext = chainQueryContext.get(accessPath);
-            if (example instanceof Map) {
-                Map<String, Object> queryParams = (Map<String, Object>) example;
-                queryParams.putAll(queryParamsInContext);
-            }
-        }
+    protected Object mergeQueryParamsToExample(EntityDefinition entityDefinition, Object queryParams, Object example) {
         return example;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected void getQueryParamsFromEntity(Map<String, Map<String, Object>> chainQueryContext, Object entity, String fieldAttribute,
-                                            String accessPath, String fieldName, boolean isCollection) {
-        Object fieldValue = BeanUtil.getFieldValue(entity, fieldAttribute);
-        if (fieldValue != null) {
-            Map<String, Object> queryParams = chainQueryContext.computeIfAbsent(accessPath, key -> new LinkedHashMap<>());
-            if (isCollection) {
-                List<Object> queryValues = (List<Object>) queryParams.computeIfAbsent(fieldName, key -> new ArrayList<>());
-                queryValues.add(fieldValue);
-            } else {
-                queryParams.put(fieldName, fieldValue);
-            }
-        }
     }
 
 }

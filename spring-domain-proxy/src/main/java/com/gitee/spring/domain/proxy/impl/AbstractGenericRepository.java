@@ -70,18 +70,21 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         return false;
     }
 
-    protected Map<String, Object> getQueryParamsFromContext(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition) {
-        Map<String, Object> queryParams = new LinkedHashMap<>();
+    protected Object getQueryParamsFromContext(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition) {
+        Object queryParams = newQueryParams(boundedContext, rootEntity, entityDefinition);
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
             Object boundValue = getBoundValue(boundedContext, rootEntity, bindingDefinition);
             if (boundValue != null) {
                 AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
                 String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
-                fieldAttribute = convertFieldName(entityDefinition, bindingDefinition, fieldAttribute);
-                queryParams.put(fieldAttribute, boundValue);
+                addToQueryParams(queryParams, fieldAttribute, boundValue);
             }
         }
         return queryParams;
+    }
+
+    protected Object newQueryParams(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition) {
+        return new LinkedHashMap<>();
     }
 
     protected Object getBoundValue(BoundedContext boundedContext, Object rootEntity, BindingDefinition bindingDefinition) {
@@ -97,8 +100,10 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         return boundValue;
     }
 
-    protected String convertFieldName(EntityDefinition entityDefinition, BindingDefinition bindingDefinition, String fieldAttribute) {
-        return fieldAttribute;
+    @SuppressWarnings("unchecked")
+    protected void addToQueryParams(Object queryParams, String fieldAttribute, Object boundValue) {
+        Map<String, Object> queryParamsMap = (Map<String, Object>) queryParams;
+        queryParamsMap.put(fieldAttribute, boundValue);
     }
 
     protected Object assembleEntity(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition, List<?> persistentObjects) {
