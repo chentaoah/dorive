@@ -11,8 +11,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class EntityDefinition {
-    private String accessPath;
     private boolean root;
+    private String accessPath;
     private EntityPropertyChain entityPropertyChain;
     private Class<?> entityClass;
     private boolean collection;

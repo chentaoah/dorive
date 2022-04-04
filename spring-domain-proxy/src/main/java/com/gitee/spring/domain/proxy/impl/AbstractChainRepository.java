@@ -12,20 +12,9 @@ import java.util.*;
 @Slf4j
 public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepository<E, PK> implements ChainRepository<E, ChainQuery> {
 
-    protected Map<Class<?>, EntityDefinition> classEntityDefinitionMap = new LinkedHashMap<>();
-
-    @Override
-    public void afterPropertiesSet() {
-        super.afterPropertiesSet();
-        classEntityDefinitionMap.put(rootEntityDefinition.getGenericEntityClass(), rootEntityDefinition);
-        for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
-            classEntityDefinitionMap.put(entityDefinition.getGenericEntityClass(), entityDefinition);
-        }
-    }
-
     @Override
     public List<E> findByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery) {
-        Map<String, Object> chainQueryContext = createChainQueryContext(boundedContext, chainQuery);
+        Map<String, Object> chainQueryContext = newChainQueryContext(boundedContext, chainQuery);
         executeChainQuery(boundedContext, chainQueryContext, chainQuery);
         Object example = chainQueryContext.get("/");
         Assert.notNull(example, "The query criteria of the root entity cannot be empty!");
@@ -39,7 +28,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
 
     @Override
     public <T> T findPageByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery, Object page) {
-        Map<String, Object> chainQueryContext = createChainQueryContext(boundedContext, chainQuery);
+        Map<String, Object> chainQueryContext = newChainQueryContext(boundedContext, chainQuery);
         executeChainQuery(boundedContext, chainQueryContext, chainQuery);
         Object example = chainQueryContext.get("/");
         Assert.notNull(example, "The query criteria of the root entity cannot be empty!");
@@ -51,7 +40,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
         return findPageByChainQuery(new BoundedContext(), chainQuery, page);
     }
 
-    protected Map<String, Object> createChainQueryContext(BoundedContext boundedContext, ChainQuery chainQuery) {
+    protected Map<String, Object> newChainQueryContext(BoundedContext boundedContext, ChainQuery chainQuery) {
         Map<String, Object> chainQueryContext = new LinkedHashMap<>();
         for (ChainQuery.Criterion criterion : chainQuery.getCriteria()) {
             EntityDefinition entityDefinition = classEntityDefinitionMap.get(criterion.getEntityClass());

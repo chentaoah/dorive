@@ -9,13 +9,9 @@ import java.util.List;
 public class DefaultEntitySelector implements EntitySelector {
 
     @Override
-    public Object select(AbstractGenericRepository<?, ?> repository, BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition) {
-        Object queryParams = repository.getQueryParamsFromContext(boundedContext, rootEntity, entityDefinition);
-        List<?> persistentObjects = repository.doSelectByExample(entityDefinition.getMapper(), boundedContext, queryParams);
-        if (persistentObjects != null && !persistentObjects.isEmpty()) {
-            return repository.assembleEntity(boundedContext, rootEntity, entityDefinition, persistentObjects);
-        }
-        return null;
+    public List<?> select(AbstractGenericRepository<?, ?> repository, BoundedContext boundedContext,
+                          Object rootEntity, EntityDefinition entityDefinition, Object queryParams) {
+        return repository.doSelectByExample(entityDefinition.getMapper(), boundedContext, queryParams);
     }
 
 }

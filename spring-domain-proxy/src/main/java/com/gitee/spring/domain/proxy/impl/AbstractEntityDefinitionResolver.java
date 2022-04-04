@@ -42,6 +42,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
     protected EntityDefinition rootEntityDefinition;
     protected Map<String, EntityDefinition> entityDefinitionMap = new LinkedHashMap<>();
     protected List<EntityDefinition> orderedEntityDefinitions = new ArrayList<>();
+    protected Map<Class<?>, EntityDefinition> classEntityDefinitionMap = new LinkedHashMap<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -73,6 +74,11 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
 
         orderedEntityDefinitions.sort(Comparator.comparingInt(
                 entityDefinition -> entityDefinition.getAttributes().getNumber(ORDER_ATTRIBUTE).intValue()));
+
+        classEntityDefinitionMap.put(rootEntityDefinition.getGenericEntityClass(), rootEntityDefinition);
+        for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
+            classEntityDefinitionMap.put(entityDefinition.getGenericEntityClass(), entityDefinition);
+        }
     }
 
     protected void visitEntityClass(String accessPath, Class<?> lastEntityClass, Class<?> entityClass, String fieldName, Class<?> genericEntityClass,
@@ -173,7 +179,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
             attributes.put(ORDER_ATTRIBUTE, -1);
         }
 
-        return new EntityDefinition(accessPath, isRoot, entityPropertyChain, entityClass, isCollection, genericEntityClass, attributes,
+        return new EntityDefinition(isRoot, accessPath, entityPropertyChain, entityClass, isCollection, genericEntityClass, attributes,
                 mapper, pojoClass, entitySelector, entityAssembler, bindingDefinitions, boundIdBindingDefinition);
     }
 
