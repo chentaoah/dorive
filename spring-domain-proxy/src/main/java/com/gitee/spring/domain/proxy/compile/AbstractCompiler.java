@@ -16,7 +16,7 @@
  */
 package com.gitee.spring.domain.proxy.compile;
 
-import com.gitee.spring.domain.proxy.api.MyCompiler;
+import com.gitee.spring.domain.proxy.api.ProxyCompiler;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 /**
  * Abstract compiler. (SPI, Prototype, ThreadSafe)
  */
-public abstract class AbstractCompiler implements MyCompiler {
+public abstract class AbstractCompiler implements ProxyCompiler {
 
     private static final Pattern PACKAGE_PATTERN = Pattern.compile("package\\s+([$_a-zA-Z][$_a-zA-Z0-9\\.]*);");
 

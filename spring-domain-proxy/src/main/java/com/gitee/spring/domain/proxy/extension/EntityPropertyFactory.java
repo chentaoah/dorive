@@ -2,7 +2,7 @@ package com.gitee.spring.domain.proxy.extension;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.proxy.api.EntityProperty;
-import com.gitee.spring.domain.proxy.api.MyCompiler;
+import com.gitee.spring.domain.proxy.api.ProxyCompiler;
 import com.gitee.spring.domain.proxy.compile.JavassistCompiler;
 import com.gitee.spring.domain.proxy.utils.ReflectUtils;
 
@@ -12,20 +12,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class EntityPropertyFactory {
 
-    private static final AtomicInteger count = new AtomicInteger(0);
-    private static final MyCompiler myCompiler = new JavassistCompiler();
-    private static final Map<String, EntityProperty> generatedProxyCache = new LinkedHashMap<>();
+    private static final AtomicInteger COUNT = new AtomicInteger(0);
+    private static final ProxyCompiler PROXY_COMPILER = new JavassistCompiler();
+    private static final Map<String, EntityProperty> GENERATED_PROXY_CACHE = new LinkedHashMap<>();
 
     public static EntityProperty newEntityProperty(Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
         String cacheKey = lastEntityClass.getTypeName() + ":" + entityClass.getTypeName() + ":" + fieldName;
-        if (generatedProxyCache.containsKey(cacheKey)) {
-            return generatedProxyCache.get(cacheKey);
+        if (GENERATED_PROXY_CACHE.containsKey(cacheKey)) {
+            return GENERATED_PROXY_CACHE.get(cacheKey);
         }
         try {
             String generatedCode = generateCode(lastEntityClass, entityClass, fieldName);
-            Class<?> generatedClass = myCompiler.compile(generatedCode, null);
+            Class<?> generatedClass = PROXY_COMPILER.compile(generatedCode, null);
             EntityProperty entityProperty = (EntityProperty) ReflectUtils.newInstance(generatedClass);
-            generatedProxyCache.put(cacheKey, entityProperty);
+            GENERATED_PROXY_CACHE.put(cacheKey, entityProperty);
             return entityProperty;
 
         } catch (Exception e) {
@@ -36,7 +36,7 @@ public class EntityPropertyFactory {
     private static String generateCode(Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
         Class<?> interfaceClass = EntityProperty.class;
         StringBuilder builder = new StringBuilder();
-        String simpleName = interfaceClass.getSimpleName() + "$Proxy" + count.getAndIncrement();
+        String simpleName = interfaceClass.getSimpleName() + "$Proxy" + COUNT.getAndIncrement();
         builder.append(String.format("package %s;\n", interfaceClass.getPackage().getName()));
         builder.append(String.format("public class %s implements %s {\n", simpleName, interfaceClass.getName()));
 

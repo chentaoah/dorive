@@ -16,7 +16,7 @@
  */
 package com.gitee.spring.domain.proxy.api;
 
-public interface MyCompiler {
+public interface ProxyCompiler {
 
     /**
      * Compile java source code.
