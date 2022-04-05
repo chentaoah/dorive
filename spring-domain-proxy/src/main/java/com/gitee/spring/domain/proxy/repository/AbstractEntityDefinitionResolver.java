@@ -1,15 +1,17 @@
-package com.gitee.spring.domain.proxy.impl;
+package com.gitee.spring.domain.proxy.repository;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.proxy.annotation.Binding;
 import com.gitee.spring.domain.proxy.annotation.Entity;
 import com.gitee.spring.domain.proxy.api.EntityAssembler;
-import com.gitee.spring.domain.proxy.api.EntitySelector;
+import com.gitee.spring.domain.proxy.api.EntityMapper;
+import com.gitee.spring.domain.proxy.api.RepositoryRoute;
 import com.gitee.spring.domain.proxy.entity.BindingDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
 import com.gitee.spring.domain.proxy.utils.PathUtils;
 import com.gitee.spring.domain.proxy.utils.ReflectUtils;
+import lombok.Getter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -24,14 +26,14 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 
-public abstract class AbstractEntityDefinitionResolver implements ApplicationContextAware, InitializingBean {
+public abstract class AbstractEntityDefinitionResolver<E, PK> extends AbstractRepository<E, PK>
+        implements ApplicationContextAware, InitializingBean, RepositoryRoute {
 
     public static final String MAPPER_ATTRIBUTE = "mapper";
     public static final String SCENE_ATTRIBUTE = "scene";
-    public static final String MANY_TO_ONE_ATTRIBUTE = "manyToOne";
-    public static final String SELECTOR_ATTRIBUTE = "selector";
     public static final String ASSEMBLER_ATTRIBUTE = "assembler";
     public static final String ORDER_ATTRIBUTE = "order";
+
     public static final String FIELD_ATTRIBUTE = "field";
     public static final String BIND_ATTRIBUTE = "bind";
 
@@ -39,10 +41,11 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
     protected Class<?> entityClass;
     protected Constructor<?> constructor;
     protected Map<String, EntityPropertyChain> entityPropertyChainMap = new LinkedHashMap<>();
-    protected EntityDefinition rootEntityDefinition;
-    protected Map<String, EntityDefinition> entityDefinitionMap = new LinkedHashMap<>();
-    protected List<EntityDefinition> orderedEntityDefinitions = new ArrayList<>();
-    protected Map<Class<?>, EntityDefinition> classEntityDefinitionMap = new LinkedHashMap<>();
+
+    protected DefaultRepository rootRepository;
+    protected List<DefaultRepository> defaultRepositories = new ArrayList<>();
+    protected List<DefaultRepository> orderedRepositories = new ArrayList<>();
+    protected Map<Class<?>, DefaultRepository> classRepositoryMap = new LinkedHashMap<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -51,7 +54,7 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
 
     @Override
     public void afterPropertiesSet() {
-        Type targetType = ReflectUtils.getGenericSuperclass(this, getTargetClass());
+        Type targetType = ReflectUtils.getGenericSuperclass(this, null);
         ParameterizedType parameterizedType = (ParameterizedType) targetType;
         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
         entityClass = (Class<?>) actualTypeArgument;
@@ -61,7 +64,8 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(entityClass, Binding.class);
         visitEntityClass("/", null, entityClass, null, entityClass, attributes, bindingAnnotations);
 
-        for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
+        for (DefaultRepository defaultRepository : defaultRepositories) {
+            EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
             EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             entityPropertyChain.initialize();
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
@@ -72,27 +76,32 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
             }
         }
 
-        orderedEntityDefinitions.sort(Comparator.comparingInt(
-                entityDefinition -> entityDefinition.getAttributes().getNumber(ORDER_ATTRIBUTE).intValue()));
+        orderedRepositories.sort(Comparator.comparingInt(defaultRepository ->
+                defaultRepository.getEntityDefinition().getAttributes().getNumber(ORDER_ATTRIBUTE).intValue()));
 
-        classEntityDefinitionMap.put(rootEntityDefinition.getGenericEntityClass(), rootEntityDefinition);
-        for (EntityDefinition entityDefinition : entityDefinitionMap.values()) {
-            classEntityDefinitionMap.put(entityDefinition.getGenericEntityClass(), entityDefinition);
+        classRepositoryMap.put(rootRepository.getEntityDefinition().getGenericEntityClass(), rootRepository);
+        for (DefaultRepository defaultRepository : defaultRepositories) {
+            classRepositoryMap.put(defaultRepository.getEntityDefinition().getGenericEntityClass(), defaultRepository);
         }
+    }
+
+    @Override
+    public DefaultRepository getRepository(Class<?> entityClass) {
+        return classRepositoryMap.get(entityClass);
     }
 
     protected void visitEntityClass(String accessPath, Class<?> lastEntityClass, Class<?> entityClass, String fieldName, Class<?> genericEntityClass,
                                     AnnotationAttributes attributes, Set<Binding> bindingAnnotations) {
         if (lastEntityClass == null && attributes != null) {
-            rootEntityDefinition = newEntityDefinition(accessPath, null, entityClass, genericEntityClass, attributes, bindingAnnotations);
-            orderedEntityDefinitions.add(rootEntityDefinition);
+            rootRepository = newDefaultRepository(accessPath, null, entityClass, genericEntityClass, attributes, bindingAnnotations);
+            orderedRepositories.add(rootRepository);
 
         } else if (lastEntityClass != null) {
             EntityPropertyChain entityPropertyChain = newEntityPropertyChain(accessPath, lastEntityClass, entityClass, fieldName);
             if (attributes != null) {
-                EntityDefinition entityDefinition = newEntityDefinition(accessPath, entityPropertyChain, entityClass, genericEntityClass, attributes, bindingAnnotations);
-                entityDefinitionMap.put(accessPath, entityDefinition);
-                orderedEntityDefinitions.add(entityDefinition);
+                DefaultRepository defaultRepository = newDefaultRepository(accessPath, entityPropertyChain, entityClass, genericEntityClass, attributes, bindingAnnotations);
+                defaultRepositories.add(defaultRepository);
+                orderedRepositories.add(defaultRepository);
             }
         }
         if (!filterEntityClass(entityClass)) {
@@ -120,8 +129,8 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
         return entityPropertyChain;
     }
 
-    protected EntityDefinition newEntityDefinition(String accessPath, EntityPropertyChain entityPropertyChain, Class<?> entityClass, Class<?> genericEntityClass,
-                                                   AnnotationAttributes attributes, Set<Binding> bindingAnnotations) {
+    protected DefaultRepository newDefaultRepository(String accessPath, EntityPropertyChain entityPropertyChain, Class<?> entityClass,
+                                                     Class<?> genericEntityClass, AnnotationAttributes attributes, Set<Binding> bindingAnnotations) {
         boolean isRoot = entityPropertyChain == null;
         boolean isCollection = Collection.class.isAssignableFrom(entityClass);
 
@@ -138,9 +147,6 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
                 pojoClass = (Class<?>) actualTypeArgument;
             }
         }
-
-        Class<?> selectorClass = attributes.getClass(SELECTOR_ATTRIBUTE);
-        EntitySelector entitySelector = (EntitySelector) applicationContext.getBean(selectorClass);
 
         Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTE);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
@@ -179,15 +185,20 @@ public abstract class AbstractEntityDefinitionResolver implements ApplicationCon
             attributes.put(ORDER_ATTRIBUTE, -1);
         }
 
-        return new EntityDefinition(isRoot, accessPath, entityPropertyChain, entityClass, isCollection, genericEntityClass, attributes,
-                mapper, pojoClass, entitySelector, entityAssembler, bindingDefinitions, boundIdBindingDefinition);
+        EntityDefinition entityDefinition = new EntityDefinition(isRoot, accessPath, entityPropertyChain, entityClass,
+                isCollection, genericEntityClass, attributes, mapper, pojoClass, entityAssembler, bindingDefinitions, boundIdBindingDefinition);
+        EntityMapper entityMapper = applicationContext.getBean(EntityMapper.class);
+
+        return doNewDefaultRepository(entityDefinition, entityMapper);
+    }
+
+    protected DefaultRepository doNewDefaultRepository(EntityDefinition entityDefinition, EntityMapper entityMapper) {
+        return new DefaultRepository(entityDefinition, entityMapper);
     }
 
     protected boolean filterEntityClass(Class<?> entityClass) {
         String className = entityClass.getName();
         return className.startsWith("java.lang.") || className.startsWith("java.util.");
     }
-
-    protected abstract Class<?> getTargetClass();
 
 }

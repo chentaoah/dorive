@@ -5,8 +5,8 @@ import com.gitee.spring.domain.proxy.entity.EntityDefinition;
 
 public interface EntityAssembler {
 
-    Object assemble(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition, Object persistentObject);
+    Object assemble(EntityDefinition entityDefinition, BoundedContext boundedContext, Object persistentObject);
 
-    Object disassemble(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition, Object entity);
+    Object disassemble(EntityDefinition entityDefinition, BoundedContext boundedContext, Object entity);
 
 }

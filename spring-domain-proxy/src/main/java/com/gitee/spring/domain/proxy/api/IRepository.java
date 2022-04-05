@@ -18,18 +18,22 @@ public interface IRepository<E, PK> {
 
     <T> T findPageByExample(Object example, Object page);
 
-    void insert(BoundedContext boundedContext, E entity);
+    int insert(BoundedContext boundedContext, E entity);
 
-    void insert(E entity);
+    int insert(E entity);
 
-    void update(BoundedContext boundedContext, E entity);
+    int update(BoundedContext boundedContext, E entity);
 
-    void update(E entity);
+    int update(E entity);
 
-    void delete(BoundedContext boundedContext, E entity);
+    int updateByExample(E entity, Object example);
 
-    void delete(E entity);
+    int delete(BoundedContext boundedContext, E entity);
 
-    void deleteByPrimaryKey(PK primaryKey);
+    int delete(E entity);
+
+    int deleteByPrimaryKey(PK primaryKey);
+
+    int deleteByExample(Object example);
 
 }

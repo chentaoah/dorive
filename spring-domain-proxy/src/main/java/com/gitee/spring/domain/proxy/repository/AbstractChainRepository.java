@@ -1,8 +1,8 @@
-package com.gitee.spring.domain.proxy.impl;
+package com.gitee.spring.domain.proxy.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.proxy.api.ChainRepository;
+import com.gitee.spring.domain.proxy.api.EntityMapper;
 import com.gitee.spring.domain.proxy.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationAttributes;
@@ -10,9 +10,8 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import java.util.*;
 
 @Slf4j
-public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepository<E, PK> implements ChainRepository<E, ChainQuery> {
+public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepository<E, PK> {
 
-    @Override
     public List<E> findByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery) {
         Map<String, Object> chainQueryContext = newChainQueryContext(boundedContext, chainQuery);
         executeChainQuery(boundedContext, chainQueryContext, chainQuery);
@@ -21,12 +20,10 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
         return super.findByExample(boundedContext, example);
     }
 
-    @Override
     public List<E> findByChainQuery(ChainQuery chainQuery) {
         return findByChainQuery(new BoundedContext(), chainQuery);
     }
 
-    @Override
     public <T> T findPageByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery, Object page) {
         Map<String, Object> chainQueryContext = newChainQueryContext(boundedContext, chainQuery);
         executeChainQuery(boundedContext, chainQueryContext, chainQuery);
@@ -35,7 +32,6 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
         return super.findPageByExample(boundedContext, example, page);
     }
 
-    @Override
     public <T> T findPageByChainQuery(ChainQuery chainQuery, Object page) {
         return findPageByChainQuery(new BoundedContext(), chainQuery, page);
     }
@@ -43,11 +39,13 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
     protected Map<String, Object> newChainQueryContext(BoundedContext boundedContext, ChainQuery chainQuery) {
         Map<String, Object> chainQueryContext = new LinkedHashMap<>();
         for (ChainQuery.Criterion criterion : chainQuery.getCriteria()) {
-            EntityDefinition entityDefinition = classEntityDefinitionMap.get(criterion.getEntityClass());
+            DefaultRepository defaultRepository = classRepositoryMap.get(criterion.getEntityClass());
+            EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
+            EntityMapper entityMapper = defaultRepository.getEntityMapper();
             Assert.notNull(entityDefinition, "The entity definition does not exist!");
             Object example = criterion.getExample();
             if (example == null) {
-                example = newQueryParams(boundedContext, null, entityDefinition);
+                example = entityMapper.newQueryParams(boundedContext, entityDefinition);
                 criterion.setExample(example);
             }
             chainQueryContext.put(entityDefinition.getAccessPath(), example);
@@ -57,26 +55,26 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
 
     protected void executeChainQuery(BoundedContext boundedContext, Map<String, Object> chainQueryContext, ChainQuery chainQuery) {
         for (ChainQuery.Criterion criterion : chainQuery.getCriteria()) {
-            EntityDefinition entityDefinition = classEntityDefinitionMap.get(criterion.getEntityClass());
-            if (entityDefinition.isRoot()) {
-                continue;
-            }
-            List<?> persistentObjects = doSelectByExample(entityDefinition.getMapper(), boundedContext, criterion.getExample());
-            Object entity = assembleEntity(boundedContext, null, entityDefinition, persistentObjects);
+            DefaultRepository defaultRepository = classRepositoryMap.get(criterion.getEntityClass());
+            EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
+            if (entityDefinition.isRoot()) continue;
+            EntityMapper entityMapper = defaultRepository.getEntityMapper();
+            List<?> entities = defaultRepository.findByExample(boundedContext, criterion.getExample());
+            Object entity = convertManyToOneEntity(entityDefinition, entities);
             log.debug("Query data is: {}", entity);
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
                     String boundAccessPath = bindingDefinition.getBoundAccessPath();
                     Object queryParams = chainQueryContext.get(boundAccessPath);
                     if (queryParams == null && "/".equals(boundAccessPath)) {
-                        queryParams = newQueryParams(boundedContext, null, rootEntityDefinition);
+                        queryParams = entityMapper.newQueryParams(boundedContext, rootRepository.getEntityDefinition());
                         chainQueryContext.put("/", queryParams);
                     }
                     if (queryParams != null) {
                         String boundFieldName = bindingDefinition.getBoundFieldName();
                         AnnotationAttributes attributes = bindingDefinition.getAttributes();
                         Object fieldValue = collectFieldValues(entity, attributes.getString(FIELD_ATTRIBUTE));
-                        addToQueryParams(queryParams, boundFieldName, fieldValue);
+                        entityMapper.addToQueryParams(queryParams, boundFieldName, fieldValue);
                         log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValue: {}", boundAccessPath, boundFieldName, fieldValue);
                     }
                 }

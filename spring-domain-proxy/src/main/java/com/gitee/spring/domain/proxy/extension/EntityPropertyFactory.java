@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.proxy.impl;
+package com.gitee.spring.domain.proxy.extension;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.proxy.api.EntityProperty;
