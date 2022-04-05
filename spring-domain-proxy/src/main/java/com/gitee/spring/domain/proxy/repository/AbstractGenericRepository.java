@@ -36,12 +36,10 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
             if (lastEntity != null && isMatchScenes(boundedContext, entityDefinition)) {
                 Object queryParams = getQueryParamsFromContext(boundedContext, rootEntity, defaultRepository);
                 List<?> entities = defaultRepository.findByExample(boundedContext, queryParams);
-                if (entities != null && !entities.isEmpty()) {
-                    Object entity = convertManyToOneEntity(entityDefinition, entities);
-                    if (entity != null) {
-                        EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
-                        entityProperty.setValue(lastEntity, entity);
-                    }
+                Object entity = convertManyToOneEntity(entityDefinition, entities);
+                if (entity != null) {
+                    EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
+                    entityProperty.setValue(lastEntity, entity);
                 }
             }
         }

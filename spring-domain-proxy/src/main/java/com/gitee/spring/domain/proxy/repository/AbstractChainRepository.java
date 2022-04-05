@@ -58,10 +58,13 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
             DefaultRepository defaultRepository = classRepositoryMap.get(criterion.getEntityClass());
             EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
             if (entityDefinition.isRoot()) continue;
-            EntityMapper entityMapper = defaultRepository.getEntityMapper();
+
             List<?> entities = defaultRepository.findByExample(boundedContext, criterion.getExample());
             Object entity = convertManyToOneEntity(entityDefinition, entities);
             log.debug("Query data is: {}", entity);
+            if (entity == null) continue;
+
+            EntityMapper entityMapper = defaultRepository.getEntityMapper();
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
                     String boundAccessPath = bindingDefinition.getBoundAccessPath();

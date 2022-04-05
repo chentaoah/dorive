@@ -16,7 +16,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class DefaultRepository extends AbstractRepository<Object, Object> {
 
     protected EntityDefinition entityDefinition;
