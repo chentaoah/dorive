@@ -5,6 +5,7 @@ import com.gitee.spring.domain.proxy.api.EntityAssembler;
 import com.gitee.spring.domain.proxy.api.EntityMapper;
 import com.gitee.spring.domain.proxy.entity.BoundedContext;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
+import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,14 +20,15 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class DefaultRepository extends AbstractRepository<Object, Object> {
 
+    protected EntityPropertyChain entityPropertyChain;
     protected EntityDefinition entityDefinition;
     protected EntityMapper entityMapper;
+    protected EntityAssembler entityAssembler;
 
     @Override
     public Object selectByPrimaryKey(BoundedContext boundedContext, Object primaryKey) {
         Object persistentObject = entityMapper.selectByPrimaryKey(entityDefinition.getMapper(), boundedContext, primaryKey);
         if (persistentObject != null) {
-            EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
             return entityAssembler.assemble(entityDefinition, boundedContext, persistentObject);
         }
         return null;
@@ -42,7 +44,6 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
     }
 
     protected List<Object> newEntities(BoundedContext boundedContext, List<?> persistentObjects) {
-        EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
         List<Object> entities = new ArrayList<>();
         for (Object persistentObject : persistentObjects) {
             Object entity = entityAssembler.assemble(entityDefinition, boundedContext, persistentObject);
@@ -79,7 +80,6 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
     protected int doInsert(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey == null) {
-            EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
             Object persistentObject = entityAssembler.disassemble(entityDefinition, boundedContext, entity);
             if (persistentObject != null) {
                 int count = entityMapper.insert(entityDefinition.getMapper(), boundedContext, persistentObject);
@@ -111,7 +111,6 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
     protected int doUpdate(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey != null) {
-            EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
             Object persistentObject = entityAssembler.disassemble(entityDefinition, boundedContext, entity);
             if (persistentObject != null) {
                 return entityMapper.update(entityDefinition.getMapper(), boundedContext, persistentObject);

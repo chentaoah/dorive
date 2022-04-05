@@ -64,9 +64,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         visitEntityClass("/", null, entityClass, null, entityClass, attributes, bindingAnnotations);
 
         for (DefaultRepository defaultRepository : defaultRepositories) {
-            EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
-            EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
+            EntityPropertyChain entityPropertyChain = defaultRepository.getEntityPropertyChain();
             entityPropertyChain.initialize();
+            EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
                     EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
@@ -147,9 +147,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         }
 
-        Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTE);
-        EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
-
         List<BindingDefinition> bindingDefinitions = new ArrayList<>();
         BindingDefinition boundIdBindingDefinition = null;
         for (Binding bindingAnnotation : bindingAnnotations) {
@@ -184,15 +181,17 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             attributes.put(ORDER_ATTRIBUTE, -1);
         }
 
-        EntityDefinition entityDefinition = new EntityDefinition(isRoot, accessPath, entityPropertyChain, entityClass,
-                isCollection, genericEntityClass, attributes, mapper, pojoClass, entityAssembler, bindingDefinitions, boundIdBindingDefinition);
+        EntityDefinition entityDefinition = new EntityDefinition(isRoot, accessPath, entityClass, isCollection, genericEntityClass,
+                attributes, mapper, pojoClass, bindingDefinitions, boundIdBindingDefinition);
         EntityMapper entityMapper = applicationContext.getBean(EntityMapper.class);
-
-        return doNewDefaultRepository(entityDefinition, entityMapper);
+        Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTE);
+        EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
+        return doNewDefaultRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler);
     }
 
-    protected DefaultRepository doNewDefaultRepository(EntityDefinition entityDefinition, EntityMapper entityMapper) {
-        return new DefaultRepository(entityDefinition, entityMapper);
+    protected DefaultRepository doNewDefaultRepository(EntityPropertyChain entityPropertyChain, EntityDefinition entityDefinition,
+                                                       EntityMapper entityMapper, EntityAssembler entityAssembler) {
+        return new DefaultRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler);
     }
 
     protected boolean filterEntityClass(Class<?> entityClass) {

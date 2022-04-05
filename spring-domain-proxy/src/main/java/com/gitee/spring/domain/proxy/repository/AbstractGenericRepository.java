@@ -29,8 +29,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     protected void handleRootEntity(BoundedContext boundedContext, Object rootEntity) {
         bindRepository(rootEntity);
         for (DefaultRepository defaultRepository : defaultRepositories) {
+            EntityPropertyChain entityPropertyChain = defaultRepository.getEntityPropertyChain();
             EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
-            EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
             EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityProperty();
             Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
             if (lastEntity != null && isMatchScenes(boundedContext, entityDefinition)) {
@@ -127,8 +127,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         bindRepository(entity);
         int count = 0;
         for (DefaultRepository defaultRepository : orderedRepositories) {
+            EntityPropertyChain entityPropertyChain = defaultRepository.getEntityPropertyChain();
             EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
-            Object targetEntity = getTargetEntity(entity, entityDefinition);
+            Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null && isMatchScenes(boundedContext, entityDefinition)) {
                 if (entityDefinition.isCollection()) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
@@ -144,11 +145,6 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
             }
         }
         return count;
-    }
-
-    protected Object getTargetEntity(Object rootEntity, EntityDefinition entityDefinition) {
-        EntityPropertyChain entityPropertyChain = entityDefinition.getEntityPropertyChain();
-        return entityPropertyChain == null ? rootEntity : entityPropertyChain.getValue(rootEntity);
     }
 
     protected void getBoundValueFromContext(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition, Object entity) {
@@ -178,8 +174,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         bindRepository(entity);
         int count = 0;
         for (DefaultRepository defaultRepository : orderedRepositories) {
+            EntityPropertyChain entityPropertyChain = defaultRepository.getEntityPropertyChain();
             EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
-            Object targetEntity = getTargetEntity(entity, entityDefinition);
+            Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null && isMatchScenes(boundedContext, entityDefinition)) {
                 count += defaultRepository.update(boundedContext, entity);
             }
@@ -198,8 +195,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         bindRepository(entity);
         int count = 0;
         for (DefaultRepository defaultRepository : orderedRepositories) {
+            EntityPropertyChain entityPropertyChain = defaultRepository.getEntityPropertyChain();
             EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
-            Object targetEntity = getTargetEntity(entity, entityDefinition);
+            Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null && isMatchScenes(boundedContext, entityDefinition)) {
                 count += defaultRepository.delete(boundedContext, entity);
             }
