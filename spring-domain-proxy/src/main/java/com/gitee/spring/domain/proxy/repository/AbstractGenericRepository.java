@@ -131,7 +131,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
             EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null && isMatchScenes(boundedContext, entityDefinition)) {
-                if (entityDefinition.isCollection()) {
+                if (targetEntity instanceof Collection) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
                         getBoundValueFromContext(boundedContext, entity, entityDefinition, eachEntity);
                         count += defaultRepository.doInsert(boundedContext, eachEntity);

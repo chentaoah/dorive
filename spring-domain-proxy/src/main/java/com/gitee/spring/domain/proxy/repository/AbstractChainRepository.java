@@ -60,9 +60,8 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
             if (entityDefinition.isRoot()) continue;
 
             List<?> entities = defaultRepository.selectByExample(boundedContext, criterion.getExample());
-            Object entity = convertManyToOneEntity(entityDefinition, entities);
-            log.debug("Query data is: {}", entity);
-            if (entity == null) continue;
+            log.debug("Query data is: {}", entities);
+            if (entities.isEmpty()) continue;
 
             EntityMapper entityMapper = defaultRepository.getEntityMapper();
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
@@ -76,26 +75,22 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
                     if (queryParams != null) {
                         String boundFieldName = bindingDefinition.getBoundFieldName();
                         AnnotationAttributes attributes = bindingDefinition.getAttributes();
-                        Object fieldValue = collectFieldValues(entity, attributes.getString(FIELD_ATTRIBUTE));
-                        entityMapper.addToQueryParams(queryParams, boundFieldName, fieldValue);
-                        log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValue: {}", boundAccessPath, boundFieldName, fieldValue);
+                        Object fieldValues = collectFieldValues(entities, attributes.getString(FIELD_ATTRIBUTE));
+                        entityMapper.addToQueryParams(queryParams, boundFieldName, fieldValues);
+                        log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValue: {}", boundAccessPath, boundFieldName, fieldValues);
                     }
                 }
             }
         }
     }
 
-    protected Object collectFieldValues(Object entity, String fieldAttribute) {
-        if (entity instanceof Collection) {
-            List<Object> fieldValues = new ArrayList<>();
-            for (Object eachEntity : (Collection<?>) entity) {
-                Object eachFieldValue = BeanUtil.getFieldValue(eachEntity, fieldAttribute);
-                fieldValues.add(eachFieldValue);
-            }
-            return fieldValues;
-        } else {
-            return BeanUtil.getFieldValue(entity, fieldAttribute);
+    protected List<Object> collectFieldValues(List<?> entities, String fieldAttribute) {
+        List<Object> fieldValues = new ArrayList<>();
+        for (Object eachEntity : entities) {
+            Object eachFieldValue = BeanUtil.getFieldValue(eachEntity, fieldAttribute);
+            fieldValues.add(eachFieldValue);
         }
+        return fieldValues;
     }
 
 }
