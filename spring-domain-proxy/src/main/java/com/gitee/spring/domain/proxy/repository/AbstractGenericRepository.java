@@ -139,7 +139,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
                 } else {
                     getBoundValueFromContext(boundedContext, entity, entityDefinition, targetEntity);
                     count += defaultRepository.doInsert(boundedContext, targetEntity);
-                    Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+                    Object primaryKey = BeanUtil.getFieldValue(targetEntity, "id");
                     setBoundIdForBoundEntity(entity, entityDefinition, primaryKey);
                 }
             }
@@ -178,7 +178,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
             EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null && isMatchScenes(boundedContext, entityDefinition)) {
-                count += defaultRepository.update(boundedContext, entity);
+                count += defaultRepository.update(boundedContext, targetEntity);
             }
         }
         return count;
@@ -199,7 +199,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
             EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null && isMatchScenes(boundedContext, entityDefinition)) {
-                count += defaultRepository.delete(boundedContext, entity);
+                count += defaultRepository.delete(boundedContext, targetEntity);
             }
         }
         return count;
