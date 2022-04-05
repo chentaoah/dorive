@@ -13,10 +13,10 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
 
     @Override
     @SuppressWarnings("unchecked")
-    public E findByPrimaryKey(BoundedContext boundedContext, PK primaryKey) {
+    public E selectByPrimaryKey(BoundedContext boundedContext, PK primaryKey) {
         Object rootEntity;
         if (rootRepository != null) {
-            rootEntity = rootRepository.findByPrimaryKey(boundedContext, primaryKey);
+            rootEntity = rootRepository.selectByPrimaryKey(boundedContext, primaryKey);
         } else {
             rootEntity = ReflectUtils.newInstance(constructor, null);
         }
@@ -35,7 +35,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
             Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
             if (lastEntity != null && isMatchScenes(boundedContext, entityDefinition)) {
                 Object queryParams = getQueryParamsFromContext(boundedContext, rootEntity, defaultRepository);
-                List<?> entities = defaultRepository.findByExample(boundedContext, queryParams);
+                List<?> entities = defaultRepository.selectByExample(boundedContext, queryParams);
                 Object entity = convertManyToOneEntity(entityDefinition, entities);
                 if (entity != null) {
                     EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
@@ -104,17 +104,17 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<E> findByExample(BoundedContext boundedContext, Object example) {
+    public List<E> selectByExample(BoundedContext boundedContext, Object example) {
         Assert.notNull(rootRepository, "Aggregation root is not annotated by @Entity, please use the [findByPrimaryKey] method.");
-        List<?> entities = rootRepository.findByExample(boundedContext, example);
+        List<?> entities = rootRepository.selectByExample(boundedContext, example);
         entities.forEach(entity -> handleRootEntity(boundedContext, entity));
         return (List<E>) entities;
     }
 
     @Override
-    public <T> T findPageByExample(BoundedContext boundedContext, Object example, Object page) {
+    public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
         Assert.notNull(rootRepository, "Aggregation root is not annotated by @Entity, please use the [findByPrimaryKey] method.");
-        T dataPage = rootRepository.findPageByExample(boundedContext, example, page);
+        T dataPage = rootRepository.selectPageByExample(boundedContext, example, page);
         EntityMapper entityMapper = rootRepository.getEntityMapper();
         List<?> entities = entityMapper.getDataFromPage(dataPage);
         entities.forEach(entity -> handleRootEntity(boundedContext, entity));
@@ -210,7 +210,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     @Override
     public int deleteByPrimaryKey(PK primaryKey) {
         BoundedContext boundedContext = new BoundedContext();
-        E entity = findByPrimaryKey(boundedContext, primaryKey);
+        E entity = selectByPrimaryKey(boundedContext, primaryKey);
         return delete(new BoundedContext(), entity);
     }
 

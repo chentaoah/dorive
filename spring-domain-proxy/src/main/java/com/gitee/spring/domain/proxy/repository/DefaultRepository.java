@@ -23,7 +23,7 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
     protected EntityMapper entityMapper;
 
     @Override
-    public Object findByPrimaryKey(BoundedContext boundedContext, Object primaryKey) {
+    public Object selectByPrimaryKey(BoundedContext boundedContext, Object primaryKey) {
         Object persistentObject = entityMapper.selectByPrimaryKey(entityDefinition.getMapper(), boundedContext, primaryKey);
         if (persistentObject != null) {
             EntityAssembler entityAssembler = entityDefinition.getEntityAssembler();
@@ -33,7 +33,7 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
     }
 
     @Override
-    public List<Object> findByExample(BoundedContext boundedContext, Object example) {
+    public List<Object> selectByExample(BoundedContext boundedContext, Object example) {
         List<?> persistentObjects = entityMapper.selectByExample(entityDefinition.getMapper(), boundedContext, example);
         if (persistentObjects != null && !persistentObjects.isEmpty()) {
             return newEntities(boundedContext, persistentObjects);
@@ -53,7 +53,7 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T findPageByExample(BoundedContext boundedContext, Object example, Object page) {
+    public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
         Object dataPage = entityMapper.selectPageByExample(entityDefinition.getMapper(), boundedContext, example, page);
         List<?> persistentObjects = entityMapper.getDataFromPage(dataPage);
         if (persistentObjects != null && !persistentObjects.isEmpty()) {

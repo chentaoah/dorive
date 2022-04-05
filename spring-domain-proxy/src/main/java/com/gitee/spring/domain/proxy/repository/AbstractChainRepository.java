@@ -12,28 +12,28 @@ import java.util.*;
 @Slf4j
 public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepository<E, PK> {
 
-    public List<E> findByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery) {
+    public List<E> selectByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery) {
         Map<String, Object> chainQueryContext = newChainQueryContext(boundedContext, chainQuery);
         executeChainQuery(boundedContext, chainQueryContext, chainQuery);
         Object example = chainQueryContext.get("/");
-        Assert.notNull(example, "The query criteria of the root entity cannot be empty!");
-        return super.findByExample(boundedContext, example);
+        Assert.notNull(example, "The query criteria of the root entity cannot be null!");
+        return super.selectByExample(boundedContext, example);
     }
 
-    public List<E> findByChainQuery(ChainQuery chainQuery) {
-        return findByChainQuery(new BoundedContext(), chainQuery);
+    public List<E> selectByChainQuery(ChainQuery chainQuery) {
+        return selectByChainQuery(new BoundedContext(), chainQuery);
     }
 
-    public <T> T findPageByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery, Object page) {
+    public <T> T selectPageByChainQuery(BoundedContext boundedContext, ChainQuery chainQuery, Object page) {
         Map<String, Object> chainQueryContext = newChainQueryContext(boundedContext, chainQuery);
         executeChainQuery(boundedContext, chainQueryContext, chainQuery);
         Object example = chainQueryContext.get("/");
-        Assert.notNull(example, "The query criteria of the root entity cannot be empty!");
-        return super.findPageByExample(boundedContext, example, page);
+        Assert.notNull(example, "The query criteria of the root entity cannot be null!");
+        return super.selectPageByExample(boundedContext, example, page);
     }
 
-    public <T> T findPageByChainQuery(ChainQuery chainQuery, Object page) {
-        return findPageByChainQuery(new BoundedContext(), chainQuery, page);
+    public <T> T selectPageByChainQuery(ChainQuery chainQuery, Object page) {
+        return selectPageByChainQuery(new BoundedContext(), chainQuery, page);
     }
 
     protected Map<String, Object> newChainQueryContext(BoundedContext boundedContext, ChainQuery chainQuery) {
@@ -59,7 +59,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
             EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
             if (entityDefinition.isRoot()) continue;
 
-            List<?> entities = defaultRepository.findByExample(boundedContext, criterion.getExample());
+            List<?> entities = defaultRepository.selectByExample(boundedContext, criterion.getExample());
             Object entity = convertManyToOneEntity(entityDefinition, entities);
             log.debug("Query data is: {}", entity);
             if (entity == null) continue;

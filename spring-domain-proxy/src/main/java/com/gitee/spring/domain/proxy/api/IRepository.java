@@ -6,17 +6,17 @@ import java.util.List;
 
 public interface IRepository<E, PK> {
 
-    E findByPrimaryKey(BoundedContext boundedContext, PK primaryKey);
+    E selectByPrimaryKey(BoundedContext boundedContext, PK primaryKey);
 
-    E findByPrimaryKey(PK primaryKey);
+    E selectByPrimaryKey(PK primaryKey);
 
-    List<E> findByExample(BoundedContext boundedContext, Object example);
+    List<E> selectByExample(BoundedContext boundedContext, Object example);
 
-    List<E> findByExample(Object example);
+    List<E> selectByExample(Object example);
 
-    <T> T findPageByExample(BoundedContext boundedContext, Object example, Object page);
+    <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page);
 
-    <T> T findPageByExample(Object example, Object page);
+    <T> T selectPageByExample(Object example, Object page);
 
     int insert(BoundedContext boundedContext, E entity);
 

@@ -8,18 +8,18 @@ import java.util.List;
 public abstract class AbstractRepository<E, PK> implements IRepository<E, PK> {
 
     @Override
-    public E findByPrimaryKey(PK primaryKey) {
-        return findByPrimaryKey(new BoundedContext(), primaryKey);
+    public E selectByPrimaryKey(PK primaryKey) {
+        return selectByPrimaryKey(new BoundedContext(), primaryKey);
     }
 
     @Override
-    public List<E> findByExample(Object example) {
-        return findByExample(new BoundedContext(), example);
+    public List<E> selectByExample(Object example) {
+        return selectByExample(new BoundedContext(), example);
     }
 
     @Override
-    public <T> T findPageByExample(Object example, Object page) {
-        return findPageByExample(new BoundedContext(), example, page);
+    public <T> T selectPageByExample(Object example, Object page) {
+        return selectPageByExample(new BoundedContext(), example, page);
     }
 
     @Override
