@@ -5,13 +5,12 @@ import com.gitee.spring.domain.proxy.annotation.Binding;
 import com.gitee.spring.domain.proxy.annotation.Entity;
 import com.gitee.spring.domain.proxy.api.EntityAssembler;
 import com.gitee.spring.domain.proxy.api.EntityMapper;
-import com.gitee.spring.domain.proxy.api.RepositoryRoute;
+import com.gitee.spring.domain.proxy.api.RepositoryContext;
 import com.gitee.spring.domain.proxy.entity.BindingDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
 import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
 import com.gitee.spring.domain.proxy.utils.PathUtils;
 import com.gitee.spring.domain.proxy.utils.ReflectUtils;
-import lombok.Getter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -26,8 +25,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 
-public abstract class AbstractEntityDefinitionResolver<E, PK> extends AbstractRepository<E, PK>
-        implements ApplicationContextAware, InitializingBean, RepositoryRoute {
+public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK>
+        implements ApplicationContextAware, InitializingBean, RepositoryContext {
 
     public static final String MAPPER_ATTRIBUTE = "mapper";
     public static final String SCENE_ATTRIBUTE = "scene";
