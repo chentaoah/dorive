@@ -10,9 +10,9 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Entity {
 
-    Class<?> mapper();
-
     String[] scene() default {};
+
+    Class<?> mapper();
 
     Class<?> assembler() default DefaultEntityAssembler.class;
 

@@ -28,8 +28,8 @@ import java.util.*;
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK>
         implements ApplicationContextAware, InitializingBean, RepositoryContext {
 
-    public static final String MAPPER_ATTRIBUTE = "mapper";
     public static final String SCENE_ATTRIBUTE = "scene";
+    public static final String MAPPER_ATTRIBUTE = "mapper";
     public static final String ASSEMBLER_ATTRIBUTE = "assembler";
     public static final String ORDER_ATTRIBUTE = "order";
 
