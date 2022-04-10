@@ -13,9 +13,9 @@ public class PathUtils {
     }
 
     public static String getAbsolutePath(String accessPath, String relativePath) {
-        accessPath = "https://gitee.com/digital-engine/spring-domain" + accessPath;
+        accessPath = "https://spring-domain" + accessPath;
         accessPath = URLUtil.completeUrl(accessPath, relativePath);
-        return accessPath.replace("https://gitee.com/digital-engine/spring-domain", "");
+        return accessPath.replace("https://spring-domain", "");
     }
 
 }
