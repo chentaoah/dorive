@@ -154,6 +154,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
             String bindAttribute = bindingAttributes.getString(BIND_ATTRIBUTE);
 
+            if (bindAttribute.startsWith(".")) {
+                bindAttribute = PathUtils.getAbsolutePath(accessPath, bindAttribute);
+            }
+
             boolean isIdField = "id".equals(fieldAttribute);
             boolean isFromContext = !bindAttribute.startsWith("/");
             boolean isBindId = isIdField && !isFromContext;

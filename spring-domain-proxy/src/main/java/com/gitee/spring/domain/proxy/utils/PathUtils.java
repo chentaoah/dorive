@@ -1,5 +1,7 @@
 package com.gitee.spring.domain.proxy.utils;
 
+import cn.hutool.core.util.URLUtil;
+
 public class PathUtils {
 
     public static String getLastAccessPath(String accessPath) {
@@ -8,6 +10,12 @@ public class PathUtils {
 
     public static String getFieldName(String accessPath) {
         return accessPath.startsWith("/") && accessPath.length() > 1 ? accessPath.substring(accessPath.lastIndexOf("/") + 1) : "";
+    }
+
+    public static String getAbsolutePath(String accessPath, String relativePath) {
+        accessPath = "https://gitee.com/digital-engine/spring-domain" + accessPath;
+        accessPath = URLUtil.completeUrl(accessPath, relativePath);
+        return accessPath.replace("https://gitee.com/digital-engine/spring-domain", "");
     }
 
 }
