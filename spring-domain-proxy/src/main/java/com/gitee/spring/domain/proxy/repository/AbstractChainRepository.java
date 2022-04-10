@@ -45,7 +45,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
             Assert.notNull(entityDefinition, "The entity definition does not exist!");
             Object example = criterion.getExample();
             if (example == null) {
-                example = entityMapper.newQueryParams(boundedContext, entityDefinition);
+                example = entityMapper.newExample(boundedContext, entityDefinition);
                 criterion.setExample(example);
             }
             chainQueryContext.put(entityDefinition.getAccessPath(), example);
@@ -67,16 +67,16 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
                     String boundAccessPath = bindingDefinition.getBoundAccessPath();
-                    Object queryParams = chainQueryContext.get(boundAccessPath);
-                    if (queryParams == null && "/".equals(boundAccessPath)) {
-                        queryParams = entityMapper.newQueryParams(boundedContext, rootRepository.getEntityDefinition());
-                        chainQueryContext.put("/", queryParams);
+                    Object example = chainQueryContext.get(boundAccessPath);
+                    if (example == null && "/".equals(boundAccessPath)) {
+                        example = entityMapper.newExample(boundedContext, rootRepository.getEntityDefinition());
+                        chainQueryContext.put("/", example);
                     }
-                    if (queryParams != null) {
+                    if (example != null) {
                         String boundFieldName = bindingDefinition.getBoundFieldName();
                         AnnotationAttributes attributes = bindingDefinition.getAttributes();
                         Object fieldValues = collectFieldValues(entities, attributes.getString(FIELD_ATTRIBUTE));
-                        entityMapper.addToQueryParams(queryParams, boundFieldName, fieldValues);
+                        entityMapper.addToExample(example, boundFieldName, fieldValues);
                         log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValue: {}", boundAccessPath, boundFieldName, fieldValues);
                     }
                 }

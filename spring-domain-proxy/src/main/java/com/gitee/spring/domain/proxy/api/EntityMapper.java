@@ -27,8 +27,8 @@ public interface EntityMapper {
 
     int deleteByExample(Object mapper, Object example);
 
-    Object newQueryParams(BoundedContext boundedContext, EntityDefinition entityDefinition);
+    Object newExample(BoundedContext boundedContext, EntityDefinition entityDefinition);
 
-    void addToQueryParams(Object queryParams, String fieldAttribute, Object boundValue);
+    void addToExample(Object example, String fieldAttribute, Object boundValue);
 
 }

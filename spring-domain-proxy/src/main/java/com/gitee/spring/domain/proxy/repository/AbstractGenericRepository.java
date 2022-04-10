@@ -34,8 +34,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
             EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityProperty();
             Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
             if (lastEntity != null && isMatchScenes(boundedContext, entityDefinition)) {
-                Object queryParams = getQueryParamsFromContext(boundedContext, rootEntity, defaultRepository);
-                List<?> entities = defaultRepository.selectByExample(boundedContext, queryParams);
+                Object example = newExampleByContext(boundedContext, rootEntity, defaultRepository);
+                List<?> entities = defaultRepository.selectByExample(boundedContext, example);
                 Object entity = convertManyToOneEntity(entityDefinition, entities);
                 if (entity != null) {
                     EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
@@ -65,19 +65,19 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         return false;
     }
 
-    protected Object getQueryParamsFromContext(BoundedContext boundedContext, Object rootEntity, DefaultRepository defaultRepository) {
+    protected Object newExampleByContext(BoundedContext boundedContext, Object rootEntity, DefaultRepository defaultRepository) {
         EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
         EntityMapper entityMapper = defaultRepository.getEntityMapper();
-        Object queryParams = entityMapper.newQueryParams(boundedContext, entityDefinition);
+        Object example = entityMapper.newExample(boundedContext, entityDefinition);
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
             Object boundValue = getBoundValue(boundedContext, rootEntity, bindingDefinition);
             if (boundValue != null) {
                 AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
                 String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
-                entityMapper.addToQueryParams(queryParams, fieldAttribute, boundValue);
+                entityMapper.addToExample(example, fieldAttribute, boundValue);
             }
         }
-        return queryParams;
+        return example;
     }
 
     protected Object getBoundValue(BoundedContext boundedContext, Object rootEntity, BindingDefinition bindingDefinition) {
@@ -133,11 +133,11 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
             if (targetEntity != null && isMatchScenes(boundedContext, entityDefinition)) {
                 if (targetEntity instanceof Collection) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
-                        getBoundValueFromContext(boundedContext, entity, entityDefinition, eachEntity);
+                        setBoundValueByContext(boundedContext, entity, entityDefinition, eachEntity);
                         count += defaultRepository.doInsert(boundedContext, eachEntity);
                     }
                 } else {
-                    getBoundValueFromContext(boundedContext, entity, entityDefinition, targetEntity);
+                    setBoundValueByContext(boundedContext, entity, entityDefinition, targetEntity);
                     count += defaultRepository.doInsert(boundedContext, targetEntity);
                     Object primaryKey = BeanUtil.getFieldValue(targetEntity, "id");
                     setBoundIdForBoundEntity(entity, entityDefinition, primaryKey);
@@ -147,7 +147,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         return count;
     }
 
-    protected void getBoundValueFromContext(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition, Object entity) {
+    protected void setBoundValueByContext(BoundedContext boundedContext, Object rootEntity, EntityDefinition entityDefinition, Object entity) {
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
             if (!bindingDefinition.isBindId()) {
                 Object boundValue = getBoundValue(boundedContext, rootEntity, bindingDefinition);
