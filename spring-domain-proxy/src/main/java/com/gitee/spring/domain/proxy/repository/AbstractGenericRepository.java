@@ -30,7 +30,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         bindRepository(rootEntity);
         for (DefaultRepository defaultRepository : defaultRepositories) {
             EntityPropertyChain entityPropertyChain = defaultRepository.getEntityPropertyChain();
-            EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityProperty();
+            EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityPropertyChain();
             Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
             if (lastEntity != null && isMatchScenes(defaultRepository, boundedContext)) {
                 Object example = newExampleByContext(defaultRepository, boundedContext, rootEntity);

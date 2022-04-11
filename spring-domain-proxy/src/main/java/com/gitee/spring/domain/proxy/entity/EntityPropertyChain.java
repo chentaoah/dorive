@@ -8,9 +8,9 @@ import lombok.ToString;
 
 @Data
 @AllArgsConstructor
-@ToString(exclude = "lastEntityProperty")
+@ToString(exclude = "lastEntityPropertyChain")
 public class EntityPropertyChain implements EntityProperty {
-    private EntityProperty lastEntityProperty;
+    private EntityPropertyChain lastEntityPropertyChain;
     private String accessPath;
     private Class<?> lastEntityClass;
     private Class<?> entityClass;
@@ -20,24 +20,22 @@ public class EntityPropertyChain implements EntityProperty {
     public void initialize() {
         if (entityProperty == null) {
             entityProperty = EntityPropertyFactory.newEntityProperty(lastEntityClass, entityClass, fieldName);
-            if (lastEntityProperty instanceof EntityPropertyChain) {
-                ((EntityPropertyChain) lastEntityProperty).initialize();
-            }
+            lastEntityPropertyChain.initialize();
         }
     }
 
     @Override
     public Object getValue(Object entity) {
-        if (lastEntityProperty != null) {
-            entity = lastEntityProperty.getValue(entity);
+        if (lastEntityPropertyChain != null) {
+            entity = lastEntityPropertyChain.getValue(entity);
         }
         return entity != null ? entityProperty.getValue(entity) : null;
     }
 
     @Override
     public void setValue(Object entity, Object property) {
-        if (lastEntityProperty != null) {
-            entity = lastEntityProperty.getValue(entity);
+        if (lastEntityPropertyChain != null) {
+            entity = lastEntityPropertyChain.getValue(entity);
         }
         if (entity != null) {
             entityProperty.setValue(entity, property);
