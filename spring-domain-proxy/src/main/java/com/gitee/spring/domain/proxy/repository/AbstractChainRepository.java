@@ -2,7 +2,6 @@ package com.gitee.spring.domain.proxy.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.proxy.api.EntityMapper;
 import com.gitee.spring.domain.proxy.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationAttributes;
@@ -40,14 +39,13 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
         Map<String, Object> chainQueryContext = new LinkedHashMap<>();
         for (ChainQuery.Criterion criterion : chainQuery.getCriteria()) {
             DefaultRepository defaultRepository = classRepositoryMap.get(criterion.getEntityClass());
-            EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
-            EntityMapper entityMapper = defaultRepository.getEntityMapper();
-            Assert.notNull(entityDefinition, "The entity definition does not exist!");
+            Assert.notNull(defaultRepository, "The repository does not exist!");
             Object example = criterion.getExample();
             if (example == null) {
-                example = entityMapper.newExample(boundedContext, entityDefinition);
+                example = newExample(defaultRepository, boundedContext);
                 criterion.setExample(example);
             }
+            EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
             chainQueryContext.put(entityDefinition.getAccessPath(), example);
         }
         return chainQueryContext;
@@ -63,20 +61,19 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
             log.debug("Query data is: {}", entities);
             if (entities.isEmpty()) continue;
 
-            EntityMapper entityMapper = defaultRepository.getEntityMapper();
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
                     String boundAccessPath = bindingDefinition.getBoundAccessPath();
                     Object example = chainQueryContext.get(boundAccessPath);
                     if (example == null && "/".equals(boundAccessPath)) {
-                        example = entityMapper.newExample(boundedContext, rootRepository.getEntityDefinition());
+                        example = newExample(rootRepository, boundedContext);
                         chainQueryContext.put("/", example);
                     }
                     if (example != null) {
-                        String boundFieldName = bindingDefinition.getBoundFieldName();
                         AnnotationAttributes attributes = bindingDefinition.getAttributes();
                         Object fieldValues = collectFieldValues(entities, attributes.getString(FIELD_ATTRIBUTE));
-                        entityMapper.addToExample(example, boundFieldName, fieldValues);
+                        String boundFieldName = bindingDefinition.getBoundFieldName();
+                        addToExample(defaultRepository, example, boundFieldName, fieldValues);
                         log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValue: {}", boundAccessPath, boundFieldName, fieldValues);
                     }
                 }

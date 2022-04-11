@@ -2,6 +2,7 @@ package com.gitee.spring.domain.proxy.api;
 
 import com.gitee.spring.domain.proxy.entity.BoundedContext;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
+import com.gitee.spring.domain.proxy.repository.DefaultRepository;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public interface EntityMapper {
 
     int deleteByExample(Object mapper, Object example);
 
-    Object newExample(BoundedContext boundedContext, EntityDefinition entityDefinition);
+    Object newExample(EntityDefinition entityDefinition, BoundedContext boundedContext);
 
     void addToExample(Object example, String fieldAttribute, Object boundValue);
 
