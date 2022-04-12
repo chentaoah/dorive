@@ -26,7 +26,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK>
-        implements ApplicationContextAware, InitializingBean, RepositoryContext {
+        implements ApplicationContextAware, InitializingBean, RepositoryContext, EntityMapper {
 
     public static final String SCENE_ATTRIBUTE = "scene";
     public static final String MAPPER_ATTRIBUTE = "mapper";
@@ -187,10 +187,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         EntityDefinition entityDefinition = new EntityDefinition(isRoot, accessPath, entityClass, isCollection, genericEntityClass,
                 attributes, mapper, pojoClass, bindingDefinitions, boundIdBindingDefinition);
-        EntityMapper entityMapper = applicationContext.getBean(EntityMapper.class);
         Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTE);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
-        return doNewDefaultRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler);
+        return doNewDefaultRepository(entityPropertyChain, entityDefinition, this, entityAssembler);
     }
 
     protected DefaultRepository doNewDefaultRepository(EntityPropertyChain entityPropertyChain, EntityDefinition entityDefinition,

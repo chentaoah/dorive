@@ -40,12 +40,12 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
         for (ChainQuery.Criterion criterion : chainQuery.getCriteria()) {
             DefaultRepository defaultRepository = classRepositoryMap.get(criterion.getEntityClass());
             Assert.notNull(defaultRepository, "The repository does not exist!");
+            EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
             Object example = criterion.getExample();
             if (example == null) {
-                example = newExample(defaultRepository, boundedContext);
+                example = newExample(entityDefinition, boundedContext);
                 criterion.setExample(example);
             }
-            EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
             chainQueryContext.put(entityDefinition.getAccessPath(), example);
         }
         return chainQueryContext;
@@ -66,14 +66,14 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
                     String boundAccessPath = bindingDefinition.getBoundAccessPath();
                     Object example = chainQueryContext.get(boundAccessPath);
                     if (example == null && "/".equals(boundAccessPath)) {
-                        example = newExample(rootRepository, boundedContext);
+                        example = newExample(rootRepository.getEntityDefinition(), boundedContext);
                         chainQueryContext.put("/", example);
                     }
                     if (example != null) {
                         AnnotationAttributes attributes = bindingDefinition.getAttributes();
                         Object fieldValues = collectFieldValues(entities, attributes.getString(FIELD_ATTRIBUTE));
                         String boundFieldName = bindingDefinition.getBoundFieldName();
-                        addToExample(defaultRepository, example, boundFieldName, fieldValues);
+                        addToExample(example, boundFieldName, fieldValues);
                         log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValue: {}", boundAccessPath, boundFieldName, fieldValues);
                     }
                 }

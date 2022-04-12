@@ -66,22 +66,17 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     }
 
     protected Object newExampleByContext(DefaultRepository defaultRepository, BoundedContext boundedContext, Object rootEntity) {
-        Object example = newExample(defaultRepository, boundedContext);
         EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
+        Object example = newExample(entityDefinition, boundedContext);
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
             Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
             if (boundValue != null) {
                 AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
                 String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
-                addToExample(defaultRepository, example, fieldAttribute, boundValue);
+                addToExample(example, fieldAttribute, boundValue);
             }
         }
         return example;
-    }
-
-    protected Object newExample(DefaultRepository defaultRepository, BoundedContext boundedContext) {
-        EntityMapper entityMapper = defaultRepository.getEntityMapper();
-        return entityMapper.newExample(defaultRepository.getEntityDefinition(), boundedContext);
     }
 
     protected Object getBoundValue(BindingDefinition bindingDefinition, BoundedContext boundedContext, Object rootEntity) {
@@ -95,11 +90,6 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
             boundValue = boundEntityPropertyChain.getValue(rootEntity);
         }
         return boundValue;
-    }
-
-    protected void addToExample(DefaultRepository defaultRepository, Object example, String fieldAttribute, Object boundValue) {
-        EntityMapper entityMapper = defaultRepository.getEntityMapper();
-        entityMapper.addToExample(example, fieldAttribute, boundValue);
     }
 
     protected Object convertManyToOneEntity(DefaultRepository defaultRepository, List<?> entities) {
