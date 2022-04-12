@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.proxy.entity;
 
 import com.gitee.spring.domain.proxy.api.EntityProperty;
-import com.gitee.spring.domain.proxy.extension.EntityPropertyFactory;
+import com.gitee.spring.domain.proxy.property.EntityPropertyFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;

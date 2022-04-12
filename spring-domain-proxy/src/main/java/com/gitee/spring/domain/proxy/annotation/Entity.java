@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.proxy.annotation;
 
-import com.gitee.spring.domain.proxy.extension.DefaultEntityAssembler;
+import com.gitee.spring.domain.proxy.property.DefaultEntityAssembler;
 
 import java.lang.annotation.*;
 
