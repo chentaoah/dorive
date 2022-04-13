@@ -9,7 +9,7 @@ import org.springframework.core.annotation.AnnotationAttributes;
 
 import java.util.*;
 
-public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK> {
+public abstract class AbstractGenericRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
 
     @Override
     @SuppressWarnings("unchecked")

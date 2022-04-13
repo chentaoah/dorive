@@ -14,6 +14,7 @@ public class EntityDefinition {
     private Class<?> entityClass;
     private boolean collection;
     private Class<?> genericEntityClass;
+    private String fieldName;
     private AnnotationAttributes attributes;
     private Object mapper;
     private Class<?> pojoClass;
