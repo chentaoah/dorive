@@ -1,9 +1,9 @@
 package com.gitee.spring.domain.proxy.api;
 
-public interface CustomAssembler<E> {
+public interface CustomAssembler {
 
-    void assembleBy(E entity);
+    void assembleBy(Object entity);
 
-    void disassembleTo(E entity);
+    void disassembleTo(Object entity);
 
 }

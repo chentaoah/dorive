@@ -70,7 +70,6 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractContextRe
         }
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T assemble(Class<T> targetClass, E entity) {
         Map<String, Object> properties = new LinkedHashMap<>();
         List<PropertyDefinition> propertyDefinitions = classPropertyDefinitionsMap.get(targetClass);
@@ -82,12 +81,11 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractContextRe
         }
         T targetEntity = BeanUtil.copyProperties(properties, targetClass);
         if (targetEntity instanceof CustomAssembler) {
-            ((CustomAssembler<E>) targetEntity).assembleBy(entity);
+            ((CustomAssembler) targetEntity).assembleBy(entity);
         }
         return targetEntity;
     }
 
-    @SuppressWarnings("unchecked")
     public void disassemble(Object targetEntity, E entity) {
         Map<String, Object> properties = BeanUtil.beanToMap(targetEntity);
         List<PropertyDefinition> propertyDefinitions = classPropertyDefinitionsMap.get(targetEntity.getClass());
@@ -98,7 +96,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractContextRe
             entityPropertyChain.setValue(entity, fieldValue);
         }
         if (targetEntity instanceof CustomAssembler) {
-            ((CustomAssembler<E>) targetEntity).disassembleTo(entity);
+            ((CustomAssembler) targetEntity).disassembleTo(entity);
         }
     }
 
