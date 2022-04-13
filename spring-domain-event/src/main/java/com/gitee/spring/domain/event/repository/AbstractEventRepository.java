@@ -15,9 +15,9 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractChainReposi
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
         EnableEvent enableEvent = AnnotationUtils.getAnnotation(this.getClass(), EnableEvent.class);
         this.enableEvent = enableEvent != null;
+        super.afterPropertiesSet();
     }
 
     @Override
