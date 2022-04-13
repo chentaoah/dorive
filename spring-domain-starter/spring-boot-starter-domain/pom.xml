@@ -18,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>spring-domain-proxy</artifactId>
+            <artifactId>spring-domain-core</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
