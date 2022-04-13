@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.proxy.api;
 
-public interface CustomAssembler {
+public interface CoatingAssembler {
 
     void assembleBy(Object entity);
 

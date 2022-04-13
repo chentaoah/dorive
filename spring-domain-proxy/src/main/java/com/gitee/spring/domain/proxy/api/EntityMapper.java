@@ -21,7 +21,7 @@ public interface EntityMapper {
 
     int update(Object mapper, BoundedContext boundedContext, Object persistentObject);
 
-    int updateByExample(Object mapper, Object entity, Object example);
+    int updateByExample(Object mapper, Object persistentObject, Object example);
 
     int deleteByPrimaryKey(Object mapper, BoundedContext boundedContext, Object primaryKey);
 

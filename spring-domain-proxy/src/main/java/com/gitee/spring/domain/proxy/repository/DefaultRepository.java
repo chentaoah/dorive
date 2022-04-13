@@ -1,6 +1,7 @@
 package com.gitee.spring.domain.proxy.repository;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.proxy.api.EntityAssembler;
 import com.gitee.spring.domain.proxy.api.EntityMapper;
 import com.gitee.spring.domain.proxy.entity.BoundedContext;
@@ -121,7 +122,12 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
 
     @Override
     public int updateByExample(Object entity, Object example) {
-        return entityMapper.updateByExample(entityDefinition.getMapper(), entity, example);
+        Assert.isTrue(!(entity instanceof Collection), "The entity cannot be a collection!");
+        Object persistentObject = entityAssembler.disassemble(entityDefinition, new BoundedContext(), entity);
+        if (persistentObject != null) {
+            return entityMapper.updateByExample(entityDefinition.getMapper(), persistentObject, example);
+        }
+        return 0;
     }
 
     @Override

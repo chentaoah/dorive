@@ -3,7 +3,7 @@ package com.gitee.spring.domain.proxy.repository;
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.proxy.annotation.CoatingScan;
 import com.gitee.spring.domain.proxy.annotation.Ignore;
-import com.gitee.spring.domain.proxy.api.CustomAssembler;
+import com.gitee.spring.domain.proxy.api.CoatingAssembler;
 import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
 import com.gitee.spring.domain.proxy.entity.PropertyDefinition;
 import com.gitee.spring.domain.proxy.utils.ResourceUtils;
@@ -14,7 +14,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 
-public abstract class AbstractCoatingRepository<E, PK> extends AbstractContextRepository<E, PK> {
+public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> {
 
     protected Map<String, EntityPropertyChain> fieldEntityPropertyChainMap = new LinkedHashMap<>();
     protected Map<Class<?>, List<PropertyDefinition>> classPropertyDefinitionsMap = new LinkedHashMap<>();
@@ -80,8 +80,8 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractContextRe
             properties.put(fieldName, fieldValue);
         }
         T targetEntity = BeanUtil.copyProperties(properties, targetClass);
-        if (targetEntity instanceof CustomAssembler) {
-            ((CustomAssembler) targetEntity).assembleBy(entity);
+        if (targetEntity instanceof CoatingAssembler) {
+            ((CoatingAssembler) targetEntity).assembleBy(entity);
         }
         return targetEntity;
     }
@@ -95,8 +95,8 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractContextRe
             EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
             entityPropertyChain.setValue(entity, fieldValue);
         }
-        if (targetEntity instanceof CustomAssembler) {
-            ((CustomAssembler) targetEntity).disassembleTo(entity);
+        if (targetEntity instanceof CoatingAssembler) {
+            ((CoatingAssembler) targetEntity).disassembleTo(entity);
         }
     }
 
