@@ -1,9 +1,9 @@
-package com.gitee.spring.domain.core.listener;
+package com.gitee.spring.domain.event.listener;
 
-import com.gitee.spring.domain.core.annotation.EventListener;
-import com.gitee.spring.domain.core.api.EntityListener;
+import com.gitee.spring.domain.event.annotation.EventListener;
+import com.gitee.spring.domain.event.api.EntityListener;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
-import com.gitee.spring.domain.core.entity.RepositoryEvent;
+import com.gitee.spring.domain.event.entity.RepositoryEvent;
 import com.gitee.spring.domain.core.repository.DefaultRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;

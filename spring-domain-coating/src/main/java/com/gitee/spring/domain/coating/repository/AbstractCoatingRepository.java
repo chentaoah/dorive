@@ -1,12 +1,13 @@
-package com.gitee.spring.domain.core.repository;
+package com.gitee.spring.domain.coating.repository;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.spring.domain.core.annotation.CoatingScan;
-import com.gitee.spring.domain.core.annotation.IgnoreProperty;
-import com.gitee.spring.domain.core.api.CoatingAssembler;
+import com.gitee.spring.domain.coating.annotation.CoatingScan;
+import com.gitee.spring.domain.coating.annotation.IgnoreProperty;
+import com.gitee.spring.domain.coating.api.CoatingAssembler;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
-import com.gitee.spring.domain.core.entity.PropertyDefinition;
-import com.gitee.spring.domain.core.utils.ResourceUtils;
+import com.gitee.spring.domain.coating.entity.PropertyDefinition;
+import com.gitee.spring.domain.coating.utils.ResourceUtils;
+import com.gitee.spring.domain.event.repository.AbstractEventRepository;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 

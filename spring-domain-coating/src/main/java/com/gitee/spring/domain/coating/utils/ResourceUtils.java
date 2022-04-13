@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core.utils;
+package com.gitee.spring.domain.coating.utils;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;

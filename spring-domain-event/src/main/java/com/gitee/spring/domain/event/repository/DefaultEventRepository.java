@@ -1,8 +1,12 @@
-package com.gitee.spring.domain.core.repository;
+package com.gitee.spring.domain.event.repository;
 
 import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.*;
+import com.gitee.spring.domain.core.repository.DefaultRepository;
+import com.gitee.spring.domain.event.entity.EntityEvent;
+import com.gitee.spring.domain.event.entity.OperationType;
+import com.gitee.spring.domain.event.entity.RepositoryEvent;
 import org.springframework.context.ApplicationContext;
 
 public class DefaultEventRepository extends DefaultRepository {

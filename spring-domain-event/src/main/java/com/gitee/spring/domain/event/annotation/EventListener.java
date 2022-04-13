@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core.annotation;
+package com.gitee.spring.domain.event.annotation;
 
 import java.lang.annotation.*;
 

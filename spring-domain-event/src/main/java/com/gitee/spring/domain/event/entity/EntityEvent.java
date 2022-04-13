@@ -1,5 +1,6 @@
-package com.gitee.spring.domain.core.entity;
+package com.gitee.spring.domain.event.entity;
 
+import com.gitee.spring.domain.core.entity.BoundedContext;
 import lombok.Data;
 
 @Data

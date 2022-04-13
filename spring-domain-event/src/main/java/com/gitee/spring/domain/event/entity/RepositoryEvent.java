@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core.entity;
+package com.gitee.spring.domain.event.entity;
 
 import com.gitee.spring.domain.core.repository.DefaultRepository;
 import lombok.Getter;

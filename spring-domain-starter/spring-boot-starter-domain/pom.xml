@@ -21,6 +21,16 @@
             <artifactId>spring-domain-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>spring-domain-event</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>spring-domain-coating</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

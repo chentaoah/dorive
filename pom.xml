@@ -11,6 +11,8 @@
     <modules>
         <module>spring-domain-injection</module>
         <module>spring-domain-core</module>
+        <module>spring-domain-event</module>
+        <module>spring-domain-coating</module>
         <module>spring-domain-starter</module>
     </modules>
 
