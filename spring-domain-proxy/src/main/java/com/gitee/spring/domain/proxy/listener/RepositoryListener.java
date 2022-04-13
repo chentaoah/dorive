@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.proxy.listener;
 
-import com.gitee.spring.domain.proxy.annotation.Listener;
+import com.gitee.spring.domain.proxy.annotation.EventListener;
 import com.gitee.spring.domain.proxy.api.EntityListener;
 import com.gitee.spring.domain.proxy.entity.EntityDefinition;
 import com.gitee.spring.domain.proxy.entity.RepositoryEvent;
@@ -32,9 +32,9 @@ public class RepositoryListener implements ApplicationListener<RepositoryEvent>,
     public void afterPropertiesSet() {
         Map<String, EntityListener> entityListenerMap = applicationContext.getBeansOfType(EntityListener.class);
         for (EntityListener entityListener : entityListenerMap.values()) {
-            Listener listener = entityListener.getClass().getAnnotation(Listener.class);
-            if (listener != null) {
-                Class<?> entityClass = listener.value();
+            EventListener eventListener = entityListener.getClass().getAnnotation(EventListener.class);
+            if (eventListener != null) {
+                Class<?> entityClass = eventListener.value();
                 List<EntityListener> entityListeners = classEntityListenerMap.computeIfAbsent(entityClass, key -> new ArrayList<>());
                 entityListeners.add(entityListener);
             }

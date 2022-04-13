@@ -2,7 +2,7 @@ package com.gitee.spring.domain.proxy.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.proxy.annotation.CoatingScan;
-import com.gitee.spring.domain.proxy.annotation.Ignore;
+import com.gitee.spring.domain.proxy.annotation.IgnoreProperty;
 import com.gitee.spring.domain.proxy.api.CoatingAssembler;
 import com.gitee.spring.domain.proxy.entity.EntityPropertyChain;
 import com.gitee.spring.domain.proxy.entity.PropertyDefinition;
@@ -52,7 +52,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
             for (Class<?> clazz : classes) {
                 List<PropertyDefinition> propertyDefinitions = new ArrayList<>();
                 ReflectionUtils.doWithLocalFields(clazz, field -> {
-                    if (field.isAnnotationPresent(Ignore.class)) return;
+                    if (field.isAnnotationPresent(IgnoreProperty.class)) return;
                     Class<?> fieldClass = field.getType();
                     boolean isCollection = false;
                     Class<?> genericFieldClass = fieldClass;
