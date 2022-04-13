@@ -19,12 +19,12 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractContextRepo
     }
 
     @Override
-    protected DefaultRepository doNewDefaultRepository(EntityPropertyChain entityPropertyChain, EntityDefinition entityDefinition,
-                                                       EntityMapper entityMapper, EntityAssembler entityAssembler) {
+    protected DefaultRepository newDefaultRepository(EntityPropertyChain entityPropertyChain, EntityDefinition entityDefinition,
+                                                     EntityMapper entityMapper, EntityAssembler entityAssembler) {
         if (enableEvent) {
             return new DefaultEventRepository(applicationContext, entityPropertyChain, entityDefinition, entityMapper, entityAssembler);
         } else {
-            return super.doNewDefaultRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler);
+            return super.newDefaultRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler);
         }
     }
 }

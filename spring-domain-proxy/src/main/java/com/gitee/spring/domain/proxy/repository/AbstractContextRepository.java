@@ -93,13 +93,13 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                                     Class<?> genericEntityClass, String fieldName, AnnotationAttributes attributes,
                                     Set<Binding> bindingAnnotations) {
         if (lastEntityClass == null && attributes != null) {
-            rootRepository = newDefaultRepository(accessPath, null, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
+            rootRepository = resolveDefaultRepository(accessPath, null, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
             orderedRepositories.add(rootRepository);
 
         } else if (lastEntityClass != null) {
             EntityPropertyChain entityPropertyChain = newEntityPropertyChain(accessPath, lastEntityClass, entityClass, fieldName);
             if (attributes != null) {
-                DefaultRepository defaultRepository = newDefaultRepository(accessPath, entityPropertyChain, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
+                DefaultRepository defaultRepository = resolveDefaultRepository(accessPath, entityPropertyChain, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
                 defaultRepositories.add(defaultRepository);
                 orderedRepositories.add(defaultRepository);
             }
@@ -129,9 +129,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return entityPropertyChain;
     }
 
-    protected DefaultRepository newDefaultRepository(String accessPath, EntityPropertyChain entityPropertyChain, Class<?> entityClass,
-                                                     Class<?> genericEntityClass, String fieldName, AnnotationAttributes attributes,
-                                                     Set<Binding> bindingAnnotations) {
+    protected DefaultRepository resolveDefaultRepository(String accessPath, EntityPropertyChain entityPropertyChain, Class<?> entityClass,
+                                                         Class<?> genericEntityClass, String fieldName, AnnotationAttributes attributes,
+                                                         Set<Binding> bindingAnnotations) {
         boolean isRoot = entityPropertyChain == null;
         boolean isCollection = Collection.class.isAssignableFrom(entityClass);
 
@@ -191,11 +191,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 fieldName, attributes, mapper, pojoClass, bindingDefinitions, boundIdBindingDefinition);
         Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTE);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
-        return doNewDefaultRepository(entityPropertyChain, entityDefinition, this, entityAssembler);
+        return newDefaultRepository(entityPropertyChain, entityDefinition, this, entityAssembler);
     }
 
-    protected DefaultRepository doNewDefaultRepository(EntityPropertyChain entityPropertyChain, EntityDefinition entityDefinition,
-                                                       EntityMapper entityMapper, EntityAssembler entityAssembler) {
+    protected DefaultRepository newDefaultRepository(EntityPropertyChain entityPropertyChain, EntityDefinition entityDefinition,
+                                                     EntityMapper entityMapper, EntityAssembler entityAssembler) {
         return new DefaultRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler);
     }
 
