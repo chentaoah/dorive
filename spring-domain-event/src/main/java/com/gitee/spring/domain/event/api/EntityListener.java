@@ -1,9 +1,9 @@
 package com.gitee.spring.domain.event.api;
 
-import com.gitee.spring.domain.event.entity.EntityEvent;
+import com.gitee.spring.domain.event.entity.RepositoryEvent;
 
 public interface EntityListener {
 
-    void onEntityEvent(EntityEvent entityEvent);
+    void onApplicationEvent(RepositoryEvent repositoryEvent);
 
 }

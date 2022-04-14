@@ -1,12 +1,13 @@
 package com.gitee.spring.domain.event.repository;
 
 import com.gitee.spring.domain.core.repository.AbstractChainRepository;
+import com.gitee.spring.domain.core.repository.AbstractRepository;
+import com.gitee.spring.domain.core.repository.ConfigurableRepository;
 import com.gitee.spring.domain.event.annotation.EnableEvent;
 import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
-import com.gitee.spring.domain.core.repository.DefaultRepository;
 import org.springframework.core.annotation.AnnotationUtils;
 
 public abstract class AbstractEventRepository<E, PK> extends AbstractChainRepository<E, PK> {
@@ -21,12 +22,13 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractChainReposi
     }
 
     @Override
-    protected DefaultRepository newDefaultRepository(EntityPropertyChain entityPropertyChain, EntityDefinition entityDefinition,
-                                                     EntityMapper entityMapper, EntityAssembler entityAssembler) {
-        if (enableEvent) {
-            return new DefaultEventRepository(applicationContext, entityPropertyChain, entityDefinition, entityMapper, entityAssembler);
-        } else {
-            return super.newDefaultRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler);
-        }
+    protected ConfigurableRepository newConfigurableRepository(EntityPropertyChain entityPropertyChain,
+                                                               EntityDefinition entityDefinition,
+                                                               EntityMapper entityMapper,
+                                                               EntityAssembler entityAssembler,
+                                                               AbstractRepository<Object, Object> repository) {
+        repository = enableEvent ? new DefaultEventRepository(repository, applicationContext) : repository;
+        return new ConfigurableRepository(repository, entityPropertyChain, entityDefinition, entityMapper, entityAssembler);
     }
+
 }

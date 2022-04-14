@@ -31,6 +31,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     public static final String SCENE_ATTRIBUTE = "scene";
     public static final String MAPPER_ATTRIBUTE = "mapper";
     public static final String ASSEMBLER_ATTRIBUTE = "assembler";
+    public static final String REPOSITORY_ATTRIBUTE = "repository";
     public static final String ORDER_ATTRIBUTE = "order";
 
     public static final String FIELD_ATTRIBUTE = "field";
@@ -41,10 +42,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected Constructor<?> constructor;
     protected Map<String, EntityPropertyChain> entityPropertyChainMap = new LinkedHashMap<>();
 
-    protected DefaultRepository rootRepository;
-    protected List<DefaultRepository> defaultRepositories = new ArrayList<>();
-    protected List<DefaultRepository> orderedRepositories = new ArrayList<>();
-    protected Map<Class<?>, DefaultRepository> classRepositoryMap = new LinkedHashMap<>();
+    protected ConfigurableRepository rootRepository;
+    protected List<ConfigurableRepository> subRepositories = new ArrayList<>();
+    protected List<ConfigurableRepository> orderedRepositories = new ArrayList<>();
+    protected Map<Class<?>, ConfigurableRepository> classRepositoryMap = new LinkedHashMap<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -63,15 +64,15 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(entityClass, Binding.class);
         visitEntityClass("/", null, entityClass, entityClass, null, attributes, bindingAnnotations);
 
-        orderedRepositories.sort(Comparator.comparingInt(defaultRepository -> {
-            EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
+        orderedRepositories.sort(Comparator.comparingInt(configurableRepository -> {
+            EntityDefinition entityDefinition = configurableRepository.getEntityDefinition();
             AnnotationAttributes annotationAttributes = entityDefinition.getAttributes();
             return annotationAttributes.getNumber(ORDER_ATTRIBUTE).intValue();
         }));
     }
 
     @Override
-    public DefaultRepository getRepository(Class<?> entityClass) {
+    public ConfigurableRepository getRepository(Class<?> entityClass) {
         return classRepositoryMap.get(entityClass);
     }
 
@@ -79,7 +80,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                                     Class<?> genericEntityClass, String fieldName, AnnotationAttributes attributes,
                                     Set<Binding> bindingAnnotations) {
         if (lastEntityClass == null && attributes != null) {
-            rootRepository = resolveDefaultRepository(accessPath, null, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
+            rootRepository = newConfigurableRepository(accessPath, null, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
             orderedRepositories.add(rootRepository);
             classRepositoryMap.put(genericEntityClass, rootRepository);
 
@@ -87,10 +88,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityPropertyChain entityPropertyChain = newEntityPropertyChain(accessPath, lastEntityClass, entityClass, fieldName);
             if (attributes != null) {
                 entityPropertyChain.initialize();
-                DefaultRepository defaultRepository = resolveDefaultRepository(accessPath, entityPropertyChain, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
-                defaultRepositories.add(defaultRepository);
-                orderedRepositories.add(defaultRepository);
-                classRepositoryMap.put(genericEntityClass, defaultRepository);
+                ConfigurableRepository configurableRepository = newConfigurableRepository(accessPath, entityPropertyChain, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
+                subRepositories.add(configurableRepository);
+                orderedRepositories.add(configurableRepository);
+                classRepositoryMap.put(genericEntityClass, configurableRepository);
             }
         }
         if (!filterEntityClass(entityClass)) {
@@ -118,9 +119,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return entityPropertyChain;
     }
 
-    protected DefaultRepository resolveDefaultRepository(String accessPath, EntityPropertyChain entityPropertyChain, Class<?> entityClass,
-                                                         Class<?> genericEntityClass, String fieldName, AnnotationAttributes attributes,
-                                                         Set<Binding> bindingAnnotations) {
+    @SuppressWarnings("unchecked")
+    protected ConfigurableRepository newConfigurableRepository(String accessPath, EntityPropertyChain entityPropertyChain, Class<?> entityClass,
+                                                               Class<?> genericEntityClass, String fieldName, AnnotationAttributes attributes,
+                                                               Set<Binding> bindingAnnotations) {
         boolean isRoot = entityPropertyChain == null;
         boolean isCollection = Collection.class.isAssignableFrom(entityClass);
 
@@ -179,14 +181,27 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         EntityDefinition entityDefinition = new EntityDefinition(isRoot, accessPath, entityClass, isCollection, genericEntityClass,
                 fieldName, attributes, mapper, pojoClass, bindingDefinitions, boundIdBindingDefinition);
+
         Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTE);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
-        return newDefaultRepository(entityPropertyChain, entityDefinition, this, entityAssembler);
+
+        Class<?> repositoryClass = attributes.getClass(REPOSITORY_ATTRIBUTE);
+        AbstractRepository<Object, Object> repository;
+        if (repositoryClass == DefaultRepository.class) {
+            repository = new DefaultRepository(entityDefinition, this, entityAssembler);
+        } else {
+            repository = (AbstractRepository<Object, Object>) applicationContext.getBean(repositoryClass);
+        }
+
+        return newConfigurableRepository(entityPropertyChain, entityDefinition, this, entityAssembler, repository);
     }
 
-    protected DefaultRepository newDefaultRepository(EntityPropertyChain entityPropertyChain, EntityDefinition entityDefinition,
-                                                     EntityMapper entityMapper, EntityAssembler entityAssembler) {
-        return new DefaultRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler);
+    protected ConfigurableRepository newConfigurableRepository(EntityPropertyChain entityPropertyChain,
+                                                               EntityDefinition entityDefinition,
+                                                               EntityMapper entityMapper,
+                                                               EntityAssembler entityAssembler,
+                                                               AbstractRepository<Object, Object> repository) {
+        return new ConfigurableRepository(repository, entityPropertyChain, entityDefinition, entityMapper, entityAssembler);
     }
 
     protected boolean filterEntityClass(Class<?> entityClass) {

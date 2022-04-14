@@ -43,15 +43,17 @@ public class RepositoryListener implements ApplicationListener<RepositoryEvent>,
 
     @Override
     public void onApplicationEvent(RepositoryEvent event) {
-        DefaultRepository defaultRepository = (DefaultRepository) event.getSource();
-        EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
-        Class<?> entityClass = entityDefinition.getGenericEntityClass();
-        List<EntityListener> entityListeners = classEntityListenerMap.get(entityClass);
-        for (EntityListener entityListener : entityListeners) {
-            try {
-                entityListener.onEntityEvent(event.getEntityEvent());
-            } catch (Exception e) {
-                log.error("Exception occurred in event listening!", e);
+        if (event.getSource() instanceof DefaultRepository) {
+            DefaultRepository defaultRepository = (DefaultRepository) event.getSource();
+            EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
+            Class<?> entityClass = entityDefinition.getGenericEntityClass();
+            List<EntityListener> entityListeners = classEntityListenerMap.get(entityClass);
+            for (EntityListener entityListener : entityListeners) {
+                try {
+                    entityListener.onApplicationEvent(event);
+                } catch (Exception e) {
+                    log.error("Exception occurred in event listening!", e);
+                }
             }
         }
     }

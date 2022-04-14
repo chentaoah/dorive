@@ -44,9 +44,9 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
     protected Map<String, Object> newChainQueryContext(BoundedContext boundedContext, ChainQuery chainQuery) {
         Map<String, Object> chainQueryContext = new LinkedHashMap<>();
         for (ChainQuery.Criterion criterion : chainQuery.getCriteria()) {
-            DefaultRepository defaultRepository = classRepositoryMap.get(criterion.getEntityClass());
-            Assert.notNull(defaultRepository, "The repository does not exist!");
-            EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
+            ConfigurableRepository configurableRepository = classRepositoryMap.get(criterion.getEntityClass());
+            Assert.notNull(configurableRepository, "The repository does not exist!");
+            EntityDefinition entityDefinition = configurableRepository.getEntityDefinition();
             Object example = criterion.getExample();
             if (example == null) {
                 example = newExample(entityDefinition, boundedContext);
@@ -59,11 +59,11 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
 
     protected void executeChainQuery(BoundedContext boundedContext, Map<String, Object> chainQueryContext, ChainQuery chainQuery) {
         for (ChainQuery.Criterion criterion : chainQuery.getCriteria()) {
-            DefaultRepository defaultRepository = classRepositoryMap.get(criterion.getEntityClass());
-            EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
+            ConfigurableRepository configurableRepository = classRepositoryMap.get(criterion.getEntityClass());
+            EntityDefinition entityDefinition = configurableRepository.getEntityDefinition();
             if (entityDefinition.isRoot()) continue;
 
-            List<?> entities = defaultRepository.selectByExample(boundedContext, criterion.getExample());
+            List<?> entities = configurableRepository.selectByExample(boundedContext, criterion.getExample());
             log.debug("Query data is: {}", entities);
             if (entities.isEmpty()) continue;
 

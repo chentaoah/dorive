@@ -21,7 +21,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class DefaultRepository extends AbstractRepository<Object, Object> {
 
-    protected EntityPropertyChain entityPropertyChain;
     protected EntityDefinition entityDefinition;
     protected EntityMapper entityMapper;
     protected EntityAssembler entityAssembler;

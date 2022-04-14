@@ -1,9 +1,9 @@
 package com.gitee.spring.domain.core.api;
 
-import com.gitee.spring.domain.core.repository.DefaultRepository;
+import com.gitee.spring.domain.core.repository.ConfigurableRepository;
 
 public interface RepositoryContext {
 
-    DefaultRepository getRepository(Class<?> entityClass);
+    ConfigurableRepository getRepository(Class<?> entityClass);
 
 }

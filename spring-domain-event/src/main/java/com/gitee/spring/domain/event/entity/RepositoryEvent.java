@@ -1,6 +1,9 @@
 package com.gitee.spring.domain.event.entity;
 
+import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.repository.AbstractRepository;
 import com.gitee.spring.domain.core.repository.DefaultRepository;
+import com.gitee.spring.domain.event.repository.DefaultEventRepository;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
@@ -9,10 +12,15 @@ import org.springframework.context.ApplicationEvent;
 @Setter
 public class RepositoryEvent extends ApplicationEvent {
 
-    private EntityEvent entityEvent;
+    private String methodName;
+    private OperationType operationType;
+    private BoundedContext boundedContext;
+    private Object entity;
+    private Object example;
+    private Object primaryKey;
 
-    public RepositoryEvent(DefaultRepository defaultRepository) {
-        super(defaultRepository);
+    public RepositoryEvent(AbstractRepository<Object, Object> repository) {
+        super(repository);
     }
 
 }
