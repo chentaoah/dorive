@@ -7,11 +7,11 @@ import com.gitee.spring.domain.event.entity.OperationType;
 import com.gitee.spring.domain.event.entity.RepositoryEvent;
 import org.springframework.context.ApplicationContext;
 
-public class DefaultEventRepository extends ProxyRepository {
+public class EventRepository extends ProxyRepository {
 
     protected ApplicationContext applicationContext;
 
-    public DefaultEventRepository(AbstractRepository<Object, Object> repository, ApplicationContext applicationContext) {
+    public EventRepository(AbstractRepository<Object, Object> repository, ApplicationContext applicationContext) {
         super(repository);
         this.applicationContext = applicationContext;
     }
