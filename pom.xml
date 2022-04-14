@@ -13,7 +13,7 @@
         <module>spring-domain-core</module>
         <module>spring-domain-event</module>
         <module>spring-domain-coating</module>
-        <module>spring-domain-starter</module>
+        <module>spring-boot-starter-domain</module>
     </modules>
 
     <properties>

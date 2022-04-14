@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.gitee.digital-engine</groupId>
-        <artifactId>spring-domain-starter</artifactId>
+        <artifactId>spring-domain</artifactId>
         <version>2.2.0</version>
     </parent>
     <artifactId>spring-boot-starter-domain</artifactId>
