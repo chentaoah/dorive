@@ -11,8 +11,7 @@ public class DefaultEventRepository extends ProxyRepository {
 
     protected ApplicationContext applicationContext;
 
-    public DefaultEventRepository(AbstractRepository<Object, Object> repository,
-                                  ApplicationContext applicationContext) {
+    public DefaultEventRepository(AbstractRepository<Object, Object> repository, ApplicationContext applicationContext) {
         super(repository);
         this.applicationContext = applicationContext;
     }

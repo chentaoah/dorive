@@ -2,8 +2,6 @@ package com.gitee.spring.domain.event.entity;
 
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.repository.AbstractRepository;
-import com.gitee.spring.domain.core.repository.DefaultRepository;
-import com.gitee.spring.domain.event.repository.DefaultEventRepository;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
