@@ -11,6 +11,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -32,7 +33,7 @@ public class RepositoryListener implements ApplicationListener<RepositoryEvent>,
     public void afterPropertiesSet() {
         Map<String, EntityListener> entityListenerMap = applicationContext.getBeansOfType(EntityListener.class);
         for (EntityListener entityListener : entityListenerMap.values()) {
-            EventListener eventListener = entityListener.getClass().getAnnotation(EventListener.class);
+            EventListener eventListener = AnnotationUtils.getAnnotation(entityListener.getClass(), EventListener.class);
             if (eventListener != null) {
                 Class<?> entityClass = eventListener.value();
                 List<EntityListener> entityListeners = classEntityListenerMap.computeIfAbsent(entityClass, key -> new ArrayList<>());
