@@ -5,20 +5,28 @@ import com.gitee.spring.domain.core.repository.AbstractRepository;
 import com.gitee.spring.domain.core.repository.ProxyRepository;
 import com.gitee.spring.domain.event.entity.OperationType;
 import com.gitee.spring.domain.event.entity.RepositoryEvent;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.context.ApplicationContext;
 
+@Getter
+@Setter
 public class EventRepository extends ProxyRepository {
 
     protected ApplicationContext applicationContext;
+    protected EntityDefinition entityDefinition;
 
-    public EventRepository(AbstractRepository<Object, Object> repository, ApplicationContext applicationContext) {
+    public EventRepository(AbstractRepository<Object, Object> repository,
+                           ApplicationContext applicationContext,
+                           EntityDefinition entityDefinition) {
         super(repository);
         this.applicationContext = applicationContext;
+        this.entityDefinition = entityDefinition;
     }
 
     @Override
     public int insert(BoundedContext boundedContext, Object entity) {
-        RepositoryEvent repositoryEvent = new RepositoryEvent(repository);
+        RepositoryEvent repositoryEvent = new RepositoryEvent(this);
         repositoryEvent.setMethodName("insert");
         repositoryEvent.setOperationType(OperationType.INSERT);
         repositoryEvent.setBoundedContext(boundedContext);
@@ -29,7 +37,7 @@ public class EventRepository extends ProxyRepository {
 
     @Override
     public int update(BoundedContext boundedContext, Object entity) {
-        RepositoryEvent repositoryEvent = new RepositoryEvent(repository);
+        RepositoryEvent repositoryEvent = new RepositoryEvent(this);
         repositoryEvent.setMethodName("update");
         repositoryEvent.setOperationType(OperationType.UPDATE);
         repositoryEvent.setBoundedContext(boundedContext);
@@ -40,7 +48,7 @@ public class EventRepository extends ProxyRepository {
 
     @Override
     public int updateByExample(Object entity, Object example) {
-        RepositoryEvent repositoryEvent = new RepositoryEvent(repository);
+        RepositoryEvent repositoryEvent = new RepositoryEvent(this);
         repositoryEvent.setMethodName("updateByExample");
         repositoryEvent.setOperationType(OperationType.UPDATE);
         repositoryEvent.setEntity(entity);
@@ -51,7 +59,7 @@ public class EventRepository extends ProxyRepository {
 
     @Override
     public int delete(BoundedContext boundedContext, Object entity) {
-        RepositoryEvent repositoryEvent = new RepositoryEvent(repository);
+        RepositoryEvent repositoryEvent = new RepositoryEvent(this);
         repositoryEvent.setMethodName("delete");
         repositoryEvent.setOperationType(OperationType.DELETE);
         repositoryEvent.setBoundedContext(boundedContext);
@@ -62,7 +70,7 @@ public class EventRepository extends ProxyRepository {
 
     @Override
     public int deleteByPrimaryKey(Object primaryKey) {
-        RepositoryEvent repositoryEvent = new RepositoryEvent(repository);
+        RepositoryEvent repositoryEvent = new RepositoryEvent(this);
         repositoryEvent.setMethodName("deleteByPrimaryKey");
         repositoryEvent.setOperationType(OperationType.DELETE);
         repositoryEvent.setPrimaryKey(primaryKey);
@@ -72,7 +80,7 @@ public class EventRepository extends ProxyRepository {
 
     @Override
     public int deleteByExample(Object example) {
-        RepositoryEvent repositoryEvent = new RepositoryEvent(repository);
+        RepositoryEvent repositoryEvent = new RepositoryEvent(this);
         repositoryEvent.setMethodName("deleteByExample");
         repositoryEvent.setOperationType(OperationType.DELETE);
         repositoryEvent.setExample(example);

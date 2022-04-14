@@ -4,7 +4,7 @@ import com.gitee.spring.domain.event.annotation.EventListener;
 import com.gitee.spring.domain.event.api.EntityListener;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.event.entity.RepositoryEvent;
-import com.gitee.spring.domain.core.repository.DefaultRepository;
+import com.gitee.spring.domain.event.repository.EventRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
@@ -44,17 +44,15 @@ public class RepositoryListener implements ApplicationListener<RepositoryEvent>,
 
     @Override
     public void onApplicationEvent(RepositoryEvent event) {
-        if (event.getSource() instanceof DefaultRepository) {
-            DefaultRepository defaultRepository = (DefaultRepository) event.getSource();
-            EntityDefinition entityDefinition = defaultRepository.getEntityDefinition();
-            Class<?> entityClass = entityDefinition.getGenericEntityClass();
-            List<EntityListener> entityListeners = classEntityListenerMap.get(entityClass);
-            for (EntityListener entityListener : entityListeners) {
-                try {
-                    entityListener.onApplicationEvent(event);
-                } catch (Exception e) {
-                    log.error("Exception occurred in event listening!", e);
-                }
+        EventRepository eventRepository = (EventRepository) event.getSource();
+        EntityDefinition entityDefinition = eventRepository.getEntityDefinition();
+        Class<?> entityClass = entityDefinition.getGenericEntityClass();
+        List<EntityListener> entityListeners = classEntityListenerMap.get(entityClass);
+        for (EntityListener entityListener : entityListeners) {
+            try {
+                entityListener.onApplicationEvent(event);
+            } catch (Exception e) {
+                log.error("Exception occurred in event listening!", e);
             }
         }
     }

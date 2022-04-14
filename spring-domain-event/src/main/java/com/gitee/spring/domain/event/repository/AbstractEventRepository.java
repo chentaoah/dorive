@@ -27,7 +27,7 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractChainReposi
                                                                EntityMapper entityMapper,
                                                                EntityAssembler entityAssembler,
                                                                AbstractRepository<Object, Object> repository) {
-        repository = enableEvent ? new EventRepository(repository, applicationContext) : repository;
+        repository = enableEvent ? new EventRepository(repository, applicationContext, entityDefinition) : repository;
         return new ConfigurableRepository(repository, entityPropertyChain, entityDefinition, entityMapper, entityAssembler);
     }
 
