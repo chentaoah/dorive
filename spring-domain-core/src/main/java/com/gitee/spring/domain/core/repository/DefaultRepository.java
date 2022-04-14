@@ -65,18 +65,6 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
 
     @Override
     public int insert(BoundedContext boundedContext, Object entity) {
-        int count = 0;
-        if (entity instanceof Collection) {
-            for (Object eachEntity : (Collection<?>) entity) {
-                count += doInsert(boundedContext, eachEntity);
-            }
-        } else {
-            count += doInsert(boundedContext, entity);
-        }
-        return count;
-    }
-
-    protected int doInsert(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey == null) {
             Object persistentObject = entityAssembler.disassemble(entityDefinition, boundedContext, entity);
@@ -96,18 +84,6 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
 
     @Override
     public int update(BoundedContext boundedContext, Object entity) {
-        int count = 0;
-        if (entity instanceof Collection) {
-            for (Object eachEntity : (Collection<?>) entity) {
-                count += doUpdate(boundedContext, eachEntity);
-            }
-        } else {
-            count += doUpdate(boundedContext, entity);
-        }
-        return count;
-    }
-
-    protected int doUpdate(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey != null) {
             Object persistentObject = entityAssembler.disassemble(entityDefinition, boundedContext, entity);
@@ -130,18 +106,6 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
 
     @Override
     public int delete(BoundedContext boundedContext, Object entity) {
-        int count = 0;
-        if (entity instanceof Collection) {
-            for (Object eachEntity : (Collection<?>) entity) {
-                count += doDelete(boundedContext, eachEntity);
-            }
-        } else {
-            count += doDelete(boundedContext, entity);
-        }
-        return count;
-    }
-
-    protected int doDelete(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey != null) {
             return entityMapper.deleteByPrimaryKey(entityDefinition.getMapper(), boundedContext, primaryKey);

@@ -184,7 +184,13 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
             EntityPropertyChain entityPropertyChain = configurableRepository.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null && isMatchScenes(configurableRepository, boundedContext)) {
-                count += configurableRepository.update(boundedContext, targetEntity);
+                if (targetEntity instanceof Collection) {
+                    for (Object eachEntity : (Collection<?>) targetEntity) {
+                        count += configurableRepository.update(boundedContext, eachEntity);
+                    }
+                } else {
+                    count += configurableRepository.update(boundedContext, targetEntity);
+                }
             }
         }
         return count;
@@ -204,7 +210,13 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
             EntityPropertyChain entityPropertyChain = configurableRepository.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null && isMatchScenes(configurableRepository, boundedContext)) {
-                count += configurableRepository.delete(boundedContext, targetEntity);
+                if (targetEntity instanceof Collection) {
+                    for (Object eachEntity : (Collection<?>) targetEntity) {
+                        count += configurableRepository.delete(boundedContext, eachEntity);
+                    }
+                } else {
+                    count += configurableRepository.delete(boundedContext, targetEntity);
+                }
             }
         }
         return count;
