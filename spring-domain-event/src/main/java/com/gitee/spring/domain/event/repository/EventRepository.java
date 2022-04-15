@@ -16,9 +16,9 @@ public class EventRepository extends ProxyRepository {
     protected ApplicationContext applicationContext;
     protected EntityDefinition entityDefinition;
 
-    public EventRepository(AbstractRepository<Object, Object> repository,
-                           ApplicationContext applicationContext,
-                           EntityDefinition entityDefinition) {
+    public EventRepository(ApplicationContext applicationContext,
+                           EntityDefinition entityDefinition,
+                           AbstractRepository<Object, Object> repository) {
         super(repository);
         this.applicationContext = applicationContext;
         this.entityDefinition = entityDefinition;

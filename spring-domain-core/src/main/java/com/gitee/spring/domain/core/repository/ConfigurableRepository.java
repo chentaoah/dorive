@@ -16,11 +16,11 @@ public class ConfigurableRepository extends ProxyRepository {
     protected EntityMapper entityMapper;
     protected EntityAssembler entityAssembler;
 
-    public ConfigurableRepository(AbstractRepository<Object, Object> repository,
-                                  EntityPropertyChain entityPropertyChain,
+    public ConfigurableRepository(EntityPropertyChain entityPropertyChain,
                                   EntityDefinition entityDefinition,
                                   EntityMapper entityMapper,
-                                  EntityAssembler entityAssembler) {
+                                  EntityAssembler entityAssembler,
+                                  AbstractRepository<Object, Object> repository) {
         super(repository);
         this.entityPropertyChain = entityPropertyChain;
         this.entityDefinition = entityDefinition;

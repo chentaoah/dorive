@@ -201,7 +201,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                                                                EntityMapper entityMapper,
                                                                EntityAssembler entityAssembler,
                                                                AbstractRepository<Object, Object> repository) {
-        return new ConfigurableRepository(repository, entityPropertyChain, entityDefinition, entityMapper, entityAssembler);
+        return new ConfigurableRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
     }
 
     protected boolean filterEntityClass(Class<?> entityClass) {
