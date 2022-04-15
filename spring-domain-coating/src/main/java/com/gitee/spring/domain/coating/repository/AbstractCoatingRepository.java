@@ -1,6 +1,7 @@
 package com.gitee.spring.domain.coating.repository;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.coating.annotation.CoatingScan;
 import com.gitee.spring.domain.coating.annotation.IgnoreProperty;
 import com.gitee.spring.domain.coating.api.CoatingAssembler;
@@ -74,6 +75,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     public <T> T assemble(Class<T> targetClass, E entity) {
         Map<String, Object> properties = new LinkedHashMap<>();
         List<PropertyDefinition> propertyDefinitions = classPropertyDefinitionsMap.get(targetClass);
+        Assert.notNull(propertyDefinitions, "No property definitions exists!");
         for (PropertyDefinition propertyDefinition : propertyDefinitions) {
             String fieldName = propertyDefinition.getFieldName();
             EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
@@ -90,6 +92,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     public void disassemble(Object targetEntity, E entity) {
         Map<String, Object> properties = BeanUtil.beanToMap(targetEntity);
         List<PropertyDefinition> propertyDefinitions = classPropertyDefinitionsMap.get(targetEntity.getClass());
+        Assert.notNull(propertyDefinitions, "No property definitions exists!");
         for (PropertyDefinition propertyDefinition : propertyDefinitions) {
             String fieldName = propertyDefinition.getFieldName();
             Object fieldValue = properties.get(fieldName);
