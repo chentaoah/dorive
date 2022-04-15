@@ -79,7 +79,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
             if (boundValue != null) {
                 AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
                 String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
-                addToExample(example, fieldAttribute, boundValue);
+                addToExample(entityDefinition, example, fieldAttribute, boundValue);
             }
         }
         return example;

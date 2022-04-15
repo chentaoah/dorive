@@ -29,6 +29,6 @@ public interface EntityMapper {
 
     Object newExample(EntityDefinition entityDefinition, BoundedContext boundedContext);
 
-    void addToExample(Object example, String fieldAttribute, Object boundValue);
+    void addToExample(EntityDefinition entityDefinition, Object example, String fieldAttribute, Object boundValue);
 
 }
