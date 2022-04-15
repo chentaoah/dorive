@@ -20,7 +20,9 @@ public class EntityPropertyChain implements EntityProperty {
     public void initialize() {
         if (entityProperty == null) {
             entityProperty = EntityPropertyFactory.newEntityProperty(lastEntityClass, entityClass, fieldName);
-            lastEntityPropertyChain.initialize();
+            if (lastEntityPropertyChain != null) {
+                lastEntityPropertyChain.initialize();
+            }
         }
     }
 
