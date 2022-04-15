@@ -22,7 +22,7 @@ import java.util.Map;
 public class RepositoryListener implements ApplicationListener<RepositoryEvent>, ApplicationContextAware, InitializingBean {
 
     protected ApplicationContext applicationContext;
-    protected Map<Class<?>, List<EventListener>> classEventListenerMap = new LinkedHashMap<>();
+    protected Map<Class<?>, List<EventListener>> classEventListenersMap = new LinkedHashMap<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -36,7 +36,7 @@ public class RepositoryListener implements ApplicationListener<RepositoryEvent>,
             EntityListener entityListener = AnnotationUtils.getAnnotation(eventListener.getClass(), EntityListener.class);
             if (entityListener != null) {
                 Class<?> entityClass = entityListener.value();
-                List<EventListener> eventListeners = classEventListenerMap.computeIfAbsent(entityClass, key -> new ArrayList<>());
+                List<EventListener> eventListeners = classEventListenersMap.computeIfAbsent(entityClass, key -> new ArrayList<>());
                 eventListeners.add(eventListener);
             }
         }
@@ -47,7 +47,7 @@ public class RepositoryListener implements ApplicationListener<RepositoryEvent>,
         EventRepository eventRepository = (EventRepository) event.getSource();
         EntityDefinition entityDefinition = eventRepository.getEntityDefinition();
         Class<?> entityClass = entityDefinition.getGenericEntityClass();
-        List<EventListener> eventListeners = classEventListenerMap.get(entityClass);
+        List<EventListener> eventListeners = classEventListenersMap.get(entityClass);
         for (EventListener eventListener : eventListeners) {
             try {
                 eventListener.onApplicationEvent(event);
