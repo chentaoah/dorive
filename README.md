@@ -19,11 +19,11 @@ spring:
     enable: true
     scan: com.company.project.** # 扫描包名
     domains:
-      - name: model # 领域名称
-        pattern: com.company.project.model.** # 该领域对应的包名
-        protect: com.company.project.model.mapper.** # 该领域内不能添加@Root的类型
-      - name: model-domian # 领域名称（model领域的子域）
-        pattern: com.company.project.domain.**
+      - name: core # 领域名称
+        pattern: com.company.project.core.** # 该领域对应的包名
+        protect: com.company.project.core.internal.** # 该领域内不能添加@Root的类型
+      - name: core-extension # 领域名称（core领域的子域）
+        pattern: com.company.project.core.extension.**
 ```
 
 ## 领域模型
