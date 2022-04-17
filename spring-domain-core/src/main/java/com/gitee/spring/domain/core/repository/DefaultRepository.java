@@ -88,7 +88,9 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
         if (primaryKey != null) {
             Object persistentObject = entityAssembler.disassemble(entityDefinition, boundedContext, entity);
             if (persistentObject != null) {
-                return entityMapper.update(entityDefinition.getMapper(), boundedContext, persistentObject);
+                Object example = entityMapper.newExample(entityDefinition, boundedContext);
+                entityMapper.addToExample(entityDefinition, example, "id", primaryKey);
+                return entityMapper.updateByExample(entityDefinition.getMapper(), persistentObject, example);
             }
         }
         return 0;
