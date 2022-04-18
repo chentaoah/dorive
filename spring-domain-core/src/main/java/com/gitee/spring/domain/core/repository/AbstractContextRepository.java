@@ -80,7 +80,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                                     Class<?> genericEntityClass, String fieldName, AnnotationAttributes attributes,
                                     Set<Binding> bindingAnnotations) {
         if (lastEntityClass == null && attributes != null) {
-            rootRepository = newConfigurableRepository(accessPath, null, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
+            rootRepository = newConfiguredRepository(accessPath, null, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
             orderedRepositories.add(rootRepository);
             classRepositoryMap.put(genericEntityClass, rootRepository);
 
@@ -88,7 +88,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityPropertyChain entityPropertyChain = newEntityPropertyChain(accessPath, lastEntityClass, entityClass, fieldName);
             if (attributes != null) {
                 entityPropertyChain.initialize();
-                ConfiguredRepository configuredRepository = newConfigurableRepository(accessPath, entityPropertyChain, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
+                ConfiguredRepository configuredRepository = newConfiguredRepository(accessPath, entityPropertyChain, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
                 subRepositories.add(configuredRepository);
                 orderedRepositories.add(configuredRepository);
                 classRepositoryMap.put(genericEntityClass, configuredRepository);
@@ -120,9 +120,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     @SuppressWarnings("unchecked")
-    protected ConfiguredRepository newConfigurableRepository(String accessPath, EntityPropertyChain entityPropertyChain, Class<?> entityClass,
-                                                             Class<?> genericEntityClass, String fieldName, AnnotationAttributes attributes,
-                                                             Set<Binding> bindingAnnotations) {
+    protected ConfiguredRepository newConfiguredRepository(String accessPath, EntityPropertyChain entityPropertyChain, Class<?> entityClass,
+                                                           Class<?> genericEntityClass, String fieldName, AnnotationAttributes attributes,
+                                                           Set<Binding> bindingAnnotations) {
         boolean isRoot = entityPropertyChain == null;
         boolean isCollection = Collection.class.isAssignableFrom(entityClass);
 

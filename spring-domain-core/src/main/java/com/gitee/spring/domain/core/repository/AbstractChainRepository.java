@@ -77,9 +77,9 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
                         AnnotationAttributes attributes = bindingDefinition.getAttributes();
                         Object fieldValues = collectFieldValues(entities, attributes.getString(FIELD_ATTRIBUTE));
 
-                        ConfiguredRepository boundConfigurableRepository = classRepositoryMap.get(boundCriterion.getEntityClass());
-                        EntityDefinition boundEntityDefinition = boundConfigurableRepository.getEntityDefinition();
-                        EntityMapper boundEntityMapper = boundConfigurableRepository.getEntityMapper();
+                        ConfiguredRepository boundConfiguredRepository = classRepositoryMap.get(boundCriterion.getEntityClass());
+                        EntityDefinition boundEntityDefinition = boundConfiguredRepository.getEntityDefinition();
+                        EntityMapper boundEntityMapper = boundConfiguredRepository.getEntityMapper();
                         String boundFieldName = bindingDefinition.getBoundFieldName();
                         boundEntityMapper.addToExample(boundEntityDefinition, boundCriterion.getExample(), boundFieldName, fieldValues);
                         log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValue: {}", boundAccessPath, boundFieldName, fieldValues);
