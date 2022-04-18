@@ -25,7 +25,7 @@ public class DefaultRepository extends ConfiguredRepository {
 
     @Override
     public Object selectByPrimaryKey(BoundedContext boundedContext, Object primaryKey) {
-        Object persistentObject = repository.selectByPrimaryKey(boundedContext, primaryKey);
+        Object persistentObject = super.selectByPrimaryKey(boundedContext, primaryKey);
         if (persistentObject != null) {
             return entityAssembler.assemble(entityDefinition, boundedContext, persistentObject);
         }
@@ -34,7 +34,7 @@ public class DefaultRepository extends ConfiguredRepository {
 
     @Override
     public List<Object> selectByExample(BoundedContext boundedContext, Object example) {
-        List<?> persistentObjects = repository.selectByExample(boundedContext, example);
+        List<?> persistentObjects = super.selectByExample(boundedContext, example);
         if (persistentObjects != null && !persistentObjects.isEmpty()) {
             return newEntities(boundedContext, persistentObjects);
         }
@@ -53,7 +53,7 @@ public class DefaultRepository extends ConfiguredRepository {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
-        Object dataPage = repository.selectPageByExample(boundedContext, example, page);
+        Object dataPage = super.selectPageByExample(boundedContext, example, page);
         List<?> persistentObjects = entityMapper.getDataFromPage(dataPage);
         if (persistentObjects != null && !persistentObjects.isEmpty()) {
             List<Object> entities = newEntities(boundedContext, persistentObjects);
@@ -68,7 +68,7 @@ public class DefaultRepository extends ConfiguredRepository {
         if (primaryKey == null) {
             Object persistentObject = entityAssembler.disassemble(entityDefinition, boundedContext, entity);
             if (persistentObject != null) {
-                int count = repository.insert(boundedContext, persistentObject);
+                int count = super.insert(boundedContext, persistentObject);
                 copyPrimaryKey(entity, persistentObject);
                 return count;
             }
@@ -89,7 +89,7 @@ public class DefaultRepository extends ConfiguredRepository {
             if (persistentObject != null) {
                 Object example = entityMapper.newExample(boundedContext);
                 entityMapper.addToExample(example, "id", primaryKey);
-                return repository.updateByExample(persistentObject, example);
+                return super.updateByExample(persistentObject, example);
             }
         }
         return 0;
@@ -100,7 +100,7 @@ public class DefaultRepository extends ConfiguredRepository {
         Assert.isTrue(!(entity instanceof Collection), "The entity cannot be a collection!");
         Object persistentObject = entityAssembler.disassemble(entityDefinition, new BoundedContext(), entity);
         if (persistentObject != null) {
-            return repository.updateByExample(persistentObject, example);
+            return super.updateByExample(persistentObject, example);
         }
         return 0;
     }
@@ -109,19 +109,9 @@ public class DefaultRepository extends ConfiguredRepository {
     public int delete(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey != null) {
-            return repository.deleteByPrimaryKey(primaryKey);
+            return super.deleteByPrimaryKey(primaryKey);
         }
         return 0;
-    }
-
-    @Override
-    public int deleteByPrimaryKey(Object primaryKey) {
-        return repository.deleteByPrimaryKey(primaryKey);
-    }
-
-    @Override
-    public int deleteByExample(Object example) {
-        return repository.deleteByExample(example);
     }
 
 }
