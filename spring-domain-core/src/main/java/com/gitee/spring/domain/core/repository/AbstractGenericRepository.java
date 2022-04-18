@@ -74,13 +74,13 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     protected Object newExampleByContext(ConfiguredRepository configuredRepository, BoundedContext boundedContext, Object rootEntity) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityMapper entityMapper = configuredRepository.getEntityMapper();
-        Object example = entityMapper.newExample(entityDefinition, boundedContext);
+        Object example = entityMapper.newExample(boundedContext);
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
             Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
             if (boundValue != null) {
                 AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
                 String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
-                entityMapper.addToExample(entityDefinition, example, fieldAttribute, boundValue);
+                entityMapper.addToExample(example, fieldAttribute, boundValue);
             }
         }
         return example;

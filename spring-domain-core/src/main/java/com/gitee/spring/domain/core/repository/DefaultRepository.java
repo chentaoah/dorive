@@ -87,8 +87,8 @@ public class DefaultRepository extends ConfiguredRepository {
         if (primaryKey != null) {
             Object persistentObject = entityAssembler.disassemble(entityDefinition, boundedContext, entity);
             if (persistentObject != null) {
-                Object example = entityMapper.newExample(entityDefinition, boundedContext);
-                entityMapper.addToExample(entityDefinition, example, "id", primaryKey);
+                Object example = entityMapper.newExample(boundedContext);
+                entityMapper.addToExample(example, "id", primaryKey);
                 return repository.updateByExample(persistentObject, example);
             }
         }

@@ -51,7 +51,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
             EntityMapper entityMapper = configuredRepository.getEntityMapper();
             Object example = criterion.getExample();
             if (example == null) {
-                example = entityMapper.newExample(entityDefinition, boundedContext);
+                example = entityMapper.newExample(boundedContext);
                 criterion.setExample(example);
             }
             chainQueryContext.put(entityDefinition.getAccessPath(), criterion);
@@ -78,10 +78,9 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractGenericRepo
                         Object fieldValues = collectFieldValues(entities, attributes.getString(FIELD_ATTRIBUTE));
 
                         ConfiguredRepository boundConfiguredRepository = classRepositoryMap.get(boundCriterion.getEntityClass());
-                        EntityDefinition boundEntityDefinition = boundConfiguredRepository.getEntityDefinition();
                         EntityMapper boundEntityMapper = boundConfiguredRepository.getEntityMapper();
                         String boundFieldName = bindingDefinition.getBoundFieldName();
-                        boundEntityMapper.addToExample(boundEntityDefinition, boundCriterion.getExample(), boundFieldName, fieldValues);
+                        boundEntityMapper.addToExample(boundCriterion.getExample(), boundFieldName, fieldValues);
                         log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValue: {}", boundAccessPath, boundFieldName, fieldValues);
                     }
                 }
