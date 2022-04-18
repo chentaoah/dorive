@@ -2,7 +2,7 @@ package com.gitee.spring.domain.event.repository;
 
 import com.gitee.spring.domain.core.repository.AbstractChainRepository;
 import com.gitee.spring.domain.core.repository.AbstractRepository;
-import com.gitee.spring.domain.core.repository.ConfigurableRepository;
+import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import com.gitee.spring.domain.event.annotation.EnableEvent;
 import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
@@ -22,13 +22,15 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractChainReposi
     }
 
     @Override
-    protected ConfigurableRepository newConfigurableRepository(EntityPropertyChain entityPropertyChain,
-                                                               EntityDefinition entityDefinition,
-                                                               EntityMapper entityMapper,
-                                                               EntityAssembler entityAssembler,
-                                                               AbstractRepository<Object, Object> repository) {
-        repository = enableEvent ? new EventRepository(applicationContext, entityDefinition, repository) : repository;
-        return new ConfigurableRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
+    protected ConfiguredRepository newConfiguredRepository(EntityPropertyChain entityPropertyChain,
+                                                           EntityDefinition entityDefinition,
+                                                           EntityMapper entityMapper,
+                                                           EntityAssembler entityAssembler,
+                                                           AbstractRepository<Object, Object> repository) {
+        if (enableEvent) {
+            repository = new EventRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository, applicationContext);
+        }
+        return super.newConfiguredRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
     }
 
 }

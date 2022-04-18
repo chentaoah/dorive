@@ -6,27 +6,26 @@ import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-public class DefaultRepository extends AbstractRepository<Object, Object> {
+public class DefaultRepository extends ConfiguredRepository {
 
-    protected EntityDefinition entityDefinition;
-    protected EntityMapper entityMapper;
-    protected EntityAssembler entityAssembler;
+    public DefaultRepository(EntityPropertyChain entityPropertyChain,
+                             EntityDefinition entityDefinition,
+                             EntityMapper entityMapper,
+                             EntityAssembler entityAssembler,
+                             AbstractRepository<Object, Object> repository) {
+        super(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
+    }
 
     @Override
     public Object selectByPrimaryKey(BoundedContext boundedContext, Object primaryKey) {
-        Object persistentObject = entityMapper.selectByPrimaryKey(entityDefinition.getMapper(), boundedContext, primaryKey);
+        Object persistentObject = repository.selectByPrimaryKey(boundedContext, primaryKey);
         if (persistentObject != null) {
             return entityAssembler.assemble(entityDefinition, boundedContext, persistentObject);
         }
@@ -35,7 +34,7 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
 
     @Override
     public List<Object> selectByExample(BoundedContext boundedContext, Object example) {
-        List<?> persistentObjects = entityMapper.selectByExample(entityDefinition.getMapper(), boundedContext, example);
+        List<?> persistentObjects = repository.selectByExample(boundedContext, example);
         if (persistentObjects != null && !persistentObjects.isEmpty()) {
             return newEntities(boundedContext, persistentObjects);
         }
@@ -54,7 +53,7 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
-        Object dataPage = entityMapper.selectPageByExample(entityDefinition.getMapper(), boundedContext, example, page);
+        Object dataPage = repository.selectPageByExample(boundedContext, example, page);
         List<?> persistentObjects = entityMapper.getDataFromPage(dataPage);
         if (persistentObjects != null && !persistentObjects.isEmpty()) {
             List<Object> entities = newEntities(boundedContext, persistentObjects);
@@ -69,7 +68,7 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
         if (primaryKey == null) {
             Object persistentObject = entityAssembler.disassemble(entityDefinition, boundedContext, entity);
             if (persistentObject != null) {
-                int count = entityMapper.insert(entityDefinition.getMapper(), boundedContext, persistentObject);
+                int count = repository.insert(boundedContext, persistentObject);
                 copyPrimaryKey(entity, persistentObject);
                 return count;
             }
@@ -90,7 +89,7 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
             if (persistentObject != null) {
                 Object example = entityMapper.newExample(entityDefinition, boundedContext);
                 entityMapper.addToExample(entityDefinition, example, "id", primaryKey);
-                return entityMapper.updateByExample(entityDefinition.getMapper(), persistentObject, example);
+                return repository.updateByExample(persistentObject, example);
             }
         }
         return 0;
@@ -101,7 +100,7 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
         Assert.isTrue(!(entity instanceof Collection), "The entity cannot be a collection!");
         Object persistentObject = entityAssembler.disassemble(entityDefinition, new BoundedContext(), entity);
         if (persistentObject != null) {
-            return entityMapper.updateByExample(entityDefinition.getMapper(), persistentObject, example);
+            return repository.updateByExample(persistentObject, example);
         }
         return 0;
     }
@@ -110,19 +109,19 @@ public class DefaultRepository extends AbstractRepository<Object, Object> {
     public int delete(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey != null) {
-            return entityMapper.deleteByPrimaryKey(entityDefinition.getMapper(), boundedContext, primaryKey);
+            return repository.deleteByPrimaryKey(primaryKey);
         }
         return 0;
     }
 
     @Override
     public int deleteByPrimaryKey(Object primaryKey) {
-        return entityMapper.deleteByPrimaryKey(entityDefinition.getMapper(), new BoundedContext(), primaryKey);
+        return repository.deleteByPrimaryKey(primaryKey);
     }
 
     @Override
     public int deleteByExample(Object example) {
-        return entityMapper.deleteByExample(entityDefinition.getMapper(), example);
+        return repository.deleteByExample(example);
     }
 
 }

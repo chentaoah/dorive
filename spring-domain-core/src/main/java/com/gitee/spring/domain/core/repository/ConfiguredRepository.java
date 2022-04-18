@@ -1,6 +1,10 @@
 package com.gitee.spring.domain.core.repository;
 
+import com.gitee.spring.domain.core.api.EntityAssembler;
+import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.EntityDefinition;
+import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,8 +14,12 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class ProxyRepository extends AbstractRepository<Object, Object> {
+public class ConfiguredRepository extends AbstractRepository<Object, Object> {
 
+    protected EntityPropertyChain entityPropertyChain;
+    protected EntityDefinition entityDefinition;
+    protected EntityMapper entityMapper;
+    protected EntityAssembler entityAssembler;
     protected AbstractRepository<Object, Object> repository;
 
     @Override

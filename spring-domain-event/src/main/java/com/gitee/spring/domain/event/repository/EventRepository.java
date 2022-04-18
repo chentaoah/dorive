@@ -1,8 +1,10 @@
 package com.gitee.spring.domain.event.repository;
 
+import com.gitee.spring.domain.core.api.EntityAssembler;
+import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.*;
 import com.gitee.spring.domain.core.repository.AbstractRepository;
-import com.gitee.spring.domain.core.repository.ProxyRepository;
+import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import com.gitee.spring.domain.event.entity.OperationType;
 import com.gitee.spring.domain.event.entity.RepositoryEvent;
 import lombok.Getter;
@@ -11,17 +13,18 @@ import org.springframework.context.ApplicationContext;
 
 @Getter
 @Setter
-public class EventRepository extends ProxyRepository {
+public class EventRepository extends ConfiguredRepository {
 
     protected ApplicationContext applicationContext;
-    protected EntityDefinition entityDefinition;
 
-    public EventRepository(ApplicationContext applicationContext,
+    public EventRepository(EntityPropertyChain entityPropertyChain,
                            EntityDefinition entityDefinition,
-                           AbstractRepository<Object, Object> repository) {
-        super(repository);
+                           EntityMapper entityMapper,
+                           EntityAssembler entityAssembler,
+                           AbstractRepository<Object, Object> repository,
+                           ApplicationContext applicationContext) {
+        super(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
         this.applicationContext = applicationContext;
-        this.entityDefinition = entityDefinition;
     }
 
     @Override
