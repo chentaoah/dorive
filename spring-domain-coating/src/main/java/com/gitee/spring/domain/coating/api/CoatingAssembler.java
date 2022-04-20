@@ -2,8 +2,8 @@ package com.gitee.spring.domain.coating.api;
 
 public interface CoatingAssembler {
 
-    void assembleBy(Object entity);
+    void assemble(Object coating, Object entity);
 
-    void disassembleTo(Object entity);
+    void disassemble(Object coating, Object entity);
 
 }

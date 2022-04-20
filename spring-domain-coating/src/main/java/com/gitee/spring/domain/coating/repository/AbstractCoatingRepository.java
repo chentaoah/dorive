@@ -1,10 +1,12 @@
 package com.gitee.spring.domain.coating.repository;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.coating.annotation.CoatingScan;
 import com.gitee.spring.domain.coating.annotation.IgnoreProperty;
 import com.gitee.spring.domain.coating.api.CoatingAssembler;
+import com.gitee.spring.domain.coating.api.CustomAssembler;
+import com.gitee.spring.domain.coating.entity.CoatingDefinition;
+import com.gitee.spring.domain.coating.property.DefaultCoatingAssembler;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.utils.ResourceUtils;
@@ -18,89 +20,69 @@ import java.util.*;
 
 public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> {
 
-    protected Map<String, EntityPropertyChain> fieldEntityPropertyChainMap = new LinkedHashMap<>();
-    protected Map<Class<?>, List<PropertyDefinition>> classPropertyDefinitionsMap = new LinkedHashMap<>();
+    protected Map<Class<?>, CoatingAssembler> classCoatingAssemblerMap = new LinkedHashMap<>();
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
         CoatingScan coatingScan = AnnotationUtils.getAnnotation(this.getClass(), CoatingScan.class);
         if (coatingScan != null) {
-            for (EntityPropertyChain entityPropertyChain : entityPropertyChainMap.values()) {
-                String fieldName = entityPropertyChain.getFieldName();
-                if (!fieldEntityPropertyChainMap.containsKey(fieldName)) {
-                    fieldEntityPropertyChainMap.put(fieldName, entityPropertyChain);
-                }
-            }
-            resolvePropertyDefinitions(coatingScan.value());
-            for (List<PropertyDefinition> propertyDefinitions : classPropertyDefinitionsMap.values()) {
-                for (PropertyDefinition propertyDefinition : propertyDefinitions) {
-                    String fieldName = propertyDefinition.getFieldName();
-                    EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
-                    if (entityPropertyChain != null) {
-                        entityPropertyChain.initialize();
-                    } else {
-                        String message = String.format("The field does not exist in the aggregate root! entity: %s, field: %s", entityClass.getName(), fieldName);
-                        throw new RuntimeException(message);
-                    }
-                }
-            }
+            resolveCoatingDefinitions(coatingScan.value());
         }
     }
 
-    protected void resolvePropertyDefinitions(String... basePackages) throws Exception {
+    protected void resolveCoatingDefinitions(String... basePackages) throws Exception {
         for (String basePackage : basePackages) {
             List<Class<?>> classes = ResourceUtils.resolveClasses(basePackage);
-            for (Class<?> clazz : classes) {
+            for (Class<?> coatingClass : classes) {
                 List<PropertyDefinition> propertyDefinitions = new ArrayList<>();
-                ReflectionUtils.doWithLocalFields(clazz, field -> {
+                ReflectionUtils.doWithLocalFields(coatingClass, field -> {
                     if (field.isAnnotationPresent(IgnoreProperty.class)) return;
+
                     Class<?> fieldClass = field.getType();
                     boolean isCollection = false;
                     Class<?> genericFieldClass = fieldClass;
+                    String fieldName = field.getName();
                     if (Collection.class.isAssignableFrom(fieldClass)) {
                         isCollection = true;
                         ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
                         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
                         genericFieldClass = (Class<?>) actualTypeArgument;
                     }
-                    PropertyDefinition propertyDefinition = new PropertyDefinition(fieldClass, isCollection, genericFieldClass, field.getName());
+
+                    EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
+                    if (entityPropertyChain == null || fieldClass != entityPropertyChain.getEntityClass()) {
+                        String message = String.format("The field does not exist in the aggregate root! type: %s, name: %s", fieldClass, fieldName);
+                        throw new RuntimeException(message);
+                    }
+
+                    PropertyDefinition propertyDefinition = new PropertyDefinition(field, fieldClass, isCollection, genericFieldClass, fieldName, entityPropertyChain);
                     propertyDefinitions.add(propertyDefinition);
                 });
-                classPropertyDefinitionsMap.put(clazz, propertyDefinitions);
+
+                CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, propertyDefinitions);
+                CoatingAssembler coatingAssembler = new DefaultCoatingAssembler(coatingDefinition);
+                classCoatingAssemblerMap.put(coatingClass, coatingAssembler);
             }
         }
     }
 
-    public <T> T assemble(Class<T> targetClass, E entity) {
-        Map<String, Object> properties = new LinkedHashMap<>();
-        List<PropertyDefinition> propertyDefinitions = classPropertyDefinitionsMap.get(targetClass);
-        Assert.notNull(propertyDefinitions, "No property definitions exists!");
-        for (PropertyDefinition propertyDefinition : propertyDefinitions) {
-            String fieldName = propertyDefinition.getFieldName();
-            EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
-            Object fieldValue = entityPropertyChain.getValue(entity);
-            properties.put(fieldName, fieldValue);
+    public <T> T assemble(T coating, E entity) {
+        CoatingAssembler coatingAssembler = classCoatingAssemblerMap.get(coating.getClass());
+        Assert.notNull(coatingAssembler, "No coating assembler exists!");
+        coatingAssembler.assemble(coating, entity);
+        if (coating instanceof CustomAssembler) {
+            ((CustomAssembler) coating).assembleBy(entity);
         }
-        T targetEntity = BeanUtil.copyProperties(properties, targetClass);
-        if (targetEntity instanceof CoatingAssembler) {
-            ((CoatingAssembler) targetEntity).assembleBy(entity);
-        }
-        return targetEntity;
+        return coating;
     }
 
-    public void disassemble(Object targetEntity, E entity) {
-        Map<String, Object> properties = BeanUtil.beanToMap(targetEntity);
-        List<PropertyDefinition> propertyDefinitions = classPropertyDefinitionsMap.get(targetEntity.getClass());
-        Assert.notNull(propertyDefinitions, "No property definitions exists!");
-        for (PropertyDefinition propertyDefinition : propertyDefinitions) {
-            String fieldName = propertyDefinition.getFieldName();
-            Object fieldValue = properties.get(fieldName);
-            EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
-            entityPropertyChain.setValue(entity, fieldValue);
-        }
-        if (targetEntity instanceof CoatingAssembler) {
-            ((CoatingAssembler) targetEntity).disassembleTo(entity);
+    public void disassemble(Object coating, E entity) {
+        CoatingAssembler coatingAssembler = classCoatingAssemblerMap.get(coating.getClass());
+        Assert.notNull(coatingAssembler, "No coating assembler exists!");
+        coatingAssembler.disassemble(coating, entity);
+        if (coating instanceof CustomAssembler) {
+            ((CustomAssembler) coating).disassembleTo(entity);
         }
     }
 
