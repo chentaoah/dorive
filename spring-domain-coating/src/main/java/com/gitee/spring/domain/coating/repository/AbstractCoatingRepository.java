@@ -10,6 +10,7 @@ import com.gitee.spring.domain.coating.property.DefaultCoatingAssembler;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.utils.ResourceUtils;
+import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import com.gitee.spring.domain.event.repository.AbstractEventRepository;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
@@ -51,12 +52,13 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                     }
 
                     EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
-                    if (entityPropertyChain == null || fieldClass != entityPropertyChain.getEntityClass()) {
+                    if (entityPropertyChain == null) {
                         String message = String.format("The field does not exist in the aggregate root! type: %s, name: %s", fieldClass, fieldName);
                         throw new RuntimeException(message);
                     }
 
-                    PropertyDefinition propertyDefinition = new PropertyDefinition(field, fieldClass, isCollection, genericFieldClass, fieldName, entityPropertyChain);
+                    ConfiguredRepository belongConfiguredRepository = findBelongRepository(entityPropertyChain);
+                    PropertyDefinition propertyDefinition = new PropertyDefinition(field, fieldClass, isCollection, genericFieldClass, fieldName, entityPropertyChain, belongConfiguredRepository);
                     propertyDefinitions.add(propertyDefinition);
                 });
 

@@ -37,4 +37,9 @@ public abstract class AbstractSelectableRepository<E, PK> extends AbstractContex
         return configuredRepository;
     }
 
+    protected ConfiguredRepository findBelongRepository(EntityPropertyChain entityPropertyChain) {
+        String belongAccessPath = getBelongAccessPath(entityPropertyChain.getAccessPath());
+        return configuredRepositoryMap.get(belongAccessPath);
+    }
+
 }

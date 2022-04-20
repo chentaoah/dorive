@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.event.repository;
 
-import com.gitee.spring.domain.core.repository.AbstractChainRepository;
+import com.gitee.spring.domain.core.repository.AbstractGenericRepository;
 import com.gitee.spring.domain.core.repository.AbstractRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import com.gitee.spring.domain.event.annotation.EnableEvent;
@@ -10,7 +10,7 @@ import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import org.springframework.core.annotation.AnnotationUtils;
 
-public abstract class AbstractEventRepository<E, PK> extends AbstractChainRepository<E, PK> {
+public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepository<E, PK> {
 
     protected boolean enableEvent;
 

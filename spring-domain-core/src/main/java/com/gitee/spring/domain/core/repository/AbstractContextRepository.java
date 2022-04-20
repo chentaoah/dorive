@@ -38,7 +38,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected ApplicationContext applicationContext;
     protected Class<?> entityClass;
     protected Constructor<?> constructor;
+
     protected Map<String, EntityPropertyChain> entityPropertyChainMap = new LinkedHashMap<>();
+    protected Map<String, ConfiguredRepository> configuredRepositoryMap = new LinkedHashMap<>();
 
     protected ConfiguredRepository rootRepository;
     protected List<ConfiguredRepository> subRepositories = new ArrayList<>();
@@ -73,6 +75,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                                     Set<Binding> bindingAnnotations) {
         if (lastEntityClass == null && attributes != null) {
             ConfiguredRepository configuredRepository = newConfiguredRepository(accessPath, null, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
+            configuredRepositoryMap.put(accessPath, configuredRepository);
             rootRepository = configuredRepository;
             orderedRepositories.add(configuredRepository);
 
@@ -81,6 +84,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             if (attributes != null) {
                 entityPropertyChain.initialize();
                 ConfiguredRepository configuredRepository = newConfiguredRepository(accessPath, entityPropertyChain, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
+                configuredRepositoryMap.put(accessPath, configuredRepository);
                 subRepositories.add(configuredRepository);
                 orderedRepositories.add(configuredRepository);
             }
@@ -146,11 +150,15 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             boolean isFromContext = !bindAttribute.startsWith("/");
             boolean isBindId = isIdField && !isFromContext;
 
-            String boundAccessPath = null;
+            String belongAccessPath = null;
+            ConfiguredRepository belongConfiguredRepository = null;
             String boundFieldName = null;
             EntityPropertyChain boundEntityPropertyChain = null;
             if (!isFromContext) {
-                boundAccessPath = PathUtils.getLastAccessPath(bindAttribute);
+                belongAccessPath = getBelongAccessPath(bindAttribute);
+                belongConfiguredRepository = configuredRepositoryMap.get(belongAccessPath);
+                Assert.notNull(belongConfiguredRepository, "No belong repository found!");
+                
                 boundFieldName = PathUtils.getFieldName(bindAttribute);
                 boundEntityPropertyChain = entityPropertyChainMap.get(bindAttribute);
                 Assert.notNull(boundEntityPropertyChain, "Bound path not available!");
@@ -158,7 +166,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
 
             BindingDefinition bindingDefinition = new BindingDefinition(bindingAttributes, isFromContext, isBindId,
-                    boundAccessPath, boundFieldName, boundEntityPropertyChain);
+                    belongAccessPath, belongConfiguredRepository, boundFieldName, boundEntityPropertyChain);
             bindingDefinitions.add(bindingDefinition);
 
             if (isBindId) {
@@ -187,6 +195,14 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         return newConfiguredRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
+    }
+
+    protected String getBelongAccessPath(String accessPath) {
+        String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
+        while (!configuredRepositoryMap.containsKey(lastAccessPath) && !"/".equals(lastAccessPath)) {
+            lastAccessPath = PathUtils.getLastAccessPath(lastAccessPath);
+        }
+        return lastAccessPath;
     }
 
     protected ConfiguredRepository newConfiguredRepository(EntityPropertyChain entityPropertyChain, EntityDefinition entityDefinition,
