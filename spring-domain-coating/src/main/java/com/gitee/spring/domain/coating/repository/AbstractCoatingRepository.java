@@ -7,10 +7,9 @@ import com.gitee.spring.domain.coating.api.CoatingAssembler;
 import com.gitee.spring.domain.coating.api.CustomAssembler;
 import com.gitee.spring.domain.coating.entity.CoatingDefinition;
 import com.gitee.spring.domain.coating.property.DefaultCoatingAssembler;
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.utils.ResourceUtils;
-import com.gitee.spring.domain.core.repository.ConfiguredRepository;
+import com.gitee.spring.domain.core.entity.EntityPropertyLocation;
 import com.gitee.spring.domain.event.repository.AbstractEventRepository;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
@@ -51,18 +50,20 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                         genericFieldClass = (Class<?>) actualTypeArgument;
                     }
 
-                    EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
-                    if (entityPropertyChain == null) {
+                    EntityPropertyLocation entityPropertyLocation = findEntityPropertyLocation(fieldName);
+                    if (entityPropertyLocation == null) {
                         String message = String.format("The field does not exist in the aggregate root! type: %s, name: %s", fieldClass, fieldName);
                         throw new RuntimeException(message);
                     }
 
-                    ConfiguredRepository belongConfiguredRepository = findBelongRepository(entityPropertyChain);
-                    PropertyDefinition propertyDefinition = new PropertyDefinition(field, fieldClass, isCollection, genericFieldClass, fieldName, entityPropertyChain, belongConfiguredRepository);
+                    PropertyDefinition propertyDefinition = new PropertyDefinition(field, fieldClass, isCollection, genericFieldClass, fieldName, entityPropertyLocation);
                     propertyDefinitions.add(propertyDefinition);
                 });
 
-                CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, propertyDefinitions);
+                List<PropertyDefinition> orderedPropertyDefinitions = new ArrayList<>(propertyDefinitions);
+                orderedPropertyDefinitions.sort(Comparator.comparingInt(propertyDefinition -> -propertyDefinition.getEntityPropertyLocation().getMultiAccessPath().size()));
+
+                CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, propertyDefinitions, orderedPropertyDefinitions);
                 CoatingAssembler coatingAssembler = new DefaultCoatingAssembler(coatingDefinition);
                 classCoatingAssemblerMap.put(coatingClass, coatingAssembler);
             }

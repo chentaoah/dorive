@@ -1,7 +1,6 @@
 package com.gitee.spring.domain.coating.entity;
 
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
-import com.gitee.spring.domain.core.repository.ConfiguredRepository;
+import com.gitee.spring.domain.core.entity.EntityPropertyLocation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -15,6 +14,5 @@ public class PropertyDefinition {
     private boolean collection;
     private Class<?> genericFieldClass;
     private String fieldName;
-    private EntityPropertyChain entityPropertyChain;
-    private ConfiguredRepository belongConfiguredRepository;
+    private EntityPropertyLocation entityPropertyLocation;
 }

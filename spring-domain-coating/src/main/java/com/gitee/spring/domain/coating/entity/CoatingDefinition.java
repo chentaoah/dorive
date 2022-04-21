@@ -11,4 +11,5 @@ public class CoatingDefinition {
     private Class<?> entityClass;
     private Class<?> coatingClass;
     private List<PropertyDefinition> propertyDefinitions;
+    private List<PropertyDefinition> orderedPropertyDefinitions;
 }

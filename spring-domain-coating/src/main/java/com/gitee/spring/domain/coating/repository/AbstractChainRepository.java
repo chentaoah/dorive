@@ -9,9 +9,7 @@ import com.gitee.spring.domain.coating.entity.Criterion;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.property.DefaultCoatingAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
-import com.gitee.spring.domain.core.entity.BindingDefinition;
-import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.EntityDefinition;
+import com.gitee.spring.domain.core.entity.*;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationAttributes;
@@ -22,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public abstract class AbstractSmartRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
+public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
 
     public Object buildExample(BoundedContext boundedContext, Object coating) {
         CoatingAssembler coatingAssembler = classCoatingAssemblerMap.get(coating.getClass());
@@ -30,17 +28,18 @@ public abstract class AbstractSmartRepository<E, PK> extends AbstractCoatingRepo
         if (coatingAssembler instanceof DefaultCoatingAssembler) {
             Map<String, Criterion> criterionMap = new LinkedHashMap<>();
             CoatingDefinition coatingDefinition = ((DefaultCoatingAssembler) coatingAssembler).getCoatingDefinition();
-            for (PropertyDefinition propertyDefinition : coatingDefinition.getPropertyDefinitions()) {
-                ConfiguredRepository belongConfiguredRepository = propertyDefinition.getBelongConfiguredRepository();
+            for (PropertyDefinition propertyDefinition : coatingDefinition.getOrderedPropertyDefinitions()) {
+                EntityPropertyLocation entityPropertyLocation = propertyDefinition.getEntityPropertyLocation();
+                ConfiguredRepository belongConfiguredRepository = entityPropertyLocation.getBelongConfiguredRepository();
                 if (belongConfiguredRepository != null) {
                     EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
                     EntityMapper entityMapper = belongConfiguredRepository.getEntityMapper();
-                    String accessPath = entityDefinition.getAccessPath();
-                    if (!criterionMap.containsKey(accessPath)) {
+                    String absoluteAccessPath = entityPropertyLocation.getPrefixAccessPath() + entityDefinition.getAccessPath();
+                    if (!criterionMap.containsKey(absoluteAccessPath)) {
                         Object example = entityMapper.newExample(boundedContext);
-                        criterionMap.put(accessPath, new Criterion(belongConfiguredRepository, example));
+                        criterionMap.put(absoluteAccessPath, new Criterion(entityPropertyLocation, example));
                     }
-                    Criterion criterion = criterionMap.get(accessPath);
+                    Criterion criterion = criterionMap.get(absoluteAccessPath);
                     Object fieldValue = ReflectUtil.getFieldValue(coating, propertyDefinition.getField());
                     entityMapper.addToExample(criterion.getExample(), propertyDefinition.getFieldName(), fieldValue);
                 }
@@ -58,25 +57,36 @@ public abstract class AbstractSmartRepository<E, PK> extends AbstractCoatingRepo
         criterionMap.forEach((accessPath, criterion) -> {
             if ("/".equals(accessPath)) return;
 
-            ConfiguredRepository configuredRepository = criterion.getConfiguredRepository();
-            List<?> entities = configuredRepository.selectByExample(boundedContext, criterion.getExample());
+            EntityPropertyLocation entityPropertyLocation = criterion.getEntityPropertyLocation();
+            ConfiguredRepository belongConfiguredRepository = entityPropertyLocation.getBelongConfiguredRepository();
+            List<?> entities = belongConfiguredRepository.selectByExample(boundedContext, criterion.getExample());
             log.debug("Query data is: {}", entities);
             if (entities.isEmpty()) return;
 
-            EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
+            String prefixAccessPath = entityPropertyLocation.getPrefixAccessPath();
+            EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
+            if (entityDefinition.isRoot()) {
+                ConfiguredRepository parentConfiguredRepository = entityPropertyLocation.getParentConfiguredRepository();
+                if (parentConfiguredRepository != null) {
+                    prefixAccessPath = entityPropertyLocation.getParentAccessPath();
+                    entityDefinition = parentConfiguredRepository.getEntityDefinition();
+                }
+            }
+
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
-                    String belongAccessPath = bindingDefinition.getBelongAccessPath();
-                    Criterion belongCriterion = criterionMap.get(belongAccessPath);
-                    if (belongCriterion != null) {
+                    String absoluteAccessPath = prefixAccessPath + bindingDefinition.getBelongAccessPath();
+                    Criterion targetCriterion = criterionMap.get(absoluteAccessPath);
+                    if (targetCriterion != null) {
                         AnnotationAttributes attributes = bindingDefinition.getAttributes();
                         Object fieldValues = collectFieldValues(entities, attributes.getString(FIELD_ATTRIBUTE));
 
-                        ConfiguredRepository belongConfiguredRepository = belongCriterion.getConfiguredRepository();
-                        EntityMapper belongEntityMapper = belongConfiguredRepository.getEntityMapper();
+                        EntityPropertyLocation targetEntityPropertyLocation = targetCriterion.getEntityPropertyLocation();
+                        ConfiguredRepository targetConfiguredRepository = targetEntityPropertyLocation.getBelongConfiguredRepository();
+                        EntityMapper targetEntityMapper = targetConfiguredRepository.getEntityMapper();
                         String boundFieldName = bindingDefinition.getBoundFieldName();
-                        belongEntityMapper.addToExample(belongCriterion.getExample(), boundFieldName, fieldValues);
-                        log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValue: {}", belongAccessPath, boundFieldName, fieldValues);
+                        targetEntityMapper.addToExample(targetCriterion.getExample(), boundFieldName, fieldValues);
+                        log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValue: {}", absoluteAccessPath, boundFieldName, fieldValues);
                     }
                 }
             }
