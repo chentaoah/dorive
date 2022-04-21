@@ -15,7 +15,7 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import java.util.Collection;
 import java.util.List;
 
-public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegatedRepository<E, PK> {
+public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateRepository<E, PK> {
 
     @Override
     @SuppressWarnings("unchecked")

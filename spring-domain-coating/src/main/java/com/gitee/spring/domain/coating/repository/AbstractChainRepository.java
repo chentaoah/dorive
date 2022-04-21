@@ -30,15 +30,19 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             CoatingDefinition coatingDefinition = ((DefaultCoatingAssembler) coatingAssembler).getCoatingDefinition();
             for (PropertyDefinition propertyDefinition : coatingDefinition.getOrderedPropertyDefinitions()) {
                 EntityPropertyLocation entityPropertyLocation = propertyDefinition.getEntityPropertyLocation();
+                String prefixAccessPath = entityPropertyLocation.getPrefixAccessPath();
                 ConfiguredRepository belongConfiguredRepository = entityPropertyLocation.getBelongConfiguredRepository();
+
                 if (belongConfiguredRepository != null) {
                     EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
                     EntityMapper entityMapper = belongConfiguredRepository.getEntityMapper();
-                    String absoluteAccessPath = entityPropertyLocation.getPrefixAccessPath() + entityDefinition.getAccessPath();
+                    String absoluteAccessPath = prefixAccessPath + entityDefinition.getAccessPath();
+
                     if (!criterionMap.containsKey(absoluteAccessPath)) {
                         Object example = entityMapper.newExample(boundedContext);
                         criterionMap.put(absoluteAccessPath, new Criterion(entityPropertyLocation, example));
                     }
+
                     Criterion criterion = criterionMap.get(absoluteAccessPath);
                     Object fieldValue = ReflectUtil.getFieldValue(coating, propertyDefinition.getField());
                     entityMapper.addToExample(criterion.getExample(), propertyDefinition.getFieldName(), fieldValue);
@@ -64,15 +68,12 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             if (entities.isEmpty()) return;
 
             String prefixAccessPath = entityPropertyLocation.getPrefixAccessPath();
-            EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
-            if (entityDefinition.isRoot()) {
-                ConfiguredRepository parentConfiguredRepository = entityPropertyLocation.getParentConfiguredRepository();
-                if (parentConfiguredRepository != null) {
-                    prefixAccessPath = entityPropertyLocation.getParentAccessPath();
-                    entityDefinition = parentConfiguredRepository.getEntityDefinition();
-                }
+            if (entityPropertyLocation.isForwardParent()) {
+                prefixAccessPath = entityPropertyLocation.getParentAccessPath();
+                belongConfiguredRepository = entityPropertyLocation.getParentConfiguredRepository();
             }
 
+            EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
                     String absoluteAccessPath = prefixAccessPath + bindingDefinition.getBelongAccessPath();
