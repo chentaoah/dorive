@@ -30,22 +30,22 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             CoatingDefinition coatingDefinition = ((DefaultCoatingAssembler) coatingAssembler).getCoatingDefinition();
             for (PropertyDefinition propertyDefinition : coatingDefinition.getOrderedPropertyDefinitions()) {
                 EntityPropertyLocation entityPropertyLocation = propertyDefinition.getEntityPropertyLocation();
-                String prefixAccessPath = entityPropertyLocation.getPrefixAccessPath();
                 ConfiguredRepository belongConfiguredRepository = entityPropertyLocation.getBelongConfiguredRepository();
-
                 if (belongConfiguredRepository != null) {
-                    EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
-                    EntityMapper entityMapper = belongConfiguredRepository.getEntityMapper();
-                    String absoluteAccessPath = prefixAccessPath + entityDefinition.getAccessPath();
-
-                    if (!criterionMap.containsKey(absoluteAccessPath)) {
-                        Object example = entityMapper.newExample(boundedContext);
-                        criterionMap.put(absoluteAccessPath, new Criterion(entityPropertyLocation, example));
-                    }
-
-                    Criterion criterion = criterionMap.get(absoluteAccessPath);
                     Object fieldValue = ReflectUtil.getFieldValue(coating, propertyDefinition.getField());
-                    entityMapper.addToExample(criterion.getExample(), propertyDefinition.getFieldName(), fieldValue);
+                    if (fieldValue != null) {
+                        EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
+                        EntityMapper entityMapper = belongConfiguredRepository.getEntityMapper();
+                        String absoluteAccessPath = entityPropertyLocation.getPrefixAccessPath() + entityDefinition.getAccessPath();
+
+                        if (!criterionMap.containsKey(absoluteAccessPath)) {
+                            Object example = entityMapper.newExample(boundedContext);
+                            criterionMap.put(absoluteAccessPath, new Criterion(entityPropertyLocation, example));
+                        }
+
+                        Criterion criterion = criterionMap.get(absoluteAccessPath);
+                        entityMapper.addToExample(criterion.getExample(), propertyDefinition.getFieldName(), fieldValue);
+                    }
                 }
             }
             executeChainQuery(boundedContext, criterionMap);
