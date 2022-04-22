@@ -9,6 +9,7 @@ import com.gitee.spring.domain.coating.entity.CoatingDefinition;
 import com.gitee.spring.domain.coating.property.DefaultCoatingAssembler;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.utils.ResourceUtils;
+import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.entity.EntityPropertyLocation;
 import com.gitee.spring.domain.event.repository.AbstractEventRepository;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -35,7 +36,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
         for (String basePackage : basePackages) {
             List<Class<?>> classes = ResourceUtils.resolveClasses(basePackage);
             for (Class<?> coatingClass : classes) {
-                List<PropertyDefinition> propertyDefinitions = new ArrayList<>();
+                Map<String, PropertyDefinition> propertyDefinitionMap = new LinkedHashMap<>();
                 ReflectionUtils.doWithLocalFields(coatingClass, field -> {
                     if (field.isAnnotationPresent(IgnoreProperty.class)) return;
 
@@ -50,23 +51,32 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                         genericFieldClass = (Class<?>) actualTypeArgument;
                     }
 
-                    EntityPropertyLocation entityPropertyLocation = findEntityPropertyLocation(fieldName);
-                    if (entityPropertyLocation == null) {
-                        String message = String.format("The field does not exist in the aggregate root! type: %s, name: %s", fieldClass, fieldName);
-                        throw new RuntimeException(message);
-                    }
-
-                    PropertyDefinition propertyDefinition = new PropertyDefinition(field, fieldClass, isCollection, genericFieldClass, fieldName, entityPropertyLocation);
-                    propertyDefinitions.add(propertyDefinition);
+                    EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
+                    PropertyDefinition propertyDefinition = new PropertyDefinition(field, fieldClass, isCollection, genericFieldClass, fieldName, entityPropertyChain);
+                    propertyDefinitionMap.put(fieldName, propertyDefinition);
                 });
 
-                List<PropertyDefinition> orderedPropertyDefinitions = new ArrayList<>(propertyDefinitions);
-                orderedPropertyDefinitions.sort(Comparator.comparingInt(propertyDefinition -> -propertyDefinition.getEntityPropertyLocation().getMultiAccessPath().size()));
+                Set<String> fieldNames = propertyDefinitionMap.keySet();
+                List<EntityPropertyLocation> entityPropertyLocations = collectEntityPropertyLocations(fieldNames);
+                checkFieldNames(coatingClass, fieldNames, entityPropertyLocations);
+                Collections.reverse(entityPropertyLocations);
 
-                CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, propertyDefinitions, orderedPropertyDefinitions);
+                CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, propertyDefinitionMap, entityPropertyLocations);
                 CoatingAssembler coatingAssembler = new DefaultCoatingAssembler(coatingDefinition);
                 classCoatingAssemblerMap.put(coatingClass, coatingAssembler);
             }
+        }
+    }
+
+    protected void checkFieldNames(Class<?> coatingClass, Set<String> fieldNames, List<EntityPropertyLocation> entityPropertyLocations) {
+        Set<String> newFieldNames = new LinkedHashSet<>(fieldNames);
+        for (EntityPropertyLocation entityPropertyLocation : entityPropertyLocations) {
+            EntityPropertyChain entityPropertyChain = entityPropertyLocation.getEntityPropertyChain();
+            newFieldNames.remove(entityPropertyChain.getFieldName());
+        }
+        if (!newFieldNames.isEmpty()) {
+            String errorMessage = String.format("The field does not exist in the aggregate root! entity: %s, coating: %s, fieldNames: %s", entityClass, coatingClass, fieldNames);
+            throw new RuntimeException(errorMessage);
         }
     }
 

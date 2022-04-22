@@ -5,7 +5,6 @@ import com.gitee.spring.domain.coating.api.CoatingAssembler;
 import com.gitee.spring.domain.coating.entity.CoatingDefinition;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
-import com.gitee.spring.domain.core.entity.EntityPropertyLocation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -17,10 +16,9 @@ public class DefaultCoatingAssembler implements CoatingAssembler {
 
     @Override
     public void assemble(Object coating, Object entity) {
-        for (PropertyDefinition propertyDefinition : coatingDefinition.getPropertyDefinitions()) {
-            EntityPropertyLocation entityPropertyLocation = propertyDefinition.getEntityPropertyLocation();
-            if ("".equals(entityPropertyLocation.getPrefixAccessPath())) {
-                EntityPropertyChain entityPropertyChain = entityPropertyLocation.getEntityPropertyChain();
+        for (PropertyDefinition propertyDefinition : coatingDefinition.getPropertyDefinitionMap().values()) {
+            EntityPropertyChain entityPropertyChain = propertyDefinition.getEntityPropertyChain();
+            if (entityPropertyChain != null) {
                 Object targetValue = entityPropertyChain.getValue(entity);
                 ReflectUtil.setFieldValue(coating, propertyDefinition.getField(), targetValue);
             }
@@ -29,11 +27,10 @@ public class DefaultCoatingAssembler implements CoatingAssembler {
 
     @Override
     public void disassemble(Object coating, Object entity) {
-        for (PropertyDefinition propertyDefinition : coatingDefinition.getPropertyDefinitions()) {
-            EntityPropertyLocation entityPropertyLocation = propertyDefinition.getEntityPropertyLocation();
-            if ("".equals(entityPropertyLocation.getPrefixAccessPath())) {
+        for (PropertyDefinition propertyDefinition : coatingDefinition.getPropertyDefinitionMap().values()) {
+            EntityPropertyChain entityPropertyChain = propertyDefinition.getEntityPropertyChain();
+            if (entityPropertyChain != null) {
                 Object fieldValue = ReflectUtil.getFieldValue(coating, propertyDefinition.getField());
-                EntityPropertyChain entityPropertyChain = entityPropertyLocation.getEntityPropertyChain();
                 entityPropertyChain.setValue(entity, fieldValue);
             }
         }

@@ -16,6 +16,7 @@ public class EntityPropertyChain implements EntityProperty {
     private Class<?> entityClass;
     private String fieldName;
     private EntityProperty entityProperty;
+    private boolean boundProperty;
 
     public void initialize() {
         if (entityProperty == null) {

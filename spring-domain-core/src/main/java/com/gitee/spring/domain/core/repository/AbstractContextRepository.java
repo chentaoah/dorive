@@ -109,7 +109,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected EntityPropertyChain newEntityPropertyChain(String accessPath, Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
         String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
         EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
-        EntityPropertyChain entityPropertyChain = new EntityPropertyChain(lastEntityPropertyChain, accessPath, lastEntityClass, entityClass, fieldName, null);
+        EntityPropertyChain entityPropertyChain = new EntityPropertyChain(lastEntityPropertyChain, accessPath, lastEntityClass, entityClass, fieldName, null, false);
         entityPropertyChainMap.put(accessPath, entityPropertyChain);
         return entityPropertyChain;
     }
@@ -158,11 +158,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 belongAccessPath = getBelongAccessPath(bindAttribute);
                 belongConfiguredRepository = configuredRepositoryMap.get(belongAccessPath);
                 Assert.notNull(belongConfiguredRepository, "No belong repository found!");
-                
+
                 boundFieldName = PathUtils.getFieldName(bindAttribute);
                 boundEntityPropertyChain = entityPropertyChainMap.get(bindAttribute);
                 Assert.notNull(boundEntityPropertyChain, "Bound path not available!");
                 boundEntityPropertyChain.initialize();
+                boundEntityPropertyChain.setBoundProperty(true);
             }
 
             BindingDefinition bindingDefinition = new BindingDefinition(bindingAttributes, isFromContext, isBindId,

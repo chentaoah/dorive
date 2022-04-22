@@ -28,23 +28,28 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         if (coatingAssembler instanceof DefaultCoatingAssembler) {
             Map<String, Criterion> criterionMap = new LinkedHashMap<>();
             CoatingDefinition coatingDefinition = ((DefaultCoatingAssembler) coatingAssembler).getCoatingDefinition();
-            for (PropertyDefinition propertyDefinition : coatingDefinition.getOrderedPropertyDefinitions()) {
-                EntityPropertyLocation entityPropertyLocation = propertyDefinition.getEntityPropertyLocation();
+            for (EntityPropertyLocation entityPropertyLocation : coatingDefinition.getReversedEntityPropertyLocations()) {
                 ConfiguredRepository belongConfiguredRepository = entityPropertyLocation.getBelongConfiguredRepository();
                 if (belongConfiguredRepository != null) {
-                    Object fieldValue = ReflectUtil.getFieldValue(coating, propertyDefinition.getField());
-                    if (fieldValue != null) {
-                        EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
-                        EntityMapper entityMapper = belongConfiguredRepository.getEntityMapper();
-                        String absoluteAccessPath = entityPropertyLocation.getPrefixAccessPath() + entityDefinition.getAccessPath();
+                    EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
+                    EntityMapper entityMapper = belongConfiguredRepository.getEntityMapper();
+                    String absoluteAccessPath = entityPropertyLocation.getPrefixAccessPath() + entityDefinition.getAccessPath();
+                    if (!criterionMap.containsKey(absoluteAccessPath)) {
+                        Object example = entityMapper.newExample(boundedContext);
+                        criterionMap.put(absoluteAccessPath, new Criterion(entityPropertyLocation, example, false));
+                    }
 
-                        if (!criterionMap.containsKey(absoluteAccessPath)) {
-                            Object example = entityMapper.newExample(boundedContext);
-                            criterionMap.put(absoluteAccessPath, new Criterion(entityPropertyLocation, example));
+                    EntityPropertyChain entityPropertyChain = entityPropertyLocation.getEntityPropertyChain();
+                    String fieldName = entityPropertyChain.getFieldName();
+                    Map<String, PropertyDefinition> propertyDefinitionMap = coatingDefinition.getPropertyDefinitionMap();
+                    PropertyDefinition propertyDefinition = propertyDefinitionMap.get(fieldName);
+                    if (propertyDefinition != null) {
+                        Object fieldValue = ReflectUtil.getFieldValue(coating, propertyDefinition.getField());
+                        if (fieldValue != null) {
+                            Criterion criterion = criterionMap.get(absoluteAccessPath);
+                            entityMapper.addToExample(criterion.getExample(), fieldName, fieldValue);
+                            criterion.setDirtyExample(true);
                         }
-
-                        Criterion criterion = criterionMap.get(absoluteAccessPath);
-                        entityMapper.addToExample(criterion.getExample(), propertyDefinition.getFieldName(), fieldValue);
                     }
                 }
             }
@@ -62,32 +67,52 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             if ("/".equals(accessPath)) return;
 
             EntityPropertyLocation entityPropertyLocation = criterion.getEntityPropertyLocation();
-            ConfiguredRepository belongConfiguredRepository = entityPropertyLocation.getBelongConfiguredRepository();
-            List<?> entities = belongConfiguredRepository.selectByExample(boundedContext, criterion.getExample());
-            log.debug("Query data is: {}", entities);
-            if (entities.isEmpty()) return;
 
             String prefixAccessPath = entityPropertyLocation.getPrefixAccessPath();
+            ConfiguredRepository belongConfiguredRepository = entityPropertyLocation.getBelongConfiguredRepository();
             if (entityPropertyLocation.isForwardParent()) {
                 prefixAccessPath = entityPropertyLocation.getParentAccessPath();
                 belongConfiguredRepository = entityPropertyLocation.getParentConfiguredRepository();
             }
 
             EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
+            belongConfiguredRepository = entityPropertyLocation.getBelongConfiguredRepository();
+            EntityMapper entityMapper = belongConfiguredRepository.getEntityMapper();
+
+            for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
+                if (bindingDefinition.isFromContext()) {
+                    AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
+                    String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
+                    String bindAttribute = bindingAttributes.getString(BIND_ATTRIBUTE);
+                    Object boundValue = boundedContext.get(bindAttribute);
+                    if (boundValue != null) {
+                        entityMapper.addToExample(criterion.getExample(), fieldAttribute, boundValue);
+                        criterion.setDirtyExample(true);
+                    }
+                }
+            }
+
+            if (!criterion.isDirtyExample()) return;
+            List<?> entities = belongConfiguredRepository.selectByExample(boundedContext, criterion.getExample());
+            log.debug("Query data is: {}", entities);
+            if (entities.isEmpty()) return;
+
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
                     String absoluteAccessPath = prefixAccessPath + bindingDefinition.getBelongAccessPath();
                     Criterion targetCriterion = criterionMap.get(absoluteAccessPath);
                     if (targetCriterion != null) {
                         AnnotationAttributes attributes = bindingDefinition.getAttributes();
-                        Object fieldValues = collectFieldValues(entities, attributes.getString(FIELD_ATTRIBUTE));
-
-                        EntityPropertyLocation targetEntityPropertyLocation = targetCriterion.getEntityPropertyLocation();
-                        ConfiguredRepository targetConfiguredRepository = targetEntityPropertyLocation.getBelongConfiguredRepository();
-                        EntityMapper targetEntityMapper = targetConfiguredRepository.getEntityMapper();
-                        String boundFieldName = bindingDefinition.getBoundFieldName();
-                        targetEntityMapper.addToExample(targetCriterion.getExample(), boundFieldName, fieldValues);
-                        log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValue: {}", absoluteAccessPath, boundFieldName, fieldValues);
+                        List<Object> fieldValues = collectFieldValues(entities, attributes.getString(FIELD_ATTRIBUTE));
+                        if (!fieldValues.isEmpty()) {
+                            EntityPropertyLocation targetEntityPropertyLocation = targetCriterion.getEntityPropertyLocation();
+                            ConfiguredRepository targetBelongConfiguredRepository = targetEntityPropertyLocation.getBelongConfiguredRepository();
+                            EntityMapper targetEntityMapper = targetBelongConfiguredRepository.getEntityMapper();
+                            String boundFieldName = bindingDefinition.getBoundFieldName();
+                            targetEntityMapper.addToExample(targetCriterion.getExample(), boundFieldName, fieldValues);
+                            targetCriterion.setDirtyExample(true);
+                            log.debug("Add query parameter for entity. absoluteAccessPath: {}, fieldName: {}, fieldValue: {}", absoluteAccessPath, boundFieldName, fieldValues);
+                        }
                     }
                 }
             }
@@ -96,9 +121,11 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
     protected List<Object> collectFieldValues(List<?> entities, String fieldAttribute) {
         List<Object> fieldValues = new ArrayList<>();
-        for (Object eachEntity : entities) {
-            Object eachFieldValue = BeanUtil.getFieldValue(eachEntity, fieldAttribute);
-            fieldValues.add(eachFieldValue);
+        for (Object entity : entities) {
+            Object fieldValue = BeanUtil.getFieldValue(entity, fieldAttribute);
+            if (fieldValue != null) {
+                fieldValues.add(fieldValue);
+            }
         }
         return fieldValues;
     }

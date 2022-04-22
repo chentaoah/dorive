@@ -34,35 +34,37 @@ public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextR
         return configuredRepository;
     }
 
-    protected EntityPropertyLocation findEntityPropertyLocation(String fieldName) {
-        return doFindEntityPropertyLocation(new ArrayList<>(), null, this, fieldName);
+    protected List<EntityPropertyLocation> collectEntityPropertyLocations(Set<String> fieldNames) {
+        List<EntityPropertyLocation> entityPropertyLocations = new ArrayList<>();
+        collectEntityPropertyLocations(new ArrayList<>(), null, this, fieldNames, entityPropertyLocations);
+        return entityPropertyLocations;
     }
 
-    protected EntityPropertyLocation doFindEntityPropertyLocation(List<String> multiAccessPath, ConfiguredRepository parentConfiguredRepository,
-                                                                  AbstractDelegateRepository<?, ?> abstractDelegateRepository, String fieldName) {
-        Map<String, EntityPropertyChain> fieldEntityPropertyChainMap = abstractDelegateRepository.fieldEntityPropertyChainMap;
-        EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
-        if (entityPropertyChain == null) {
-            for (ConfiguredRepository configuredRepository : delegateConfiguredRepositories) {
-                multiAccessPath = new ArrayList<>(multiAccessPath);
-                EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-                multiAccessPath.add(entityDefinition.getAccessPath());
-                AbstractDelegateRepository<?, ?> delegateRepository = (AbstractDelegateRepository<?, ?>) configuredRepository.getRepository();
-                EntityPropertyLocation entityPropertyLocation = doFindEntityPropertyLocation(multiAccessPath, configuredRepository, delegateRepository, fieldName);
-                if (entityPropertyLocation != null) {
-                    return entityPropertyLocation;
-                }
+    protected void collectEntityPropertyLocations(List<String> multiAccessPath, ConfiguredRepository parentConfiguredRepository,
+                                                  AbstractDelegateRepository<?, ?> abstractDelegateRepository, Set<String> fieldNames,
+                                                  List<EntityPropertyLocation> entityPropertyLocations) {
+        for (EntityPropertyChain entityPropertyChain : entityPropertyChainMap.values()) {
+            if (fieldNames.contains(entityPropertyChain.getFieldName()) || entityPropertyChain.isBoundProperty()) {
+                String prefixAccessPath = StrUtil.join("", multiAccessPath);
+
+                ConfiguredRepository belongConfiguredRepository = findBelongConfiguredRepository(entityPropertyChain);
+                EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
+                boolean forwardParent = entityDefinition.isRoot() && parentConfiguredRepository != null;
+
+                String parentAccessPath = multiAccessPath.size() > 1 ? StrUtil.join("", multiAccessPath.subList(0, multiAccessPath.size() - 1)) : "";
+
+                EntityPropertyLocation entityPropertyLocation = new EntityPropertyLocation(multiAccessPath, prefixAccessPath, forwardParent, parentAccessPath,
+                        parentConfiguredRepository, abstractDelegateRepository, entityPropertyChain, belongConfiguredRepository);
+                entityPropertyLocations.add(entityPropertyLocation);
             }
-        } else {
-            String prefixAccessPath = StrUtil.join("", multiAccessPath);
-            String parentAccessPath = multiAccessPath.size() > 1 ? StrUtil.join("", multiAccessPath.subList(0, multiAccessPath.size() - 1)) : "";
-            ConfiguredRepository belongConfiguredRepository = findBelongConfiguredRepository(entityPropertyChain);
-            EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
-            boolean forwardParent = entityDefinition.isRoot() && parentConfiguredRepository != null;
-            return new EntityPropertyLocation(multiAccessPath, prefixAccessPath, forwardParent, parentAccessPath,
-                    parentConfiguredRepository, abstractDelegateRepository, entityPropertyChain, belongConfiguredRepository);
         }
-        return null;
+        for (ConfiguredRepository configuredRepository : delegateConfiguredRepositories) {
+            multiAccessPath = new ArrayList<>(multiAccessPath);
+            EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
+            multiAccessPath.add(entityDefinition.getAccessPath());
+            AbstractDelegateRepository<?, ?> delegateRepository = (AbstractDelegateRepository<?, ?>) configuredRepository.getRepository();
+            collectEntityPropertyLocations(multiAccessPath, configuredRepository, delegateRepository, fieldNames, entityPropertyLocations);
+        }
     }
 
     protected ConfiguredRepository findBelongConfiguredRepository(EntityPropertyChain entityPropertyChain) {

@@ -9,4 +9,5 @@ import lombok.Data;
 public class Criterion {
     private EntityPropertyLocation entityPropertyLocation;
     private Object example;
+    private boolean dirtyExample;
 }
