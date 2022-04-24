@@ -117,9 +117,9 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                         AnnotationAttributes attributes = bindingDefinition.getAttributes();
                         List<Object> fieldValues = collectFieldValues(entities, attributes.getString(FIELD_ATTRIBUTE));
                         if (!fieldValues.isEmpty()) {
+                            String boundFieldName = bindingDefinition.getBoundFieldName();
                             ConfiguredRepository targetQueryRepository = targetCriterion.getQueryRepository();
                             EntityMapper targetEntityMapper = targetQueryRepository.getEntityMapper();
-                            String boundFieldName = bindingDefinition.getBoundFieldName();
                             targetEntityMapper.addToExample(targetCriterion.getExample(), boundFieldName, fieldValues);
                             targetCriterion.setDirtyExample(true);
                             log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValues: {}", absoluteAccessPath, boundFieldName, fieldValues);
