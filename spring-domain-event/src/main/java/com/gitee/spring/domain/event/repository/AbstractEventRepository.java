@@ -22,10 +22,8 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
     }
 
     @Override
-    protected ConfiguredRepository newConfiguredRepository(EntityPropertyChain entityPropertyChain,
-                                                           EntityDefinition entityDefinition,
-                                                           EntityMapper entityMapper,
-                                                           EntityAssembler entityAssembler,
+    protected ConfiguredRepository newConfiguredRepository(EntityPropertyChain entityPropertyChain, EntityDefinition entityDefinition,
+                                                           EntityMapper entityMapper, EntityAssembler entityAssembler,
                                                            AbstractRepository<Object, Object> repository) {
         ConfiguredRepository configuredRepository = super.newConfiguredRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
         if (enableEvent) {
