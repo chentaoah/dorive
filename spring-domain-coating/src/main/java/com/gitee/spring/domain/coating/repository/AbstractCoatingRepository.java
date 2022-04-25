@@ -75,7 +75,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
             newFieldNames.remove(entityPropertyChain.getFieldName());
         }
         if (!newFieldNames.isEmpty()) {
-            String errorMessage = String.format("The field does not exist in the aggregate root! entity: %s, coating: %s, fieldNames: %s", entityClass, coatingClass, fieldNames);
+            String errorMessage = String.format("The field does not exist in the aggregate root! entity: %s, coating: %s, fieldNames: %s", entityClass, coatingClass, newFieldNames);
             throw new RuntimeException(errorMessage);
         }
     }
