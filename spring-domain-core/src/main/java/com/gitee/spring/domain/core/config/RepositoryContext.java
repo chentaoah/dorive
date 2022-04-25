@@ -20,6 +20,7 @@ public class RepositoryContext implements ApplicationContextAware, InitializingB
     }
 
     @Override
+    @SuppressWarnings("all")
     public void afterPropertiesSet() throws Exception {
         Map<String, AbstractGenericRepository> beansOfType = applicationContext.getBeansOfType(AbstractGenericRepository.class);
         for (AbstractGenericRepository<?, ?> abstractGenericRepository : beansOfType.values()) {
@@ -27,6 +28,7 @@ public class RepositoryContext implements ApplicationContextAware, InitializingB
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static <T extends AbstractGenericRepository<?, ?>> T getRepository(Class<?> entityClass) {
         return (T) CLASS_REPOSITORY_MAP.get(entityClass);
     }
