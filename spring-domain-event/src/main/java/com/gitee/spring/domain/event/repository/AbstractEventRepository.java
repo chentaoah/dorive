@@ -28,9 +28,10 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
                                                            EntityAssembler entityAssembler,
                                                            AbstractRepository<Object, Object> repository) {
         if (enableEvent) {
-            repository = new EventRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository, applicationContext);
+            return new EventRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository, applicationContext);
+        } else {
+            return super.newConfiguredRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
         }
-        return super.newConfiguredRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
     }
 
 }
