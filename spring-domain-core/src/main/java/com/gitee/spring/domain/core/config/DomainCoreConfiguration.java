@@ -14,4 +14,9 @@ public class DomainCoreConfiguration {
         return new DefaultEntityAssembler();
     }
 
+    @Bean
+    public RepositoryContext repositoryContext() {
+        return new RepositoryContext();
+    }
+
 }

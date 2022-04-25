@@ -6,31 +6,34 @@ import com.gitee.spring.domain.core.api.ProxyCompiler;
 import com.gitee.spring.domain.core.compile.JavassistCompiler;
 import com.gitee.spring.domain.core.utils.ReflectUtils;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class EntityPropertyFactory {
 
     private static final AtomicInteger COUNT = new AtomicInteger(0);
     private static final ProxyCompiler PROXY_COMPILER = new JavassistCompiler();
-    private static final Map<String, EntityProperty> GENERATED_PROXY_CACHE = new LinkedHashMap<>();
+    private static final Map<String, EntityProperty> GENERATED_PROXY_CACHE = new ConcurrentHashMap<>();
 
     public static EntityProperty newEntityProperty(Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
         String cacheKey = lastEntityClass.getTypeName() + ":" + entityClass.getTypeName() + ":" + fieldName;
-        if (GENERATED_PROXY_CACHE.containsKey(cacheKey)) {
-            return GENERATED_PROXY_CACHE.get(cacheKey);
-        }
-        try {
-            String generatedCode = generateCode(lastEntityClass, entityClass, fieldName);
-            Class<?> generatedClass = PROXY_COMPILER.compile(generatedCode, null);
-            EntityProperty entityProperty = (EntityProperty) ReflectUtils.newInstance(generatedClass);
-            GENERATED_PROXY_CACHE.put(cacheKey, entityProperty);
-            return entityProperty;
+        if (!GENERATED_PROXY_CACHE.containsKey(cacheKey)) {
+            synchronized (GENERATED_PROXY_CACHE) {
+                if (!GENERATED_PROXY_CACHE.containsKey(cacheKey)) {
+                    try {
+                        String generatedCode = generateCode(lastEntityClass, entityClass, fieldName);
+                        Class<?> generatedClass = PROXY_COMPILER.compile(generatedCode, null);
+                        EntityProperty entityProperty = (EntityProperty) ReflectUtils.newInstance(generatedClass);
+                        GENERATED_PROXY_CACHE.put(cacheKey, entityProperty);
 
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to generate class!", e);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Failed to generate class!", e);
+                    }
+                }
+            }
         }
+        return GENERATED_PROXY_CACHE.get(cacheKey);
     }
 
     private static String generateCode(Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {

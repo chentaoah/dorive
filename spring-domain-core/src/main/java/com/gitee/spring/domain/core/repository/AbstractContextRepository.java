@@ -10,6 +10,8 @@ import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.utils.PathUtils;
 import com.gitee.spring.domain.core.utils.ReflectUtils;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -24,6 +26,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 
+@Data
+@EqualsAndHashCode(callSuper = false)
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, InitializingBean {
 
     public static final String SCENE_ATTRIBUTE = "scene";
