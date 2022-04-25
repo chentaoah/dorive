@@ -41,6 +41,11 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             executeChainQuery(boundedContext, criterionMap);
             Criterion criterion = criterionMap.get("/");
             Assert.notNull(criterion, "The criterion cannot be null!");
+            if (criterion.isEmptyQuery()) {
+                ConfiguredRepository queryRepository = criterion.getQueryRepository();
+                EntityMapper entityMapper = queryRepository.getEntityMapper();
+                entityMapper.addToExample(criterion.getExample(), "id", -1);
+            }
             return criterion.getExample();
         }
         return null;
