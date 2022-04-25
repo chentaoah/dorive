@@ -85,6 +85,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         } else if (lastEntityClass != null) {
             EntityPropertyChain entityPropertyChain = newEntityPropertyChain(accessPath, lastEntityClass, entityClass, fieldName);
+            entityPropertyChainMap.put(accessPath, entityPropertyChain);
             if (attributes != null) {
                 entityPropertyChain.initialize();
                 ConfiguredRepository configuredRepository = newConfiguredRepository(accessPath, entityPropertyChain, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
@@ -113,9 +114,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected EntityPropertyChain newEntityPropertyChain(String accessPath, Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
         String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
         EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
-        EntityPropertyChain entityPropertyChain = new EntityPropertyChain(lastEntityPropertyChain, accessPath, lastEntityClass, entityClass, fieldName, null, false);
-        entityPropertyChainMap.put(accessPath, entityPropertyChain);
-        return entityPropertyChain;
+        return new EntityPropertyChain(lastEntityPropertyChain, accessPath, lastEntityClass, entityClass, fieldName, null, false);
     }
 
     @SuppressWarnings("unchecked")
