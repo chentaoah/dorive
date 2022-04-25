@@ -12,4 +12,5 @@ public class Criterion {
     private ConfiguredRepository queryRepository;
     private Object example;
     private boolean dirtyExample;
+    private boolean emptyQuery;
 }

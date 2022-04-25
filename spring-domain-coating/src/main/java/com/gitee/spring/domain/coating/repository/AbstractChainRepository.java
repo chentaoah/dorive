@@ -14,10 +14,7 @@ import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationAttributes;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
@@ -59,7 +56,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         ConfiguredRepository queryRepository = entityPropertyLocation.getBelongConfiguredRepository();
         EntityMapper entityMapper = queryRepository.getEntityMapper();
         Object example = entityMapper.newExample(boundedContext);
-        return new Criterion(definitionAccessPath, definitionRepository, queryRepository, example, false);
+        return new Criterion(definitionAccessPath, definitionRepository, queryRepository, example, false, false);
     }
 
     protected void addToExampleForCriterion(CoatingDefinition coatingDefinition, EntityPropertyLocation entityPropertyLocation, Object coating, Criterion criterion) {
@@ -87,6 +84,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             ConfiguredRepository queryRepository = criterion.getQueryRepository();
             Object example = criterion.getExample();
             boolean isDirtyExample = criterion.isDirtyExample();
+            boolean isEmptyQuery = criterion.isEmptyQuery();
 
             EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
             EntityMapper entityMapper = queryRepository.getEntityMapper();
@@ -104,25 +102,34 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                 }
             }
 
-            if (!isDirtyExample) return;
-            List<?> entities = queryRepository.selectByExample(boundedContext, example);
-            log.debug("Query data is: {}", entities);
-            if (entities.isEmpty()) return;
+            List<?> entities = null;
+            if (isEmptyQuery) {
+                entities = Collections.emptyList();
+
+            } else if (isDirtyExample) {
+                entities = queryRepository.selectByExample(boundedContext, example);
+                log.debug("Query data is: {}", entities);
+            }
+            if (entities == null) return;
 
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (!bindingDefinition.isFromContext()) {
                     String absoluteAccessPath = definitionAccessPath + bindingDefinition.getBelongAccessPath();
                     Criterion targetCriterion = criterionMap.get(absoluteAccessPath);
                     if (targetCriterion != null) {
-                        AnnotationAttributes attributes = bindingDefinition.getAttributes();
-                        List<Object> fieldValues = collectFieldValues(entities, attributes.getString(FIELD_ATTRIBUTE));
-                        if (!fieldValues.isEmpty()) {
-                            String boundFieldName = bindingDefinition.getBoundFieldName();
-                            ConfiguredRepository targetQueryRepository = targetCriterion.getQueryRepository();
-                            EntityMapper targetEntityMapper = targetQueryRepository.getEntityMapper();
-                            targetEntityMapper.addToExample(targetCriterion.getExample(), boundFieldName, fieldValues);
-                            targetCriterion.setDirtyExample(true);
-                            log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValues: {}", absoluteAccessPath, boundFieldName, fieldValues);
+                        if (!entities.isEmpty()) {
+                            AnnotationAttributes attributes = bindingDefinition.getAttributes();
+                            List<Object> fieldValues = collectFieldValues(entities, attributes.getString(FIELD_ATTRIBUTE));
+                            if (!fieldValues.isEmpty()) {
+                                String boundFieldName = bindingDefinition.getBoundFieldName();
+                                ConfiguredRepository targetQueryRepository = targetCriterion.getQueryRepository();
+                                EntityMapper targetEntityMapper = targetQueryRepository.getEntityMapper();
+                                targetEntityMapper.addToExample(targetCriterion.getExample(), boundFieldName, fieldValues);
+                                targetCriterion.setDirtyExample(true);
+                                log.debug("Add query parameter for entity. accessPath: {}, fieldName: {}, fieldValues: {}", absoluteAccessPath, boundFieldName, fieldValues);
+                            }
+                        } else {
+                            targetCriterion.setEmptyQuery(true);
                         }
                     }
                 }
