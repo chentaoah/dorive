@@ -1,6 +1,8 @@
 package com.gitee.spring.domain.coating.repository;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
+import com.gitee.spring.domain.coating.annotation.Coating;
 import com.gitee.spring.domain.coating.annotation.CoatingScan;
 import com.gitee.spring.domain.coating.annotation.IgnoreProperty;
 import com.gitee.spring.domain.coating.api.CoatingAssembler;
@@ -12,27 +14,38 @@ import com.gitee.spring.domain.coating.utils.ResourceUtils;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.entity.EntityPropertyLocation;
 import com.gitee.spring.domain.event.repository.AbstractEventRepository;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Data
+@EqualsAndHashCode(callSuper = false)
 public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> {
 
-    protected Map<Class<?>, CoatingAssembler> classCoatingAssemblerMap = new LinkedHashMap<>();
+    public static final String NAME_ATTRIBUTE = "name";
+
+    protected Map<Class<?>, CoatingAssembler> classCoatingAssemblerMap = new ConcurrentHashMap<>();
+    protected Map<String, CoatingAssembler> nameCoatingAssemblerMap = new ConcurrentHashMap<>();
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
         CoatingScan coatingScan = AnnotationUtils.getAnnotation(this.getClass(), CoatingScan.class);
         if (coatingScan != null) {
-            resolveCoatingDefinitions(coatingScan.value());
+            resolveCoatingAssemblers(coatingScan.value());
         }
     }
 
-    protected void resolveCoatingDefinitions(String... basePackages) throws Exception {
+    protected void resolveCoatingAssemblers(String... basePackages) throws Exception {
         for (String basePackage : basePackages) {
             List<Class<?>> classes = ResourceUtils.resolveClasses(basePackage);
             for (Class<?> coatingClass : classes) {
@@ -61,9 +74,18 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                 checkFieldNames(coatingClass, fieldNames, entityPropertyLocations);
                 Collections.reverse(entityPropertyLocations);
 
-                CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, propertyDefinitionMap, entityPropertyLocations);
+                AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(coatingClass, Coating.class);
+                CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, attributes, propertyDefinitionMap, entityPropertyLocations);
                 CoatingAssembler coatingAssembler = new DefaultCoatingAssembler(coatingDefinition);
+
                 classCoatingAssemblerMap.put(coatingClass, coatingAssembler);
+                if (attributes != null) {
+                    String name = attributes.getString(NAME_ATTRIBUTE);
+                    if (StringUtils.isBlank(name)) {
+                        name = StrUtil.lowerFirst(coatingClass.getSimpleName());
+                    }
+                    nameCoatingAssemblerMap.putIfAbsent(name, coatingAssembler);
+                }
             }
         }
     }

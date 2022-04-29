@@ -8,13 +8,17 @@
         <artifactId>spring-domain</artifactId>
         <version>2.5.0</version>
     </parent>
-    <artifactId>spring-domain-event</artifactId>
+    <artifactId>spring-domain-web</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>spring-domain-core</artifactId>
+            <artifactId>spring-domain-coating</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
         </dependency>
     </dependencies>
 
