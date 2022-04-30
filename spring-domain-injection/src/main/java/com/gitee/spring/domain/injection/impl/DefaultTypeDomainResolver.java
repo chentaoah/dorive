@@ -6,6 +6,7 @@ import com.gitee.spring.domain.injection.api.TypeDomainResolver;
 import com.gitee.spring.domain.injection.entity.DomainDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.AntPathMatcher;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class DefaultTypeDomainResolver implements TypeDomainResolver {
 
     @Override
     public void checkDomain(Class<?> targetType, Class<?> injectedType) {
-        if (injectedType.isAnnotationPresent(Root.class)) {
+        if (AnnotationUtils.getAnnotation(injectedType, Root.class) != null) {
             return;
         }
         DomainDefinition injectedDomainDefinition = resolveDomain(injectedType);

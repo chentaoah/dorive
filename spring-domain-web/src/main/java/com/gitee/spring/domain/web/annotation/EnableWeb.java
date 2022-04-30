@@ -7,7 +7,4 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EnableWeb {
-
-    String name() default "";
-
 }

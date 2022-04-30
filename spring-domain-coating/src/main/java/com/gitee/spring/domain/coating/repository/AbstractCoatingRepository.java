@@ -31,8 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> {
 
-    public static final String NAME_ATTRIBUTE = "name";
-
     protected Map<Class<?>, CoatingAssembler> classCoatingAssemblerMap = new ConcurrentHashMap<>();
     protected Map<String, CoatingAssembler> nameCoatingAssemblerMap = new ConcurrentHashMap<>();
 
@@ -84,6 +82,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                     if (StringUtils.isBlank(name)) {
                         name = StrUtil.lowerFirst(coatingClass.getSimpleName());
                     }
+                    Assert.isTrue(!nameCoatingAssemblerMap.containsKey(name), "The same coating name cannot exist!");
                     nameCoatingAssemblerMap.putIfAbsent(name, coatingAssembler);
                 }
             }

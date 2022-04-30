@@ -8,6 +8,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CoatingScan {
 
-    String[] value();
+    String[] value() default {};
 
 }

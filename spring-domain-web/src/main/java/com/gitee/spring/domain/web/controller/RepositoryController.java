@@ -1,5 +1,6 @@
 package com.gitee.spring.domain.web.controller;
 
+import cn.hutool.core.lang.Assert;
 import com.alibaba.fastjson.JSON;
 import com.gitee.spring.domain.coating.api.CoatingAssembler;
 import com.gitee.spring.domain.coating.entity.CoatingDefinition;
@@ -37,12 +38,14 @@ public class RepositoryController implements ApplicationContextAware, Initializi
         Map<String, AbstractWebRepository> beansOfType = applicationContext.getBeansOfType(AbstractWebRepository.class);
         for (AbstractWebRepository<Object, Object> abstractWebRepository : beansOfType.values()) {
             if (abstractWebRepository.isEnableWeb()) {
-                nameRepositoryMap.putIfAbsent(abstractWebRepository.getName(), abstractWebRepository);
+                String name = abstractWebRepository.getName();
+                Assert.isTrue(!nameRepositoryMap.containsKey(name), "The same repository name cannot exist!");
+                nameRepositoryMap.putIfAbsent(name, abstractWebRepository);
             }
         }
     }
 
-    @PostMapping("/add/{coating}")
+    @PostMapping("/insert/{coating}")
     public ResObject<Object> add(@PathVariable("entity") String entity, @PathVariable("coating") String coating, @RequestBody String message) {
         AbstractWebRepository<Object, Object> abstractWebRepository = nameRepositoryMap.get(entity);
         if (abstractWebRepository == null) {
@@ -57,7 +60,7 @@ public class RepositoryController implements ApplicationContextAware, Initializi
             if (coatingAssembler instanceof DefaultCoatingAssembler) {
                 CoatingDefinition coatingDefinition = ((DefaultCoatingAssembler) coatingAssembler).getCoatingDefinition();
                 Object coatingObject = JSON.parseObject(message, coatingDefinition.getCoatingClass());
-                Object entityObject = ReflectUtils.newInstance(abstractWebRepository.getConstructor(), null);
+                Object entityObject = ReflectUtils.newInstance(abstractWebRepository.getEntityCtor(), null);
                 abstractWebRepository.disassemble(coatingObject, entityObject);
                 int count = abstractWebRepository.insert(entityObject);
                 return ResObject.successData(count);
@@ -70,7 +73,7 @@ public class RepositoryController implements ApplicationContextAware, Initializi
         return ResObject.failMsg("The server cannot process the request!");
     }
 
-    @PostMapping("/query/{coating}/{pageNum}/{pageSize}")
+    @PostMapping("/select/{coating}/{pageNum}/{pageSize}")
     public ResObject<Object> query(@PathVariable("entity") String entity, @PathVariable("coating") String coating,
                                    @PathVariable("pageNum") Integer pageNum, @PathVariable("pageSize") Integer pageSize,
                                    @RequestBody String message) {
@@ -117,7 +120,7 @@ public class RepositoryController implements ApplicationContextAware, Initializi
             if (coatingAssembler instanceof DefaultCoatingAssembler) {
                 CoatingDefinition coatingDefinition = ((DefaultCoatingAssembler) coatingAssembler).getCoatingDefinition();
                 Object coatingObject = JSON.parseObject(message, coatingDefinition.getCoatingClass());
-                Object entityObject = ReflectUtils.newInstance(abstractWebRepository.getConstructor(), null);
+                Object entityObject = ReflectUtils.newInstance(abstractWebRepository.getEntityCtor(), null);
                 abstractWebRepository.disassemble(coatingObject, entityObject);
                 int count = abstractWebRepository.update(entityObject);
                 return ResObject.successData(count);

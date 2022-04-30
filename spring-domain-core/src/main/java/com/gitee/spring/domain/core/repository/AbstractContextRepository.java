@@ -1,8 +1,10 @@
 package com.gitee.spring.domain.core.repository;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core.annotation.Binding;
 import com.gitee.spring.domain.core.annotation.Entity;
+import com.gitee.spring.domain.core.annotation.Repository;
 import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
@@ -12,6 +14,7 @@ import com.gitee.spring.domain.core.utils.PathUtils;
 import com.gitee.spring.domain.core.utils.ReflectUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -30,6 +33,8 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, InitializingBean {
 
+    public static final String NAME_ATTRIBUTE = "name";
+
     public static final String SCENE_ATTRIBUTE = "scene";
     public static final String MAPPER_ATTRIBUTE = "mapper";
     public static final String ASSEMBLER_ATTRIBUTE = "assembler";
@@ -40,8 +45,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     public static final String BIND_ATTRIBUTE = "bind";
 
     protected ApplicationContext applicationContext;
+
+    protected AnnotationAttributes attributes;
+    protected String name;
+
     protected Class<?> entityClass;
-    protected Constructor<?> constructor;
+    protected Constructor<?> entityCtor;
 
     protected Map<String, EntityPropertyChain> entityPropertyChainMap = new LinkedHashMap<>();
     protected Map<String, ConfiguredRepository> configuredRepositoryMap = new LinkedHashMap<>();
@@ -57,17 +66,26 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        this.attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(this.getClass(), Repository.class);
+        if (this.attributes != null) {
+            this.name = this.attributes.getString(NAME_ATTRIBUTE);
+        }
+
         Type targetType = ReflectUtils.getGenericSuperclass(this, null);
         ParameterizedType parameterizedType = (ParameterizedType) targetType;
         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-        entityClass = (Class<?>) actualTypeArgument;
-        constructor = ReflectUtils.getConstructor(entityClass, null);
+        this.entityClass = (Class<?>) actualTypeArgument;
+        this.entityCtor = ReflectUtils.getConstructor(this.entityClass, null);
 
-        AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(entityClass, Entity.class);
-        Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(entityClass, Binding.class);
-        visitEntityClass("/", null, entityClass, entityClass, null, attributes, bindingAnnotations);
+        if (StringUtils.isBlank(this.name)) {
+            this.name = StrUtil.lowerFirst(this.entityClass.getSimpleName());
+        }
 
-        orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> {
+        AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(this.entityClass, Entity.class);
+        Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(this.entityClass, Binding.class);
+        visitEntityClass("/", null, this.entityClass, this.entityClass, null, attributes, bindingAnnotations);
+
+        this.orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> {
             EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
             AnnotationAttributes annotationAttributes = entityDefinition.getAttributes();
             return annotationAttributes.getNumber(ORDER_ATTRIBUTE).intValue();

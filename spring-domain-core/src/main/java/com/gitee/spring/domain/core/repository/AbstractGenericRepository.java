@@ -23,7 +23,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         if (rootRepository != null) {
             rootEntity = rootRepository.selectByPrimaryKey(boundedContext, primaryKey);
         } else {
-            rootEntity = ReflectUtils.newInstance(constructor, null);
+            rootEntity = ReflectUtils.newInstance(entityCtor, null);
         }
         if (rootEntity != null) {
             handleRootEntity(boundedContext, rootEntity);
