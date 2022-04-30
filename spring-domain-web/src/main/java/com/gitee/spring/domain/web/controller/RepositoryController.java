@@ -46,7 +46,7 @@ public class RepositoryController implements ApplicationContextAware, Initializi
     }
 
     @PostMapping("/insert/{coating}")
-    public ResObject<Object> add(@PathVariable("entity") String entity, @PathVariable("coating") String coating, @RequestBody String message) {
+    public ResObject<Object> insert(@PathVariable("entity") String entity, @PathVariable("coating") String coating, @RequestBody String message) {
         AbstractWebRepository<Object, Object> abstractWebRepository = nameRepositoryMap.get(entity);
         if (abstractWebRepository == null) {
             return ResObject.failMsg("The repository does not exist!");
@@ -74,9 +74,9 @@ public class RepositoryController implements ApplicationContextAware, Initializi
     }
 
     @PostMapping("/select/{coating}/{pageNum}/{pageSize}")
-    public ResObject<Object> query(@PathVariable("entity") String entity, @PathVariable("coating") String coating,
-                                   @PathVariable("pageNum") Integer pageNum, @PathVariable("pageSize") Integer pageSize,
-                                   @RequestBody String message) {
+    public ResObject<Object> select(@PathVariable("entity") String entity, @PathVariable("coating") String coating,
+                                    @PathVariable("pageNum") Integer pageNum, @PathVariable("pageSize") Integer pageSize,
+                                    @RequestBody String message) {
         pageNum = pageNum == null || pageNum <= 0 ? 1 : pageNum;
         pageSize = pageSize == null || pageSize > 100 ? 10 : pageSize;
 
