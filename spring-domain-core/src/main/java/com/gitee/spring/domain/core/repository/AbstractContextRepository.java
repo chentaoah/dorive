@@ -156,6 +156,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         }
 
+        boolean sameType = genericEntityClass == pojoClass;
+
         List<BindingDefinition> bindingDefinitions = new ArrayList<>();
         BindingDefinition boundIdBindingDefinition = null;
         for (Binding bindingAnnotation : bindingAnnotations) {
@@ -201,7 +203,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         EntityDefinition entityDefinition = new EntityDefinition(isRoot, accessPath, entityClass, isCollection, genericEntityClass,
-                fieldName, attributes, mapper, pojoClass, bindingDefinitions, boundIdBindingDefinition);
+                fieldName, attributes, mapper, pojoClass, sameType, bindingDefinitions, boundIdBindingDefinition);
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
 

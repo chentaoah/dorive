@@ -9,12 +9,20 @@ public class DefaultEntityAssembler implements EntityAssembler {
 
     @Override
     public Object assemble(EntityDefinition entityDefinition, BoundedContext boundedContext, Object persistentObject) {
-        return BeanUtil.copyProperties(persistentObject, entityDefinition.getGenericEntityClass());
+        if (entityDefinition.isSameType()) {
+            return persistentObject;
+        } else {
+            return BeanUtil.copyProperties(persistentObject, entityDefinition.getGenericEntityClass());
+        }
     }
 
     @Override
     public Object disassemble(EntityDefinition entityDefinition, BoundedContext boundedContext, Object entity) {
-        return BeanUtil.copyProperties(entity, entityDefinition.getPojoClass());
+        if (entityDefinition.isSameType()) {
+            return entity;
+        } else {
+            return BeanUtil.copyProperties(entity, entityDefinition.getPojoClass());
+        }
     }
 
 }

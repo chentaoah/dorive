@@ -18,6 +18,7 @@ public class EntityDefinition {
     private AnnotationAttributes attributes;
     private Object mapper;
     private Class<?> pojoClass;
+    private boolean sameType;
     private List<BindingDefinition> bindingDefinitions;
     private BindingDefinition boundIdBindingDefinition;
 }
