@@ -113,7 +113,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         }
         if (!filterEntityClass(entityClass)) {
-            ReflectionUtils.doWithFields(entityClass, field -> {
+            ReflectionUtils.doWithLocalFields(entityClass, field -> {
                 String fieldAccessPath = "/".equals(accessPath) ? accessPath + field.getName() : accessPath + "/" + field.getName();
                 Class<?> fieldEntityClass = field.getType();
                 Class<?> fieldGenericEntityClass = fieldEntityClass;
