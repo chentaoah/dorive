@@ -81,9 +81,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             this.name = StrUtil.lowerFirst(this.entityClass.getSimpleName());
         }
 
-        AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(this.entityClass, Entity.class);
-        Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(this.entityClass, Binding.class);
-        visitEntityClass("/", null, this.entityClass, this.entityClass, null, attributes, bindingAnnotations);
+        resolveRootRepository(this.entityClass);
+        resolveSubRepositories("/", this.entityClass);
 
         this.orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> {
             EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
@@ -92,41 +91,50 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }));
     }
 
-    protected void visitEntityClass(String accessPath, Class<?> lastEntityClass, Class<?> entityClass,
-                                    Class<?> genericEntityClass, String fieldName, AnnotationAttributes attributes,
-                                    Set<Binding> bindingAnnotations) {
-        if (lastEntityClass == null && attributes != null) {
-            ConfiguredRepository configuredRepository = newConfiguredRepository(accessPath, null, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
-            configuredRepositoryMap.put(accessPath, configuredRepository);
+    protected void resolveRootRepository(Class<?> entityClass) {
+        AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(entityClass, Entity.class);
+        if (attributes != null) {
+            Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(entityClass, Binding.class);
+            ConfiguredRepository configuredRepository = newConfiguredRepository("/", null, entityClass, entityClass, null, attributes, bindingAnnotations);
+            configuredRepositoryMap.put("/", configuredRepository);
             rootRepository = configuredRepository;
             orderedRepositories.add(configuredRepository);
+        }
+    }
 
-        } else if (lastEntityClass != null) {
-            EntityPropertyChain entityPropertyChain = newEntityPropertyChain(accessPath, lastEntityClass, entityClass, fieldName);
-            entityPropertyChainMap.put(accessPath, entityPropertyChain);
-            if (attributes != null) {
+    protected void resolveSubRepositories(String accessPath, Class<?> entityClass) {
+        ReflectionUtils.doWithLocalFields(entityClass, declaredField -> {
+            String fieldName = declaredField.getName();
+            String fieldAccessPath = "/".equals(accessPath) ? accessPath + fieldName : accessPath + "/" + fieldName;
+
+            Class<?> fieldEntityClass = declaredField.getType();
+            Class<?> fieldGenericEntityClass = fieldEntityClass;
+            if (Collection.class.isAssignableFrom(fieldEntityClass)) {
+                ParameterizedType parameterizedType = (ParameterizedType) declaredField.getGenericType();
+                Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
+                fieldGenericEntityClass = (Class<?>) actualTypeArgument;
+            }
+
+            EntityPropertyChain entityPropertyChain = newEntityPropertyChain(fieldAccessPath, entityClass, fieldEntityClass, fieldName);
+            entityPropertyChainMap.put(fieldAccessPath, entityPropertyChain);
+
+            AnnotationAttributes fieldAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(declaredField, Entity.class);
+            if (fieldAttributes != null) {
                 entityPropertyChain.initialize();
-                ConfiguredRepository configuredRepository = newConfiguredRepository(accessPath, entityPropertyChain, entityClass, genericEntityClass, fieldName, attributes, bindingAnnotations);
-                configuredRepositoryMap.put(accessPath, configuredRepository);
+                Set<Binding> fieldBindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(declaredField, Binding.class);
+
+                ConfiguredRepository configuredRepository = newConfiguredRepository(fieldAccessPath, entityPropertyChain,
+                        fieldEntityClass, fieldGenericEntityClass, fieldName, fieldAttributes, fieldBindingAnnotations);
+
+                configuredRepositoryMap.put(fieldAccessPath, configuredRepository);
                 subRepositories.add(configuredRepository);
                 orderedRepositories.add(configuredRepository);
             }
-        }
-        if (!filterEntityClass(entityClass)) {
-            ReflectionUtils.doWithLocalFields(entityClass, field -> {
-                String fieldAccessPath = "/".equals(accessPath) ? accessPath + field.getName() : accessPath + "/" + field.getName();
-                Class<?> fieldEntityClass = field.getType();
-                Class<?> fieldGenericEntityClass = fieldEntityClass;
-                if (Collection.class.isAssignableFrom(fieldEntityClass)) {
-                    ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-                    Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-                    fieldGenericEntityClass = (Class<?>) actualTypeArgument;
-                }
-                AnnotationAttributes fieldAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(field, Entity.class);
-                Set<Binding> fieldBindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(field, Binding.class);
-                visitEntityClass(fieldAccessPath, entityClass, fieldEntityClass, fieldGenericEntityClass, field.getName(), fieldAttributes, fieldBindingAnnotations);
-            });
-        }
+
+            if (!filterEntityClass(fieldEntityClass)) {
+                resolveSubRepositories(fieldAccessPath, fieldEntityClass);
+            }
+        });
     }
 
     protected EntityPropertyChain newEntityPropertyChain(String accessPath, Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
