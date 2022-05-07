@@ -127,6 +127,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     public int insert(BoundedContext boundedContext, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
         int count = 0;
+        List<ConfiguredRepository> orderedRepositories = classOrderedRepositoriesMap.get(entity.getClass());
         for (ConfiguredRepository configuredRepository : orderedRepositories) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
@@ -174,6 +175,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     public int update(BoundedContext boundedContext, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
         int count = 0;
+        List<ConfiguredRepository> orderedRepositories = classOrderedRepositoriesMap.get(entity.getClass());
         for (ConfiguredRepository configuredRepository : orderedRepositories) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
@@ -199,6 +201,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     public int delete(BoundedContext boundedContext, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
         int count = 0;
+        List<ConfiguredRepository> orderedRepositories = classOrderedRepositoriesMap.get(entity.getClass());
         for (ConfiguredRepository configuredRepository : orderedRepositories) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
