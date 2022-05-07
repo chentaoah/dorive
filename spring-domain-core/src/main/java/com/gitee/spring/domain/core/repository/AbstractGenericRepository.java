@@ -32,17 +32,20 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     }
 
     protected void handleRootEntity(BoundedContext boundedContext, Object rootEntity) {
-        for (ConfiguredRepository configuredRepository : subRepositories) {
-            EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
-            EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityPropertyChain();
-            Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
-            if (lastEntity != null && isMatchScenes(configuredRepository, boundedContext)) {
-                Object example = newExampleByContext(configuredRepository, boundedContext, rootEntity);
-                List<?> entities = configuredRepository.selectByExample(boundedContext, example);
-                Object entity = convertManyToOneEntity(configuredRepository, entities);
-                if (entity != null) {
-                    EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
-                    entityProperty.setValue(lastEntity, entity);
+        List<ConfiguredRepository> configuredRepositories = classSubRepositoriesMap.get(rootEntity.getClass());
+        if (configuredRepositories != null && !configuredRepositories.isEmpty()) {
+            for (ConfiguredRepository configuredRepository : configuredRepositories) {
+                EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
+                EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityPropertyChain();
+                Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
+                if (lastEntity != null && isMatchScenes(configuredRepository, boundedContext)) {
+                    Object example = newExampleByContext(configuredRepository, boundedContext, rootEntity);
+                    List<?> entities = configuredRepository.selectByExample(boundedContext, example);
+                    Object entity = convertManyToOneEntity(configuredRepository, entities);
+                    if (entity != null) {
+                        EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
+                        entityProperty.setValue(lastEntity, entity);
+                    }
                 }
             }
         }
