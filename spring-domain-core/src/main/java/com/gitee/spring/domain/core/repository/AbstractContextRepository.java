@@ -99,18 +99,19 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     protected void resolveSubRepositories(Class<?> entityClass) {
+        List<ConfiguredRepository> subRepositories = classSubRepositoriesMap.computeIfAbsent(entityClass, key -> new ArrayList<>());
+        List<ConfiguredRepository> orderedRepositories = classOrderedRepositoriesMap.computeIfAbsent(entityClass, key -> new ArrayList<>());
+
         List<Class<?>> superClasses = ReflectUtils.getAllSuperClasses(entityClass);
         for (Class<?> superClass : superClasses) {
             List<ConfiguredRepository> superSubRepositories = classSubRepositoriesMap.get(superClass);
             if (superSubRepositories != null) {
-                List<ConfiguredRepository> subRepositories = classSubRepositoriesMap.computeIfAbsent(entityClass, key -> new ArrayList<>());
                 subRepositories.addAll(superSubRepositories);
                 subRepositories = subRepositories.stream().distinct().collect(Collectors.toList());
                 classSubRepositoriesMap.put(entityClass, subRepositories);
             }
             List<ConfiguredRepository> superOrderedRepositories = classOrderedRepositoriesMap.get(superClass);
             if (superOrderedRepositories != null) {
-                List<ConfiguredRepository> orderedRepositories = classOrderedRepositoriesMap.computeIfAbsent(entityClass, key -> new ArrayList<>());
                 orderedRepositories.addAll(superOrderedRepositories);
                 orderedRepositories = orderedRepositories.stream().distinct().collect(Collectors.toList());
                 classOrderedRepositoriesMap.put(entityClass, orderedRepositories);
@@ -119,14 +120,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         resolveSubRepositories("/", entityClass, entityClass);
 
-        List<ConfiguredRepository> orderedRepositories = classOrderedRepositoriesMap.get(entityClass);
-        if (orderedRepositories != null) {
-            orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> {
-                EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-                AnnotationAttributes annotationAttributes = entityDefinition.getAttributes();
-                return annotationAttributes.getNumber(ORDER_ATTRIBUTE).intValue();
-            }));
-        }
+        orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> {
+            EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
+            AnnotationAttributes attributes = entityDefinition.getAttributes();
+            return attributes.getNumber(ORDER_ATTRIBUTE).intValue();
+        }));
     }
 
     protected void resolveSubRepositories(String accessPath, Class<?> rootEntityClass, Class<?> entityClass) {
