@@ -67,23 +67,23 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        this.attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(this.getClass(), Repository.class);
-        if (this.attributes != null) {
-            this.name = this.attributes.getString(NAME_ATTRIBUTE);
+        attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(this.getClass(), Repository.class);
+        if (attributes != null) {
+            name = attributes.getString(NAME_ATTRIBUTE);
         }
 
         Type targetType = ReflectUtils.getGenericSuperclass(this, null);
         ParameterizedType parameterizedType = (ParameterizedType) targetType;
         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-        this.entityClass = (Class<?>) actualTypeArgument;
-        this.entityCtor = ReflectUtils.getConstructor(this.entityClass, null);
+        entityClass = (Class<?>) actualTypeArgument;
+        entityCtor = ReflectUtils.getConstructor(entityClass, null);
 
-        if (StringUtils.isBlank(this.name)) {
-            this.name = StrUtil.lowerFirst(this.entityClass.getSimpleName());
+        if (StringUtils.isBlank(name)) {
+            name = StrUtil.lowerFirst(entityClass.getSimpleName());
         }
 
-        resolveRootRepository(this.entityClass);
-        resolveSubRepositories(this.entityClass);
+        resolveRootRepository(entityClass);
+        resolveSubRepositories(entityClass);
     }
 
     protected void resolveRootRepository(Class<?> entityClass) {
