@@ -8,6 +8,7 @@ import com.gitee.spring.domain.core.annotation.Repository;
 import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
+import com.gitee.spring.domain.core.entity.Constants;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.utils.PathUtils;
@@ -28,37 +29,25 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, InitializingBean {
 
-    public static final String NAME_ATTRIBUTE = "name";
-
-    public static final String SCENE_ATTRIBUTE = "scene";
-    public static final String MAPPER_ATTRIBUTE = "mapper";
-    public static final String ASSEMBLER_ATTRIBUTE = "assembler";
-    public static final String REPOSITORY_ATTRIBUTE = "repository";
-    public static final String ORDER_ATTRIBUTE = "order";
-
-    public static final String FIELD_ATTRIBUTE = "field";
-    public static final String BIND_ATTRIBUTE = "bind";
-
     protected ApplicationContext applicationContext;
-
-    protected AnnotationAttributes attributes;
-    protected String name;
 
     protected Class<?> entityClass;
     protected Constructor<?> entityCtor;
+
+    protected AnnotationAttributes attributes;
+    protected String name;
 
     protected Map<String, EntityPropertyChain> entityPropertyChainMap = new LinkedHashMap<>();
     protected Map<String, ConfiguredRepository> configuredRepositoryMap = new LinkedHashMap<>();
 
     protected ConfiguredRepository rootRepository;
-    protected Map<Class<?>, List<ConfiguredRepository>> classSubRepositoriesMap = new LinkedHashMap<>();
-    protected Map<Class<?>, List<ConfiguredRepository>> classOrderedRepositoriesMap = new LinkedHashMap<>();
+    protected List<ConfiguredRepository> subRepositories = new ArrayList<>();
+    protected List<ConfiguredRepository> orderedRepositories = new ArrayList<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -67,23 +56,28 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(this.getClass(), Repository.class);
-        if (attributes != null) {
-            name = attributes.getString(NAME_ATTRIBUTE);
-        }
-
         Type targetType = ReflectUtils.getGenericSuperclass(this, null);
         ParameterizedType parameterizedType = (ParameterizedType) targetType;
         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
         entityClass = (Class<?>) actualTypeArgument;
         entityCtor = ReflectUtils.getConstructor(entityClass, null);
 
+        attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(this.getClass(), Repository.class);
+        if (attributes != null) {
+            name = attributes.getString(Constants.NAME_ATTRIBUTE);
+        }
         if (StringUtils.isBlank(name)) {
             name = StrUtil.lowerFirst(entityClass.getSimpleName());
         }
 
         resolveRootRepository(entityClass);
-        resolveSubRepositories(entityClass);
+        resolveSubRepositories("/", entityClass);
+
+        orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> {
+            EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
+            AnnotationAttributes attributes = entityDefinition.getAttributes();
+            return attributes.getNumber(Constants.ORDER_ATTRIBUTE).intValue();
+        }));
     }
 
     protected void resolveRootRepository(Class<?> entityClass) {
@@ -93,49 +87,19 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             ConfiguredRepository configuredRepository = newConfiguredRepository("/", null, entityClass, entityClass, null, attributes, bindingAnnotations);
             configuredRepositoryMap.put("/", configuredRepository);
             rootRepository = configuredRepository;
-            List<ConfiguredRepository> orderedRepositories = classOrderedRepositoriesMap.computeIfAbsent(entityClass, key -> new ArrayList<>());
             orderedRepositories.add(configuredRepository);
         }
     }
 
-    protected void resolveSubRepositories(Class<?> entityClass) {
-        List<ConfiguredRepository> subRepositories = classSubRepositoriesMap.computeIfAbsent(entityClass, key -> new ArrayList<>());
-        List<ConfiguredRepository> orderedRepositories = classOrderedRepositoriesMap.computeIfAbsent(entityClass, key -> new ArrayList<>());
-
-        List<Class<?>> superClasses = ReflectUtils.getAllSuperClasses(entityClass);
-        for (Class<?> superClass : superClasses) {
-            List<ConfiguredRepository> superSubRepositories = classSubRepositoriesMap.get(superClass);
-            if (superSubRepositories != null) {
-                subRepositories.addAll(superSubRepositories);
-                subRepositories = subRepositories.stream().distinct().collect(Collectors.toList());
-                classSubRepositoriesMap.put(entityClass, subRepositories);
-            }
-            List<ConfiguredRepository> superOrderedRepositories = classOrderedRepositoriesMap.get(superClass);
-            if (superOrderedRepositories != null) {
-                orderedRepositories.addAll(superOrderedRepositories);
-                orderedRepositories = orderedRepositories.stream().distinct().collect(Collectors.toList());
-                classOrderedRepositoriesMap.put(entityClass, orderedRepositories);
-            }
-        }
-
-        resolveSubRepositories("/", entityClass, entityClass);
-
-        orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> {
-            EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-            AnnotationAttributes attributes = entityDefinition.getAttributes();
-            return attributes.getNumber(ORDER_ATTRIBUTE).intValue();
-        }));
-    }
-
-    protected void resolveSubRepositories(String accessPath, Class<?> rootEntityClass, Class<?> entityClass) {
-        ReflectionUtils.doWithLocalFields(entityClass, declaredField -> {
-            String fieldName = declaredField.getName();
+    protected void resolveSubRepositories(String accessPath, Class<?> entityClass) {
+        ReflectionUtils.doWithFields(entityClass, eachField -> {
+            String fieldName = eachField.getName();
             String fieldAccessPath = "/".equals(accessPath) ? accessPath + fieldName : accessPath + "/" + fieldName;
 
-            Class<?> fieldEntityClass = declaredField.getType();
+            Class<?> fieldEntityClass = eachField.getType();
             Class<?> fieldGenericEntityClass = fieldEntityClass;
             if (Collection.class.isAssignableFrom(fieldEntityClass)) {
-                ParameterizedType parameterizedType = (ParameterizedType) declaredField.getGenericType();
+                ParameterizedType parameterizedType = (ParameterizedType) eachField.getGenericType();
                 Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
                 fieldGenericEntityClass = (Class<?>) actualTypeArgument;
             }
@@ -143,23 +107,21 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityPropertyChain entityPropertyChain = newEntityPropertyChain(fieldAccessPath, entityClass, fieldEntityClass, fieldName);
             entityPropertyChainMap.put(fieldAccessPath, entityPropertyChain);
 
-            AnnotationAttributes fieldAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(declaredField, Entity.class);
+            AnnotationAttributes fieldAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(eachField, Entity.class);
             if (fieldAttributes != null) {
                 entityPropertyChain.initialize();
-                Set<Binding> fieldBindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(declaredField, Binding.class);
+                Set<Binding> fieldBindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(eachField, Binding.class);
 
                 ConfiguredRepository configuredRepository = newConfiguredRepository(fieldAccessPath, entityPropertyChain,
                         fieldEntityClass, fieldGenericEntityClass, fieldName, fieldAttributes, fieldBindingAnnotations);
 
                 configuredRepositoryMap.put(fieldAccessPath, configuredRepository);
-                List<ConfiguredRepository> subRepositories = classSubRepositoriesMap.computeIfAbsent(rootEntityClass, key -> new ArrayList<>());
                 subRepositories.add(configuredRepository);
-                List<ConfiguredRepository> orderedRepositories = classOrderedRepositoriesMap.computeIfAbsent(rootEntityClass, key -> new ArrayList<>());
                 orderedRepositories.add(configuredRepository);
             }
 
             if (!filterEntityClass(fieldEntityClass)) {
-                resolveSubRepositories(fieldAccessPath, rootEntityClass, fieldEntityClass);
+                resolveSubRepositories(fieldAccessPath, fieldEntityClass);
             }
         });
     }
@@ -177,7 +139,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         boolean isRoot = entityPropertyChain == null;
         boolean isCollection = Collection.class.isAssignableFrom(entityClass);
 
-        Class<?> mapperClass = attributes.getClass(MAPPER_ATTRIBUTE);
+        Class<?> mapperClass = attributes.getClass(Constants.MAPPER_ATTRIBUTE);
         Object mapper = applicationContext.getBean(mapperClass);
 
         Class<?> pojoClass = null;
@@ -197,8 +159,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         BindingDefinition boundIdBindingDefinition = null;
         for (Binding bindingAnnotation : bindingAnnotations) {
             AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(bindingAnnotation, false, false);
-            String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
-            String bindAttribute = bindingAttributes.getString(BIND_ATTRIBUTE);
+            String fieldAttribute = bindingAttributes.getString(Constants.FIELD_ATTRIBUTE);
+            String bindAttribute = bindingAttributes.getString(Constants.BIND_ATTRIBUTE);
 
             if (bindAttribute.startsWith(".")) {
                 bindAttribute = PathUtils.getAbsolutePath(accessPath, bindAttribute);
@@ -233,8 +195,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         }
 
-        if (boundIdBindingDefinition != null && attributes.getNumber(ORDER_ATTRIBUTE).intValue() == 0) {
-            attributes.put(ORDER_ATTRIBUTE, -1);
+        if (boundIdBindingDefinition != null && attributes.getNumber(Constants.ORDER_ATTRIBUTE).intValue() == 0) {
+            attributes.put(Constants.ORDER_ATTRIBUTE, -1);
         }
 
         EntityDefinition entityDefinition = new EntityDefinition(isRoot, accessPath, entityClass, isCollection, genericEntityClass,
@@ -242,10 +204,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
 
-        Class<?> assemblerClass = attributes.getClass(ASSEMBLER_ATTRIBUTE);
+        Class<?> assemblerClass = attributes.getClass(Constants.ASSEMBLER_ATTRIBUTE);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
 
-        Class<?> repositoryClass = attributes.getClass(REPOSITORY_ATTRIBUTE);
+        Class<?> repositoryClass = attributes.getClass(Constants.REPOSITORY_ATTRIBUTE);
         AbstractRepository<Object, Object> repository;
         if (repositoryClass == DefaultRepository.class) {
             repository = new DefaultRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, newRepository(entityDefinition));

@@ -11,6 +11,7 @@ import com.gitee.spring.domain.coating.entity.CoatingDefinition;
 import com.gitee.spring.domain.coating.property.DefaultCoatingAssembler;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.utils.ResourceUtils;
+import com.gitee.spring.domain.core.entity.Constants;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.entity.EntityPropertyLocation;
 import com.gitee.spring.domain.event.repository.AbstractEventRepository;
@@ -78,7 +79,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
                 classCoatingAssemblerMap.put(coatingClass, coatingAssembler);
                 if (attributes != null) {
-                    String name = attributes.getString(NAME_ATTRIBUTE);
+                    String name = attributes.getString(Constants.NAME_ATTRIBUTE);
                     if (StringUtils.isBlank(name)) {
                         name = StrUtil.lowerFirst(coatingClass.getSimpleName());
                     }

@@ -72,4 +72,8 @@ public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextR
         return configuredRepositoryMap.get(belongAccessPath);
     }
 
+    protected AbstractDelegateRepository<?, ?> adaptiveRepository(Object rootEntity) {
+        return this;
+    }
+
 }

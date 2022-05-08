@@ -97,8 +97,8 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (bindingDefinition.isFromContext()) {
                     AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
-                    String fieldAttribute = bindingAttributes.getString(FIELD_ATTRIBUTE);
-                    String bindAttribute = bindingAttributes.getString(BIND_ATTRIBUTE);
+                    String fieldAttribute = bindingAttributes.getString(Constants.FIELD_ATTRIBUTE);
+                    String bindAttribute = bindingAttributes.getString(Constants.BIND_ATTRIBUTE);
                     Object boundValue = boundedContext.get(bindAttribute);
                     if (boundValue != null) {
                         entityMapper.addToExample(example, fieldAttribute, boundValue);
@@ -124,7 +124,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                     if (targetCriterion != null) {
                         if (!entities.isEmpty()) {
                             AnnotationAttributes attributes = bindingDefinition.getAttributes();
-                            List<Object> fieldValues = collectFieldValues(entities, attributes.getString(FIELD_ATTRIBUTE));
+                            List<Object> fieldValues = collectFieldValues(entities, attributes.getString(Constants.FIELD_ATTRIBUTE));
                             if (!fieldValues.isEmpty()) {
                                 String boundFieldName = bindingDefinition.getBoundFieldName();
                                 ConfiguredRepository targetQueryRepository = targetCriterion.getQueryRepository();
