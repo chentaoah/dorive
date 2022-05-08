@@ -23,13 +23,12 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         } else {
             rootEntity = ReflectUtils.newInstance(entityCtor, null);
         }
-        if (rootEntity != null) {
-            handleRootEntity(boundedContext, rootEntity);
-        }
+        handleRootEntity(boundedContext, rootEntity);
         return (E) rootEntity;
     }
 
     protected void handleRootEntity(BoundedContext boundedContext, Object rootEntity) {
+        if (rootEntity == null) return;
         AbstractDelegateRepository<?, ?> delegateRepository = adaptiveRepository(rootEntity);
         for (ConfiguredRepository configuredRepository : delegateRepository.getSubRepositories()) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
