@@ -71,7 +71,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         resolveRootRepository(entityClass);
-        resolveSubRepositories("/", entityClass);
+        List<Class<?>> superClasses = ReflectUtils.getAllSuperClasses(entityClass, Object.class);
+        superClasses.add(entityClass);
+        superClasses.forEach(clazz -> resolveSubRepositories("/", clazz));
 
         orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> {
             EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
@@ -92,14 +94,14 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     protected void resolveSubRepositories(String accessPath, Class<?> entityClass) {
-        ReflectionUtils.doWithFields(entityClass, eachField -> {
-            String fieldName = eachField.getName();
+        ReflectionUtils.doWithLocalFields(entityClass, declaredField -> {
+            String fieldName = declaredField.getName();
             String fieldAccessPath = "/".equals(accessPath) ? accessPath + fieldName : accessPath + "/" + fieldName;
 
-            Class<?> fieldEntityClass = eachField.getType();
+            Class<?> fieldEntityClass = declaredField.getType();
             Class<?> fieldGenericEntityClass = fieldEntityClass;
             if (Collection.class.isAssignableFrom(fieldEntityClass)) {
-                ParameterizedType parameterizedType = (ParameterizedType) eachField.getGenericType();
+                ParameterizedType parameterizedType = (ParameterizedType) declaredField.getGenericType();
                 Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
                 fieldGenericEntityClass = (Class<?>) actualTypeArgument;
             }
@@ -107,10 +109,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityPropertyChain entityPropertyChain = newEntityPropertyChain(fieldAccessPath, entityClass, fieldEntityClass, fieldName);
             entityPropertyChainMap.put(fieldAccessPath, entityPropertyChain);
 
-            AnnotationAttributes fieldAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(eachField, Entity.class);
+            AnnotationAttributes fieldAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(declaredField, Entity.class);
             if (fieldAttributes != null) {
                 entityPropertyChain.initialize();
-                Set<Binding> fieldBindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(eachField, Binding.class);
+                Set<Binding> fieldBindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(declaredField, Binding.class);
 
                 ConfiguredRepository configuredRepository = newConfiguredRepository(fieldAccessPath, entityPropertyChain,
                         fieldEntityClass, fieldGenericEntityClass, fieldName, fieldAttributes, fieldBindingAnnotations);
