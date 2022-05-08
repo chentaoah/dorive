@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core.entity;
+package com.gitee.spring.domain.core.api;
 
 public interface Constants {
     String NAME_ATTRIBUTE = "name";

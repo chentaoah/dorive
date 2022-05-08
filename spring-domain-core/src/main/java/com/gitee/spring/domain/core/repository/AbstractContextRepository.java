@@ -8,7 +8,7 @@ import com.gitee.spring.domain.core.annotation.Repository;
 import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
-import com.gitee.spring.domain.core.entity.Constants;
+import com.gitee.spring.domain.core.api.Constants;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.utils.PathUtils;

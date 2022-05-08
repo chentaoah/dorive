@@ -2,6 +2,7 @@ package com.gitee.spring.domain.core.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import com.gitee.spring.domain.core.api.Constants;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.EntityProperty;
 import com.gitee.spring.domain.core.entity.*;

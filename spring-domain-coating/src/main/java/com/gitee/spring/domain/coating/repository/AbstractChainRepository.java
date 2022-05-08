@@ -8,6 +8,7 @@ import com.gitee.spring.domain.coating.entity.CoatingDefinition;
 import com.gitee.spring.domain.coating.entity.Criterion;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.property.DefaultCoatingAssembler;
+import com.gitee.spring.domain.core.api.Constants;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.*;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;

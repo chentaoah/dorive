@@ -11,7 +11,7 @@ import com.gitee.spring.domain.coating.entity.CoatingDefinition;
 import com.gitee.spring.domain.coating.property.DefaultCoatingAssembler;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.utils.ResourceUtils;
-import com.gitee.spring.domain.core.entity.Constants;
+import com.gitee.spring.domain.core.api.Constants;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.entity.EntityPropertyLocation;
 import com.gitee.spring.domain.event.repository.AbstractEventRepository;
