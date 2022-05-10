@@ -212,6 +212,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Class<?> repositoryClass = attributes.getClass(Constants.REPOSITORY_ATTRIBUTE);
         AbstractRepository<Object, Object> repository;
         if (repositoryClass == DefaultRepository.class) {
+            Assert.isTrue(mapper != Object.class, "The mapper cannot be object class!");
             repository = new DefaultRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, newRepository(entityDefinition));
         } else {
             repository = (AbstractRepository<Object, Object>) applicationContext.getBean(repositoryClass);

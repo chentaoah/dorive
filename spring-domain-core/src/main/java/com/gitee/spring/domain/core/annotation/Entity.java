@@ -13,7 +13,7 @@ public @interface Entity {
 
     String[] scene() default {};
 
-    Class<?> mapper();
+    Class<?> mapper() default Object.class;
 
     Class<?> assembler() default DefaultEntityAssembler.class;
 
