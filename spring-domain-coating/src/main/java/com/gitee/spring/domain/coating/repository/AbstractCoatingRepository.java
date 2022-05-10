@@ -69,7 +69,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                     EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
                     PropertyDefinition propertyDefinition = new PropertyDefinition(declaredField, fieldClass, isCollection, genericFieldClass, fieldName, entityPropertyChain);
                     propertyDefinitionMap.put(fieldName, propertyDefinition);
-                    if (entityPropertyChain != null) {
+                    if (entityPropertyChain != null && fieldClass == entityPropertyChain.getEntityClass()) {
                         availablePropertyDefinitions.add(propertyDefinition);
                     }
                 });
