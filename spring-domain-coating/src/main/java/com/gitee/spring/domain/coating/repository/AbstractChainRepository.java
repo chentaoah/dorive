@@ -154,5 +154,4 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         return fieldValues;
     }
 
-
 }
