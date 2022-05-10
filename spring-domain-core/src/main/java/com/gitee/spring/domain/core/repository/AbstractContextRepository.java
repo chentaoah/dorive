@@ -176,6 +176,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             ConfiguredRepository belongConfiguredRepository = null;
             String boundFieldName = null;
             EntityPropertyChain boundEntityPropertyChain = null;
+            
             if (!isFromContext) {
                 belongAccessPath = getBelongAccessPath(bindAttribute);
                 belongConfiguredRepository = configuredRepositoryMap.get(belongAccessPath);
@@ -184,6 +185,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 boundFieldName = PathUtils.getFieldName(bindAttribute);
                 boundEntityPropertyChain = entityPropertyChainMap.get(bindAttribute);
                 Assert.notNull(boundEntityPropertyChain, "Bound path not available!");
+
                 boundEntityPropertyChain.initialize();
                 boundEntityPropertyChain.setBoundProperty(true);
             }
