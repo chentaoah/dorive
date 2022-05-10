@@ -14,6 +14,7 @@ public class CoatingDefinition {
     private Class<?> entityClass;
     private Class<?> coatingClass;
     private AnnotationAttributes attributes;
+    private String name;
     private Map<String, PropertyDefinition> propertyDefinitionMap;
     private List<EntityPropertyLocation> reversedEntityPropertyLocations;
 }

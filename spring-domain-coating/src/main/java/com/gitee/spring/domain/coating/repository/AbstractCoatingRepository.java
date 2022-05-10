@@ -49,23 +49,29 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
             List<Class<?>> classes = ResourceUtils.resolveClasses(basePackage);
             for (Class<?> coatingClass : classes) {
                 Map<String, PropertyDefinition> propertyDefinitionMap = new LinkedHashMap<>();
-                ReflectionUtils.doWithLocalFields(coatingClass, field -> {
-                    if (field.isAnnotationPresent(IgnoreProperty.class)) return;
+                List<PropertyDefinition> availablePropertyDefinitions = new ArrayList<>();
 
-                    Class<?> fieldClass = field.getType();
+                ReflectionUtils.doWithLocalFields(coatingClass, declaredField -> {
+                    if (declaredField.isAnnotationPresent(IgnoreProperty.class)) return;
+
+                    Class<?> fieldClass = declaredField.getType();
                     boolean isCollection = false;
                     Class<?> genericFieldClass = fieldClass;
-                    String fieldName = field.getName();
+                    String fieldName = declaredField.getName();
+
                     if (Collection.class.isAssignableFrom(fieldClass)) {
                         isCollection = true;
-                        ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+                        ParameterizedType parameterizedType = (ParameterizedType) declaredField.getGenericType();
                         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
                         genericFieldClass = (Class<?>) actualTypeArgument;
                     }
 
                     EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
-                    PropertyDefinition propertyDefinition = new PropertyDefinition(field, fieldClass, isCollection, genericFieldClass, fieldName, entityPropertyChain);
+                    PropertyDefinition propertyDefinition = new PropertyDefinition(declaredField, fieldClass, isCollection, genericFieldClass, fieldName, entityPropertyChain);
                     propertyDefinitionMap.put(fieldName, propertyDefinition);
+                    if (entityPropertyChain != null) {
+                        availablePropertyDefinitions.add(propertyDefinition);
+                    }
                 });
 
                 Set<String> fieldNames = propertyDefinitionMap.keySet();
@@ -74,18 +80,20 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                 Collections.reverse(entityPropertyLocations);
 
                 AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(coatingClass, Coating.class);
-                CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, attributes, propertyDefinitionMap, entityPropertyLocations);
-                CoatingAssembler coatingAssembler = new DefaultCoatingAssembler(coatingDefinition);
+                String name = null;
+                if (attributes != null) {
+                    name = attributes.getString(Constants.NAME_ATTRIBUTE);
+                }
+                if (StringUtils.isBlank(name)) {
+                    name = StrUtil.lowerFirst(coatingClass.getSimpleName());
+                }
+
+                CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, attributes, name, propertyDefinitionMap, entityPropertyLocations);
+                CoatingAssembler coatingAssembler = new DefaultCoatingAssembler(coatingDefinition, availablePropertyDefinitions);
 
                 classCoatingAssemblerMap.put(coatingClass, coatingAssembler);
-                if (attributes != null) {
-                    String name = attributes.getString(Constants.NAME_ATTRIBUTE);
-                    if (StringUtils.isBlank(name)) {
-                        name = StrUtil.lowerFirst(coatingClass.getSimpleName());
-                    }
-                    Assert.isTrue(!nameCoatingAssemblerMap.containsKey(name), "The same coating name cannot exist!");
-                    nameCoatingAssemblerMap.putIfAbsent(name, coatingAssembler);
-                }
+                Assert.isTrue(!nameCoatingAssemblerMap.containsKey(name), "The same coating name cannot exist!");
+                nameCoatingAssemblerMap.putIfAbsent(name, coatingAssembler);
             }
         }
     }
