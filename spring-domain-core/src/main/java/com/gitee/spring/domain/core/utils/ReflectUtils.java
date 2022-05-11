@@ -1,16 +1,11 @@
 package com.gitee.spring.domain.core.utils;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class ReflectUtils {
-
-    public static Type getGenericSuperclass(Object object, Class<?> targetClass) {
-        return object.getClass().getGenericSuperclass();
-    }
 
     public static Constructor<?> getConstructor(Class<?> type, Class<?>[] parameterTypes) {
         return org.springframework.cglib.core.ReflectUtils.getConstructor(type, parameterTypes);

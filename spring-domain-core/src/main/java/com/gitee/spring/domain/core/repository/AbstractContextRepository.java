@@ -56,8 +56,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Type targetType = ReflectUtils.getGenericSuperclass(this, null);
-        ParameterizedType parameterizedType = (ParameterizedType) targetType;
+        Type genericSuperclass = this.getClass().getGenericSuperclass();
+        ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
         entityClass = (Class<?>) actualTypeArgument;
         entityCtor = ReflectUtils.getConstructor(entityClass, null);
@@ -167,9 +167,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         if (repositoryClass != DefaultRepository.class) {
             repository = applicationContext.getBean(repositoryClass);
             if (pojoClass == null) {
-                if (AbstractContextRepository.class.isAssignableFrom(repositoryClass)) {
-                    pojoClass = ((AbstractContextRepository<?, ?>) repository).getEntityClass();
-                }
+                Type genericSuperclass = repositoryClass.getGenericSuperclass();
+                ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
+                Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
+                pojoClass = (Class<?>) actualTypeArgument;
             }
         }
 
