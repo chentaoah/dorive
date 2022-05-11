@@ -158,11 +158,18 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         }
 
+        Class<?> assemblerClass = attributes.getClass(Constants.ASSEMBLER_ATTRIBUTE);
+        EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
+
+        Object repository = null;
+
         Class<?> repositoryClass = attributes.getClass(Constants.REPOSITORY_ATTRIBUTE);
-        if (pojoClass == null && repositoryClass != DefaultRepository.class) {
-            if (AbstractContextRepository.class.isAssignableFrom(repositoryClass)) {
-                AbstractContextRepository<?, ?> repository = (AbstractContextRepository<?, ?>) applicationContext.getBean(repositoryClass);
-                pojoClass = repository.getEntityClass();
+        if (repositoryClass != DefaultRepository.class) {
+            repository = applicationContext.getBean(repositoryClass);
+            if (pojoClass == null) {
+                if (AbstractContextRepository.class.isAssignableFrom(repositoryClass)) {
+                    pojoClass = ((AbstractContextRepository<?, ?>) repository).getEntityClass();
+                }
             }
         }
 
@@ -219,18 +226,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
 
-        Class<?> assemblerClass = attributes.getClass(Constants.ASSEMBLER_ATTRIBUTE);
-        EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
-
-        AbstractRepository<Object, Object> repository;
-        if (repositoryClass == DefaultRepository.class) {
+        if (repository == null) {
             Assert.isTrue(mapper != Object.class, "The mapper cannot be object class!");
             repository = new DefaultRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, newRepository(entityDefinition));
-        } else {
-            repository = (AbstractRepository<Object, Object>) applicationContext.getBean(repositoryClass);
         }
 
-        return newConfiguredRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
+        return newConfiguredRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, (AbstractRepository<Object, Object>) repository);
     }
 
     protected String getBelongAccessPath(String accessPath) {
