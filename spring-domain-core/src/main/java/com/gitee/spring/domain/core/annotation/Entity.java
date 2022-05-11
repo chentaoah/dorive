@@ -19,6 +19,8 @@ public @interface Entity {
 
     Class<?> repository() default DefaultRepository.class;
 
+    Class<?> converter() default Object.class;
+
     int order() default 0;
 
 }
