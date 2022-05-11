@@ -141,17 +141,28 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         boolean isRoot = entityPropertyChain == null;
         boolean isCollection = Collection.class.isAssignableFrom(entityClass);
 
-        Class<?> mapperClass = attributes.getClass(Constants.MAPPER_ATTRIBUTE);
-        Object mapper = applicationContext.getBean(mapperClass);
-
+        Object mapper = null;
         Class<?> pojoClass = null;
-        Type[] genericInterfaces = mapperClass.getGenericInterfaces();
-        if (genericInterfaces.length > 0) {
-            Type genericInterface = mapperClass.getGenericInterfaces()[0];
-            if (genericInterface instanceof ParameterizedType) {
-                ParameterizedType parameterizedType = (ParameterizedType) genericInterface;
-                Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-                pojoClass = (Class<?>) actualTypeArgument;
+
+        Class<?> mapperClass = attributes.getClass(Constants.MAPPER_ATTRIBUTE);
+        if (mapperClass != Object.class) {
+            mapper = applicationContext.getBean(mapperClass);
+            Type[] genericInterfaces = mapperClass.getGenericInterfaces();
+            if (genericInterfaces.length > 0) {
+                Type genericInterface = mapperClass.getGenericInterfaces()[0];
+                if (genericInterface instanceof ParameterizedType) {
+                    ParameterizedType parameterizedType = (ParameterizedType) genericInterface;
+                    Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
+                    pojoClass = (Class<?>) actualTypeArgument;
+                }
+            }
+        }
+
+        Class<?> repositoryClass = attributes.getClass(Constants.REPOSITORY_ATTRIBUTE);
+        if (pojoClass == null && repositoryClass != DefaultRepository.class) {
+            if (AbstractContextRepository.class.isAssignableFrom(repositoryClass)) {
+                AbstractContextRepository<?, ?> repository = (AbstractContextRepository<?, ?>) applicationContext.getBean(repositoryClass);
+                pojoClass = repository.getEntityClass();
             }
         }
 
@@ -176,7 +187,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             ConfiguredRepository belongConfiguredRepository = null;
             String boundFieldName = null;
             EntityPropertyChain boundEntityPropertyChain = null;
-            
+
             if (!isFromContext) {
                 belongAccessPath = getBelongAccessPath(bindAttribute);
                 belongConfiguredRepository = configuredRepositoryMap.get(belongAccessPath);
@@ -211,7 +222,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Class<?> assemblerClass = attributes.getClass(Constants.ASSEMBLER_ATTRIBUTE);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
 
-        Class<?> repositoryClass = attributes.getClass(Constants.REPOSITORY_ATTRIBUTE);
         AbstractRepository<Object, Object> repository;
         if (repositoryClass == DefaultRepository.class) {
             Assert.isTrue(mapper != Object.class, "The mapper cannot be object class!");
