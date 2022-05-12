@@ -74,13 +74,16 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
                     AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(declaredField, Property.class);
                     String belongAttribute = null;
-                    String aliasAttribute = fieldName;
+                    String aliasAttribute = null;
                     boolean isBound = false;
 
                     if (attributes != null) {
                         belongAttribute = attributes.getString(Constants.BELONG_ATTRIBUTE);
                         aliasAttribute = attributes.getString(Constants.ALIAS_ATTRIBUTE);
                         isBound = belongAttribute.startsWith("/");
+                    }
+                    if (StringUtils.isBlank(aliasAttribute)) {
+                        aliasAttribute = fieldName;
                     }
 
                     EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
