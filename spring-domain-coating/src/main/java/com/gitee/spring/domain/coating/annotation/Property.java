@@ -10,6 +10,6 @@ public @interface Property {
 
     String belong();
 
-    String alias();
+    String alias() default "";
 
 }
