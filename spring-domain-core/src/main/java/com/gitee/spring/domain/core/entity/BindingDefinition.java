@@ -10,7 +10,7 @@ import org.springframework.core.annotation.AnnotationAttributes;
 public class BindingDefinition {
     private AnnotationAttributes attributes;
     private boolean fromContext;
-    private boolean bindId;
+    private boolean boundId;
     private String belongAccessPath;
     private ConfiguredRepository belongConfiguredRepository;
     private String boundFieldName;

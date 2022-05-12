@@ -3,10 +3,9 @@ package com.gitee.spring.domain.coating.repository;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.spring.domain.coating.api.CoatingAssembler;
-import com.gitee.spring.domain.coating.entity.CoatingDefinition;
 import com.gitee.spring.domain.coating.entity.Criterion;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
+import com.gitee.spring.domain.coating.entity.RepositoryLocation;
 import com.gitee.spring.domain.coating.property.DefaultCoatingAssembler;
 import com.gitee.spring.domain.core.api.Constants;
 import com.gitee.spring.domain.core.api.EntityMapper;
@@ -21,61 +20,54 @@ import java.util.*;
 public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
 
     public Object buildExample(BoundedContext boundedContext, Object coating) {
-        CoatingAssembler coatingAssembler = classCoatingAssemblerMap.get(coating.getClass());
-        Assert.notNull(coatingAssembler, "No coating assembler exists!");
-        if (coatingAssembler instanceof DefaultCoatingAssembler) {
-            Map<String, Criterion> criterionMap = new LinkedHashMap<>();
-            CoatingDefinition coatingDefinition = ((DefaultCoatingAssembler) coatingAssembler).getCoatingDefinition();
-            for (EntityPropertyLocation entityPropertyLocation : coatingDefinition.getReversedEntityPropertyLocations()) {
-                ConfiguredRepository belongConfiguredRepository = entityPropertyLocation.getBelongConfiguredRepository();
-                if (belongConfiguredRepository != null) {
-                    EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
-                    String absoluteAccessPath = entityPropertyLocation.getPrefixAccessPath() + entityDefinition.getAccessPath();
-                    if (!criterionMap.containsKey(absoluteAccessPath)) {
-                        Criterion criterion = buildCriterion(boundedContext, entityPropertyLocation);
-                        criterionMap.put(absoluteAccessPath, criterion);
-                    }
-                    Criterion criterion = criterionMap.get(absoluteAccessPath);
-                    addToExampleForCriterion(coatingDefinition, entityPropertyLocation, coating, criterion);
-                }
+        DefaultCoatingAssembler defaultCoatingAssembler = (DefaultCoatingAssembler) classCoatingAssemblerMap.get(coating.getClass());
+        Assert.notNull(defaultCoatingAssembler, "No coating assembler exists!");
+
+        Map<String, Criterion> criterionMap = new LinkedHashMap<>();
+        for (RepositoryLocation repositoryLocation : defaultCoatingAssembler.getReversedRepositoryLocations()) {
+            String absoluteAccessPath = repositoryLocation.getAbsoluteAccessPath();
+            if (!criterionMap.containsKey(absoluteAccessPath)) {
+                Criterion criterion = buildCriterion(boundedContext, repositoryLocation);
+                criterionMap.put(absoluteAccessPath, criterion);
             }
-            executeChainQuery(boundedContext, criterionMap);
-            Criterion criterion = criterionMap.get("/");
-            Assert.notNull(criterion, "The criterion cannot be null!");
-            if (criterion.isEmptyQuery()) {
-                ConfiguredRepository queryRepository = criterion.getQueryRepository();
-                EntityMapper entityMapper = queryRepository.getEntityMapper();
-                entityMapper.addToExample(criterion.getExample(), "id", -1);
-            }
-            return criterion.getExample();
+            Criterion criterion = criterionMap.get(absoluteAccessPath);
+            addToExampleForCriterion(repositoryLocation, coating, criterion);
         }
-        return null;
+
+        executeChainQuery(boundedContext, criterionMap);
+
+        Criterion criterion = criterionMap.get("/");
+        Assert.notNull(criterion, "The criterion cannot be null!");
+        if (criterion.isEmptyQuery()) {
+            ConfiguredRepository queryRepository = criterion.getQueryRepository();
+            EntityMapper entityMapper = queryRepository.getEntityMapper();
+            entityMapper.addToExample(criterion.getExample(), "id", -1);
+        }
+
+        return criterion.getExample();
     }
 
-    protected Criterion buildCriterion(BoundedContext boundedContext, EntityPropertyLocation entityPropertyLocation) {
-        String definitionAccessPath = entityPropertyLocation.getPrefixAccessPath();
-        ConfiguredRepository definitionRepository = entityPropertyLocation.getBelongConfiguredRepository();
-        if (entityPropertyLocation.isForwardParent()) {
-            definitionAccessPath = entityPropertyLocation.getParentAccessPath();
-            definitionRepository = entityPropertyLocation.getParentConfiguredRepository();
+    protected Criterion buildCriterion(BoundedContext boundedContext, RepositoryLocation repositoryLocation) {
+        String definitionAccessPath = repositoryLocation.getPrefixAccessPath();
+        ConfiguredRepository definitionRepository = repositoryLocation.getBelongConfiguredRepository();
+        if (repositoryLocation.isForwardParent()) {
+            definitionAccessPath = repositoryLocation.getParentAccessPath();
+            definitionRepository = repositoryLocation.getParentConfiguredRepository();
         }
-        ConfiguredRepository queryRepository = entityPropertyLocation.getBelongConfiguredRepository();
+        ConfiguredRepository queryRepository = repositoryLocation.getBelongConfiguredRepository();
         EntityMapper entityMapper = queryRepository.getEntityMapper();
         Object example = entityMapper.newExample(boundedContext);
         return new Criterion(definitionAccessPath, definitionRepository, queryRepository, example, false, false);
     }
 
-    protected void addToExampleForCriterion(CoatingDefinition coatingDefinition, EntityPropertyLocation entityPropertyLocation, Object coating, Criterion criterion) {
-        EntityPropertyChain entityPropertyChain = entityPropertyLocation.getEntityPropertyChain();
-        String fieldName = entityPropertyChain.getFieldName();
-        Map<String, PropertyDefinition> propertyDefinitionMap = coatingDefinition.getPropertyDefinitionMap();
-        PropertyDefinition propertyDefinition = propertyDefinitionMap.get(fieldName);
+    protected void addToExampleForCriterion(RepositoryLocation repositoryLocation, Object coating, Criterion criterion) {
+        PropertyDefinition propertyDefinition = repositoryLocation.getPropertyDefinition();
         if (propertyDefinition != null) {
-            Object fieldValue = ReflectUtil.getFieldValue(coating, propertyDefinition.getField());
+            Object fieldValue = ReflectUtil.getFieldValue(coating, propertyDefinition.getDeclaredField());
             if (fieldValue != null) {
                 ConfiguredRepository queryRepository = criterion.getQueryRepository();
                 EntityMapper entityMapper = queryRepository.getEntityMapper();
-                entityMapper.addToExample(criterion.getExample(), fieldName, fieldValue);
+                entityMapper.addToExample(criterion.getExample(), propertyDefinition.getAlias(), fieldValue);
                 criterion.setDirtyExample(true);
             }
         }

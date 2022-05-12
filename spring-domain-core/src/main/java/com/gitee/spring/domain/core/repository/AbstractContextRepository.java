@@ -198,7 +198,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
             boolean isIdField = "id".equals(fieldAttribute);
             boolean isFromContext = !bindAttribute.startsWith("/");
-            boolean isBindId = isIdField && !isFromContext;
+            boolean isBoundId = isIdField && !isFromContext;
 
             String belongAccessPath = null;
             ConfiguredRepository belongConfiguredRepository = null;
@@ -218,11 +218,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 boundEntityPropertyChain.setBoundProperty(true);
             }
 
-            BindingDefinition bindingDefinition = new BindingDefinition(bindingAttributes, isFromContext, isBindId,
+            BindingDefinition bindingDefinition = new BindingDefinition(bindingAttributes, isFromContext, isBoundId,
                     belongAccessPath, belongConfiguredRepository, boundFieldName, boundEntityPropertyChain);
             bindingDefinitions.add(bindingDefinition);
 
-            if (isBindId) {
+            if (isBoundId) {
                 boundIdBindingDefinition = bindingDefinition;
             }
         }

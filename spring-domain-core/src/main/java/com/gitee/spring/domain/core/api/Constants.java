@@ -10,4 +10,6 @@ public interface Constants {
     String ORDER_ATTRIBUTE = "order";
     String FIELD_ATTRIBUTE = "field";
     String BIND_ATTRIBUTE = "bind";
+    String BELONG_ATTRIBUTE = "belong";
+    String ALIAS_ATTRIBUTE = "alias";
 }

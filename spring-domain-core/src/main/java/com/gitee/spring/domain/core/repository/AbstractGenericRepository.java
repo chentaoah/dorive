@@ -146,7 +146,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     protected void setBoundValueByContext(ConfiguredRepository configuredRepository, BoundedContext boundedContext, Object rootEntity, Object entity) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
-            if (!bindingDefinition.isBindId()) {
+            if (!bindingDefinition.isBoundId()) {
                 Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
                 if (boundValue != null) {
                     AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
