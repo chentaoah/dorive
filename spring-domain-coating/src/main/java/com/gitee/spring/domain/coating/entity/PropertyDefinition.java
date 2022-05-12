@@ -16,8 +16,8 @@ public class PropertyDefinition {
     private Class<?> genericFieldClass;
     private String fieldName;
     private AnnotationAttributes attributes;
-    private String belong;
-    private String alias;
+    private String locationAttribute;
+    private String aliasAttribute;
     private boolean bound;
     private EntityPropertyChain entityPropertyChain;
 }

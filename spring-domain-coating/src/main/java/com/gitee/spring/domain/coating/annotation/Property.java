@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Property {
 
-    String belong() default "";
+    String location() default "";
 
     String alias() default "";
 

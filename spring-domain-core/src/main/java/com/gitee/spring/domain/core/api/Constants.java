@@ -9,7 +9,7 @@ public interface Constants {
     String CONVERTER_ATTRIBUTE = "converter";
     String ORDER_ATTRIBUTE = "order";
     String FIELD_ATTRIBUTE = "field";
-    String BIND_ATTRIBUTE = "bind";
-    String BELONG_ATTRIBUTE = "belong";
     String ALIAS_ATTRIBUTE = "alias";
+    String BIND_ATTRIBUTE = "bind";
+    String LOCATION_ATTRIBUTE = "location";
 }

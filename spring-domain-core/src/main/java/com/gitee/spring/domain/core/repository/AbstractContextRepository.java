@@ -190,7 +190,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         for (Binding bindingAnnotation : bindingAnnotations) {
             AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(bindingAnnotation, false, false);
             String fieldAttribute = bindingAttributes.getString(Constants.FIELD_ATTRIBUTE);
+            String aliasAttribute = bindingAttributes.getString(Constants.ALIAS_ATTRIBUTE);
             String bindAttribute = bindingAttributes.getString(Constants.BIND_ATTRIBUTE);
+
+            if (StringUtils.isBlank(aliasAttribute)) {
+                aliasAttribute = fieldAttribute;
+            }
 
             if (bindAttribute.startsWith(".")) {
                 bindAttribute = PathUtils.getAbsolutePath(accessPath, bindAttribute);
@@ -218,7 +223,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 boundEntityPropertyChain.setBoundProperty(true);
             }
 
-            BindingDefinition bindingDefinition = new BindingDefinition(bindingAttributes, isFromContext, isBoundId,
+            BindingDefinition bindingDefinition = new BindingDefinition(
+                    bindingAttributes, fieldAttribute, aliasAttribute, bindAttribute, isFromContext, isBoundId,
                     belongAccessPath, belongConfiguredRepository, boundFieldName, boundEntityPropertyChain);
             bindingDefinitions.add(bindingDefinition);
 

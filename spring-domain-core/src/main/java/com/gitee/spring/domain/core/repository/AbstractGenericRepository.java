@@ -68,9 +68,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
             Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
             if (boundValue != null) {
-                AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
-                String fieldAttribute = bindingAttributes.getString(Constants.FIELD_ATTRIBUTE);
-                entityMapper.addToExample(example, fieldAttribute, boundValue);
+                String aliasAttribute = bindingDefinition.getAliasAttribute();
+                entityMapper.addToExample(example, aliasAttribute, boundValue);
             }
         }
         return example;
@@ -79,8 +78,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     protected Object getBoundValue(BindingDefinition bindingDefinition, BoundedContext boundedContext, Object rootEntity) {
         Object boundValue;
         if (bindingDefinition.isFromContext()) {
-            AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
-            String bindAttribute = bindingAttributes.getString(Constants.BIND_ATTRIBUTE);
+            String bindAttribute = bindingDefinition.getBindAttribute();
             boundValue = boundedContext.get(bindAttribute);
         } else {
             EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
@@ -149,8 +147,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             if (!bindingDefinition.isBoundId()) {
                 Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
                 if (boundValue != null) {
-                    AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
-                    String fieldAttribute = bindingAttributes.getString(Constants.FIELD_ATTRIBUTE);
+                    String fieldAttribute = bindingDefinition.getFieldAttribute();
                     BeanUtil.setFieldValue(entity, fieldAttribute, boundValue);
                 }
             }

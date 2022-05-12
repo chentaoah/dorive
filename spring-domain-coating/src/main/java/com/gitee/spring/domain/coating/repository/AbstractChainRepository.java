@@ -7,12 +7,10 @@ import com.gitee.spring.domain.coating.entity.Criterion;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
 import com.gitee.spring.domain.coating.property.DefaultCoatingAssembler;
-import com.gitee.spring.domain.core.api.Constants;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.*;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.annotation.AnnotationAttributes;
 
 import java.util.*;
 
@@ -31,7 +29,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                 criterionMap.put(absoluteAccessPath, criterion);
             }
             Criterion criterion = criterionMap.get(absoluteAccessPath);
-            addToExampleForCriterion(repositoryLocation, coating, criterion);
+            addToExampleOfCriterion(repositoryLocation, coating, criterion);
         }
 
         executeChainQuery(boundedContext, criterionMap);
@@ -60,14 +58,14 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         return new Criterion(definitionAccessPath, definitionRepository, queryRepository, example, false, false);
     }
 
-    protected void addToExampleForCriterion(RepositoryLocation repositoryLocation, Object coating, Criterion criterion) {
+    protected void addToExampleOfCriterion(RepositoryLocation repositoryLocation, Object coating, Criterion criterion) {
         PropertyDefinition propertyDefinition = repositoryLocation.getPropertyDefinition();
         if (propertyDefinition != null) {
             Object fieldValue = ReflectUtil.getFieldValue(coating, propertyDefinition.getDeclaredField());
             if (fieldValue != null) {
                 ConfiguredRepository queryRepository = criterion.getQueryRepository();
                 EntityMapper entityMapper = queryRepository.getEntityMapper();
-                entityMapper.addToExample(criterion.getExample(), propertyDefinition.getAlias(), fieldValue);
+                entityMapper.addToExample(criterion.getExample(), propertyDefinition.getAliasAttribute(), fieldValue);
                 criterion.setDirtyExample(true);
             }
         }
@@ -89,12 +87,9 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (bindingDefinition.isFromContext()) {
-                    AnnotationAttributes bindingAttributes = bindingDefinition.getAttributes();
-                    String fieldAttribute = bindingAttributes.getString(Constants.FIELD_ATTRIBUTE);
-                    String bindAttribute = bindingAttributes.getString(Constants.BIND_ATTRIBUTE);
-                    Object boundValue = boundedContext.get(bindAttribute);
+                    Object boundValue = boundedContext.get(bindingDefinition.getBindAttribute());
                     if (boundValue != null) {
-                        entityMapper.addToExample(example, fieldAttribute, boundValue);
+                        entityMapper.addToExample(example, bindingDefinition.getAliasAttribute(), boundValue);
                         criterion.setDirtyExample(true);
                     }
                 }
@@ -116,8 +111,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                     Criterion targetCriterion = criterionMap.get(absoluteAccessPath);
                     if (targetCriterion != null) {
                         if (!entities.isEmpty()) {
-                            AnnotationAttributes attributes = bindingDefinition.getAttributes();
-                            List<Object> fieldValues = collectFieldValues(entities, attributes.getString(Constants.FIELD_ATTRIBUTE));
+                            List<Object> fieldValues = collectFieldValues(entities, bindingDefinition.getFieldAttribute());
                             if (!fieldValues.isEmpty()) {
                                 String boundFieldName = bindingDefinition.getBoundFieldName();
                                 ConfiguredRepository targetQueryRepository = targetCriterion.getQueryRepository();

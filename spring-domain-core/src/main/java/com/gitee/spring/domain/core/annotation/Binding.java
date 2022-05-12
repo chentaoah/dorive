@@ -11,6 +11,8 @@ public @interface Binding {
 
     String field();
 
+    String alias() default "";
+
     String bind();
 
 }
