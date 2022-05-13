@@ -19,7 +19,7 @@ public @interface Entity {
 
     Class<?> repository() default DefaultRepository.class;
 
-    Class<?> converter() default Object.class;
+    boolean mapAsExample() default false;
 
     int order() default 0;
 

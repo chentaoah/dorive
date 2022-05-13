@@ -1,21 +1,21 @@
 package com.gitee.spring.domain.core.property;
 
 import com.gitee.spring.domain.core.api.EntityMapper;
-import com.gitee.spring.domain.core.api.ParameterConverter;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class DefaultEntityMapper implements EntityMapper {
+public class MapEntityMapper implements EntityMapper {
 
     protected EntityMapper entityMapper;
-    protected ParameterConverter parameterConverter;
 
     @Override
     public Object newPage(Integer pageNum, Integer pageSize) {
@@ -34,16 +34,14 @@ public class DefaultEntityMapper implements EntityMapper {
 
     @Override
     public Object newExample(BoundedContext boundedContext) {
-        return entityMapper.newExample(boundedContext);
+        return new LinkedHashMap<>();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void addToExample(Object example, String fieldAttribute, Object boundValue) {
-        if (parameterConverter != null) {
-            fieldAttribute = parameterConverter.convertFieldName(fieldAttribute, boundValue);
-            boundValue = parameterConverter.convertFieldValue(fieldAttribute, boundValue);
-        }
-        entityMapper.addToExample(example, fieldAttribute, boundValue);
+        Map<String, Object> parameterMap = (Map<String, Object>) example;
+        parameterMap.put(fieldAttribute, boundValue);
     }
 
 }

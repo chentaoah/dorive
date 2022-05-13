@@ -7,12 +7,11 @@ import com.gitee.spring.domain.core.annotation.Entity;
 import com.gitee.spring.domain.core.annotation.Repository;
 import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
-import com.gitee.spring.domain.core.api.ParameterConverter;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.api.Constants;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
-import com.gitee.spring.domain.core.property.DefaultEntityMapper;
+import com.gitee.spring.domain.core.property.MapEntityMapper;
 import com.gitee.spring.domain.core.utils.PathUtils;
 import com.gitee.spring.domain.core.utils.ReflectUtils;
 import lombok.Data;
@@ -176,12 +175,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         }
 
-        ParameterConverter converter = null;
-
-        Class<?> converterClass = attributes.getClass(Constants.CONVERTER_ATTRIBUTE);
-        if (converterClass != Object.class) {
-            converter = (ParameterConverter) applicationContext.getBean(converterClass);
-        }
+        boolean mapAsExample = attributes.getBoolean(Constants.MAP_AS_EXAMPLE_ATTRIBUTE);
 
         boolean sameType = genericEntityClass == pojoClass;
 
@@ -240,7 +234,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         EntityDefinition entityDefinition = new EntityDefinition(isRoot, accessPath, entityClass, isCollection, genericEntityClass,
                 fieldName, attributes, mapper, pojoClass, sameType, bindingDefinitions, boundIdBindingDefinition);
 
-        EntityMapper entityMapper = new DefaultEntityMapper(newEntityMapper(entityDefinition), converter);
+        EntityMapper entityMapper = newEntityMapper(entityDefinition);
+        if (mapAsExample) {
+            entityMapper = new MapEntityMapper(entityMapper);
+        }
 
         if (repository == null) {
             Assert.isTrue(mapper != Object.class, "The mapper cannot be object class!");
