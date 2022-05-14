@@ -42,7 +42,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        CoatingScan coatingScan = AnnotationUtils.getAnnotation(this.getClass(), CoatingScan.class);
+        CoatingScan coatingScan = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), CoatingScan.class);
         if (coatingScan != null) {
             resolveCoatingAssemblers(coatingScan.value());
         }
