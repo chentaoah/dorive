@@ -11,12 +11,12 @@ import java.util.List;
 @AllArgsConstructor
 public class RepositoryLocation {
     private List<String> multiAccessPath;
-    private String prefixAccessPath;
     private String parentAccessPath;
+    private String prefixAccessPath;
     private String absoluteAccessPath;
     private boolean forwardParent;
     private ConfiguredRepository parentConfiguredRepository;
     private AbstractDelegateRepository<?, ?> abstractDelegateRepository;
     private ConfiguredRepository belongConfiguredRepository;
-    private PropertyDefinition propertyDefinition;
+    private List<PropertyDefinition> collectedPropertyDefinitions;
 }

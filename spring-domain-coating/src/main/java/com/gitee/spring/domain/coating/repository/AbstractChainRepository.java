@@ -59,8 +59,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
     }
 
     protected void addToExampleOfCriterion(RepositoryLocation repositoryLocation, Object coating, Criterion criterion) {
-        PropertyDefinition propertyDefinition = repositoryLocation.getPropertyDefinition();
-        if (propertyDefinition != null) {
+        for (PropertyDefinition propertyDefinition : repositoryLocation.getCollectedPropertyDefinitions()) {
             Object fieldValue = ReflectUtil.getFieldValue(coating, propertyDefinition.getDeclaredField());
             if (fieldValue != null) {
                 ConfiguredRepository queryRepository = criterion.getQueryRepository();
