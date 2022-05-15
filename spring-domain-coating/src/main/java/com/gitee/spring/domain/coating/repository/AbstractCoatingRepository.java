@@ -206,8 +206,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
             repositoryLocationMap.put(absoluteAccessPath, repositoryLocation);
         }
     }
-
-
+    
     protected void checkFieldNames(Class<?> coatingClass, Set<String> fieldNames, List<RepositoryLocation> repositoryLocations) {
         Set<String> newFieldNames = new LinkedHashSet<>(fieldNames);
         for (RepositoryLocation repositoryLocation : repositoryLocations) {
