@@ -14,6 +14,8 @@ public interface EntityMapper {
 
     Object newExample(BoundedContext boundedContext);
 
-    void addToExample(Object example, String fieldAttribute, Object boundValue);
+    void addToExample(Object example, String fieldName, Object fieldValue);
+
+    void selectColumns(Object example, List<String> columns);
 
 }

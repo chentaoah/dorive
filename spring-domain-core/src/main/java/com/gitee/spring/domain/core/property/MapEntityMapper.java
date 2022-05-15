@@ -2,6 +2,7 @@ package com.gitee.spring.domain.core.property;
 
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.utils.DataUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -39,9 +40,24 @@ public class MapEntityMapper implements EntityMapper {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void addToExample(Object example, String fieldAttribute, Object boundValue) {
+    public void addToExample(Object example, String fieldName, Object fieldValue) {
         Map<String, Object> parameterMap = (Map<String, Object>) example;
-        parameterMap.put(fieldAttribute, boundValue);
+        if (parameterMap.containsKey(fieldName)) {
+            List<Object> fieldValues = DataUtils.intersection(parameterMap.get(fieldName), fieldValue);
+            if (fieldValues.isEmpty()) {
+                parameterMap.put(fieldName, null);
+                parameterMap.put("id", -1);
+                return;
+            }
+        }
+        parameterMap.put(fieldName, fieldValue);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void selectColumns(Object example, List<String> columns) {
+        Map<String, Object> parameterMap = (Map<String, Object>) example;
+        parameterMap.put("|columns|", columns);
     }
 
 }
