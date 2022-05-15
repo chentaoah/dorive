@@ -24,8 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequestMapping("/domain/{repository}")
 public class RepositoryController implements ApplicationContextAware, InitializingBean {
 
+    public static final Map<String, AbstractWebRepository<Object, Object>> NAME_REPOSITORY_MAP = new ConcurrentHashMap<>();
     private ApplicationContext applicationContext;
-    private final Map<String, AbstractWebRepository<Object, Object>> nameRepositoryMap = new ConcurrentHashMap<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -39,15 +39,15 @@ public class RepositoryController implements ApplicationContextAware, Initializi
         for (AbstractWebRepository<Object, Object> abstractWebRepository : beansOfType.values()) {
             if (abstractWebRepository.isEnableWeb()) {
                 String name = abstractWebRepository.getName();
-                Assert.isTrue(!nameRepositoryMap.containsKey(name), "The same repository name cannot exist!");
-                nameRepositoryMap.putIfAbsent(name, abstractWebRepository);
+                Assert.isTrue(!NAME_REPOSITORY_MAP.containsKey(name), "The same repository name cannot exist!");
+                NAME_REPOSITORY_MAP.putIfAbsent(name, abstractWebRepository);
             }
         }
     }
 
     @PostMapping("/insert/{coating}")
     public ResObject<Object> insert(@PathVariable("repository") String repository, @PathVariable("coating") String coating, @RequestBody String message) {
-        AbstractWebRepository<Object, Object> abstractWebRepository = nameRepositoryMap.get(repository);
+        AbstractWebRepository<Object, Object> abstractWebRepository = NAME_REPOSITORY_MAP.get(repository);
         if (abstractWebRepository == null) {
             return ResObject.failMsg("The repository does not exist!");
         }
@@ -80,7 +80,7 @@ public class RepositoryController implements ApplicationContextAware, Initializi
         pageNum = pageNum == null || pageNum <= 0 ? 1 : pageNum;
         pageSize = pageSize == null || pageSize > 100 ? 10 : pageSize;
 
-        AbstractWebRepository<Object, Object> abstractWebRepository = nameRepositoryMap.get(repository);
+        AbstractWebRepository<Object, Object> abstractWebRepository = NAME_REPOSITORY_MAP.get(repository);
         if (abstractWebRepository == null) {
             return ResObject.failMsg("The repository does not exist!");
         }
@@ -107,7 +107,7 @@ public class RepositoryController implements ApplicationContextAware, Initializi
 
     @PostMapping("/update/{coating}")
     public ResObject<Object> update(@PathVariable("repository") String repository, @PathVariable("coating") String coating, @RequestBody String message) {
-        AbstractWebRepository<Object, Object> abstractWebRepository = nameRepositoryMap.get(repository);
+        AbstractWebRepository<Object, Object> abstractWebRepository = NAME_REPOSITORY_MAP.get(repository);
         if (abstractWebRepository == null) {
             return ResObject.failMsg("The repository does not exist!");
         }
@@ -135,7 +135,7 @@ public class RepositoryController implements ApplicationContextAware, Initializi
 
     @GetMapping("/delete/{id}")
     public ResObject<Object> delete(@PathVariable("repository") String repository, @PathVariable("id") Integer id) {
-        AbstractWebRepository<Object, Object> abstractWebRepository = nameRepositoryMap.get(repository);
+        AbstractWebRepository<Object, Object> abstractWebRepository = NAME_REPOSITORY_MAP.get(repository);
         if (abstractWebRepository == null) {
             return ResObject.failMsg("The repository does not exist!");
         }

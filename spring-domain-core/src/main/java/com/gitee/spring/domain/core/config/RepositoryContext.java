@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class RepositoryContext implements ApplicationContextAware, InitializingBean {
 
-    private static final Map<Class<?>, AbstractGenericRepository<?, ?>> CLASS_REPOSITORY_MAP = new ConcurrentHashMap<>();
+    public static final Map<Class<?>, AbstractGenericRepository<?, ?>> CLASS_REPOSITORY_MAP = new ConcurrentHashMap<>();
     private ApplicationContext applicationContext;
 
     @Override
