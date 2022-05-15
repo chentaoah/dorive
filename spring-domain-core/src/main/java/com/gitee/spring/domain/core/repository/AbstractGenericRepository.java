@@ -6,7 +6,6 @@ import com.gitee.spring.domain.core.api.Constants;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.EntityProperty;
 import com.gitee.spring.domain.core.entity.*;
-import com.gitee.spring.domain.core.utils.ReflectUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
 
 import java.util.Collection;
@@ -17,20 +16,15 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     @Override
     @SuppressWarnings("unchecked")
     public E selectByPrimaryKey(BoundedContext boundedContext, PK primaryKey) {
-        Object rootEntity;
-        if (rootRepository != null) {
-            rootEntity = rootRepository.selectByPrimaryKey(boundedContext, primaryKey);
-        } else {
-            rootEntity = ReflectUtils.newInstance(entityCtor, null);
-        }
+        Object rootEntity = rootRepository.selectByPrimaryKey(boundedContext, primaryKey);
         handleRootEntity(boundedContext, rootEntity);
         return (E) rootEntity;
     }
 
     protected void handleRootEntity(BoundedContext boundedContext, Object rootEntity) {
         if (rootEntity == null) return;
-        AbstractDelegateRepository<?, ?> delegateRepository = adaptiveRepository(rootEntity);
-        for (ConfiguredRepository configuredRepository : delegateRepository.getSubRepositories()) {
+        AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(rootEntity);
+        for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getSubRepositories()) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
             EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityPropertyChain();
             Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
@@ -100,7 +94,6 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     @Override
     @SuppressWarnings("unchecked")
     public List<E> selectByExample(BoundedContext boundedContext, Object example) {
-        Assert.notNull(rootRepository, "Aggregation root is not annotated by @Entity, please use the [findByPrimaryKey] method.");
         List<?> entities = rootRepository.selectByExample(boundedContext, example);
         entities.forEach(entity -> handleRootEntity(boundedContext, entity));
         return (List<E>) entities;
@@ -108,7 +101,6 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
 
     @Override
     public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
-        Assert.notNull(rootRepository, "Aggregation root is not annotated by @Entity, please use the [findByPrimaryKey] method.");
         T dataPage = rootRepository.selectPageByExample(boundedContext, example, page);
         EntityMapper entityMapper = rootRepository.getEntityMapper();
         List<?> entities = entityMapper.getDataFromPage(dataPage);
@@ -120,8 +112,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     public int insert(BoundedContext boundedContext, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
         int count = 0;
-        AbstractDelegateRepository<?, ?> delegateRepository = adaptiveRepository(entity);
-        for (ConfiguredRepository configuredRepository : delegateRepository.getOrderedRepositories()) {
+        AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(entity);
+        for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getOrderedRepositories()) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null && isMatchScenes(configuredRepository, boundedContext)) {
@@ -167,8 +159,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     public int update(BoundedContext boundedContext, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
         int count = 0;
-        AbstractDelegateRepository<?, ?> delegateRepository = adaptiveRepository(entity);
-        for (ConfiguredRepository configuredRepository : delegateRepository.getOrderedRepositories()) {
+        AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(entity);
+        for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getOrderedRepositories()) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null && isMatchScenes(configuredRepository, boundedContext)) {
@@ -193,8 +185,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     public int delete(BoundedContext boundedContext, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
         int count = 0;
-        AbstractDelegateRepository<?, ?> delegateRepository = adaptiveRepository(entity);
-        for (ConfiguredRepository configuredRepository : delegateRepository.getOrderedRepositories()) {
+        AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(entity);
+        for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getOrderedRepositories()) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null && isMatchScenes(configuredRepository, boundedContext)) {

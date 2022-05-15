@@ -72,6 +72,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         resolveRootRepository(entityClass);
+        Assert.notNull(rootRepository, "The root repository does not exist!");
         List<Class<?>> superClasses = ReflectUtils.getAllSuperClasses(entityClass, Object.class);
         superClasses.add(entityClass);
         superClasses.forEach(clazz -> resolveSubRepositories("/", clazz));
