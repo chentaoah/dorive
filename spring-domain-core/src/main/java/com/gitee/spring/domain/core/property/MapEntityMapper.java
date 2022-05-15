@@ -49,6 +49,7 @@ public class MapEntityMapper implements EntityMapper {
                 parameterMap.put("id", -1);
                 return;
             }
+            fieldValue = fieldValues;
         }
         parameterMap.put(fieldName, fieldValue);
     }
