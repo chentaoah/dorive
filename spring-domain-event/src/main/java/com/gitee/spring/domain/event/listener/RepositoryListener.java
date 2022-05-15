@@ -11,6 +11,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import java.util.ArrayList;
@@ -32,7 +33,9 @@ public class RepositoryListener implements ApplicationListener<RepositoryEvent>,
     @Override
     public void afterPropertiesSet() {
         Map<String, EventListener> entityListenerMap = applicationContext.getBeansOfType(EventListener.class);
-        for (EventListener eventListener : entityListenerMap.values()) {
+        List<EventListener> orderedEventListeners = new ArrayList<>(entityListenerMap.values());
+        orderedEventListeners.sort(new AnnotationAwareOrderComparator());
+        for (EventListener eventListener : orderedEventListeners) {
             EntityListener entityListener = AnnotationUtils.getAnnotation(eventListener.getClass(), EntityListener.class);
             if (entityListener != null) {
                 Class<?> entityClass = entityListener.value();
