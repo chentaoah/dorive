@@ -108,11 +108,8 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                 return;
             }
 
-            List<Object> entities;
-            if (entityExample.isEmptyQuery()) {
-                entities = Collections.emptyList();
-
-            } else {
+            List<Object> entities = Collections.emptyList();
+            if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
                 entityExample.setColumns(columns);
                 entities = queryRepository.selectByExample(boundedContext, entityExample.buildExample());
                 log.debug("The data queried is: {}", entities);
