@@ -4,7 +4,7 @@ import cn.hutool.core.lang.Assert;
 import com.alibaba.fastjson.JSON;
 import com.gitee.spring.domain.coating.api.CoatingAssembler;
 import com.gitee.spring.domain.coating.entity.CoatingDefinition;
-import com.gitee.spring.domain.coating.property.DefaultCoatingAssembler;
+import com.gitee.spring.domain.coating.impl.DefaultCoatingAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;

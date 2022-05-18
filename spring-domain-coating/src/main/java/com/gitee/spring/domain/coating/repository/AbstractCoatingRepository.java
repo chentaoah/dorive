@@ -9,7 +9,7 @@ import com.gitee.spring.domain.coating.annotation.Property;
 import com.gitee.spring.domain.coating.api.CoatingAssembler;
 import com.gitee.spring.domain.coating.api.CustomAssembler;
 import com.gitee.spring.domain.coating.entity.CoatingDefinition;
-import com.gitee.spring.domain.coating.property.DefaultCoatingAssembler;
+import com.gitee.spring.domain.coating.impl.DefaultCoatingAssembler;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.utils.ResourceUtils;
 import com.gitee.spring.domain.core.api.Constants;

@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.coating.property;
+package com.gitee.spring.domain.coating.impl;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.spring.domain.coating.api.CoatingAssembler;

@@ -6,7 +6,7 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.spring.domain.coating.entity.Criterion;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
-import com.gitee.spring.domain.coating.property.DefaultCoatingAssembler;
+import com.gitee.spring.domain.coating.impl.DefaultCoatingAssembler;
 import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.*;
