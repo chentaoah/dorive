@@ -3,9 +3,11 @@ package com.gitee.spring.domain.core.repository;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.EntityAssembler;
+import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
+import com.gitee.spring.domain.core.entity.EntityExample;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 
 import java.util.ArrayList;
@@ -87,9 +89,10 @@ public class DefaultRepository extends ConfiguredRepository {
         if (primaryKey != null) {
             Object persistentObject = entityAssembler.disassemble(entityDefinition, boundedContext, entity);
             if (persistentObject != null) {
-                Object example = entityMapper.newExample(boundedContext);
-                entityMapper.addToExample(example, "id", primaryKey);
-                return super.updateByExample(persistentObject, example);
+                EntityExample entityExample = entityMapper.newExample(entityDefinition, boundedContext);
+                EntityCriterion entityCriterion = entityMapper.newEqualsCriterion("id", primaryKey);
+                entityExample.addCriterion(entityCriterion);
+                return super.updateByExample(persistentObject, entityExample.buildExample());
             }
         }
         return 0;

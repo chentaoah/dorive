@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core.property;
+package com.gitee.spring.domain.core.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core.api.EntityAssembler;

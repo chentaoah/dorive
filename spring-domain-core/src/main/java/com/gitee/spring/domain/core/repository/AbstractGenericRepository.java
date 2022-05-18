@@ -3,6 +3,7 @@ package com.gitee.spring.domain.core.repository;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.Constants;
+import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.EntityProperty;
 import com.gitee.spring.domain.core.entity.*;
@@ -29,12 +30,14 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityPropertyChain();
             Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
             if (lastEntity != null && isMatchScenes(configuredRepository, boundedContext)) {
-                Object example = newExampleByContext(configuredRepository, boundedContext, rootEntity);
-                List<?> entities = configuredRepository.selectByExample(boundedContext, example);
-                Object entity = convertManyToOneEntity(configuredRepository, entities);
-                if (entity != null) {
-                    EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
-                    entityProperty.setValue(lastEntity, entity);
+                EntityExample entityExample = newExampleByContext(configuredRepository, boundedContext, rootEntity);
+                if (entityExample.isDirtyQuery()) {
+                    List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample.buildExample());
+                    Object entity = convertManyToOneEntity(configuredRepository, entities);
+                    if (entity != null) {
+                        EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
+                        entityProperty.setValue(lastEntity, entity);
+                    }
                 }
             }
         }
@@ -55,18 +58,19 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         return false;
     }
 
-    protected Object newExampleByContext(ConfiguredRepository configuredRepository, BoundedContext boundedContext, Object rootEntity) {
+    protected EntityExample newExampleByContext(ConfiguredRepository configuredRepository, BoundedContext boundedContext, Object rootEntity) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityMapper entityMapper = configuredRepository.getEntityMapper();
-        Object example = entityMapper.newExample(boundedContext);
+        EntityExample entityExample = entityMapper.newExample(entityDefinition, boundedContext);
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
             Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
             if (boundValue != null) {
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
-                entityMapper.addToExample(example, aliasAttribute, boundValue);
+                EntityCriterion entityCriterion = entityMapper.newEqualsCriterion(aliasAttribute, boundValue);
+                entityExample.addCriterion(entityCriterion);
             }
         }
-        return example;
+        return entityExample;
     }
 
     protected Object getBoundValue(BindingDefinition bindingDefinition, BoundedContext boundedContext, Object rootEntity) {

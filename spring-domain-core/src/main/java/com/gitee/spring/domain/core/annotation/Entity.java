@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.core.annotation;
 
-import com.gitee.spring.domain.core.property.DefaultEntityAssembler;
+import com.gitee.spring.domain.core.impl.DefaultEntityAssembler;
 import com.gitee.spring.domain.core.repository.DefaultRepository;
 
 import java.lang.annotation.*;

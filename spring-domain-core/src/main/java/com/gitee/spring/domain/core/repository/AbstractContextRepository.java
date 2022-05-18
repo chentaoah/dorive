@@ -11,7 +11,7 @@ import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.api.Constants;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
-import com.gitee.spring.domain.core.property.MapEntityMapper;
+import com.gitee.spring.domain.core.impl.MapEntityMapper;
 import com.gitee.spring.domain.core.utils.PathUtils;
 import com.gitee.spring.domain.core.utils.ReflectUtils;
 import lombok.Data;
