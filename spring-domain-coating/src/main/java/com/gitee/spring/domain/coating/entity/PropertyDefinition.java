@@ -18,6 +18,6 @@ public class PropertyDefinition {
     private AnnotationAttributes attributes;
     private String locationAttribute;
     private String aliasAttribute;
-    private boolean bound;
+    private boolean boundLocation;
     private EntityPropertyChain entityPropertyChain;
 }

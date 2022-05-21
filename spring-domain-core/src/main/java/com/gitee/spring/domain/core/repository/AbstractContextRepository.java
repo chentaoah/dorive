@@ -115,8 +115,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 entityPropertyChain.initialize();
                 Set<Binding> fieldBindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(declaredField, Binding.class);
 
-                ConfiguredRepository configuredRepository = newConfiguredRepository(fieldAccessPath, entityPropertyChain,
-                        fieldEntityClass, fieldGenericEntityClass, fieldName, fieldAttributes, fieldBindingAnnotations);
+                ConfiguredRepository configuredRepository = newConfiguredRepository(
+                        fieldAccessPath, entityPropertyChain,
+                        fieldEntityClass, fieldGenericEntityClass, fieldName,
+                        fieldAttributes, fieldBindingAnnotations);
 
                 configuredRepositoryMap.put(fieldAccessPath, configuredRepository);
                 subRepositories.add(configuredRepository);
@@ -136,9 +138,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     @SuppressWarnings("unchecked")
-    protected ConfiguredRepository newConfiguredRepository(String accessPath, EntityPropertyChain entityPropertyChain, Class<?> entityClass,
-                                                           Class<?> genericEntityClass, String fieldName, AnnotationAttributes attributes,
-                                                           Set<Binding> bindingAnnotations) {
+    protected ConfiguredRepository newConfiguredRepository(String accessPath, EntityPropertyChain entityPropertyChain,
+                                                           Class<?> entityClass, Class<?> genericEntityClass, String fieldName,
+                                                           AnnotationAttributes attributes, Set<Binding> bindingAnnotations) {
         boolean isRoot = entityPropertyChain == null;
         boolean isCollection = Collection.class.isAssignableFrom(entityClass);
 

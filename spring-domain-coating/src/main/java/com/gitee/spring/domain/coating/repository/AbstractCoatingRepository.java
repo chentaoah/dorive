@@ -75,12 +75,12 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                     AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(declaredField, Property.class);
                     String locationAttribute = null;
                     String aliasAttribute = null;
-                    boolean isBound = false;
+                    boolean isBoundLocation = false;
 
                     if (attributes != null) {
                         locationAttribute = attributes.getString(Constants.LOCATION_ATTRIBUTE);
                         aliasAttribute = attributes.getString(Constants.ALIAS_ATTRIBUTE);
-                        isBound = locationAttribute.startsWith("/");
+                        isBoundLocation = locationAttribute.startsWith("/");
                     }
                     if (StringUtils.isBlank(aliasAttribute)) {
                         aliasAttribute = fieldName;
@@ -88,8 +88,9 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
                     EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
 
-                    PropertyDefinition propertyDefinition = new PropertyDefinition(declaredField, fieldClass, isCollection, genericFieldClass, fieldName,
-                            attributes, locationAttribute, aliasAttribute, isBound, entityPropertyChain);
+                    PropertyDefinition propertyDefinition = new PropertyDefinition(
+                            declaredField, fieldClass, isCollection, genericFieldClass, fieldName,
+                            attributes, locationAttribute, aliasAttribute, isBoundLocation, entityPropertyChain);
 
                     allPropertyDefinitionMap.put(fieldName, propertyDefinition);
 
@@ -97,7 +98,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                         availablePropertyDefinitions.add(propertyDefinition);
                     }
 
-                    if (isBound) {
+                    if (isBoundLocation) {
                         List<PropertyDefinition> propertyDefinitions = locationPropertyDefinitionsMap.computeIfAbsent(locationAttribute, key -> new ArrayList<>());
                         propertyDefinitions.add(propertyDefinition);
                     } else {
