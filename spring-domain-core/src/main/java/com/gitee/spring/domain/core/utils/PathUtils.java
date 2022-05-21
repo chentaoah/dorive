@@ -2,6 +2,8 @@ package com.gitee.spring.domain.core.utils;
 
 import cn.hutool.core.util.URLUtil;
 
+import java.util.Set;
+
 public class PathUtils {
 
     public static String getLastAccessPath(String accessPath) {
@@ -16,6 +18,14 @@ public class PathUtils {
         accessPath = "https://spring-domain" + accessPath;
         accessPath = URLUtil.completeUrl(accessPath, relativePath);
         return accessPath.replace("https://spring-domain", "");
+    }
+
+    public static String getBelongPath(Set<String> allAccessPath, String accessPath) {
+        String lastAccessPath = getLastAccessPath(accessPath);
+        while (!allAccessPath.contains(lastAccessPath) && !"/".equals(lastAccessPath)) {
+            lastAccessPath = PathUtils.getLastAccessPath(lastAccessPath);
+        }
+        return lastAccessPath;
     }
 
 }

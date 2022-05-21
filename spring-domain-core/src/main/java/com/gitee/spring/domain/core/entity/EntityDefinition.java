@@ -16,9 +16,12 @@ public class EntityDefinition {
     private Class<?> genericEntityClass;
     private String fieldName;
     private AnnotationAttributes attributes;
+    private String[] sceneAttribute;
     private Object mapper;
     private Class<?> pojoClass;
     private boolean sameType;
+    private boolean mapAsExample;
+    private int order;
     private List<BindingDefinition> bindingDefinitions;
     private BindingDefinition boundIdBindingDefinition;
 }

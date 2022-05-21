@@ -15,13 +15,13 @@ public @interface Entity {
 
     Class<?> mapper() default Object.class;
 
-    Class<?> assembler() default DefaultEntityAssembler.class;
-
-    Class<?> repository() default DefaultRepository.class;
-
     boolean mapAsExample() default false;
 
     int order() default 0;
+
+    Class<?> assembler() default DefaultEntityAssembler.class;
+
+    Class<?> repository() default DefaultRepository.class;
 
 }
 

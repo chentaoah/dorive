@@ -18,6 +18,7 @@ import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
 import com.gitee.spring.domain.core.repository.AbstractDelegateRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
+import com.gitee.spring.domain.core.utils.PathUtils;
 import com.gitee.spring.domain.event.repository.AbstractEventRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -154,7 +155,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
             String fieldName = entityPropertyChain.getFieldName();
             if (fieldPropertyDefinitionMap.containsKey(fieldName) || entityPropertyChain.isBoundProperty()) {
-                String belongAccessPath = getBelongAccessPath(accessPath);
+                String belongAccessPath = PathUtils.getBelongPath(configuredRepositoryMap.keySet(), accessPath);
                 ConfiguredRepository belongConfiguredRepository = configuredRepositoryMap.get(belongAccessPath);
                 if (belongConfiguredRepository != null) {
                     EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
@@ -206,7 +207,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
             repositoryLocationMap.put(absoluteAccessPath, repositoryLocation);
         }
     }
-    
+
     protected void checkFieldNames(Class<?> coatingClass, Set<String> fieldNames, List<RepositoryLocation> repositoryLocations) {
         Set<String> newFieldNames = new LinkedHashSet<>(fieldNames);
         for (RepositoryLocation repositoryLocation : repositoryLocations) {

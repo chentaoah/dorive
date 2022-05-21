@@ -79,8 +79,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> {
             EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-            AnnotationAttributes attributes = entityDefinition.getAttributes();
-            return attributes.getNumber(Constants.ORDER_ATTRIBUTE).intValue();
+            return entityDefinition.getOrder();
         }));
     }
 
@@ -143,9 +142,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         boolean isRoot = entityPropertyChain == null;
         boolean isCollection = Collection.class.isAssignableFrom(entityClass);
 
+        String[] sceneAttribute = attributes.getStringArray(Constants.SCENE_ATTRIBUTE);
+
         Object mapper = null;
         Class<?> pojoClass = null;
-
         Class<?> mapperClass = attributes.getClass(Constants.MAPPER_ATTRIBUTE);
         if (mapperClass != Object.class) {
             mapper = applicationContext.getBean(mapperClass);
@@ -159,12 +159,15 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 }
             }
         }
+        boolean sameType = genericEntityClass == pojoClass;
+
+        boolean mapAsExample = attributes.getBoolean(Constants.MAP_AS_EXAMPLE_ATTRIBUTE);
+        int order = attributes.getNumber(Constants.ORDER_ATTRIBUTE).intValue();
 
         Class<?> assemblerClass = attributes.getClass(Constants.ASSEMBLER_ATTRIBUTE);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
 
         Object repository = null;
-
         Class<?> repositoryClass = attributes.getClass(Constants.REPOSITORY_ATTRIBUTE);
         if (repositoryClass != DefaultRepository.class) {
             repository = applicationContext.getBean(repositoryClass);
@@ -175,10 +178,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 pojoClass = (Class<?>) actualTypeArgument;
             }
         }
-
-        boolean mapAsExample = attributes.getBoolean(Constants.MAP_AS_EXAMPLE_ATTRIBUTE);
-
-        boolean sameType = genericEntityClass == pojoClass;
 
         List<BindingDefinition> bindingDefinitions = new ArrayList<>();
         BindingDefinition boundIdBindingDefinition = null;
@@ -206,7 +205,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityPropertyChain boundEntityPropertyChain = null;
 
             if (!isFromContext) {
-                belongAccessPath = getBelongAccessPath(bindAttribute);
+                belongAccessPath = PathUtils.getBelongPath(configuredRepositoryMap.keySet(), bindAttribute);
                 belongConfiguredRepository = configuredRepositoryMap.get(belongAccessPath);
                 Assert.notNull(belongConfiguredRepository, "No belong repository found!");
 
@@ -228,12 +227,15 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         }
 
-        if (boundIdBindingDefinition != null && attributes.getNumber(Constants.ORDER_ATTRIBUTE).intValue() == 0) {
-            attributes.put(Constants.ORDER_ATTRIBUTE, -1);
+        if (boundIdBindingDefinition != null && order == 0) {
+            order = -1;
         }
 
-        EntityDefinition entityDefinition = new EntityDefinition(isRoot, accessPath, entityClass, isCollection, genericEntityClass,
-                fieldName, attributes, mapper, pojoClass, sameType, bindingDefinitions, boundIdBindingDefinition);
+        EntityDefinition entityDefinition = new EntityDefinition(
+                isRoot, accessPath,
+                entityClass, isCollection, genericEntityClass, fieldName,
+                attributes, sceneAttribute, mapper, pojoClass, sameType, mapAsExample, order,
+                bindingDefinitions, boundIdBindingDefinition);
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {
@@ -248,16 +250,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return newConfiguredRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, (AbstractRepository<Object, Object>) repository);
     }
 
-    protected String getBelongAccessPath(String accessPath) {
-        String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
-        while (!configuredRepositoryMap.containsKey(lastAccessPath) && !"/".equals(lastAccessPath)) {
-            lastAccessPath = PathUtils.getLastAccessPath(lastAccessPath);
-        }
-        return lastAccessPath;
-    }
-
-    protected ConfiguredRepository newConfiguredRepository(EntityPropertyChain entityPropertyChain, EntityDefinition entityDefinition,
-                                                           EntityMapper entityMapper, EntityAssembler entityAssembler,
+    protected ConfiguredRepository newConfiguredRepository(EntityPropertyChain entityPropertyChain,
+                                                           EntityDefinition entityDefinition,
+                                                           EntityMapper entityMapper,
+                                                           EntityAssembler entityAssembler,
                                                            AbstractRepository<Object, Object> repository) {
         return new ConfiguredRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
     }

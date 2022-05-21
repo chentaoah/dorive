@@ -2,12 +2,10 @@ package com.gitee.spring.domain.core.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.core.api.Constants;
 import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.EntityProperty;
 import com.gitee.spring.domain.core.entity.*;
-import org.springframework.core.annotation.AnnotationAttributes;
 
 import java.util.Collection;
 import java.util.List;
@@ -45,11 +43,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
 
     protected boolean isMatchScenes(ConfiguredRepository configuredRepository, BoundedContext boundedContext) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        AnnotationAttributes attributes = entityDefinition.getAttributes();
-        String[] sceneAttribute = attributes.getStringArray(Constants.SCENE_ATTRIBUTE);
-        if (sceneAttribute.length == 0) {
-            return true;
-        }
+        String[] sceneAttribute = entityDefinition.getSceneAttribute();
+        if (sceneAttribute.length == 0) return true;
         for (String scene : sceneAttribute) {
             if (boundedContext.containsKey(scene)) {
                 return true;
