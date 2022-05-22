@@ -22,3 +22,5 @@ spring:
         pattern: com.company.project.core.extension.**
 ```
 
+![avatar](https://gitee.com/digital-engine/spring-domain/raw/master/static/img/domain.png)
+
