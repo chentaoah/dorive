@@ -1,4 +1,4 @@
-## :sunny:Spring Domain
+## Spring Domain
 
 Spring体系下实现的领域驱动框架。核心功能：
 
@@ -7,13 +7,23 @@ Spring体系下实现的领域驱动框架。核心功能：
 - 领域事件传播
 - 防腐层映射与查询
 
-## :snowflake:领域划分
+## 领域划分
+
+### 示意图
+
+![avatar](https://gitee.com/digital-engine/spring-domain/raw/master/static/img/layer.png)
 
 领域驱动的分层方式，有别于传统的三层。分别为：表现层、应用层、领域层、基础设施层。
 
 基础设施层囊括了之前的持久层。
 
 为了防止应用层跳过领域层，直接调用底层持久层服务，需要先进行领域划分，以此梳理出各个领域之间的关系。
+
+### 示意图
+
+![avatar](https://gitee.com/digital-engine/spring-domain/raw/master/static/img/group.png)
+
+同理，在同一层中，也存在以上的问题。
 
 ### 配置
 
@@ -30,7 +40,4 @@ spring:
         pattern: com.company.project.domain.**
 ```
 
-### 示意图
-
-![avatar](https://gitee.com/digital-engine/spring-domain/raw/master/static/img/layer.png)
-
+### 
