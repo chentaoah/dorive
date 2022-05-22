@@ -1,4 +1,4 @@
-## Spring Domain
+## :sunny:Spring Domain
 
 Spring体系下实现的领域驱动框架。核心功能：
 
@@ -7,20 +7,30 @@ Spring体系下实现的领域驱动框架。核心功能：
 - 领域事件传播
 - 防腐层映射与查询
 
-## 领域定义
+## :snowflake:领域划分
+
+领域驱动的分层方式，有别于传统的三层。分别为：表现层、应用层、领域层、基础设施层。
+
+基础设施层囊括了之前的持久层。
+
+为了防止应用层跳过领域层，直接调用底层持久层服务，需要先进行领域划分，以此梳理出各个领域之间的关系。
+
+### 配置
 
 ```yaml
 spring:
   domain:
     enable: true
-    scan: com.company.project.** # 扫描包名
+    scan: com.company.project.**        # 扫描包名
     domains:
-      - name: core # 领域名称
-        pattern: com.company.project.core.** # 该领域对应的包名
-        protect: com.company.project.core.internal.** # 该领域内不能添加@Root的类型
-      - name: core-extension # 领域名称（core领域的子域）
-        pattern: com.company.project.core.extension.**
+      - name: dal                       # 一个名叫dal的领域
+        pattern: com.company.project.dal.**
+        protect: com.company.project.dal.mapper.** # 该领域内不建议外部直接调用的服务
+      - name: dal-domain                # 一个名叫dal-domain的领域，它是dal的子域
+        pattern: com.company.project.domain.**
 ```
 
-![avatar](https://gitee.com/digital-engine/spring-domain/raw/master/static/img/domain.png)
+### 示意图
+
+![avatar](https://gitee.com/digital-engine/spring-domain/raw/master/static/img/layer.png)
 
