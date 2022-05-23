@@ -39,3 +39,10 @@ spring:
         pattern: com.company.project.service.b.**
         protect: com.company.project.service.b.internal.** # 该领域内不建议外部直接调用的服务
 ```
+
+通过配置，定义了多个领域。分别为：dal、dal-domain、serviceA、serviceB
+
+![avatar](https://gitee.com/digital-engine/spring-domain/raw/master/static/img/divide.png)
+
+
+
