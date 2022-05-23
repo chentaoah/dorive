@@ -7,7 +7,7 @@ Spring体系下实现的领域驱动框架。核心功能：
 - 领域事件传播
 - 防腐层映射与查询
 
-## 领域划分
+## 依赖管理
 
 ### 示意图
 
@@ -18,12 +18,6 @@ Spring体系下实现的领域驱动框架。核心功能：
 基础设施层囊括了之前的持久层。
 
 为了防止应用层跳过领域层，直接调用底层持久层服务，需要先进行领域划分，以此梳理出各个领域之间的关系。
-
-### 示意图
-
-![avatar](https://gitee.com/digital-engine/spring-domain/raw/master/static/img/group.png)
-
-同理，在同一层中，也存在以上的问题。
 
 ### 配置
 
@@ -39,5 +33,3 @@ spring:
       - name: dal-domain                # 一个名叫dal-domain的领域，它是dal的子域
         pattern: com.company.project.domain.**
 ```
-
-### 
