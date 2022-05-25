@@ -10,7 +10,7 @@ import org.springframework.core.annotation.Order;
 public class DomainCoatingConfiguration {
 
     @Bean
-    public EqualEntityCriterionBuilder equalsCriterionBuilder() {
+    public EqualEntityCriterionBuilder equalCriterionBuilder() {
         return new EqualEntityCriterionBuilder();
     }
 
