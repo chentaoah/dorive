@@ -110,7 +110,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     @Override
     public int insert(BoundedContext boundedContext, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        int count = 0;
+        int totalCount = 0;
         AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(entity);
         for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getOrderedRepositories()) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
@@ -119,17 +119,17 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
                 if (targetEntity instanceof Collection) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
                         setBoundValueByContext(configuredRepository, boundedContext, entity, eachEntity);
-                        count += configuredRepository.insert(boundedContext, eachEntity);
+                        totalCount += configuredRepository.insert(boundedContext, eachEntity);
                     }
                 } else {
                     setBoundValueByContext(configuredRepository, boundedContext, entity, targetEntity);
-                    count += configuredRepository.insert(boundedContext, targetEntity);
+                    totalCount += configuredRepository.insert(boundedContext, targetEntity);
                     Object primaryKey = BeanUtil.getFieldValue(targetEntity, "id");
                     setBoundIdForBoundEntity(configuredRepository, entity, primaryKey);
                 }
             }
         }
-        return count;
+        return totalCount;
     }
 
     protected void setBoundValueByContext(ConfiguredRepository configuredRepository, BoundedContext boundedContext, Object rootEntity, Object entity) {
@@ -157,7 +157,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     @Override
     public int update(BoundedContext boundedContext, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        int count = 0;
+        int totalCount = 0;
         AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(entity);
         for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getOrderedRepositories()) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
@@ -165,14 +165,14 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             if (targetEntity != null && isMatchScenes(configuredRepository, boundedContext)) {
                 if (targetEntity instanceof Collection) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
-                        count += configuredRepository.update(boundedContext, eachEntity);
+                        totalCount += configuredRepository.update(boundedContext, eachEntity);
                     }
                 } else {
-                    count += configuredRepository.update(boundedContext, targetEntity);
+                    totalCount += configuredRepository.update(boundedContext, targetEntity);
                 }
             }
         }
-        return count;
+        return totalCount;
     }
 
     @Override
@@ -183,7 +183,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     @Override
     public int delete(BoundedContext boundedContext, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        int count = 0;
+        int totalCount = 0;
         AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(entity);
         for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getOrderedRepositories()) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
@@ -191,14 +191,14 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             if (targetEntity != null && isMatchScenes(configuredRepository, boundedContext)) {
                 if (targetEntity instanceof Collection) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
-                        count += configuredRepository.delete(boundedContext, eachEntity);
+                        totalCount += configuredRepository.delete(boundedContext, eachEntity);
                     }
                 } else {
-                    count += configuredRepository.delete(boundedContext, targetEntity);
+                    totalCount += configuredRepository.delete(boundedContext, targetEntity);
                 }
             }
         }
-        return count;
+        return totalCount;
     }
 
     @Override
