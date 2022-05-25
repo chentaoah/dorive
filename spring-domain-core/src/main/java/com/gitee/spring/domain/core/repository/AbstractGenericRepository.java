@@ -30,7 +30,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             if (lastEntity != null && isMatchScenes(configuredRepository, boundedContext)) {
                 EntityExample entityExample = newExampleByContext(configuredRepository, boundedContext, rootEntity);
                 if (entityExample.isDirtyQuery()) {
-                    List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample.buildExample());
+                    List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample.getBuiltExample());
                     Object entity = convertManyToOneEntity(configuredRepository, entities);
                     if (entity != null) {
                         EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
@@ -61,7 +61,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
             if (boundValue != null) {
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
-                EntityCriterion entityCriterion = entityMapper.newEqualsCriterion(aliasAttribute, boundValue);
+                EntityCriterion entityCriterion = entityMapper.newEqualCriterion(aliasAttribute, boundValue);
                 entityExample.addCriterion(entityCriterion);
             }
         }

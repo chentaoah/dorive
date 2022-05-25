@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Criterion {
+public class ChainCriterion {
     private String definitionAccessPath;
     private ConfiguredRepository definitionRepository;
     private ConfiguredRepository queryRepository;

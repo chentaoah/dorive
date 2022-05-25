@@ -15,6 +15,8 @@ public @interface Entity {
 
     Class<?> mapper() default Object.class;
 
+    boolean useEntityExample() default false;
+
     boolean mapAsExample() default false;
 
     int order() default 0;

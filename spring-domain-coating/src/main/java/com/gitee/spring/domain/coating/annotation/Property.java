@@ -12,4 +12,6 @@ public @interface Property {
 
     String alias() default "";
 
+    String operator() default "=";
+
 }

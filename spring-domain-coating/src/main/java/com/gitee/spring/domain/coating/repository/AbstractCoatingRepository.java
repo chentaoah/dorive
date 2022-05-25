@@ -7,7 +7,9 @@ import com.gitee.spring.domain.coating.annotation.CoatingScan;
 import com.gitee.spring.domain.coating.annotation.IgnoreProperty;
 import com.gitee.spring.domain.coating.annotation.Property;
 import com.gitee.spring.domain.coating.api.CoatingAssembler;
+import com.gitee.spring.domain.coating.api.EntityCriterionBuilder;
 import com.gitee.spring.domain.coating.api.CustomAssembler;
+import com.gitee.spring.domain.coating.builder.*;
 import com.gitee.spring.domain.coating.entity.CoatingDefinition;
 import com.gitee.spring.domain.coating.impl.DefaultCoatingAssembler;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
@@ -75,22 +77,28 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                     AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(declaredField, Property.class);
                     String locationAttribute = null;
                     String aliasAttribute = null;
+                    String operatorAttribute = null;
                     boolean isBoundLocation = false;
 
                     if (attributes != null) {
                         locationAttribute = attributes.getString(Constants.LOCATION_ATTRIBUTE);
                         aliasAttribute = attributes.getString(Constants.ALIAS_ATTRIBUTE);
+                        operatorAttribute = attributes.getString(Constants.OPERATOR_ATTRIBUTE);
                         isBoundLocation = locationAttribute.startsWith("/");
                     }
                     if (StringUtils.isBlank(aliasAttribute)) {
                         aliasAttribute = fieldName;
                     }
 
+                    EntityCriterionBuilder entityCriterionBuilder = getEntityCriterionBuilder(operatorAttribute);
+                    Assert.notNull(entityCriterionBuilder, "The builder of criterion cannot be null!");
+
                     EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
 
                     PropertyDefinition propertyDefinition = new PropertyDefinition(
                             declaredField, fieldClass, isCollection, genericFieldClass, fieldName,
-                            attributes, locationAttribute, aliasAttribute, isBoundLocation, entityPropertyChain);
+                            attributes, locationAttribute, aliasAttribute, operatorAttribute,
+                            isBoundLocation, entityCriterionBuilder, entityPropertyChain);
 
                     allPropertyDefinitionMap.put(fieldName, propertyDefinition);
 
@@ -131,6 +139,25 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                 nameCoatingAssemblerMap.putIfAbsent(name, coatingAssembler);
             }
         }
+    }
+
+    protected EntityCriterionBuilder getEntityCriterionBuilder(String operatorAttribute) {
+        if ("=".equals(operatorAttribute)) {
+            return applicationContext.getBean(EqualEntityCriterionBuilder.class);
+
+        } else if (">".equals(operatorAttribute)) {
+            return applicationContext.getBean(GreaterThanEntityCriterionBuilder.class);
+
+        } else if (">=".equals(operatorAttribute)) {
+            return applicationContext.getBean(GreaterThanOrEqualEntityCriterionBuilder.class);
+
+        } else if ("<".equals(operatorAttribute)) {
+            return applicationContext.getBean(LessThanEntityCriterionBuilder.class);
+
+        } else if ("<=".equals(operatorAttribute)) {
+            return applicationContext.getBean(LessThanOrEqualEntityCriterionBuilder.class);
+        }
+        return null;
     }
 
     protected void collectRepositoryLocationMap(Map<String, RepositoryLocation> repositoryLocationMap,

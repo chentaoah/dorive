@@ -90,9 +90,9 @@ public class DefaultRepository extends ConfiguredRepository {
             Object persistentObject = entityAssembler.disassemble(entityDefinition, boundedContext, entity);
             if (persistentObject != null) {
                 EntityExample entityExample = entityMapper.newExample(entityDefinition, boundedContext);
-                EntityCriterion entityCriterion = entityMapper.newEqualsCriterion("id", primaryKey);
+                EntityCriterion entityCriterion = entityMapper.newEqualCriterion("id", primaryKey);
                 entityExample.addCriterion(entityCriterion);
-                return super.updateByExample(persistentObject, entityExample.buildExample());
+                return super.updateByExample(persistentObject, entityExample.getBuiltExample());
             }
         }
         return 0;

@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core.impl;
+package com.gitee.spring.domain.core.mapper;
 
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.AbstractEntityCriterion;
@@ -7,34 +7,15 @@ import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
 import com.gitee.spring.domain.core.utils.DataUtils;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@Data
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-public class MapEntityMapper implements EntityMapper {
+public class MapEntityMapper extends ProxyEntityMapper {
 
-    protected EntityMapper entityMapper;
-
-    @Override
-    public Object newPage(Integer pageNum, Integer pageSize) {
-        return entityMapper.newPage(pageNum, pageSize);
-    }
-
-    @Override
-    public List<?> getDataFromPage(Object dataPage) {
-        return entityMapper.getDataFromPage(dataPage);
-    }
-
-    @Override
-    public Object newPageOfEntities(Object dataPage, List<Object> entities) {
-        return entityMapper.newPageOfEntities(dataPage, entities);
+    public MapEntityMapper(EntityMapper entityMapper) {
+        super(entityMapper);
     }
 
     @Override
@@ -43,7 +24,7 @@ public class MapEntityMapper implements EntityMapper {
     }
 
     @Override
-    public EntityCriterion newEqualsCriterion(String fieldName, Object fieldValue) {
+    public EntityCriterion newEqualCriterion(String fieldName, Object fieldValue) {
         return new AbstractEntityCriterion(fieldName, fieldValue) {
             @Override
             @SuppressWarnings("unchecked")
@@ -60,6 +41,26 @@ public class MapEntityMapper implements EntityMapper {
                 parameterMap.put(fieldName, fieldValue);
             }
         };
+    }
+
+    @Override
+    public EntityCriterion newGreaterThanCriterion(String fieldName, Object fieldValue) {
+        return newEqualCriterion(fieldName + "::GreaterThan", fieldValue);
+    }
+
+    @Override
+    public EntityCriterion newGreaterThanOrEqualCriterion(String fieldName, Object fieldValue) {
+        return newEqualCriterion(fieldName + "::GreaterThanOrEqual", fieldValue);
+    }
+
+    @Override
+    public EntityCriterion newLessThanCriterion(String fieldName, Object fieldValue) {
+        return newEqualCriterion(fieldName + "::LessThan", fieldValue);
+    }
+
+    @Override
+    public EntityCriterion newLessThanOrEqualCriterion(String fieldName, Object fieldValue) {
+        return newEqualCriterion(fieldName + "::LessThanOrEqual", fieldValue);
     }
 
 }

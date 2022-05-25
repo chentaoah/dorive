@@ -11,7 +11,8 @@ import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.api.Constants;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
-import com.gitee.spring.domain.core.impl.MapEntityMapper;
+import com.gitee.spring.domain.core.mapper.MapEntityMapper;
+import com.gitee.spring.domain.core.mapper.NoBuiltEntityMapper;
 import com.gitee.spring.domain.core.utils.PathUtils;
 import com.gitee.spring.domain.core.utils.ReflectUtils;
 import lombok.Data;
@@ -163,6 +164,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
         boolean sameType = genericEntityClass == pojoClass;
 
+        boolean useEntityExample = attributes.getBoolean(Constants.USE_ENTITY_EXAMPLE_ATTRIBUTE);
         boolean mapAsExample = attributes.getBoolean(Constants.MAP_AS_EXAMPLE_ATTRIBUTE);
         int order = attributes.getNumber(Constants.ORDER_ATTRIBUTE).intValue();
 
@@ -236,12 +238,15 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         EntityDefinition entityDefinition = new EntityDefinition(
                 isRoot, accessPath,
                 entityClass, isCollection, genericEntityClass, fieldName,
-                attributes, sceneAttribute, mapper, pojoClass, sameType, mapAsExample, order,
+                attributes, sceneAttribute, mapper, pojoClass, sameType, useEntityExample, mapAsExample, order,
                 bindingDefinitions, boundIdBindingDefinition);
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {
             entityMapper = new MapEntityMapper(entityMapper);
+        }
+        if (useEntityExample) {
+            entityMapper = new NoBuiltEntityMapper(entityMapper);
         }
 
         if (repository == null) {

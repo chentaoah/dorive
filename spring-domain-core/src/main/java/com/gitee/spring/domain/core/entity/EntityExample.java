@@ -10,21 +10,23 @@ import java.util.List;
 public class EntityExample {
 
     protected boolean emptyQuery = false;
-    protected boolean dirtyQuery = false;
-    protected List<String> columns;
     protected Object example;
+    protected List<String> columns;
     protected List<EntityCriterion> entityCriteria = new ArrayList<>();
 
     public EntityExample(Object example) {
         this.example = example;
     }
 
+    public boolean isDirtyQuery() {
+        return entityCriteria.size() > 0;
+    }
+
     public boolean isAllQuery() {
-        return !emptyQuery && !dirtyQuery;
+        return !emptyQuery && !isDirtyQuery();
     }
 
     public void addCriterion(EntityCriterion entityCriterion) {
-        dirtyQuery = true;
         entityCriteria.add(entityCriterion);
     }
 
@@ -35,6 +37,10 @@ public class EntityExample {
             }
         }
         return example;
+    }
+
+    public Object getBuiltExample() {
+        return buildExample();
     }
 
 }

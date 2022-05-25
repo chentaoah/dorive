@@ -20,6 +20,7 @@ public class EntityDefinition {
     private Object mapper;
     private Class<?> pojoClass;
     private boolean sameType;
+    private boolean useEntityExample;
     private boolean mapAsExample;
     private int order;
     private List<BindingDefinition> bindingDefinitions;
