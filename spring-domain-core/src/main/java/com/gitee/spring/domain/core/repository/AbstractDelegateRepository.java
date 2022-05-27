@@ -15,9 +15,7 @@ public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextR
     @Override
     protected EntityPropertyChain newEntityPropertyChain(String accessPath, Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
         EntityPropertyChain entityPropertyChain = super.newEntityPropertyChain(accessPath, lastEntityClass, entityClass, fieldName);
-        if (!fieldEntityPropertyChainMap.containsKey(fieldName)) {
-            fieldEntityPropertyChainMap.put(fieldName, entityPropertyChain);
-        }
+        fieldEntityPropertyChainMap.putIfAbsent(fieldName, entityPropertyChain);
         return entityPropertyChain;
     }
 
