@@ -85,7 +85,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(entityClass, Entity.class);
         if (attributes != null) {
             Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(entityClass, Binding.class);
-            ConfiguredRepository configuredRepository = newConfiguredRepository("/", null, entityClass, entityClass, null, attributes, bindingAnnotations);
+
+            ConfiguredRepository configuredRepository = newConfiguredRepository(
+                    "/", null,
+                    entityClass, entityClass, null,
+                    attributes, bindingAnnotations);
+
             configuredRepositoryMap.put("/", configuredRepository);
             rootRepository = configuredRepository;
             orderedRepositories.add(configuredRepository);
