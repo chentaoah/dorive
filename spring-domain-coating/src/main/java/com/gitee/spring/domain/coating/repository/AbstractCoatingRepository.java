@@ -236,8 +236,10 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
         if (locationPropertyDefinitionsMap.containsKey(absoluteAccessPath)) {
             List<PropertyDefinition> propertyDefinitions = locationPropertyDefinitionsMap.get(absoluteAccessPath);
-            RepositoryLocation repositoryLocation = new RepositoryLocation(multiAccessPath, parentAccessPath, prefixAccessPath, absoluteAccessPath,
-                    forwardParent, parentConfiguredRepository, abstractDelegateRepository, configuredRepository, propertyDefinitions);
+            RepositoryLocation repositoryLocation = new RepositoryLocation(
+                    multiAccessPath, parentAccessPath, prefixAccessPath, absoluteAccessPath,
+                    forwardParent, parentConfiguredRepository, abstractDelegateRepository, configuredRepository,
+                    propertyDefinitions);
             repositoryLocationMap.put(absoluteAccessPath, repositoryLocation);
         }
     }
