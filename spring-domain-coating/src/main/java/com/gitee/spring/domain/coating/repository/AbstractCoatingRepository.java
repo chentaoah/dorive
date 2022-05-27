@@ -170,7 +170,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
         String parentAccessPath = multiAccessPath.size() > 1 ? StrUtil.join("", multiAccessPath.subList(0, multiAccessPath.size() - 1)) : "";
         String prefixAccessPath = StrUtil.join("", multiAccessPath);
 
-        collectRepositoryLocationByLocationAttribute(
+        collectRepositoryLocationByLocations(
                 repositoryLocationMap, multiAccessPath,
                 parentConfiguredRepository, abstractDelegateRepository, locationPropertyDefinitionsMap,
                 parentAccessPath, prefixAccessPath, rootRepository);
@@ -179,7 +179,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
             String accessPath = entityPropertyChain.getAccessPath();
             ConfiguredRepository configuredRepository = configuredRepositoryMap.get(accessPath);
             if (configuredRepository != null) {
-                collectRepositoryLocationByLocationAttribute(
+                collectRepositoryLocationByLocations(
                         repositoryLocationMap, multiAccessPath,
                         parentConfiguredRepository, abstractDelegateRepository, locationPropertyDefinitionsMap,
                         parentAccessPath, prefixAccessPath, configuredRepository);
@@ -222,14 +222,14 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
         }
     }
 
-    protected void collectRepositoryLocationByLocationAttribute(Map<String, RepositoryLocation> repositoryLocationMap,
-                                                                List<String> multiAccessPath,
-                                                                ConfiguredRepository parentConfiguredRepository,
-                                                                AbstractDelegateRepository<?, ?> abstractDelegateRepository,
-                                                                Map<String, List<PropertyDefinition>> locationPropertyDefinitionsMap,
-                                                                String parentAccessPath,
-                                                                String prefixAccessPath,
-                                                                ConfiguredRepository configuredRepository) {
+    protected void collectRepositoryLocationByLocations(Map<String, RepositoryLocation> repositoryLocationMap,
+                                                        List<String> multiAccessPath,
+                                                        ConfiguredRepository parentConfiguredRepository,
+                                                        AbstractDelegateRepository<?, ?> abstractDelegateRepository,
+                                                        Map<String, List<PropertyDefinition>> locationPropertyDefinitionsMap,
+                                                        String parentAccessPath,
+                                                        String prefixAccessPath,
+                                                        ConfiguredRepository configuredRepository) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         String absoluteAccessPath = prefixAccessPath + entityDefinition.getAccessPath();
         boolean forwardParent = entityDefinition.isRoot() && parentConfiguredRepository != null;
