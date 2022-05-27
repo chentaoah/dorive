@@ -205,7 +205,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     public int deleteByPrimaryKey(PK primaryKey) {
         BoundedContext boundedContext = new BoundedContext();
         E entity = selectByPrimaryKey(boundedContext, primaryKey);
-        return delete(new BoundedContext(), entity);
+        return delete(boundedContext, entity);
     }
 
     @Override
