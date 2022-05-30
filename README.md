@@ -84,10 +84,7 @@ public class Grade {
 ### 创建仓储
 
 ```java
-@Data
 @RootRepository
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class SchoolRepository extends MybatisPlusRepository<School, Integer> {
 }
 ```
