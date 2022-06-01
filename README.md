@@ -122,7 +122,7 @@ public class SchoolServiceImpl implements SchoolService {
     public List<School> querySchoolsByDto(SchoolQuery dto) {
         BoundedContext boundedContext = new BoundedContext();
         EntityExample entityExample = schoolRepository.buildExample(boundedContext, dto);
-        Object example = entityExample.getBuiltExample();
+        Object example = entityExample.buildExample();
 		return schoolRepository.selectByExample(boundedContext, example);
     }
 }
@@ -162,7 +162,7 @@ public class SchoolServiceImpl implements SchoolService {
     public List<School> querySchoolsByDto(SchoolQuery dto) { // 代码没变
         BoundedContext boundedContext = new BoundedContext();
         EntityExample entityExample = schoolRepository.buildExample(boundedContext, dto);
-        Object example = entityExample.getBuiltExample();
+        Object example = entityExample.buildExample();
 		return schoolRepository.selectByExample(boundedContext, example);
     }
 }
