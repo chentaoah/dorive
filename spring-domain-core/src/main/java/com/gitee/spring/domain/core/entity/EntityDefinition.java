@@ -26,7 +26,7 @@ public class EntityDefinition {
     private String orderByDesc;
     private String orderBy;
     private String sort;
-    private int order;
+    private int orderAttribute;
     private List<BindingDefinition> bindingDefinitions;
     private BindingDefinition boundIdBindingDefinition;
 }

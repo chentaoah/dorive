@@ -78,7 +78,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         superClasses.add(entityClass);
         superClasses.forEach(clazz -> resolveSubRepositories("/", clazz));
 
-        orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> configuredRepository.getEntityDefinition().getOrder()));
+        orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> configuredRepository.getEntityDefinition().getOrderAttribute()));
     }
 
     protected void resolveRootRepository(Class<?> entityClass) {
