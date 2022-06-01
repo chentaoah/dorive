@@ -30,7 +30,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             if (lastEntity != null && isMatchScenes(configuredRepository, boundedContext)) {
                 EntityExample entityExample = newExampleByContext(configuredRepository, boundedContext, rootEntity);
                 if (entityExample.isDirtyQuery()) {
-                    List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample.getBuiltExample());
+                    List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample.buildExample());
                     Object entity = convertManyToOneEntity(configuredRepository, entities);
                     if (entity != null) {
                         EntityProperty entityProperty = entityPropertyChain.getEntityProperty();

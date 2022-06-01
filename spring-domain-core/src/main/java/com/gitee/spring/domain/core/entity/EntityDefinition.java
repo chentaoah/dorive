@@ -22,6 +22,10 @@ public class EntityDefinition {
     private boolean sameType;
     private boolean useEntityExample;
     private boolean mapAsExample;
+    private String orderByAsc;
+    private String orderByDesc;
+    private String orderBy;
+    private String sort;
     private int order;
     private List<BindingDefinition> bindingDefinitions;
     private BindingDefinition boundIdBindingDefinition;

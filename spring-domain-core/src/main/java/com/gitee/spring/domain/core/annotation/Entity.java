@@ -19,6 +19,10 @@ public @interface Entity {
 
     boolean mapAsExample() default false;
 
+    String orderByAsc() default "";
+
+    String orderByDesc() default "";
+
     int order() default 0;
 
     Class<?> assembler() default DefaultEntityAssembler.class;

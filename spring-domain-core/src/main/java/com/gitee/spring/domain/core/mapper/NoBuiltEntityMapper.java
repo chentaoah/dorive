@@ -14,10 +14,10 @@ public class NoBuiltEntityMapper extends ProxyEntityMapper {
     @Override
     public EntityExample newExample(EntityDefinition entityDefinition, BoundedContext boundedContext) {
         EntityExample entityExample = super.newExample(entityDefinition, boundedContext);
-        return new EntityExample(entityExample.getExample()) {
+        return new EntityExample(entityExample) {
             @Override
-            public Object getBuiltExample() {
-                return this;
+            public Object buildExample() {
+                return example;
             }
         };
     }

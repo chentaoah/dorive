@@ -13,6 +13,8 @@ public class EntityExample {
     protected Object example;
     protected List<String> columns;
     protected List<EntityCriterion> entityCriteria = new ArrayList<>();
+    protected String orderBy;
+    protected String sort;
 
     public EntityExample(Object example) {
         this.example = example;
@@ -30,17 +32,21 @@ public class EntityExample {
         entityCriteria.add(entityCriterion);
     }
 
-    public Object buildExample() {
+    public EntityExample appendCriteria() {
         if (example != null) {
             for (EntityCriterion entityCriterion : entityCriteria) {
                 entityCriterion.appendTo(this);
             }
         }
-        return example;
+        return this;
     }
 
-    public Object getBuiltExample() {
-        return buildExample();
+    public EntityExample orderBy() {
+        return this;
     }
 
+    public Object buildExample() {
+        return appendCriteria().orderBy().getExample();
+    }
+    
 }

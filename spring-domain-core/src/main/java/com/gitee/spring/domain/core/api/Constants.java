@@ -6,6 +6,8 @@ public interface Constants {
     String MAPPER_ATTRIBUTE = "mapper";
     String USE_ENTITY_EXAMPLE_ATTRIBUTE = "useEntityExample";
     String MAP_AS_EXAMPLE_ATTRIBUTE = "mapAsExample";
+    String ORDER_BY_ASC_ATTRIBUTE = "orderByAsc";
+    String ORDER_BY_DESC_ATTRIBUTE = "orderByDesc";
     String ORDER_ATTRIBUTE = "order";
     String ASSEMBLER_ATTRIBUTE = "assembler";
     String REPOSITORY_ATTRIBUTE = "repository";

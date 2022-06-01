@@ -168,6 +168,20 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         boolean useEntityExample = attributes.getBoolean(Constants.USE_ENTITY_EXAMPLE_ATTRIBUTE);
         boolean mapAsExample = attributes.getBoolean(Constants.MAP_AS_EXAMPLE_ATTRIBUTE);
+
+        String orderByAsc = attributes.getString(Constants.ORDER_BY_ASC_ATTRIBUTE);
+        String orderByDesc = attributes.getString(Constants.ORDER_BY_DESC_ATTRIBUTE);
+        String orderBy = null;
+        String sort = null;
+        if (StringUtils.isNotBlank(orderByAsc)) {
+            orderBy = orderByAsc;
+            sort = "asc";
+        }
+        if (StringUtils.isNotBlank(orderByDesc)) {
+            orderBy = orderByAsc;
+            sort = "desc";
+        }
+
         int order = attributes.getNumber(Constants.ORDER_ATTRIBUTE).intValue();
 
         Class<?> assemblerClass = attributes.getClass(Constants.ASSEMBLER_ATTRIBUTE);
@@ -240,7 +254,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         EntityDefinition entityDefinition = new EntityDefinition(
                 isRoot, accessPath,
                 entityClass, isCollection, genericEntityClass, fieldName,
-                attributes, sceneAttribute, mapper, pojoClass, sameType, useEntityExample, mapAsExample, order,
+                attributes, sceneAttribute, mapper, pojoClass, sameType,
+                useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, order,
                 bindingDefinitions, boundIdBindingDefinition);
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);

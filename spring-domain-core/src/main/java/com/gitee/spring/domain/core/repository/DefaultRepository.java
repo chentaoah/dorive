@@ -92,7 +92,7 @@ public class DefaultRepository extends ConfiguredRepository {
                 EntityExample entityExample = entityMapper.newExample(entityDefinition, boundedContext);
                 EntityCriterion entityCriterion = entityMapper.newEqualCriterion("id", primaryKey);
                 entityExample.addCriterion(entityCriterion);
-                return super.updateByExample(persistentObject, entityExample.getBuiltExample());
+                return super.updateByExample(persistentObject, entityExample.buildExample());
             }
         }
         return 0;
