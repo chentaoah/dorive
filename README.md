@@ -1,91 +1,77 @@
 ## Spring Domain
 
-Spring体系下实现的领域驱动框架。
+框架的目的：只一行代码实现：
 
-## 依赖管理
+- **多表联动新增、删除、更新、查询。**
+- **直接得到实体对象。**
+- **使用DTO查询，表结构改变，代码不用改。**
 
-### 示意图
+## 快速开始
 
-![avatar](https://gitee.com/digital-engine/spring-domain/raw/master/static/img/layer.png)
+![avatar](https://gitee.com/digital-engine/spring-domain/raw/master/static/img/model.png)
 
-领域驱动的分层方式，有别于传统的三层。分别为：表现层、应用层、领域层、基础设施层。
-
-依赖管理包括两方面：
-
-- 跨层级，不建议直接调用。
-- 相同层级间，不建议直接调用内部服务。
-
-### 配置
-
-```yaml
-spring:
-  domain:
-    enable: true
-    scan: com.company.project.**        # 扫描包名
-    domains:
-      - name: dal                       # 一个名叫dal的领域
-        pattern: com.company.project.dal.**
-        protect: com.company.project.dal.mapper.** # 该领域内不建议外部直接调用的服务
-      - name: dal-domain                # 一个名叫dal-domain的领域，它是dal的子域
-        pattern: com.company.project.domain.**
-      - name: serviceA                  # 一个名叫serviceA的领域
-        pattern: com.company.project.service.a.**
-      - name: serviceB                  # 一个名叫serviceB的领域
-        pattern: com.company.project.service.b.**
-        protect: com.company.project.service.b.internal.** # 该领域内不建议外部直接调用的服务
-```
-
-通过配置，定义了多个领域。分别为：dal、dal-domain、serviceA、serviceB
-
-![avatar](https://gitee.com/digital-engine/spring-domain/raw/master/static/img/divide.png)
-
-## 实体映射
-
-### 示意图
-
-![avatar](https://gitee.com/digital-engine/spring-domain/raw/master/static/img/entity.png)
-
-名词解释：
-
-- School（学校）
-- Grade（年级）
-
-一个学校可以包含多个年级，一个年级可以包含多个班级，一个班级又可以包含多个学生。
-
-School实体对象的数据来源于database_school表，但字段无需完全一致。
-
-Grade实体对象的数据来源于database_grade表，但字段无需完全一致。
-
-### 创建模型
+### 创建实体
 
 ```java
 @Data
-@Entity(mapper = DatabaseSchoolMapper.class)
+@Entity(mapper = SysDbSchoolMapper.class)
 public class School {
     private Integer id;
-    private String name;
+    private String schoolName;
     
-    @Entity(mapper = DatabaseGradeMapper.class)
+    @Entity(mapper = SysDbTeacherMapper.class)
     @Binding(field = "schoolId", bind = "./id")
-    private List<Grade> grades;
+    private List<Teacher> teachers;
+    
+    @Entity(repository = ClassRepository.class) // 多层嵌套
+    @Binding(field = "schoolId", bind = "./id")
+    private List<Class> classes;
 }
 ```
 
 ```java
 @Data
-public class Grade {
+public class Teacher {
     private Integer id;
     private Integer schoolId;
-    private String name;
-	private List<Class> classes;
+    private String teacherName;
+	private boolean model; // 是否校内模范
+}
+```
+
+```java
+@Data
+public class Class {
+    private Integer id;
+    private Integer schoolId;
+    private String className;
+    
+    @Entity(mapper = SysDbStudentMapper.class)
+    @Binding(field = "classId", bind = "./id")
+	private List<Student> students;
+}
+```
+
+```java
+@Data
+public class Student {
+    private Integer id;
+    private Integer classId;
+    private String studentName;
 }
 ```
 
 ### 创建仓储
 
 ```java
-@RootRepository
+@RootRepository(scanPackages = "xxx.xxx.xxx.query")
 public class SchoolRepository extends MybatisPlusRepository<School, Integer> {
+}
+```
+
+```java
+@RootRepository
+public class ClassRepository extends MybatisPlusRepository<Class, Integer> {
 }
 ```
 
@@ -105,7 +91,80 @@ public class SchoolServiceImpl implements SchoolService {
 }
 ```
 
-执行逻辑：
+## 动态查询
 
-- DatabaseSchoolMapper根据id，查询出DatabaseSchool实例，并映射到School实体上。
-- DatabaseGradeMapper再根据School实体的id，查询出DatabaseGrade实例，并映射到Grade实体上。
+### 创建查询
+
+```java
+package xxx.xxx.xxx.query;
+
+@Data
+public class SchoolQuery {
+    private String schoolName;
+    private String teacherName;
+    private String className;
+    private String studentName;
+    private Boolean model; // 是否校内模范
+}
+```
+
+### 调用仓储
+
+```java
+@Service
+@AllArgsConstructor
+public class SchoolServiceImpl implements SchoolService {
+
+    private final SchoolRepository schoolRepository;
+
+    @Override
+    public List<School> querySchoolsByDto(SchoolQuery dto) {
+        BoundedContext boundedContext = new BoundedContext();
+        EntityExample entityExample = schoolRepository.buildExample(boundedContext, dto);
+        Object example = entityExample.getBuiltExample();
+		return schoolRepository.selectByExample(boundedContext, example);
+    }
+}
+```
+
+### 实体变更
+
+![avatar](https://gitee.com/digital-engine/spring-domain/raw/master/static/img/modify.png)
+
+```java
+@Data
+public class Teacher {
+    private Integer id;
+    private Integer schoolId;
+    private String teacherName;
+}
+```
+
+```java
+@Data
+public class Student {
+    private Integer id;
+    private Integer classId;
+    private String studentName;
+    private boolean model; // 是否校内模范
+}
+```
+
+```java
+@Service
+@AllArgsConstructor
+public class SchoolServiceImpl implements SchoolService {
+
+    private final SchoolRepository schoolRepository;
+
+    @Override
+    public List<School> querySchoolsByDto(SchoolQuery dto) { // 代码没变
+        BoundedContext boundedContext = new BoundedContext();
+        EntityExample entityExample = schoolRepository.buildExample(boundedContext, dto);
+        Object example = entityExample.getBuiltExample();
+		return schoolRepository.selectByExample(boundedContext, example);
+    }
+}
+```
+
+### 
