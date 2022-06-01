@@ -41,6 +41,7 @@ public class Teacher {
 
 ```java
 @Data
+@Entity(mapper = SysDbClassMapper.class)
 public class Class {
     private Integer id;
     private Integer schoolId;
@@ -167,4 +168,3 @@ public class SchoolServiceImpl implements SchoolService {
 }
 ```
 
-### 
