@@ -9,15 +9,15 @@ import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
-@Inherited
-@Documented
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
 @Root
 @Repository
 @EnableEvent
 @CoatingScan
 @EnableWeb
+@Inherited
+@Documented
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface RootRepository {
 
     @AliasFor(annotation = Repository.class)

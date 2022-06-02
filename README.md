@@ -66,13 +66,13 @@ public class Student {
 
 ```java
 @RootRepository(scanPackages = "xxx.xxx.xxx.query")
-public class SchoolRepository extends MybatisPlusRepository<School, Integer> {
+public class SchoolRepository extends MybatisPlusGenericRepository<School, Integer> {
 }
 ```
 
 ```java
 @RootRepository
-public class ClassRepository extends MybatisPlusRepository<Class, Integer> {
+public class ClassRepository extends MybatisPlusGenericRepository<Class, Integer> {
 }
 ```
 
