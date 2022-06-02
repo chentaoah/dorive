@@ -84,7 +84,6 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
             EntityMapper entityMapper = queryRepository.getEntityMapper();
 
-            List<String> columns = new ArrayList<>();
             for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
                 if (bindingDefinition.isFromContext()) {
                     Object boundValue = boundedContext.get(bindingDefinition.getBindAttribute());
@@ -102,7 +101,6 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                             break;
                         }
                     }
-                    columns.add(bindingDefinition.getAliasAttribute());
                 }
             }
 
@@ -112,7 +110,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
             List<Object> entities = Collections.emptyList();
             if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
-                entityExample.setColumns(columns);
+                entityExample.setColumns(entityDefinition.getBindingColumns());
                 entities = queryRepository.selectByExample(boundedContext, entityExample.buildExample());
                 log.debug("The data queried is: {}", entities);
             }

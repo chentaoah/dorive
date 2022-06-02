@@ -29,4 +29,5 @@ public class EntityDefinition {
     private int orderAttribute;
     private List<BindingDefinition> bindingDefinitions;
     private BindingDefinition boundIdBindingDefinition;
+    private List<String> bindingColumns;
 }

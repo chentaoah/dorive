@@ -32,6 +32,10 @@ public class EntityExample {
         entityCriteria.add(entityCriterion);
     }
 
+    public EntityExample selectColumns() {
+        return this;
+    }
+
     public EntityExample appendCriteria() {
         if (example != null) {
             for (EntityCriterion entityCriterion : entityCriteria) {
@@ -46,7 +50,7 @@ public class EntityExample {
     }
 
     public Object buildExample() {
-        return appendCriteria().orderBy().getExample();
+        return selectColumns().appendCriteria().orderBy().getExample();
     }
-    
+
 }

@@ -38,12 +38,18 @@ public class MybatisPlusEntityMapper implements EntityMapper {
     public EntityExample newExample(EntityDefinition entityDefinition, BoundedContext boundedContext) {
         EntityExample entityExample = new EntityExample(new QueryWrapper<>()) {
             @Override
-            public Object buildExample() {
-                QueryWrapper<?> queryWrapper = (QueryWrapper<?>) example;
+            public EntityExample selectColumns() {
                 if (columns != null) {
+                    QueryWrapper<?> queryWrapper = (QueryWrapper<?>) example;
                     queryWrapper.select(columns.toArray(new String[0]));
                 }
+                return this;
+            }
+
+            @Override
+            public EntityExample orderBy() {
                 if (orderBy != null && sort != null) {
+                    QueryWrapper<?> queryWrapper = (QueryWrapper<?>) example;
                     if ("asc".equals(sort)) {
                         queryWrapper.orderByAsc(orderBy);
 
@@ -51,7 +57,7 @@ public class MybatisPlusEntityMapper implements EntityMapper {
                         queryWrapper.orderByDesc(orderBy);
                     }
                 }
-                return super.buildExample();
+                return this;
             }
         };
         entityExample.setOrderBy(entityDefinition.getOrderBy());

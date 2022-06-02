@@ -182,7 +182,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             sort = "desc";
         }
 
-        int order = attributes.getNumber(Constants.ORDER_ATTRIBUTE).intValue();
+        int orderAttribute = attributes.getNumber(Constants.ORDER_ATTRIBUTE).intValue();
 
         Class<?> assemblerClass = attributes.getClass(Constants.ASSEMBLER_ATTRIBUTE);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
@@ -201,6 +201,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         List<BindingDefinition> bindingDefinitions = new ArrayList<>();
         BindingDefinition boundIdBindingDefinition = null;
+        List<String> bindingColumns = new ArrayList<>();
         for (Binding bindingAnnotation : bindingAnnotations) {
             AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(bindingAnnotation, false, false);
             String fieldAttribute = bindingAttributes.getString(Constants.FIELD_ATTRIBUTE);
@@ -235,6 +236,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
                 boundEntityPropertyChain.initialize();
                 boundEntityPropertyChain.setBoundProperty(true);
+
+                bindingColumns.add(StrUtil.toUnderlineCase(aliasAttribute));
             }
 
             BindingDefinition bindingDefinition = new BindingDefinition(
@@ -247,16 +250,16 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         }
 
-        if (boundIdBindingDefinition != null && order == 0) {
-            order = -1;
+        if (boundIdBindingDefinition != null && orderAttribute == 0) {
+            orderAttribute = -1;
         }
 
         EntityDefinition entityDefinition = new EntityDefinition(
                 isRoot, accessPath,
                 entityClass, isCollection, genericEntityClass, fieldName,
                 attributes, sceneAttribute, mapper, pojoClass, sameType,
-                useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, order,
-                bindingDefinitions, boundIdBindingDefinition);
+                useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
+                bindingDefinitions, boundIdBindingDefinition, bindingColumns);
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {
