@@ -77,7 +77,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                     AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(declaredField, Property.class);
                     String locationAttribute = null;
                     String aliasAttribute = null;
-                    String operatorAttribute = null;
+                    String operatorAttribute = "=";
                     boolean isBoundLocation = false;
 
                     if (attributes != null) {
