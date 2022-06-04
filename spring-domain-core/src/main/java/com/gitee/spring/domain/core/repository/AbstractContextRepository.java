@@ -28,6 +28,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -110,7 +111,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 fieldGenericEntityClass = (Class<?>) actualTypeArgument;
             }
 
-            EntityPropertyChain entityPropertyChain = newEntityPropertyChain(fieldAccessPath, entityClass, fieldEntityClass, fieldName);
+            EntityPropertyChain entityPropertyChain = newEntityPropertyChain(
+                    entityClass, declaredField, fieldAccessPath, fieldEntityClass, fieldName);
             entityPropertyChainMap.put(fieldAccessPath, entityPropertyChain);
 
             AnnotationAttributes fieldAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(declaredField, Entity.class);
@@ -134,10 +136,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         });
     }
 
-    protected EntityPropertyChain newEntityPropertyChain(String accessPath, Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
+    protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass, Field declaredField,
+                                                         String accessPath, Class<?> entityClass, String fieldName) {
         String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
         EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
-        return new EntityPropertyChain(lastEntityPropertyChain, accessPath, lastEntityClass, entityClass, fieldName, null, false);
+        return new EntityPropertyChain(lastEntityPropertyChain, lastEntityClass, declaredField,
+                accessPath, entityClass, fieldName, null, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -149,9 +153,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         String[] sceneAttribute = attributes.getStringArray(Constants.SCENE_ATTRIBUTE);
 
+        Class<?> mapperClass = attributes.getClass(Constants.MAPPER_ATTRIBUTE);
         Object mapper = null;
         Class<?> pojoClass = null;
-        Class<?> mapperClass = attributes.getClass(Constants.MAPPER_ATTRIBUTE);
         if (mapperClass != Object.class) {
             mapper = applicationContext.getBean(mapperClass);
             Type[] genericInterfaces = mapperClass.getGenericInterfaces();
@@ -165,6 +169,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         }
         boolean sameType = genericEntityClass == pojoClass;
+        Class<?> mappedClass = pojoClass != null ? pojoClass : genericEntityClass;
 
         boolean useEntityExample = attributes.getBoolean(Constants.USE_ENTITY_EXAMPLE_ATTRIBUTE);
         boolean mapAsExample = attributes.getBoolean(Constants.MAP_AS_EXAMPLE_ATTRIBUTE);
@@ -187,29 +192,22 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Class<?> assemblerClass = attributes.getClass(Constants.ASSEMBLER_ATTRIBUTE);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
 
-        Object repository = null;
         Class<?> repositoryClass = attributes.getClass(Constants.REPOSITORY_ATTRIBUTE);
-        if (repositoryClass != DefaultRepository.class) {
-            repository = applicationContext.getBean(repositoryClass);
-            if (pojoClass == null) {
-                Type genericSuperclass = repositoryClass.getGenericSuperclass();
-                ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
-                Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-                pojoClass = (Class<?>) actualTypeArgument;
-            }
-        }
+        Object repository = repositoryClass != DefaultRepository.class ? applicationContext.getBean(repositoryClass) : null;
 
         List<BindingDefinition> bindingDefinitions = new ArrayList<>();
         BindingDefinition boundIdBindingDefinition = null;
         List<String> bindingColumns = new ArrayList<>();
         for (Binding bindingAnnotation : bindingAnnotations) {
-            AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(bindingAnnotation, false, false);
+            AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(
+                    bindingAnnotation, false, false);
             String fieldAttribute = bindingAttributes.getString(Constants.FIELD_ATTRIBUTE);
-            String aliasAttribute = bindingAttributes.getString(Constants.ALIAS_ATTRIBUTE);
+            String fieldAliasAttribute = bindingAttributes.getString(Constants.FIELD_ALIAS_ATTRIBUTE);
             String bindAttribute = bindingAttributes.getString(Constants.BIND_ATTRIBUTE);
+            String bindAliasAttribute = bindingAttributes.getString(Constants.BIND_ALIAS_ATTRIBUTE);
 
-            if (StringUtils.isBlank(aliasAttribute)) {
-                aliasAttribute = fieldAttribute;
+            if (StringUtils.isBlank(fieldAliasAttribute)) {
+                fieldAliasAttribute = fieldAttribute;
             }
 
             if (bindAttribute.startsWith(".")) {
@@ -237,11 +235,17 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 boundEntityPropertyChain.initialize();
                 boundEntityPropertyChain.setBoundProperty(true);
 
-                bindingColumns.add(StrUtil.toUnderlineCase(aliasAttribute));
+                bindingColumns.add(StrUtil.toUnderlineCase(fieldAliasAttribute));
+            }
+
+            if (StringUtils.isBlank(bindAliasAttribute) && boundFieldName != null) {
+                bindAliasAttribute = boundFieldName;
             }
 
             BindingDefinition bindingDefinition = new BindingDefinition(
-                    bindingAttributes, fieldAttribute, aliasAttribute, bindAttribute, isFromContext, isBoundId,
+                    bindingAttributes,
+                    fieldAttribute, fieldAliasAttribute, bindAttribute, bindAliasAttribute,
+                    isFromContext, isBoundId,
                     belongAccessPath, belongConfiguredRepository, boundFieldName, boundEntityPropertyChain);
             bindingDefinitions.add(bindingDefinition);
 
@@ -257,9 +261,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         EntityDefinition entityDefinition = new EntityDefinition(
                 isRoot, accessPath,
                 entityClass, isCollection, genericEntityClass, fieldName,
-                attributes, sceneAttribute, mapper, pojoClass, sameType,
-                useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
-                bindingDefinitions, boundIdBindingDefinition, bindingColumns);
+                attributes, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
+                useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort,
+                orderAttribute, bindingDefinitions, boundIdBindingDefinition, bindingColumns);
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {
@@ -271,23 +275,22 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         if (repository == null) {
             Assert.isTrue(mapper != Object.class, "The mapper cannot be object class!");
-            repository = new DefaultRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, newRepository(entityDefinition));
+            repository = new DefaultRepository(entityDefinition, entityMapper, entityAssembler, newRepository(entityDefinition));
         }
 
-        return newConfiguredRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, (AbstractRepository<Object, Object>) repository);
-    }
+        ConfiguredRepository configuredRepository = new ConfiguredRepository(
+                entityPropertyChain, entityDefinition, entityMapper, entityAssembler, (AbstractRepository<Object, Object>) repository);
 
-    protected ConfiguredRepository newConfiguredRepository(EntityPropertyChain entityPropertyChain,
-                                                           EntityDefinition entityDefinition,
-                                                           EntityMapper entityMapper,
-                                                           EntityAssembler entityAssembler,
-                                                           AbstractRepository<Object, Object> repository) {
-        return new ConfiguredRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
+        return processConfiguredRepository(configuredRepository);
     }
 
     protected boolean filterEntityClass(Class<?> entityClass) {
         String className = entityClass.getName();
         return className.startsWith("java.lang.") || className.startsWith("java.util.");
+    }
+
+    protected ConfiguredRepository processConfiguredRepository(ConfiguredRepository configuredRepository) {
+        return configuredRepository;
     }
 
     protected abstract EntityMapper newEntityMapper(EntityDefinition entityDefinition);

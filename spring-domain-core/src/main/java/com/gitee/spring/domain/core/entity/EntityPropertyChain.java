@@ -6,13 +6,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
 
+import java.lang.reflect.Field;
+
 @Data
 @AllArgsConstructor
 @ToString(exclude = "lastEntityPropertyChain")
 public class EntityPropertyChain implements EntityProperty {
     private EntityPropertyChain lastEntityPropertyChain;
-    private String accessPath;
     private Class<?> lastEntityClass;
+    private Field declaredField;
+    private String accessPath;
     private Class<?> entityClass;
     private String fieldName;
     private EntityProperty entityProperty;

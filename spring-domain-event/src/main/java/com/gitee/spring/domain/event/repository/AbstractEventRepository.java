@@ -1,13 +1,8 @@
 package com.gitee.spring.domain.event.repository;
 
 import com.gitee.spring.domain.core.repository.AbstractGenericRepository;
-import com.gitee.spring.domain.core.repository.AbstractRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import com.gitee.spring.domain.event.annotation.EnableEvent;
-import com.gitee.spring.domain.core.api.EntityAssembler;
-import com.gitee.spring.domain.core.api.EntityMapper;
-import com.gitee.spring.domain.core.entity.EntityDefinition;
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import org.springframework.core.annotation.AnnotationUtils;
 
 public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepository<E, PK> {
@@ -20,16 +15,10 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
         this.enableEvent = enableEvent != null;
         super.afterPropertiesSet();
     }
-
+    
     @Override
-    protected ConfiguredRepository newConfiguredRepository(EntityPropertyChain entityPropertyChain, EntityDefinition entityDefinition,
-                                                           EntityMapper entityMapper, EntityAssembler entityAssembler,
-                                                           AbstractRepository<Object, Object> repository) {
-        ConfiguredRepository configuredRepository = super.newConfiguredRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
-        if (enableEvent) {
-            configuredRepository = new EventRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, configuredRepository, applicationContext);
-        }
-        return configuredRepository;
+    protected ConfiguredRepository processConfiguredRepository(ConfiguredRepository configuredRepository) {
+        return enableEvent ? new EventRepository(configuredRepository, applicationContext) : super.processConfiguredRepository(configuredRepository);
     }
 
 }

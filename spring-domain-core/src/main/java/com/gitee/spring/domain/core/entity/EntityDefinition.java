@@ -20,6 +20,7 @@ public class EntityDefinition {
     private Object mapper;
     private Class<?> pojoClass;
     private boolean sameType;
+    private Class<?> mappedClass;
     private boolean useEntityExample;
     private boolean mapAsExample;
     private String orderByAsc;

@@ -2,6 +2,7 @@ package com.gitee.spring.domain.core.api;
 
 public interface Constants {
     String NAME_ATTRIBUTE = "name";
+
     String SCENE_ATTRIBUTE = "scene";
     String MAPPER_ATTRIBUTE = "mapper";
     String USE_ENTITY_EXAMPLE_ATTRIBUTE = "useEntityExample";
@@ -11,9 +12,13 @@ public interface Constants {
     String ORDER_ATTRIBUTE = "order";
     String ASSEMBLER_ATTRIBUTE = "assembler";
     String REPOSITORY_ATTRIBUTE = "repository";
+
     String FIELD_ATTRIBUTE = "field";
-    String ALIAS_ATTRIBUTE = "alias";
+    String FIELD_ALIAS_ATTRIBUTE = "fieldAlias";
     String BIND_ATTRIBUTE = "bind";
+    String BIND_ALIAS_ATTRIBUTE = "bindAlias";
+
     String LOCATION_ATTRIBUTE = "location";
+    String ALIAS_ATTRIBUTE = "alias";
     String OPERATOR_ATTRIBUTE = "operator";
 }

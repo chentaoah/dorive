@@ -1,10 +1,8 @@
 package com.gitee.spring.domain.core.repository;
 
-import com.gitee.spring.domain.core.api.EntityAssembler;
-import com.gitee.spring.domain.core.api.EntityMapper;
-import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextRepository<E, PK> {
@@ -13,21 +11,19 @@ public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextR
     protected List<ConfiguredRepository> delegateConfiguredRepositories = new ArrayList<>();
 
     @Override
-    protected EntityPropertyChain newEntityPropertyChain(String accessPath, Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
-        EntityPropertyChain entityPropertyChain = super.newEntityPropertyChain(accessPath, lastEntityClass, entityClass, fieldName);
+    protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass, Field declaredField,
+                                                         String accessPath, Class<?> entityClass, String fieldName) {
+        EntityPropertyChain entityPropertyChain = super.newEntityPropertyChain(lastEntityClass, declaredField, accessPath, entityClass, fieldName);
         fieldEntityPropertyChainMap.putIfAbsent(fieldName, entityPropertyChain);
         return entityPropertyChain;
     }
 
     @Override
-    protected ConfiguredRepository newConfiguredRepository(EntityPropertyChain entityPropertyChain, EntityDefinition entityDefinition,
-                                                           EntityMapper entityMapper, EntityAssembler entityAssembler,
-                                                           AbstractRepository<Object, Object> repository) {
-        ConfiguredRepository configuredRepository = super.newConfiguredRepository(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
-        if (repository instanceof AbstractDelegateRepository) {
+    protected ConfiguredRepository processConfiguredRepository(ConfiguredRepository configuredRepository) {
+        if (configuredRepository.getRepository() instanceof AbstractDelegateRepository) {
             delegateConfiguredRepositories.add(configuredRepository);
         }
-        return configuredRepository;
+        return super.processConfiguredRepository(configuredRepository);
     }
 
     protected AbstractDelegateRepository<?, ?> adaptiveRepository(Object rootEntity) {

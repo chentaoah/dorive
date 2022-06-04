@@ -8,21 +8,26 @@ import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class DefaultRepository extends ConfiguredRepository {
+public class DefaultRepository extends ProxyRepository {
 
-    public DefaultRepository(EntityPropertyChain entityPropertyChain,
-                             EntityDefinition entityDefinition,
+    protected EntityDefinition entityDefinition;
+    protected EntityMapper entityMapper;
+    protected EntityAssembler entityAssembler;
+
+    public DefaultRepository(EntityDefinition entityDefinition,
                              EntityMapper entityMapper,
                              EntityAssembler entityAssembler,
                              AbstractRepository<Object, Object> repository) {
-        super(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
+        super(repository);
+        this.entityDefinition = entityDefinition;
+        this.entityMapper = entityMapper;
+        this.entityAssembler = entityAssembler;
     }
 
     @Override

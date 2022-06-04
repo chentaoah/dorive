@@ -1,9 +1,6 @@
 package com.gitee.spring.domain.event.repository;
 
-import com.gitee.spring.domain.core.api.EntityAssembler;
-import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.*;
-import com.gitee.spring.domain.core.repository.AbstractRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import com.gitee.spring.domain.event.entity.OperationType;
 import com.gitee.spring.domain.event.entity.RepositoryEvent;
@@ -17,13 +14,8 @@ public class EventRepository extends ConfiguredRepository {
 
     protected ApplicationContext applicationContext;
 
-    public EventRepository(EntityPropertyChain entityPropertyChain,
-                           EntityDefinition entityDefinition,
-                           EntityMapper entityMapper,
-                           EntityAssembler entityAssembler,
-                           AbstractRepository<Object, Object> repository,
-                           ApplicationContext applicationContext) {
-        super(entityPropertyChain, entityDefinition, entityMapper, entityAssembler, repository);
+    public EventRepository(ConfiguredRepository configuredRepository, ApplicationContext applicationContext) {
+        super(configuredRepository);
         this.applicationContext = applicationContext;
     }
 

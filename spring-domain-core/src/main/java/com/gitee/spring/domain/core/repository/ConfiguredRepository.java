@@ -28,4 +28,12 @@ public class ConfiguredRepository extends ProxyRepository {
         this.entityAssembler = entityAssembler;
     }
 
+    public ConfiguredRepository(ConfiguredRepository configuredRepository) {
+        super(configuredRepository);
+        this.entityPropertyChain = configuredRepository.getEntityPropertyChain();
+        this.entityDefinition = configuredRepository.getEntityDefinition();
+        this.entityMapper = configuredRepository.getEntityMapper();
+        this.entityAssembler = configuredRepository.getEntityAssembler();
+    }
+
 }

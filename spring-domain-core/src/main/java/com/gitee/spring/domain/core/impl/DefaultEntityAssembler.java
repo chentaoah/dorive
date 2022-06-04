@@ -21,7 +21,7 @@ public class DefaultEntityAssembler implements EntityAssembler {
         if (entityDefinition.isSameType()) {
             return entity;
         } else {
-            return BeanUtil.copyProperties(entity, entityDefinition.getPojoClass());
+            return BeanUtil.copyProperties(entity, entityDefinition.getMappedClass());
         }
     }
 

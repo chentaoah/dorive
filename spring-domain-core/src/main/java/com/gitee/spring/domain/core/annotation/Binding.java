@@ -11,8 +11,10 @@ public @interface Binding {
 
     String field();
 
-    String alias() default "";
+    String fieldAlias() default "";
 
     String bind();
+
+    String bindAlias() default "";
 
 }
