@@ -88,7 +88,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                 if (bindingDefinition.isFromContext()) {
                     Object boundValue = boundedContext.get(bindingDefinition.getBindAttribute());
                     if (boundValue != null) {
-                        EntityCriterion entityCriterion = entityMapper.newEqualCriterion(bindingDefinition.getAliasAttribute(), boundValue);
+                        EntityCriterion entityCriterion = entityMapper.newEqualCriterion(bindingDefinition.getFieldAliasAttribute(), boundValue);
                         entityExample.addCriterion(entityCriterion);
                     }
                 } else {

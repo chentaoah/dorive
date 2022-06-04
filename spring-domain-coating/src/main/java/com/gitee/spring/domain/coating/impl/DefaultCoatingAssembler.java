@@ -17,6 +17,7 @@ public class DefaultCoatingAssembler implements CoatingAssembler {
 
     private CoatingDefinition coatingDefinition;
     private List<PropertyDefinition> availablePropertyDefinitions;
+    private List<RepositoryLocation> repositoryLocations;
     private List<RepositoryLocation> reversedRepositoryLocations;
 
     @Override

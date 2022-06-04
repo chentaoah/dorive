@@ -120,7 +120,8 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
                 List<RepositoryLocation> repositoryLocations = new ArrayList<>(repositoryLocationMap.values());
                 checkFieldNames(coatingClass, allPropertyDefinitionMap.keySet(), repositoryLocations);
-                Collections.reverse(repositoryLocations);
+                List<RepositoryLocation> reversedRepositoryLocations = new ArrayList<>(repositoryLocations);
+                Collections.reverse(reversedRepositoryLocations);
 
                 AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(coatingClass, Coating.class);
                 String name = null;
@@ -132,7 +133,8 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                 }
 
                 CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, attributes, name, allPropertyDefinitionMap);
-                CoatingAssembler coatingAssembler = new DefaultCoatingAssembler(coatingDefinition, availablePropertyDefinitions, repositoryLocations);
+                CoatingAssembler coatingAssembler = new DefaultCoatingAssembler(
+                        coatingDefinition, availablePropertyDefinitions, repositoryLocations, reversedRepositoryLocations);
 
                 classCoatingAssemblerMap.put(coatingClass, coatingAssembler);
                 Assert.isTrue(!nameCoatingAssemblerMap.containsKey(name), "The same coating name cannot exist!");
