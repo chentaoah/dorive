@@ -27,10 +27,7 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.*;
 
 @Data
@@ -88,7 +85,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(entityClass, Binding.class);
 
             ConfiguredRepository configuredRepository = newConfiguredRepository(
-                    "/", null,
+                    "/", entityClass, null,
                     entityClass, entityClass, null,
                     attributes, bindingAnnotations);
 
@@ -121,7 +118,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 Set<Binding> fieldBindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(declaredField, Binding.class);
 
                 ConfiguredRepository configuredRepository = newConfiguredRepository(
-                        fieldAccessPath, entityPropertyChain,
+                        fieldAccessPath, declaredField, entityPropertyChain,
                         fieldEntityClass, fieldGenericEntityClass, fieldName,
                         fieldAttributes, fieldBindingAnnotations);
 
@@ -145,9 +142,14 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     @SuppressWarnings("unchecked")
-    protected ConfiguredRepository newConfiguredRepository(String accessPath, EntityPropertyChain entityPropertyChain,
-                                                           Class<?> entityClass, Class<?> genericEntityClass, String fieldName,
-                                                           AnnotationAttributes attributes, Set<Binding> bindingAnnotations) {
+    protected ConfiguredRepository newConfiguredRepository(String accessPath,
+                                                           AnnotatedElement annotatedElement,
+                                                           EntityPropertyChain entityPropertyChain,
+                                                           Class<?> entityClass,
+                                                           Class<?> genericEntityClass,
+                                                           String fieldName,
+                                                           AnnotationAttributes attributes,
+                                                           Set<Binding> bindingAnnotations) {
         boolean isRoot = entityPropertyChain == null;
         boolean isCollection = Collection.class.isAssignableFrom(entityClass);
 
@@ -259,7 +261,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         EntityDefinition entityDefinition = new EntityDefinition(
-                isRoot, accessPath,
+                isRoot, accessPath, annotatedElement,
                 entityClass, isCollection, genericEntityClass, fieldName,
                 attributes, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort,

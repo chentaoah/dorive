@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.core.annotation.AnnotationAttributes;
 
+import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 
 @Data
@@ -11,6 +12,7 @@ import java.util.List;
 public class EntityDefinition {
     private boolean root;
     private String accessPath;
+    private AnnotatedElement annotatedElement;
     private Class<?> entityClass;
     private boolean collection;
     private Class<?> genericEntityClass;
