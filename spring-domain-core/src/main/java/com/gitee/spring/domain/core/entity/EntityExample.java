@@ -8,6 +8,7 @@ import java.util.List;
 
 @Data
 public class EntityExample {
+
     protected boolean emptyQuery = false;
     protected Object example;
     protected List<String> columns;

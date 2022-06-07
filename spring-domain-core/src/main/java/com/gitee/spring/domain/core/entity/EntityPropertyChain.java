@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 @AllArgsConstructor
 @ToString(exclude = "lastEntityPropertyChain")
 public class EntityPropertyChain implements EntityProperty {
+
     private EntityPropertyChain lastEntityPropertyChain;
     private Class<?> lastEntityClass;
     private Field declaredField;
