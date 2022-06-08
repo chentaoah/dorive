@@ -10,9 +10,8 @@ import org.springframework.core.annotation.AnnotationAttributes;
 public class BindingDefinition {
     private AnnotationAttributes attributes;
     private String fieldAttribute;
-    private String fieldAliasAttribute;
+    private String aliasAttribute;
     private String bindAttribute;
-    private String bindAliasAttribute;
     private boolean fromContext;
     private boolean boundId;
     private String belongAccessPath;

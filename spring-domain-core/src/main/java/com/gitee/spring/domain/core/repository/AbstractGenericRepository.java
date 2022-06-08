@@ -60,8 +60,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
             Object boundValue = getBoundValue(boundedContext, bindingDefinition, rootEntity);
             if (boundValue != null) {
-                String fieldAliasAttribute = bindingDefinition.getFieldAliasAttribute();
-                EntityCriterion entityCriterion = entityMapper.newEqualCriterion(fieldAliasAttribute, boundValue);
+                String aliasAttribute = bindingDefinition.getAliasAttribute();
+                EntityCriterion entityCriterion = entityMapper.newEqualCriterion(aliasAttribute, boundValue);
                 entityExample.addCriterion(entityCriterion);
             }
         }

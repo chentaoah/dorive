@@ -204,12 +204,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(
                     bindingAnnotation, false, false);
             String fieldAttribute = bindingAttributes.getString(Constants.FIELD_ATTRIBUTE);
-            String fieldAliasAttribute = bindingAttributes.getString(Constants.FIELD_ALIAS_ATTRIBUTE);
+            String aliasAttribute = bindingAttributes.getString(Constants.ALIAS_ATTRIBUTE);
             String bindAttribute = bindingAttributes.getString(Constants.BIND_ATTRIBUTE);
-            String bindAliasAttribute = bindingAttributes.getString(Constants.BIND_ALIAS_ATTRIBUTE);
 
-            if (StringUtils.isBlank(fieldAliasAttribute)) {
-                fieldAliasAttribute = fieldAttribute;
+            if (StringUtils.isBlank(aliasAttribute)) {
+                aliasAttribute = fieldAttribute;
             }
 
             if (bindAttribute.startsWith(".")) {
@@ -242,16 +241,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                     boundEntityPropertyChains.add(boundEntityPropertyChain);
                 }
 
-                bindingColumns.add(StrUtil.toUnderlineCase(fieldAliasAttribute));
+                bindingColumns.add(StrUtil.toUnderlineCase(aliasAttribute));
             }
-
-            if (StringUtils.isBlank(bindAliasAttribute) && boundFieldName != null) {
-                bindAliasAttribute = boundFieldName;
-            }
-
+            
             BindingDefinition bindingDefinition = new BindingDefinition(
                     bindingAttributes,
-                    fieldAttribute, fieldAliasAttribute, bindAttribute, bindAliasAttribute,
+                    fieldAttribute, aliasAttribute, bindAttribute,
                     isFromContext, isBoundId,
                     belongAccessPath, belongConfiguredRepository, boundFieldName, boundEntityPropertyChain);
             bindingDefinitions.add(bindingDefinition);
