@@ -2,7 +2,6 @@ package com.gitee.spring.domain.core.repository;
 
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextRepository<E, PK> {
@@ -11,11 +10,10 @@ public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextR
     protected List<ConfiguredRepository> delegateConfiguredRepositories = new ArrayList<>();
 
     @Override
-    protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass, Field declaredField,
-                                                         String accessPath, Class<?> entityClass, String fieldName) {
-        EntityPropertyChain entityPropertyChain = super.newEntityPropertyChain(lastEntityClass, declaredField, accessPath, entityClass, fieldName);
-        fieldEntityPropertyChainMap.putIfAbsent(fieldName, entityPropertyChain);
-        return entityPropertyChain;
+    public void afterPropertiesSet() throws Exception {
+        super.afterPropertiesSet();
+        allEntityPropertyChainMap.values().forEach(entityPropertyChain ->
+                fieldEntityPropertyChainMap.putIfAbsent(entityPropertyChain.getFieldName(), entityPropertyChain));
     }
 
     @Override

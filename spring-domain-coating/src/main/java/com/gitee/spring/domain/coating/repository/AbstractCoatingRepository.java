@@ -120,8 +120,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
                 List<RepositoryLocation> repositoryLocations = new ArrayList<>(repositoryLocationMap.values());
                 checkFieldNames(coatingClass, allPropertyDefinitionMap.keySet(), repositoryLocations);
-                List<RepositoryLocation> reversedRepositoryLocations = new ArrayList<>(repositoryLocations);
-                Collections.reverse(reversedRepositoryLocations);
+                Collections.reverse(repositoryLocations);
 
                 AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(coatingClass, Coating.class);
                 String name = null;
@@ -134,7 +133,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
                 CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, attributes, name, allPropertyDefinitionMap);
                 CoatingAssembler coatingAssembler = new DefaultCoatingAssembler(
-                        coatingDefinition, availablePropertyDefinitions, repositoryLocations, reversedRepositoryLocations);
+                        coatingDefinition, availablePropertyDefinitions, repositoryLocations);
 
                 classCoatingAssemblerMap.put(coatingClass, coatingAssembler);
                 Assert.isTrue(!nameCoatingAssemblerMap.containsKey(name), "The same coating name cannot exist!");
@@ -172,47 +171,36 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
         String parentAccessPath = multiAccessPath.size() > 1 ? StrUtil.join("", multiAccessPath.subList(0, multiAccessPath.size() - 1)) : "";
         String prefixAccessPath = StrUtil.join("", multiAccessPath);
 
-        collectRepositoryLocationByLocations(
-                repositoryLocationMap, multiAccessPath,
-                parentConfiguredRepository, abstractDelegateRepository, locationPropertyDefinitionsMap,
-                parentAccessPath, prefixAccessPath, rootRepository);
+        List<String> finalMultiAccessPath = multiAccessPath;
+        allConfiguredRepositoryMap.forEach((accessPath, configuredRepository) -> {
+            EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
 
-        for (EntityPropertyChain entityPropertyChain : entityPropertyChainMap.values()) {
-            String accessPath = entityPropertyChain.getAccessPath();
-            ConfiguredRepository configuredRepository = configuredRepositoryMap.get(accessPath);
-            if (configuredRepository != null) {
-                collectRepositoryLocationByLocations(
-                        repositoryLocationMap, multiAccessPath,
-                        parentConfiguredRepository, abstractDelegateRepository, locationPropertyDefinitionsMap,
-                        parentAccessPath, prefixAccessPath, configuredRepository);
+            String absoluteAccessPath = prefixAccessPath + entityDefinition.getAccessPath();
+            boolean forwardParent = entityDefinition.isRoot() && parentConfiguredRepository != null;
+
+            List<PropertyDefinition> propertyDefinitions = new ArrayList<>();
+            if (locationPropertyDefinitionsMap.containsKey(absoluteAccessPath)) {
+                propertyDefinitions.addAll(locationPropertyDefinitionsMap.get(absoluteAccessPath));
             }
 
-            String fieldName = entityPropertyChain.getFieldName();
-            if (fieldPropertyDefinitionMap.containsKey(fieldName) || entityPropertyChain.isBoundProperty()) {
-                String belongAccessPath = PathUtils.getBelongPath(configuredRepositoryMap.keySet(), accessPath);
-                ConfiguredRepository belongConfiguredRepository = configuredRepositoryMap.get(belongAccessPath);
-                if (belongConfiguredRepository != null) {
-                    EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
-                    String absoluteAccessPath = prefixAccessPath + entityDefinition.getAccessPath();
-                    boolean forwardParent = entityDefinition.isRoot() && parentConfiguredRepository != null;
+            Set<String> fieldNames = entityDefinition.getFieldNames();
+            List<EntityPropertyChain> boundEntityPropertyChains = entityDefinition.getBoundEntityPropertyChains();
 
-                    if (!repositoryLocationMap.containsKey(absoluteAccessPath)) {
-                        RepositoryLocation repositoryLocation = new RepositoryLocation(
-                                multiAccessPath, parentAccessPath, prefixAccessPath, absoluteAccessPath,
-                                forwardParent, parentConfiguredRepository, abstractDelegateRepository, belongConfiguredRepository,
-                                new ArrayList<>());
-                        repositoryLocationMap.put(absoluteAccessPath, repositoryLocation);
-                    }
-
-                    PropertyDefinition propertyDefinition = fieldPropertyDefinitionMap.get(fieldName);
-                    if (propertyDefinition != null) {
-                        RepositoryLocation repositoryLocation = repositoryLocationMap.get(absoluteAccessPath);
-                        List<PropertyDefinition> propertyDefinitions = repositoryLocation.getCollectedPropertyDefinitions();
-                        propertyDefinitions.add(propertyDefinition);
-                    }
+            for (String fieldName : fieldNames) {
+                PropertyDefinition propertyDefinition = fieldPropertyDefinitionMap.get(fieldName);
+                if (propertyDefinition != null) {
+                    propertyDefinitions.add(propertyDefinition);
                 }
             }
-        }
+
+            if (!propertyDefinitions.isEmpty() || !boundEntityPropertyChains.isEmpty()) {
+                RepositoryLocation repositoryLocation = new RepositoryLocation(
+                        finalMultiAccessPath, parentAccessPath, prefixAccessPath, absoluteAccessPath,
+                        forwardParent, parentConfiguredRepository, abstractDelegateRepository, configuredRepository,
+                        propertyDefinitions);
+                repositoryLocationMap.put(absoluteAccessPath, repositoryLocation);
+            }
+        });
 
         for (ConfiguredRepository configuredRepository : delegateConfiguredRepositories) {
             multiAccessPath = new ArrayList<>(multiAccessPath);
@@ -221,28 +209,6 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
             AbstractDelegateRepository<?, ?> delegateRepository = (AbstractDelegateRepository<?, ?>) configuredRepository.getRepository();
             collectRepositoryLocationMap(repositoryLocationMap, multiAccessPath, configuredRepository, delegateRepository,
                     locationPropertyDefinitionsMap, fieldPropertyDefinitionMap);
-        }
-    }
-
-    protected void collectRepositoryLocationByLocations(Map<String, RepositoryLocation> repositoryLocationMap,
-                                                        List<String> multiAccessPath,
-                                                        ConfiguredRepository parentConfiguredRepository,
-                                                        AbstractDelegateRepository<?, ?> abstractDelegateRepository,
-                                                        Map<String, List<PropertyDefinition>> locationPropertyDefinitionsMap,
-                                                        String parentAccessPath,
-                                                        String prefixAccessPath,
-                                                        ConfiguredRepository configuredRepository) {
-        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        String absoluteAccessPath = prefixAccessPath + entityDefinition.getAccessPath();
-        boolean forwardParent = entityDefinition.isRoot() && parentConfiguredRepository != null;
-
-        if (locationPropertyDefinitionsMap.containsKey(absoluteAccessPath)) {
-            List<PropertyDefinition> propertyDefinitions = locationPropertyDefinitionsMap.get(absoluteAccessPath);
-            RepositoryLocation repositoryLocation = new RepositoryLocation(
-                    multiAccessPath, parentAccessPath, prefixAccessPath, absoluteAccessPath,
-                    forwardParent, parentConfiguredRepository, abstractDelegateRepository, configuredRepository,
-                    propertyDefinitions);
-            repositoryLocationMap.put(absoluteAccessPath, repositoryLocation);
         }
     }
 

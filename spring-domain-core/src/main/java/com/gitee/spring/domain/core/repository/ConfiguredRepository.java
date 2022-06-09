@@ -20,7 +20,6 @@ public class ConfiguredRepository extends ProxyRepository {
     protected EntityDefinition entityDefinition;
     protected EntityMapper entityMapper;
     protected EntityAssembler entityAssembler;
-    protected List<EntityPropertyChain> boundEntityPropertyChains = new ArrayList<>();
 
     public ConfiguredRepository(EntityPropertyChain entityPropertyChain,
                                 EntityDefinition entityDefinition,
@@ -40,7 +39,6 @@ public class ConfiguredRepository extends ProxyRepository {
         this.entityDefinition = configuredRepository.getEntityDefinition();
         this.entityMapper = configuredRepository.getEntityMapper();
         this.entityAssembler = configuredRepository.getEntityAssembler();
-        this.boundEntityPropertyChains = configuredRepository.getBoundEntityPropertyChains();
     }
 
     @Override

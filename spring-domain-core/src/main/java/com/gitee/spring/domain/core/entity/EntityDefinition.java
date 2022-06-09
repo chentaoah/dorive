@@ -6,6 +6,8 @@ import org.springframework.core.annotation.AnnotationAttributes;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -33,4 +35,7 @@ public class EntityDefinition {
     private List<BindingDefinition> bindingDefinitions;
     private BindingDefinition boundIdBindingDefinition;
     private List<String> bindingColumns;
+    private Map<String, EntityPropertyChain> entityPropertyChainMap;
+    private Set<String> fieldNames;
+    private List<EntityPropertyChain> boundEntityPropertyChains;
 }

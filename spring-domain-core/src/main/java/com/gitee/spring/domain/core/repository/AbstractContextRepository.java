@@ -42,8 +42,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected AnnotationAttributes attributes;
     protected String name;
 
-    protected Map<String, EntityPropertyChain> entityPropertyChainMap = new LinkedHashMap<>();
-    protected Map<String, ConfiguredRepository> configuredRepositoryMap = new LinkedHashMap<>();
+    protected Map<String, EntityPropertyChain> allEntityPropertyChainMap = new LinkedHashMap<>();
+    protected Map<String, ConfiguredRepository> allConfiguredRepositoryMap = new LinkedHashMap<>();
 
     protected ConfiguredRepository rootRepository;
     protected List<ConfiguredRepository> subRepositories = new ArrayList<>();
@@ -76,7 +76,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         superClasses.add(entityClass);
         superClasses.forEach(clazz -> resolveSubRepositories("/", clazz));
 
-        orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> configuredRepository.getEntityDefinition().getOrderAttribute()));
+        orderedRepositories.sort(Comparator.comparingInt(
+                configuredRepository -> configuredRepository.getEntityDefinition().getOrderAttribute()));
     }
 
     protected void resolveRootRepository(Class<?> entityClass) {
@@ -89,7 +90,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                     entityClass, entityClass, null,
                     attributes, bindingAnnotations);
 
-            configuredRepositoryMap.put("/", configuredRepository);
+            allConfiguredRepositoryMap.put("/", configuredRepository);
             rootRepository = configuredRepository;
             orderedRepositories.add(configuredRepository);
         }
@@ -108,9 +109,22 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 fieldGenericEntityClass = (Class<?>) actualTypeArgument;
             }
 
+            String belongAccessPath = PathUtils.getBelongPath(allConfiguredRepositoryMap.keySet(), fieldAccessPath);
+            ConfiguredRepository belongConfiguredRepository = allConfiguredRepositoryMap.get(belongAccessPath);
+            Assert.notNull(belongConfiguredRepository, "No belong repository found!");
+            EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
+
+            Map<String, EntityPropertyChain> entityPropertyChainMap = entityDefinition.getEntityPropertyChainMap();
+            EntityPropertyChain relativeEntityPropertyChain = newEntityPropertyChain(
+                    entityPropertyChainMap, entityClass, declaredField, fieldAccessPath, fieldEntityClass, fieldName);
+            entityPropertyChainMap.put(fieldAccessPath, relativeEntityPropertyChain);
+
+            Set<String> fieldNames = entityDefinition.getFieldNames();
+            fieldNames.add(fieldName);
+
             EntityPropertyChain entityPropertyChain = newEntityPropertyChain(
-                    entityClass, declaredField, fieldAccessPath, fieldEntityClass, fieldName);
-            entityPropertyChainMap.put(fieldAccessPath, entityPropertyChain);
+                    allEntityPropertyChainMap, entityClass, declaredField, fieldAccessPath, fieldEntityClass, fieldName);
+            allEntityPropertyChainMap.put(fieldAccessPath, entityPropertyChain);
 
             AnnotationAttributes fieldAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(declaredField, Entity.class);
             if (fieldAttributes != null) {
@@ -122,7 +136,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                         fieldEntityClass, fieldGenericEntityClass, fieldName,
                         fieldAttributes, fieldBindingAnnotations);
 
-                configuredRepositoryMap.put(fieldAccessPath, configuredRepository);
+                allConfiguredRepositoryMap.put(fieldAccessPath, configuredRepository);
                 subRepositories.add(configuredRepository);
                 orderedRepositories.add(configuredRepository);
             }
@@ -133,8 +147,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         });
     }
 
-    protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass, Field declaredField,
-                                                         String accessPath, Class<?> entityClass, String fieldName) {
+    protected EntityPropertyChain newEntityPropertyChain(Map<String, EntityPropertyChain> entityPropertyChainMap,
+                                                         Class<?> lastEntityClass,
+                                                         Field declaredField,
+                                                         String accessPath,
+                                                         Class<?> entityClass,
+                                                         String fieldName) {
         String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
         EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
         return new EntityPropertyChain(lastEntityPropertyChain, lastEntityClass, declaredField,
@@ -203,6 +221,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         for (Binding bindingAnnotation : bindingAnnotations) {
             AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(
                     bindingAnnotation, false, false);
+
             String fieldAttribute = bindingAttributes.getString(Constants.FIELD_ATTRIBUTE);
             String aliasAttribute = bindingAttributes.getString(Constants.ALIAS_ATTRIBUTE);
             String bindAttribute = bindingAttributes.getString(Constants.BIND_ATTRIBUTE);
@@ -225,30 +244,32 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityPropertyChain boundEntityPropertyChain = null;
 
             if (!isFromContext) {
-                belongAccessPath = PathUtils.getBelongPath(configuredRepositoryMap.keySet(), bindAttribute);
-                belongConfiguredRepository = configuredRepositoryMap.get(belongAccessPath);
+                belongAccessPath = PathUtils.getBelongPath(allConfiguredRepositoryMap.keySet(), bindAttribute);
+                belongConfiguredRepository = allConfiguredRepositoryMap.get(belongAccessPath);
                 Assert.notNull(belongConfiguredRepository, "No belong repository found!");
 
                 boundFieldName = PathUtils.getFieldName(bindAttribute);
-                boundEntityPropertyChain = entityPropertyChainMap.get(bindAttribute);
+                boundEntityPropertyChain = allEntityPropertyChainMap.get(bindAttribute);
                 Assert.notNull(boundEntityPropertyChain, "Bound path not available!");
 
                 boundEntityPropertyChain.initialize();
                 boundEntityPropertyChain.setBoundProperty(true);
 
-                List<EntityPropertyChain> boundEntityPropertyChains = belongConfiguredRepository.getBoundEntityPropertyChains();
-                if (!boundEntityPropertyChains.contains(boundEntityPropertyChain)) {
-                    boundEntityPropertyChains.add(boundEntityPropertyChain);
-                }
-
                 bindingColumns.add(StrUtil.toUnderlineCase(aliasAttribute));
+
+                EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
+                Map<String, EntityPropertyChain> entityPropertyChainMap = entityDefinition.getEntityPropertyChainMap();
+                List<EntityPropertyChain> boundEntityPropertyChains = entityDefinition.getBoundEntityPropertyChains();
+                EntityPropertyChain relativeEntityPropertyChain = entityPropertyChainMap.get(bindAttribute);
+                if (!boundEntityPropertyChains.contains(relativeEntityPropertyChain)) {
+                    boundEntityPropertyChains.add(relativeEntityPropertyChain);
+                }
             }
-            
+
             BindingDefinition bindingDefinition = new BindingDefinition(
-                    bindingAttributes,
-                    fieldAttribute, aliasAttribute, bindAttribute,
-                    isFromContext, isBoundId,
-                    belongAccessPath, belongConfiguredRepository, boundFieldName, boundEntityPropertyChain);
+                    bindingAttributes, fieldAttribute, aliasAttribute, bindAttribute,
+                    isFromContext, isBoundId, belongAccessPath, belongConfiguredRepository,
+                    boundFieldName, boundEntityPropertyChain);
             bindingDefinitions.add(bindingDefinition);
 
             if (isBoundId) {
@@ -265,7 +286,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 entityClass, isCollection, genericEntityClass, fieldName,
                 attributes, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort,
-                orderAttribute, bindingDefinitions, boundIdBindingDefinition, bindingColumns);
+                orderAttribute, bindingDefinitions, boundIdBindingDefinition, bindingColumns,
+                new LinkedHashMap<>(), new LinkedHashSet<>(), new ArrayList<>());
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {
