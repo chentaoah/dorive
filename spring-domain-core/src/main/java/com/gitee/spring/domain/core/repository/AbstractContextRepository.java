@@ -303,7 +303,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository(
-                entityPropertyChain, entityDefinition, entityMapper, entityAssembler, (AbstractRepository<Object, Object>) repository);
+                entityPropertyChain, entityDefinition, entityMapper, entityAssembler,
+                (AbstractRepository<Object, Object>) repository);
 
         return processConfiguredRepository(configuredRepository);
     }
