@@ -261,7 +261,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             BindingDefinition bindingDefinition = new BindingDefinition(
                     bindingAttributes, fieldAttribute, aliasAttribute, bindAttribute,
                     isFromContext, isBoundId, belongAccessPath, belongConfiguredRepository,
-                    boundFieldName, boundEntityPropertyChain);
+                    boundFieldName, boundEntityPropertyChain, null);
             bindingDefinitions.add(bindingDefinition);
 
             if (isBoundId) {
@@ -279,7 +279,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 attributes, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort,
                 orderAttribute, bindingDefinitions, boundIdBindingDefinition, bindingColumns,
-                new LinkedHashSet<>(), new LinkedHashMap<>(), new ArrayList<>(), new ArrayList<>());
+                new LinkedHashSet<>(), new LinkedHashMap<>(), new ArrayList<>());
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {
@@ -320,6 +320,13 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityPropertyChain relativeEntityPropertyChain = new EntityPropertyChain(
                     lastEntityPropertyChain, entityPropertyChain);
             entityPropertyChainMap.put(accessPath, relativeEntityPropertyChain);
+        }
+
+        for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
+            String accessPath = prefixAccessPath + bindingDefinition.getFieldAttribute();
+            EntityPropertyChain entityPropertyChain = entityPropertyChainMap.get(accessPath);
+            Assert.notNull(entityPropertyChain, "The binding field does not exist!");
+            bindingDefinition.setFieldEntityPropertyChain(entityPropertyChain);
         }
 
         return configuredRepository;
