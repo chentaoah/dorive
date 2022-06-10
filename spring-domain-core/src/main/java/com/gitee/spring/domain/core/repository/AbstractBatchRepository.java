@@ -63,7 +63,22 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
     }
 
     protected void addEntitiesToContext(BoundedContext boundedContext, ConfiguredRepository configuredRepository, List<?> entities) {
+        
+        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
+        List<BindingDefinition> bindingDefinitions = entityDefinition.getBindingDefinitions();
+        for (Object entity : entities) {
+            StringBuilder builder = new StringBuilder();
+            for (BindingDefinition bindingDefinition : bindingDefinitions) {
+                EntityPropertyChain entityPropertyChain = bindingDefinition.getFieldEntityPropertyChain();
+                String aliasAttribute = bindingDefinition.getAliasAttribute();
+                Object boundValue = entityPropertyChain.getValue(entity);
+                builder.append(aliasAttribute).append(": ").append(boundValue).append(", ");
+            }
+            if (builder.length() > 0) {
+                builder.delete(builder.length() - 2, builder.length());
+            }
 
+        }
     }
 
 }
