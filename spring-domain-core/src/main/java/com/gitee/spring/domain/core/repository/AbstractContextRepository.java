@@ -79,7 +79,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         annotatedElementMap.put("/", entityClass);
         allEntityPropertyChainMap.values().forEach(entityPropertyChain ->
                 annotatedElementMap.put(entityPropertyChain.getAccessPath(), entityPropertyChain.getDeclaredField()));
-        resolveRepositories(annotatedElementMap);
+        annotatedElementMap.forEach(this::resolveRepository);
 
         orderedRepositories.sort(Comparator.comparingInt(
                 configuredRepository -> configuredRepository.getEntityDefinition().getOrderAttribute()));
@@ -118,39 +118,37 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return className.startsWith("java.lang.") || className.startsWith("java.util.");
     }
 
-    protected void resolveRepositories(Map<String, AnnotatedElement> annotatedElementMap) {
-        annotatedElementMap.forEach((accessPath, annotatedElement) -> {
-            AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Entity.class);
-            Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(annotatedElement, Binding.class);
-            if (attributes != null) {
-                ConfiguredRepository configuredRepository;
-                boolean isRoot = "/".equals(accessPath);
-                if (isRoot) {
-                    configuredRepository = newConfiguredRepository(
-                            true, "/", annotatedElement, null,
-                            entityClass, false, entityClass, null,
-                            attributes, bindingAnnotations);
-                    rootRepository = configuredRepository;
+    protected void resolveRepository(String accessPath, AnnotatedElement annotatedElement) {
+        AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Entity.class);
+        Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(annotatedElement, Binding.class);
+        if (attributes != null) {
+            ConfiguredRepository configuredRepository;
+            boolean isRoot = "/".equals(accessPath);
+            if (isRoot) {
+                configuredRepository = newConfiguredRepository(
+                        true, "/", annotatedElement, null,
+                        entityClass, false, entityClass, null,
+                        attributes, bindingAnnotations);
+                rootRepository = configuredRepository;
 
-                } else {
-                    EntityPropertyChain entityPropertyChain = allEntityPropertyChainMap.get(accessPath);
-                    Class<?> entityClass = entityPropertyChain.getEntityClass();
-                    boolean isCollection = entityPropertyChain.isCollection();
-                    Class<?> genericEntityClass = entityPropertyChain.getGenericEntityClass();
-                    String fieldName = entityPropertyChain.getFieldName();
+            } else {
+                EntityPropertyChain entityPropertyChain = allEntityPropertyChainMap.get(accessPath);
+                Class<?> entityClass = entityPropertyChain.getEntityClass();
+                boolean isCollection = entityPropertyChain.isCollection();
+                Class<?> genericEntityClass = entityPropertyChain.getGenericEntityClass();
+                String fieldName = entityPropertyChain.getFieldName();
 
-                    entityPropertyChain.initialize();
+                entityPropertyChain.initialize();
 
-                    configuredRepository = newConfiguredRepository(
-                            false, accessPath, annotatedElement, entityPropertyChain,
-                            entityClass, isCollection, genericEntityClass, fieldName,
-                            attributes, bindingAnnotations);
-                    subRepositories.add(configuredRepository);
-                }
-                allConfiguredRepositoryMap.put(accessPath, configuredRepository);
-                orderedRepositories.add(configuredRepository);
+                configuredRepository = newConfiguredRepository(
+                        false, accessPath, annotatedElement, entityPropertyChain,
+                        entityClass, isCollection, genericEntityClass, fieldName,
+                        attributes, bindingAnnotations);
+                subRepositories.add(configuredRepository);
             }
-        });
+            allConfiguredRepositoryMap.put(accessPath, configuredRepository);
+            orderedRepositories.add(configuredRepository);
+        }
     }
 
     @SuppressWarnings("unchecked")
