@@ -253,6 +253,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 List<EntityPropertyChain> boundEntityPropertyChains = entityDefinition.getBoundEntityPropertyChains();
                 EntityPropertyChain relativeEntityPropertyChain = entityPropertyChainMap.get(bindAttribute);
                 if (!boundEntityPropertyChains.contains(relativeEntityPropertyChain)) {
+                    relativeEntityPropertyChain.initialize();
                     boundEntityPropertyChains.add(relativeEntityPropertyChain);
                 }
             }
