@@ -114,13 +114,13 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             Assert.notNull(belongConfiguredRepository, "No belong repository found!");
             EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
 
+            Set<String> fieldNames = entityDefinition.getFieldNames();
+            fieldNames.add(fieldName);
+
             Map<String, EntityPropertyChain> entityPropertyChainMap = entityDefinition.getEntityPropertyChainMap();
             EntityPropertyChain relativeEntityPropertyChain = newEntityPropertyChain(
                     entityPropertyChainMap, entityClass, declaredField, fieldAccessPath, fieldEntityClass, fieldName);
             entityPropertyChainMap.put(fieldAccessPath, relativeEntityPropertyChain);
-
-            Set<String> fieldNames = entityDefinition.getFieldNames();
-            fieldNames.add(fieldName);
 
             EntityPropertyChain entityPropertyChain = newEntityPropertyChain(
                     allEntityPropertyChainMap, entityClass, declaredField, fieldAccessPath, fieldEntityClass, fieldName);
@@ -287,7 +287,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 attributes, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort,
                 orderAttribute, bindingDefinitions, boundIdBindingDefinition, bindingColumns,
-                new LinkedHashMap<>(), new LinkedHashSet<>(), new ArrayList<>());
+                new LinkedHashSet<>(), new LinkedHashMap<>(), new ArrayList<>(), new ArrayList<>());
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {
