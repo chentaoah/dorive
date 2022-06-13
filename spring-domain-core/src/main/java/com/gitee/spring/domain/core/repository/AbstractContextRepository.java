@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, InitializingBean {
 
-    protected ApplicationContext applicationContext;
+    protected Class<?> repositoryClass;
 
     protected Class<?> entityClass;
     protected Constructor<?> entityCtor;
@@ -50,6 +50,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected List<ConfiguredRepository> subRepositories = new ArrayList<>();
     protected List<ConfiguredRepository> orderedRepositories = new ArrayList<>();
 
+    protected ApplicationContext applicationContext;
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -57,6 +59,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        repositoryClass = this.getClass();
+
         Type genericSuperclass = this.getClass().getGenericSuperclass();
         ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
@@ -295,7 +299,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository(
-                entityPropertyChain, entityDefinition, entityMapper, entityAssembler,
+                this, entityPropertyChain, entityDefinition, entityMapper, entityAssembler,
                 (AbstractRepository<Object, Object>) repository);
 
         return processConfiguredRepository(configuredRepository);

@@ -8,12 +8,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultQueryCache implements QueryCache {
 
-    protected Map<Class<?>, Map<String, List<Object>>> entitiesCache = new ConcurrentHashMap<>();
+    protected Map<Class<?>, Map<String, Map<String, List<Object>>>> entitiesCache = new ConcurrentHashMap<>();
 
     @Override
-    public Object selectByPrimaryKey(Class<?> entityClass, String primaryKey) {
-        Map<String, List<Object>> entitiesMap = entitiesCache.get(entityClass);
-        return entitiesMap.get(primaryKey);
+    public Map<String, List<Object>> getOrCreateCache(Class<?> repositoryClass, String accessPath) {
+        Map<String, Map<String, List<Object>>> entitiesMap = entitiesCache.computeIfAbsent(repositoryClass, key -> new ConcurrentHashMap<>());
+        return entitiesMap.computeIfAbsent(accessPath, key -> new ConcurrentHashMap<>());
+    }
+
+    @Override
+    public Map<String, List<Object>> getCache(Class<?> repositoryClass, String accessPath) {
+        Map<String, Map<String, List<Object>>> entitiesMap = entitiesCache.get(repositoryClass);
+        return entitiesMap != null ? entitiesMap.get(accessPath) : null;
     }
 
 }

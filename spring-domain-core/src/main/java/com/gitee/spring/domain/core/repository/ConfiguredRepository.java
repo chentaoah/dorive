@@ -16,17 +16,20 @@ import java.util.List;
 @Setter
 public class ConfiguredRepository extends ProxyRepository {
 
+    protected AbstractContextRepository<?, ?> abstractContextRepository;
     protected EntityPropertyChain entityPropertyChain;
     protected EntityDefinition entityDefinition;
     protected EntityMapper entityMapper;
     protected EntityAssembler entityAssembler;
 
-    public ConfiguredRepository(EntityPropertyChain entityPropertyChain,
+    public ConfiguredRepository(AbstractContextRepository<?, ?> abstractContextRepository,
+                                EntityPropertyChain entityPropertyChain,
                                 EntityDefinition entityDefinition,
                                 EntityMapper entityMapper,
                                 EntityAssembler entityAssembler,
                                 AbstractRepository<Object, Object> repository) {
         super(repository);
+        this.abstractContextRepository = abstractContextRepository;
         this.entityPropertyChain = entityPropertyChain;
         this.entityDefinition = entityDefinition;
         this.entityMapper = entityMapper;
@@ -35,6 +38,7 @@ public class ConfiguredRepository extends ProxyRepository {
 
     public ConfiguredRepository(ConfiguredRepository configuredRepository) {
         super(configuredRepository);
+        this.abstractContextRepository = configuredRepository.getAbstractContextRepository();
         this.entityPropertyChain = configuredRepository.getEntityPropertyChain();
         this.entityDefinition = configuredRepository.getEntityDefinition();
         this.entityMapper = configuredRepository.getEntityMapper();
