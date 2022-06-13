@@ -2,9 +2,9 @@ package com.gitee.spring.domain.core.repository;
 
 import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
-import com.gitee.spring.domain.core.api.QueryCache;
+import com.gitee.spring.domain.core.api.EntityCache;
 import com.gitee.spring.domain.core.entity.*;
-import com.gitee.spring.domain.core.impl.DefaultQueryCache;
+import com.gitee.spring.domain.core.impl.DefaultEntityCache;
 
 import java.util.*;
 
@@ -17,8 +17,8 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
 
     @Override
     protected void handleRootEntities(BoundedContext boundedContext, List<?> rootEntities) {
-        if (boundedContext.getQueryCache() == null) {
-            boundedContext.setQueryCache(new DefaultQueryCache());
+        if (boundedContext.getEntityCache() == null) {
+            boundedContext.setEntityCache(new DefaultEntityCache());
         }
 
         Map<AbstractDelegateRepository<?, ?>, List<Object>> repositoryEntitiesMap = adaptiveRepositoryEntities(rootEntities);
@@ -97,8 +97,8 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                                         List<?> entities) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
 
-        QueryCache queryCache = boundedContext.getQueryCache();
-        Map<String, List<Object>> entitiesMap = queryCache.getOrCreateCache(repositoryClass, entityDefinition.getAccessPath());
+        EntityCache entityCache = boundedContext.getEntityCache();
+        Map<String, List<Object>> entitiesMap = entityCache.getOrCreateCache(repositoryClass, entityDefinition.getAccessPath());
 
         List<BindingDefinition> bindingDefinitions = entityDefinition.getBindingDefinitions();
         for (Object entity : entities) {

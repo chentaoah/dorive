@@ -1,12 +1,12 @@
 package com.gitee.spring.domain.core.impl;
 
-import com.gitee.spring.domain.core.api.QueryCache;
+import com.gitee.spring.domain.core.api.EntityCache;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DefaultQueryCache implements QueryCache {
+public class DefaultEntityCache implements EntityCache {
 
     protected Map<Class<?>, Map<String, Map<String, List<Object>>>> entitiesCache = new ConcurrentHashMap<>();
 

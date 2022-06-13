@@ -3,7 +3,7 @@ package com.gitee.spring.domain.core.api;
 import java.util.List;
 import java.util.Map;
 
-public interface QueryCache {
+public interface EntityCache {
 
     Map<String, List<Object>> getOrCreateCache(Class<?> repositoryClass, String accessPath);
 

@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.core.repository;
 
 import com.gitee.spring.domain.core.api.EntityCriterion;
-import com.gitee.spring.domain.core.api.QueryCache;
+import com.gitee.spring.domain.core.api.EntityCache;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityExample;
 
@@ -17,11 +17,11 @@ public class BatchRepository extends ConfiguredRepository {
 
     @Override
     public List<Object> selectByExample(BoundedContext boundedContext, Object example) {
-        QueryCache queryCache = boundedContext.getQueryCache();
-        if (queryCache != null && example instanceof EntityExample) {
+        EntityCache entityCache = boundedContext.getEntityCache();
+        if (entityCache != null && example instanceof EntityExample) {
             Class<?> repositoryClass = abstractContextRepository.getRepositoryClass();
             String accessPath = entityDefinition.getAccessPath();
-            Map<String, List<Object>> entitiesMap = queryCache.getCache(repositoryClass, accessPath);
+            Map<String, List<Object>> entitiesMap = entityCache.getCache(repositoryClass, accessPath);
             if (entitiesMap != null) {
                 if (entitiesMap.isEmpty()) {
                     return Collections.emptyList();
