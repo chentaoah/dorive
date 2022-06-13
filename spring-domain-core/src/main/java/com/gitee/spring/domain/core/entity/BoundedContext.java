@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.core.entity;
 
-import com.gitee.spring.domain.core.api.EntityCache;
+import com.gitee.spring.domain.core.api.EntityCaches;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,5 +13,5 @@ import java.util.LinkedHashMap;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class BoundedContext extends LinkedHashMap<String, Object> {
-    private EntityCache entityCache;
+    private EntityCaches entityCaches;
 }
