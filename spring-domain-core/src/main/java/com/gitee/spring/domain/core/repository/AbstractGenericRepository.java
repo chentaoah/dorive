@@ -64,7 +64,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityMapper entityMapper = configuredRepository.getEntityMapper();
         EntityExample entityExample = entityMapper.newExample(entityDefinition, boundedContext);
-        for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
+        for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
             Object boundValue = getBoundValue(boundedContext, bindingDefinition, rootEntity);
             if (boundValue != null) {
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
@@ -145,7 +145,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
 
     protected void setBoundValueByContext(ConfiguredRepository configuredRepository, BoundedContext boundedContext, Object rootEntity, Object entity) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
+        for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
             if (!bindingDefinition.isBoundId()) {
                 Object boundValue = getBoundValue(boundedContext, bindingDefinition, rootEntity);
                 if (boundValue != null) {

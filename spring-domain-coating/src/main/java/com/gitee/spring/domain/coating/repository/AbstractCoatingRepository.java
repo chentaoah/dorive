@@ -18,9 +18,9 @@ import com.gitee.spring.domain.core.api.Constants;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
+import com.gitee.spring.domain.core.entity.SceneEntityProperty;
 import com.gitee.spring.domain.core.repository.AbstractDelegateRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
-import com.gitee.spring.domain.core.utils.PathUtils;
 import com.gitee.spring.domain.event.repository.AbstractEventRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -184,7 +184,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
             }
 
             Set<String> fieldNames = entityDefinition.getFieldNames();
-            List<EntityPropertyChain> boundEntityPropertyChains = entityDefinition.getBoundEntityPropertyChains();
+            List<SceneEntityProperty> boundSceneEntityProperties = entityDefinition.getBoundSceneEntityProperties();
 
             for (String fieldName : fieldNames) {
                 PropertyDefinition propertyDefinition = fieldPropertyDefinitionMap.get(fieldName);
@@ -193,7 +193,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                 }
             }
 
-            if (!propertyDefinitions.isEmpty() || !boundEntityPropertyChains.isEmpty()) {
+            if (!propertyDefinitions.isEmpty() || !boundSceneEntityProperties.isEmpty()) {
                 RepositoryLocation repositoryLocation = new RepositoryLocation(
                         finalMultiAccessPath, parentAccessPath, prefixAccessPath, absoluteAccessPath,
                         forwardParent, parentConfiguredRepository, abstractDelegateRepository, configuredRepository,

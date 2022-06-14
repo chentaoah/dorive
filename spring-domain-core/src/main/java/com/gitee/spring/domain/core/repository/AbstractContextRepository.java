@@ -215,8 +215,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Object repository = repositoryClass != DefaultRepository.class ? applicationContext.getBean(repositoryClass) : null;
 
         List<BindingDefinition> bindingDefinitions = new ArrayList<>();
+        List<BindingDefinition> boundBindingDefinitions = new ArrayList<>();
+        List<BindingDefinition> contextBindingDefinitions = new ArrayList<>();
         BindingDefinition boundIdBindingDefinition = null;
+        Set<String> entityJoinAliases = new LinkedHashSet<>();
         List<String> bindingColumns = new ArrayList<>();
+
         for (Binding bindingAnnotation : bindingAnnotations) {
             AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(
                     bindingAnnotation, false, false);
@@ -253,6 +257,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
                 boundEntityPropertyChain.initialize();
 
+                entityJoinAliases.add(aliasAttribute);
                 bindingColumns.add(StrUtil.toUnderlineCase(aliasAttribute));
 
                 EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
@@ -277,7 +282,13 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                     bindingAttributes, fieldAttribute, aliasAttribute, bindAttribute,
                     isFromContext, isBoundId, belongAccessPath, belongConfiguredRepository,
                     boundFieldName, boundEntityPropertyChain, null);
+
             bindingDefinitions.add(bindingDefinition);
+            if (!isFromContext) {
+                boundBindingDefinitions.add(bindingDefinition);
+            } else {
+                contextBindingDefinitions.add(bindingDefinition);
+            }
 
             if (isBoundId) {
                 boundIdBindingDefinition = bindingDefinition;
@@ -292,9 +303,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 isRoot, accessPath, annotatedElement,
                 entityClass, isCollection, genericEntityClass, fieldName,
                 attributes, sceneAttributeSet, mapper, pojoClass, sameType, mappedClass,
-                useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort,
-                orderAttribute, bindingDefinitions, boundIdBindingDefinition, bindingColumns,
-                new LinkedHashSet<>(), new LinkedHashMap<>(), new ArrayList<>());
+                useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
+                bindingDefinitions, boundBindingDefinitions, contextBindingDefinitions, boundIdBindingDefinition,
+                entityJoinAliases, bindingColumns, new LinkedHashSet<>(), new LinkedHashMap<>(), new ArrayList<>());
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {
@@ -337,7 +348,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             entityPropertyChainMap.put(accessPath, relativeEntityPropertyChain);
         }
 
-        for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
+        for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
             String accessPath = prefixAccessPath + bindingDefinition.getFieldAttribute();
             EntityPropertyChain entityPropertyChain = entityPropertyChainMap.get(accessPath);
             Assert.notNull(entityPropertyChain, "The binding field does not exist!");

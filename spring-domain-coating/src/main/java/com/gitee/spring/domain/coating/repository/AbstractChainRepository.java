@@ -84,22 +84,24 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
             EntityMapper entityMapper = queryRepository.getEntityMapper();
 
-            for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
-                if (bindingDefinition.isFromContext()) {
+            for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
+                String absoluteAccessPath = definitionAccessPath + bindingDefinition.getBelongAccessPath();
+                ChainCriterion targetChainCriterion = criterionMap.get(absoluteAccessPath);
+                if (targetChainCriterion != null) {
+                    EntityExample targetEntityExample = targetChainCriterion.getEntityExample();
+                    if (targetEntityExample.isEmptyQuery()) {
+                        entityExample.setEmptyQuery(true);
+                        break;
+                    }
+                }
+            }
+
+            if (!entityExample.isEmptyQuery()) {
+                for (BindingDefinition bindingDefinition : entityDefinition.getContextBindingDefinitions()) {
                     Object boundValue = boundedContext.get(bindingDefinition.getBindAttribute());
                     if (boundValue != null) {
                         EntityCriterion entityCriterion = entityMapper.newEqualCriterion(bindingDefinition.getAliasAttribute(), boundValue);
                         entityExample.addCriterion(entityCriterion);
-                    }
-                } else {
-                    String absoluteAccessPath = definitionAccessPath + bindingDefinition.getBelongAccessPath();
-                    ChainCriterion targetChainCriterion = criterionMap.get(absoluteAccessPath);
-                    if (targetChainCriterion != null) {
-                        EntityExample targetEntityExample = targetChainCriterion.getEntityExample();
-                        if (targetEntityExample.isEmptyQuery()) {
-                            entityExample.setEmptyQuery(true);
-                            break;
-                        }
                     }
                 }
             }
@@ -115,32 +117,30 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                 log.debug("The data queried is: {}", entities);
             }
 
-            for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
-                if (!bindingDefinition.isFromContext()) {
-                    String absoluteAccessPath = definitionAccessPath + bindingDefinition.getBelongAccessPath();
-                    ChainCriterion targetChainCriterion = criterionMap.get(absoluteAccessPath);
-                    if (targetChainCriterion != null) {
-                        EntityExample targetEntityExample = targetChainCriterion.getEntityExample();
-                        if (entities.isEmpty()) {
-                            targetEntityExample.setEmptyQuery(true);
-                            continue;
-                        }
-
-                        List<Object> fieldValues = collectFieldValues(entities, bindingDefinition.getFieldAttribute());
-                        if (fieldValues.isEmpty()) {
-                            targetEntityExample.setEmptyQuery(true);
-                            continue;
-                        }
-
-                        String boundFieldName = bindingDefinition.getBoundFieldName();
-                        Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
-
-                        ConfiguredRepository targetQueryRepository = targetChainCriterion.getQueryRepository();
-                        EntityMapper targetEntityMapper = targetQueryRepository.getEntityMapper();
-
-                        EntityCriterion entityCriterion = targetEntityMapper.newEqualCriterion(boundFieldName, fieldValue);
-                        targetEntityExample.addCriterion(entityCriterion);
+            for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
+                String absoluteAccessPath = definitionAccessPath + bindingDefinition.getBelongAccessPath();
+                ChainCriterion targetChainCriterion = criterionMap.get(absoluteAccessPath);
+                if (targetChainCriterion != null) {
+                    EntityExample targetEntityExample = targetChainCriterion.getEntityExample();
+                    if (entities.isEmpty()) {
+                        targetEntityExample.setEmptyQuery(true);
+                        continue;
                     }
+
+                    List<Object> fieldValues = collectFieldValues(entities, bindingDefinition.getFieldAttribute());
+                    if (fieldValues.isEmpty()) {
+                        targetEntityExample.setEmptyQuery(true);
+                        continue;
+                    }
+
+                    String boundFieldName = bindingDefinition.getBoundFieldName();
+                    Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
+
+                    ConfiguredRepository targetQueryRepository = targetChainCriterion.getQueryRepository();
+                    EntityMapper targetEntityMapper = targetQueryRepository.getEntityMapper();
+
+                    EntityCriterion entityCriterion = targetEntityMapper.newEqualCriterion(boundFieldName, fieldValue);
+                    targetEntityExample.addCriterion(entityCriterion);
                 }
             }
         });

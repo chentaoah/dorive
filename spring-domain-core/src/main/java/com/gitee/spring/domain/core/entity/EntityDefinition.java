@@ -32,8 +32,11 @@ public class EntityDefinition {
     private String orderBy;
     private String sort;
     private int orderAttribute;
-    private List<BindingDefinition> bindingDefinitions;
+    private List<BindingDefinition> allBindingDefinitions;
+    private List<BindingDefinition> boundBindingDefinitions;
+    private List<BindingDefinition> contextBindingDefinitions;
     private BindingDefinition boundIdBindingDefinition;
+    private Set<String> entityJoinAliases;
     private List<String> bindingColumns;
     private Set<String> fieldNames;
     private Map<String, EntityPropertyChain> entityPropertyChainMap;

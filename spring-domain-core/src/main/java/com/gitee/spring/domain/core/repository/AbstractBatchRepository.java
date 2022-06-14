@@ -37,7 +37,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                     if (entityExample.isDirtyQuery()) {
                         List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample.buildExample());
                         collectFieldValues(boundedContext, fieldValues, configuredRepository, entities);
-                        addEntitiesToContext(boundedContext, repositoryClass, configuredRepository, entities);
+                        buildIndexForEntities(boundedContext, repositoryClass, configuredRepository, entities);
                     }
                 }
             }
@@ -83,9 +83,14 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityMapper entityMapper = configuredRepository.getEntityMapper();
         EntityExample entityExample = entityMapper.newExample(entityDefinition, boundedContext);
-        for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
+        for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
             String bindAttribute = bindingDefinition.getBindAttribute();
-            List<Object> boundValues = fieldValues.get(bindAttribute);
+            Object boundValues;
+            if (bindingDefinition.isFromContext()) {
+                boundValues = boundedContext.get(bindAttribute);
+            } else {
+                boundValues = fieldValues.get(bindAttribute);
+            }
             if (boundValues != null) {
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
                 EntityCriterion entityCriterion = entityMapper.newEqualCriterion(aliasAttribute, boundValues);
@@ -95,25 +100,23 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
         return entityExample;
     }
 
-    protected void addEntitiesToContext(BoundedContext boundedContext,
-                                        Class<?> repositoryClass,
-                                        ConfiguredRepository configuredRepository,
-                                        List<?> entities) {
+    protected void buildIndexForEntities(BoundedContext boundedContext,
+                                         Class<?> repositoryClass,
+                                         ConfiguredRepository configuredRepository,
+                                         List<?> entities) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
 
         EntityCaches entityCaches = boundedContext.getEntityCaches();
         Map<String, List<Object>> entitiesMap = entityCaches.getOrCreateCache(repositoryClass, entityDefinition.getAccessPath());
 
-        List<BindingDefinition> bindingDefinitions = entityDefinition.getBindingDefinitions();
+        List<BindingDefinition> bindingDefinitions = entityDefinition.getBoundBindingDefinitions();
         for (Object entity : entities) {
             StringBuilder builder = new StringBuilder();
             for (BindingDefinition bindingDefinition : bindingDefinitions) {
-                if (!bindingDefinition.isFromContext()) {
-                    String aliasAttribute = bindingDefinition.getAliasAttribute();
-                    EntityPropertyChain entityPropertyChain = bindingDefinition.getFieldEntityPropertyChain();
-                    Object boundValue = entityPropertyChain.getValue(entity);
-                    builder.append(aliasAttribute).append(": ").append(boundValue).append(", ");
-                }
+                String aliasAttribute = bindingDefinition.getAliasAttribute();
+                EntityPropertyChain entityPropertyChain = bindingDefinition.getFieldEntityPropertyChain();
+                Object boundValue = entityPropertyChain.getValue(entity);
+                builder.append(aliasAttribute).append(": ").append(boundValue).append(", ");
             }
             if (builder.length() > 0) {
                 builder.delete(builder.length() - 2, builder.length());
