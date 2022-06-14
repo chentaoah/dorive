@@ -1,11 +1,11 @@
 package com.gitee.spring.domain.event.repository;
 
-import com.gitee.spring.domain.core.repository.AbstractGenericRepository;
+import com.gitee.spring.domain.core.repository.AbstractBatchRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import com.gitee.spring.domain.event.annotation.EnableEvent;
 import org.springframework.core.annotation.AnnotationUtils;
 
-public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepository<E, PK> {
+public abstract class AbstractEventRepository<E, PK> extends AbstractBatchRepository<E, PK> {
 
     protected boolean enableEvent;
 
