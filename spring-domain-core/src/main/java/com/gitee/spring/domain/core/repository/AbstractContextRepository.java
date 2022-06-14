@@ -1,5 +1,6 @@
 package com.gitee.spring.domain.core.repository;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core.annotation.Binding;
@@ -11,6 +12,7 @@ import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.api.Constants;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
+import com.gitee.spring.domain.core.entity.SceneEntityProperty;
 import com.gitee.spring.domain.core.mapper.MapEntityMapper;
 import com.gitee.spring.domain.core.mapper.NoBuiltEntityMapper;
 import com.gitee.spring.domain.core.utils.PathUtils;
@@ -167,7 +169,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                                                            AnnotationAttributes attributes,
                                                            Set<Binding> bindingAnnotations) {
 
-        String[] sceneAttribute = attributes.getStringArray(Constants.SCENE_ATTRIBUTE);
+        String[] sceneAttributeStrs = attributes.getStringArray(Constants.SCENE_ATTRIBUTE);
+        Set<String> sceneAttributeSet = new LinkedHashSet<>(Arrays.asList(sceneAttributeStrs));
 
         Class<?> mapperClass = attributes.getClass(Constants.MAPPER_ATTRIBUTE);
         Object mapper = null;
@@ -254,11 +257,19 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
                 EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
                 Map<String, EntityPropertyChain> entityPropertyChainMap = entityDefinition.getEntityPropertyChainMap();
-                List<EntityPropertyChain> boundEntityPropertyChains = entityDefinition.getBoundEntityPropertyChains();
+                List<SceneEntityProperty> boundSceneEntityProperties = entityDefinition.getBoundSceneEntityProperties();
+
                 EntityPropertyChain relativeEntityPropertyChain = entityPropertyChainMap.get(bindAttribute);
-                if (!boundEntityPropertyChains.contains(relativeEntityPropertyChain)) {
+                SceneEntityProperty sceneEntityProperty = CollUtil.findOne(boundSceneEntityProperties, item ->
+                        item.getEntityPropertyChain() == relativeEntityPropertyChain);
+                if (sceneEntityProperty != null) {
+                    Set<String> sceneAttribute = sceneEntityProperty.getSceneAttribute();
+                    sceneAttribute.addAll(sceneAttributeSet);
+                } else {
                     relativeEntityPropertyChain.initialize();
-                    boundEntityPropertyChains.add(relativeEntityPropertyChain);
+                    SceneEntityProperty newSceneEntityProperty = new SceneEntityProperty(
+                            new LinkedHashSet<>(sceneAttributeSet), relativeEntityPropertyChain);
+                    boundSceneEntityProperties.add(newSceneEntityProperty);
                 }
             }
 
@@ -280,7 +291,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         EntityDefinition entityDefinition = new EntityDefinition(
                 isRoot, accessPath, annotatedElement,
                 entityClass, isCollection, genericEntityClass, fieldName,
-                attributes, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
+                attributes, sceneAttributeSet, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort,
                 orderAttribute, bindingDefinitions, boundIdBindingDefinition, bindingColumns,
                 new LinkedHashSet<>(), new LinkedHashMap<>(), new ArrayList<>());
@@ -330,6 +341,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             String accessPath = prefixAccessPath + bindingDefinition.getFieldAttribute();
             EntityPropertyChain entityPropertyChain = entityPropertyChainMap.get(accessPath);
             Assert.notNull(entityPropertyChain, "The binding field does not exist!");
+            entityPropertyChain.initialize();
             bindingDefinition.setFieldEntityPropertyChain(entityPropertyChain);
         }
 

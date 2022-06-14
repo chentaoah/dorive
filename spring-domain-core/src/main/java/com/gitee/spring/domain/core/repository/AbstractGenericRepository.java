@@ -9,6 +9,7 @@ import com.gitee.spring.domain.core.entity.*;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateRepository<E, PK> {
 
@@ -43,8 +44,14 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
 
     protected boolean isMatchScenes(BoundedContext boundedContext, ConfiguredRepository configuredRepository) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        String[] sceneAttribute = entityDefinition.getSceneAttribute();
-        if (sceneAttribute.length == 0) return true;
+        Set<String> sceneAttribute = entityDefinition.getSceneAttribute();
+        return isMatchScenes(boundedContext, sceneAttribute);
+    }
+
+    protected boolean isMatchScenes(BoundedContext boundedContext, Set<String> sceneAttribute) {
+        if (sceneAttribute.isEmpty()) {
+            return true;
+        }
         for (String scene : sceneAttribute) {
             if (boundedContext.containsKey(scene)) {
                 return true;

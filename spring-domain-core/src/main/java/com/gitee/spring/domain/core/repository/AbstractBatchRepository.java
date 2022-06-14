@@ -29,14 +29,14 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
             List<ConfiguredRepository> subRepositories = abstractDelegateRepository.getSubRepositories();
 
             Map<String, List<Object>> fieldValues = new LinkedHashMap<>();
-            collectFieldValues(fieldValues, rootRepository, eachRootEntities);
+            collectFieldValues(boundedContext, fieldValues, rootRepository, eachRootEntities);
 
             for (ConfiguredRepository configuredRepository : subRepositories) {
                 if (isMatchScenes(boundedContext, configuredRepository)) {
                     EntityExample entityExample = newExampleByFieldValues(boundedContext, fieldValues, configuredRepository);
                     if (entityExample.isDirtyQuery()) {
                         List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample.buildExample());
-                        collectFieldValues(fieldValues, configuredRepository, entities);
+                        collectFieldValues(boundedContext, fieldValues, configuredRepository, entities);
                         addEntitiesToContext(boundedContext, repositoryClass, configuredRepository, entities);
                     }
                 }
@@ -56,18 +56,22 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
         return repositoryEntitiesMap;
     }
 
-    protected void collectFieldValues(Map<String, List<Object>> fieldValues,
+    protected void collectFieldValues(BoundedContext boundedContext,
+                                      Map<String, List<Object>> fieldValues,
                                       ConfiguredRepository configuredRepository,
                                       List<?> entities) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        List<EntityPropertyChain> boundEntityPropertyChains = entityDefinition.getBoundEntityPropertyChains();
-        for (EntityPropertyChain entityPropertyChain : boundEntityPropertyChains) {
-            String accessPath = entityPropertyChain.getAccessPath();
-            for (Object entity : entities) {
-                Object boundValue = entityPropertyChain.getValue(entity);
-                if (boundValue != null) {
-                    List<Object> boundValues = fieldValues.computeIfAbsent(accessPath, key -> new ArrayList<>());
-                    boundValues.add(boundValue);
+        List<SceneEntityProperty> boundSceneEntityProperties = entityDefinition.getBoundSceneEntityProperties();
+        for (SceneEntityProperty sceneEntityProperty : boundSceneEntityProperties) {
+            if (isMatchScenes(boundedContext, sceneEntityProperty.getSceneAttribute())) {
+                EntityPropertyChain entityPropertyChain = sceneEntityProperty.getEntityPropertyChain();
+                String accessPath = entityPropertyChain.getAccessPath();
+                for (Object entity : entities) {
+                    Object boundValue = entityPropertyChain.getValue(entity);
+                    if (boundValue != null) {
+                        List<Object> boundValues = fieldValues.computeIfAbsent(accessPath, key -> new ArrayList<>());
+                        boundValues.add(boundValue);
+                    }
                 }
             }
         }

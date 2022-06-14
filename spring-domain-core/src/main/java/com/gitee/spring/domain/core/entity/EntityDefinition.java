@@ -20,7 +20,7 @@ public class EntityDefinition {
     private Class<?> genericEntityClass;
     private String fieldName;
     private AnnotationAttributes attributes;
-    private String[] sceneAttribute;
+    private Set<String> sceneAttribute;
     private Object mapper;
     private Class<?> pojoClass;
     private boolean sameType;
@@ -37,5 +37,5 @@ public class EntityDefinition {
     private List<String> bindingColumns;
     private Set<String> fieldNames;
     private Map<String, EntityPropertyChain> entityPropertyChainMap;
-    private List<EntityPropertyChain> boundEntityPropertyChains;
+    private List<SceneEntityProperty> boundSceneEntityProperties;
 }
