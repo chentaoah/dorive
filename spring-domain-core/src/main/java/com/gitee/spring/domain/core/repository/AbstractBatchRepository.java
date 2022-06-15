@@ -17,6 +17,11 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
 
     @Override
     protected void handleRootEntities(BoundedContext boundedContext, List<?> rootEntities) {
+        if (rootEntities.size() == 1) {
+            super.handleRootEntity(boundedContext, rootEntities.get(0));
+            return;
+        }
+
         if (boundedContext.getEntityCaches() == null) {
             boundedContext.setEntityCaches(new DefaultEntityCaches());
         }
