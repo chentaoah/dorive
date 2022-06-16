@@ -194,14 +194,14 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         String orderByAsc = attributes.getString(Attribute.ORDER_BY_ASC_ATTRIBUTE);
         String orderByDesc = attributes.getString(Attribute.ORDER_BY_DESC_ATTRIBUTE);
-        String orderBy = null;
+        String[] orderBy = null;
         String sort = null;
         if (StringUtils.isNotBlank(orderByAsc)) {
-            orderBy = orderByAsc;
+            orderBy = StrUtil.splitTrim(orderByAsc, ",").toArray(new String[0]);
             sort = "asc";
         }
         if (StringUtils.isNotBlank(orderByDesc)) {
-            orderBy = orderByAsc;
+            orderBy = StrUtil.splitTrim(orderByDesc, ",").toArray(new String[0]);
             sort = "desc";
         }
 
@@ -310,7 +310,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         if (mapAsExample) {
             entityMapper = new MapEntityMapper(entityMapper);
         }
-        
+
         if (repository == null) {
             Assert.isTrue(mapper != Object.class, "The mapper cannot be object class!");
             repository = new DefaultRepository(entityDefinition, entityMapper, entityAssembler, newRepository(entityDefinition));

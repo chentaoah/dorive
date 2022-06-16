@@ -29,7 +29,7 @@ public class EntityDefinition {
     private boolean mapAsExample;
     private String orderByAsc;
     private String orderByDesc;
-    private String orderBy;
+    private String[] orderBy;
     private String sort;
     private int orderAttribute;
     private List<BindingDefinition> allBindingDefinitions;
