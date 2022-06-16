@@ -1,6 +1,5 @@
 package com.gitee.spring.domain.coating.entity;
 
-import com.gitee.spring.domain.coating.api.EntityCriterionBuilder;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +20,5 @@ public class PropertyDefinition {
     private String aliasAttribute;
     private String operatorAttribute;
     private boolean boundLocation;
-    private EntityCriterionBuilder entityCriterionBuilder;
     private EntityPropertyChain entityPropertyChain;
 }

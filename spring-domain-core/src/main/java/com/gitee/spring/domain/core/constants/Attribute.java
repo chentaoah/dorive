@@ -1,6 +1,6 @@
-package com.gitee.spring.domain.core.api;
+package com.gitee.spring.domain.core.constants;
 
-public interface Constants {
+public interface Attribute {
     String NAME_ATTRIBUTE = "name";
 
     String SCENE_ATTRIBUTE = "scene";

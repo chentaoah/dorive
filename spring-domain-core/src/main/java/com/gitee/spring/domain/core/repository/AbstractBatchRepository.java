@@ -3,6 +3,7 @@ package com.gitee.spring.domain.core.repository;
 import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.EntityCaches;
+import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.entity.*;
 import com.gitee.spring.domain.core.impl.DefaultEntityCaches;
 
@@ -98,7 +99,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
             }
             if (boundValues != null) {
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
-                EntityCriterion entityCriterion = entityMapper.newEqualCriterion(aliasAttribute, boundValues);
+                EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, boundValues);
                 entityExample.addCriterion(entityCriterion);
             }
         }

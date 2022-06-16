@@ -6,6 +6,8 @@ public interface EntityCriterion {
 
     String getFieldName();
 
+    String getOperator();
+
     Object getFieldValue();
 
     void appendTo(EntityExample entityExample);

@@ -9,7 +9,7 @@ import com.gitee.spring.domain.core.annotation.Repository;
 import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
-import com.gitee.spring.domain.core.api.Constants;
+import com.gitee.spring.domain.core.constants.Attribute;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.entity.SceneEntityProperty;
@@ -71,7 +71,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(this.getClass(), Repository.class);
         if (attributes != null) {
-            name = attributes.getString(Constants.NAME_ATTRIBUTE);
+            name = attributes.getString(Attribute.NAME_ATTRIBUTE);
         }
         if (StringUtils.isBlank(name)) {
             name = StrUtil.lowerFirst(entityClass.getSimpleName());
@@ -169,10 +169,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                                                            AnnotationAttributes attributes,
                                                            Set<Binding> bindingAnnotations) {
 
-        String[] sceneAttributeStrs = attributes.getStringArray(Constants.SCENE_ATTRIBUTE);
+        String[] sceneAttributeStrs = attributes.getStringArray(Attribute.SCENE_ATTRIBUTE);
         Set<String> sceneAttributeSet = new LinkedHashSet<>(Arrays.asList(sceneAttributeStrs));
 
-        Class<?> mapperClass = attributes.getClass(Constants.MAPPER_ATTRIBUTE);
+        Class<?> mapperClass = attributes.getClass(Attribute.MAPPER_ATTRIBUTE);
         Object mapper = null;
         Class<?> pojoClass = null;
         if (mapperClass != Object.class) {
@@ -190,11 +190,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         boolean sameType = genericEntityClass == pojoClass;
         Class<?> mappedClass = pojoClass != null ? pojoClass : genericEntityClass;
 
-        boolean useEntityExample = attributes.getBoolean(Constants.USE_ENTITY_EXAMPLE_ATTRIBUTE);
-        boolean mapAsExample = attributes.getBoolean(Constants.MAP_AS_EXAMPLE_ATTRIBUTE);
+        boolean useEntityExample = attributes.getBoolean(Attribute.USE_ENTITY_EXAMPLE_ATTRIBUTE);
+        boolean mapAsExample = attributes.getBoolean(Attribute.MAP_AS_EXAMPLE_ATTRIBUTE);
 
-        String orderByAsc = attributes.getString(Constants.ORDER_BY_ASC_ATTRIBUTE);
-        String orderByDesc = attributes.getString(Constants.ORDER_BY_DESC_ATTRIBUTE);
+        String orderByAsc = attributes.getString(Attribute.ORDER_BY_ASC_ATTRIBUTE);
+        String orderByDesc = attributes.getString(Attribute.ORDER_BY_DESC_ATTRIBUTE);
         String orderBy = null;
         String sort = null;
         if (StringUtils.isNotBlank(orderByAsc)) {
@@ -206,12 +206,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             sort = "desc";
         }
 
-        int orderAttribute = attributes.getNumber(Constants.ORDER_ATTRIBUTE).intValue();
+        int orderAttribute = attributes.getNumber(Attribute.ORDER_ATTRIBUTE).intValue();
 
-        Class<?> assemblerClass = attributes.getClass(Constants.ASSEMBLER_ATTRIBUTE);
+        Class<?> assemblerClass = attributes.getClass(Attribute.ASSEMBLER_ATTRIBUTE);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
 
-        Class<?> repositoryClass = attributes.getClass(Constants.REPOSITORY_ATTRIBUTE);
+        Class<?> repositoryClass = attributes.getClass(Attribute.REPOSITORY_ATTRIBUTE);
         Object repository = repositoryClass != DefaultRepository.class ? applicationContext.getBean(repositoryClass) : null;
 
         List<BindingDefinition> bindingDefinitions = new ArrayList<>();
@@ -225,9 +225,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(
                     bindingAnnotation, false, false);
 
-            String fieldAttribute = bindingAttributes.getString(Constants.FIELD_ATTRIBUTE);
-            String aliasAttribute = bindingAttributes.getString(Constants.ALIAS_ATTRIBUTE);
-            String bindAttribute = bindingAttributes.getString(Constants.BIND_ATTRIBUTE);
+            String fieldAttribute = bindingAttributes.getString(Attribute.FIELD_ATTRIBUTE);
+            String aliasAttribute = bindingAttributes.getString(Attribute.ALIAS_ATTRIBUTE);
+            String bindAttribute = bindingAttributes.getString(Attribute.BIND_ATTRIBUTE);
 
             if (StringUtils.isBlank(aliasAttribute)) {
                 aliasAttribute = fieldAttribute;

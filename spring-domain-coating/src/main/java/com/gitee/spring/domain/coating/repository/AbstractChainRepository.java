@@ -3,13 +3,13 @@ package com.gitee.spring.domain.coating.repository;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.spring.domain.coating.api.EntityCriterionBuilder;
 import com.gitee.spring.domain.coating.entity.ChainCriterion;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
 import com.gitee.spring.domain.coating.impl.DefaultCoatingAssembler;
 import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
+import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.entity.*;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -63,10 +63,12 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         for (PropertyDefinition propertyDefinition : repositoryLocation.getCollectedPropertyDefinitions()) {
             Object fieldValue = ReflectUtil.getFieldValue(coating, propertyDefinition.getDeclaredField());
             if (fieldValue != null) {
-                EntityCriterionBuilder entityCriterionBuilder = propertyDefinition.getEntityCriterionBuilder();
+                String aliasAttribute = propertyDefinition.getAliasAttribute();
+                String operatorAttribute = propertyDefinition.getOperatorAttribute();
+
                 ConfiguredRepository queryRepository = chainCriterion.getQueryRepository();
                 EntityMapper entityMapper = queryRepository.getEntityMapper();
-                EntityCriterion entityCriterion = entityCriterionBuilder.newCriterion(entityMapper, propertyDefinition.getAliasAttribute(), fieldValue);
+                EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, operatorAttribute, fieldValue);
                 entityExample.addCriterion(entityCriterion);
             }
         }
@@ -100,7 +102,8 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                 for (BindingDefinition bindingDefinition : entityDefinition.getContextBindingDefinitions()) {
                     Object boundValue = boundedContext.get(bindingDefinition.getBindAttribute());
                     if (boundValue != null) {
-                        EntityCriterion entityCriterion = entityMapper.newEqualCriterion(bindingDefinition.getAliasAttribute(), boundValue);
+                        String aliasAttribute = bindingDefinition.getAliasAttribute();
+                        EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, boundValue);
                         entityExample.addCriterion(entityCriterion);
                     }
                 }
@@ -139,7 +142,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                     ConfiguredRepository targetQueryRepository = targetChainCriterion.getQueryRepository();
                     EntityMapper targetEntityMapper = targetQueryRepository.getEntityMapper();
 
-                    EntityCriterion entityCriterion = targetEntityMapper.newEqualCriterion(boundFieldName, fieldValue);
+                    EntityCriterion entityCriterion = targetEntityMapper.newCriterion(boundFieldName, Operator.EQ, fieldValue);
                     targetEntityExample.addCriterion(entityCriterion);
                 }
             }

@@ -16,14 +16,6 @@ public interface EntityMapper {
 
     EntityExample newExample(EntityDefinition entityDefinition, BoundedContext boundedContext);
 
-    EntityCriterion newEqualCriterion(String fieldName, Object fieldValue);
-
-    EntityCriterion newGreaterThanCriterion(String fieldName, Object fieldValue);
-
-    EntityCriterion newGreaterThanOrEqualCriterion(String fieldName, Object fieldValue);
-
-    EntityCriterion newLessThanCriterion(String fieldName, Object fieldValue);
-
-    EntityCriterion newLessThanOrEqualCriterion(String fieldName, Object fieldValue);
+    EntityCriterion newCriterion(String fieldName, String operator, Object fieldValue);
 
 }

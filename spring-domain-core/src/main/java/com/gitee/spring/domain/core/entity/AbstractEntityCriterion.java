@@ -8,5 +8,6 @@ import lombok.Data;
 @AllArgsConstructor
 public abstract class AbstractEntityCriterion implements EntityCriterion {
     protected String fieldName;
+    protected String Operator;
     protected Object fieldValue;
 }

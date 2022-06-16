@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.EntityProperty;
+import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.entity.*;
 
 import java.util.Collection;
@@ -68,7 +69,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             Object boundValue = getBoundValue(boundedContext, bindingDefinition, rootEntity);
             if (boundValue != null) {
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
-                EntityCriterion entityCriterion = entityMapper.newEqualCriterion(aliasAttribute, boundValue);
+                EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, boundValue);
                 entityExample.addCriterion(entityCriterion);
             }
         }
