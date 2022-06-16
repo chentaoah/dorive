@@ -41,7 +41,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                 if (isMatchScenes(boundedContext, configuredRepository)) {
                     EntityExample entityExample = newExampleByFieldValues(boundedContext, fieldValues, configuredRepository);
                     if (entityExample.isDirtyQuery()) {
-                        List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample.buildExample());
+                        List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample);
                         collectFieldValues(boundedContext, fieldValues, configuredRepository, entities);
                         buildIndexForEntities(boundedContext, repositoryClass, configuredRepository, entities);
                     }

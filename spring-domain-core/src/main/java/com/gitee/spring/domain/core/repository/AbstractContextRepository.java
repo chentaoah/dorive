@@ -14,7 +14,6 @@ import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.entity.SceneEntityProperty;
 import com.gitee.spring.domain.core.mapper.MapEntityMapper;
-import com.gitee.spring.domain.core.mapper.NoBuiltEntityMapper;
 import com.gitee.spring.domain.core.utils.PathUtils;
 import com.gitee.spring.domain.core.utils.ReflectUtils;
 import lombok.Data;
@@ -311,10 +310,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         if (mapAsExample) {
             entityMapper = new MapEntityMapper(entityMapper);
         }
-        if (useEntityExample) {
-            entityMapper = new NoBuiltEntityMapper(entityMapper);
-        }
-
+        
         if (repository == null) {
             Assert.isTrue(mapper != Object.class, "The mapper cannot be object class!");
             repository = new DefaultRepository(entityDefinition, entityMapper, entityAssembler, newRepository(entityDefinition));

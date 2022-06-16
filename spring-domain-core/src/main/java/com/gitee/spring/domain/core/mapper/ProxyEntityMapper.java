@@ -37,28 +37,8 @@ public class ProxyEntityMapper implements EntityMapper {
     }
 
     @Override
-    public EntityCriterion newEqualCriterion(String fieldName, Object fieldValue) {
-        return entityMapper.newEqualCriterion(fieldName, fieldValue);
-    }
-
-    @Override
-    public EntityCriterion newGreaterThanCriterion(String fieldName, Object fieldValue) {
-        return entityMapper.newGreaterThanCriterion(fieldName, fieldValue);
-    }
-
-    @Override
-    public EntityCriterion newGreaterThanOrEqualCriterion(String fieldName, Object fieldValue) {
-        return entityMapper.newGreaterThanOrEqualCriterion(fieldName, fieldValue);
-    }
-
-    @Override
-    public EntityCriterion newLessThanCriterion(String fieldName, Object fieldValue) {
-        return entityMapper.newLessThanCriterion(fieldName, fieldValue);
-    }
-
-    @Override
-    public EntityCriterion newLessThanOrEqualCriterion(String fieldName, Object fieldValue) {
-        return entityMapper.newLessThanOrEqualCriterion(fieldName, fieldValue);
+    public EntityCriterion newCriterion(String fieldName, String operator, Object fieldValue) {
+        return entityMapper.newCriterion(fieldName, operator, fieldValue);
     }
 
 }
