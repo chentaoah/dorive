@@ -47,13 +47,17 @@ public class ConfiguredRepository extends ProxyRepository {
 
     @Override
     public List<Object> selectByExample(BoundedContext boundedContext, Object example) {
-        example = example instanceof EntityExample ? ((EntityExample) example).buildExample() : example;
+        if (!entityDefinition.isUseEntityExample() && example instanceof EntityExample) {
+            example = ((EntityExample) example).buildExample();
+        }
         return super.selectByExample(boundedContext, example);
     }
 
     @Override
     public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
-        example = example instanceof EntityExample ? ((EntityExample) example).buildExample() : example;
+        if (!entityDefinition.isUseEntityExample() && example instanceof EntityExample) {
+            example = ((EntityExample) example).buildExample();
+        }
         return super.selectPageByExample(boundedContext, example, page);
     }
 
