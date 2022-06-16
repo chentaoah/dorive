@@ -26,6 +26,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
         if (boundedContext.getEntityCaches() == null) {
             boundedContext.setEntityCaches(new DefaultEntityCaches());
         }
+        EntityCaches entityCaches = boundedContext.getEntityCaches();
 
         Map<AbstractDelegateRepository<?, ?>, List<Object>> repositoryEntitiesMap = adaptiveRepositoryEntities(rootEntities);
         repositoryEntitiesMap.forEach((abstractDelegateRepository, eachRootEntities) -> {
@@ -38,12 +39,16 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
             collectFieldValues(boundedContext, fieldValues, rootRepository, eachRootEntities);
 
             for (ConfiguredRepository configuredRepository : subRepositories) {
-                if (isMatchScenes(boundedContext, configuredRepository)) {
-                    EntityExample entityExample = newExampleByFieldValues(boundedContext, fieldValues, configuredRepository);
-                    if (entityExample.isDirtyQuery()) {
-                        List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample);
-                        collectFieldValues(boundedContext, fieldValues, configuredRepository, entities);
-                        buildIndexForEntities(boundedContext, repositoryClass, configuredRepository, entities);
+                EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
+                Map<String, List<Object>> entitiesMap = entityCaches.getCache(repositoryClass, entityDefinition.getAccessPath());
+                if (entitiesMap == null) {
+                    if (isMatchScenes(boundedContext, configuredRepository)) {
+                        EntityExample entityExample = newExampleByFieldValues(boundedContext, fieldValues, configuredRepository);
+                        if (entityExample.isDirtyQuery()) {
+                            List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample);
+                            collectFieldValues(boundedContext, fieldValues, configuredRepository, entities);
+                            buildIndexForEntities(boundedContext, repositoryClass, configuredRepository, entities);
+                        }
                     }
                 }
             }

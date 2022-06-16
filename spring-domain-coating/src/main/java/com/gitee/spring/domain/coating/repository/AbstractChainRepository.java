@@ -11,6 +11,8 @@ import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.entity.*;
+import com.gitee.spring.domain.core.impl.DefaultEntityCaches;
+import com.gitee.spring.domain.core.repository.AbstractDelegateRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,12 +52,13 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             definitionRepository = repositoryLocation.getParentConfiguredRepository();
         }
 
+        AbstractDelegateRepository<?, ?> abstractDelegateRepository = repositoryLocation.getAbstractDelegateRepository();
         ConfiguredRepository queryRepository = repositoryLocation.getBelongConfiguredRepository();
         EntityDefinition entityDefinition = queryRepository.getEntityDefinition();
         EntityMapper entityMapper = queryRepository.getEntityMapper();
         EntityExample entityExample = entityMapper.newExample(entityDefinition, boundedContext);
 
-        return new ChainCriterion(definitionAccessPath, definitionRepository, queryRepository, entityExample);
+        return new ChainCriterion(definitionAccessPath, definitionRepository, abstractDelegateRepository, queryRepository, entityExample);
     }
 
     protected void addToExampleOfCriterion(RepositoryLocation repositoryLocation, Object coating, ChainCriterion chainCriterion) {
@@ -75,14 +78,21 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
     }
 
     protected void executeChainQuery(BoundedContext boundedContext, Map<String, ChainCriterion> criterionMap) {
+
+        if (boundedContext.getEntityCaches() == null) {
+            boundedContext.setEntityCaches(new DefaultEntityCaches());
+        }
+
         criterionMap.forEach((accessPath, chainCriterion) -> {
             if ("/".equals(accessPath)) return;
 
             String definitionAccessPath = chainCriterion.getDefinitionAccessPath();
             ConfiguredRepository definitionRepository = chainCriterion.getDefinitionRepository();
+            AbstractDelegateRepository<?, ?> abstractDelegateRepository = chainCriterion.getAbstractDelegateRepository();
             ConfiguredRepository queryRepository = chainCriterion.getQueryRepository();
             EntityExample entityExample = chainCriterion.getEntityExample();
 
+            Class<?> repositoryClass = abstractDelegateRepository.getRepositoryClass();
             EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
             EntityMapper entityMapper = queryRepository.getEntityMapper();
 
@@ -115,10 +125,11 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
             List<Object> entities = Collections.emptyList();
             if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
-                entityExample.setColumns(entityDefinition.getBindingColumns());
-                entities = queryRepository.selectByExample(boundedContext, entityExample.buildExample());
+                entities = queryRepository.selectByExample(boundedContext, entityExample);
                 log.debug("The data queried is: {}", entities);
             }
+
+            buildIndexForEntities(boundedContext, repositoryClass, definitionRepository, entities);
 
             for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
                 String absoluteAccessPath = definitionAccessPath + bindingDefinition.getBelongAccessPath();

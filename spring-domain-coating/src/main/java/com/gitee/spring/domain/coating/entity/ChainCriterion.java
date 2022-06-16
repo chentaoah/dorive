@@ -1,6 +1,7 @@
 package com.gitee.spring.domain.coating.entity;
 
 import com.gitee.spring.domain.core.entity.EntityExample;
+import com.gitee.spring.domain.core.repository.AbstractDelegateRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.Data;
 public class ChainCriterion {
     private String definitionAccessPath;
     private ConfiguredRepository definitionRepository;
+    private AbstractDelegateRepository<?, ?> abstractDelegateRepository;
     private ConfiguredRepository queryRepository;
     private EntityExample entityExample;
 }
