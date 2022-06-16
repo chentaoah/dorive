@@ -61,4 +61,20 @@ public class ConfiguredRepository extends ProxyRepository {
         return super.selectPageByExample(boundedContext, example, page);
     }
 
+    @Override
+    public int updateByExample(Object entity, Object example) {
+        if (!entityDefinition.isUseEntityExample() && example instanceof EntityExample) {
+            example = ((EntityExample) example).buildExample();
+        }
+        return super.updateByExample(entity, example);
+    }
+
+    @Override
+    public int deleteByExample(Object example) {
+        if (!entityDefinition.isUseEntityExample() && example instanceof EntityExample) {
+            example = ((EntityExample) example).buildExample();
+        }
+        return super.deleteByExample(example);
+    }
+
 }
