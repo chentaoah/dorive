@@ -1,7 +1,6 @@
 package com.gitee.spring.domain.core.repository;
 
 import com.gitee.spring.domain.core.api.EntityCriterion;
-import com.gitee.spring.domain.core.api.EntityCaches;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityExample;
 

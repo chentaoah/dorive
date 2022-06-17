@@ -36,8 +36,6 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, InitializingBean {
 
-    protected Class<?> repositoryClass;
-
     protected Class<?> entityClass;
     protected Constructor<?> entityCtor;
 
@@ -60,8 +58,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        repositoryClass = this.getClass();
-
         Type genericSuperclass = this.getClass().getGenericSuperclass();
         ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];

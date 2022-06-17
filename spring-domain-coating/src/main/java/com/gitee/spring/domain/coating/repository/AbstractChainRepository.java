@@ -11,7 +11,6 @@ import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.entity.*;
-import com.gitee.spring.domain.core.impl.DefaultEntityCaches;
 import com.gitee.spring.domain.core.repository.AbstractDelegateRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.extern.slf4j.Slf4j;

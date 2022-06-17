@@ -1,9 +1,13 @@
 package com.gitee.spring.domain.core.repository;
 
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.*;
 
+@Data
+@EqualsAndHashCode(callSuper = false)
 public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextRepository<E, PK> {
 
     protected Map<String, EntityPropertyChain> fieldEntityPropertyChainMap = new LinkedHashMap<>();
@@ -22,10 +26,6 @@ public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextR
             delegateConfiguredRepositories.add(configuredRepository);
         }
         return super.processConfiguredRepository(configuredRepository);
-    }
-
-    protected AbstractDelegateRepository<?, ?> adaptiveRepository(Object rootEntity) {
-        return this;
     }
 
 }

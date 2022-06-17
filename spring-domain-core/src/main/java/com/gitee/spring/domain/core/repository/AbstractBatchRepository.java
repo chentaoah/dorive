@@ -2,10 +2,8 @@ package com.gitee.spring.domain.core.repository;
 
 import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
-import com.gitee.spring.domain.core.api.EntityCaches;
 import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.entity.*;
-import com.gitee.spring.domain.core.impl.DefaultEntityCaches;
 
 import java.util.*;
 
@@ -18,25 +16,21 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
 
     @Override
     protected void handleRootEntities(BoundedContext boundedContext, List<?> rootEntities) {
+
+        executeChainQuery(boundedContext, repositoryLocations.get(0));
+
         if (rootEntities.size() == 1) {
             super.handleRootEntity(boundedContext, rootEntities.get(0));
             return;
         }
 
-        if (boundedContext.getEntityCaches() == null) {
-            boundedContext.setEntityCaches(new DefaultEntityCaches());
-        }
-        EntityCaches entityCaches = boundedContext.getEntityCaches();
-
-        Map<AbstractDelegateRepository<?, ?>, List<Object>> repositoryEntitiesMap = adaptiveRepositoryEntities(rootEntities);
-        repositoryEntitiesMap.forEach((abstractDelegateRepository, eachRootEntities) -> {
-
-            Class<?> repositoryClass = abstractDelegateRepository.getRepositoryClass();
-            ConfiguredRepository rootRepository = abstractDelegateRepository.getRootRepository();
-            List<ConfiguredRepository> subRepositories = abstractDelegateRepository.getSubRepositories();
-
-            Map<String, List<Object>> fieldValues = new LinkedHashMap<>();
-            collectFieldValues(boundedContext, fieldValues, rootRepository, eachRootEntities);
+        Map<AbstractAwareRepository<?, ?>, List<Object>> repositoryEntitiesMap = adaptiveRepositoryEntities(rootEntities);
+        repositoryEntitiesMap.forEach((abstractAwareRepository, eachRootEntities) -> {
+            List<RepositoryLocation> repositoryLocations = abstractAwareRepository.getRepositoryLocations();
+            for (int index = 1; index < repositoryLocations.size(); index++) {
+                RepositoryLocation repositoryLocation = repositoryLocations.get(index);
+                executeChainQuery(boundedContext, repositoryLocation);
+            }
 
             for (ConfiguredRepository configuredRepository : subRepositories) {
                 EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
@@ -57,11 +51,65 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
         });
     }
 
-    protected Map<AbstractDelegateRepository<?, ?>, List<Object>> adaptiveRepositoryEntities(List<?> rootEntities) {
-        Map<AbstractDelegateRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>();
+    protected void executeChainQuery(BoundedContext boundedContext, RepositoryLocation repositoryLocation) {
+        Map<String, List<Object>> entitiesCache = boundedContext.getEntitiesCache();
+        String absoluteAccessPath = repositoryLocation.getAbsoluteAccessPath();
+        List<Object> entities = entitiesCache.get(absoluteAccessPath);
+        if (entities == null) {
+            ConfiguredRepository definitionRepository = repositoryLocation.getDefinitionRepository();
+            ConfiguredRepository configuredRepository = repositoryLocation.getConfiguredRepository();
+
+            EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
+            if (isMatchScenes(boundedContext, entityDefinition.getSceneAttribute())) {
+                EntityExample entityExample = newExampleByCache(boundedContext, repositoryLocation);
+                if (entityExample.isDirtyQuery()) {
+                    entities = configuredRepository.selectByExample(entityExample);
+                    entitiesCache.put(absoluteAccessPath, entities);
+                }
+            }
+        }
+    }
+
+    protected EntityExample newExampleByCache(BoundedContext boundedContext, RepositoryLocation repositoryLocation) {
+        Map<String, List<Object>> entitiesCache = boundedContext.getEntitiesCache();
+
+        String definitionAccessPath = repositoryLocation.getDefinitionAccessPath();
+        ConfiguredRepository definitionRepository = repositoryLocation.getDefinitionRepository();
+        ConfiguredRepository configuredRepository = repositoryLocation.getConfiguredRepository();
+
+        EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
+        EntityDefinition queryEntityDefinition = configuredRepository.getEntityDefinition();
+        EntityMapper entityMapper = configuredRepository.getEntityMapper();
+        EntityExample entityExample = entityMapper.newExample(queryEntityDefinition, boundedContext);
+
+        for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
+            String absoluteAccessPath = definitionAccessPath + bindingDefinition.getBindAttribute();
+            List<Object> fieldValues = entitiesCache.get(absoluteAccessPath);
+            if (fieldValues == null) {
+                fieldValues = collectFieldValues(boundedContext, definitionAccessPath, bindingDefinition);
+            }
+            if (fieldValues != null && !fieldValues.isEmpty()) {
+                String aliasAttribute = bindingDefinition.getAliasAttribute();
+                EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, fieldValues);
+                entityExample.addCriterion(entityCriterion);
+            }
+        }
+        return entityExample;
+    }
+
+    protected List<Object> collectFieldValues(BoundedContext boundedContext, String definitionAccessPath, BindingDefinition bindingDefinition) {
+        Map<String, List<Object>> entitiesCache = boundedContext.getEntitiesCache();
+        String belongAccessPath = bindingDefinition.getBelongAccessPath();
+        String absoluteAccessPath = definitionAccessPath + belongAccessPath;
+
+        return null;
+    }
+
+    protected Map<AbstractAwareRepository<?, ?>, List<Object>> adaptiveRepositoryEntities(List<?> rootEntities) {
+        Map<AbstractAwareRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>();
         for (Object rootEntity : rootEntities) {
-            AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(rootEntity);
-            List<Object> entities = repositoryEntitiesMap.computeIfAbsent(abstractDelegateRepository, key -> new ArrayList<>());
+            AbstractAwareRepository<?, ?> abstractAwareRepository = adaptiveRepository(rootEntity);
+            List<Object> entities = repositoryEntitiesMap.computeIfAbsent(abstractAwareRepository, key -> new ArrayList<>());
             entities.add(rootEntity);
         }
         return repositoryEntitiesMap;
