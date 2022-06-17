@@ -214,7 +214,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         List<BindingDefinition> contextBindingDefinitions = new ArrayList<>();
         BindingDefinition boundIdBindingDefinition = null;
         Set<String> entityJoinAliases = new LinkedHashSet<>();
-        List<String> bindingColumns = new ArrayList<>();
 
         for (Binding bindingAnnotation : bindingAnnotations) {
             AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(
@@ -240,43 +239,31 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             ConfiguredRepository belongConfiguredRepository = null;
             String boundFieldName = null;
             EntityPropertyChain boundEntityPropertyChain = null;
+            EntityPropertyChain relativeEntityPropertyChain = null;
 
             if (!isFromContext) {
                 belongAccessPath = PathUtils.getBelongPath(allConfiguredRepositoryMap.keySet(), bindAttribute);
                 belongConfiguredRepository = allConfiguredRepositoryMap.get(belongAccessPath);
-                Assert.notNull(belongConfiguredRepository, "No belong repository found!");
+                Assert.notNull(belongConfiguredRepository, "The belong repository cannot be null!");
 
                 boundFieldName = PathUtils.getFieldName(bindAttribute);
                 boundEntityPropertyChain = allEntityPropertyChainMap.get(bindAttribute);
-                Assert.notNull(boundEntityPropertyChain, "Bound path not available!");
-
+                Assert.notNull(boundEntityPropertyChain, "The bound entity property cannot be null!");
                 boundEntityPropertyChain.initialize();
-
-                entityJoinAliases.add(aliasAttribute);
-                bindingColumns.add(StrUtil.toUnderlineCase(aliasAttribute));
 
                 EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
                 Map<String, EntityPropertyChain> entityPropertyChainMap = entityDefinition.getEntityPropertyChainMap();
-                List<SceneEntityProperty> boundSceneEntityProperties = entityDefinition.getBoundSceneEntityProperties();
+                relativeEntityPropertyChain = entityPropertyChainMap.get(bindAttribute);
+                Assert.notNull(relativeEntityPropertyChain, "The relative entity property cannot be null!");
+                relativeEntityPropertyChain.initialize();
 
-                EntityPropertyChain relativeEntityPropertyChain = entityPropertyChainMap.get(bindAttribute);
-                SceneEntityProperty sceneEntityProperty = CollUtil.findOne(boundSceneEntityProperties, item ->
-                        item.getEntityPropertyChain() == relativeEntityPropertyChain);
-                if (sceneEntityProperty != null) {
-                    Set<String> sceneAttribute = sceneEntityProperty.getSceneAttribute();
-                    sceneAttribute.addAll(sceneAttributeSet);
-                } else {
-                    relativeEntityPropertyChain.initialize();
-                    SceneEntityProperty newSceneEntityProperty = new SceneEntityProperty(
-                            new LinkedHashSet<>(sceneAttributeSet), relativeEntityPropertyChain);
-                    boundSceneEntityProperties.add(newSceneEntityProperty);
-                }
+                entityJoinAliases.add(aliasAttribute);
             }
 
             BindingDefinition bindingDefinition = new BindingDefinition(
                     bindingAttributes, fieldAttribute, aliasAttribute, bindAttribute,
                     isFromContext, isBoundId, belongAccessPath, belongConfiguredRepository,
-                    boundFieldName, boundEntityPropertyChain, null);
+                    boundFieldName, boundEntityPropertyChain, relativeEntityPropertyChain, null);
 
             bindingDefinitions.add(bindingDefinition);
             if (!isFromContext) {
@@ -300,7 +287,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 attributes, sceneAttributeSet, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
                 bindingDefinitions, boundBindingDefinitions, contextBindingDefinitions, boundIdBindingDefinition,
-                entityJoinAliases, bindingColumns, new LinkedHashSet<>(), new LinkedHashMap<>(), new ArrayList<>());
+                entityJoinAliases, new LinkedHashSet<>(), new LinkedHashMap<>());
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {
@@ -343,7 +330,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
             String accessPath = prefixAccessPath + bindingDefinition.getFieldAttribute();
             EntityPropertyChain entityPropertyChain = entityPropertyChainMap.get(accessPath);
-            Assert.notNull(entityPropertyChain, "The binding field does not exist!");
+            Assert.notNull(entityPropertyChain, "The field entity property cannot be null!");
             entityPropertyChain.initialize();
             bindingDefinition.setFieldEntityPropertyChain(entityPropertyChain);
         }
