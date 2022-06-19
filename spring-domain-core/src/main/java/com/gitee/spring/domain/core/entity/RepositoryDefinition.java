@@ -1,5 +1,6 @@
 package com.gitee.spring.domain.core.entity;
 
+import com.gitee.spring.domain.core.repository.AbstractAwareRepository;
 import com.gitee.spring.domain.core.repository.AbstractDelegateRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.AllArgsConstructor;
@@ -9,7 +10,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class RepositoryLocation {
+public class RepositoryDefinition {
 
     private List<String> multiAccessPath;
     private String parentAccessPath;
@@ -17,7 +18,7 @@ public class RepositoryLocation {
     private String absoluteAccessPath;
     private boolean forwardParent;
     private ConfiguredRepository parentConfiguredRepository;
-    private AbstractDelegateRepository<?, ?> abstractDelegateRepository;
+    private AbstractAwareRepository<?, ?> abstractAwareRepository;
     private ConfiguredRepository configuredRepository;
 
     public String getDefinitionAccessPath() {

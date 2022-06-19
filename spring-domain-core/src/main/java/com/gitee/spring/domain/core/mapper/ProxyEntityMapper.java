@@ -22,7 +22,7 @@ public class ProxyEntityMapper implements EntityMapper {
     }
 
     @Override
-    public List<?> getDataFromPage(Object dataPage) {
+    public List<Object> getDataFromPage(Object dataPage) {
         return entityMapper.getDataFromPage(dataPage);
     }
 

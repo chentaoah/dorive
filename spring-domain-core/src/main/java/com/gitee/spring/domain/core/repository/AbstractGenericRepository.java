@@ -101,7 +101,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractAwareRepo
     @Override
     @SuppressWarnings("unchecked")
     public List<E> selectByExample(BoundedContext boundedContext, Object example) {
-        List<?> rootEntities = rootRepository.selectByExample(boundedContext, example);
+        List<Object> rootEntities = rootRepository.selectByExample(boundedContext, example);
         handleRootEntities(boundedContext, rootEntities);
         return (List<E>) rootEntities;
     }
@@ -110,12 +110,12 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractAwareRepo
     public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
         T dataPage = rootRepository.selectPageByExample(boundedContext, example, page);
         EntityMapper entityMapper = rootRepository.getEntityMapper();
-        List<?> rootEntities = entityMapper.getDataFromPage(dataPage);
+        List<Object> rootEntities = entityMapper.getDataFromPage(dataPage);
         handleRootEntities(boundedContext, rootEntities);
         return dataPage;
     }
 
-    protected void handleRootEntities(BoundedContext boundedContext, List<?> rootEntities) {
+    protected void handleRootEntities(BoundedContext boundedContext, List<Object> rootEntities) {
         rootEntities.forEach(rootEntity -> handleRootEntity(boundedContext, rootEntity));
     }
 

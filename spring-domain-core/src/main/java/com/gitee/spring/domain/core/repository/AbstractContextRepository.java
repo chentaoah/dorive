@@ -1,6 +1,5 @@
 package com.gitee.spring.domain.core.repository;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core.annotation.Binding;
@@ -12,7 +11,6 @@ import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.constants.Attribute;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
-import com.gitee.spring.domain.core.entity.SceneEntityProperty;
 import com.gitee.spring.domain.core.mapper.MapEntityMapper;
 import com.gitee.spring.domain.core.utils.PathUtils;
 import com.gitee.spring.domain.core.utils.ReflectUtils;
@@ -127,9 +125,16 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             boolean isRoot = "/".equals(accessPath);
             if (isRoot) {
                 configuredRepository = newConfiguredRepository(
-                        true, "/", annotatedElement, null,
-                        entityClass, false, entityClass, null,
-                        attributes, bindingAnnotations);
+                        true,
+                        "/",
+                        annotatedElement,
+                        null,
+                        entityClass,
+                        false,
+                        entityClass,
+                        null,
+                        attributes,
+                        bindingAnnotations);
                 rootRepository = configuredRepository;
 
             } else {
@@ -142,9 +147,16 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 entityPropertyChain.initialize();
 
                 configuredRepository = newConfiguredRepository(
-                        false, accessPath, annotatedElement, entityPropertyChain,
-                        entityClass, isCollection, genericEntityClass, fieldName,
-                        attributes, bindingAnnotations);
+                        false,
+                        accessPath,
+                        annotatedElement,
+                        entityPropertyChain,
+                        entityClass,
+                        isCollection,
+                        genericEntityClass,
+                        fieldName,
+                        attributes,
+                        bindingAnnotations);
                 subRepositories.add(configuredRepository);
             }
             allConfiguredRepositoryMap.put(accessPath, configuredRepository);

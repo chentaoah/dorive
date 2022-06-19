@@ -16,7 +16,6 @@ import com.gitee.spring.domain.core.constants.Attribute;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
-import com.gitee.spring.domain.core.entity.SceneEntityProperty;
 import com.gitee.spring.domain.core.repository.AbstractDelegateRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import com.gitee.spring.domain.event.repository.AbstractEventRepository;
@@ -178,7 +177,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
             }
         });
 
-        for (ConfiguredRepository configuredRepository : delegateConfiguredRepositories) {
+        for (ConfiguredRepository configuredRepository : delegateRepositories) {
             multiAccessPath = new ArrayList<>(multiAccessPath);
             EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
             multiAccessPath.add(entityDefinition.getAccessPath());

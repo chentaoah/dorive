@@ -2,9 +2,11 @@ package com.gitee.spring.domain.core.repository;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
-import com.gitee.spring.domain.core.entity.RepositoryLocation;
+import com.gitee.spring.domain.core.entity.RepositoryGroup;
+import com.gitee.spring.domain.core.entity.RepositoryDefinition;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -12,52 +14,67 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractAwareRepository<E, PK> extends AbstractDelegateRepository<E, PK> {
 
-    protected Map<String, RepositoryLocation> repositoryLocationMap = new LinkedHashMap<>();
-    protected List<RepositoryLocation> repositoryLocations = new ArrayList<>();
-    protected List<RepositoryLocation> reversedRepositoryLocations = new ArrayList<>();
+    protected Map<String, RepositoryGroup> repositoryGroupMap = new LinkedHashMap<>();
+    protected List<RepositoryGroup> repositoryGroups = new ArrayList<>();
+    protected List<RepositoryGroup> reversedRepositoryGroups = new ArrayList<>();
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        resolveRepositoryLocationMap(new ArrayList<>(), null, this);
-        repositoryLocations.addAll(repositoryLocationMap.values());
-        reversedRepositoryLocations.addAll(repositoryLocationMap.values());
-        Collections.reverse(reversedRepositoryLocations);
+        resolveRepositoryGroups(new ArrayList<>(), null, this);
+        repositoryGroups.addAll(repositoryGroupMap.values());
+        reversedRepositoryGroups.addAll(repositoryGroupMap.values());
+        Collections.reverse(reversedRepositoryGroups);
     }
 
-    protected void resolveRepositoryLocationMap(List<String> multiAccessPath,
-                                                ConfiguredRepository parentConfiguredRepository,
-                                                AbstractDelegateRepository<?, ?> abstractDelegateRepository) {
+    protected void resolveRepositoryGroups(List<String> multiAccessPath,
+                                           ConfiguredRepository parentConfiguredRepository,
+                                           AbstractAwareRepository<?, ?> abstractAwareRepository) {
 
         List<String> finalMultiAccessPath = multiAccessPath;
         String parentAccessPath = multiAccessPath.size() > 1 ? StrUtil.join("", multiAccessPath.subList(0, multiAccessPath.size() - 1)) : "";
         String prefixAccessPath = StrUtil.join("", multiAccessPath);
 
-        Map<String, ConfiguredRepository> allConfiguredRepositoryMap = abstractDelegateRepository.getAllConfiguredRepositoryMap();
-        allConfiguredRepositoryMap.forEach((accessPath, configuredRepository) -> {
+        String groupAccessPath = StringUtils.isNotBlank(prefixAccessPath) ? prefixAccessPath : "/";
+        RepositoryGroup repositoryGroup = new RepositoryGroup(groupAccessPath, new ArrayList<>());
+        repositoryGroupMap.put(groupAccessPath, repositoryGroup);
+        List<RepositoryDefinition> repositoryDefinitions = repositoryGroup.getRepositoryDefinitions();
 
+        List<ConfiguredRepository> subRepositories = abstractAwareRepository.getSubRepositories();
+        for (ConfiguredRepository configuredRepository : subRepositories) {
             EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
             String absoluteAccessPath = prefixAccessPath + entityDefinition.getAccessPath();
-            boolean forwardParent = entityDefinition.isRoot() && parentConfiguredRepository != null;
 
-            RepositoryLocation repositoryLocation = new RepositoryLocation(
-                    finalMultiAccessPath,
-                    parentAccessPath,
-                    prefixAccessPath,
-                    absoluteAccessPath,
-                    forwardParent,
-                    parentConfiguredRepository,
-                    abstractDelegateRepository,
-                    configuredRepository);
-            repositoryLocationMap.put(absoluteAccessPath, repositoryLocation);
-        });
+            AbstractRepository<Object, Object> abstractRepository = configuredRepository.getRepository();
+            if (abstractRepository instanceof AbstractAwareRepository) {
+                AbstractAwareRepository<?, ?> repository = (AbstractAwareRepository<?, ?>) abstractRepository;
 
-        for (ConfiguredRepository configuredRepository : delegateConfiguredRepositories) {
-            multiAccessPath = new ArrayList<>(multiAccessPath);
-            EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-            multiAccessPath.add(entityDefinition.getAccessPath());
-            AbstractDelegateRepository<?, ?> delegateRepository = (AbstractDelegateRepository<?, ?>) configuredRepository.getRepository();
-            resolveRepositoryLocationMap(multiAccessPath, configuredRepository, delegateRepository);
+                RepositoryDefinition repositoryDefinition = new RepositoryDefinition(
+                        finalMultiAccessPath,
+                        parentAccessPath,
+                        prefixAccessPath,
+                        absoluteAccessPath,
+                        true,
+                        configuredRepository,
+                        repository,
+                        repository.getRootRepository());
+                repositoryDefinitions.add(repositoryDefinition);
+
+                multiAccessPath = new ArrayList<>(multiAccessPath);
+                multiAccessPath.add(entityDefinition.getAccessPath());
+                resolveRepositoryGroups(multiAccessPath, configuredRepository, repository);
+            } else {
+                RepositoryDefinition repositoryDefinition = new RepositoryDefinition(
+                        finalMultiAccessPath,
+                        parentAccessPath,
+                        prefixAccessPath,
+                        absoluteAccessPath,
+                        false,
+                        parentConfiguredRepository,
+                        abstractAwareRepository,
+                        configuredRepository);
+                repositoryDefinitions.add(repositoryDefinition);
+            }
         }
     }
 

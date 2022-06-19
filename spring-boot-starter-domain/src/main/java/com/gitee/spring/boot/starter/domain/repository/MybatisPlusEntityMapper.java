@@ -34,8 +34,9 @@ public class MybatisPlusEntityMapper implements EntityMapper {
     }
 
     @Override
-    public List<?> getDataFromPage(Object dataPage) {
-        return ((IPage<?>) dataPage).getRecords();
+    @SuppressWarnings("unchecked")
+    public List<Object> getDataFromPage(Object dataPage) {
+        return ((IPage<Object>) dataPage).getRecords();
     }
 
     @Override

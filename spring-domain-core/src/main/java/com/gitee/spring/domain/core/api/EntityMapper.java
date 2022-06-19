@@ -10,7 +10,7 @@ public interface EntityMapper {
 
     Object newPage(Integer pageNum, Integer pageSize);
 
-    List<?> getDataFromPage(Object dataPage);
+    List<Object> getDataFromPage(Object dataPage);
 
     Object newPageOfEntities(Object dataPage, List<Object> entities);
 

@@ -9,7 +9,6 @@ import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
