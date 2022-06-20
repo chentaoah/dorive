@@ -225,7 +225,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         List<BindingDefinition> boundBindingDefinitions = new ArrayList<>();
         List<BindingDefinition> contextBindingDefinitions = new ArrayList<>();
         BindingDefinition boundIdBindingDefinition = null;
-        Set<String> entityJoinAliases = new LinkedHashSet<>();
 
         for (Binding bindingAnnotation : bindingAnnotations) {
             AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(
@@ -264,12 +263,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 boundEntityPropertyChain.initialize();
 
                 EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
+                entityDefinition.setBoundEntity(true);
                 Map<String, EntityPropertyChain> entityPropertyChainMap = entityDefinition.getEntityPropertyChainMap();
                 relativeEntityPropertyChain = entityPropertyChainMap.get(bindAttribute);
                 Assert.notNull(relativeEntityPropertyChain, "The relative entity property cannot be null!");
                 relativeEntityPropertyChain.initialize();
-
-                entityJoinAliases.add(aliasAttribute);
             }
 
             BindingDefinition bindingDefinition = new BindingDefinition(
@@ -299,7 +297,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 attributes, sceneAttributeSet, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
                 bindingDefinitions, boundBindingDefinitions, contextBindingDefinitions, boundIdBindingDefinition,
-                entityJoinAliases, new LinkedHashSet<>(), new LinkedHashMap<>());
+                false, new LinkedHashSet<>(), new LinkedHashMap<>());
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {

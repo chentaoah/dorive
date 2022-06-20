@@ -16,6 +16,8 @@ import com.gitee.spring.domain.core.constants.Attribute;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
+import com.gitee.spring.domain.core.entity.RepositoryDefinition;
+import com.gitee.spring.domain.core.entity.RepositoryGroup;
 import com.gitee.spring.domain.core.repository.AbstractDelegateRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import com.gitee.spring.domain.event.repository.AbstractEventRepository;
@@ -108,13 +110,9 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                     }
                 });
 
-                Map<String, RepositoryLocation> repositoryLocationMap = new LinkedHashMap<>();
-                collectRepositoryLocationMap(repositoryLocationMap, new ArrayList<>(), null, this,
+                List<RepositoryLocation> reversedRepositoryLocations = collectReversedRepositoryLocations(
                         locationPropertyDefinitionsMap, fieldPropertyDefinitionMap);
-
-                List<RepositoryLocation> repositoryLocations = new ArrayList<>(repositoryLocationMap.values());
-                checkFieldNames(coatingClass, allPropertyDefinitionMap.keySet(), repositoryLocations);
-                Collections.reverse(repositoryLocations);
+                checkFieldNames(coatingClass, allPropertyDefinitionMap.keySet(), reversedRepositoryLocations);
 
                 AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(coatingClass, Coating.class);
                 String name = null;
@@ -127,7 +125,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
                 CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, attributes, name, allPropertyDefinitionMap);
                 CoatingAssembler coatingAssembler = new DefaultCoatingAssembler(
-                        coatingDefinition, availablePropertyDefinitions, repositoryLocations);
+                        coatingDefinition, availablePropertyDefinitions, reversedRepositoryLocations);
 
                 classCoatingAssemblerMap.put(coatingClass, coatingAssembler);
                 Assert.isTrue(!nameCoatingAssemblerMap.containsKey(name), "The same coating name cannot exist!");
@@ -136,55 +134,34 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
         }
     }
 
-    protected void collectRepositoryLocationMap(Map<String, RepositoryLocation> repositoryLocationMap,
-                                                List<String> multiAccessPath,
-                                                ConfiguredRepository parentConfiguredRepository,
-                                                AbstractDelegateRepository<?, ?> abstractDelegateRepository,
-                                                Map<String, List<PropertyDefinition>> locationPropertyDefinitionsMap,
-                                                Map<String, PropertyDefinition> fieldPropertyDefinitionMap) {
+    private List<RepositoryLocation> collectReversedRepositoryLocations(Map<String, List<PropertyDefinition>> locationPropertyDefinitionsMap,
+                                                                        Map<String, PropertyDefinition> fieldPropertyDefinitionMap) {
+        List<RepositoryLocation> reversedRepositoryLocations = new ArrayList<>();
+        for (RepositoryGroup repositoryGroup : reversedRepositoryGroups) {
+            for (RepositoryDefinition repositoryDefinition : repositoryGroup.getRepositoryDefinitions()) {
+                String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
+                ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
+                EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
 
-        String parentAccessPath = multiAccessPath.size() > 1 ? StrUtil.join("", multiAccessPath.subList(0, multiAccessPath.size() - 1)) : "";
-        String prefixAccessPath = StrUtil.join("", multiAccessPath);
+                List<PropertyDefinition> propertyDefinitions = new ArrayList<>();
+                if (locationPropertyDefinitionsMap.containsKey(absoluteAccessPath)) {
+                    propertyDefinitions.addAll(locationPropertyDefinitionsMap.get(absoluteAccessPath));
+                }
 
-        List<String> finalMultiAccessPath = multiAccessPath;
-        allConfiguredRepositoryMap.forEach((accessPath, configuredRepository) -> {
-            EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
+                for (String fieldName : entityDefinition.getFieldNames()) {
+                    PropertyDefinition propertyDefinition = fieldPropertyDefinitionMap.get(fieldName);
+                    if (propertyDefinition != null) {
+                        propertyDefinitions.add(propertyDefinition);
+                    }
+                }
 
-            String absoluteAccessPath = prefixAccessPath + entityDefinition.getAccessPath();
-            boolean forwardParent = entityDefinition.isRoot() && parentConfiguredRepository != null;
-
-            List<PropertyDefinition> propertyDefinitions = new ArrayList<>();
-            if (locationPropertyDefinitionsMap.containsKey(absoluteAccessPath)) {
-                propertyDefinitions.addAll(locationPropertyDefinitionsMap.get(absoluteAccessPath));
-            }
-
-            Set<String> fieldNames = entityDefinition.getFieldNames();
-            List<SceneEntityProperty> boundSceneEntityProperties = entityDefinition.getBoundSceneEntityProperties();
-
-            for (String fieldName : fieldNames) {
-                PropertyDefinition propertyDefinition = fieldPropertyDefinitionMap.get(fieldName);
-                if (propertyDefinition != null) {
-                    propertyDefinitions.add(propertyDefinition);
+                if (!propertyDefinitions.isEmpty() || entityDefinition.isBoundEntity()) {
+                    RepositoryLocation repositoryLocation = new RepositoryLocation(repositoryDefinition, propertyDefinitions);
+                    reversedRepositoryLocations.add(repositoryLocation);
                 }
             }
-
-            if (!propertyDefinitions.isEmpty() || !boundSceneEntityProperties.isEmpty()) {
-                RepositoryLocation repositoryLocation = new RepositoryLocation(
-                        finalMultiAccessPath, parentAccessPath, prefixAccessPath, absoluteAccessPath,
-                        forwardParent, parentConfiguredRepository, abstractDelegateRepository, configuredRepository,
-                        propertyDefinitions);
-                repositoryLocationMap.put(absoluteAccessPath, repositoryLocation);
-            }
-        });
-
-        for (ConfiguredRepository configuredRepository : delegateRepositories) {
-            multiAccessPath = new ArrayList<>(multiAccessPath);
-            EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-            multiAccessPath.add(entityDefinition.getAccessPath());
-            AbstractDelegateRepository<?, ?> delegateRepository = (AbstractDelegateRepository<?, ?>) configuredRepository.getRepository();
-            collectRepositoryLocationMap(repositoryLocationMap, multiAccessPath, configuredRepository, delegateRepository,
-                    locationPropertyDefinitionsMap, fieldPropertyDefinitionMap);
         }
+        return reversedRepositoryLocations;
     }
 
     protected void checkFieldNames(Class<?> coatingClass, Set<String> fieldNames, List<RepositoryLocation> repositoryLocations) {

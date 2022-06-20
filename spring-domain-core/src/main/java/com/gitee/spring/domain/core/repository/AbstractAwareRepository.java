@@ -21,22 +21,17 @@ public abstract class AbstractAwareRepository<E, PK> extends AbstractDelegateRep
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        resolveRepositoryGroups(new ArrayList<>(), null, this);
+        resolveRepositoryGroups(new ArrayList<>(), this);
         repositoryGroups.addAll(repositoryGroupMap.values());
         reversedRepositoryGroups.addAll(repositoryGroupMap.values());
         Collections.reverse(reversedRepositoryGroups);
     }
 
-    protected void resolveRepositoryGroups(List<String> multiAccessPath,
-                                           ConfiguredRepository parentConfiguredRepository,
-                                           AbstractAwareRepository<?, ?> abstractAwareRepository) {
-
-        List<String> finalMultiAccessPath = multiAccessPath;
-        String parentAccessPath = multiAccessPath.size() > 1 ? StrUtil.join("", multiAccessPath.subList(0, multiAccessPath.size() - 1)) : "";
+    protected void resolveRepositoryGroups(List<String> multiAccessPath, AbstractAwareRepository<?, ?> abstractAwareRepository) {
         String prefixAccessPath = StrUtil.join("", multiAccessPath);
 
         String groupAccessPath = StringUtils.isNotBlank(prefixAccessPath) ? prefixAccessPath : "/";
-        RepositoryGroup repositoryGroup = new RepositoryGroup(groupAccessPath, new ArrayList<>());
+        RepositoryGroup repositoryGroup = new RepositoryGroup(groupAccessPath, abstractAwareRepository, new ArrayList<>());
         repositoryGroupMap.put(groupAccessPath, repositoryGroup);
         List<RepositoryDefinition> repositoryDefinitions = repositoryGroup.getRepositoryDefinitions();
 
@@ -50,28 +45,23 @@ public abstract class AbstractAwareRepository<E, PK> extends AbstractDelegateRep
                 AbstractAwareRepository<?, ?> repository = (AbstractAwareRepository<?, ?>) abstractRepository;
 
                 RepositoryDefinition repositoryDefinition = new RepositoryDefinition(
-                        finalMultiAccessPath,
-                        parentAccessPath,
                         prefixAccessPath,
                         absoluteAccessPath,
                         true,
                         configuredRepository,
-                        repository,
                         repository.getRootRepository());
                 repositoryDefinitions.add(repositoryDefinition);
 
                 multiAccessPath = new ArrayList<>(multiAccessPath);
                 multiAccessPath.add(entityDefinition.getAccessPath());
-                resolveRepositoryGroups(multiAccessPath, configuredRepository, repository);
+                resolveRepositoryGroups(multiAccessPath, repository);
+
             } else {
                 RepositoryDefinition repositoryDefinition = new RepositoryDefinition(
-                        finalMultiAccessPath,
-                        parentAccessPath,
                         prefixAccessPath,
                         absoluteAccessPath,
                         false,
-                        parentConfiguredRepository,
-                        abstractAwareRepository,
+                        configuredRepository,
                         configuredRepository);
                 repositoryDefinitions.add(repositoryDefinition);
             }
