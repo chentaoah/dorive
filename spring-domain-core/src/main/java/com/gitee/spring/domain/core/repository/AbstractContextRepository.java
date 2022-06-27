@@ -122,8 +122,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(annotatedElement, Binding.class);
         if (attributes != null) {
             ConfiguredRepository configuredRepository;
-            boolean isRoot = "/".equals(accessPath);
-            if (isRoot) {
+            if ("/".equals(accessPath)) {
                 configuredRepository = newConfiguredRepository(
                         true,
                         "/",
@@ -139,12 +138,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
             } else {
                 EntityPropertyChain entityPropertyChain = allEntityPropertyChainMap.get(accessPath);
+                entityPropertyChain.initialize();
+
                 Class<?> entityClass = entityPropertyChain.getEntityClass();
                 boolean isCollection = entityPropertyChain.isCollection();
                 Class<?> genericEntityClass = entityPropertyChain.getGenericEntityClass();
                 String fieldName = entityPropertyChain.getFieldName();
-
-                entityPropertyChain.initialize();
 
                 configuredRepository = newConfiguredRepository(
                         false,
