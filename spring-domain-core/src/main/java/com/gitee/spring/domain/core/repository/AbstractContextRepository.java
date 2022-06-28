@@ -102,8 +102,15 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             String fieldAccessPath = accessPath + "/" + fieldName;
 
             EntityPropertyChain entityPropertyChain = new EntityPropertyChain(
-                    lastEntityPropertyChain, entityClass, fieldAccessPath, declaredField,
-                    fieldEntityClass, isCollection, fieldGenericEntityClass, fieldName, null);
+                    lastEntityPropertyChain,
+                    entityClass,
+                    fieldAccessPath,
+                    declaredField,
+                    fieldEntityClass,
+                    isCollection,
+                    fieldGenericEntityClass,
+                    fieldName,
+                    null);
             allEntityPropertyChainMap.put(fieldAccessPath, entityPropertyChain);
 
             if (!filterEntityClass(fieldEntityClass)) {
