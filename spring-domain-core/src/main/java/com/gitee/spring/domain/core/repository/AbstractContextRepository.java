@@ -121,9 +121,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Entity.class);
         Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(annotatedElement, Binding.class);
         if (attributes != null) {
-            ConfiguredRepository configuredRepository;
             if ("/".equals(accessPath)) {
-                configuredRepository = newConfiguredRepository(
+                ConfiguredRepository configuredRepository = newConfiguredRepository(
                         true,
                         "/",
                         annotatedElement,
@@ -135,6 +134,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                         attributes,
                         bindingAnnotations);
                 rootRepository = configuredRepository;
+                allConfiguredRepositoryMap.put(accessPath, configuredRepository);
+                orderedRepositories.add(configuredRepository);
 
             } else {
                 EntityPropertyChain entityPropertyChain = allEntityPropertyChainMap.get(accessPath);
@@ -145,7 +146,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 Class<?> genericEntityClass = entityPropertyChain.getGenericEntityClass();
                 String fieldName = entityPropertyChain.getFieldName();
 
-                configuredRepository = newConfiguredRepository(
+                ConfiguredRepository configuredRepository = newConfiguredRepository(
                         false,
                         accessPath,
                         annotatedElement,
@@ -157,9 +158,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                         attributes,
                         bindingAnnotations);
                 subRepositories.add(configuredRepository);
+                allConfiguredRepositoryMap.put(accessPath, configuredRepository);
+                orderedRepositories.add(configuredRepository);
             }
-            allConfiguredRepositoryMap.put(accessPath, configuredRepository);
-            orderedRepositories.add(configuredRepository);
         }
     }
 
