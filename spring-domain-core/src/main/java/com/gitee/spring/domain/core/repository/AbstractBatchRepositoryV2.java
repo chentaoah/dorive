@@ -25,7 +25,7 @@ public abstract class AbstractBatchRepositoryV2<E, PK> extends AbstractGenericRe
                 if (isMatchScenes(boundedContext, configuredRepository)) {
                     EntityExample entityExample = newExampleByRootEntities(boundedContext, configuredRepository, eachRootEntities);
                     if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
-                        List<Object> entities = configuredRepository.selectByExample(entityExample);
+                        List<Object> entities = configuredRepository.selectByExample(boundedContext, entityExample);
                         log.debug("The data queried is: {}", entities);
                         assembleRootEntities(boundedContext, eachRootEntities, configuredRepository, entities);
                     }
