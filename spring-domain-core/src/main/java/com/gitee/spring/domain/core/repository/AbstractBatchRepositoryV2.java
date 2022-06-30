@@ -19,9 +19,9 @@ public abstract class AbstractBatchRepositoryV2<E, PK> extends AbstractGenericRe
 
     @Override
     protected void handleRootEntities(BoundedContext boundedContext, List<Object> rootEntities) {
-        Map<AbstractAwareRepository<?, ?>, List<Object>> repositoryEntitiesMap = adaptiveRepositoryEntities(rootEntities);
-        repositoryEntitiesMap.forEach((abstractAwareRepository, eachRootEntities) -> {
-            for (ConfiguredRepository configuredRepository : abstractAwareRepository.getSubRepositories()) {
+        Map<AbstractDelegateRepository<?, ?>, List<Object>> repositoryEntitiesMap = adaptiveRepositoryEntities(rootEntities);
+        repositoryEntitiesMap.forEach((abstractDelegateRepository, eachRootEntities) -> {
+            for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getSubRepositories()) {
                 if (isMatchScenes(boundedContext, configuredRepository)) {
                     EntityExample entityExample = newExampleByRootEntities(boundedContext, configuredRepository, eachRootEntities);
                     if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
@@ -34,11 +34,11 @@ public abstract class AbstractBatchRepositoryV2<E, PK> extends AbstractGenericRe
         });
     }
 
-    protected Map<AbstractAwareRepository<?, ?>, List<Object>> adaptiveRepositoryEntities(List<?> rootEntities) {
-        Map<AbstractAwareRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>();
+    protected Map<AbstractDelegateRepository<?, ?>, List<Object>> adaptiveRepositoryEntities(List<?> rootEntities) {
+        Map<AbstractDelegateRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>();
         for (Object rootEntity : rootEntities) {
-            AbstractAwareRepository<?, ?> abstractAwareRepository = adaptiveRepository(rootEntity);
-            List<Object> entities = repositoryEntitiesMap.computeIfAbsent(abstractAwareRepository, key -> new ArrayList<>());
+            AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(rootEntity);
+            List<Object> entities = repositoryEntitiesMap.computeIfAbsent(abstractDelegateRepository, key -> new ArrayList<>());
             entities.add(rootEntity);
         }
         return repositoryEntitiesMap;

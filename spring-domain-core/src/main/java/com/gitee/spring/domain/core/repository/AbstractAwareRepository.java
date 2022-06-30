@@ -68,8 +68,4 @@ public abstract class AbstractAwareRepository<E, PK> extends AbstractDelegateRep
         }
     }
 
-    protected AbstractAwareRepository<?, ?> adaptiveRepository(Object rootEntity) {
-        return this;
-    }
-
 }

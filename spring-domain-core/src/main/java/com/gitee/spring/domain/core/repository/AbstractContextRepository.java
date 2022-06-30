@@ -41,6 +41,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected String name;
 
     protected Map<String, EntityPropertyChain> allEntityPropertyChainMap = new LinkedHashMap<>();
+    protected Map<String, EntityPropertyChain> fieldEntityPropertyChainMap = new LinkedHashMap<>();
     protected Map<String, ConfiguredRepository> allConfiguredRepositoryMap = new LinkedHashMap<>();
 
     protected ConfiguredRepository rootRepository;
@@ -78,7 +79,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         annotatedElementMap.put("/", entityClass);
         allEntityPropertyChainMap.values().forEach(entityPropertyChain ->
                 annotatedElementMap.put(entityPropertyChain.getAccessPath(), entityPropertyChain.getDeclaredField()));
-        annotatedElementMap.forEach(this::resolveRepository);
+        annotatedElementMap.forEach(this::resolveConfiguredRepository);
 
         orderedRepositories.sort(Comparator.comparingInt(
                 configuredRepository -> configuredRepository.getEntityDefinition().getOrderAttribute()));
@@ -112,6 +113,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                     fieldName,
                     null);
             allEntityPropertyChainMap.put(fieldAccessPath, entityPropertyChain);
+            fieldEntityPropertyChainMap.putIfAbsent(fieldName, entityPropertyChain);
 
             if (!filterEntityClass(fieldEntityClass)) {
                 resolveEntityPropertyChains(fieldAccessPath, fieldEntityClass);
@@ -124,7 +126,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return className.startsWith("java.lang.") || className.startsWith("java.util.");
     }
 
-    protected void resolveRepository(String accessPath, AnnotatedElement annotatedElement) {
+    protected void resolveConfiguredRepository(String accessPath, AnnotatedElement annotatedElement) {
         AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Entity.class);
         Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(annotatedElement, Binding.class);
         if (attributes != null) {
