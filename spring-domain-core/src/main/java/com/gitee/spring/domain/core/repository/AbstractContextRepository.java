@@ -185,6 +185,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                                                            AnnotationAttributes attributes,
                                                            Set<Binding> bindingAnnotations) {
 
+        String uniqueKey = name + ":" + accessPath;
+
         String[] sceneAttributeStrs = attributes.getStringArray(Attribute.SCENE_ATTRIBUTE);
         Set<String> sceneAttributeSet = new LinkedHashSet<>(Arrays.asList(sceneAttributeStrs));
 
@@ -301,7 +303,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         EntityDefinition entityDefinition = new EntityDefinition(
-                isRoot, accessPath, annotatedElement,
+                isRoot, accessPath, uniqueKey, annotatedElement,
                 entityClass, isCollection, genericEntityClass, fieldName,
                 attributes, sceneAttributeSet, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,

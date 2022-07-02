@@ -14,6 +14,7 @@ import java.util.Set;
 public class EntityDefinition {
     private boolean root;
     private String accessPath;
+    private String uniqueKey;
     private AnnotatedElement annotatedElement;
     private Class<?> entityClass;
     private boolean collection;
