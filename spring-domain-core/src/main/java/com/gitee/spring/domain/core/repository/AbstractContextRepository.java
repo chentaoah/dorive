@@ -184,7 +184,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                                                            String fieldName,
                                                            AnnotationAttributes attributes,
                                                            Set<Binding> bindingAnnotations) {
-
         String uniqueKey = name + ":" + accessPath;
 
         String[] sceneAttributeStrs = attributes.getStringArray(Attribute.SCENE_ATTRIBUTE);
@@ -333,8 +332,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Map<String, EntityPropertyChain> entityPropertyChainMap = entityDefinition.getEntityPropertyChainMap();
 
         String prefixAccessPath = entityDefinition.getAccessPath() + "/";
-        List<String> accessPaths = allEntityPropertyChainMap.keySet().stream()
-                .filter(key -> key.startsWith(prefixAccessPath)).collect(Collectors.toList());
+        List<String> accessPaths = allEntityPropertyChainMap.keySet().stream().filter(key ->
+                key.startsWith(prefixAccessPath)).collect(Collectors.toList());
 
         for (String accessPath : accessPaths) {
             String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
