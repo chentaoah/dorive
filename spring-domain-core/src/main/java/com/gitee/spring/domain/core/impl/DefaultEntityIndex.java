@@ -16,9 +16,8 @@ public class DefaultEntityIndex implements EntityIndex {
 
     private final Map<String, List<Object>> entitiesMap = new ConcurrentHashMap<>();
 
-    public DefaultEntityIndex(RepositoryDefinition repositoryDefinition, List<?> entities) {
-        ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
-        EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
+    public DefaultEntityIndex(ConfiguredRepository configuredRepository, List<?> entities) {
+        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         List<BindingDefinition> bindingDefinitions = entityDefinition.getBoundBindingDefinitions();
         for (Object entity : entities) {
             StringBuilder builder = new StringBuilder();
@@ -35,6 +34,22 @@ public class DefaultEntityIndex implements EntityIndex {
             List<Object> existEntities = entitiesMap.computeIfAbsent(foreignKey, key -> new ArrayList<>());
             existEntities.add(entity);
         }
+    }
+
+    @Override
+    public String buildForeignKey(ConfiguredRepository configuredRepository, Object rootEntity) {
+        StringBuilder builder = new StringBuilder();
+        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
+        for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
+            String aliasAttribute = bindingDefinition.getAliasAttribute();
+            EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
+            Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
+            builder.append(aliasAttribute).append(": ").append(boundValue).append(", ");
+        }
+        if (builder.length() > 0) {
+            builder.delete(builder.length() - 2, builder.length());
+        }
+        return builder.toString();
     }
 
     @Override

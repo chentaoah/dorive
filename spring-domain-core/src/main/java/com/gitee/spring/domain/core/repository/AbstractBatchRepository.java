@@ -50,7 +50,8 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                 if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
                     List<Object> entities = configuredRepository.selectByExample(boundedContext, entityExample);
                     log.debug("The data queried is: {}", entities);
-                    assembleRootEntities(boundedContext, rootEntities, configuredRepository, entities);
+                    EntityIndex entityIndex = new DefaultEntityIndex(configuredRepository, entities);
+                    assembleRootEntities(rootEntities, configuredRepository, entityIndex);
                 }
             }
         }
@@ -78,20 +79,30 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                 break;
             }
         }
+        if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
+            for (BindingDefinition bindingDefinition : entityDefinition.getContextBindingDefinitions()) {
+                String bindAttribute = bindingDefinition.getBindAttribute();
+                Object boundValue = boundedContext.get(bindAttribute);
+                if (boundValue != null) {
+                    String aliasAttribute = bindingDefinition.getAliasAttribute();
+                    EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, boundValue);
+                    entityExample.addCriterion(entityCriterion);
+                }
+            }
+        }
         return entityExample;
     }
 
-    protected void assembleRootEntities(BoundedContext boundedContext, List<Object> rootEntities, ConfiguredRepository configuredRepository, List<Object> entities) {
-        EntityIndex entityIndex = new DefaultEntityIndex(null, entities);
+    protected void assembleRootEntities(List<Object> rootEntities, ConfiguredRepository configuredRepository, EntityIndex entityIndex) {
         for (Object rootEntity : rootEntities) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
             EntityPropertyChain lastEntityPropertyChain = entityPropertyChain.getLastEntityPropertyChain();
             Object lastEntity = lastEntityPropertyChain == null ? rootEntity : lastEntityPropertyChain.getValue(rootEntity);
-            if (lastEntity != null && isMatchScenes(boundedContext, configuredRepository)) {
-                String foreignKey = buildForeignKey(configuredRepository, rootEntity);
-                List<Object> eachEntities = entityIndex.selectList(foreignKey);
-                if (eachEntities != null) {
-                    Object entity = convertManyToOneEntity(configuredRepository, eachEntities);
+            if (lastEntity != null) {
+                String foreignKey = entityIndex.buildForeignKey(configuredRepository, rootEntity);
+                List<Object> entities = entityIndex.selectList(foreignKey);
+                if (entities != null) {
+                    Object entity = convertManyToOneEntity(configuredRepository, entities);
                     if (entity != null) {
                         EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
                         entityProperty.setValue(lastEntity, entity);
@@ -99,21 +110,6 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                 }
             }
         }
-    }
-
-    protected String buildForeignKey(ConfiguredRepository configuredRepository, Object rootEntity) {
-        StringBuilder builder = new StringBuilder();
-        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
-            String aliasAttribute = bindingDefinition.getAliasAttribute();
-            EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
-            Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
-            builder.append(aliasAttribute).append(": ").append(boundValue).append(", ");
-        }
-        if (builder.length() > 0) {
-            builder.delete(builder.length() - 2, builder.length());
-        }
-        return builder.toString();
     }
 
 }
