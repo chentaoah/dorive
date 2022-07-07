@@ -6,8 +6,6 @@ import java.util.List;
 
 public interface EntityIndex {
 
-    String buildForeignKey(ConfiguredRepository configuredRepository, Object rootEntity);
-
-    List<Object> selectList(String foreignKey);
+    List<Object> selectList(Object rootEntity, ConfiguredRepository configuredRepository);
 
 }

@@ -50,7 +50,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                 if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
                     List<Object> entities = configuredRepository.selectByExample(boundedContext, entityExample);
                     log.debug("The data queried is: {}", entities);
-                    EntityIndex entityIndex = new DefaultEntityIndex(configuredRepository, entities);
+                    EntityIndex entityIndex = buildEntityIndex(configuredRepository, entities);
                     assembleRootEntities(rootEntities, configuredRepository, entityIndex);
                 }
             }
@@ -93,14 +93,17 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
         return entityExample;
     }
 
+    protected EntityIndex buildEntityIndex(ConfiguredRepository configuredRepository, List<Object> entities) {
+        return new DefaultEntityIndex(configuredRepository, entities);
+    }
+
     protected void assembleRootEntities(List<Object> rootEntities, ConfiguredRepository configuredRepository, EntityIndex entityIndex) {
         for (Object rootEntity : rootEntities) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
             EntityPropertyChain lastEntityPropertyChain = entityPropertyChain.getLastEntityPropertyChain();
             Object lastEntity = lastEntityPropertyChain == null ? rootEntity : lastEntityPropertyChain.getValue(rootEntity);
             if (lastEntity != null) {
-                String foreignKey = entityIndex.buildForeignKey(configuredRepository, rootEntity);
-                List<Object> entities = entityIndex.selectList(foreignKey);
+                List<Object> entities = entityIndex.selectList(rootEntity, configuredRepository);
                 if (entities != null) {
                     Object entity = convertManyToOneEntity(configuredRepository, entities);
                     if (entity != null) {

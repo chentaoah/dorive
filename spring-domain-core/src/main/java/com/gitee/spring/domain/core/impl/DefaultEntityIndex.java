@@ -37,7 +37,11 @@ public class DefaultEntityIndex implements EntityIndex {
     }
 
     @Override
-    public String buildForeignKey(ConfiguredRepository configuredRepository, Object rootEntity) {
+    public List<Object> selectList(Object rootEntity, ConfiguredRepository configuredRepository) {
+        return entitiesMap.get(buildForeignKey(rootEntity, configuredRepository));
+    }
+
+    public String buildForeignKey(Object rootEntity, ConfiguredRepository configuredRepository) {
         StringBuilder builder = new StringBuilder();
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
@@ -50,11 +54,6 @@ public class DefaultEntityIndex implements EntityIndex {
             builder.delete(builder.length() - 2, builder.length());
         }
         return builder.toString();
-    }
-
-    @Override
-    public List<Object> selectList(String foreignKey) {
-        return entitiesMap.get(foreignKey);
     }
 
 }
