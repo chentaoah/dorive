@@ -24,11 +24,11 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
 
         } else if (rootEntities.size() > 1) {
             if (delegateRepositoryMap.size() == 1) {
-                executeQuery(boundedContext, this, rootEntities);
+                executeQuery(boundedContext, rootEntities, this);
             } else {
                 Map<AbstractDelegateRepository<?, ?>, List<Object>> repositoryEntitiesMap = adaptiveRepositoryEntities(rootEntities);
                 repositoryEntitiesMap.forEach((abstractDelegateRepository, eachRootEntities) ->
-                        executeQuery(boundedContext, abstractDelegateRepository, eachRootEntities));
+                        executeQuery(boundedContext, eachRootEntities, abstractDelegateRepository));
             }
         }
     }
@@ -43,7 +43,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
         return repositoryEntitiesMap;
     }
 
-    protected void executeQuery(BoundedContext boundedContext, AbstractDelegateRepository<?, ?> abstractDelegateRepository, List<Object> rootEntities) {
+    protected void executeQuery(BoundedContext boundedContext, List<Object> rootEntities, AbstractDelegateRepository<?, ?> abstractDelegateRepository) {
         for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getSubRepositories()) {
             if (isMatchScenes(boundedContext, configuredRepository)) {
                 EntityExample entityExample = newExampleByRootEntities(boundedContext, rootEntities, configuredRepository);
