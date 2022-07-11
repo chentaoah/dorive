@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-public abstract class AbstractGenericRepository<E, PK> extends AbstractAwareRepository<E, PK> {
+public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateRepository<E, PK> {
 
     @Override
     @SuppressWarnings("unchecked")

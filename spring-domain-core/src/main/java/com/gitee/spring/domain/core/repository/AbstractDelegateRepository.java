@@ -15,10 +15,10 @@ public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextR
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        resolveDelegateRepositories();
+        resolveDelegateRepositoryMap();
     }
 
-    protected void resolveDelegateRepositories() {
+    protected void resolveDelegateRepositoryMap() {
         delegateRepositoryMap.put(entityClass, this);
         Class<?> repositoryClass = this.getClass();
         ReflectionUtils.doWithLocalFields(repositoryClass, declaredField -> {
