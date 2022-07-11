@@ -16,11 +16,9 @@ import com.gitee.spring.domain.core.constants.Attribute;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
-import com.gitee.spring.domain.core.entity.RepositoryDefinition;
-import com.gitee.spring.domain.core.entity.RepositoryGroup;
-import com.gitee.spring.domain.core.repository.AbstractDelegateRepository;
+import com.gitee.spring.domain.coating.entity.RepositoryDefinition;
+import com.gitee.spring.domain.coating.entity.RepositoryGroup;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
-import com.gitee.spring.domain.event.repository.AbstractEventRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> {
+public abstract class AbstractCoatingRepository<E, PK> extends AbstractAwareRepository<E, PK> {
 
     protected Map<Class<?>, CoatingAssembler> classCoatingAssemblerMap = new ConcurrentHashMap<>();
     protected Map<String, CoatingAssembler> nameCoatingAssemblerMap = new ConcurrentHashMap<>();
@@ -134,8 +132,8 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
         }
     }
 
-    private List<RepositoryLocation> collectReversedRepositoryLocations(Map<String, List<PropertyDefinition>> locationPropertyDefinitionsMap,
-                                                                        Map<String, PropertyDefinition> fieldPropertyDefinitionMap) {
+    protected List<RepositoryLocation> collectReversedRepositoryLocations(Map<String, List<PropertyDefinition>> locationPropertyDefinitionsMap,
+                                                                          Map<String, PropertyDefinition> fieldPropertyDefinitionMap) {
         List<RepositoryLocation> reversedRepositoryLocations = new ArrayList<>();
         for (RepositoryGroup repositoryGroup : reversedRepositoryGroups) {
             for (RepositoryDefinition repositoryDefinition : repositoryGroup.getRepositoryDefinitions()) {
@@ -144,8 +142,9 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
                 EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
 
                 List<PropertyDefinition> propertyDefinitions = new ArrayList<>();
-                if (locationPropertyDefinitionsMap.containsKey(absoluteAccessPath)) {
-                    propertyDefinitions.addAll(locationPropertyDefinitionsMap.get(absoluteAccessPath));
+                List<PropertyDefinition> locationPropertyDefinitions = locationPropertyDefinitionsMap.get(absoluteAccessPath);
+                if (locationPropertyDefinitions != null) {
+                    propertyDefinitions.addAll(locationPropertyDefinitions);
                 }
 
                 for (String fieldName : entityDefinition.getFieldNames()) {

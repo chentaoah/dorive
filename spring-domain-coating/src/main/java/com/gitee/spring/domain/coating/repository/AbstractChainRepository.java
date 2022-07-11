@@ -5,13 +5,13 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.spring.domain.coating.entity.ChainCriterion;
 import com.gitee.spring.domain.coating.entity.PropertyDefinition;
+import com.gitee.spring.domain.coating.entity.RepositoryDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
 import com.gitee.spring.domain.coating.impl.DefaultCoatingAssembler;
 import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.entity.*;
-import com.gitee.spring.domain.core.repository.AbstractDelegateRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,22 +20,19 @@ import java.util.*;
 @Slf4j
 public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
 
-    public EntityExample buildExample(BoundedContext boundedContext, Object coating) {
-        DefaultCoatingAssembler defaultCoatingAssembler = (DefaultCoatingAssembler) classCoatingAssemblerMap.get(coating.getClass());
+    public EntityExample buildExample(BoundedContext boundedContext, Object coatingObject) {
+        DefaultCoatingAssembler defaultCoatingAssembler = (DefaultCoatingAssembler) classCoatingAssemblerMap.get(coatingObject.getClass());
         Assert.notNull(defaultCoatingAssembler, "No coating assembler exists!");
 
         Map<String, ChainCriterion> criterionMap = new LinkedHashMap<>();
         for (RepositoryLocation repositoryLocation : defaultCoatingAssembler.getReversedRepositoryLocations()) {
+            ChainCriterion chainCriterion = buildCriterion(boundedContext, repositoryLocation);
+            addToExampleOfCriterion(chainCriterion, coatingObject);
+
             RepositoryDefinition repositoryDefinition = repositoryLocation.getRepositoryDefinition();
             String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
-
-            if (!criterionMap.containsKey(absoluteAccessPath)) {
-                ChainCriterion chainCriterion = buildCriterion(boundedContext, repositoryLocation);
-                criterionMap.put(absoluteAccessPath, chainCriterion);
-            }
-
-            ChainCriterion chainCriterion = criterionMap.get(absoluteAccessPath);
-            addToExampleOfCriterion(chainCriterion, coating);
+            absoluteAccessPath = repositoryDefinition.isAggregateRoot() ? absoluteAccessPath + "/" : absoluteAccessPath;
+            criterionMap.put(absoluteAccessPath, chainCriterion);
         }
 
         executeChainQuery(boundedContext, criterionMap);
@@ -54,15 +51,14 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         return new ChainCriterion(repositoryLocation, entityExample);
     }
 
-    protected void addToExampleOfCriterion(ChainCriterion chainCriterion, Object coating) {
+    protected void addToExampleOfCriterion(ChainCriterion chainCriterion, Object coatingObject) {
         RepositoryLocation repositoryLocation = chainCriterion.getRepositoryLocation();
         EntityExample entityExample = chainCriterion.getEntityExample();
         for (PropertyDefinition propertyDefinition : repositoryLocation.getCollectedPropertyDefinitions()) {
-            Object fieldValue = ReflectUtil.getFieldValue(coating, propertyDefinition.getDeclaredField());
+            String aliasAttribute = propertyDefinition.getAliasAttribute();
+            String operatorAttribute = propertyDefinition.getOperatorAttribute();
+            Object fieldValue = ReflectUtil.getFieldValue(coatingObject, propertyDefinition.getDeclaredField());
             if (fieldValue != null) {
-                String aliasAttribute = propertyDefinition.getAliasAttribute();
-                String operatorAttribute = propertyDefinition.getOperatorAttribute();
-
                 RepositoryDefinition repositoryDefinition = repositoryLocation.getRepositoryDefinition();
                 ConfiguredRepository configuredRepository = repositoryDefinition.getConfiguredRepository();
                 EntityMapper entityMapper = configuredRepository.getEntityMapper();
@@ -74,8 +70,6 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
     protected void executeChainQuery(BoundedContext boundedContext, Map<String, ChainCriterion> criterionMap) {
         criterionMap.forEach((accessPath, chainCriterion) -> {
-            if ("/".equals(accessPath)) return;
-
             RepositoryLocation repositoryLocation = chainCriterion.getRepositoryLocation();
             EntityExample entityExample = chainCriterion.getEntityExample();
 

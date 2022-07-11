@@ -1,9 +1,12 @@
-package com.gitee.spring.domain.core.repository;
+package com.gitee.spring.domain.coating.repository;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
-import com.gitee.spring.domain.core.entity.RepositoryGroup;
-import com.gitee.spring.domain.core.entity.RepositoryDefinition;
+import com.gitee.spring.domain.coating.entity.RepositoryGroup;
+import com.gitee.spring.domain.coating.entity.RepositoryDefinition;
+import com.gitee.spring.domain.core.repository.AbstractRepository;
+import com.gitee.spring.domain.core.repository.ConfiguredRepository;
+import com.gitee.spring.domain.event.repository.AbstractEventRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +15,7 @@ import java.util.*;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class AbstractAwareRepository<E, PK> extends AbstractDelegateRepository<E, PK> {
+public abstract class AbstractAwareRepository<E, PK> extends AbstractEventRepository<E, PK> {
 
     protected Map<String, RepositoryGroup> repositoryGroupMap = new LinkedHashMap<>();
     protected List<RepositoryGroup> repositoryGroups = new ArrayList<>();
@@ -35,8 +38,7 @@ public abstract class AbstractAwareRepository<E, PK> extends AbstractDelegateRep
         repositoryGroupMap.put(groupAccessPath, repositoryGroup);
         List<RepositoryDefinition> repositoryDefinitions = repositoryGroup.getRepositoryDefinitions();
 
-        List<ConfiguredRepository> subRepositories = abstractAwareRepository.getSubRepositories();
-        for (ConfiguredRepository configuredRepository : subRepositories) {
+        for (ConfiguredRepository configuredRepository : abstractAwareRepository.getSubRepositories()) {
             EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
             String absoluteAccessPath = prefixAccessPath + entityDefinition.getAccessPath();
 

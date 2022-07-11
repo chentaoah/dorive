@@ -1,6 +1,6 @@
-package com.gitee.spring.domain.core.entity;
+package com.gitee.spring.domain.coating.entity;
 
-import com.gitee.spring.domain.core.repository.AbstractAwareRepository;
+import com.gitee.spring.domain.coating.repository.AbstractAwareRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
