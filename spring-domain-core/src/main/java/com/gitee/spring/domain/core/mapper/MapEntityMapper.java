@@ -19,7 +19,7 @@ public class MapEntityMapper extends ProxyEntityMapper {
     }
 
     @Override
-    public EntityExample newExample(EntityDefinition entityDefinition, BoundedContext boundedContext) {
+    public EntityExample newExample(BoundedContext boundedContext, EntityDefinition entityDefinition) {
         return new EntityExample(new LinkedHashMap<>());
     }
 

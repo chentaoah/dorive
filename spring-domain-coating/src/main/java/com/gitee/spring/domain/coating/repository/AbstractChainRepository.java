@@ -47,7 +47,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         ConfiguredRepository configuredRepository = repositoryDefinition.getConfiguredRepository();
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityMapper entityMapper = configuredRepository.getEntityMapper();
-        EntityExample entityExample = entityMapper.newExample(entityDefinition, boundedContext);
+        EntityExample entityExample = entityMapper.newExample(boundedContext, entityDefinition);
         return new ChainCriterion(repositoryLocation, entityExample);
     }
 

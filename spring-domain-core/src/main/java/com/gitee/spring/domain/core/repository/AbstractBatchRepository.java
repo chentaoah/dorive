@@ -60,7 +60,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
     protected EntityExample newExampleByRootEntities(BoundedContext boundedContext, List<Object> rootEntities, ConfiguredRepository configuredRepository) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityMapper entityMapper = configuredRepository.getEntityMapper();
-        EntityExample entityExample = entityMapper.newExample(entityDefinition, boundedContext);
+        EntityExample entityExample = entityMapper.newExample(boundedContext, entityDefinition);
         for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
             EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
             List<Object> fieldValues = new ArrayList<>();

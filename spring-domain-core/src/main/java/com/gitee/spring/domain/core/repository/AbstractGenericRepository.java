@@ -64,7 +64,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     protected EntityExample newExampleByContext(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityMapper entityMapper = configuredRepository.getEntityMapper();
-        EntityExample entityExample = entityMapper.newExample(entityDefinition, boundedContext);
+        EntityExample entityExample = entityMapper.newExample(boundedContext, entityDefinition);
         for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
             Object boundValue = getBoundValue(boundedContext, rootEntity, bindingDefinition);
             if (boundValue != null) {

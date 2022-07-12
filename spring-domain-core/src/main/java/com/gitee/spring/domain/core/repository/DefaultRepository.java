@@ -95,7 +95,7 @@ public class DefaultRepository extends ProxyRepository {
         if (primaryKey != null) {
             Object persistentObject = entityAssembler.disassemble(entityDefinition, boundedContext, entity);
             if (persistentObject != null) {
-                EntityExample entityExample = entityMapper.newExample(entityDefinition, boundedContext);
+                EntityExample entityExample = entityMapper.newExample(boundedContext, entityDefinition);
                 EntityCriterion entityCriterion = entityMapper.newCriterion("id", Operator.EQ, primaryKey);
                 entityExample.addCriterion(entityCriterion);
                 return super.updateByExample(persistentObject, entityExample.buildExample());

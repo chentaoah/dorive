@@ -32,8 +32,8 @@ public class ProxyEntityMapper implements EntityMapper {
     }
 
     @Override
-    public EntityExample newExample(EntityDefinition entityDefinition, BoundedContext boundedContext) {
-        return entityMapper.newExample(entityDefinition, boundedContext);
+    public EntityExample newExample(BoundedContext boundedContext, EntityDefinition entityDefinition) {
+        return entityMapper.newExample(boundedContext, entityDefinition);
     }
 
     @Override

@@ -48,7 +48,7 @@ public class MybatisPlusEntityMapper implements EntityMapper {
     }
 
     @Override
-    public EntityExample newExample(EntityDefinition entityDefinition, BoundedContext boundedContext) {
+    public EntityExample newExample(BoundedContext boundedContext, EntityDefinition entityDefinition) {
         EntityExample entityExample = new EntityExample(new QueryWrapper<>()) {
             @Override
             public EntityExample selectColumns() {

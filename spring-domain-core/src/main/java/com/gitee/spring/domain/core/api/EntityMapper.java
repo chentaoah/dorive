@@ -14,7 +14,7 @@ public interface EntityMapper {
 
     Object newPageOfEntities(Object dataPage, List<Object> entities);
 
-    EntityExample newExample(EntityDefinition entityDefinition, BoundedContext boundedContext);
+    EntityExample newExample(BoundedContext boundedContext, EntityDefinition entityDefinition);
 
     EntityCriterion newCriterion(String fieldName, String operator, Object fieldValue);
 
