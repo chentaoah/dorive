@@ -20,19 +20,19 @@ public class DefaultCoatingAssembler implements CoatingAssembler {
     private List<RepositoryLocation> reversedRepositoryLocations;
 
     @Override
-    public void assemble(Object coating, Object entity) {
+    public void assemble(Object coatingObject, Object entity) {
         for (PropertyDefinition propertyDefinition : availablePropertyDefinitions) {
             EntityPropertyChain entityPropertyChain = propertyDefinition.getEntityPropertyChain();
             Object targetValue = entityPropertyChain.getValue(entity);
-            ReflectUtil.setFieldValue(coating, propertyDefinition.getDeclaredField(), targetValue);
+            ReflectUtil.setFieldValue(coatingObject, propertyDefinition.getDeclaredField(), targetValue);
         }
     }
 
     @Override
-    public void disassemble(Object coating, Object entity) {
+    public void disassemble(Object coatingObject, Object entity) {
         for (PropertyDefinition propertyDefinition : availablePropertyDefinitions) {
             EntityPropertyChain entityPropertyChain = propertyDefinition.getEntityPropertyChain();
-            Object fieldValue = ReflectUtil.getFieldValue(coating, propertyDefinition.getDeclaredField());
+            Object fieldValue = ReflectUtil.getFieldValue(coatingObject, propertyDefinition.getDeclaredField());
             entityPropertyChain.setValue(entity, fieldValue);
         }
     }
