@@ -315,8 +315,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository(
-                this, entityPropertyChain, entityDefinition, entityMapper, entityAssembler,
-                (AbstractRepository<Object, Object>) repository);
+                entityPropertyChain, entityDefinition, entityMapper, entityAssembler, (AbstractRepository<Object, Object>) repository);
 
         return postProcessRepository(configuredRepository);
     }
