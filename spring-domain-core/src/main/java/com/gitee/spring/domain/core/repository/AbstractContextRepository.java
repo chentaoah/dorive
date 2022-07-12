@@ -73,7 +73,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         List<Class<?>> superClasses = ReflectUtils.getAllSuperClasses(entityClass, Object.class);
         superClasses.add(entityClass);
-        superClasses.forEach(clazz -> resolveEntityPropertyChains("", clazz));
+        superClasses.forEach(clazz -> resolveAllEntityPropertyChainMap("", clazz));
 
         Map<String, AnnotatedElement> annotatedElementMap = new LinkedHashMap<>();
         annotatedElementMap.put("/", entityClass);
@@ -85,7 +85,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 configuredRepository -> configuredRepository.getEntityDefinition().getOrderAttribute()));
     }
 
-    protected void resolveEntityPropertyChains(String accessPath, Class<?> entityClass) {
+    protected void resolveAllEntityPropertyChainMap(String accessPath, Class<?> entityClass) {
         ReflectionUtils.doWithLocalFields(entityClass, declaredField -> {
             Class<?> fieldEntityClass = declaredField.getType();
             boolean isCollection = false;
@@ -116,7 +116,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             fieldEntityPropertyChainMap.putIfAbsent(fieldName, entityPropertyChain);
 
             if (!filterEntityClass(fieldEntityClass)) {
-                resolveEntityPropertyChains(fieldAccessPath, fieldEntityClass);
+                resolveAllEntityPropertyChainMap(fieldAccessPath, fieldEntityClass);
             }
         });
     }
@@ -187,7 +187,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         String uniqueKey = name + ":" + accessPath;
 
         String[] sceneAttributeStrs = attributes.getStringArray(Attribute.SCENE_ATTRIBUTE);
-        Set<String> sceneAttributeSet = new LinkedHashSet<>(Arrays.asList(sceneAttributeStrs));
+        Set<String> sceneAttribute = new LinkedHashSet<>(Arrays.asList(sceneAttributeStrs));
 
         Class<?> mapperClass = attributes.getClass(Attribute.MAPPER_ATTRIBUTE);
         Object mapper = null;
@@ -260,7 +260,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             ConfiguredRepository belongConfiguredRepository = null;
             String boundFieldName = null;
             EntityPropertyChain boundEntityPropertyChain = null;
-            EntityPropertyChain relativeEntityPropertyChain = null;
 
             if (!isFromContext) {
                 belongAccessPath = PathUtils.getBelongPath(allConfiguredRepositoryMap.keySet(), bindAttribute);
@@ -274,16 +273,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
                 EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
                 entityDefinition.setBoundEntity(true);
-                Map<String, EntityPropertyChain> entityPropertyChainMap = entityDefinition.getEntityPropertyChainMap();
-                relativeEntityPropertyChain = entityPropertyChainMap.get(bindAttribute);
-                Assert.notNull(relativeEntityPropertyChain, "The relative entity property cannot be null!");
-                relativeEntityPropertyChain.initialize();
             }
 
             BindingDefinition bindingDefinition = new BindingDefinition(
                     bindingAttributes, fieldAttribute, aliasAttribute, bindAttribute,
                     isFromContext, isBoundId, belongAccessPath, belongConfiguredRepository,
-                    boundFieldName, boundEntityPropertyChain, relativeEntityPropertyChain, null);
+                    boundFieldName, boundEntityPropertyChain, null);
 
             bindingDefinitions.add(bindingDefinition);
             if (!isFromContext) {
@@ -304,7 +299,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         EntityDefinition entityDefinition = new EntityDefinition(
                 isRoot, accessPath, uniqueKey, annotatedElement,
                 entityClass, isCollection, genericEntityClass, fieldName,
-                attributes, sceneAttributeSet, mapper, pojoClass, sameType, mappedClass,
+                attributes, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
                 bindingDefinitions, boundBindingDefinitions, contextBindingDefinitions, boundIdBindingDefinition,
                 false, new LinkedHashSet<>(), new LinkedHashMap<>());
@@ -323,10 +318,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 this, entityPropertyChain, entityDefinition, entityMapper, entityAssembler,
                 (AbstractRepository<Object, Object>) repository);
 
-        return processConfiguredRepository(configuredRepository);
+        return postProcessRepository(configuredRepository);
     }
 
-    protected ConfiguredRepository processConfiguredRepository(ConfiguredRepository configuredRepository) {
+    protected ConfiguredRepository postProcessRepository(ConfiguredRepository configuredRepository) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         Set<String> fieldNames = entityDefinition.getFieldNames();
         Map<String, EntityPropertyChain> entityPropertyChainMap = entityDefinition.getEntityPropertyChainMap();
@@ -338,7 +333,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         for (String accessPath : accessPaths) {
             String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
             EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
-            EntityPropertyChain entityPropertyChain = entityPropertyChainMap.get(accessPath);
+            EntityPropertyChain entityPropertyChain = allEntityPropertyChainMap.get(accessPath);
 
             fieldNames.add(entityPropertyChain.getFieldName());
 

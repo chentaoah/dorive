@@ -18,6 +18,5 @@ public class BindingDefinition {
     private ConfiguredRepository belongConfiguredRepository;
     private String boundFieldName;
     private EntityPropertyChain boundEntityPropertyChain;
-    private EntityPropertyChain relativeEntityPropertyChain;
     private EntityPropertyChain fieldEntityPropertyChain;
 }
