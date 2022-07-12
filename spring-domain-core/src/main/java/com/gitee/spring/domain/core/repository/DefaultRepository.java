@@ -35,7 +35,7 @@ public class DefaultRepository extends ProxyRepository {
     public Object selectByPrimaryKey(BoundedContext boundedContext, Object primaryKey) {
         Object persistentObject = super.selectByPrimaryKey(boundedContext, primaryKey);
         if (persistentObject != null) {
-            return entityAssembler.assemble(entityDefinition, boundedContext, persistentObject);
+            return entityAssembler.assemble(boundedContext, entityDefinition, persistentObject);
         }
         return null;
     }
@@ -52,7 +52,7 @@ public class DefaultRepository extends ProxyRepository {
     protected List<Object> newEntities(BoundedContext boundedContext, List<?> persistentObjects) {
         List<Object> entities = new ArrayList<>();
         for (Object persistentObject : persistentObjects) {
-            Object entity = entityAssembler.assemble(entityDefinition, boundedContext, persistentObject);
+            Object entity = entityAssembler.assemble(boundedContext, entityDefinition, persistentObject);
             entities.add(entity);
         }
         return entities;
@@ -74,7 +74,7 @@ public class DefaultRepository extends ProxyRepository {
     public int insert(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey == null) {
-            Object persistentObject = entityAssembler.disassemble(entityDefinition, boundedContext, entity);
+            Object persistentObject = entityAssembler.disassemble(boundedContext, entityDefinition, entity);
             if (persistentObject != null) {
                 int count = super.insert(boundedContext, persistentObject);
                 copyPrimaryKey(entity, persistentObject);
@@ -93,7 +93,7 @@ public class DefaultRepository extends ProxyRepository {
     public int update(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey != null) {
-            Object persistentObject = entityAssembler.disassemble(entityDefinition, boundedContext, entity);
+            Object persistentObject = entityAssembler.disassemble(boundedContext, entityDefinition, entity);
             if (persistentObject != null) {
                 EntityExample entityExample = entityMapper.newExample(boundedContext, entityDefinition);
                 EntityCriterion entityCriterion = entityMapper.newCriterion("id", Operator.EQ, primaryKey);
@@ -107,7 +107,7 @@ public class DefaultRepository extends ProxyRepository {
     @Override
     public int updateByExample(Object entity, Object example) {
         Assert.isTrue(!(entity instanceof Collection), "The entity cannot be a collection!");
-        Object persistentObject = entityAssembler.disassemble(entityDefinition, new BoundedContext(), entity);
+        Object persistentObject = entityAssembler.disassemble(new BoundedContext(), entityDefinition, entity);
         if (persistentObject != null) {
             return super.updateByExample(persistentObject, example);
         }
