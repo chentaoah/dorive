@@ -5,10 +5,12 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.EntityProperty;
+import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.entity.*;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateRepository<E, PK> {
 
@@ -25,12 +27,12 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(rootEntity);
         for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getSubRepositories()) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
-            EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityPropertyChain();
-            Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
-            if (lastEntity != null && isMatchScenes(configuredRepository, boundedContext)) {
-                EntityExample entityExample = newExampleByContext(configuredRepository, boundedContext, rootEntity);
+            EntityPropertyChain lastEntityPropertyChain = entityPropertyChain.getLastEntityPropertyChain();
+            Object lastEntity = lastEntityPropertyChain == null ? rootEntity : lastEntityPropertyChain.getValue(rootEntity);
+            if (lastEntity != null && isMatchScenes(boundedContext, configuredRepository)) {
+                EntityExample entityExample = newExampleByContext(boundedContext, rootEntity, configuredRepository);
                 if (entityExample.isDirtyQuery()) {
-                    List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample.buildExample());
+                    List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample);
                     Object entity = convertManyToOneEntity(configuredRepository, entities);
                     if (entity != null) {
                         EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
@@ -41,10 +43,16 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         }
     }
 
-    protected boolean isMatchScenes(ConfiguredRepository configuredRepository, BoundedContext boundedContext) {
+    protected boolean isMatchScenes(BoundedContext boundedContext, ConfiguredRepository configuredRepository) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        String[] sceneAttribute = entityDefinition.getSceneAttribute();
-        if (sceneAttribute.length == 0) return true;
+        Set<String> sceneAttribute = entityDefinition.getSceneAttribute();
+        return isMatchScenes(boundedContext, sceneAttribute);
+    }
+
+    protected boolean isMatchScenes(BoundedContext boundedContext, Set<String> sceneAttribute) {
+        if (sceneAttribute.isEmpty()) {
+            return true;
+        }
         for (String scene : sceneAttribute) {
             if (boundedContext.containsKey(scene)) {
                 return true;
@@ -53,22 +61,22 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         return false;
     }
 
-    protected EntityExample newExampleByContext(ConfiguredRepository configuredRepository, BoundedContext boundedContext, Object rootEntity) {
+    protected EntityExample newExampleByContext(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityMapper entityMapper = configuredRepository.getEntityMapper();
-        EntityExample entityExample = entityMapper.newExample(entityDefinition, boundedContext);
-        for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
-            Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
+        EntityExample entityExample = entityMapper.newExample(boundedContext, entityDefinition);
+        for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
+            Object boundValue = getBoundValue(boundedContext, rootEntity, bindingDefinition);
             if (boundValue != null) {
-                String fieldAliasAttribute = bindingDefinition.getFieldAliasAttribute();
-                EntityCriterion entityCriterion = entityMapper.newEqualCriterion(fieldAliasAttribute, boundValue);
+                String aliasAttribute = bindingDefinition.getAliasAttribute();
+                EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, boundValue);
                 entityExample.addCriterion(entityCriterion);
             }
         }
         return entityExample;
     }
 
-    protected Object getBoundValue(BindingDefinition bindingDefinition, BoundedContext boundedContext, Object rootEntity) {
+    protected Object getBoundValue(BoundedContext boundedContext, Object rootEntity, BindingDefinition bindingDefinition) {
         Object boundValue;
         if (bindingDefinition.isFromContext()) {
             String bindAttribute = bindingDefinition.getBindAttribute();
@@ -93,18 +101,22 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     @Override
     @SuppressWarnings("unchecked")
     public List<E> selectByExample(BoundedContext boundedContext, Object example) {
-        List<?> entities = rootRepository.selectByExample(boundedContext, example);
-        entities.forEach(entity -> handleRootEntity(boundedContext, entity));
-        return (List<E>) entities;
+        List<Object> rootEntities = rootRepository.selectByExample(boundedContext, example);
+        handleRootEntities(boundedContext, rootEntities);
+        return (List<E>) rootEntities;
     }
 
     @Override
     public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
         T dataPage = rootRepository.selectPageByExample(boundedContext, example, page);
         EntityMapper entityMapper = rootRepository.getEntityMapper();
-        List<?> entities = entityMapper.getDataFromPage(dataPage);
-        entities.forEach(entity -> handleRootEntity(boundedContext, entity));
+        List<Object> rootEntities = entityMapper.getDataFromPage(dataPage);
+        handleRootEntities(boundedContext, rootEntities);
         return dataPage;
+    }
+
+    protected void handleRootEntities(BoundedContext boundedContext, List<Object> rootEntities) {
+        rootEntities.forEach(rootEntity -> handleRootEntity(boundedContext, rootEntity));
     }
 
     @Override
@@ -115,7 +127,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getOrderedRepositories()) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
-            if (targetEntity != null && isMatchScenes(configuredRepository, boundedContext)) {
+            if (targetEntity != null && isMatchScenes(boundedContext, configuredRepository)) {
                 if (targetEntity instanceof Collection) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
                         setBoundValueByContext(configuredRepository, boundedContext, entity, eachEntity);
@@ -134,9 +146,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
 
     protected void setBoundValueByContext(ConfiguredRepository configuredRepository, BoundedContext boundedContext, Object rootEntity, Object entity) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        for (BindingDefinition bindingDefinition : entityDefinition.getBindingDefinitions()) {
+        for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
             if (!bindingDefinition.isBoundId()) {
-                Object boundValue = getBoundValue(bindingDefinition, boundedContext, rootEntity);
+                Object boundValue = getBoundValue(boundedContext, rootEntity, bindingDefinition);
                 if (boundValue != null) {
                     String fieldAttribute = bindingDefinition.getFieldAttribute();
                     BeanUtil.setFieldValue(entity, fieldAttribute, boundValue);
@@ -162,7 +174,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getOrderedRepositories()) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
-            if (targetEntity != null && isMatchScenes(configuredRepository, boundedContext)) {
+            if (targetEntity != null && isMatchScenes(boundedContext, configuredRepository)) {
                 if (targetEntity instanceof Collection) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
                         totalCount += configuredRepository.update(boundedContext, eachEntity);
@@ -188,7 +200,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getOrderedRepositories()) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
-            if (targetEntity != null && isMatchScenes(configuredRepository, boundedContext)) {
+            if (targetEntity != null && isMatchScenes(boundedContext, configuredRepository)) {
                 if (targetEntity instanceof Collection) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
                         totalCount += configuredRepository.delete(boundedContext, eachEntity);

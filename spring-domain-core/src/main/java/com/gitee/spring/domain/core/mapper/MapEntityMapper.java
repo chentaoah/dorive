@@ -19,13 +19,13 @@ public class MapEntityMapper extends ProxyEntityMapper {
     }
 
     @Override
-    public EntityExample newExample(EntityDefinition entityDefinition, BoundedContext boundedContext) {
+    public EntityExample newExample(BoundedContext boundedContext, EntityDefinition entityDefinition) {
         return new EntityExample(new LinkedHashMap<>());
     }
 
     @Override
-    public EntityCriterion newEqualCriterion(String fieldName, Object fieldValue) {
-        return new AbstractEntityCriterion(fieldName, fieldValue) {
+    public EntityCriterion newCriterion(String fieldName, String operator, Object fieldValue) {
+        return new AbstractEntityCriterion(fieldName, operator, fieldValue) {
             @Override
             @SuppressWarnings("unchecked")
             public void appendTo(EntityExample entityExample) {
@@ -41,26 +41,6 @@ public class MapEntityMapper extends ProxyEntityMapper {
                 parameterMap.put(fieldName, fieldValue);
             }
         };
-    }
-
-    @Override
-    public EntityCriterion newGreaterThanCriterion(String fieldName, Object fieldValue) {
-        return newEqualCriterion(fieldName + "::GreaterThan", fieldValue);
-    }
-
-    @Override
-    public EntityCriterion newGreaterThanOrEqualCriterion(String fieldName, Object fieldValue) {
-        return newEqualCriterion(fieldName + "::GreaterThanOrEqual", fieldValue);
-    }
-
-    @Override
-    public EntityCriterion newLessThanCriterion(String fieldName, Object fieldValue) {
-        return newEqualCriterion(fieldName + "::LessThan", fieldValue);
-    }
-
-    @Override
-    public EntityCriterion newLessThanOrEqualCriterion(String fieldName, Object fieldValue) {
-        return newEqualCriterion(fieldName + "::LessThanOrEqual", fieldValue);
     }
 
 }

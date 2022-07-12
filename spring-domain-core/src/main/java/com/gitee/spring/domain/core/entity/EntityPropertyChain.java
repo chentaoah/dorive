@@ -12,14 +12,29 @@ import java.lang.reflect.Field;
 @AllArgsConstructor
 @ToString(exclude = "lastEntityPropertyChain")
 public class EntityPropertyChain implements EntityProperty {
+
     private EntityPropertyChain lastEntityPropertyChain;
     private Class<?> lastEntityClass;
-    private Field declaredField;
     private String accessPath;
+    private Field declaredField;
     private Class<?> entityClass;
+    private boolean collection;
+    private Class<?> genericEntityClass;
     private String fieldName;
     private EntityProperty entityProperty;
-    private boolean boundProperty;
+
+    public EntityPropertyChain(EntityPropertyChain lastEntityPropertyChain,
+                               EntityPropertyChain entityPropertyChain) {
+        this.lastEntityPropertyChain = lastEntityPropertyChain;
+        this.lastEntityClass = entityPropertyChain.getLastEntityClass();
+        this.accessPath = entityPropertyChain.getAccessPath();
+        this.declaredField = entityPropertyChain.getDeclaredField();
+        this.entityClass = entityPropertyChain.getEntityClass();
+        this.collection = entityPropertyChain.isCollection();
+        this.genericEntityClass = entityPropertyChain.getGenericEntityClass();
+        this.fieldName = entityPropertyChain.getFieldName();
+        this.entityProperty = entityPropertyChain.getEntityProperty();
+    }
 
     public void initialize() {
         if (entityProperty == null) {
