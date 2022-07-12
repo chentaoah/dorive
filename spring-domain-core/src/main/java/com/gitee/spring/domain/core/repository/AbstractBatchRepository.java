@@ -37,8 +37,8 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
         Map<AbstractDelegateRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>();
         for (Object rootEntity : rootEntities) {
             AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(rootEntity);
-            List<Object> entities = repositoryEntitiesMap.computeIfAbsent(abstractDelegateRepository, key -> new ArrayList<>());
-            entities.add(rootEntity);
+            List<Object> eachRootEntities = repositoryEntitiesMap.computeIfAbsent(abstractDelegateRepository, key -> new ArrayList<>());
+            eachRootEntities.add(rootEntity);
         }
         return repositoryEntitiesMap;
     }
