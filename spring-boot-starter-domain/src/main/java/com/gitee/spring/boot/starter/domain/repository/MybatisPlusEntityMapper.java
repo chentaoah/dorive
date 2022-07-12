@@ -52,9 +52,9 @@ public class MybatisPlusEntityMapper implements EntityMapper {
         EntityExample entityExample = new EntityExample(new QueryWrapper<>()) {
             @Override
             public EntityExample selectColumns() {
-                if (columns != null) {
+                if (selectColumns != null) {
                     QueryWrapper<?> queryWrapper = (QueryWrapper<?>) example;
-                    queryWrapper.select(columns.toArray(new String[0]));
+                    queryWrapper.select(selectColumns.toArray(new String[0]));
                 }
                 return this;
             }

@@ -235,6 +235,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         List<BindingDefinition> boundBindingDefinitions = new ArrayList<>();
         List<BindingDefinition> contextBindingDefinitions = new ArrayList<>();
         BindingDefinition boundIdBindingDefinition = null;
+        Set<String> boundColumns = new LinkedHashSet<>();
 
         for (Binding bindingAnnotation : bindingAnnotations) {
             AnnotationAttributes bindingAttributes = AnnotationUtils.getAnnotationAttributes(
@@ -273,6 +274,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
                 EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
                 entityDefinition.setBoundEntity(true);
+
+                boundColumns.add(StrUtil.toUnderlineCase(aliasAttribute));
             }
 
             BindingDefinition bindingDefinition = new BindingDefinition(
@@ -302,7 +305,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 attributes, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
                 bindingDefinitions, boundBindingDefinitions, contextBindingDefinitions, boundIdBindingDefinition,
-                false, new LinkedHashSet<>(), new LinkedHashMap<>());
+                boundColumns, new LinkedHashSet<>(), new LinkedHashMap<>(), false);
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {
