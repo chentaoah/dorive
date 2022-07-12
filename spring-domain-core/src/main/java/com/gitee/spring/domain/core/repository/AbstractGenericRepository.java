@@ -27,8 +27,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(rootEntity);
         for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getSubRepositories()) {
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
-            EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityPropertyChain();
-            Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
+            EntityPropertyChain lastEntityPropertyChain = entityPropertyChain.getLastEntityPropertyChain();
+            Object lastEntity = lastEntityPropertyChain == null ? rootEntity : lastEntityPropertyChain.getValue(rootEntity);
             if (lastEntity != null && isMatchScenes(boundedContext, configuredRepository)) {
                 EntityExample entityExample = newExampleByContext(boundedContext, rootEntity, configuredRepository);
                 if (entityExample.isDirtyQuery()) {
