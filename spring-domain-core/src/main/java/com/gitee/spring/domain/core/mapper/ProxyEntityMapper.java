@@ -22,7 +22,7 @@ public class ProxyEntityMapper implements EntityMapper {
     }
 
     @Override
-    public List<?> getDataFromPage(Object dataPage) {
+    public List<Object> getDataFromPage(Object dataPage) {
         return entityMapper.getDataFromPage(dataPage);
     }
 
@@ -32,33 +32,13 @@ public class ProxyEntityMapper implements EntityMapper {
     }
 
     @Override
-    public EntityExample newExample(EntityDefinition entityDefinition, BoundedContext boundedContext) {
-        return entityMapper.newExample(entityDefinition, boundedContext);
+    public EntityExample newExample(BoundedContext boundedContext, EntityDefinition entityDefinition) {
+        return entityMapper.newExample(boundedContext, entityDefinition);
     }
 
     @Override
-    public EntityCriterion newEqualCriterion(String fieldName, Object fieldValue) {
-        return entityMapper.newEqualCriterion(fieldName, fieldValue);
-    }
-
-    @Override
-    public EntityCriterion newGreaterThanCriterion(String fieldName, Object fieldValue) {
-        return entityMapper.newGreaterThanCriterion(fieldName, fieldValue);
-    }
-
-    @Override
-    public EntityCriterion newGreaterThanOrEqualCriterion(String fieldName, Object fieldValue) {
-        return entityMapper.newGreaterThanOrEqualCriterion(fieldName, fieldValue);
-    }
-
-    @Override
-    public EntityCriterion newLessThanCriterion(String fieldName, Object fieldValue) {
-        return entityMapper.newLessThanCriterion(fieldName, fieldValue);
-    }
-
-    @Override
-    public EntityCriterion newLessThanOrEqualCriterion(String fieldName, Object fieldValue) {
-        return entityMapper.newLessThanOrEqualCriterion(fieldName, fieldValue);
+    public EntityCriterion newCriterion(String fieldName, String operator, Object fieldValue) {
+        return entityMapper.newCriterion(fieldName, operator, fieldValue);
     }
 
 }

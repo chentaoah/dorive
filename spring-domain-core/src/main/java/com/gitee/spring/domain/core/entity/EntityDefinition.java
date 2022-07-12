@@ -6,19 +6,22 @@ import org.springframework.core.annotation.AnnotationAttributes;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 public class EntityDefinition {
     private boolean root;
     private String accessPath;
+    private String uniqueKey;
     private AnnotatedElement annotatedElement;
     private Class<?> entityClass;
     private boolean collection;
     private Class<?> genericEntityClass;
     private String fieldName;
     private AnnotationAttributes attributes;
-    private String[] sceneAttribute;
+    private Set<String> sceneAttribute;
     private Object mapper;
     private Class<?> pojoClass;
     private boolean sameType;
@@ -27,10 +30,14 @@ public class EntityDefinition {
     private boolean mapAsExample;
     private String orderByAsc;
     private String orderByDesc;
-    private String orderBy;
+    private String[] orderBy;
     private String sort;
     private int orderAttribute;
-    private List<BindingDefinition> bindingDefinitions;
+    private List<BindingDefinition> allBindingDefinitions;
+    private List<BindingDefinition> boundBindingDefinitions;
+    private List<BindingDefinition> contextBindingDefinitions;
     private BindingDefinition boundIdBindingDefinition;
-    private List<String> bindingColumns;
+    private boolean boundEntity;
+    private Set<String> fieldNames;
+    private Map<String, EntityPropertyChain> entityPropertyChainMap;
 }

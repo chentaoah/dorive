@@ -8,11 +8,12 @@ import java.util.List;
 
 @Data
 public class EntityExample {
+
     protected boolean emptyQuery = false;
     protected Object example;
     protected List<String> columns;
     protected List<EntityCriterion> entityCriteria = new ArrayList<>();
-    protected String orderBy;
+    protected String[] orderBy;
     protected String sort;
 
     public EntityExample(Object example) {

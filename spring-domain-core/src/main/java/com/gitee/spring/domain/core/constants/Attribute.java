@@ -1,6 +1,6 @@
-package com.gitee.spring.domain.core.api;
+package com.gitee.spring.domain.core.constants;
 
-public interface Constants {
+public interface Attribute {
     String NAME_ATTRIBUTE = "name";
 
     String SCENE_ATTRIBUTE = "scene";
@@ -14,11 +14,9 @@ public interface Constants {
     String REPOSITORY_ATTRIBUTE = "repository";
 
     String FIELD_ATTRIBUTE = "field";
-    String FIELD_ALIAS_ATTRIBUTE = "fieldAlias";
+    String ALIAS_ATTRIBUTE = "alias";
     String BIND_ATTRIBUTE = "bind";
-    String BIND_ALIAS_ATTRIBUTE = "bindAlias";
 
     String LOCATION_ATTRIBUTE = "location";
-    String ALIAS_ATTRIBUTE = "alias";
     String OPERATOR_ATTRIBUTE = "operator";
 }

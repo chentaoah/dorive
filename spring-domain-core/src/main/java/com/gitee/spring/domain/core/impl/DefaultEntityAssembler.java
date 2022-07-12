@@ -8,7 +8,7 @@ import com.gitee.spring.domain.core.entity.EntityDefinition;
 public class DefaultEntityAssembler implements EntityAssembler {
 
     @Override
-    public Object assemble(EntityDefinition entityDefinition, BoundedContext boundedContext, Object persistentObject) {
+    public Object assemble(BoundedContext boundedContext, EntityDefinition entityDefinition, Object persistentObject) {
         if (entityDefinition.isSameType()) {
             return persistentObject;
         } else {
@@ -17,7 +17,7 @@ public class DefaultEntityAssembler implements EntityAssembler {
     }
 
     @Override
-    public Object disassemble(EntityDefinition entityDefinition, BoundedContext boundedContext, Object entity) {
+    public Object disassemble(BoundedContext boundedContext, EntityDefinition entityDefinition, Object entity) {
         if (entityDefinition.isSameType()) {
             return entity;
         } else {

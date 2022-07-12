@@ -1,33 +1,44 @@
 package com.gitee.spring.domain.core.repository;
 
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
+@Data
+@EqualsAndHashCode(callSuper = false)
 public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextRepository<E, PK> {
 
-    protected Map<String, EntityPropertyChain> fieldEntityPropertyChainMap = new LinkedHashMap<>();
-    protected List<ConfiguredRepository> delegateConfiguredRepositories = new ArrayList<>();
+    protected Map<Class<?>, AbstractDelegateRepository<?, ?>> delegateRepositoryMap = new LinkedHashMap<>();
 
     @Override
-    protected EntityPropertyChain newEntityPropertyChain(Class<?> lastEntityClass, Field declaredField,
-                                                         String accessPath, Class<?> entityClass, String fieldName) {
-        EntityPropertyChain entityPropertyChain = super.newEntityPropertyChain(lastEntityClass, declaredField, accessPath, entityClass, fieldName);
-        fieldEntityPropertyChainMap.putIfAbsent(fieldName, entityPropertyChain);
-        return entityPropertyChain;
+    public void afterPropertiesSet() throws Exception {
+        super.afterPropertiesSet();
+        resolveDelegateRepositoryMap();
     }
 
-    @Override
-    protected ConfiguredRepository processConfiguredRepository(ConfiguredRepository configuredRepository) {
-        if (configuredRepository.getRepository() instanceof AbstractDelegateRepository) {
-            delegateConfiguredRepositories.add(configuredRepository);
-        }
-        return super.processConfiguredRepository(configuredRepository);
+    protected void resolveDelegateRepositoryMap() {
+        delegateRepositoryMap.put(entityClass, this);
+        ReflectionUtils.doWithLocalFields(this.getClass(), declaredField -> {
+            Class<?> fieldClass = declaredField.getType();
+            if (AbstractDelegateRepository.class.isAssignableFrom(fieldClass)) {
+                Object bean = applicationContext.getBean(fieldClass);
+                AbstractDelegateRepository<?, ?> repository = (AbstractDelegateRepository<?, ?>) bean;
+                Class<?> fieldEntityClass = repository.getEntityClass();
+                if (entityClass.isAssignableFrom(fieldEntityClass)) {
+                    delegateRepositoryMap.put(fieldEntityClass, repository);
+                }
+            }
+        });
+    }
+
+    protected AbstractDelegateRepository<?, ?> adaptiveRepository(Class<?> entityClass) {
+        return delegateRepositoryMap.get(entityClass);
     }
 
     protected AbstractDelegateRepository<?, ?> adaptiveRepository(Object rootEntity) {
-        return this;
+        return adaptiveRepository(rootEntity.getClass());
     }
 
 }

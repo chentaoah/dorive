@@ -10,20 +10,12 @@ public interface EntityMapper {
 
     Object newPage(Integer pageNum, Integer pageSize);
 
-    List<?> getDataFromPage(Object dataPage);
+    List<Object> getDataFromPage(Object dataPage);
 
     Object newPageOfEntities(Object dataPage, List<Object> entities);
 
-    EntityExample newExample(EntityDefinition entityDefinition, BoundedContext boundedContext);
+    EntityExample newExample(BoundedContext boundedContext, EntityDefinition entityDefinition);
 
-    EntityCriterion newEqualCriterion(String fieldName, Object fieldValue);
-
-    EntityCriterion newGreaterThanCriterion(String fieldName, Object fieldValue);
-
-    EntityCriterion newGreaterThanOrEqualCriterion(String fieldName, Object fieldValue);
-
-    EntityCriterion newLessThanCriterion(String fieldName, Object fieldValue);
-
-    EntityCriterion newLessThanOrEqualCriterion(String fieldName, Object fieldValue);
+    EntityCriterion newCriterion(String fieldName, String operator, Object fieldValue);
 
 }
