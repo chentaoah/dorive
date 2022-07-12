@@ -104,12 +104,10 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
             Object lastEntity = lastEntityPropertyChain == null ? rootEntity : lastEntityPropertyChain.getValue(rootEntity);
             if (lastEntity != null) {
                 List<Object> entities = entityIndex.selectList(rootEntity, configuredRepository);
-                if (entities != null) {
-                    Object entity = convertManyToOneEntity(configuredRepository, entities);
-                    if (entity != null) {
-                        EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
-                        entityProperty.setValue(lastEntity, entity);
-                    }
+                Object entity = convertManyToOneEntity(configuredRepository, entities);
+                if (entity != null) {
+                    EntityProperty entityProperty = entityPropertyChain.getEntityProperty();
+                    entityProperty.setValue(lastEntity, entity);
                 }
             }
         }
