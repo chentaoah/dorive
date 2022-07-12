@@ -30,7 +30,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             EntityProperty lastEntityProperty = entityPropertyChain.getLastEntityPropertyChain();
             Object lastEntity = lastEntityProperty == null ? rootEntity : lastEntityProperty.getValue(rootEntity);
             if (lastEntity != null && isMatchScenes(boundedContext, configuredRepository)) {
-                EntityExample entityExample = newExampleByContext(boundedContext, configuredRepository, rootEntity);
+                EntityExample entityExample = newExampleByContext(boundedContext, rootEntity, configuredRepository);
                 if (entityExample.isDirtyQuery()) {
                     List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample);
                     Object entity = convertManyToOneEntity(configuredRepository, entities);
@@ -61,12 +61,12 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         return false;
     }
 
-    protected EntityExample newExampleByContext(BoundedContext boundedContext, ConfiguredRepository configuredRepository, Object rootEntity) {
+    protected EntityExample newExampleByContext(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityMapper entityMapper = configuredRepository.getEntityMapper();
         EntityExample entityExample = entityMapper.newExample(entityDefinition, boundedContext);
         for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
-            Object boundValue = getBoundValue(boundedContext, bindingDefinition, rootEntity);
+            Object boundValue = getBoundValue(boundedContext, rootEntity, bindingDefinition);
             if (boundValue != null) {
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
                 EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, boundValue);
@@ -76,7 +76,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         return entityExample;
     }
 
-    protected Object getBoundValue(BoundedContext boundedContext, BindingDefinition bindingDefinition, Object rootEntity) {
+    protected Object getBoundValue(BoundedContext boundedContext, Object rootEntity, BindingDefinition bindingDefinition) {
         Object boundValue;
         if (bindingDefinition.isFromContext()) {
             String bindAttribute = bindingDefinition.getBindAttribute();
@@ -148,7 +148,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
             if (!bindingDefinition.isBoundId()) {
-                Object boundValue = getBoundValue(boundedContext, bindingDefinition, rootEntity);
+                Object boundValue = getBoundValue(boundedContext, rootEntity, bindingDefinition);
                 if (boundValue != null) {
                     String fieldAttribute = bindingDefinition.getFieldAttribute();
                     BeanUtil.setFieldValue(entity, fieldAttribute, boundValue);
