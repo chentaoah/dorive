@@ -31,7 +31,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
             RepositoryDefinition repositoryDefinition = repositoryLocation.getRepositoryDefinition();
             String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
-            absoluteAccessPath = repositoryDefinition.isAggregateRoot() ? absoluteAccessPath + "/" : absoluteAccessPath;
+            absoluteAccessPath = repositoryDefinition.isDelegateRoot() ? absoluteAccessPath + "/" : absoluteAccessPath;
             criterionMap.put(absoluteAccessPath, chainCriterion);
         }
 

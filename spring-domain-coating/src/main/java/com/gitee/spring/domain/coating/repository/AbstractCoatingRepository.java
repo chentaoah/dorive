@@ -135,32 +135,45 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractAwareRepo
     protected List<RepositoryLocation> collectReversedRepositoryLocations(Map<String, List<PropertyDefinition>> locationPropertyDefinitionsMap,
                                                                           Map<String, PropertyDefinition> fieldPropertyDefinitionMap) {
         List<RepositoryLocation> reversedRepositoryLocations = new ArrayList<>();
+
+        collectReversedRepositoryLocations(locationPropertyDefinitionsMap, fieldPropertyDefinitionMap,
+                reversedRepositoryLocations, rootRepositoryDefinition);
+
         for (RepositoryGroup repositoryGroup : reversedRepositoryGroups) {
             for (RepositoryDefinition repositoryDefinition : repositoryGroup.getRepositoryDefinitions()) {
-                String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
-                ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
-                EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
-
-                List<PropertyDefinition> propertyDefinitions = new ArrayList<>();
-                List<PropertyDefinition> locationPropertyDefinitions = locationPropertyDefinitionsMap.get(absoluteAccessPath);
-                if (locationPropertyDefinitions != null) {
-                    propertyDefinitions.addAll(locationPropertyDefinitions);
-                }
-
-                for (String fieldName : entityDefinition.getFieldNames()) {
-                    PropertyDefinition propertyDefinition = fieldPropertyDefinitionMap.get(fieldName);
-                    if (propertyDefinition != null) {
-                        propertyDefinitions.add(propertyDefinition);
-                    }
-                }
-
-                if (!propertyDefinitions.isEmpty() || entityDefinition.isBoundEntity()) {
-                    RepositoryLocation repositoryLocation = new RepositoryLocation(repositoryDefinition, propertyDefinitions);
-                    reversedRepositoryLocations.add(repositoryLocation);
-                }
+                collectReversedRepositoryLocations(locationPropertyDefinitionsMap, fieldPropertyDefinitionMap,
+                        reversedRepositoryLocations, repositoryDefinition);
             }
         }
+
         return reversedRepositoryLocations;
+    }
+
+    protected void collectReversedRepositoryLocations(Map<String, List<PropertyDefinition>> locationPropertyDefinitionsMap,
+                                                      Map<String, PropertyDefinition> fieldPropertyDefinitionMap,
+                                                      List<RepositoryLocation> reversedRepositoryLocations,
+                                                      RepositoryDefinition repositoryDefinition) {
+        String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
+        ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
+        EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
+
+        List<PropertyDefinition> propertyDefinitions = new ArrayList<>();
+        List<PropertyDefinition> locationPropertyDefinitions = locationPropertyDefinitionsMap.get(absoluteAccessPath);
+        if (locationPropertyDefinitions != null) {
+            propertyDefinitions.addAll(locationPropertyDefinitions);
+        }
+
+        for (String fieldName : entityDefinition.getFieldNames()) {
+            PropertyDefinition propertyDefinition = fieldPropertyDefinitionMap.get(fieldName);
+            if (propertyDefinition != null) {
+                propertyDefinitions.add(propertyDefinition);
+            }
+        }
+
+        if (!propertyDefinitions.isEmpty() || entityDefinition.isBoundEntity()) {
+            RepositoryLocation repositoryLocation = new RepositoryLocation(repositoryDefinition, propertyDefinitions);
+            reversedRepositoryLocations.add(repositoryLocation);
+        }
     }
 
     protected void checkFieldNames(Class<?> coatingClass, Set<String> fieldNames, List<RepositoryLocation> repositoryLocations) {

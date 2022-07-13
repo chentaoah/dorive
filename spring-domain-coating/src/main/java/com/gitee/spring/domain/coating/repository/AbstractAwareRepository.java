@@ -17,6 +17,7 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractAwareRepository<E, PK> extends AbstractEventRepository<E, PK> {
 
+    protected RepositoryDefinition rootRepositoryDefinition;
     protected Map<String, RepositoryGroup> repositoryGroupMap = new LinkedHashMap<>();
     protected List<RepositoryGroup> repositoryGroups = new ArrayList<>();
     protected List<RepositoryGroup> reversedRepositoryGroups = new ArrayList<>();
@@ -24,6 +25,12 @@ public abstract class AbstractAwareRepository<E, PK> extends AbstractEventReposi
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
+        rootRepositoryDefinition = new RepositoryDefinition(
+                "",
+                "/",
+                false,
+                rootRepository,
+                rootRepository);
         resolveRepositoryGroups(new ArrayList<>(), this);
         repositoryGroups.addAll(repositoryGroupMap.values());
         reversedRepositoryGroups.addAll(repositoryGroupMap.values());

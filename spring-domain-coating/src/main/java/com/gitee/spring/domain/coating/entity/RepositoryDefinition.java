@@ -9,7 +9,7 @@ import lombok.Data;
 public class RepositoryDefinition {
     private String prefixAccessPath;
     private String absoluteAccessPath;
-    private boolean aggregateRoot;
+    private boolean delegateRoot;
     private ConfiguredRepository definitionRepository;
     private ConfiguredRepository configuredRepository;
 }
