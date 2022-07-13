@@ -5,13 +5,14 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class EntityExample {
 
     protected boolean emptyQuery = false;
     protected Object example;
-    protected List<String> columns;
+    protected Set<String> selectColumns;
     protected List<EntityCriterion> entityCriteria = new ArrayList<>();
     protected String[] orderBy;
     protected String sort;
