@@ -70,6 +70,8 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
     protected void executeChainQuery(BoundedContext boundedContext, Map<String, ChainCriterion> criterionMap) {
         criterionMap.forEach((accessPath, chainCriterion) -> {
+            if ("/".equals(accessPath)) return;
+
             RepositoryLocation repositoryLocation = chainCriterion.getRepositoryLocation();
             EntityExample entityExample = chainCriterion.getEntityExample();
 
