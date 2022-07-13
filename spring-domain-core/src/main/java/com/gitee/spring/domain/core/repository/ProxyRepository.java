@@ -12,51 +12,51 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class ProxyRepository extends AbstractRepository<Object, Object> {
 
-    protected AbstractRepository<Object, Object> repository;
+    protected AbstractRepository<Object, Object> proxyRepository;
 
     @Override
     public Object selectByPrimaryKey(BoundedContext boundedContext, Object primaryKey) {
-        return repository.selectByPrimaryKey(boundedContext, primaryKey);
+        return proxyRepository.selectByPrimaryKey(boundedContext, primaryKey);
     }
 
     @Override
     public List<Object> selectByExample(BoundedContext boundedContext, Object example) {
-        return repository.selectByExample(boundedContext, example);
+        return proxyRepository.selectByExample(boundedContext, example);
     }
 
     @Override
     public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
-        return repository.selectPageByExample(boundedContext, example, page);
+        return proxyRepository.selectPageByExample(boundedContext, example, page);
     }
 
     @Override
     public int insert(BoundedContext boundedContext, Object entity) {
-        return repository.insert(boundedContext, entity);
+        return proxyRepository.insert(boundedContext, entity);
     }
 
     @Override
     public int update(BoundedContext boundedContext, Object entity) {
-        return repository.update(boundedContext, entity);
+        return proxyRepository.update(boundedContext, entity);
     }
 
     @Override
     public int updateByExample(Object entity, Object example) {
-        return repository.updateByExample(entity, example);
+        return proxyRepository.updateByExample(entity, example);
     }
 
     @Override
     public int delete(BoundedContext boundedContext, Object entity) {
-        return repository.delete(boundedContext, entity);
+        return proxyRepository.delete(boundedContext, entity);
     }
 
     @Override
     public int deleteByPrimaryKey(Object primaryKey) {
-        return repository.deleteByPrimaryKey(primaryKey);
+        return proxyRepository.deleteByPrimaryKey(primaryKey);
     }
 
     @Override
     public int deleteByExample(Object example) {
-        return repository.deleteByExample(example);
+        return proxyRepository.deleteByExample(example);
     }
 
 }
