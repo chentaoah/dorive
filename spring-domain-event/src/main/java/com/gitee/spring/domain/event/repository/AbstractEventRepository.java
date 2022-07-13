@@ -15,10 +15,11 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractBatchReposi
         this.enableEvent = enableEvent != null;
         super.afterPropertiesSet();
     }
-    
+
     @Override
     protected ConfiguredRepository postProcessRepository(ConfiguredRepository configuredRepository) {
-        return enableEvent ? new EventRepository(configuredRepository, applicationContext) : super.postProcessRepository(configuredRepository);
+        super.postProcessRepository(configuredRepository);
+        return enableEvent ? new EventRepository(configuredRepository, applicationContext) : configuredRepository;
     }
 
 }
