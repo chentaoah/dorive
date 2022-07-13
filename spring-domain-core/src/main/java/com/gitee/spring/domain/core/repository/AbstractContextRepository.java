@@ -309,6 +309,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 EntityPropertyResolver entityPropertyResolver = new EntityPropertyResolver();
                 entityPropertyResolver.resolveEntityProperties("", entityDefinition.getGenericEntityClass());
                 entityPropertyChainMap.putAll(entityPropertyResolver.getAllEntityPropertyChainMap());
+
+                Set<String> fieldNames = entityDefinition.getFieldNames();
+                entityPropertyChainMap.values().forEach(entityPropertyChain -> fieldNames.add(entityPropertyChain.getFieldName()));
+
                 prefixAccessPath = "/";
             }
 
