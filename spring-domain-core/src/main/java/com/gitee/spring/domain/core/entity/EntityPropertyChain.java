@@ -17,6 +17,7 @@ public class EntityPropertyChain implements EntityProperty {
     private Class<?> lastEntityClass;
     private String accessPath;
     private Field declaredField;
+    private boolean annotatedEntity;
     private Class<?> entityClass;
     private boolean collection;
     private Class<?> genericEntityClass;
@@ -29,6 +30,7 @@ public class EntityPropertyChain implements EntityProperty {
         this.lastEntityClass = entityPropertyChain.getLastEntityClass();
         this.accessPath = entityPropertyChain.getAccessPath();
         this.declaredField = entityPropertyChain.getDeclaredField();
+        this.annotatedEntity = entityPropertyChain.isAnnotatedEntity();
         this.entityClass = entityPropertyChain.getEntityClass();
         this.collection = entityPropertyChain.isCollection();
         this.genericEntityClass = entityPropertyChain.getGenericEntityClass();
