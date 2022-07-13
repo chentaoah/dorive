@@ -38,7 +38,7 @@ public class EntityDefinition {
     private List<BindingDefinition> contextBindingDefinitions;
     private BindingDefinition boundIdBindingDefinition;
     private Set<String> boundColumns;
+    private boolean boundEntity;
     private Set<String> fieldNames;
     private Map<String, EntityPropertyChain> entityPropertyChainMap;
-    private boolean boundEntity;
 }
