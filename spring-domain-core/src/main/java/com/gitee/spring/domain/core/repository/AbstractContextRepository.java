@@ -11,6 +11,7 @@ import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.constants.Attribute;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
+import com.gitee.spring.domain.core.impl.EntityPropertyResolver;
 import com.gitee.spring.domain.core.mapper.MapEntityMapper;
 import com.gitee.spring.domain.core.utils.PathUtils;
 import com.gitee.spring.domain.core.utils.ReflectUtils;
@@ -24,11 +25,9 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -71,9 +70,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             name = StrUtil.lowerFirst(entityClass.getSimpleName());
         }
 
+        EntityPropertyResolver entityPropertyResolver = new EntityPropertyResolver();
         List<Class<?>> superClasses = ReflectUtils.getAllSuperClasses(entityClass, Object.class);
-        superClasses.add(entityClass);
-        superClasses.forEach(clazz -> resolveAllEntityPropertyChainMap("", clazz));
+        superClasses.forEach(clazz -> entityPropertyResolver.resolveEntityProperties("", clazz));
+        entityPropertyResolver.resolveEntityProperties("", entityClass);
+        allEntityPropertyChainMap.putAll(entityPropertyResolver.getAllEntityPropertyChainMap());
+        fieldEntityPropertyChainMap.putAll(entityPropertyResolver.getFieldEntityPropertyChainMap());
 
         resolveConfiguredRepository("/", entityClass);
         allEntityPropertyChainMap.forEach((accessPath, entityPropertyChain) -> {
@@ -86,54 +88,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         orderedRepositories.sort(Comparator.comparingInt(
                 configuredRepository -> configuredRepository.getEntityDefinition().getOrderAttribute()));
-    }
-
-    protected void resolveAllEntityPropertyChainMap(String accessPath, Class<?> entityClass) {
-        ReflectionUtils.doWithLocalFields(entityClass, declaredField -> {
-            Class<?> fieldEntityClass = declaredField.getType();
-            boolean isCollection = false;
-            Class<?> fieldGenericEntityClass = fieldEntityClass;
-            String fieldName = declaredField.getName();
-
-            if (Collection.class.isAssignableFrom(fieldEntityClass)) {
-                isCollection = true;
-                ParameterizedType parameterizedType = (ParameterizedType) declaredField.getGenericType();
-                Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-                fieldGenericEntityClass = (Class<?>) actualTypeArgument;
-            }
-
-            EntityPropertyChain lastEntityPropertyChain = allEntityPropertyChainMap.get(accessPath);
-            String fieldAccessPath = accessPath + "/" + fieldName;
-            boolean annotatedEntity = AnnotatedElementUtils.isAnnotated(declaredField, Entity.class);
-
-            EntityPropertyChain entityPropertyChain = new EntityPropertyChain(
-                    lastEntityPropertyChain,
-                    entityClass,
-                    fieldAccessPath,
-                    declaredField,
-                    annotatedEntity,
-                    fieldEntityClass,
-                    isCollection,
-                    fieldGenericEntityClass,
-                    fieldName,
-                    null);
-
-            if (annotatedEntity) {
-                entityPropertyChain.initialize();
-            }
-
-            allEntityPropertyChainMap.put(fieldAccessPath, entityPropertyChain);
-            fieldEntityPropertyChainMap.putIfAbsent(fieldName, entityPropertyChain);
-
-            if (!filterEntityClass(fieldEntityClass)) {
-                resolveAllEntityPropertyChainMap(fieldAccessPath, fieldEntityClass);
-            }
-        });
-    }
-
-    protected boolean filterEntityClass(Class<?> entityClass) {
-        String className = entityClass.getName();
-        return className.startsWith("java.lang.") || className.startsWith("java.util.");
     }
 
     protected void resolveConfiguredRepository(String accessPath, AnnotatedElement annotatedElement) {
@@ -350,6 +304,13 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
             Map<String, EntityPropertyChain> entityPropertyChainMap = entityDefinition.getEntityPropertyChainMap();
             String prefixAccessPath = entityDefinition.isRoot() ? "/" : entityDefinition.getAccessPath() + "/";
+
+            if (entityPropertyChainMap.isEmpty() && entityDefinition.isCollection()) {
+                EntityPropertyResolver entityPropertyResolver = new EntityPropertyResolver();
+                entityPropertyResolver.resolveEntityProperties("", entityDefinition.getGenericEntityClass());
+                entityPropertyChainMap.putAll(entityPropertyResolver.getAllEntityPropertyChainMap());
+                prefixAccessPath = "/";
+            }
 
             for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
                 String fieldAccessPath = prefixAccessPath + bindingDefinition.getFieldAttribute();
