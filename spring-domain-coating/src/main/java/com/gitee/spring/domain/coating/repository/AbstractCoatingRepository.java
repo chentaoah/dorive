@@ -85,7 +85,8 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractAwareRepo
                     if (StringUtils.isBlank(aliasAttribute)) {
                         aliasAttribute = fieldName;
                     }
-
+                    
+                    Map<String, EntityPropertyChain> fieldEntityPropertyChainMap = entityPropertyResolver.getFieldEntityPropertyChainMap();
                     EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
 
                     PropertyDefinition propertyDefinition = new PropertyDefinition(
