@@ -183,7 +183,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Class<?> repositoryClass = attributes.getClass(Attribute.REPOSITORY_ATTRIBUTE);
         Object repository = repositoryClass != DefaultRepository.class ? applicationContext.getBean(repositoryClass) : null;
 
-        List<BindingDefinition> bindingDefinitions = new ArrayList<>();
+        List<BindingDefinition> allBindingDefinitions = new ArrayList<>();
         List<BindingDefinition> boundBindingDefinitions = new ArrayList<>();
         List<BindingDefinition> contextBindingDefinitions = new ArrayList<>();
         BindingDefinition boundIdBindingDefinition = null;
@@ -236,7 +236,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                     belongAccessPath, belongConfiguredRepository, boundFieldName, boundEntityPropertyChain,
                     null);
 
-            bindingDefinitions.add(bindingDefinition);
+            allBindingDefinitions.add(bindingDefinition);
             if (!isFromContext) {
                 boundBindingDefinitions.add(bindingDefinition);
             } else {
@@ -257,7 +257,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 entityClass, isCollection, genericEntityClass, fieldName,
                 attributes, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
-                bindingDefinitions, boundBindingDefinitions, contextBindingDefinitions, boundIdBindingDefinition,
+                allBindingDefinitions, boundBindingDefinitions, contextBindingDefinitions, boundIdBindingDefinition,
                 boundColumns, false, new LinkedHashSet<>(), new LinkedHashMap<>());
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
