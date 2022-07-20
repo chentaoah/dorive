@@ -34,21 +34,21 @@ public class EntityPropertyResolver {
 
             EntityPropertyChain lastEntityPropertyChain = allEntityPropertyChainMap.get(lastAccessPath);
             String fieldAccessPath = lastAccessPath + "/" + fieldName;
-            boolean annotatedEntity = AnnotatedElementUtils.isAnnotated(declaredField, Entity.class);
+            boolean isAnnotatedEntity = AnnotatedElementUtils.isAnnotated(declaredField, Entity.class);
 
             EntityPropertyChain entityPropertyChain = new EntityPropertyChain(
                     lastEntityPropertyChain,
                     entityClass,
                     fieldAccessPath,
                     declaredField,
-                    annotatedEntity,
+                    isAnnotatedEntity,
                     fieldEntityClass,
                     isCollection,
                     fieldGenericEntityClass,
                     fieldName,
                     null);
 
-            if (annotatedEntity) {
+            if (isAnnotatedEntity) {
                 entityPropertyChain.initialize();
             }
 
