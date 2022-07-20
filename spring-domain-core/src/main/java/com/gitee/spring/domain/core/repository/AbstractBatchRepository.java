@@ -79,17 +79,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                 break;
             }
         }
-        if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
-            for (BindingDefinition bindingDefinition : entityDefinition.getContextBindingDefinitions()) {
-                String bindAttribute = bindingDefinition.getBindAttribute();
-                Object boundValue = boundedContext.get(bindAttribute);
-                if (boundValue != null) {
-                    String aliasAttribute = bindingDefinition.getAliasAttribute();
-                    EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, boundValue);
-                    entityExample.addCriterion(entityCriterion);
-                }
-            }
-        }
+        newCriterionByContext(boundedContext, configuredRepository, entityExample);
         return entityExample;
     }
 

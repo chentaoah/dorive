@@ -80,9 +80,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 resolveConfiguredRepository(accessPath, entityPropertyChain.getDeclaredField());
             }
         });
-
-        resolveRepositoryEntityFields();
-
+        postProcessAllRepositories();
+        
         orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> configuredRepository.getEntityDefinition().getOrderAttribute()));
     }
 
@@ -280,13 +279,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return configuredRepository;
     }
 
-    protected void resolveRepositoryEntityFields() {
+    protected void postProcessAllRepositories() {
         Map<String, EntityPropertyChain> allEntityPropertyChainMap = entityPropertyResolver.getAllEntityPropertyChainMap();
         allEntityPropertyChainMap.forEach((accessPath, entityPropertyChain) -> {
             String belongAccessPath = PathUtils.getBelongPath(allConfiguredRepositoryMap.keySet(), accessPath);
             ConfiguredRepository belongConfiguredRepository = allConfiguredRepositoryMap.get(belongAccessPath);
             Assert.notNull(belongConfiguredRepository, "The belong repository cannot be null!");
-
             EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
 
             Set<String> fieldNames = entityDefinition.getFieldNames();

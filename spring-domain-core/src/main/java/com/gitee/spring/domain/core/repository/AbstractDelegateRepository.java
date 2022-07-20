@@ -23,11 +23,11 @@ public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextR
         ReflectionUtils.doWithLocalFields(this.getClass(), declaredField -> {
             Class<?> fieldClass = declaredField.getType();
             if (AbstractDelegateRepository.class.isAssignableFrom(fieldClass)) {
-                Object bean = applicationContext.getBean(fieldClass);
-                AbstractDelegateRepository<?, ?> repository = (AbstractDelegateRepository<?, ?>) bean;
-                Class<?> fieldEntityClass = repository.getEntityClass();
+                Object beanInstance = applicationContext.getBean(fieldClass);
+                AbstractDelegateRepository<?, ?> abstractDelegateRepository = (AbstractDelegateRepository<?, ?>) beanInstance;
+                Class<?> fieldEntityClass = abstractDelegateRepository.getEntityClass();
                 if (entityClass.isAssignableFrom(fieldEntityClass)) {
-                    delegateRepositoryMap.put(fieldEntityClass, repository);
+                    delegateRepositoryMap.put(fieldEntityClass, abstractDelegateRepository);
                 }
             }
         });

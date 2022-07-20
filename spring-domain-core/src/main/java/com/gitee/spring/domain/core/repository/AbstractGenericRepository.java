@@ -31,7 +31,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             Object lastEntity = lastEntityPropertyChain == null ? rootEntity : lastEntityPropertyChain.getValue(rootEntity);
             if (lastEntity != null && isMatchScenes(boundedContext, configuredRepository)) {
                 EntityExample entityExample = newExampleByContext(boundedContext, rootEntity, configuredRepository);
-                if (entityExample.isDirtyQuery()) {
+                if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
                     List<?> entities = configuredRepository.selectByExample(boundedContext, entityExample);
                     Object entity = convertManyToOneEntity(configuredRepository, entities);
                     if (entity != null) {
@@ -65,27 +65,36 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityMapper entityMapper = configuredRepository.getEntityMapper();
         EntityExample entityExample = entityMapper.newExample(boundedContext, entityDefinition);
-        for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
-            Object boundValue = getBoundValue(boundedContext, rootEntity, bindingDefinition);
+        for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
+            EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
+            Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
             if (boundValue != null) {
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
                 EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, boundValue);
                 entityExample.addCriterion(entityCriterion);
+            } else {
+                entityExample.setEmptyQuery(true);
+                break;
             }
         }
+        newCriterionByContext(boundedContext, configuredRepository, entityExample);
         return entityExample;
     }
 
-    protected Object getBoundValue(BoundedContext boundedContext, Object rootEntity, BindingDefinition bindingDefinition) {
-        Object boundValue;
-        if (bindingDefinition.isFromContext()) {
-            String bindAttribute = bindingDefinition.getBindAttribute();
-            boundValue = boundedContext.get(bindAttribute);
-        } else {
-            EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
-            boundValue = boundEntityPropertyChain.getValue(rootEntity);
+    protected void newCriterionByContext(BoundedContext boundedContext, ConfiguredRepository configuredRepository, EntityExample entityExample) {
+        if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
+            EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
+            EntityMapper entityMapper = configuredRepository.getEntityMapper();
+            for (BindingDefinition bindingDefinition : entityDefinition.getContextBindingDefinitions()) {
+                String bindAttribute = bindingDefinition.getBindAttribute();
+                Object boundValue = boundedContext.get(bindAttribute);
+                if (boundValue != null) {
+                    String aliasAttribute = bindingDefinition.getAliasAttribute();
+                    EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, boundValue);
+                    entityExample.addCriterion(entityCriterion);
+                }
+            }
         }
-        return boundValue;
     }
 
     protected Object convertManyToOneEntity(ConfiguredRepository configuredRepository, List<?> entities) {
@@ -154,6 +163,16 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
                     BeanUtil.setFieldValue(entity, fieldAttribute, boundValue);
                 }
             }
+        }
+    }
+
+    protected Object getBoundValue(BoundedContext boundedContext, Object rootEntity, BindingDefinition bindingDefinition) {
+        if (!bindingDefinition.isFromContext()) {
+            EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
+            return boundEntityPropertyChain.getValue(rootEntity);
+        } else {
+            String bindAttribute = bindingDefinition.getBindAttribute();
+            return boundedContext.get(bindAttribute);
         }
     }
 
