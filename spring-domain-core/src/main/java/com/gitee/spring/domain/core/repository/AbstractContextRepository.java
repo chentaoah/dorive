@@ -301,17 +301,16 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         allConfiguredRepositoryMap.forEach((accessPath, configuredRepository) -> {
             EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
+            Set<String> fieldNames = entityDefinition.getFieldNames();
             Map<String, EntityPropertyChain> entityPropertyChainMap = entityDefinition.getEntityPropertyChainMap();
             String prefixAccessPath = entityDefinition.isRoot() ? "/" : entityDefinition.getAccessPath() + "/";
 
             if (entityPropertyChainMap.isEmpty() && entityDefinition.isCollection()) {
                 EntityPropertyResolver entityPropertyResolver = new EntityPropertyResolver();
                 entityPropertyResolver.resolveEntityProperties("", entityDefinition.getGenericEntityClass());
-                entityPropertyChainMap.putAll(entityPropertyResolver.getAllEntityPropertyChainMap());
-
-                Set<String> fieldNames = entityDefinition.getFieldNames();
-                entityPropertyChainMap.values().forEach(entityPropertyChain -> fieldNames.add(entityPropertyChain.getFieldName()));
-
+                Map<String, EntityPropertyChain> subAllEntityPropertyChainMap = entityPropertyResolver.getAllEntityPropertyChainMap();
+                subAllEntityPropertyChainMap.values().forEach(entityPropertyChain -> fieldNames.add(entityPropertyChain.getFieldName()));
+                entityPropertyChainMap.putAll(subAllEntityPropertyChainMap);
                 prefixAccessPath = "/";
             }
 
