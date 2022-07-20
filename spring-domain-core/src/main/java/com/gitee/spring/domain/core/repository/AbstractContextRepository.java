@@ -218,23 +218,23 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 belongAccessPath = PathUtils.getBelongPath(allConfiguredRepositoryMap.keySet(), bindAttribute);
                 belongConfiguredRepository = allConfiguredRepositoryMap.get(belongAccessPath);
                 Assert.notNull(belongConfiguredRepository, "The belong repository cannot be null!");
-                
+                EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
+                entityDefinition.setBoundEntity(true);
+
                 boundFieldName = PathUtils.getFieldName(bindAttribute);
                 Map<String, EntityPropertyChain> allEntityPropertyChainMap = entityPropertyResolver.getAllEntityPropertyChainMap();
                 boundEntityPropertyChain = allEntityPropertyChainMap.get(bindAttribute);
                 Assert.notNull(boundEntityPropertyChain, "The bound entity property cannot be null!");
                 boundEntityPropertyChain.initialize();
 
-                EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
-                entityDefinition.setBoundEntity(true);
-
                 boundColumns.add(StrUtil.toUnderlineCase(aliasAttribute));
             }
 
             BindingDefinition bindingDefinition = new BindingDefinition(
                     bindingAttributes, fieldAttribute, aliasAttribute, bindAttribute,
-                    isFromContext, isBoundId, belongAccessPath, belongConfiguredRepository,
-                    boundFieldName, boundEntityPropertyChain, null);
+                    isFromContext, isBoundId,
+                    belongAccessPath, belongConfiguredRepository, boundFieldName, boundEntityPropertyChain,
+                    null);
 
             bindingDefinitions.add(bindingDefinition);
             if (!isFromContext) {
