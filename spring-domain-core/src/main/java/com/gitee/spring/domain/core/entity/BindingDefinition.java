@@ -12,11 +12,11 @@ public class BindingDefinition {
     private String fieldAttribute;
     private String aliasAttribute;
     private String bindAttribute;
+    private String bindAliasAttribute;
     private boolean fromContext;
     private boolean boundId;
     private String belongAccessPath;
     private ConfiguredRepository belongConfiguredRepository;
-    private String boundFieldName;
     private EntityPropertyChain boundEntityPropertyChain;
     private EntityPropertyChain fieldEntityPropertyChain;
 }

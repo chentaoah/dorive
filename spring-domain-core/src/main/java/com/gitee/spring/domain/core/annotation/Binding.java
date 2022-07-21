@@ -15,4 +15,6 @@ public @interface Binding {
 
     String bind();
 
+    String bindAlias() default "";
+
 }

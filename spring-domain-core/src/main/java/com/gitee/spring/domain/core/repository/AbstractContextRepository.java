@@ -81,7 +81,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         });
         postProcessAllRepositories();
-        
+
         orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> configuredRepository.getEntityDefinition().getOrderAttribute()));
     }
 
@@ -195,6 +195,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             String fieldAttribute = bindingAttributes.getString(Attribute.FIELD_ATTRIBUTE);
             String aliasAttribute = bindingAttributes.getString(Attribute.ALIAS_ATTRIBUTE);
             String bindAttribute = bindingAttributes.getString(Attribute.BIND_ATTRIBUTE);
+            String bindAliasAttribute = bindingAttributes.getString(Attribute.BIND_ALIAS_ATTRIBUTE);
 
             if (StringUtils.isBlank(aliasAttribute)) {
                 aliasAttribute = fieldAttribute;
@@ -210,17 +211,19 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
             String belongAccessPath = null;
             ConfiguredRepository belongConfiguredRepository = null;
-            String boundFieldName = null;
             EntityPropertyChain boundEntityPropertyChain = null;
 
             if (!isFromContext) {
+                if (StringUtils.isBlank(bindAliasAttribute)) {
+                    bindAliasAttribute = PathUtils.getFieldName(bindAttribute);
+                }
+
                 belongAccessPath = PathUtils.getBelongPath(allConfiguredRepositoryMap.keySet(), bindAttribute);
                 belongConfiguredRepository = allConfiguredRepositoryMap.get(belongAccessPath);
                 Assert.notNull(belongConfiguredRepository, "The belong repository cannot be null!");
                 EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
                 entityDefinition.setBoundEntity(true);
 
-                boundFieldName = PathUtils.getFieldName(bindAttribute);
                 Map<String, EntityPropertyChain> allEntityPropertyChainMap = entityPropertyResolver.getAllEntityPropertyChainMap();
                 boundEntityPropertyChain = allEntityPropertyChainMap.get(bindAttribute);
                 Assert.notNull(boundEntityPropertyChain, "The bound entity property cannot be null!");
@@ -230,10 +233,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
 
             BindingDefinition bindingDefinition = new BindingDefinition(
-                    bindingAttributes, fieldAttribute, aliasAttribute, bindAttribute,
+                    bindingAttributes, fieldAttribute, aliasAttribute, bindAttribute, bindAliasAttribute,
                     isFromContext, isBoundId,
-                    belongAccessPath, belongConfiguredRepository, boundFieldName, boundEntityPropertyChain,
-                    null);
+                    belongAccessPath, belongConfiguredRepository, boundEntityPropertyChain, null);
 
             allBindingDefinitions.add(bindingDefinition);
             if (!isFromContext) {

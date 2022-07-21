@@ -26,8 +26,8 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
         Map<String, ChainCriterion> criterionMap = new LinkedHashMap<>();
         for (RepositoryLocation repositoryLocation : defaultCoatingAssembler.getReversedRepositoryLocations()) {
-            ChainCriterion chainCriterion = buildCriterion(boundedContext, repositoryLocation);
-            addToExampleOfCriterion(chainCriterion, coatingObject);
+            ChainCriterion chainCriterion = buildChainCriterion(boundedContext, repositoryLocation);
+            appendCriterionToExample(chainCriterion, coatingObject);
 
             RepositoryDefinition repositoryDefinition = repositoryLocation.getRepositoryDefinition();
             String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
@@ -42,7 +42,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         return chainCriterion.getEntityExample();
     }
 
-    protected ChainCriterion buildCriterion(BoundedContext boundedContext, RepositoryLocation repositoryLocation) {
+    protected ChainCriterion buildChainCriterion(BoundedContext boundedContext, RepositoryLocation repositoryLocation) {
         RepositoryDefinition repositoryDefinition = repositoryLocation.getRepositoryDefinition();
         ConfiguredRepository configuredRepository = repositoryDefinition.getConfiguredRepository();
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
@@ -51,7 +51,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         return new ChainCriterion(repositoryLocation, entityExample);
     }
 
-    protected void addToExampleOfCriterion(ChainCriterion chainCriterion, Object coatingObject) {
+    protected void appendCriterionToExample(ChainCriterion chainCriterion, Object coatingObject) {
         RepositoryLocation repositoryLocation = chainCriterion.getRepositoryLocation();
         EntityExample entityExample = chainCriterion.getEntityExample();
         for (PropertyDefinition propertyDefinition : repositoryLocation.getCollectedPropertyDefinitions()) {
@@ -133,15 +133,15 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                         continue;
                     }
 
-                    String boundFieldName = bindingDefinition.getBoundFieldName();
+                    String bindAliasAttribute = bindingDefinition.getBindAliasAttribute();
                     Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
 
                     RepositoryLocation targetRepositoryLocation = targetChainCriterion.getRepositoryLocation();
                     RepositoryDefinition targetRepositoryDefinition = targetRepositoryLocation.getRepositoryDefinition();
                     ConfiguredRepository targetConfiguredRepository = targetRepositoryDefinition.getConfiguredRepository();
-                    EntityMapper targetEntityMapper = targetConfiguredRepository.getEntityMapper();
 
-                    EntityCriterion entityCriterion = targetEntityMapper.newCriterion(boundFieldName, Operator.EQ, fieldValue);
+                    EntityMapper targetEntityMapper = targetConfiguredRepository.getEntityMapper();
+                    EntityCriterion entityCriterion = targetEntityMapper.newCriterion(bindAliasAttribute, Operator.EQ, fieldValue);
                     targetEntityExample.addCriterion(entityCriterion);
                 }
             }

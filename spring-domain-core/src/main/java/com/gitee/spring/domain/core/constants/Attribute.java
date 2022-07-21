@@ -16,6 +16,7 @@ public interface Attribute {
     String FIELD_ATTRIBUTE = "field";
     String ALIAS_ATTRIBUTE = "alias";
     String BIND_ATTRIBUTE = "bind";
+    String BIND_ALIAS_ATTRIBUTE = "bindAlias";
 
     String LOCATION_ATTRIBUTE = "location";
     String OPERATOR_ATTRIBUTE = "operator";
