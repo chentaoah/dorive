@@ -85,7 +85,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractAwareRepo
                     if (StringUtils.isBlank(aliasAttribute)) {
                         aliasAttribute = fieldName;
                     }
-                    
+
                     Map<String, EntityPropertyChain> fieldEntityPropertyChainMap = entityPropertyResolver.getFieldEntityPropertyChainMap();
                     EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
 
@@ -108,8 +108,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractAwareRepo
                     }
                 });
 
-                List<RepositoryLocation> reversedRepositoryLocations = collectRepositoryLocations(
-                        locationPropertyDefinitionsMap, fieldPropertyDefinitionMap);
+                List<RepositoryLocation> reversedRepositoryLocations = collectRepositoryLocations(locationPropertyDefinitionsMap, fieldPropertyDefinitionMap);
                 Collections.reverse(reversedRepositoryLocations);
                 checkFieldNames(coatingClass, allPropertyDefinitionMap.keySet(), reversedRepositoryLocations);
 
@@ -123,8 +122,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractAwareRepo
                 }
 
                 CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, attributes, name, allPropertyDefinitionMap);
-                CoatingAssembler coatingAssembler = new DefaultCoatingAssembler(
-                        coatingDefinition, availablePropertyDefinitions, reversedRepositoryLocations);
+                CoatingAssembler coatingAssembler = new DefaultCoatingAssembler(coatingDefinition, availablePropertyDefinitions, reversedRepositoryLocations);
 
                 classCoatingAssemblerMap.put(coatingClass, coatingAssembler);
                 Assert.isTrue(!nameCoatingAssemblerMap.containsKey(name), "The same coating name cannot exist!");
@@ -141,7 +139,6 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractAwareRepo
             String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
             ConfiguredRepository configuredRepository = repositoryDefinition.getConfiguredRepository();
             EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-
             List<PropertyDefinition> propertyDefinitions = new ArrayList<>();
 
             List<PropertyDefinition> locationPropertyDefinitions = locationPropertyDefinitionsMap.get(absoluteAccessPath);
@@ -166,14 +163,15 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractAwareRepo
     }
 
     protected void checkFieldNames(Class<?> coatingClass, Set<String> fieldNames, List<RepositoryLocation> repositoryLocations) {
-        Set<String> newFieldNames = new LinkedHashSet<>(fieldNames);
+        Set<String> remainFieldNames = new LinkedHashSet<>(fieldNames);
         for (RepositoryLocation repositoryLocation : repositoryLocations) {
             for (PropertyDefinition propertyDefinition : repositoryLocation.getCollectedPropertyDefinitions()) {
-                newFieldNames.remove(propertyDefinition.getFieldName());
+                remainFieldNames.remove(propertyDefinition.getFieldName());
             }
         }
-        if (!newFieldNames.isEmpty()) {
-            String errorMessage = String.format("The field does not exist in the aggregate root! entity: %s, coating: %s, fieldNames: %s", entityClass, coatingClass, newFieldNames);
+        if (!remainFieldNames.isEmpty()) {
+            String errorMessage = String.format("The field does not exist in the aggregate root! entity: %s, coating: %s, fieldNames: %s",
+                    entityClass, coatingClass, remainFieldNames);
             throw new RuntimeException(errorMessage);
         }
     }
