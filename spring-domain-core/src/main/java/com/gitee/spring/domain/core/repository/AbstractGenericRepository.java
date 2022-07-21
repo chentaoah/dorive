@@ -77,22 +77,22 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
                 break;
             }
         }
-        newCriterionByContext(boundedContext, configuredRepository, entityExample);
+        if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
+            newCriterionByContext(boundedContext, configuredRepository, entityExample);
+        }
         return entityExample;
     }
 
     protected void newCriterionByContext(BoundedContext boundedContext, ConfiguredRepository configuredRepository, EntityExample entityExample) {
-        if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
-            EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-            EntityMapper entityMapper = configuredRepository.getEntityMapper();
-            for (BindingDefinition bindingDefinition : entityDefinition.getContextBindingDefinitions()) {
-                String bindAttribute = bindingDefinition.getBindAttribute();
-                Object boundValue = boundedContext.get(bindAttribute);
-                if (boundValue != null) {
-                    String aliasAttribute = bindingDefinition.getAliasAttribute();
-                    EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, boundValue);
-                    entityExample.addCriterion(entityCriterion);
-                }
+        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
+        EntityMapper entityMapper = configuredRepository.getEntityMapper();
+        for (BindingDefinition bindingDefinition : entityDefinition.getContextBindingDefinitions()) {
+            String bindAttribute = bindingDefinition.getBindAttribute();
+            Object boundValue = boundedContext.get(bindAttribute);
+            if (boundValue != null) {
+                String aliasAttribute = bindingDefinition.getAliasAttribute();
+                EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, boundValue);
+                entityExample.addCriterion(entityCriterion);
             }
         }
     }

@@ -79,7 +79,9 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                 break;
             }
         }
-        newCriterionByContext(boundedContext, configuredRepository, entityExample);
+        if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
+            newCriterionByContext(boundedContext, configuredRepository, entityExample);
+        }
         return entityExample;
     }
 
