@@ -40,6 +40,15 @@ public class ConfiguredRepository extends ProxyRepository {
         this.entityAssembler = configuredRepository.getEntityAssembler();
     }
 
+    @Override
+    public AbstractRepository<Object, Object> getProxyRepository() {
+        AbstractRepository<Object, Object> abstractRepository = super.getProxyRepository();
+        if (abstractRepository instanceof ConfiguredRepository) {
+            return ((ConfiguredRepository) abstractRepository).getProxyRepository();
+        }
+        return abstractRepository;
+    }
+
     private Object processExample(Object example) {
         if (!entityDefinition.isUseEntityExample() && example instanceof EntityExample) {
             return ((EntityExample) example).buildExample();
