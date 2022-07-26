@@ -51,11 +51,13 @@ public class RepositoryListener implements ApplicationListener<RepositoryEvent>,
         EntityDefinition entityDefinition = eventRepository.getEntityDefinition();
         Class<?> entityClass = entityDefinition.getGenericEntityClass();
         List<EventListener> eventListeners = classEventListenersMap.get(entityClass);
-        for (EventListener eventListener : eventListeners) {
-            try {
-                eventListener.onApplicationEvent(event);
-            } catch (Exception e) {
-                log.error("Exception occurred in event listening!", e);
+        if (eventListeners != null && !eventListeners.isEmpty()) {
+            for (EventListener eventListener : eventListeners) {
+                try {
+                    eventListener.onApplicationEvent(event);
+                } catch (Exception e) {
+                    log.error("Exception occurred in event listening!", e);
+                }
             }
         }
     }
