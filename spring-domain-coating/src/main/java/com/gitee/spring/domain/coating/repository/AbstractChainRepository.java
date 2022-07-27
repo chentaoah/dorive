@@ -1,6 +1,5 @@
 package com.gitee.spring.domain.coating.repository;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.spring.domain.coating.entity.ChainCriterion;
@@ -11,11 +10,19 @@ import com.gitee.spring.domain.coating.impl.DefaultCoatingAssembler;
 import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.constants.Operator;
-import com.gitee.spring.domain.core.entity.*;
+import com.gitee.spring.domain.core.entity.BindingDefinition;
+import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.EntityDefinition;
+import com.gitee.spring.domain.core.entity.EntityExample;
+import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
@@ -127,7 +134,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                         continue;
                     }
 
-                    List<Object> fieldValues = collectFieldValues(entities, bindingDefinition.getFieldAttribute());
+                    List<Object> fieldValues = collectFieldValues(entities, bindingDefinition);
                     if (fieldValues.isEmpty()) {
                         targetEntityExample.setEmptyQuery(true);
                         continue;
@@ -148,10 +155,11 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         });
     }
 
-    protected List<Object> collectFieldValues(List<?> entities, String fieldAttribute) {
+    protected List<Object> collectFieldValues(List<Object> entities, BindingDefinition bindingDefinition) {
+        EntityPropertyChain fieldEntityPropertyChain = bindingDefinition.getFieldEntityPropertyChain();
         List<Object> fieldValues = new ArrayList<>();
         for (Object entity : entities) {
-            Object fieldValue = BeanUtil.getFieldValue(entity, fieldAttribute);
+            Object fieldValue = fieldEntityPropertyChain.getValue(entity);
             if (fieldValue != null) {
                 fieldValues.add(fieldValue);
             }
