@@ -118,7 +118,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractAwareRepo
                     name = attributes.getString(Attribute.NAME_ATTRIBUTE);
                 }
                 if (StringUtils.isBlank(name)) {
-                    name = StrUtil.lowerFirst(coatingClass.getSimpleName());
+                    name = coatingClass.getSimpleName();
                 }
 
                 CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, attributes, name, allPropertyDefinitionMap);

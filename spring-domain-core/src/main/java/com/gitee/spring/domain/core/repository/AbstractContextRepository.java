@@ -66,7 +66,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             name = attributes.getString(Attribute.NAME_ATTRIBUTE);
         }
         if (StringUtils.isBlank(name)) {
-            name = StrUtil.lowerFirst(entityClass.getSimpleName());
+            name = this.getClass().getSimpleName();
         }
 
         List<Class<?>> superClasses = ReflectUtils.getAllSuperClasses(entityClass, Object.class);

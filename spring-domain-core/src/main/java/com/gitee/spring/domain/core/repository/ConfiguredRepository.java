@@ -9,6 +9,7 @@ import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -50,30 +51,44 @@ public class ConfiguredRepository extends ProxyRepository {
     }
 
     private Object processExample(Object example) {
-        if (!entityDefinition.isUseEntityExample() && example instanceof EntityExample) {
-            return ((EntityExample) example).buildExample();
+        if (example instanceof EntityExample) {
+            EntityExample entityExample = (EntityExample) example;
+            if (entityExample.isEmptyQuery()) {
+                return null;
+            } else if (!entityDefinition.isUseEntityExample()) {
+                return entityExample.buildExample();
+            }
         }
         return example;
     }
 
     @Override
     public List<Object> selectByExample(BoundedContext boundedContext, Object example) {
-        return super.selectByExample(boundedContext, processExample(example));
+        example = processExample(example);
+        return example != null ? super.selectByExample(boundedContext, example) : Collections.emptyList();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
-        return super.selectPageByExample(boundedContext, processExample(example), page);
+        example = processExample(example);
+        if (example == null) {
+            return (T) entityMapper.newPageOfEntities(page, Collections.emptyList());
+        } else {
+            return super.selectPageByExample(boundedContext, example, page);
+        }
     }
 
     @Override
     public int updateByExample(Object entity, Object example) {
-        return super.updateByExample(entity, processExample(example));
+        example = processExample(example);
+        return example != null ? super.updateByExample(entity, example) : 0;
     }
 
     @Override
     public int deleteByExample(Object example) {
-        return super.deleteByExample(processExample(example));
+        example = processExample(example);
+        return example != null ? super.deleteByExample(example) : 0;
     }
 
 }
