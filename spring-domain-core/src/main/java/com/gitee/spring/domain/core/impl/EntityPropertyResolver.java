@@ -63,7 +63,7 @@ public class EntityPropertyResolver {
 
     private boolean filterEntityClass(Class<?> entityClass) {
         String className = entityClass.getName();
-        return className.startsWith("java.lang.") || className.startsWith("java.util.");
+        return className.startsWith("java.lang.") || className.startsWith("java.util.") || entityClass.isEnum();
     }
 
 }
