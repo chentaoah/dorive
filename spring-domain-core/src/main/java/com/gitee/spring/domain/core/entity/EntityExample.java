@@ -1,6 +1,7 @@
 package com.gitee.spring.domain.core.entity;
 
 import com.gitee.spring.domain.core.api.EntityCriterion;
+import com.gitee.spring.domain.core.utils.StringUtils;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -33,6 +34,10 @@ public class EntityExample {
         entityCriteria.add(entityCriterion);
     }
 
+    public Object buildExample() {
+        return selectColumns().appendCriteria().orderBy().getExample();
+    }
+
     public EntityExample selectColumns() {
         return this;
     }
@@ -50,8 +55,14 @@ public class EntityExample {
         return this;
     }
 
-    public Object buildExample() {
-        return selectColumns().appendCriteria().orderBy().getExample();
+    public void orderByAsc(String... columns) {
+        orderBy = StringUtils.toUnderlineCase(columns);
+        sort = "asc";
+    }
+
+    public void orderByDesc(String... columns) {
+        orderBy = StringUtils.toUnderlineCase(columns);
+        sort = "desc";
     }
 
 }
