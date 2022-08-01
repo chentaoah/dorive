@@ -10,4 +10,12 @@ public class StringUtils {
         return StrUtil.splitTrim(columnsStr, ",").toArray(new String[0]);
     }
 
+    public static boolean isLike(Object boundValue) {
+        if (boundValue instanceof String) {
+            String boundValueStr = (String) boundValue;
+            return boundValueStr.startsWith("%") && boundValueStr.endsWith("%");
+        }
+        return false;
+    }
+
 }
