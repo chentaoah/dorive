@@ -6,7 +6,11 @@ import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.EntityProperty;
 import com.gitee.spring.domain.core.constants.Operator;
-import com.gitee.spring.domain.core.entity.*;
+import com.gitee.spring.domain.core.entity.BindingDefinition;
+import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.EntityDefinition;
+import com.gitee.spring.domain.core.entity.EntityExample;
+import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.utils.StringUtils;
 
 import java.util.Collection;
@@ -92,7 +96,11 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             Object boundValue = boundedContext.get(bindAttribute);
             if (boundValue != null) {
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
-                String operator = !StringUtils.isLike(boundValue) ? Operator.EQ : Operator.LIKE;
+                String operator = Operator.EQ;
+                if (boundValue instanceof String && StringUtils.isLike((String) boundValue)) {
+                    operator = Operator.LIKE;
+                    boundValue = StringUtils.strip((String) boundValue);
+                }
                 EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, operator, boundValue);
                 entityExample.addCriterion(entityCriterion);
             }
