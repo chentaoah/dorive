@@ -99,7 +99,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
                 String operator = Operator.EQ;
                 if (boundValue instanceof String && StringUtils.isLike((String) boundValue)) {
                     operator = Operator.LIKE;
-                    boundValue = StringUtils.strip((String) boundValue);
+                    boundValue = StringUtils.stripLike((String) boundValue);
                 }
                 EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, operator, boundValue);
                 entityExample.addCriterion(entityCriterion);
@@ -149,21 +149,23 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             if (targetEntity != null && isMatchScenes(boundedContext, configuredRepository)) {
                 if (targetEntity instanceof Collection) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
-                        setBoundValueByContext(configuredRepository, boundedContext, entity, eachEntity);
+                        setBoundValueByContext(boundedContext, entity, configuredRepository, eachEntity);
                         totalCount += configuredRepository.insert(boundedContext, eachEntity);
                     }
                 } else {
-                    setBoundValueByContext(configuredRepository, boundedContext, entity, targetEntity);
+                    setBoundValueByContext(boundedContext, entity, configuredRepository, targetEntity);
                     totalCount += configuredRepository.insert(boundedContext, targetEntity);
-                    Object primaryKey = BeanUtil.getFieldValue(targetEntity, "id");
-                    setBoundIdForBoundEntity(configuredRepository, entity, primaryKey);
+                    setBoundIdForBoundEntity(boundedContext, entity, configuredRepository, targetEntity);
                 }
             }
         }
         return totalCount;
     }
 
-    protected void setBoundValueByContext(ConfiguredRepository configuredRepository, BoundedContext boundedContext, Object rootEntity, Object entity) {
+    protected void setBoundValueByContext(BoundedContext boundedContext,
+                                          Object rootEntity,
+                                          ConfiguredRepository configuredRepository,
+                                          Object entity) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
             if (!bindingDefinition.isBoundId()) {
@@ -186,12 +188,18 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         }
     }
 
-    protected void setBoundIdForBoundEntity(ConfiguredRepository configuredRepository, Object rootEntity, Object primaryKey) {
+    protected void setBoundIdForBoundEntity(BoundedContext boundedContext,
+                                            Object rootEntity,
+                                            ConfiguredRepository configuredRepository,
+                                            Object entity) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         BindingDefinition boundIdBindingDefinition = entityDefinition.getBoundIdBindingDefinition();
-        if (boundIdBindingDefinition != null && primaryKey != null) {
+        if (boundIdBindingDefinition != null) {
             EntityPropertyChain boundEntityPropertyChain = boundIdBindingDefinition.getBoundEntityPropertyChain();
-            boundEntityPropertyChain.setValue(rootEntity, primaryKey);
+            Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+            if (primaryKey != null) {
+                boundEntityPropertyChain.setValue(rootEntity, primaryKey);
+            }
         }
     }
 

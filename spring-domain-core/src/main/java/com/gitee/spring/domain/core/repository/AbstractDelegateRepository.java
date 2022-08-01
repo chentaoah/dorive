@@ -10,7 +10,7 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextRepository<E, PK> {
 
-    protected Map<Class<?>, AbstractDelegateRepository<?, ?>> delegateRepositoryMap = new LinkedHashMap<>();
+    protected Map<Class<?>, AbstractDelegateRepository<?, ?>> classDelegateRepositoryMap = new LinkedHashMap<>();
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -19,7 +19,7 @@ public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextR
     }
 
     protected void resolveDelegateRepositoryMap() {
-        delegateRepositoryMap.put(entityClass, this);
+        classDelegateRepositoryMap.put(entityClass, this);
         ReflectionUtils.doWithLocalFields(this.getClass(), declaredField -> {
             Class<?> fieldClass = declaredField.getType();
             if (AbstractDelegateRepository.class.isAssignableFrom(fieldClass)) {
@@ -27,14 +27,14 @@ public abstract class AbstractDelegateRepository<E, PK> extends AbstractContextR
                 AbstractDelegateRepository<?, ?> abstractDelegateRepository = (AbstractDelegateRepository<?, ?>) beanInstance;
                 Class<?> fieldEntityClass = abstractDelegateRepository.getEntityClass();
                 if (entityClass.isAssignableFrom(fieldEntityClass)) {
-                    delegateRepositoryMap.put(fieldEntityClass, abstractDelegateRepository);
+                    classDelegateRepositoryMap.put(fieldEntityClass, abstractDelegateRepository);
                 }
             }
         });
     }
 
     protected AbstractDelegateRepository<?, ?> adaptiveRepository(Class<?> entityClass) {
-        return delegateRepositoryMap.get(entityClass);
+        return classDelegateRepositoryMap.get(entityClass);
     }
 
     protected AbstractDelegateRepository<?, ?> adaptiveRepository(Object rootEntity) {

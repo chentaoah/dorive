@@ -14,7 +14,7 @@ public class StringUtils {
         return boundValue.startsWith("%") && boundValue.endsWith("%");
     }
 
-    public static String strip(String boundValue) {
+    public static String stripLike(String boundValue) {
         return StrUtil.strip(boundValue, "%");
     }
 

@@ -121,7 +121,6 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
                 entityExample.setSelectColumns(entityDefinition.getBoundColumns());
                 entities = configuredRepository.selectByExample(boundedContext, entityExample);
-                log.debug("The data queried is: {}", entities);
             }
 
             for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {

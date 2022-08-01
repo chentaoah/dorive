@@ -23,7 +23,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
             super.handleRootEntity(boundedContext, rootEntities.get(0));
 
         } else if (rootEntities.size() > 1) {
-            if (delegateRepositoryMap.size() == 1) {
+            if (classDelegateRepositoryMap.size() == 1) {
                 executeQuery(boundedContext, rootEntities, this);
             } else {
                 Map<AbstractDelegateRepository<?, ?>, List<Object>> repositoryEntitiesMap = adaptiveRepositoryEntities(rootEntities);
@@ -49,7 +49,6 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                 EntityExample entityExample = newExampleByRootEntities(boundedContext, rootEntities, configuredRepository);
                 if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
                     List<Object> entities = configuredRepository.selectByExample(boundedContext, entityExample);
-                    log.debug("The data queried is: {}", entities);
                     EntityIndex entityIndex = buildEntityIndex(configuredRepository, entities);
                     assembleRootEntities(rootEntities, configuredRepository, entityIndex);
                 }
