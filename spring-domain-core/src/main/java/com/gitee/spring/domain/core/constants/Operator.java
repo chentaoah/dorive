@@ -6,4 +6,5 @@ public interface Operator {
     String GE = ">=";
     String LT = "<";
     String LE = "<=";
+    String LIKE = "like";
 }

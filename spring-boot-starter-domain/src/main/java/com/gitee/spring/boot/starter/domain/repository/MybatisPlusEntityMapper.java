@@ -26,6 +26,7 @@ public class MybatisPlusEntityMapper implements EntityMapper {
         operatorEntityCriterionBuilderMap.put(Operator.GE, new GEEntityCriterionBuilder());
         operatorEntityCriterionBuilderMap.put(Operator.LT, new LTEntityCriterionBuilder());
         operatorEntityCriterionBuilderMap.put(Operator.LE, new LEEntityCriterionBuilder());
+        operatorEntityCriterionBuilderMap.put(Operator.LIKE, new LikeEntityCriterionBuilder());
     }
 
     @Override
