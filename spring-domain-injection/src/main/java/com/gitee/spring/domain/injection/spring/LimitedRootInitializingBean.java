@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.injection.processor;
+package com.gitee.spring.domain.injection.spring;
 
 import com.gitee.spring.domain.injection.annotation.Root;
 import com.gitee.spring.domain.injection.api.TypeDomainResolver;
@@ -29,7 +29,7 @@ public class LimitedRootInitializingBean implements ApplicationContextAware, Ini
         Map<String, Object> beans = applicationContext.getBeansWithAnnotation(Root.class);
         beans.forEach((id, bean) -> {
             Class<?> targetClass = AopUtils.getAnnotatedClass(bean, Root.class);
-            typeDomainResolver.checkDomainRoot(targetClass);
+            typeDomainResolver.checkDomainProtection(targetClass);
         });
     }
 

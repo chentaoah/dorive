@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.injection.processor;
+package com.gitee.spring.domain.injection.spring;
 
 import com.gitee.spring.domain.injection.api.TypeDomainResolver;
 import org.apache.commons.logging.Log;
@@ -19,8 +19,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
-public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
-        implements MergedBeanDefinitionPostProcessor {
+public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter implements MergedBeanDefinitionPostProcessor {
 
     protected final Log logger = LogFactory.getLog(getClass());
     private final TypeDomainResolver typeDomainResolver;

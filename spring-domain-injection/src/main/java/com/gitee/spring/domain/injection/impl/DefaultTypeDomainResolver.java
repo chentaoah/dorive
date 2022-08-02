@@ -14,9 +14,9 @@ import java.util.Objects;
 
 public class DefaultTypeDomainResolver implements TypeDomainResolver {
 
+    private final AntPathMatcher antPathMatcher = new AntPathMatcher(".");
     private final String scanPackage;
     private final List<DomainDefinition> domainDefinitions;
-    private final AntPathMatcher antPathMatcher = new AntPathMatcher(".");
 
     public DefaultTypeDomainResolver(String scanPackage, List<DomainDefinition> domainDefinitions) {
         this.scanPackage = scanPackage;
@@ -29,48 +29,58 @@ public class DefaultTypeDomainResolver implements TypeDomainResolver {
     }
 
     @Override
-    public DomainDefinition resolveDomain(Class<?> typeToMatch) {
+    public DomainDefinition matchDomainDefinition(Class<?> typeToMatch) {
         return CollUtil.findOne(domainDefinitions, item -> antPathMatcher.match(item.getPattern(), typeToMatch.getName()));
     }
 
     @Override
     public void checkDomain(Class<?> targetType, Class<?> injectedType) {
-        if (AnnotationUtils.getAnnotation(injectedType, Root.class) != null) {
+        Root root = AnnotationUtils.getAnnotation(injectedType, Root.class);
+        if (root != null) {
             return;
         }
-        DomainDefinition injectedDomainDefinition = resolveDomain(injectedType);
+
+        DomainDefinition injectedDomainDefinition = matchDomainDefinition(injectedType);
         if (injectedDomainDefinition == null) {
             return;
         }
-        DomainDefinition targetDomainDefinition = resolveDomain(targetType);
-        if (targetDomainDefinition != null) {
-            boolean isMatch = Objects.equals(targetDomainDefinition.getName(), injectedDomainDefinition.getName())
-                    || targetDomainDefinition.getName().startsWith(injectedDomainDefinition.getName() + "-");
-            if (!isMatch) {
-                throwInjectionException(targetType, targetDomainDefinition, injectedType, injectedDomainDefinition);
-            }
-        } else {
-            throwInjectionException(targetType, null, injectedType, injectedDomainDefinition);
+
+        DomainDefinition targetDomainDefinition = matchDomainDefinition(targetType);
+        if (targetDomainDefinition == null) {
+            throwInjectionException(targetType, null, injectedType, injectedDomainDefinition.getName());
+            return;
+        }
+
+        String targetDomainName = targetDomainDefinition.getName();
+        String injectedDomainName = injectedDomainDefinition.getName();
+
+        boolean isSameDomain = Objects.equals(targetDomainName, injectedDomainName);
+        boolean isSubdomain = targetDomainName.startsWith(injectedDomainName + "-");
+
+        if (!isSameDomain && !isSubdomain) {
+            throwInjectionException(targetType, targetDomainName, injectedType, injectedDomainName);
         }
     }
 
-    protected void throwInjectionException(Class<?> targetType, DomainDefinition targetDomainDefinition,
-                                           Class<?> injectedType, DomainDefinition injectedDomainDefinition) {
+    protected void throwInjectionException(Class<?> targetType, String targetDomainName, Class<?> injectedType, String injectedDomainName) {
         String message = String.format("Injection of autowired dependencies failed! targetType: [%s], targetDomain: [%s], injectedType: [%s], injectedDomain: [%s]",
-                targetType.getName(), targetDomainDefinition != null ? targetDomainDefinition.getName() : null,
-                injectedType.getName(), injectedDomainDefinition.getName());
+                targetType.getName(), targetDomainName, injectedType.getName(), injectedDomainName);
         throw new BeanCreationException(message);
     }
 
     @Override
-    public void checkDomainRoot(Class<?> targetType) {
-        DomainDefinition domainDefinition = resolveDomain(targetType);
-        if (domainDefinition != null && StringUtils.isNotBlank(domainDefinition.getProtect())) {
-            if (antPathMatcher.match(domainDefinition.getProtect(), targetType.getName())) {
-                String message = String.format("The type cannot be annotated by @Root! protect: [%s], targetType: [%s]",
-                        domainDefinition.getProtect(), targetType.getName());
-                throw new BeanCreationException(message);
-            }
+    public void checkDomainProtection(Class<?> targetType) {
+        DomainDefinition domainDefinition = matchDomainDefinition(targetType);
+        if (domainDefinition == null) {
+            return;
+        }
+
+        String protect = domainDefinition.getProtect();
+        String targetTypeName = targetType.getName();
+
+        if (StringUtils.isNotBlank(protect) && antPathMatcher.match(protect, targetTypeName)) {
+            String message = String.format("The type cannot be annotated by @Root! targetType: [%s], protect: [%s]", targetTypeName, protect);
+            throw new BeanCreationException(message);
         }
     }
 

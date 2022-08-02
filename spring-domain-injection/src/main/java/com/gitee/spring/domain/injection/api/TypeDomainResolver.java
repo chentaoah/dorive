@@ -6,10 +6,10 @@ public interface TypeDomainResolver {
 
     boolean isUnderScanPackage(Class<?> typeToMatch);
 
-    DomainDefinition resolveDomain(Class<?> typeToMatch);
+    DomainDefinition matchDomainDefinition(Class<?> typeToMatch);
 
     void checkDomain(Class<?> targetType, Class<?> injectedType);
 
-    void checkDomainRoot(Class<?> targetType);
+    void checkDomainProtection(Class<?> targetType);
 
 }

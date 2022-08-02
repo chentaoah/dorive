@@ -1,12 +1,12 @@
 package com.gitee.spring.domain.injection.config;
 
+import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.injection.api.TypeDomainResolver;
 import com.gitee.spring.domain.injection.entity.DomainDefinition;
-import com.gitee.spring.domain.injection.processor.LimitedAutowiredBeanPostProcessor;
-import com.gitee.spring.domain.injection.processor.LimitedCglibSubclassingInstantiationStrategy;
-import com.gitee.spring.domain.injection.processor.LimitedRootInitializingBean;
 import com.gitee.spring.domain.injection.impl.DefaultTypeDomainResolver;
-import org.apache.commons.lang3.StringUtils;
+import com.gitee.spring.domain.injection.spring.LimitedAutowiredBeanPostProcessor;
+import com.gitee.spring.domain.injection.spring.LimitedCglibSubclassingInstantiationStrategy;
+import com.gitee.spring.domain.injection.spring.LimitedRootInitializingBean;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -39,11 +39,8 @@ public class DomainInjectionConfiguration implements BeanFactoryPostProcessor {
     @ConditionalOnMissingClass
     public TypeDomainResolver typeDomainResolver(Environment environment) {
         String scanPackage = environment.getProperty("spring.domain.scan");
-        if (StringUtils.isBlank(scanPackage)) {
-            throw new RuntimeException("The configuration item could not be found! name: [spring.domain.scan]");
-        }
-        List<DomainDefinition> domainDefinitions = Binder.get(environment)
-                .bind("spring.domain.domains", Bindable.listOf(DomainDefinition.class)).get();
+        Assert.notBlank(scanPackage, "The configuration item could not be found! name: [spring.domain.scan]");
+        List<DomainDefinition> domainDefinitions = Binder.get(environment).bind("spring.domain.domains", Bindable.listOf(DomainDefinition.class)).get();
         domainDefinitions.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
         return new DefaultTypeDomainResolver(scanPackage, domainDefinitions);
     }

@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.injection.processor;
+package com.gitee.spring.domain.injection.spring;
 
 import com.gitee.spring.domain.injection.api.TypeDomainResolver;
 import org.springframework.beans.factory.BeanFactory;
@@ -16,9 +16,9 @@ public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassi
         tryGetResolverFromContext(owner);
         if (typeDomainResolver != null) {
             Class<?> resolvableType = (Class<?>) bd.getResolvableType().getType();
-            if (!isSpringFrameworkInternalType(resolvableType) && typeDomainResolver.isUnderScanPackage(resolvableType)) {
+            if (isNotSpringInternalType(resolvableType) && typeDomainResolver.isUnderScanPackage(resolvableType)) {
                 for (Class<?> parameterType : ctor.getParameterTypes()) {
-                    if (!isSpringFrameworkInternalType(parameterType) && typeDomainResolver.isUnderScanPackage(parameterType)) {
+                    if (isNotSpringInternalType(parameterType) && typeDomainResolver.isUnderScanPackage(parameterType)) {
                         typeDomainResolver.checkDomain(resolvableType, parameterType);
                     }
                 }
@@ -37,8 +37,8 @@ public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassi
         }
     }
 
-    protected boolean isSpringFrameworkInternalType(Class<?> typeToMatch) {
-        return typeToMatch.getName().startsWith("org.springframework.");
+    protected boolean isNotSpringInternalType(Class<?> typeToMatch) {
+        return !typeToMatch.getName().startsWith("org.springframework.");
     }
 
 }
