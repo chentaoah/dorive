@@ -33,6 +33,8 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, InitializingBean {
 
+    public static final Set<String> REPOSITORY_NAMES = new LinkedHashSet<>();
+
     protected Class<?> entityClass;
     protected Constructor<?> entityCtor;
 
@@ -68,6 +70,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         if (StringUtils.isBlank(name)) {
             name = this.getClass().getSimpleName();
         }
+        Assert.isTrue(!REPOSITORY_NAMES.contains(name), "The same repository name exists!");
+        REPOSITORY_NAMES.add(name);
 
         List<Class<?>> superClasses = ReflectUtils.getAllSuperClasses(entityClass, Object.class);
         superClasses.forEach(superClass -> entityPropertyResolver.resolveEntityProperties("", superClass));

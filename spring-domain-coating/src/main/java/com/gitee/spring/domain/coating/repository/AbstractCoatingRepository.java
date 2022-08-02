@@ -40,8 +40,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractCoatingRepository<E, PK> extends AbstractAwareRepository<E, PK> {
 
+    public static final Set<String> COATING_NAMES = new LinkedHashSet<>();
     protected Map<Class<?>, CoatingAssembler> classCoatingAssemblerMap = new ConcurrentHashMap<>();
-    protected Map<String, CoatingAssembler> nameCoatingAssemblerMap = new ConcurrentHashMap<>();
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -126,13 +126,12 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractAwareRepo
                 if (StringUtils.isBlank(name)) {
                     name = coatingClass.getSimpleName();
                 }
+                Assert.isTrue(!COATING_NAMES.contains(name), "The same coating name exists!");
+                COATING_NAMES.add(name);
 
                 CoatingDefinition coatingDefinition = new CoatingDefinition(entityClass, coatingClass, attributes, name, allPropertyDefinitionMap);
                 CoatingAssembler coatingAssembler = new DefaultCoatingAssembler(coatingDefinition, availablePropertyDefinitions, reversedRepositoryLocations);
-
                 classCoatingAssemblerMap.put(coatingClass, coatingAssembler);
-                Assert.isTrue(!nameCoatingAssemblerMap.containsKey(name), "The same coating name cannot exist!");
-                nameCoatingAssemblerMap.putIfAbsent(name, coatingAssembler);
             }
         }
     }
