@@ -9,17 +9,12 @@
         <version>2.7.2</version>
     </parent>
     <artifactId>spring-domain-web</artifactId>
-
+    
     <dependencies>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
             <artifactId>spring-domain-coating</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-        </dependency>
     </dependencies>
-
 </project>
