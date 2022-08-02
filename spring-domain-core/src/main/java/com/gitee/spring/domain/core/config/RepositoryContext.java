@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class RepositoryContext implements ApplicationContextAware, InitializingBean {
 
-    public static final Map<Class<?>, AbstractGenericRepository<?, ?>> CLASS_REPOSITORY_MAP = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, AbstractGenericRepository<?, ?>> CLASS_REPOSITORY_MAP = new ConcurrentHashMap<>();
     private ApplicationContext applicationContext;
 
     @Override
@@ -20,8 +20,8 @@ public class RepositoryContext implements ApplicationContextAware, InitializingB
     }
 
     @Override
-    @SuppressWarnings("all")
-    public void afterPropertiesSet() throws Exception {
+    @SuppressWarnings("rawtypes")
+    public void afterPropertiesSet() {
         Map<String, AbstractGenericRepository> beansOfType = applicationContext.getBeansOfType(AbstractGenericRepository.class);
         for (AbstractGenericRepository<?, ?> abstractGenericRepository : beansOfType.values()) {
             CLASS_REPOSITORY_MAP.put(abstractGenericRepository.getEntityClass(), abstractGenericRepository);
@@ -29,8 +29,8 @@ public class RepositoryContext implements ApplicationContextAware, InitializingB
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends AbstractGenericRepository<?, ?>> T getRepository(Class<?> entityClass) {
-        return (T) CLASS_REPOSITORY_MAP.get(entityClass);
+    public static <R extends AbstractGenericRepository<E, ?>, E> R getRepository(Class<E> entityClass) {
+        return (R) CLASS_REPOSITORY_MAP.get(entityClass);
     }
 
 }
