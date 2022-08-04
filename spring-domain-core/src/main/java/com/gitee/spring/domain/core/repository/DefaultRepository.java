@@ -3,10 +3,10 @@ package com.gitee.spring.domain.core.repository;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.EntityAssembler;
-import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.EntityCriterion;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
 
@@ -96,10 +96,11 @@ public class DefaultRepository extends ProxyRepository {
         if (primaryKey != null) {
             Object persistentObject = entityAssembler.disassemble(boundedContext, entityDefinition, entity);
             if (persistentObject != null) {
-                EntityExample entityExample = entityMapper.newExample(boundedContext, entityDefinition);
-                EntityCriterion entityCriterion = entityMapper.newCriterion("id", Operator.EQ, primaryKey);
+                EntityExample entityExample = new EntityExample();
+                EntityCriterion entityCriterion = new EntityCriterion("id", Operator.EQ, primaryKey);
                 entityExample.addCriterion(entityCriterion);
-                return super.updateByExample(persistentObject, entityExample.buildExample());
+                Object example = entityMapper.buildExample(boundedContext, entityDefinition, entityExample);
+                return super.updateByExample(persistentObject, example);
             }
         }
         return 0;

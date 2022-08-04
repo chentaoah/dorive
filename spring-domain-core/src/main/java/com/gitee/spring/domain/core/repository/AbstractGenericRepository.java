@@ -2,15 +2,10 @@ package com.gitee.spring.domain.core.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.EntityProperty;
 import com.gitee.spring.domain.core.constants.Operator;
-import com.gitee.spring.domain.core.entity.BindingDefinition;
-import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.EntityDefinition;
-import com.gitee.spring.domain.core.entity.EntityExample;
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
+import com.gitee.spring.domain.core.entity.*;
 import com.gitee.spring.domain.core.utils.StringUtils;
 
 import java.util.Collection;
@@ -68,14 +63,13 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
 
     protected EntityExample newExampleByContext(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        EntityMapper entityMapper = configuredRepository.getEntityMapper();
-        EntityExample entityExample = entityMapper.newExample(boundedContext, entityDefinition);
+        EntityExample entityExample = new EntityExample();
         for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
             EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
             Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
             if (boundValue != null) {
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
-                EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, boundValue);
+                EntityCriterion entityCriterion = new EntityCriterion(aliasAttribute, Operator.EQ, boundValue);
                 entityExample.addCriterion(entityCriterion);
             } else {
                 entityExample.setEmptyQuery(true);
@@ -90,7 +84,6 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
 
     protected void newCriterionByContext(BoundedContext boundedContext, ConfiguredRepository configuredRepository, EntityExample entityExample) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        EntityMapper entityMapper = configuredRepository.getEntityMapper();
         for (BindingDefinition bindingDefinition : entityDefinition.getContextBindingDefinitions()) {
             String bindAttribute = bindingDefinition.getBindAttribute();
             Object boundValue = boundedContext.get(bindAttribute);
@@ -101,7 +94,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
                     operator = Operator.LIKE;
                     boundValue = StringUtils.stripLike((String) boundValue);
                 }
-                EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, operator, boundValue);
+                EntityCriterion entityCriterion = new EntityCriterion(aliasAttribute, operator, boundValue);
                 entityExample.addCriterion(entityCriterion);
             }
         }

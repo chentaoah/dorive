@@ -1,8 +1,6 @@
 package com.gitee.spring.domain.core.repository;
 
-import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityIndex;
-import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.EntityProperty;
 import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.entity.*;
@@ -58,8 +56,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
 
     protected EntityExample newExampleByRootEntities(BoundedContext boundedContext, List<Object> rootEntities, ConfiguredRepository configuredRepository) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        EntityMapper entityMapper = configuredRepository.getEntityMapper();
-        EntityExample entityExample = entityMapper.newExample(boundedContext, entityDefinition);
+        EntityExample entityExample = new EntityExample();
         for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
             EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
             List<Object> fieldValues = new ArrayList<>();
@@ -71,7 +68,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
             }
             if (!fieldValues.isEmpty()) {
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
-                EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, fieldValues);
+                EntityCriterion entityCriterion = new EntityCriterion(aliasAttribute, Operator.EQ, fieldValues);
                 entityExample.addCriterion(entityCriterion);
             } else {
                 entityExample.setEmptyQuery(true);

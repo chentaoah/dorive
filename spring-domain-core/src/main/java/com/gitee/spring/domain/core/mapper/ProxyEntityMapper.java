@@ -1,6 +1,5 @@
 package com.gitee.spring.domain.core.mapper;
 
-import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
@@ -32,13 +31,8 @@ public class ProxyEntityMapper implements EntityMapper {
     }
 
     @Override
-    public EntityExample newExample(BoundedContext boundedContext, EntityDefinition entityDefinition) {
-        return entityMapper.newExample(boundedContext, entityDefinition);
-    }
-
-    @Override
-    public EntityCriterion newCriterion(String fieldName, String operator, Object fieldValue) {
-        return entityMapper.newCriterion(fieldName, operator, fieldValue);
+    public Object buildExample(BoundedContext boundedContext, EntityDefinition entityDefinition, EntityExample entityExample) {
+        return entityMapper.buildExample(boundedContext, entityDefinition, entityExample);
     }
 
 }

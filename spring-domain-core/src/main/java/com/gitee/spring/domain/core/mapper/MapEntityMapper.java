@@ -1,9 +1,8 @@
 package com.gitee.spring.domain.core.mapper;
 
 import com.gitee.spring.domain.core.api.EntityMapper;
-import com.gitee.spring.domain.core.entity.AbstractEntityCriterion;
 import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.api.EntityCriterion;
+import com.gitee.spring.domain.core.entity.EntityCriterion;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
 import com.gitee.spring.domain.core.utils.DataUtils;
@@ -19,28 +18,22 @@ public class MapEntityMapper extends ProxyEntityMapper {
     }
 
     @Override
-    public EntityExample newExample(BoundedContext boundedContext, EntityDefinition entityDefinition) {
-        return new EntityExample(new LinkedHashMap<>());
-    }
-
-    @Override
-    public EntityCriterion newCriterion(String fieldName, String operator, Object fieldValue) {
-        return new AbstractEntityCriterion(fieldName, operator, fieldValue) {
-            @Override
-            @SuppressWarnings("unchecked")
-            public void appendTo(EntityExample entityExample) {
-                Map<String, Object> parameterMap = (Map<String, Object>) entityExample.getExample();
-                if (parameterMap.containsKey(fieldName)) {
-                    List<Object> fieldValues = DataUtils.intersection(parameterMap.get(fieldName), fieldValue);
-                    if (fieldValues.isEmpty()) {
-                        entityExample.setEmptyQuery(true);
-                        return;
-                    }
-                    fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
+    public Object buildExample(BoundedContext boundedContext, EntityDefinition entityDefinition, EntityExample entityExample) {
+        Map<String, Object> mapExample = new LinkedHashMap<>();
+        for (EntityCriterion entityCriterion : entityExample.getEntityCriteria()) {
+            String fieldName = entityCriterion.getFieldName();
+            Object fieldValue = entityCriterion.getFieldValue();
+            if (mapExample.containsKey(fieldName)) {
+                List<Object> fieldValues = DataUtils.intersection(mapExample.get(fieldName), fieldValue);
+                if (fieldValues.isEmpty()) {
+                    entityExample.setEmptyQuery(true);
+                    return null;
                 }
-                parameterMap.put(fieldName, fieldValue);
+                fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
             }
-        };
+            mapExample.put(fieldName, fieldValue);
+        }
+        return mapExample;
     }
 
 }

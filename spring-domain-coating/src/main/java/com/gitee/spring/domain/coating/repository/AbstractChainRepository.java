@@ -7,22 +7,12 @@ import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
 import com.gitee.spring.domain.coating.impl.DefaultCoatingAssembler;
-import com.gitee.spring.domain.core.api.EntityCriterion;
-import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.constants.Operator;
-import com.gitee.spring.domain.core.entity.BindingDefinition;
-import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.EntityDefinition;
-import com.gitee.spring.domain.core.entity.EntityExample;
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
+import com.gitee.spring.domain.core.entity.*;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
@@ -33,7 +23,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
         Map<String, ChainCriterion> criterionMap = new LinkedHashMap<>();
         for (RepositoryLocation repositoryLocation : defaultCoatingAssembler.getReversedRepositoryLocations()) {
-            ChainCriterion chainCriterion = buildChainCriterion(boundedContext, repositoryLocation);
+            ChainCriterion chainCriterion = new ChainCriterion(repositoryLocation, new EntityExample());
             appendCriterionToExample(chainCriterion, coatingObject);
 
             RepositoryDefinition repositoryDefinition = repositoryLocation.getRepositoryDefinition();
@@ -49,15 +39,6 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         return chainCriterion.getEntityExample();
     }
 
-    protected ChainCriterion buildChainCriterion(BoundedContext boundedContext, RepositoryLocation repositoryLocation) {
-        RepositoryDefinition repositoryDefinition = repositoryLocation.getRepositoryDefinition();
-        ConfiguredRepository configuredRepository = repositoryDefinition.getConfiguredRepository();
-        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        EntityMapper entityMapper = configuredRepository.getEntityMapper();
-        EntityExample entityExample = entityMapper.newExample(boundedContext, entityDefinition);
-        return new ChainCriterion(repositoryLocation, entityExample);
-    }
-
     protected void appendCriterionToExample(ChainCriterion chainCriterion, Object coatingObject) {
         RepositoryLocation repositoryLocation = chainCriterion.getRepositoryLocation();
         EntityExample entityExample = chainCriterion.getEntityExample();
@@ -66,10 +47,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             String operatorAttribute = propertyDefinition.getOperatorAttribute();
             Object fieldValue = ReflectUtil.getFieldValue(coatingObject, propertyDefinition.getDeclaredField());
             if (fieldValue != null) {
-                RepositoryDefinition repositoryDefinition = repositoryLocation.getRepositoryDefinition();
-                ConfiguredRepository configuredRepository = repositoryDefinition.getConfiguredRepository();
-                EntityMapper entityMapper = configuredRepository.getEntityMapper();
-                EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, operatorAttribute, fieldValue);
+                EntityCriterion entityCriterion = new EntityCriterion(aliasAttribute, operatorAttribute, fieldValue);
                 entityExample.addCriterion(entityCriterion);
             }
         }
@@ -88,7 +66,6 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             ConfiguredRepository configuredRepository = repositoryDefinition.getConfiguredRepository();
 
             EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
-            EntityMapper entityMapper = configuredRepository.getEntityMapper();
 
             for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
                 String absoluteAccessPath = prefixAccessPath + bindingDefinition.getBelongAccessPath();
@@ -107,7 +84,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                     Object boundValue = boundedContext.get(bindingDefinition.getBindAttribute());
                     if (boundValue != null) {
                         String aliasAttribute = bindingDefinition.getAliasAttribute();
-                        EntityCriterion entityCriterion = entityMapper.newCriterion(aliasAttribute, Operator.EQ, boundValue);
+                        EntityCriterion entityCriterion = new EntityCriterion(aliasAttribute, Operator.EQ, boundValue);
                         entityExample.addCriterion(entityCriterion);
                     }
                 }
@@ -141,13 +118,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
                     String bindAliasAttribute = bindingDefinition.getBindAliasAttribute();
                     Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
-
-                    RepositoryLocation targetRepositoryLocation = targetChainCriterion.getRepositoryLocation();
-                    RepositoryDefinition targetRepositoryDefinition = targetRepositoryLocation.getRepositoryDefinition();
-                    ConfiguredRepository targetConfiguredRepository = targetRepositoryDefinition.getConfiguredRepository();
-
-                    EntityMapper targetEntityMapper = targetConfiguredRepository.getEntityMapper();
-                    EntityCriterion entityCriterion = targetEntityMapper.newCriterion(bindAliasAttribute, Operator.EQ, fieldValue);
+                    EntityCriterion entityCriterion = new EntityCriterion(bindAliasAttribute, Operator.EQ, fieldValue);
                     targetEntityExample.addCriterion(entityCriterion);
                 }
             }

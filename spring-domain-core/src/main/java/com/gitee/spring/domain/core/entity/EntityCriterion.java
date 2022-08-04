@@ -1,13 +1,12 @@
 package com.gitee.spring.domain.core.entity;
 
-import com.gitee.spring.domain.core.api.EntityCriterion;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public abstract class AbstractEntityCriterion implements EntityCriterion {
+public class EntityCriterion {
     protected String fieldName;
-    protected String Operator;
+    protected String operator;
     protected Object fieldValue;
 }

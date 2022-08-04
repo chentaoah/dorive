@@ -50,13 +50,13 @@ public class ConfiguredRepository extends ProxyRepository {
         return abstractRepository;
     }
 
-    private Object processExample(Object example) {
+    private Object processExample(BoundedContext boundedContext, Object example) {
         if (example instanceof EntityExample) {
             EntityExample entityExample = (EntityExample) example;
             if (entityExample.isEmptyQuery()) {
                 return null;
             } else if (!entityDefinition.isUseEntityExample()) {
-                return entityExample.buildExample();
+                return entityMapper.buildExample(boundedContext, entityDefinition, entityExample);
             }
         }
         return example;
@@ -64,14 +64,14 @@ public class ConfiguredRepository extends ProxyRepository {
 
     @Override
     public List<Object> selectByExample(BoundedContext boundedContext, Object example) {
-        example = processExample(example);
+        example = processExample(boundedContext, example);
         return example != null ? super.selectByExample(boundedContext, example) : Collections.emptyList();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
-        example = processExample(example);
+        example = processExample(boundedContext, example);
         if (example == null) {
             return (T) entityMapper.newPageOfEntities(page, Collections.emptyList());
         } else {
@@ -81,13 +81,13 @@ public class ConfiguredRepository extends ProxyRepository {
 
     @Override
     public int updateByExample(Object entity, Object example) {
-        example = processExample(example);
+        example = processExample(new BoundedContext(), example);
         return example != null ? super.updateByExample(entity, example) : 0;
     }
 
     @Override
     public int deleteByExample(Object example) {
-        example = processExample(example);
+        example = processExample(new BoundedContext(), example);
         return example != null ? super.deleteByExample(example) : 0;
     }
 
