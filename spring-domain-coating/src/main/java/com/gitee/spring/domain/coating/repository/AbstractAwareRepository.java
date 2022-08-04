@@ -49,9 +49,9 @@ public abstract class AbstractAwareRepository<E, PK> extends AbstractEventReposi
                         repository.getRootRepository());
                 repositoryDefinitionMap.put(absoluteAccessPath, repositoryDefinition);
 
-                multiAccessPath = new ArrayList<>(multiAccessPath);
-                multiAccessPath.add(entityDefinition.getAccessPath());
-                resolveRepositoryDefinitionMap(multiAccessPath, repository);
+                List<String> newMultiAccessPath = new ArrayList<>(multiAccessPath);
+                newMultiAccessPath.add(entityDefinition.getAccessPath());
+                resolveRepositoryDefinitionMap(newMultiAccessPath, repository);
 
             } else {
                 RepositoryDefinition repositoryDefinition = new RepositoryDefinition(
