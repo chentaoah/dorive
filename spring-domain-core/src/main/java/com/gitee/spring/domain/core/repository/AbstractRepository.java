@@ -1,11 +1,11 @@
 package com.gitee.spring.domain.core.repository;
 
-import com.gitee.spring.domain.core.api.IRepository;
+import com.gitee.spring.domain.core.api.SimpleRepository;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 
 import java.util.List;
 
-public abstract class AbstractRepository<E, PK> implements IRepository<E, PK> {
+public abstract class AbstractRepository<E, PK> implements SimpleRepository<E, PK> {
 
     @Override
     public E selectByPrimaryKey(PK primaryKey) {
