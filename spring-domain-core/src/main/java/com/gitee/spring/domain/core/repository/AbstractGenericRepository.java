@@ -5,7 +5,6 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.EntityCriterion;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.EntityProperty;
-import com.gitee.spring.domain.core.api.GenericRepository;
 import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.entity.BoundedContext;
@@ -18,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateRepository<E, PK> implements GenericRepository<E, PK> {
+public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateRepository<E, PK> {
 
     @Override
     @SuppressWarnings("unchecked")
@@ -261,33 +260,6 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     @Override
     public int deleteByExample(Object example) {
         return rootRepository.deleteByExample(example);
-    }
-
-    @Override
-    public int insertList(BoundedContext boundedContext, List<E> entities) {
-        return entities.stream().mapToInt(entity -> insert(boundedContext, entity)).sum();
-    }
-
-    @Override
-    public int updateList(BoundedContext boundedContext, List<E> entities) {
-        return entities.stream().mapToInt(entity -> update(boundedContext, entity)).sum();
-    }
-
-    @Override
-    public int deleteList(BoundedContext boundedContext, List<E> entities) {
-        return entities.stream().mapToInt(entity -> delete(boundedContext, entity)).sum();
-    }
-
-    @Override
-    public int forceInsert(BoundedContext boundedContext, E entity) {
-        boundedContext.put("#forceInsert", true);
-        return insert(boundedContext, entity);
-    }
-
-    @Override
-    public int forceInsertList(BoundedContext boundedContext, List<E> entities) {
-        boundedContext.put("#forceInsert", true);
-        return entities.stream().mapToInt(entity -> insert(boundedContext, entity)).sum();
     }
 
 }

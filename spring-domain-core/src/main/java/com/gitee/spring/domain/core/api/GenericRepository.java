@@ -4,16 +4,20 @@ import com.gitee.spring.domain.core.entity.BoundedContext;
 
 import java.util.List;
 
-public interface GenericRepository<E, PK> extends SimpleRepository<E, PK> {
+public interface GenericRepository<E, PK> extends IRepository<E, PK> {
 
-    int insertList(BoundedContext boundedContext, List<E> entities);
+    E selectByPrimaryKey(PK primaryKey);
 
-    int updateList(BoundedContext boundedContext, List<E> entities);
+    List<E> selectByExample(Object example);
 
-    int deleteList(BoundedContext boundedContext, List<E> entities);
+    <T> T selectPageByExample(Object example, Object page);
+
+    int insert(E entity);
+
+    int update(E entity);
+
+    int delete(E entity);
 
     int forceInsert(BoundedContext boundedContext, E entity);
-
-    int forceInsertList(BoundedContext boundedContext, List<E> entities);
 
 }
