@@ -72,8 +72,9 @@ public class DefaultRepository extends ProxyRepository {
 
     @Override
     public int insert(BoundedContext boundedContext, Object entity) {
+        boolean forceInsert = boundedContext.containsKey("#forceInsert");
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-        if (primaryKey == null) {
+        if (forceInsert || primaryKey == null) {
             Object persistentObject = entityAssembler.disassemble(boundedContext, entityDefinition, entity);
             if (persistentObject != null) {
                 int count = super.insert(boundedContext, persistentObject);
