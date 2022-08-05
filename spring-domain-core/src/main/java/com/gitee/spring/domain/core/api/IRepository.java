@@ -16,12 +16,12 @@ public interface IRepository<E, PK> {
 
     int update(BoundedContext boundedContext, E entity);
 
-    int updateByExample(E entity, Object example);
+    int updateByExample(BoundedContext boundedContext, Object entity, Object example);
 
     int delete(BoundedContext boundedContext, E entity);
 
     int deleteByPrimaryKey(PK primaryKey);
 
-    int deleteByExample(Object example);
+    int deleteByExample(BoundedContext boundedContext, Object example);
 
 }

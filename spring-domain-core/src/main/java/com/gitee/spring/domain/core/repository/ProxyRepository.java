@@ -40,8 +40,8 @@ public class ProxyRepository extends AbstractRepository<Object, Object> {
     }
 
     @Override
-    public int updateByExample(Object entity, Object example) {
-        return proxyRepository.updateByExample(entity, example);
+    public int updateByExample(BoundedContext boundedContext, Object entity, Object example) {
+        return proxyRepository.updateByExample(boundedContext, entity, example);
     }
 
     @Override
@@ -55,8 +55,8 @@ public class ProxyRepository extends AbstractRepository<Object, Object> {
     }
 
     @Override
-    public int deleteByExample(Object example) {
-        return proxyRepository.deleteByExample(example);
+    public int deleteByExample(BoundedContext boundedContext, Object example) {
+        return proxyRepository.deleteByExample(boundedContext, example);
     }
 
 }

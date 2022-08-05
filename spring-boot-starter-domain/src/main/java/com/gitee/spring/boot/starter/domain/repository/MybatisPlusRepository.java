@@ -52,7 +52,7 @@ public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
     }
 
     @Override
-    public int updateByExample(Object entity, Object example) {
+    public int updateByExample(BoundedContext boundedContext, Object entity, Object example) {
         return baseMapper.update(entity, (QueryWrapper<Object>) example);
     }
 
@@ -68,7 +68,7 @@ public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
     }
 
     @Override
-    public int deleteByExample(Object example) {
+    public int deleteByExample(BoundedContext boundedContext, Object example) {
         return baseMapper.delete((QueryWrapper<Object>) example);
     }
 

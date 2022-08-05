@@ -97,18 +97,19 @@ public class DefaultRepository extends ProxyRepository {
                 EntityExample entityExample = new EntityExample();
                 entityExample.eq("id", primaryKey);
                 Object example = entityMapper.buildExample(boundedContext, entityDefinition, entityExample);
-                return super.updateByExample(persistentObject, example);
+                return super.updateByExample(boundedContext, persistentObject, example);
             }
         }
         return 0;
     }
 
     @Override
-    public int updateByExample(Object entity, Object example) {
+    public int updateByExample(BoundedContext boundedContext, Object entity, Object example) {
         Assert.isTrue(!(entity instanceof Collection), "The entity cannot be a collection!");
+        entity = BeanUtil.copyProperties(entity, entityDefinition.getGenericEntityClass());
         Object persistentObject = entityAssembler.disassemble(new BoundedContext(), entityDefinition, entity);
         if (persistentObject != null) {
-            return super.updateByExample(persistentObject, example);
+            return super.updateByExample(boundedContext, persistentObject, example);
         }
         return 0;
     }

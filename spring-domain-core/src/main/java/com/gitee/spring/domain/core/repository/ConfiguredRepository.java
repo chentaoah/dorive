@@ -50,7 +50,7 @@ public class ConfiguredRepository extends ProxyRepository {
         return abstractRepository;
     }
 
-    private Object processExample(BoundedContext boundedContext, Object example) {
+    private Object buildExample(BoundedContext boundedContext, Object example) {
         if (example instanceof EntityExample) {
             EntityExample entityExample = (EntityExample) example;
             if (entityExample.isEmptyQuery()) {
@@ -64,14 +64,14 @@ public class ConfiguredRepository extends ProxyRepository {
 
     @Override
     public List<Object> selectByExample(BoundedContext boundedContext, Object example) {
-        example = processExample(boundedContext, example);
+        example = buildExample(boundedContext, example);
         return example != null ? super.selectByExample(boundedContext, example) : Collections.emptyList();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
-        example = processExample(boundedContext, example);
+        example = buildExample(boundedContext, example);
         if (example == null) {
             return (T) entityMapper.newPageOfEntities(page, Collections.emptyList());
         } else {
@@ -80,15 +80,15 @@ public class ConfiguredRepository extends ProxyRepository {
     }
 
     @Override
-    public int updateByExample(Object entity, Object example) {
-        example = processExample(new BoundedContext(), example);
-        return example != null ? super.updateByExample(entity, example) : 0;
+    public int updateByExample(BoundedContext boundedContext, Object entity, Object example) {
+        example = buildExample(new BoundedContext(), example);
+        return example != null ? super.updateByExample(boundedContext, entity, example) : 0;
     }
 
     @Override
-    public int deleteByExample(Object example) {
-        example = processExample(new BoundedContext(), example);
-        return example != null ? super.deleteByExample(example) : 0;
+    public int deleteByExample(BoundedContext boundedContext, Object example) {
+        example = buildExample(new BoundedContext(), example);
+        return example != null ? super.deleteByExample(boundedContext, example) : 0;
     }
 
 }

@@ -48,8 +48,8 @@ public class EventRepository extends ConfiguredRepository {
     }
 
     @Override
-    public int updateByExample(Object entity, Object example) {
-        int count = super.updateByExample(entity, example);
+    public int updateByExample(BoundedContext boundedContext, Object entity, Object example) {
+        int count = super.updateByExample(boundedContext, entity, example);
         if (count != 0) {
             RepositoryEvent repositoryEvent = new RepositoryEvent(this);
             repositoryEvent.setMethodName("updateByExample");
@@ -89,8 +89,8 @@ public class EventRepository extends ConfiguredRepository {
     }
 
     @Override
-    public int deleteByExample(Object example) {
-        int count = super.deleteByExample(example);
+    public int deleteByExample(BoundedContext boundedContext, Object example) {
+        int count = super.deleteByExample(boundedContext, example);
         if (count != 0) {
             RepositoryEvent repositoryEvent = new RepositoryEvent(this);
             repositoryEvent.setMethodName("deleteByExample");
