@@ -7,12 +7,20 @@ import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
 import com.gitee.spring.domain.coating.impl.DefaultCoatingAssembler;
-import com.gitee.spring.domain.core.constants.Operator;
-import com.gitee.spring.domain.core.entity.*;
+import com.gitee.spring.domain.core.entity.BindingDefinition;
+import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.EntityCriterion;
+import com.gitee.spring.domain.core.entity.EntityDefinition;
+import com.gitee.spring.domain.core.entity.EntityExample;
+import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
@@ -84,8 +92,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                     Object boundValue = boundedContext.get(bindingDefinition.getBindAttribute());
                     if (boundValue != null) {
                         String aliasAttribute = bindingDefinition.getAliasAttribute();
-                        EntityCriterion entityCriterion = new EntityCriterion(aliasAttribute, Operator.EQ, boundValue);
-                        entityExample.addCriterion(entityCriterion);
+                        entityExample.eq(aliasAttribute, boundValue);
                     }
                 }
             }
@@ -118,8 +125,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
                     String bindAliasAttribute = bindingDefinition.getBindAliasAttribute();
                     Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
-                    EntityCriterion entityCriterion = new EntityCriterion(bindAliasAttribute, Operator.EQ, fieldValue);
-                    targetEntityExample.addCriterion(entityCriterion);
+                    entityExample.eq(bindAliasAttribute, fieldValue);
                 }
             }
         });
