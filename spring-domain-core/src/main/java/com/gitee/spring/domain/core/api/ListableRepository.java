@@ -12,6 +12,4 @@ public interface ListableRepository<E, PK> extends GenericRepository<E, PK> {
 
     int deleteList(BoundedContext boundedContext, List<E> entities);
 
-    int forceInsertList(BoundedContext boundedContext, List<E> entities);
-
 }

@@ -181,6 +181,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         int orderAttribute = attributes.getNumber(Attribute.ORDER_ATTRIBUTE).intValue();
+        boolean forceInsertAttribute = attributes.getBoolean(Attribute.FORCE_INSERT_ATTRIBUTE);
 
         Class<?> assemblerClass = attributes.getClass(Attribute.ASSEMBLER_ATTRIBUTE);
         EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
@@ -263,7 +264,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 isRoot, accessPath, uniqueKey, annotatedElement,
                 entityClass, isCollection, genericEntityClass, fieldName,
                 attributes, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
-                useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
+                useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute, forceInsertAttribute,
                 allBindingDefinitions, boundBindingDefinitions, contextBindingDefinitions, boundIdBindingDefinition, boundColumns,
                 false, new LinkedHashSet<>(), new LinkedHashMap<>());
 
