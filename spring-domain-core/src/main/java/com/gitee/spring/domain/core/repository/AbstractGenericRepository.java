@@ -4,8 +4,11 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.EntityProperty;
-import com.gitee.spring.domain.core.constants.Operator;
-import com.gitee.spring.domain.core.entity.*;
+import com.gitee.spring.domain.core.entity.BindingDefinition;
+import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.EntityDefinition;
+import com.gitee.spring.domain.core.entity.EntityExample;
+import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.utils.StringUtils;
 
 import java.util.Collection;
@@ -69,8 +72,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
             if (boundValue != null) {
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
-                EntityCriterion entityCriterion = new EntityCriterion(aliasAttribute, Operator.EQ, boundValue);
-                entityExample.addCriterion(entityCriterion);
+                entityExample.eq(aliasAttribute, boundValue);
             } else {
                 entityExample.setEmptyQuery(true);
                 break;
@@ -89,13 +91,12 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             Object boundValue = boundedContext.get(bindAttribute);
             if (boundValue != null) {
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
-                String operator = Operator.EQ;
                 if (boundValue instanceof String && StringUtils.isLike((String) boundValue)) {
-                    operator = Operator.LIKE;
                     boundValue = StringUtils.stripLike((String) boundValue);
+                    entityExample.like(aliasAttribute, boundValue);
+                } else {
+                    entityExample.eq(aliasAttribute, boundValue);
                 }
-                EntityCriterion entityCriterion = new EntityCriterion(aliasAttribute, operator, boundValue);
-                entityExample.addCriterion(entityCriterion);
             }
         }
     }

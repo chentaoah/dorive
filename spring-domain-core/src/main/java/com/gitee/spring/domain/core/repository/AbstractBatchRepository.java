@@ -2,8 +2,11 @@ package com.gitee.spring.domain.core.repository;
 
 import com.gitee.spring.domain.core.api.EntityIndex;
 import com.gitee.spring.domain.core.api.EntityProperty;
-import com.gitee.spring.domain.core.constants.Operator;
-import com.gitee.spring.domain.core.entity.*;
+import com.gitee.spring.domain.core.entity.BindingDefinition;
+import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.EntityDefinition;
+import com.gitee.spring.domain.core.entity.EntityExample;
+import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.impl.DefaultEntityIndex;
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,8 +71,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
             }
             if (!fieldValues.isEmpty()) {
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
-                EntityCriterion entityCriterion = new EntityCriterion(aliasAttribute, Operator.EQ, fieldValues);
-                entityExample.addCriterion(entityCriterion);
+                entityExample.eq(aliasAttribute, fieldValues);
             } else {
                 entityExample.setEmptyQuery(true);
                 break;

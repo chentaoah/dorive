@@ -1,5 +1,6 @@
 package com.gitee.spring.domain.core.entity;
 
+import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.utils.StringUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,36 @@ public class EntityExample {
 
     public void addCriterion(EntityCriterion entityCriterion) {
         entityCriteria.add(entityCriterion);
+    }
+
+    public EntityExample eq(String fieldName, Object fieldValue) {
+        entityCriteria.add(new EntityCriterion(fieldName, Operator.EQ, fieldValue));
+        return this;
+    }
+
+    public EntityExample gt(String fieldName, Object fieldValue) {
+        entityCriteria.add(new EntityCriterion(fieldName, Operator.GT, fieldValue));
+        return this;
+    }
+
+    public EntityExample ge(String fieldName, Object fieldValue) {
+        entityCriteria.add(new EntityCriterion(fieldName, Operator.GE, fieldValue));
+        return this;
+    }
+
+    public EntityExample lt(String fieldName, Object fieldValue) {
+        entityCriteria.add(new EntityCriterion(fieldName, Operator.LT, fieldValue));
+        return this;
+    }
+
+    public EntityExample le(String fieldName, Object fieldValue) {
+        entityCriteria.add(new EntityCriterion(fieldName, Operator.LE, fieldValue));
+        return this;
+    }
+
+    public EntityExample like(String fieldName, Object fieldValue) {
+        entityCriteria.add(new EntityCriterion(fieldName, Operator.LIKE, fieldValue));
+        return this;
     }
 
     public void orderByAsc(String... columns) {

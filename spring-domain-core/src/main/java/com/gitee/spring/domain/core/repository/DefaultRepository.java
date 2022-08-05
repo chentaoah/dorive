@@ -4,9 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
-import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.EntityCriterion;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
 
@@ -97,8 +95,7 @@ public class DefaultRepository extends ProxyRepository {
             Object persistentObject = entityAssembler.disassemble(boundedContext, entityDefinition, entity);
             if (persistentObject != null) {
                 EntityExample entityExample = new EntityExample();
-                EntityCriterion entityCriterion = new EntityCriterion("id", Operator.EQ, primaryKey);
-                entityExample.addCriterion(entityCriterion);
+                entityExample.eq("id", primaryKey);
                 Object example = entityMapper.buildExample(boundedContext, entityDefinition, entityExample);
                 return super.updateByExample(persistentObject, example);
             }
