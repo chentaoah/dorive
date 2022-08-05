@@ -226,6 +226,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         if (!ignoreRoot && isMatchScenes(boundedContext, getRootRepository())) {
             totalCount += getRootRepository().updateByExample(boundedContext, entity, example);
         }
+        if (ignoreRoot) {
+            boundedContext.remove("#ignoreRoot");
+        }
         for (ConfiguredRepository configuredRepository : getSubRepositories()) {
             if (isMatchScenes(boundedContext, configuredRepository)) {
                 totalCount += configuredRepository.updateByExample(boundedContext, entity, example);
@@ -268,6 +271,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         boolean ignoreRoot = boundedContext.containsKey("#ignoreRoot");
         if (!ignoreRoot && isMatchScenes(boundedContext, getRootRepository())) {
             totalCount += getRootRepository().deleteByExample(boundedContext, example);
+        }
+        if (ignoreRoot) {
+            boundedContext.remove("#ignoreRoot");
         }
         for (ConfiguredRepository configuredRepository : getSubRepositories()) {
             if (isMatchScenes(boundedContext, configuredRepository)) {
