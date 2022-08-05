@@ -222,7 +222,11 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     public int updateByExample(BoundedContext boundedContext, Object entity, Object example) {
         Assert.notNull(entity, "The entity cannot be null!");
         int totalCount = 0;
-        for (ConfiguredRepository configuredRepository : getOrderedRepositories()) {
+        boolean ignoreRoot = boundedContext.containsKey("#ignoreRoot");
+        if (!ignoreRoot && isMatchScenes(boundedContext, getRootRepository())) {
+            totalCount += getRootRepository().updateByExample(boundedContext, entity, example);
+        }
+        for (ConfiguredRepository configuredRepository : getSubRepositories()) {
             if (isMatchScenes(boundedContext, configuredRepository)) {
                 totalCount += configuredRepository.updateByExample(boundedContext, entity, example);
             }
@@ -261,7 +265,11 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     @Override
     public int deleteByExample(BoundedContext boundedContext, Object example) {
         int totalCount = 0;
-        for (ConfiguredRepository configuredRepository : getOrderedRepositories()) {
+        boolean ignoreRoot = boundedContext.containsKey("#ignoreRoot");
+        if (!ignoreRoot && isMatchScenes(boundedContext, getRootRepository())) {
+            totalCount += getRootRepository().deleteByExample(boundedContext, example);
+        }
+        for (ConfiguredRepository configuredRepository : getSubRepositories()) {
             if (isMatchScenes(boundedContext, configuredRepository)) {
                 totalCount += configuredRepository.deleteByExample(boundedContext, example);
             }
