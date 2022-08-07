@@ -3,6 +3,7 @@ package com.gitee.spring.domain.core.constants;
 public interface Attribute {
     String NAME_ATTRIBUTE = "name";
 
+    String ID_ATTRIBUTE = "id";
     String SCENE_ATTRIBUTE = "scene";
     String MAPPER_ATTRIBUTE = "mapper";
     String USE_ENTITY_EXAMPLE_ATTRIBUTE = "useEntityExample";

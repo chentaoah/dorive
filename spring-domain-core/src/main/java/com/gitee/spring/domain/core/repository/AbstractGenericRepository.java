@@ -4,18 +4,19 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.EntityProperty;
-import com.gitee.spring.domain.core.entity.BindingDefinition;
-import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.EntityDefinition;
-import com.gitee.spring.domain.core.entity.EntityExample;
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
+import com.gitee.spring.domain.core.api.GenericRepository;
+import com.gitee.spring.domain.core.constants.EntityState;
+import com.gitee.spring.domain.core.entity.*;
+import com.gitee.spring.domain.core.impl.EntityStateResolver;
 import com.gitee.spring.domain.core.utils.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateRepository<E, PK> {
+public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateRepository<E, PK> implements GenericRepository<E, PK> {
+
+    protected EntityStateResolver entityStateResolver = new EntityStateResolver();
 
     @Override
     @SuppressWarnings("unchecked")
@@ -23,6 +24,27 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         Object rootEntity = rootRepository.selectByPrimaryKey(boundedContext, primaryKey);
         handleRootEntity(boundedContext, rootEntity);
         return (E) rootEntity;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<E> selectByExample(BoundedContext boundedContext, Object example) {
+        List<Object> rootEntities = rootRepository.selectByExample(boundedContext, example);
+        handleRootEntities(boundedContext, rootEntities);
+        return (List<E>) rootEntities;
+    }
+
+    @Override
+    public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
+        T dataPage = rootRepository.selectPageByExample(boundedContext, example, page);
+        EntityMapper entityMapper = rootRepository.getEntityMapper();
+        List<Object> rootEntities = entityMapper.getDataFromPage(dataPage);
+        handleRootEntities(boundedContext, rootEntities);
+        return dataPage;
+    }
+
+    protected void handleRootEntities(BoundedContext boundedContext, List<Object> rootEntities) {
+        rootEntities.forEach(rootEntity -> handleRootEntity(boundedContext, rootEntity));
     }
 
     protected void handleRootEntity(BoundedContext boundedContext, Object rootEntity) {
@@ -112,28 +134,16 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public List<E> selectByExample(BoundedContext boundedContext, Object example) {
-        List<Object> rootEntities = rootRepository.selectByExample(boundedContext, example);
-        handleRootEntities(boundedContext, rootEntities);
-        return (List<E>) rootEntities;
-    }
-
-    @Override
-    public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
-        T dataPage = rootRepository.selectPageByExample(boundedContext, example, page);
-        EntityMapper entityMapper = rootRepository.getEntityMapper();
-        List<Object> rootEntities = entityMapper.getDataFromPage(dataPage);
-        handleRootEntities(boundedContext, rootEntities);
-        return dataPage;
-    }
-
-    protected void handleRootEntities(BoundedContext boundedContext, List<Object> rootEntities) {
-        rootEntities.forEach(rootEntity -> handleRootEntity(boundedContext, rootEntity));
-    }
-
-    @Override
     public int insert(BoundedContext boundedContext, E entity) {
+        return operateEntityByState(boundedContext, entity, EntityState.INSERT);
+    }
+
+    @Override
+    public int update(BoundedContext boundedContext, E entity) {
+        return operateEntityByState(boundedContext, entity, EntityState.UPDATE);
+    }
+
+    protected int operateEntityByState(BoundedContext boundedContext, E entity, int expectedEntityState) {
         Assert.notNull(entity, "The entity cannot be null!");
         int totalCount = 0;
         AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(entity);
@@ -141,25 +151,41 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
             Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
             if (targetEntity != null && isMatchScenes(boundedContext, configuredRepository)) {
+                int contextEntityState = entityStateResolver.resolveEntityStateByContext(boundedContext, configuredRepository);
                 if (targetEntity instanceof Collection) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
-                        setBoundValueByContext(boundedContext, entity, configuredRepository, eachEntity);
-                        totalCount += configuredRepository.insert(boundedContext, eachEntity);
+                        int entityState = entityStateResolver.resolveEntityState(expectedEntityState, contextEntityState, eachEntity);
+                        if (entityState == EntityState.INSERT) {
+                            getBoundValueFromContext(boundedContext, entity, configuredRepository, eachEntity);
+                            totalCount += configuredRepository.insert(boundedContext, eachEntity);
+
+                        } else if (entityState == EntityState.UPDATE) {
+                            totalCount += configuredRepository.update(boundedContext, eachEntity);
+
+                        } else if (entityState == EntityState.DELETE) {
+                            totalCount += configuredRepository.delete(boundedContext, eachEntity);
+                        }
                     }
                 } else {
-                    setBoundValueByContext(boundedContext, entity, configuredRepository, targetEntity);
-                    totalCount += configuredRepository.insert(boundedContext, targetEntity);
-                    setBoundIdForBoundEntity(boundedContext, entity, configuredRepository, targetEntity);
+                    int entityState = entityStateResolver.resolveEntityState(expectedEntityState, contextEntityState, targetEntity);
+                    if (entityState == EntityState.INSERT) {
+                        getBoundValueFromContext(boundedContext, entity, configuredRepository, targetEntity);
+                        totalCount += configuredRepository.insert(boundedContext, targetEntity);
+                        setBoundIdForBoundEntity(boundedContext, entity, configuredRepository, targetEntity);
+
+                    } else if (entityState == EntityState.UPDATE) {
+                        totalCount += configuredRepository.update(boundedContext, targetEntity);
+
+                    } else if (entityState == EntityState.DELETE) {
+                        totalCount += configuredRepository.delete(boundedContext, targetEntity);
+                    }
                 }
             }
         }
         return totalCount;
     }
 
-    protected void setBoundValueByContext(BoundedContext boundedContext,
-                                          Object rootEntity,
-                                          ConfiguredRepository configuredRepository,
-                                          Object entity) {
+    protected void getBoundValueFromContext(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository, Object entity) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
             if (!bindingDefinition.isBoundId()) {
@@ -182,10 +208,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         }
     }
 
-    protected void setBoundIdForBoundEntity(BoundedContext boundedContext,
-                                            Object rootEntity,
-                                            ConfiguredRepository configuredRepository,
-                                            Object entity) {
+    protected void setBoundIdForBoundEntity(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository, Object entity) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         BindingDefinition boundIdBindingDefinition = entityDefinition.getBoundIdBindingDefinition();
         if (boundIdBindingDefinition != null) {
@@ -195,27 +218,6 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
                 boundEntityPropertyChain.setValue(rootEntity, primaryKey);
             }
         }
-    }
-
-    @Override
-    public int update(BoundedContext boundedContext, E entity) {
-        Assert.notNull(entity, "The entity cannot be null!");
-        int totalCount = 0;
-        AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(entity);
-        for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getOrderedRepositories()) {
-            EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
-            Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
-            if (targetEntity != null && isMatchScenes(boundedContext, configuredRepository)) {
-                if (targetEntity instanceof Collection) {
-                    for (Object eachEntity : (Collection<?>) targetEntity) {
-                        totalCount += configuredRepository.update(boundedContext, eachEntity);
-                    }
-                } else {
-                    totalCount += configuredRepository.update(boundedContext, targetEntity);
-                }
-            }
-        }
-        return totalCount;
     }
 
     @Override
@@ -239,23 +241,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
 
     @Override
     public int delete(BoundedContext boundedContext, E entity) {
-        Assert.notNull(entity, "The entity cannot be null!");
-        int totalCount = 0;
-        AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(entity);
-        for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getOrderedRepositories()) {
-            EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
-            Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
-            if (targetEntity != null && isMatchScenes(boundedContext, configuredRepository)) {
-                if (targetEntity instanceof Collection) {
-                    for (Object eachEntity : (Collection<?>) targetEntity) {
-                        totalCount += configuredRepository.delete(boundedContext, eachEntity);
-                    }
-                } else {
-                    totalCount += configuredRepository.delete(boundedContext, targetEntity);
-                }
-            }
-        }
-        return totalCount;
+        return operateEntityByState(boundedContext, entity, EntityState.DELETE);
     }
 
     @Override
@@ -281,6 +267,31 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             }
         }
         return totalCount;
+    }
+
+    @Override
+    public int insertOrUpdate(BoundedContext boundedContext, E entity) {
+        return operateEntityByState(boundedContext, entity, EntityState.INSERT_OR_UPDATE);
+    }
+
+    @Override
+    public int insertList(BoundedContext boundedContext, List<E> entities) {
+        return entities.stream().mapToInt(entity -> insert(boundedContext, entity)).sum();
+    }
+
+    @Override
+    public int updateList(BoundedContext boundedContext, List<E> entities) {
+        return entities.stream().mapToInt(entity -> update(boundedContext, entity)).sum();
+    }
+
+    @Override
+    public int deleteList(BoundedContext boundedContext, List<E> entities) {
+        return entities.stream().mapToInt(entity -> delete(boundedContext, entity)).sum();
+    }
+
+    @Override
+    public int insertOrUpdateList(BoundedContext boundedContext, List<E> entities) {
+        return entities.stream().mapToInt(entity -> insertOrUpdate(boundedContext, entity)).sum();
     }
 
 }

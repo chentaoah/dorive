@@ -11,6 +11,8 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Entity {
 
+    String id() default "";
+
     String[] scene() default {};
 
     Class<?> mapper() default Object.class;

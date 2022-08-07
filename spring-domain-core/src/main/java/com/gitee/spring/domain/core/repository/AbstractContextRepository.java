@@ -139,7 +139,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                                                            String fieldName,
                                                            AnnotationAttributes attributes,
                                                            Set<Binding> bindingAnnotations) {
-        String uniqueKey = name + ":" + accessPath;
+
+        String idAttribute = attributes.getString(Attribute.ID_ATTRIBUTE);
+        idAttribute = StringUtils.isNotBlank(idAttribute) ? idAttribute : null;
 
         String[] sceneAttributeStrs = attributes.getStringArray(Attribute.SCENE_ATTRIBUTE);
         Set<String> sceneAttribute = new LinkedHashSet<>(Arrays.asList(sceneAttributeStrs));
@@ -260,9 +262,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         EntityDefinition entityDefinition = new EntityDefinition(
-                isRoot, accessPath, uniqueKey, annotatedElement,
+                isRoot, accessPath, annotatedElement,
                 entityClass, isCollection, genericEntityClass, fieldName,
-                attributes, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
+                attributes, idAttribute, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
                 allBindingDefinitions, boundBindingDefinitions, contextBindingDefinitions, boundIdBindingDefinition, boundColumns,
                 false, new LinkedHashSet<>(), new LinkedHashMap<>());
