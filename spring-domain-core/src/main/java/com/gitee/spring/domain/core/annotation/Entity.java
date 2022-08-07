@@ -27,6 +27,8 @@ public @interface Entity {
 
     int order() default 0;
 
+    boolean forceInsert() default false;
+
     Class<?> assembler() default DefaultEntityAssembler.class;
 
     Class<?> repository() default DefaultRepository.class;

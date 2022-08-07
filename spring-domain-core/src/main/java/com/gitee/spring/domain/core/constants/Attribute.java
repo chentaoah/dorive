@@ -11,6 +11,7 @@ public interface Attribute {
     String ORDER_BY_ASC_ATTRIBUTE = "orderByAsc";
     String ORDER_BY_DESC_ATTRIBUTE = "orderByDesc";
     String ORDER_ATTRIBUTE = "order";
+    String FORCE_INSERT_ATTRIBUTE = "forceInsert";
     String ASSEMBLER_ATTRIBUTE = "assembler";
     String REPOSITORY_ATTRIBUTE = "repository";
 

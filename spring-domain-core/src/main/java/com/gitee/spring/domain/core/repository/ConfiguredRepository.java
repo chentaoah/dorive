@@ -1,5 +1,6 @@
 package com.gitee.spring.domain.core.repository;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;
@@ -77,6 +78,19 @@ public class ConfiguredRepository extends ProxyRepository {
         } else {
             return super.selectPageByExample(boundedContext, example, page);
         }
+    }
+
+    @Override
+    public int insert(BoundedContext boundedContext, Object entity) {
+        if (entityDefinition.isForceInsertAttribute()) {
+            return super.insert(boundedContext, entity);
+        } else {
+            Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+            if (primaryKey == null) {
+                return super.insert(boundedContext, entity);
+            }
+        }
+        return 0;
     }
 
     @Override
