@@ -33,7 +33,6 @@ public class EntityDefinition {
     private String[] orderBy;
     private String sort;
     private int orderAttribute;
-    private boolean forceInsertAttribute;
     private List<BindingDefinition> allBindingDefinitions;
     private List<BindingDefinition> boundBindingDefinitions;
     private List<BindingDefinition> contextBindingDefinitions;
