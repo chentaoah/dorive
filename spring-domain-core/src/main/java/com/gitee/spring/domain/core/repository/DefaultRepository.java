@@ -91,7 +91,7 @@ public class DefaultRepository extends ProxyRepository {
             EntityExample entityExample = new EntityExample();
             entityExample.eq("id", primaryKey);
             Object example = entityMapper.buildExample(boundedContext, entityDefinition, entityExample);
-            return super.updateByExample(boundedContext, entity, example);
+            return updateByExample(boundedContext, entity, example);
         }
         return 0;
     }
