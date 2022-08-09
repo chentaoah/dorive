@@ -125,7 +125,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
                     String bindAliasAttribute = bindingDefinition.getBindAliasAttribute();
                     Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
-                    entityExample.eq(bindAliasAttribute, fieldValue);
+                    targetEntityExample.eq(bindAliasAttribute, fieldValue);
                 }
             }
         });
