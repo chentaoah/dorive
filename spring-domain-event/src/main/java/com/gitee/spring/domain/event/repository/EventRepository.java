@@ -54,6 +54,7 @@ public class EventRepository extends ConfiguredRepository {
             RepositoryEvent repositoryEvent = new RepositoryEvent(this);
             repositoryEvent.setMethodName("updateByExample");
             repositoryEvent.setOperationType(OperationType.UPDATE);
+            repositoryEvent.setBoundedContext(boundedContext);
             repositoryEvent.setEntity(entity);
             repositoryEvent.setExample(example);
             applicationContext.publishEvent(repositoryEvent);
@@ -82,6 +83,7 @@ public class EventRepository extends ConfiguredRepository {
             RepositoryEvent repositoryEvent = new RepositoryEvent(this);
             repositoryEvent.setMethodName("deleteByPrimaryKey");
             repositoryEvent.setOperationType(OperationType.DELETE);
+            repositoryEvent.setBoundedContext(boundedContext);
             repositoryEvent.setPrimaryKey(primaryKey);
             applicationContext.publishEvent(repositoryEvent);
         }
@@ -95,6 +97,7 @@ public class EventRepository extends ConfiguredRepository {
             RepositoryEvent repositoryEvent = new RepositoryEvent(this);
             repositoryEvent.setMethodName("deleteByExample");
             repositoryEvent.setOperationType(OperationType.DELETE);
+            repositoryEvent.setBoundedContext(boundedContext);
             repositoryEvent.setExample(example);
             applicationContext.publishEvent(repositoryEvent);
         }
