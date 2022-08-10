@@ -88,7 +88,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractAwareRepo
                         aliasAttribute = fieldName;
                     }
 
-                    Map<String, EntityPropertyChain> fieldEntityPropertyChainMap = entityPropertyResolver.getFieldEntityPropertyChainMap();
+                    Map<String, EntityPropertyChain> fieldEntityPropertyChainMap = entityPropertiesResolver.getFieldEntityPropertyChainMap();
                     EntityPropertyChain entityPropertyChain = fieldEntityPropertyChainMap.get(fieldName);
 
                     PropertyDefinition propertyDefinition = new PropertyDefinition(

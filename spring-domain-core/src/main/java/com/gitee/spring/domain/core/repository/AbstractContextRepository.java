@@ -11,7 +11,7 @@ import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.constants.Attribute;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
-import com.gitee.spring.domain.core.impl.EntityPropertyResolver;
+import com.gitee.spring.domain.core.impl.EntityPropertiesResolver;
 import com.gitee.spring.domain.core.mapper.MapEntityMapper;
 import com.gitee.spring.domain.core.utils.PathUtils;
 import com.gitee.spring.domain.core.utils.ReflectUtils;
@@ -41,7 +41,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected AnnotationAttributes attributes;
     protected String name;
 
-    protected EntityPropertyResolver entityPropertyResolver = new EntityPropertyResolver();
+    protected EntityPropertiesResolver entityPropertiesResolver = new EntityPropertiesResolver();
 
     protected Map<String, ConfiguredRepository> allConfiguredRepositoryMap = new LinkedHashMap<>();
     protected ConfiguredRepository rootRepository;
@@ -74,11 +74,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         REPOSITORY_NAMES.add(name);
 
         List<Class<?>> superClasses = ReflectUtils.getAllSuperClasses(entityClass, Object.class);
-        superClasses.forEach(superClass -> entityPropertyResolver.resolveEntityProperties("", superClass));
-        entityPropertyResolver.resolveEntityProperties("", entityClass);
+        superClasses.forEach(superClass -> entityPropertiesResolver.resolveEntityProperties("", superClass));
+        entityPropertiesResolver.resolveEntityProperties("", entityClass);
 
         resolveConfiguredRepository("/", entityClass);
-        Map<String, EntityPropertyChain> allEntityPropertyChainMap = entityPropertyResolver.getAllEntityPropertyChainMap();
+        Map<String, EntityPropertyChain> allEntityPropertyChainMap = entityPropertiesResolver.getAllEntityPropertyChainMap();
         allEntityPropertyChainMap.forEach((accessPath, entityPropertyChain) -> {
             if (entityPropertyChain.isAnnotatedEntity()) {
                 resolveConfiguredRepository(accessPath, entityPropertyChain.getDeclaredField());
@@ -109,7 +109,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             orderedRepositories.add(configuredRepository);
 
         } else {
-            Map<String, EntityPropertyChain> allEntityPropertyChainMap = entityPropertyResolver.getAllEntityPropertyChainMap();
+            Map<String, EntityPropertyChain> allEntityPropertyChainMap = entityPropertiesResolver.getAllEntityPropertyChainMap();
             EntityPropertyChain entityPropertyChain = allEntityPropertyChainMap.get(accessPath);
             ConfiguredRepository configuredRepository = newConfiguredRepository(
                     false,
@@ -232,7 +232,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
                 entityDefinition.setBoundEntity(true);
 
-                Map<String, EntityPropertyChain> allEntityPropertyChainMap = entityPropertyResolver.getAllEntityPropertyChainMap();
+                Map<String, EntityPropertyChain> allEntityPropertyChainMap = entityPropertiesResolver.getAllEntityPropertyChainMap();
                 boundEntityPropertyChain = allEntityPropertyChainMap.get(bindAttribute);
                 Assert.notNull(boundEntityPropertyChain, "The bound entity property cannot be null!");
                 boundEntityPropertyChain.initialize();
@@ -290,7 +290,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     protected void postProcessAllRepositories() {
-        Map<String, EntityPropertyChain> allEntityPropertyChainMap = entityPropertyResolver.getAllEntityPropertyChainMap();
+        Map<String, EntityPropertyChain> allEntityPropertyChainMap = entityPropertiesResolver.getAllEntityPropertyChainMap();
         allEntityPropertyChainMap.forEach((accessPath, entityPropertyChain) -> {
             String belongAccessPath = PathUtils.getBelongPath(allConfiguredRepositoryMap.keySet(), accessPath);
             ConfiguredRepository belongConfiguredRepository = allConfiguredRepositoryMap.get(belongAccessPath);
@@ -314,9 +314,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             String prefixAccessPath = entityDefinition.isAggregateRoot() ? "/" : entityDefinition.getAccessPath() + "/";
 
             if (entityPropertyChainMap.isEmpty() && entityDefinition.isCollection()) {
-                EntityPropertyResolver entityPropertyResolver = new EntityPropertyResolver();
-                entityPropertyResolver.resolveEntityProperties("", entityDefinition.getGenericEntityClass());
-                Map<String, EntityPropertyChain> subAllEntityPropertyChainMap = entityPropertyResolver.getAllEntityPropertyChainMap();
+                EntityPropertiesResolver entityPropertiesResolver = new EntityPropertiesResolver();
+                entityPropertiesResolver.resolveEntityProperties("", entityDefinition.getGenericEntityClass());
+                Map<String, EntityPropertyChain> subAllEntityPropertyChainMap = entityPropertiesResolver.getAllEntityPropertyChainMap();
                 subAllEntityPropertyChainMap.values().forEach(entityPropertyChain -> fieldNames.add(entityPropertyChain.getFieldName()));
                 entityPropertyChainMap.putAll(subAllEntityPropertyChainMap);
                 prefixAccessPath = "/";
