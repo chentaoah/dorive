@@ -129,7 +129,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     @SuppressWarnings("unchecked")
-    protected ConfiguredRepository newConfiguredRepository(boolean isRoot,
+    protected ConfiguredRepository newConfiguredRepository(boolean isAggregateRoot,
                                                            String accessPath,
                                                            AnnotatedElement annotatedElement,
                                                            EntityPropertyChain entityPropertyChain,
@@ -262,7 +262,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         EntityDefinition entityDefinition = new EntityDefinition(
-                isRoot, accessPath, annotatedElement,
+                isAggregateRoot, accessPath, annotatedElement,
                 entityClass, isCollection, genericEntityClass, fieldName,
                 attributes, idAttribute, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
@@ -311,7 +311,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
             Set<String> fieldNames = entityDefinition.getFieldNames();
             Map<String, EntityPropertyChain> entityPropertyChainMap = entityDefinition.getEntityPropertyChainMap();
-            String prefixAccessPath = entityDefinition.isRoot() ? "/" : entityDefinition.getAccessPath() + "/";
+            String prefixAccessPath = entityDefinition.isAggregateRoot() ? "/" : entityDefinition.getAccessPath() + "/";
 
             if (entityPropertyChainMap.isEmpty() && entityDefinition.isCollection()) {
                 EntityPropertyResolver entityPropertyResolver = new EntityPropertyResolver();

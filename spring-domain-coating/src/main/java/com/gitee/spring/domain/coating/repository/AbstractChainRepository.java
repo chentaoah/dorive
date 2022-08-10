@@ -24,7 +24,8 @@ import java.util.Map;
 
 @Slf4j
 public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
-
+    
+    @Override
     public EntityExample buildExample(BoundedContext boundedContext, Object coatingObject) {
         DefaultCoatingAssembler defaultCoatingAssembler = (DefaultCoatingAssembler) classCoatingAssemblerMap.get(coatingObject.getClass());
         Assert.notNull(defaultCoatingAssembler, "No coating assembler exists!");

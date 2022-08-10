@@ -12,7 +12,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 public class EntityDefinition {
-    private boolean root;
+    private boolean aggregateRoot;
     private String accessPath;
     private AnnotatedElement annotatedElement;
     private Class<?> entityClass;
