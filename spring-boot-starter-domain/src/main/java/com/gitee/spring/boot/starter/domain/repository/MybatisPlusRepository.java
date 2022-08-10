@@ -59,11 +59,11 @@ public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
     @Override
     public int delete(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-        return deleteByPrimaryKey(primaryKey);
+        return deleteByPrimaryKey(boundedContext, primaryKey);
     }
 
     @Override
-    public int deleteByPrimaryKey(Object primaryKey) {
+    public int deleteByPrimaryKey(BoundedContext boundedContext, Object primaryKey) {
         return baseMapper.deleteById((Serializable) primaryKey);
     }
 

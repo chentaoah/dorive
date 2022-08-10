@@ -50,8 +50,8 @@ public class ProxyRepository extends AbstractRepository<Object, Object> {
     }
 
     @Override
-    public int deleteByPrimaryKey(Object primaryKey) {
-        return proxyRepository.deleteByPrimaryKey(primaryKey);
+    public int deleteByPrimaryKey(BoundedContext boundedContext, Object primaryKey) {
+        return proxyRepository.deleteByPrimaryKey(boundedContext, primaryKey);
     }
 
     @Override

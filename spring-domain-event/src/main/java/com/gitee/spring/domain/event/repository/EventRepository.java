@@ -76,8 +76,8 @@ public class EventRepository extends ConfiguredRepository {
     }
 
     @Override
-    public int deleteByPrimaryKey(Object primaryKey) {
-        int count = super.deleteByPrimaryKey(primaryKey);
+    public int deleteByPrimaryKey(BoundedContext boundedContext, Object primaryKey) {
+        int count = super.deleteByPrimaryKey(boundedContext, primaryKey);
         if (count != 0) {
             RepositoryEvent repositoryEvent = new RepositoryEvent(this);
             repositoryEvent.setMethodName("deleteByPrimaryKey");

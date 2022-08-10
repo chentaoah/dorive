@@ -20,7 +20,7 @@ public interface IRepository<E, PK> {
 
     int delete(BoundedContext boundedContext, E entity);
 
-    int deleteByPrimaryKey(PK primaryKey);
+    int deleteByPrimaryKey(BoundedContext boundedContext, PK primaryKey);
 
     int deleteByExample(BoundedContext boundedContext, Object example);
 

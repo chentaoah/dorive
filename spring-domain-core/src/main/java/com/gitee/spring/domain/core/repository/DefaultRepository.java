@@ -113,7 +113,7 @@ public class DefaultRepository extends ProxyRepository {
     public int delete(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey != null) {
-            return super.deleteByPrimaryKey(primaryKey);
+            return super.deleteByPrimaryKey(boundedContext, primaryKey);
         }
         return 0;
     }
