@@ -12,6 +12,10 @@ import java.util.LinkedHashMap;
 public class BoundedContext extends LinkedHashMap<String, Object> {
 
     public BoundedContext(String... scenes) {
+        put(scenes);
+    }
+
+    public void put(String... scenes) {
         for (String scene : scenes) {
             put(scene, true);
         }
