@@ -36,6 +36,21 @@ public class EntityExample {
         return this;
     }
 
+    public EntityExample ne(String fieldName, Object fieldValue) {
+        entityCriteria.add(new EntityCriterion(fieldName, Operator.NE, fieldValue));
+        return this;
+    }
+
+    public EntityExample in(String fieldName, Object fieldValue) {
+        entityCriteria.add(new EntityCriterion(fieldName, Operator.IN, fieldValue));
+        return this;
+    }
+
+    public EntityExample notIn(String fieldName, Object fieldValue) {
+        entityCriteria.add(new EntityCriterion(fieldName, Operator.NOT_IN, fieldValue));
+        return this;
+    }
+
     public EntityExample gt(String fieldName, Object fieldValue) {
         entityCriteria.add(new EntityCriterion(fieldName, Operator.GT, fieldValue));
         return this;
@@ -58,6 +73,11 @@ public class EntityExample {
 
     public EntityExample like(String fieldName, Object fieldValue) {
         entityCriteria.add(new EntityCriterion(fieldName, Operator.LIKE, fieldValue));
+        return this;
+    }
+
+    public EntityExample notLike(String fieldName, Object fieldValue) {
+        entityCriteria.add(new EntityCriterion(fieldName, Operator.NOT_LIKE, fieldValue));
         return this;
     }
 

@@ -24,11 +24,15 @@ public class MybatisPlusEntityMapper implements EntityMapper {
 
     static {
         operatorExampleBuilderMap.put(Operator.EQ, new EQExampleBuilder());
+        operatorExampleBuilderMap.put(Operator.NE, new NEExampleBuilder());
+        operatorExampleBuilderMap.put(Operator.IN, new InExampleBuilder());
+        operatorExampleBuilderMap.put(Operator.NOT_IN, new NotInExampleBuilder());
         operatorExampleBuilderMap.put(Operator.GT, new GTExampleBuilder());
         operatorExampleBuilderMap.put(Operator.GE, new GEExampleBuilder());
         operatorExampleBuilderMap.put(Operator.LT, new LTExampleBuilder());
         operatorExampleBuilderMap.put(Operator.LE, new LEExampleBuilder());
         operatorExampleBuilderMap.put(Operator.LIKE, new LikeExampleBuilder());
+        operatorExampleBuilderMap.put(Operator.NOT_LIKE, new NotLikeExampleBuilder());
     }
 
     @Override
