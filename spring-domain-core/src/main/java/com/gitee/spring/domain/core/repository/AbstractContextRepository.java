@@ -7,10 +7,13 @@ import com.gitee.spring.domain.core.annotation.Entity;
 import com.gitee.spring.domain.core.annotation.Repository;
 import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
+import com.gitee.spring.domain.core.api.PropertyConverter;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.constants.Attribute;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
+import com.gitee.spring.domain.core.impl.DefaultEntityAssembler;
+import com.gitee.spring.domain.core.impl.DefaultPropertyConverter;
 import com.gitee.spring.domain.core.impl.EntityPropertiesResolver;
 import com.gitee.spring.domain.core.mapper.MapEntityMapper;
 import com.gitee.spring.domain.core.utils.PathUtils;
@@ -185,7 +188,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         int orderAttribute = attributes.getNumber(Attribute.ORDER_ATTRIBUTE).intValue();
 
         Class<?> assemblerClass = attributes.getClass(Attribute.ASSEMBLER_ATTRIBUTE);
-        EntityAssembler entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
+        Object entityAssembler = assemblerClass != DefaultEntityAssembler.class ? applicationContext.getBean(assemblerClass) : null;
 
         Class<?> repositoryClass = attributes.getClass(Attribute.REPOSITORY_ATTRIBUTE);
         Object repository = repositoryClass != DefaultRepository.class ? applicationContext.getBean(repositoryClass) : null;
@@ -204,6 +207,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             String aliasAttribute = bindingAttributes.getString(Attribute.ALIAS_ATTRIBUTE);
             String bindAttribute = bindingAttributes.getString(Attribute.BIND_ATTRIBUTE);
             String bindAliasAttribute = bindingAttributes.getString(Attribute.BIND_ALIAS_ATTRIBUTE);
+            String propertyAttribute = bindingAttributes.getString(Attribute.PROPERTY_ATTRIBUTE);
+
+            Class<?> converterClass = bindingAttributes.getClass(Attribute.CONVERTER_ATTRIBUTE);
+            Object propertyConverter = converterClass != DefaultPropertyConverter.class ? applicationContext.getBean(converterClass) : null;
 
             if (StringUtils.isBlank(aliasAttribute)) {
                 aliasAttribute = fieldAttribute;
@@ -241,9 +248,14 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
 
             BindingDefinition bindingDefinition = new BindingDefinition(
-                    bindingAttributes, fieldAttribute, aliasAttribute, bindAttribute, bindAliasAttribute,
+                    bindingAttributes, fieldAttribute, aliasAttribute, bindAttribute, bindAliasAttribute, propertyAttribute, null,
                     isFromContext, isBoundId,
                     belongAccessPath, belongConfiguredRepository, boundEntityPropertyChain, null);
+
+            if (propertyConverter == null) {
+                propertyConverter = new DefaultPropertyConverter(bindingDefinition);
+            }
+            bindingDefinition.setPropertyConverter((PropertyConverter) propertyConverter);
 
             allBindingDefinitions.add(bindingDefinition);
             if (!isFromContext) {
@@ -274,13 +286,17 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             entityMapper = new MapEntityMapper(entityMapper);
         }
 
+        if (entityAssembler == null) {
+            entityAssembler = new DefaultEntityAssembler(entityDefinition);
+        }
+
         if (repository == null) {
             Assert.isTrue(mapper != Object.class, "The mapper cannot be object class!");
-            repository = new DefaultRepository(entityDefinition, entityMapper, entityAssembler, newRepository(entityDefinition));
+            repository = new DefaultRepository(entityDefinition, entityMapper, (EntityAssembler) entityAssembler, newRepository(entityDefinition));
         }
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository(
-                entityPropertyChain, entityDefinition, entityMapper, entityAssembler, (AbstractRepository<Object, Object>) repository);
+                entityPropertyChain, entityDefinition, entityMapper, (EntityAssembler) entityAssembler, (AbstractRepository<Object, Object>) repository);
 
         return postProcessRepository(configuredRepository);
     }

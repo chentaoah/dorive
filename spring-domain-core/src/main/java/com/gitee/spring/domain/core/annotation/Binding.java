@@ -1,5 +1,7 @@
 package com.gitee.spring.domain.core.annotation;
 
+import com.gitee.spring.domain.core.impl.DefaultPropertyConverter;
+
 import java.lang.annotation.*;
 
 @Inherited
@@ -16,5 +18,9 @@ public @interface Binding {
     String bind();
 
     String bindAlias() default "";
+
+    String property() default "";
+
+    Class<?> converter() default DefaultPropertyConverter.class;
 
 }
