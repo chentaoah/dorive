@@ -186,12 +186,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         int orderAttribute = attributes.getNumber(Attribute.ORDER_ATTRIBUTE).intValue();
-
         Class<?> assemblerClass = attributes.getClass(Attribute.ASSEMBLER_ATTRIBUTE);
-        Object entityAssembler = assemblerClass != DefaultEntityAssembler.class ? applicationContext.getBean(assemblerClass) : null;
-
         Class<?> repositoryClass = attributes.getClass(Attribute.REPOSITORY_ATTRIBUTE);
-        Object repository = repositoryClass != DefaultRepository.class ? applicationContext.getBean(repositoryClass) : null;
 
         List<BindingDefinition> allBindingDefinitions = new ArrayList<>();
         List<BindingDefinition> boundBindingDefinitions = new ArrayList<>();
@@ -208,9 +204,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             String bindAttribute = bindingAttributes.getString(Attribute.BIND_ATTRIBUTE);
             String bindAliasAttribute = bindingAttributes.getString(Attribute.BIND_ALIAS_ATTRIBUTE);
             String propertyAttribute = bindingAttributes.getString(Attribute.PROPERTY_ATTRIBUTE);
-
             Class<?> converterClass = bindingAttributes.getClass(Attribute.CONVERTER_ATTRIBUTE);
-            Object propertyConverter = converterClass != DefaultPropertyConverter.class ? applicationContext.getBean(converterClass) : null;
 
             if (StringUtils.isBlank(aliasAttribute)) {
                 aliasAttribute = fieldAttribute;
@@ -252,10 +246,13 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                     isFromContext, isBoundId,
                     belongAccessPath, belongConfiguredRepository, boundEntityPropertyChain, null);
 
-            if (propertyConverter == null) {
-                propertyConverter = new DefaultPropertyConverter(bindingDefinition);
+            PropertyConverter propertyConverter;
+            if (DefaultPropertyConverter.class.isAssignableFrom(converterClass)) {
+                propertyConverter = (PropertyConverter) applicationContext.getBean(converterClass, bindingDefinition);
+            } else {
+                propertyConverter = (PropertyConverter) applicationContext.getBean(converterClass);
             }
-            bindingDefinition.setPropertyConverter((PropertyConverter) propertyConverter);
+            bindingDefinition.setPropertyConverter(propertyConverter);
 
             allBindingDefinitions.add(bindingDefinition);
             if (!isFromContext) {
@@ -286,17 +283,23 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             entityMapper = new MapEntityMapper(entityMapper);
         }
 
-        if (entityAssembler == null) {
-            entityAssembler = new DefaultEntityAssembler(entityDefinition);
+        EntityAssembler entityAssembler;
+        if (DefaultEntityAssembler.class.isAssignableFrom(assemblerClass)) {
+            entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass, entityDefinition);
+        } else {
+            entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
         }
 
-        if (repository == null) {
+        Object repository;
+        if (DefaultRepository.class.isAssignableFrom(repositoryClass)) {
             Assert.isTrue(mapper != Object.class, "The mapper cannot be object class!");
-            repository = new DefaultRepository(entityDefinition, entityMapper, (EntityAssembler) entityAssembler, newRepository(entityDefinition));
+            repository = applicationContext.getBean(repositoryClass, entityDefinition, entityMapper, entityAssembler, newRepository(entityDefinition));
+        } else {
+            repository = applicationContext.getBean(repositoryClass);
         }
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository(
-                entityPropertyChain, entityDefinition, entityMapper, (EntityAssembler) entityAssembler, (AbstractRepository<Object, Object>) repository);
+                entityPropertyChain, entityDefinition, entityMapper, entityAssembler, (AbstractRepository<Object, Object>) repository);
 
         return postProcessRepository(configuredRepository);
     }

@@ -5,7 +5,9 @@ import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
+@Data
 @AllArgsConstructor
 public class DefaultEntityAssembler implements EntityAssembler {
 
