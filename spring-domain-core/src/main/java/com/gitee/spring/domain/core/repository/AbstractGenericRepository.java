@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.EntityProperty;
 import com.gitee.spring.domain.core.api.GenericRepository;
+import com.gitee.spring.domain.core.api.PropertyConverter;
 import com.gitee.spring.domain.core.constants.EntityState;
 import com.gitee.spring.domain.core.entity.*;
 import com.gitee.spring.domain.core.impl.EntityStateResolver;
@@ -91,8 +92,10 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         EntityExample entityExample = new EntityExample();
         for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
             EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
+            PropertyConverter propertyConverter = bindingDefinition.getPropertyConverter();
             Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
             if (boundValue != null) {
+                boundValue = propertyConverter.convert(boundedContext, boundValue);
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
                 entityExample.eq(aliasAttribute, boundValue);
             } else {

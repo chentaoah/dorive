@@ -2,6 +2,7 @@ package com.gitee.spring.domain.core.repository;
 
 import com.gitee.spring.domain.core.api.EntityIndex;
 import com.gitee.spring.domain.core.api.EntityProperty;
+import com.gitee.spring.domain.core.api.PropertyConverter;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
@@ -11,6 +12,7 @@ import com.gitee.spring.domain.core.impl.DefaultEntityIndex;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,11 +64,17 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
         EntityExample entityExample = new EntityExample();
         for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
             EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
+            PropertyConverter propertyConverter = bindingDefinition.getPropertyConverter();
             List<Object> fieldValues = new ArrayList<>();
             for (Object rootEntity : rootEntities) {
-                Object fieldValue = boundEntityPropertyChain.getValue(rootEntity);
-                if (fieldValue != null) {
-                    fieldValues.add(fieldValue);
+                Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
+                if (boundValue != null) {
+                    boundValue = propertyConverter.convert(boundedContext, boundValue);
+                    if (boundValue instanceof Collection) {
+                        fieldValues.addAll((Collection<?>) boundValue);
+                    } else {
+                        fieldValues.add(boundValue);
+                    }
                 }
             }
             if (!fieldValues.isEmpty()) {
