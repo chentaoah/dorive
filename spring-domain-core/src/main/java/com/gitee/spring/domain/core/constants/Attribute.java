@@ -18,6 +18,8 @@ public interface Attribute {
     String ALIAS_ATTRIBUTE = "alias";
     String BIND_ATTRIBUTE = "bind";
     String BIND_ALIAS_ATTRIBUTE = "bindAlias";
+    String PROPERTY_ATTRIBUTE = "property";
+    String CONVERTER_ATTRIBUTE = "converter";
 
     String LOCATION_ATTRIBUTE = "location";
     String OPERATOR_ATTRIBUTE = "operator";

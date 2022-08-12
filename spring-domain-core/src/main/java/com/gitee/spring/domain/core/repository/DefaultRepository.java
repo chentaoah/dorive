@@ -7,12 +7,18 @@ import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class DefaultRepository extends ProxyRepository {
 
     protected EntityDefinition entityDefinition;
@@ -33,7 +39,7 @@ public class DefaultRepository extends ProxyRepository {
     public Object selectByPrimaryKey(BoundedContext boundedContext, Object primaryKey) {
         Object persistentObject = super.selectByPrimaryKey(boundedContext, primaryKey);
         if (persistentObject != null) {
-            return entityAssembler.assemble(boundedContext, entityDefinition, persistentObject);
+            return entityAssembler.assemble(boundedContext, persistentObject);
         }
         return null;
     }
@@ -50,7 +56,7 @@ public class DefaultRepository extends ProxyRepository {
     protected List<Object> newEntities(BoundedContext boundedContext, List<?> persistentObjects) {
         List<Object> entities = new ArrayList<>();
         for (Object persistentObject : persistentObjects) {
-            Object entity = entityAssembler.assemble(boundedContext, entityDefinition, persistentObject);
+            Object entity = entityAssembler.assemble(boundedContext, persistentObject);
             entities.add(entity);
         }
         return entities;
@@ -70,7 +76,7 @@ public class DefaultRepository extends ProxyRepository {
 
     @Override
     public int insert(BoundedContext boundedContext, Object entity) {
-        Object persistentObject = entityAssembler.disassemble(boundedContext, entityDefinition, entity);
+        Object persistentObject = entityAssembler.disassemble(boundedContext, entity);
         if (persistentObject != null) {
             int count = super.insert(boundedContext, persistentObject);
             copyPrimaryKey(entity, persistentObject);
@@ -102,7 +108,7 @@ public class DefaultRepository extends ProxyRepository {
         if (entity.getClass() != entityDefinition.getGenericEntityClass()) {
             entity = BeanUtil.copyProperties(entity, entityDefinition.getGenericEntityClass());
         }
-        Object persistentObject = entityAssembler.disassemble(new BoundedContext(), entityDefinition, entity);
+        Object persistentObject = entityAssembler.disassemble(new BoundedContext(), entity);
         if (persistentObject != null) {
             return super.updateByExample(boundedContext, persistentObject, example);
         }

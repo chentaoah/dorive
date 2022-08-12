@@ -1,5 +1,6 @@
 package com.gitee.spring.domain.core.entity;
 
+import com.gitee.spring.domain.core.api.PropertyConverter;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +14,8 @@ public class BindingDefinition {
     private String aliasAttribute;
     private String bindAttribute;
     private String bindAliasAttribute;
+    private String propertyAttribute;
+    private PropertyConverter propertyConverter;
     private boolean fromContext;
     private boolean boundId;
     private String belongAccessPath;
