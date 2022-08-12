@@ -1,5 +1,6 @@
 package com.gitee.spring.domain.core.repository;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core.annotation.Binding;
@@ -249,6 +250,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             PropertyConverter propertyConverter;
             if (converterClass == DefaultPropertyConverter.class) {
                 propertyConverter = (PropertyConverter) applicationContext.getBean(converterClass, bindingDefinition);
+
+            } else if (DefaultPropertyConverter.class.isAssignableFrom(converterClass)) {
+                propertyConverter = (PropertyConverter) applicationContext.getBean(converterClass);
+                BeanUtil.setFieldValue(propertyConverter, "bindingDefinition", bindingDefinition);
+
             } else {
                 propertyConverter = (PropertyConverter) applicationContext.getBean(converterClass);
             }
@@ -286,6 +292,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         EntityAssembler entityAssembler;
         if (assemblerClass == DefaultEntityAssembler.class) {
             entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass, entityDefinition);
+
+        } else if (DefaultEntityAssembler.class.isAssignableFrom(assemblerClass)) {
+            entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
+            BeanUtil.setFieldValue(entityAssembler, "entityDefinition", entityDefinition);
+
         } else {
             entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
         }
@@ -294,6 +305,15 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         if (repositoryClass == DefaultRepository.class) {
             Assert.isTrue(mapper != Object.class, "The mapper cannot be object class!");
             repository = applicationContext.getBean(repositoryClass, entityDefinition, entityMapper, entityAssembler, newRepository(entityDefinition));
+
+        } else if (DefaultRepository.class.isAssignableFrom(repositoryClass)) {
+            Assert.isTrue(mapper != Object.class, "The mapper cannot be object class!");
+            repository = applicationContext.getBean(repositoryClass);
+            BeanUtil.setFieldValue(repository, "entityDefinition", entityDefinition);
+            BeanUtil.setFieldValue(repository, "entityMapper", entityMapper);
+            BeanUtil.setFieldValue(repository, "entityAssembler", entityAssembler);
+            BeanUtil.setFieldValue(repository, "proxyRepository", newRepository(entityDefinition));
+
         } else {
             repository = applicationContext.getBean(repositoryClass);
         }

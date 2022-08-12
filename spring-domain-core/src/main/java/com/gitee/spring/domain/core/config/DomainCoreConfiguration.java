@@ -16,19 +16,19 @@ public class DomainCoreConfiguration {
     @Bean
     @Scope(BeanDefinition.SCOPE_PROTOTYPE)
     public DefaultEntityAssembler defaultEntityAssembler() {
-        return new DefaultEntityAssembler(null);
+        return new DefaultEntityAssembler();
     }
 
     @Bean
     @Scope(BeanDefinition.SCOPE_PROTOTYPE)
     public DefaultRepository defaultRepository() {
-        return new DefaultRepository(null, null, null, null);
+        return new DefaultRepository();
     }
 
     @Bean
     @Scope(BeanDefinition.SCOPE_PROTOTYPE)
     public DefaultPropertyConverter defaultPropertyConverter() {
-        return new DefaultPropertyConverter(null);
+        return new DefaultPropertyConverter();
     }
 
     @Bean
