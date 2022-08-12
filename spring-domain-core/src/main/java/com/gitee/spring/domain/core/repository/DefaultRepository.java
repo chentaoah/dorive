@@ -7,6 +7,8 @@ import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
@@ -14,7 +16,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+@Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class DefaultRepository extends ProxyRepository {
 
     protected EntityDefinition entityDefinition;

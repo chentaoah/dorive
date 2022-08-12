@@ -1,6 +1,5 @@
 package com.gitee.spring.domain.core.repository;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core.annotation.Binding;
@@ -9,8 +8,8 @@ import com.gitee.spring.domain.core.annotation.Repository;
 import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.PropertyConverter;
-import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.constants.Attribute;
+import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.impl.DefaultEntityAssembler;
@@ -30,8 +29,19 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.AnnotationUtils;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -252,8 +262,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 propertyConverter = new DefaultPropertyConverter(bindingDefinition);
 
             } else if (DefaultPropertyConverter.class.isAssignableFrom(converterClass)) {
-                propertyConverter = (PropertyConverter) applicationContext.getBean(converterClass);
-                BeanUtil.setFieldValue(propertyConverter, "bindingDefinition", bindingDefinition);
+                DefaultPropertyConverter defaultPropertyConverter = (DefaultPropertyConverter) applicationContext.getBean(converterClass);
+                defaultPropertyConverter.setBindingDefinition(bindingDefinition);
+                propertyConverter = defaultPropertyConverter;
 
             } else {
                 propertyConverter = (PropertyConverter) applicationContext.getBean(converterClass);
@@ -294,8 +305,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             entityAssembler = new DefaultEntityAssembler(entityDefinition);
 
         } else if (DefaultEntityAssembler.class.isAssignableFrom(assemblerClass)) {
-            entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
-            BeanUtil.setFieldValue(entityAssembler, "entityDefinition", entityDefinition);
+            DefaultEntityAssembler defaultEntityAssembler = (DefaultEntityAssembler) applicationContext.getBean(assemblerClass);
+            defaultEntityAssembler.setEntityDefinition(entityDefinition);
+            entityAssembler = defaultEntityAssembler;
 
         } else {
             entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
@@ -308,11 +320,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         } else if (DefaultRepository.class.isAssignableFrom(repositoryClass)) {
             Assert.isTrue(mapper != Object.class, "The mapper cannot be object class!");
-            repository = applicationContext.getBean(repositoryClass);
-            BeanUtil.setFieldValue(repository, "entityDefinition", entityDefinition);
-            BeanUtil.setFieldValue(repository, "entityMapper", entityMapper);
-            BeanUtil.setFieldValue(repository, "entityAssembler", entityAssembler);
-            BeanUtil.setFieldValue(repository, "proxyRepository", newRepository(entityDefinition));
+            DefaultRepository defaultRepository = (DefaultRepository) applicationContext.getBean(repositoryClass);
+            defaultRepository.setEntityDefinition(entityDefinition);
+            defaultRepository.setEntityMapper(entityMapper);
+            defaultRepository.setEntityAssembler(entityAssembler);
+            defaultRepository.setProxyRepository(newRepository(entityDefinition));
+            repository = defaultRepository;
 
         } else {
             repository = applicationContext.getBean(repositoryClass);
