@@ -249,7 +249,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
             PropertyConverter propertyConverter;
             if (converterClass == DefaultPropertyConverter.class) {
-                propertyConverter = (PropertyConverter) applicationContext.getBean(converterClass, bindingDefinition);
+                propertyConverter = new DefaultPropertyConverter(bindingDefinition);
 
             } else if (DefaultPropertyConverter.class.isAssignableFrom(converterClass)) {
                 propertyConverter = (PropertyConverter) applicationContext.getBean(converterClass);
@@ -291,7 +291,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         EntityAssembler entityAssembler;
         if (assemblerClass == DefaultEntityAssembler.class) {
-            entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass, entityDefinition);
+            entityAssembler = new DefaultEntityAssembler(entityDefinition);
 
         } else if (DefaultEntityAssembler.class.isAssignableFrom(assemblerClass)) {
             entityAssembler = (EntityAssembler) applicationContext.getBean(assemblerClass);
@@ -304,7 +304,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Object repository;
         if (repositoryClass == DefaultRepository.class) {
             Assert.isTrue(mapper != Object.class, "The mapper cannot be object class!");
-            repository = applicationContext.getBean(repositoryClass, entityDefinition, entityMapper, entityAssembler, newRepository(entityDefinition));
+            repository = new DefaultRepository(entityDefinition, entityMapper, entityAssembler, newRepository(entityDefinition));
 
         } else if (DefaultRepository.class.isAssignableFrom(repositoryClass)) {
             Assert.isTrue(mapper != Object.class, "The mapper cannot be object class!");
