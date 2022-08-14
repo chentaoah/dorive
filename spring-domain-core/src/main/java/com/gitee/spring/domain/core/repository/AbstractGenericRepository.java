@@ -90,17 +90,22 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     protected EntityExample newExampleByContext(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityExample entityExample = new EntityExample();
+        boolean isValidQuery = false;
         for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
             EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
             PropertyConverter propertyConverter = bindingDefinition.getPropertyConverter();
             String aliasAttribute = bindingDefinition.getAliasAttribute();
             Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
             if (boundValue != null) {
+                isValidQuery = true;
                 boundValue = propertyConverter.convert(boundedContext, boundValue);
                 entityExample.eq(aliasAttribute, boundValue);
             } else {
                 entityExample.isNull(aliasAttribute);
             }
+        }
+        if (!isValidQuery) {
+            entityExample.setEmptyQuery(true);
         }
         if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
             newCriterionByContext(boundedContext, configuredRepository, entityExample);
