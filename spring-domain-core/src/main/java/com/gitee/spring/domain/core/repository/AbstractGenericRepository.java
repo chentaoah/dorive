@@ -93,10 +93,10 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
             EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
             PropertyConverter propertyConverter = bindingDefinition.getPropertyConverter();
+            String aliasAttribute = bindingDefinition.getAliasAttribute();
             Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
             if (boundValue != null) {
                 boundValue = propertyConverter.convert(boundedContext, boundValue);
-                String aliasAttribute = bindingDefinition.getAliasAttribute();
                 entityExample.eq(aliasAttribute, boundValue);
             } else {
                 entityExample.setEmptyQuery(true);
