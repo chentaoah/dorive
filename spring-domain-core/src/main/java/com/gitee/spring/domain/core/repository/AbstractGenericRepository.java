@@ -99,8 +99,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
                 boundValue = propertyConverter.convert(boundedContext, boundValue);
                 entityExample.eq(aliasAttribute, boundValue);
             } else {
-                entityExample.setEmptyQuery(true);
-                break;
+                entityExample.isNull(aliasAttribute);
             }
         }
         if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
