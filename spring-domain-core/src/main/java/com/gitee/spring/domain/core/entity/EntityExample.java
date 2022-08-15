@@ -51,6 +51,26 @@ public class EntityExample {
         return this;
     }
 
+    public EntityExample isNull(String fieldName) {
+        entityCriteria.add(new EntityCriterion(fieldName, Operator.IS_NULL, null));
+        return this;
+    }
+
+    public EntityExample isNotNull(String fieldName) {
+        entityCriteria.add(new EntityCriterion(fieldName, Operator.IS_NOT_NULL, null));
+        return this;
+    }
+
+    public EntityExample like(String fieldName, Object fieldValue) {
+        entityCriteria.add(new EntityCriterion(fieldName, Operator.LIKE, fieldValue));
+        return this;
+    }
+
+    public EntityExample notLike(String fieldName, Object fieldValue) {
+        entityCriteria.add(new EntityCriterion(fieldName, Operator.NOT_LIKE, fieldValue));
+        return this;
+    }
+
     public EntityExample gt(String fieldName, Object fieldValue) {
         entityCriteria.add(new EntityCriterion(fieldName, Operator.GT, fieldValue));
         return this;
@@ -68,16 +88,6 @@ public class EntityExample {
 
     public EntityExample le(String fieldName, Object fieldValue) {
         entityCriteria.add(new EntityCriterion(fieldName, Operator.LE, fieldValue));
-        return this;
-    }
-
-    public EntityExample like(String fieldName, Object fieldValue) {
-        entityCriteria.add(new EntityCriterion(fieldName, Operator.LIKE, fieldValue));
-        return this;
-    }
-
-    public EntityExample notLike(String fieldName, Object fieldValue) {
-        entityCriteria.add(new EntityCriterion(fieldName, Operator.NOT_LIKE, fieldValue));
         return this;
     }
 

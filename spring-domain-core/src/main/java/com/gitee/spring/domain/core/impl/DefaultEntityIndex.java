@@ -4,6 +4,7 @@ import com.gitee.spring.domain.core.api.EntityIndex;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
+import com.gitee.spring.domain.core.entity.ForeignKey;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 
 import java.util.ArrayList;
@@ -51,32 +52,37 @@ public class DefaultEntityIndex implements EntityIndex {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Object> selectList(Object rootEntity, ConfiguredRepository configuredRepository) {
-        String foreignKey = buildForeignKey(rootEntity, configuredRepository);
-        Object existEntity = entitiesMap.get(foreignKey);
-        if (existEntity != null) {
-            if (existEntity instanceof Collection) {
-                return (List<Object>) existEntity;
-            } else {
-                return Collections.singletonList(existEntity);
-            }
-        }
-        return Collections.emptyList();
-    }
+    public List<Object> selectList(Object rootEntity, ForeignKey foreignKey) {
+        List<String> keys = foreignKey.getKeys();
+        if (keys.isEmpty()) {
+            return Collections.emptyList();
 
-    public String buildForeignKey(Object rootEntity, ConfiguredRepository configuredRepository) {
-        StringBuilder builder = new StringBuilder();
-        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
-            String aliasAttribute = bindingDefinition.getAliasAttribute();
-            EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
-            Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
-            builder.append(aliasAttribute).append(": ").append(boundValue).append(", ");
+        } else if (keys.size() == 1) {
+            Object existEntity = entitiesMap.get(keys.get(0));
+            if (existEntity != null) {
+                if (existEntity instanceof Collection) {
+                    return (List<Object>) existEntity;
+                } else {
+                    return Collections.singletonList(existEntity);
+                }
+            } else {
+                return Collections.emptyList();
+            }
+
+        } else {
+            List<Object> fieldValues = new ArrayList<>();
+            for (String key : keys) {
+                Object existEntity = entitiesMap.get(key);
+                if (existEntity != null) {
+                    if (existEntity instanceof Collection) {
+                        fieldValues.addAll((Collection<?>) existEntity);
+                    } else {
+                        fieldValues.add(existEntity);
+                    }
+                }
+            }
+            return fieldValues;
         }
-        if (builder.length() > 0) {
-            builder.delete(builder.length() - 2, builder.length());
-        }
-        return builder.toString();
     }
 
 }
