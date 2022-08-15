@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.repository.AbstractRepository;
 
 import java.io.Serializable;
@@ -14,9 +15,11 @@ import java.util.Map;
 @SuppressWarnings("unchecked")
 public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
 
+    protected EntityDefinition entityDefinition;
     protected BaseMapper<Object> baseMapper;
 
-    public MybatisPlusRepository(BaseMapper<Object> baseMapper) {
+    public MybatisPlusRepository(EntityDefinition entityDefinition, BaseMapper<Object> baseMapper) {
+        this.entityDefinition = entityDefinition;
         this.baseMapper = baseMapper;
     }
 

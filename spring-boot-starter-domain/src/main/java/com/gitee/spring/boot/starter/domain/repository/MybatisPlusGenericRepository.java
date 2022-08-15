@@ -19,7 +19,7 @@ public class MybatisPlusGenericRepository<E, PK extends Serializable> extends Ab
     @SuppressWarnings("unchecked")
     protected AbstractRepository<Object, Object> newRepository(EntityDefinition entityDefinition) {
         BaseMapper<Object> baseMapper = (BaseMapper<Object>) entityDefinition.getMapper();
-        return new MybatisPlusRepository(baseMapper);
+        return new MybatisPlusRepository(entityDefinition, baseMapper);
     }
 
 }
