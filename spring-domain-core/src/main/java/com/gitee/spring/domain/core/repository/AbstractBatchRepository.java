@@ -60,6 +60,9 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                                                      ConfiguredRepository configuredRepository, List<ForeignKey> foreignKeys) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityExample entityExample = new EntityExample();
+        for (Object rootEntity : rootEntities) {
+            foreignKeys.add(buildForeignKey(configuredRepository, rootEntity));
+        }
         for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
             EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
             PropertyConverter propertyConverter = bindingDefinition.getPropertyConverter();
@@ -77,10 +80,6 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                     }
                 }
                 ForeignKey foreignKey = foreignKeys.get(index);
-                if (foreignKey == null) {
-                    foreignKey = buildForeignKey(configuredRepository, rootEntity);
-                    foreignKeys.add(foreignKey);
-                }
                 foreignKey.mergeFieldValue(aliasAttribute, boundValue);
             }
             if (!fieldValues.isEmpty()) {
