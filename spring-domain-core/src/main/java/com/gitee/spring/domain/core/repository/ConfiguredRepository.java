@@ -56,7 +56,7 @@ public class ConfiguredRepository extends ProxyRepository {
             if (entityExample.isEmptyQuery()) {
                 return null;
             } else if (!entityDefinition.isUseEntityExample()) {
-                return entityMapper.buildExample(boundedContext, entityDefinition, entityExample);
+                return entityMapper.buildExample(boundedContext, entityExample);
             }
         }
         return example;

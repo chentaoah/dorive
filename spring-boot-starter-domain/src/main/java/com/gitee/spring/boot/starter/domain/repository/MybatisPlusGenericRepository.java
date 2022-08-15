@@ -12,7 +12,7 @@ public class MybatisPlusGenericRepository<E, PK extends Serializable> extends Ab
 
     @Override
     protected EntityMapper newEntityMapper(EntityDefinition entityDefinition) {
-        return new MybatisPlusEntityMapper();
+        return new MybatisPlusEntityMapper(entityDefinition);
     }
 
     @Override

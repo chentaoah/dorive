@@ -1,7 +1,6 @@
 package com.gitee.spring.domain.core.api;
 
 import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
 
 import java.util.List;
@@ -14,6 +13,6 @@ public interface EntityMapper {
 
     Object newPageOfEntities(Object dataPage, List<Object> entities);
 
-    Object buildExample(BoundedContext boundedContext, EntityDefinition entityDefinition, EntityExample entityExample);
+    Object buildExample(BoundedContext boundedContext, EntityExample entityExample);
 
 }

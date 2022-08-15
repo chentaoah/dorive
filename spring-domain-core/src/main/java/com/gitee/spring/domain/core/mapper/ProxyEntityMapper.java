@@ -2,7 +2,6 @@ package com.gitee.spring.domain.core.mapper;
 
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,8 +30,8 @@ public class ProxyEntityMapper implements EntityMapper {
     }
 
     @Override
-    public Object buildExample(BoundedContext boundedContext, EntityDefinition entityDefinition, EntityExample entityExample) {
-        return entityMapper.buildExample(boundedContext, entityDefinition, entityExample);
+    public Object buildExample(BoundedContext boundedContext, EntityExample entityExample) {
+        return entityMapper.buildExample(boundedContext, entityExample);
     }
 
 }

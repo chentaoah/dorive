@@ -3,7 +3,6 @@ package com.gitee.spring.domain.core.mapper;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityCriterion;
-import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
 import com.gitee.spring.domain.core.utils.DataUtils;
 
@@ -18,7 +17,7 @@ public class MapEntityMapper extends ProxyEntityMapper {
     }
 
     @Override
-    public Object buildExample(BoundedContext boundedContext, EntityDefinition entityDefinition, EntityExample entityExample) {
+    public Object buildExample(BoundedContext boundedContext, EntityExample entityExample) {
         Map<String, Object> mapExample = new LinkedHashMap<>();
         for (EntityCriterion entityCriterion : entityExample.getEntityCriteria()) {
             String fieldName = entityCriterion.getFieldName();

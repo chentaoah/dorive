@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MybatisPlusEntityMapper implements EntityMapper {
 
     public static Map<String, ExampleBuilder> operatorExampleBuilderMap = new ConcurrentHashMap<>();
+    protected EntityDefinition entityDefinition;
 
     static {
         operatorExampleBuilderMap.put(Operator.EQ, new EQExampleBuilder());
@@ -35,6 +36,10 @@ public class MybatisPlusEntityMapper implements EntityMapper {
         operatorExampleBuilderMap.put(Operator.GE, new GEExampleBuilder());
         operatorExampleBuilderMap.put(Operator.LT, new LTExampleBuilder());
         operatorExampleBuilderMap.put(Operator.LE, new LEExampleBuilder());
+    }
+
+    public MybatisPlusEntityMapper(EntityDefinition entityDefinition) {
+        this.entityDefinition = entityDefinition;
     }
 
     @Override
@@ -57,7 +62,7 @@ public class MybatisPlusEntityMapper implements EntityMapper {
     }
 
     @Override
-    public Object buildExample(BoundedContext boundedContext, EntityDefinition entityDefinition, EntityExample entityExample) {
+    public Object buildExample(BoundedContext boundedContext, EntityExample entityExample) {
         QueryWrapper<?> queryWrapper = new QueryWrapper<>();
         Set<String> selectColumns = entityExample.getSelectColumns();
         if (selectColumns != null) {
