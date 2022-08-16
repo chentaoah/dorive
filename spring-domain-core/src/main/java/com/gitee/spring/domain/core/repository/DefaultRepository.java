@@ -93,13 +93,14 @@ public class DefaultRepository extends ProxyRepository {
     @Override
     public int update(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-        if (primaryKey != null) {
-            EntityExample entityExample = new EntityExample();
-            entityExample.eq("id", primaryKey);
-            Object example = entityMapper.buildExample(boundedContext, entityDefinition, entityExample);
-            return updateByExample(boundedContext, entity, example);
-        }
-        return 0;
+        return primaryKey != null ? doUpdate(boundedContext, entity, primaryKey) : 0;
+    }
+
+    protected int doUpdate(BoundedContext boundedContext, Object entity, Object primaryKey) {
+        EntityExample entityExample = new EntityExample();
+        entityExample.eq("id", primaryKey);
+        Object example = entityMapper.buildExample(boundedContext, entityExample);
+        return updateByExample(boundedContext, entity, example);
     }
 
     @Override
@@ -108,11 +109,21 @@ public class DefaultRepository extends ProxyRepository {
         if (entity.getClass() != entityDefinition.getGenericEntityClass()) {
             entity = BeanUtil.copyProperties(entity, entityDefinition.getGenericEntityClass());
         }
-        Object persistentObject = entityAssembler.disassemble(new BoundedContext(), entity);
+        Object persistentObject = entityAssembler.disassemble(boundedContext, entity);
         if (persistentObject != null) {
             return super.updateByExample(boundedContext, persistentObject, example);
         }
         return 0;
+    }
+
+    @Override
+    public int insertOrUpdate(BoundedContext boundedContext, Object entity) {
+        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+        if (primaryKey == null) {
+            return insert(boundedContext, entity);
+        } else {
+            return doUpdate(boundedContext, entity, primaryKey);
+        }
     }
 
     @Override

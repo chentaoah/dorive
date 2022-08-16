@@ -21,11 +21,17 @@ public class EntityStateResolver {
     }
 
     public int resolveEntityState(int expectedEntityState, int contextEntityState, Object entity) {
-        if (contextEntityState != EntityState.FORCE_INSERT) {
+        if (expectedEntityState == EntityState.INSERT_OR_UPDATE) {
+            return EntityState.INSERT_OR_UPDATE;
+
+        } else if (contextEntityState == EntityState.FORCE_INSERT) {
+            return expectedEntityState & contextEntityState;
+
+        } else {
             Object primaryKey = BeanUtil.getFieldValue(entity, "id");
             contextEntityState = primaryKey == null ? EntityState.INSERT : EntityState.UPDATE_OR_DELETE;
+            return expectedEntityState & contextEntityState;
         }
-        return expectedEntityState & contextEntityState;
     }
 
 }

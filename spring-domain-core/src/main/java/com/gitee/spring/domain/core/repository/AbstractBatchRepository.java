@@ -45,27 +45,31 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
     protected void executeQuery(BoundedContext boundedContext, List<Object> rootEntities, AbstractDelegateRepository<?, ?> abstractDelegateRepository) {
         for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getSubRepositories()) {
             if (isMatchScenes(boundedContext, configuredRepository)) {
-                Map<Object, ForeignKey> foreignKeyMap = new LinkedHashMap<>();
-                EntityExample entityExample = newExampleByRootEntities(boundedContext, rootEntities, configuredRepository, foreignKeyMap);
+                List<ForeignKey> foreignKeys = new ArrayList<>(rootEntities.size());
+                EntityExample entityExample = newExampleByRootEntities(boundedContext, rootEntities, configuredRepository, foreignKeys);
                 if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
                     List<Object> entities = configuredRepository.selectByExample(boundedContext, entityExample);
                     EntityIndex entityIndex = buildEntityIndex(configuredRepository, entities);
-                    assembleRootEntities(rootEntities, configuredRepository, foreignKeyMap, entityIndex);
+                    assembleRootEntities(rootEntities, configuredRepository, foreignKeys, entityIndex);
                 }
             }
         }
     }
 
     protected EntityExample newExampleByRootEntities(BoundedContext boundedContext, List<Object> rootEntities,
-                                                     ConfiguredRepository configuredRepository, Map<Object, ForeignKey> foreignKeyMap) {
+                                                     ConfiguredRepository configuredRepository, List<ForeignKey> foreignKeys) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityExample entityExample = new EntityExample();
+        for (Object rootEntity : rootEntities) {
+            foreignKeys.add(buildForeignKey(configuredRepository, rootEntity));
+        }
         for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
             EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
             PropertyConverter propertyConverter = bindingDefinition.getPropertyConverter();
             String aliasAttribute = bindingDefinition.getAliasAttribute();
             List<Object> fieldValues = new ArrayList<>();
-            for (Object rootEntity : rootEntities) {
+            for (int index = 0; index < rootEntities.size(); index++) {
+                Object rootEntity = rootEntities.get(index);
                 Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
                 if (boundValue != null) {
                     boundValue = propertyConverter.convert(boundedContext, boundValue);
@@ -75,7 +79,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                         fieldValues.add(boundValue);
                     }
                 }
-                ForeignKey foreignKey = foreignKeyMap.computeIfAbsent(rootEntity, key -> buildForeignKey(configuredRepository, rootEntity));
+                ForeignKey foreignKey = foreignKeys.get(index);
                 foreignKey.mergeFieldValue(aliasAttribute, boundValue);
             }
             if (!fieldValues.isEmpty()) {
@@ -100,13 +104,15 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
     }
 
     protected void assembleRootEntities(List<Object> rootEntities, ConfiguredRepository configuredRepository,
-                                        Map<Object, ForeignKey> foreignKeyMap, EntityIndex entityIndex) {
-        for (Object rootEntity : rootEntities) {
+                                        List<ForeignKey> foreignKeys, EntityIndex entityIndex) {
+        for (int index = 0; index < rootEntities.size(); index++) {
+            Object rootEntity = rootEntities.get(index);
+            ForeignKey foreignKey = foreignKeys.get(index);
             EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
             EntityPropertyChain lastEntityPropertyChain = entityPropertyChain.getLastEntityPropertyChain();
             Object lastEntity = lastEntityPropertyChain == null ? rootEntity : lastEntityPropertyChain.getValue(rootEntity);
             if (lastEntity != null) {
-                List<Object> entities = entityIndex.selectList(rootEntity, foreignKeyMap.get(rootEntity));
+                List<Object> entities = entityIndex.selectList(rootEntity, foreignKey);
                 Object entity = convertManyToOneEntity(configuredRepository, entities);
                 if (entity != null) {
                     EntityProperty entityProperty = entityPropertyChain.getEntityProperty();

@@ -12,14 +12,14 @@ public class MybatisPlusGenericRepository<E, PK extends Serializable> extends Ab
 
     @Override
     protected EntityMapper newEntityMapper(EntityDefinition entityDefinition) {
-        return new MybatisPlusEntityMapper();
+        return new MybatisPlusEntityMapper(entityDefinition);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     protected AbstractRepository<Object, Object> newRepository(EntityDefinition entityDefinition) {
         BaseMapper<Object> baseMapper = (BaseMapper<Object>) entityDefinition.getMapper();
-        return new MybatisPlusRepository(baseMapper);
+        return new MybatisPlusRepository(entityDefinition, baseMapper);
     }
 
 }

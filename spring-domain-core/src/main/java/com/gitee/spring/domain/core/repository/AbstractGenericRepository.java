@@ -158,7 +158,11 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
                 if (targetEntity instanceof Collection) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
                         int entityState = entityStateResolver.resolveEntityState(expectedEntityState, contextEntityState, eachEntity);
-                        if (entityState == EntityState.INSERT) {
+                        if (entityState == EntityState.INSERT_OR_UPDATE) {
+                            getBoundValueFromContext(boundedContext, entity, configuredRepository, eachEntity);
+                            totalCount += configuredRepository.insertOrUpdate(boundedContext, eachEntity);
+
+                        } else if (entityState == EntityState.INSERT) {
                             getBoundValueFromContext(boundedContext, entity, configuredRepository, eachEntity);
                             totalCount += configuredRepository.insert(boundedContext, eachEntity);
 
@@ -171,7 +175,12 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
                     }
                 } else {
                     int entityState = entityStateResolver.resolveEntityState(expectedEntityState, contextEntityState, targetEntity);
-                    if (entityState == EntityState.INSERT) {
+                    if (entityState == EntityState.INSERT_OR_UPDATE) {
+                        getBoundValueFromContext(boundedContext, entity, configuredRepository, targetEntity);
+                        totalCount += configuredRepository.insertOrUpdate(boundedContext, targetEntity);
+                        setBoundIdForBoundEntity(boundedContext, entity, configuredRepository, targetEntity);
+
+                    } else if (entityState == EntityState.INSERT) {
                         getBoundValueFromContext(boundedContext, entity, configuredRepository, targetEntity);
                         totalCount += configuredRepository.insert(boundedContext, targetEntity);
                         setBoundIdForBoundEntity(boundedContext, entity, configuredRepository, targetEntity);
@@ -191,11 +200,16 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     protected void getBoundValueFromContext(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository, Object entity) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
-            if (!bindingDefinition.isBoundId()) {
-                Object boundValue = getBoundValue(boundedContext, rootEntity, bindingDefinition);
-                if (boundValue != null) {
-                    String fieldAttribute = bindingDefinition.getFieldAttribute();
-                    BeanUtil.setFieldValue(entity, fieldAttribute, boundValue);
+            if (!bindingDefinition.isBoundId() && !bindingDefinition.isFromCollection()) {
+                EntityPropertyChain fieldEntityPropertyChain = bindingDefinition.getFieldEntityPropertyChain();
+                Object fieldValue = fieldEntityPropertyChain.getValue(entity);
+                if (fieldValue == null) {
+                    Object boundValue = getBoundValue(boundedContext, rootEntity, bindingDefinition);
+                    if (boundValue != null) {
+                        PropertyConverter propertyConverter = bindingDefinition.getPropertyConverter();
+                        boundValue = propertyConverter.convert(boundedContext, boundValue);
+                        fieldEntityPropertyChain.setValue(entity, boundValue);
+                    }
                 }
             }
         }
@@ -243,6 +257,11 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     }
 
     @Override
+    public int insertOrUpdate(BoundedContext boundedContext, E entity) {
+        return operateEntityByState(boundedContext, entity, EntityState.INSERT_OR_UPDATE);
+    }
+
+    @Override
     public int delete(BoundedContext boundedContext, E entity) {
         return operateEntityByState(boundedContext, entity, EntityState.DELETE);
     }
@@ -272,11 +291,6 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     }
 
     @Override
-    public int insertOrUpdate(BoundedContext boundedContext, E entity) {
-        return operateEntityByState(boundedContext, entity, EntityState.INSERT_OR_UPDATE);
-    }
-
-    @Override
     public int insertList(BoundedContext boundedContext, List<E> entities) {
         return entities.stream().mapToInt(entity -> insert(boundedContext, entity)).sum();
     }
@@ -287,13 +301,13 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     }
 
     @Override
-    public int deleteList(BoundedContext boundedContext, List<E> entities) {
-        return entities.stream().mapToInt(entity -> delete(boundedContext, entity)).sum();
+    public int insertOrUpdateList(BoundedContext boundedContext, List<E> entities) {
+        return entities.stream().mapToInt(entity -> insertOrUpdate(boundedContext, entity)).sum();
     }
 
     @Override
-    public int insertOrUpdateList(BoundedContext boundedContext, List<E> entities) {
-        return entities.stream().mapToInt(entity -> insertOrUpdate(boundedContext, entity)).sum();
+    public int deleteList(BoundedContext boundedContext, List<E> entities) {
+        return entities.stream().mapToInt(entity -> delete(boundedContext, entity)).sum();
     }
 
 }

@@ -18,6 +18,8 @@ public interface IRepository<E, PK> {
 
     int updateByExample(BoundedContext boundedContext, Object entity, Object example);
 
+    int insertOrUpdate(BoundedContext boundedContext, E entity);
+
     int delete(BoundedContext boundedContext, E entity);
 
     int deleteByPrimaryKey(BoundedContext boundedContext, PK primaryKey);
