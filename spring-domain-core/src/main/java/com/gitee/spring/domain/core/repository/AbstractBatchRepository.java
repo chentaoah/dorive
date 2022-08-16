@@ -1,17 +1,13 @@
 package com.gitee.spring.domain.core.repository;
 
+import com.gitee.spring.domain.core.api.EntityBinder;
 import com.gitee.spring.domain.core.api.EntityIndex;
 import com.gitee.spring.domain.core.api.EntityProperty;
-import com.gitee.spring.domain.core.api.PropertyConverter;
 import com.gitee.spring.domain.core.entity.*;
 import com.gitee.spring.domain.core.impl.DefaultEntityIndex;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepository<E, PK> {
@@ -58,39 +54,35 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
 
     protected EntityExample newExampleByRootEntities(BoundedContext boundedContext, List<Object> rootEntities,
                                                      ConfiguredRepository configuredRepository, List<ForeignKey> foreignKeys) {
-        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityExample entityExample = new EntityExample();
         for (Object rootEntity : rootEntities) {
             foreignKeys.add(buildForeignKey(configuredRepository, rootEntity));
         }
-        for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
-            EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
-            PropertyConverter propertyConverter = bindingDefinition.getPropertyConverter();
-            String aliasAttribute = bindingDefinition.getAliasAttribute();
+        for (EntityBinder entityBinder : configuredRepository.getBoundEntityBinders()) {
+            String columnName = entityBinder.getColumnName();
             List<Object> fieldValues = new ArrayList<>();
             for (int index = 0; index < rootEntities.size(); index++) {
                 Object rootEntity = rootEntities.get(index);
-                Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
-                if (boundValue != null) {
-                    boundValue = propertyConverter.convert(boundedContext, boundValue);
-                    if (boundValue instanceof Collection) {
-                        fieldValues.addAll((Collection<?>) boundValue);
+                Object queryParameter = entityBinder.getBoundValue(boundedContext, rootEntity);
+                if (queryParameter != null) {
+                    if (queryParameter instanceof Collection) {
+                        fieldValues.addAll((Collection<?>) queryParameter);
                     } else {
-                        fieldValues.add(boundValue);
+                        fieldValues.add(queryParameter);
                     }
                 }
                 ForeignKey foreignKey = foreignKeys.get(index);
-                foreignKey.mergeFieldValue(aliasAttribute, boundValue);
+                foreignKey.mergeFieldValue(columnName, queryParameter);
             }
             if (!fieldValues.isEmpty()) {
-                entityExample.eq(aliasAttribute, fieldValues);
+                entityExample.eq(columnName, fieldValues);
             } else {
                 entityExample.setEmptyQuery(true);
                 break;
             }
         }
         if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
-            newCriterionByContext(boundedContext, configuredRepository, entityExample);
+            newCriterionByContext(boundedContext, null, configuredRepository, entityExample);
         }
         return entityExample;
     }

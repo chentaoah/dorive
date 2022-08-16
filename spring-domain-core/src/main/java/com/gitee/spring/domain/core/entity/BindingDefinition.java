@@ -22,6 +22,5 @@ public class BindingDefinition {
     private String belongAccessPath;
     private ConfiguredRepository belongConfiguredRepository;
     private EntityPropertyChain boundEntityPropertyChain;
-    private boolean fromCollection;
     private EntityPropertyChain fieldEntityPropertyChain;
 }

@@ -6,8 +6,11 @@ import com.gitee.spring.domain.core.annotation.Binding;
 import com.gitee.spring.domain.core.annotation.Entity;
 import com.gitee.spring.domain.core.annotation.Repository;
 import com.gitee.spring.domain.core.api.EntityAssembler;
+import com.gitee.spring.domain.core.api.EntityBinder;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.PropertyConverter;
+import com.gitee.spring.domain.core.binder.ContextEntityBinder;
+import com.gitee.spring.domain.core.binder.PropertyEntityBinder;
 import com.gitee.spring.domain.core.constants.Attribute;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
@@ -200,10 +203,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Class<?> assemblerClass = attributes.getClass(Attribute.ASSEMBLER_ATTRIBUTE);
         Class<?> repositoryClass = attributes.getClass(Attribute.REPOSITORY_ATTRIBUTE);
 
-        List<BindingDefinition> allBindingDefinitions = new ArrayList<>();
-        List<BindingDefinition> boundBindingDefinitions = new ArrayList<>();
-        List<BindingDefinition> contextBindingDefinitions = new ArrayList<>();
-        BindingDefinition boundIdBindingDefinition = null;
+        List<EntityBinder> allEntityBinders = new ArrayList<>();
+        List<EntityBinder> boundEntityBinders = new ArrayList<>();
+        List<EntityBinder> contextEntityBinders = new ArrayList<>();
+        EntityBinder boundIdEntityBinder = null;
+
         Set<String> boundColumns = new LinkedHashSet<>();
 
         for (Binding bindingAnnotation : bindingAnnotations) {
@@ -237,7 +241,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             String belongAccessPath = null;
             ConfiguredRepository belongConfiguredRepository = null;
             EntityPropertyChain boundEntityPropertyChain = null;
-            boolean isFromCollection = false;
 
             if (!isFromContext) {
                 if (StringUtils.isBlank(bindAliasAttribute)) {
@@ -255,8 +258,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 Assert.notNull(boundEntityPropertyChain, "The bound entity property cannot be null!");
                 boundEntityPropertyChain.initialize();
 
-                isFromCollection = boundEntityPropertyChain.isCollection();
-
                 boundColumns.add(StrUtil.toUnderlineCase(aliasAttribute));
             }
 
@@ -266,8 +267,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                     propertyAttribute, null,
                     isFromContext, isBoundId,
                     belongAccessPath, belongConfiguredRepository,
-                    boundEntityPropertyChain, isFromCollection,
-                    null);
+                    boundEntityPropertyChain, null);
 
             PropertyConverter propertyConverter;
             if (converterClass == DefaultPropertyConverter.class) {
@@ -283,19 +283,23 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
             bindingDefinition.setPropertyConverter(propertyConverter);
 
-            allBindingDefinitions.add(bindingDefinition);
             if (!isFromContext) {
-                boundBindingDefinitions.add(bindingDefinition);
+                EntityBinder entityBinder = new PropertyEntityBinder(bindingDefinition);
+                allEntityBinders.add(entityBinder);
+                boundEntityBinders.add(entityBinder);
+
             } else {
-                contextBindingDefinitions.add(bindingDefinition);
+                EntityBinder entityBinder = new ContextEntityBinder(bindingDefinition);
+                allEntityBinders.add(entityBinder);
+                contextEntityBinders.add(entityBinder);
             }
 
             if (isBoundId) {
-                boundIdBindingDefinition = bindingDefinition;
+                boundIdEntityBinder = new PropertyEntityBinder(bindingDefinition);
             }
         }
 
-        if (boundIdBindingDefinition != null && orderAttribute == 0) {
+        if (boundIdEntityBinder != null && orderAttribute == 0) {
             orderAttribute = -1;
         }
 
@@ -304,8 +308,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 entityClass, isCollection, genericEntityClass, fieldName,
                 attributes, idAttribute, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
-                allBindingDefinitions, boundBindingDefinitions, contextBindingDefinitions, boundIdBindingDefinition, boundColumns,
-                false, new LinkedHashSet<>(), new LinkedHashMap<>());
+                boundColumns, false, new LinkedHashSet<>(), new LinkedHashMap<>());
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {
@@ -344,7 +347,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository(
-                entityPropertyChain, entityDefinition, entityMapper, entityAssembler, (AbstractRepository<Object, Object>) repository);
+                (AbstractRepository<Object, Object>) repository,
+                entityPropertyChain, entityDefinition,
+                allEntityBinders, boundEntityBinders, contextEntityBinders, boundIdEntityBinder,
+                entityMapper, entityAssembler);
 
         return postProcessRepository(configuredRepository);
     }
@@ -386,13 +392,24 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 prefixAccessPath = "/";
             }
 
-            for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
+            List<EntityBinder> boundValueEntityBinders = new ArrayList<>();
+            for (EntityBinder entityBinder : configuredRepository.getAllEntityBinders()) {
+                BindingDefinition bindingDefinition = entityBinder.getBindingDefinition();
                 String fieldAccessPath = prefixAccessPath + bindingDefinition.getFieldAttribute();
                 EntityPropertyChain entityPropertyChain = entityPropertyChainMap.get(fieldAccessPath);
                 Assert.notNull(entityPropertyChain, "The field entity property cannot be null!");
                 entityPropertyChain.initialize();
                 bindingDefinition.setFieldEntityPropertyChain(entityPropertyChain);
+
+                Class<?> entityClass = bindingDefinition.getBoundEntityPropertyChain().getEntityClass();
+                Class<?> fieldEntityClass = bindingDefinition.getFieldEntityPropertyChain().getEntityClass();
+                boolean isBlankProperty = StringUtils.isBlank(bindingDefinition.getPropertyAttribute());
+                boolean isDefaultConverter = bindingDefinition.getAttributes().getClass(Attribute.CONVERTER_ATTRIBUTE) == DefaultPropertyConverter.class;
+                if (entityClass == fieldEntityClass && isBlankProperty && isDefaultConverter) {
+                    boundValueEntityBinders.add(entityBinder);
+                }
             }
+            configuredRepository.setBoundValueEntityBinders(boundValueEntityBinders);
         });
     }
 

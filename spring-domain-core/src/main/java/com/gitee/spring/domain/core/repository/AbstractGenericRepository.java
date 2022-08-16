@@ -2,10 +2,7 @@ package com.gitee.spring.domain.core.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.core.api.EntityMapper;
-import com.gitee.spring.domain.core.api.EntityProperty;
-import com.gitee.spring.domain.core.api.GenericRepository;
-import com.gitee.spring.domain.core.api.PropertyConverter;
+import com.gitee.spring.domain.core.api.*;
 import com.gitee.spring.domain.core.constants.EntityState;
 import com.gitee.spring.domain.core.entity.*;
 import com.gitee.spring.domain.core.impl.EntityStateResolver;
@@ -88,39 +85,33 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     }
 
     protected EntityExample newExampleByContext(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository) {
-        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityExample entityExample = new EntityExample();
-        for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
-            EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
-            PropertyConverter propertyConverter = bindingDefinition.getPropertyConverter();
-            String aliasAttribute = bindingDefinition.getAliasAttribute();
-            Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
-            if (boundValue != null) {
-                boundValue = propertyConverter.convert(boundedContext, boundValue);
-                entityExample.eq(aliasAttribute, boundValue);
+        for (EntityBinder entityBinder : configuredRepository.getBoundEntityBinders()) {
+            String columnName = entityBinder.getColumnName();
+            Object queryParameter = entityBinder.getBoundValue(boundedContext, rootEntity);
+            if (queryParameter != null) {
+                entityExample.eq(columnName, queryParameter);
             } else {
                 entityExample.setEmptyQuery(true);
                 break;
             }
         }
         if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
-            newCriterionByContext(boundedContext, configuredRepository, entityExample);
+            newCriterionByContext(boundedContext, rootEntity, configuredRepository, entityExample);
         }
         return entityExample;
     }
 
-    protected void newCriterionByContext(BoundedContext boundedContext, ConfiguredRepository configuredRepository, EntityExample entityExample) {
-        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        for (BindingDefinition bindingDefinition : entityDefinition.getContextBindingDefinitions()) {
-            String bindAttribute = bindingDefinition.getBindAttribute();
-            Object boundValue = boundedContext.get(bindAttribute);
-            if (boundValue != null) {
-                String aliasAttribute = bindingDefinition.getAliasAttribute();
-                if (boundValue instanceof String && StringUtils.isLike((String) boundValue)) {
-                    boundValue = StringUtils.stripLike((String) boundValue);
-                    entityExample.like(aliasAttribute, boundValue);
+    protected void newCriterionByContext(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository, EntityExample entityExample) {
+        for (EntityBinder entityBinder : configuredRepository.getContextEntityBinders()) {
+            String columnName = entityBinder.getColumnName();
+            Object queryParameter = entityBinder.getBoundValue(boundedContext, rootEntity);
+            if (queryParameter != null) {
+                if (queryParameter instanceof String && StringUtils.isLike((String) queryParameter)) {
+                    queryParameter = StringUtils.stripLike((String) queryParameter);
+                    entityExample.like(columnName, queryParameter);
                 } else {
-                    entityExample.eq(aliasAttribute, boundValue);
+                    entityExample.eq(columnName, queryParameter);
                 }
             }
         }
@@ -198,41 +189,23 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     }
 
     protected void getBoundValueFromContext(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository, Object entity) {
-        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        for (BindingDefinition bindingDefinition : entityDefinition.getAllBindingDefinitions()) {
-            if (!bindingDefinition.isBoundId() && !bindingDefinition.isFromCollection()) {
-                EntityPropertyChain fieldEntityPropertyChain = bindingDefinition.getFieldEntityPropertyChain();
-                Object fieldValue = fieldEntityPropertyChain.getValue(entity);
-                if (fieldValue == null) {
-                    Object boundValue = getBoundValue(boundedContext, rootEntity, bindingDefinition);
-                    if (boundValue != null) {
-                        PropertyConverter propertyConverter = bindingDefinition.getPropertyConverter();
-                        boundValue = propertyConverter.convert(boundedContext, boundValue);
-                        fieldEntityPropertyChain.setValue(entity, boundValue);
-                    }
+        for (EntityBinder entityBinder : configuredRepository.getBoundValueEntityBinders()) {
+            Object fieldValue = entityBinder.getFieldValue(boundedContext, entity);
+            if (fieldValue == null) {
+                Object boundValue = entityBinder.getBoundValue(boundedContext, rootEntity);
+                if (boundValue != null) {
+                    entityBinder.setFieldValue(boundedContext, entity, boundValue);
                 }
             }
         }
     }
 
-    protected Object getBoundValue(BoundedContext boundedContext, Object rootEntity, BindingDefinition bindingDefinition) {
-        if (!bindingDefinition.isFromContext()) {
-            EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
-            return boundEntityPropertyChain.getValue(rootEntity);
-        } else {
-            String bindAttribute = bindingDefinition.getBindAttribute();
-            return boundedContext.get(bindAttribute);
-        }
-    }
-
     protected void setBoundIdForBoundEntity(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository, Object entity) {
-        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        BindingDefinition boundIdBindingDefinition = entityDefinition.getBoundIdBindingDefinition();
-        if (boundIdBindingDefinition != null) {
-            EntityPropertyChain boundEntityPropertyChain = boundIdBindingDefinition.getBoundEntityPropertyChain();
+        EntityBinder entityBinder = configuredRepository.getBoundIdEntityBinder();
+        if (entityBinder != null) {
             Object primaryKey = BeanUtil.getFieldValue(entity, "id");
             if (primaryKey != null) {
-                boundEntityPropertyChain.setValue(rootEntity, primaryKey);
+                entityBinder.setBoundValue(boundedContext, rootEntity, primaryKey);
             }
         }
     }

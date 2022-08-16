@@ -7,6 +7,7 @@ import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
 import com.gitee.spring.domain.coating.impl.DefaultCoatingAssembler;
+import com.gitee.spring.domain.core.api.EntityBinder;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityCriterion;
@@ -24,7 +25,7 @@ import java.util.Map;
 
 @Slf4j
 public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
-    
+
     @Override
     public EntityExample buildExample(BoundedContext boundedContext, Object coatingObject) {
         DefaultCoatingAssembler defaultCoatingAssembler = (DefaultCoatingAssembler) classCoatingAssemblerMap.get(coatingObject.getClass());
@@ -76,7 +77,8 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
             EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
 
-            for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
+            for (EntityBinder entityBinder : definitionRepository.getBoundEntityBinders()) {
+                BindingDefinition bindingDefinition = entityBinder.getBindingDefinition();
                 String absoluteAccessPath = prefixAccessPath + bindingDefinition.getBelongAccessPath();
                 ChainCriterion targetChainCriterion = criterionMap.get(absoluteAccessPath);
                 if (targetChainCriterion != null) {
@@ -89,11 +91,11 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             }
 
             if (!entityExample.isEmptyQuery()) {
-                for (BindingDefinition bindingDefinition : entityDefinition.getContextBindingDefinitions()) {
-                    Object boundValue = boundedContext.get(bindingDefinition.getBindAttribute());
-                    if (boundValue != null) {
-                        String aliasAttribute = bindingDefinition.getAliasAttribute();
-                        entityExample.eq(aliasAttribute, boundValue);
+                for (EntityBinder entityBinder : definitionRepository.getContextEntityBinders()) {
+                    String columnName = entityBinder.getColumnName();
+                    Object queryParameter = entityBinder.getBoundValue(boundedContext, null);
+                    if (queryParameter != null) {
+                        entityExample.eq(columnName, queryParameter);
                     }
                 }
             }
@@ -108,7 +110,8 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                 entities = configuredRepository.selectByExample(boundedContext, entityExample);
             }
 
-            for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
+            for (EntityBinder entityBinder : definitionRepository.getBoundEntityBinders()) {
+                BindingDefinition bindingDefinition = entityBinder.getBindingDefinition();
                 String absoluteAccessPath = prefixAccessPath + bindingDefinition.getBelongAccessPath();
                 ChainCriterion targetChainCriterion = criterionMap.get(absoluteAccessPath);
                 if (targetChainCriterion != null) {

@@ -5,7 +5,6 @@ import lombok.Data;
 import org.springframework.core.annotation.AnnotationAttributes;
 
 import java.lang.reflect.AnnotatedElement;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,10 +32,6 @@ public class EntityDefinition {
     private String[] orderBy;
     private String sort;
     private int orderAttribute;
-    private List<BindingDefinition> allBindingDefinitions;
-    private List<BindingDefinition> boundBindingDefinitions;
-    private List<BindingDefinition> contextBindingDefinitions;
-    private BindingDefinition boundIdBindingDefinition;
     private Set<String> boundColumns;
     private boolean boundEntity;
     private Set<String> fieldNames;
