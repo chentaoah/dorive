@@ -33,6 +33,11 @@ public abstract class AbstractRepository<E, PK> implements BaseRepository<E, PK>
     }
 
     @Override
+    public int insertOrUpdate(E entity) {
+        return insertOrUpdate(new BoundedContext(), entity);
+    }
+
+    @Override
     public int delete(E entity) {
         return delete(new BoundedContext(), entity);
     }

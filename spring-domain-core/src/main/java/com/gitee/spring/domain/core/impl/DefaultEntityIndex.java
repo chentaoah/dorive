@@ -25,9 +25,9 @@ public class DefaultEntityIndex implements EntityIndex {
         for (Object entity : entities) {
             StringBuilder builder = new StringBuilder();
             for (BindingDefinition bindingDefinition : bindingDefinitions) {
+                EntityPropertyChain fieldEntityPropertyChain = bindingDefinition.getFieldEntityPropertyChain();
+                Object boundValue = fieldEntityPropertyChain.getValue(entity);
                 String aliasAttribute = bindingDefinition.getAliasAttribute();
-                EntityPropertyChain entityPropertyChain = bindingDefinition.getFieldEntityPropertyChain();
-                Object boundValue = entityPropertyChain.getValue(entity);
                 builder.append(aliasAttribute).append(": ").append(boundValue).append(", ");
             }
             if (builder.length() > 0) {

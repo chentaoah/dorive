@@ -232,6 +232,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             String belongAccessPath = null;
             ConfiguredRepository belongConfiguredRepository = null;
             EntityPropertyChain boundEntityPropertyChain = null;
+            boolean isFromCollection = false;
 
             if (!isFromContext) {
                 if (StringUtils.isBlank(bindAliasAttribute)) {
@@ -249,13 +250,19 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 Assert.notNull(boundEntityPropertyChain, "The bound entity property cannot be null!");
                 boundEntityPropertyChain.initialize();
 
+                isFromCollection = boundEntityPropertyChain.isCollection();
+
                 boundColumns.add(StrUtil.toUnderlineCase(aliasAttribute));
             }
 
             BindingDefinition bindingDefinition = new BindingDefinition(
-                    bindingAttributes, fieldAttribute, aliasAttribute, bindAttribute, bindAliasAttribute, propertyAttribute, null,
+                    bindingAttributes,
+                    fieldAttribute, aliasAttribute, bindAttribute, bindAliasAttribute,
+                    propertyAttribute, null,
                     isFromContext, isBoundId,
-                    belongAccessPath, belongConfiguredRepository, boundEntityPropertyChain, null);
+                    belongAccessPath, belongConfiguredRepository,
+                    boundEntityPropertyChain, isFromCollection,
+                    null);
 
             PropertyConverter propertyConverter;
             if (converterClass == DefaultPropertyConverter.class) {

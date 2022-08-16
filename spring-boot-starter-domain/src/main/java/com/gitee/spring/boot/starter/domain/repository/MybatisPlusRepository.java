@@ -60,6 +60,11 @@ public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
     }
 
     @Override
+    public int insertOrUpdate(BoundedContext boundedContext, Object entity) {
+        throw new RuntimeException("This method is not supported!");
+    }
+
+    @Override
     public int delete(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         return deleteByPrimaryKey(boundedContext, primaryKey);
