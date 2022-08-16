@@ -17,6 +17,8 @@ public @interface Binding {
 
     String bind();
 
+    String bindExp() default "";
+
     String bindAlias() default "";
 
     String property() default "";

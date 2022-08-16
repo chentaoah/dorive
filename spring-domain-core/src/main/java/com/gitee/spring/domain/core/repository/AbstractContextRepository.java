@@ -213,6 +213,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             String fieldAttribute = bindingAttributes.getString(Attribute.FIELD_ATTRIBUTE);
             String aliasAttribute = bindingAttributes.getString(Attribute.ALIAS_ATTRIBUTE);
             String bindAttribute = bindingAttributes.getString(Attribute.BIND_ATTRIBUTE);
+            String bindExpAttribute = bindingAttributes.getString(Attribute.BIND_EXP_ATTRIBUTE);
             String bindAliasAttribute = bindingAttributes.getString(Attribute.BIND_ALIAS_ATTRIBUTE);
             String propertyAttribute = bindingAttributes.getString(Attribute.PROPERTY_ATTRIBUTE);
             Class<?> converterClass = bindingAttributes.getClass(Attribute.CONVERTER_ATTRIBUTE);
@@ -223,6 +224,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
             if (bindAttribute.startsWith(".")) {
                 bindAttribute = PathUtils.getAbsolutePath(accessPath, bindAttribute);
+            }
+
+            if (StringUtils.isBlank(bindExpAttribute)) {
+                bindExpAttribute = bindAttribute;
             }
 
             boolean isIdField = "id".equals(fieldAttribute);
@@ -257,7 +262,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
             BindingDefinition bindingDefinition = new BindingDefinition(
                     bindingAttributes,
-                    fieldAttribute, aliasAttribute, bindAttribute, bindAliasAttribute,
+                    fieldAttribute, aliasAttribute, bindAttribute, bindExpAttribute, bindAliasAttribute,
                     propertyAttribute, null,
                     isFromContext, isBoundId,
                     belongAccessPath, belongConfiguredRepository,

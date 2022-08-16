@@ -13,6 +13,7 @@ public class BindingDefinition {
     private String fieldAttribute;
     private String aliasAttribute;
     private String bindAttribute;
+    private String bindExpAttribute;
     private String bindAliasAttribute;
     private String propertyAttribute;
     private PropertyConverter propertyConverter;
