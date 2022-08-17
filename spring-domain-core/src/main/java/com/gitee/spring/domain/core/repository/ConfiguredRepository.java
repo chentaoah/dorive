@@ -3,6 +3,8 @@ package com.gitee.spring.domain.core.repository;
 import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityBinder;
 import com.gitee.spring.domain.core.api.EntityMapper;
+import com.gitee.spring.domain.core.binder.ContextEntityBinder;
+import com.gitee.spring.domain.core.binder.PropertyEntityBinder;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
@@ -20,10 +22,10 @@ public class ConfiguredRepository extends ProxyRepository {
     protected EntityPropertyChain entityPropertyChain;
     protected EntityDefinition entityDefinition;
     protected List<EntityBinder> allEntityBinders;
-    protected List<EntityBinder> boundEntityBinders;
-    protected List<EntityBinder> contextEntityBinders;
-    protected List<EntityBinder> boundValueEntityBinders;
-    protected EntityBinder boundIdEntityBinder;
+    protected List<PropertyEntityBinder> boundEntityBinders;
+    protected List<ContextEntityBinder> contextEntityBinders;
+    protected List<PropertyEntityBinder> boundValueEntityBinders;
+    protected PropertyEntityBinder boundIdEntityBinder;
     protected EntityMapper entityMapper;
     protected EntityAssembler entityAssembler;
 
@@ -31,9 +33,10 @@ public class ConfiguredRepository extends ProxyRepository {
                                 EntityPropertyChain entityPropertyChain,
                                 EntityDefinition entityDefinition,
                                 List<EntityBinder> allEntityBinders,
-                                List<EntityBinder> boundEntityBinders,
-                                List<EntityBinder> contextEntityBinders,
-                                EntityBinder boundIdEntityBinder,
+                                List<PropertyEntityBinder> boundEntityBinders,
+                                List<ContextEntityBinder> contextEntityBinders,
+                                List<PropertyEntityBinder> boundValueEntityBinders,
+                                PropertyEntityBinder boundIdEntityBinder,
                                 EntityMapper entityMapper,
                                 EntityAssembler entityAssembler) {
         super(repository);
@@ -42,6 +45,7 @@ public class ConfiguredRepository extends ProxyRepository {
         this.allEntityBinders = allEntityBinders;
         this.boundEntityBinders = boundEntityBinders;
         this.contextEntityBinders = contextEntityBinders;
+        this.boundValueEntityBinders = boundValueEntityBinders;
         this.boundIdEntityBinder = boundIdEntityBinder;
         this.entityMapper = entityMapper;
         this.entityAssembler = entityAssembler;

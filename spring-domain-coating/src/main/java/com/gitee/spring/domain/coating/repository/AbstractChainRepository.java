@@ -8,12 +8,12 @@ import com.gitee.spring.domain.coating.entity.RepositoryDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
 import com.gitee.spring.domain.coating.impl.DefaultCoatingAssembler;
 import com.gitee.spring.domain.core.api.EntityBinder;
+import com.gitee.spring.domain.core.binder.PropertyEntityBinder;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityCriterion;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -77,9 +77,8 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
             EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
 
-            for (EntityBinder entityBinder : definitionRepository.getBoundEntityBinders()) {
-                BindingDefinition bindingDefinition = entityBinder.getBindingDefinition();
-                String absoluteAccessPath = prefixAccessPath + bindingDefinition.getBelongAccessPath();
+            for (PropertyEntityBinder propertyEntityBinder : definitionRepository.getBoundEntityBinders()) {
+                String absoluteAccessPath = prefixAccessPath + propertyEntityBinder.getBelongAccessPath();
                 ChainCriterion targetChainCriterion = criterionMap.get(absoluteAccessPath);
                 if (targetChainCriterion != null) {
                     EntityExample targetEntityExample = targetChainCriterion.getEntityExample();
@@ -110,9 +109,9 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                 entities = configuredRepository.selectByExample(boundedContext, entityExample);
             }
 
-            for (EntityBinder entityBinder : definitionRepository.getBoundEntityBinders()) {
-                BindingDefinition bindingDefinition = entityBinder.getBindingDefinition();
-                String absoluteAccessPath = prefixAccessPath + bindingDefinition.getBelongAccessPath();
+            for (PropertyEntityBinder propertyEntityBinder : definitionRepository.getBoundEntityBinders()) {
+                BindingDefinition bindingDefinition = propertyEntityBinder.getBindingDefinition();
+                String absoluteAccessPath = prefixAccessPath + propertyEntityBinder.getBelongAccessPath();
                 ChainCriterion targetChainCriterion = criterionMap.get(absoluteAccessPath);
                 if (targetChainCriterion != null) {
                     EntityExample targetEntityExample = targetChainCriterion.getEntityExample();
@@ -121,7 +120,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                         continue;
                     }
 
-                    List<Object> fieldValues = collectFieldValues(entities, bindingDefinition);
+                    List<Object> fieldValues = collectFieldValues(boundedContext, entities, propertyEntityBinder);
                     if (fieldValues.isEmpty()) {
                         targetEntityExample.setEmptyQuery(true);
                         continue;
@@ -135,11 +134,10 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         });
     }
 
-    protected List<Object> collectFieldValues(List<Object> entities, BindingDefinition bindingDefinition) {
-        EntityPropertyChain fieldEntityPropertyChain = bindingDefinition.getFieldEntityPropertyChain();
+    protected List<Object> collectFieldValues(BoundedContext boundedContext, List<Object> entities, PropertyEntityBinder propertyEntityBinder) {
         List<Object> fieldValues = new ArrayList<>();
         for (Object entity : entities) {
-            Object fieldValue = fieldEntityPropertyChain.getValue(entity);
+            Object fieldValue = propertyEntityBinder.getFieldValue(boundedContext, entity);
             if (fieldValue != null) {
                 fieldValues.add(fieldValue);
             }
