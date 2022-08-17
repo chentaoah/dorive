@@ -45,7 +45,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                 EntityExample entityExample = newExampleByRootEntities(boundedContext, rootEntities, configuredRepository, foreignKeys);
                 if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
                     List<Object> entities = configuredRepository.selectByExample(boundedContext, entityExample);
-                    EntityIndex entityIndex = buildEntityIndex(configuredRepository, entities);
+                    EntityIndex entityIndex = buildEntityIndex(boundedContext, entities, configuredRepository);
                     assembleRootEntities(rootEntities, configuredRepository, foreignKeys, entityIndex);
                 }
             }
@@ -56,7 +56,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                                                      ConfiguredRepository configuredRepository, List<ForeignKey> foreignKeys) {
         EntityExample entityExample = new EntityExample();
         for (Object rootEntity : rootEntities) {
-            foreignKeys.add(buildForeignKey(configuredRepository, rootEntity));
+            foreignKeys.add(buildForeignKey(rootEntity, configuredRepository));
         }
         for (EntityBinder entityBinder : configuredRepository.getBoundEntityBinders()) {
             String columnName = entityBinder.getColumnName();
@@ -87,12 +87,12 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
         return entityExample;
     }
 
-    protected ForeignKey buildForeignKey(ConfiguredRepository configuredRepository, Object rootEntity) {
-        return new ForeignKey(configuredRepository, rootEntity);
+    protected ForeignKey buildForeignKey(Object rootEntity, ConfiguredRepository configuredRepository) {
+        return new ForeignKey(rootEntity, configuredRepository);
     }
 
-    protected EntityIndex buildEntityIndex(ConfiguredRepository configuredRepository, List<Object> entities) {
-        return new DefaultEntityIndex(configuredRepository, entities);
+    protected EntityIndex buildEntityIndex(BoundedContext boundedContext, List<Object> entities, ConfiguredRepository configuredRepository) {
+        return new DefaultEntityIndex(boundedContext, entities, configuredRepository);
     }
 
     protected void assembleRootEntities(List<Object> rootEntities, ConfiguredRepository configuredRepository,
