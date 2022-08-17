@@ -24,7 +24,7 @@ public class ConfiguredRepository extends ProxyRepository {
     protected List<EntityBinder> allEntityBinders;
     protected List<PropertyEntityBinder> boundEntityBinders;
     protected List<ContextEntityBinder> contextEntityBinders;
-    protected List<PropertyEntityBinder> boundValueEntityBinders;
+    protected List<EntityBinder> boundValueEntityBinders;
     protected PropertyEntityBinder boundIdEntityBinder;
     protected EntityMapper entityMapper;
     protected EntityAssembler entityAssembler;
@@ -35,7 +35,7 @@ public class ConfiguredRepository extends ProxyRepository {
                                 List<EntityBinder> allEntityBinders,
                                 List<PropertyEntityBinder> boundEntityBinders,
                                 List<ContextEntityBinder> contextEntityBinders,
-                                List<PropertyEntityBinder> boundValueEntityBinders,
+                                List<EntityBinder> boundValueEntityBinders,
                                 PropertyEntityBinder boundIdEntityBinder,
                                 EntityMapper entityMapper,
                                 EntityAssembler entityAssembler) {
