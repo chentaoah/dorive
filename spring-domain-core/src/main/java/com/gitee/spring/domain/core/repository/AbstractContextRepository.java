@@ -406,7 +406,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                     boolean isBlankProperty = StringUtils.isBlank(bindingDefinition.getPropertyAttribute());
                     boolean isDefaultConverter = bindingDefinition.getAttributes().getClass(Attribute.CONVERTER_ATTRIBUTE) == DefaultPropertyConverter.class;
                     if (isNotBoundId && entityClass == fieldEntityClass && isBlankProperty && isDefaultConverter) {
-                        boundValueEntityBinders.add(propertyEntityBinder);
+                        boundValueEntityBinders.add(entityBinder);
                     }
 
                 } else if (entityBinder instanceof ContextEntityBinder) {
