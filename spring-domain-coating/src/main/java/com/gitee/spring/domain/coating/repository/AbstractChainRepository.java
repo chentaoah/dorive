@@ -110,7 +110,6 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             }
 
             for (PropertyEntityBinder propertyEntityBinder : definitionRepository.getBoundEntityBinders()) {
-                BindingDefinition bindingDefinition = propertyEntityBinder.getBindingDefinition();
                 String absoluteAccessPath = prefixAccessPath + propertyEntityBinder.getBelongAccessPath();
                 ChainCriterion targetChainCriterion = criterionMap.get(absoluteAccessPath);
                 if (targetChainCriterion != null) {
@@ -126,6 +125,7 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                         continue;
                     }
 
+                    BindingDefinition bindingDefinition = propertyEntityBinder.getBindingDefinition();
                     String bindAliasAttribute = bindingDefinition.getBindAliasAttribute();
                     Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
                     targetEntityExample.eq(bindAliasAttribute, fieldValue);
