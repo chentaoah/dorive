@@ -1,9 +1,8 @@
 package com.gitee.spring.domain.core.impl;
 
+import com.gitee.spring.domain.core.api.EntityBinder;
 import com.gitee.spring.domain.core.api.EntityIndex;
-import com.gitee.spring.domain.core.entity.BindingDefinition;
-import com.gitee.spring.domain.core.entity.EntityDefinition;
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
+import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.ForeignKey;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 
@@ -16,19 +15,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultEntityIndex implements EntityIndex {
 
-    private final Map<String, Object> entitiesMap = new ConcurrentHashMap<>();
+    protected final Map<String, Object> entitiesMap = new ConcurrentHashMap<>();
 
     @SuppressWarnings("unchecked")
-    public DefaultEntityIndex(ConfiguredRepository configuredRepository, List<?> entities) {
-        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-        List<BindingDefinition> bindingDefinitions = entityDefinition.getBoundBindingDefinitions();
+    public DefaultEntityIndex(BoundedContext boundedContext, List<?> entities, ConfiguredRepository configuredRepository) {
         for (Object entity : entities) {
             StringBuilder builder = new StringBuilder();
-            for (BindingDefinition bindingDefinition : bindingDefinitions) {
-                EntityPropertyChain fieldEntityPropertyChain = bindingDefinition.getFieldEntityPropertyChain();
-                Object boundValue = fieldEntityPropertyChain.getValue(entity);
-                String aliasAttribute = bindingDefinition.getAliasAttribute();
-                builder.append(aliasAttribute).append(": ").append(boundValue).append(", ");
+            for (EntityBinder entityBinder : configuredRepository.getBoundEntityBinders()) {
+                String columnName = entityBinder.getColumnName();
+                Object fieldValue = entityBinder.getFieldValue(boundedContext, entity);
+                builder.append(columnName).append(": ").append(fieldValue).append(", ");
             }
             if (builder.length() > 0) {
                 builder.delete(builder.length() - 2, builder.length());

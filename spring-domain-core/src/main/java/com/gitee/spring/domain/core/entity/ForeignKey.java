@@ -9,14 +9,14 @@ import java.util.List;
 
 @Data
 public class ForeignKey {
-
-    protected ConfiguredRepository configuredRepository;
+    
     protected Object rootEntity;
+    protected ConfiguredRepository configuredRepository;
     protected List<String> keys;
 
-    public ForeignKey(ConfiguredRepository configuredRepository, Object rootEntity) {
-        this.configuredRepository = configuredRepository;
+    public ForeignKey(Object rootEntity, ConfiguredRepository configuredRepository) {
         this.rootEntity = rootEntity;
+        this.configuredRepository = configuredRepository;
     }
 
     public void mergeFieldValue(String fieldName, Object fieldValue) {

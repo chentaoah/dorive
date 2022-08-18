@@ -7,12 +7,13 @@ import com.gitee.spring.domain.coating.entity.PropertyDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
 import com.gitee.spring.domain.coating.impl.DefaultCoatingAssembler;
+import com.gitee.spring.domain.core.api.EntityBinder;
+import com.gitee.spring.domain.core.binder.PropertyEntityBinder;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityCriterion;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +25,7 @@ import java.util.Map;
 
 @Slf4j
 public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
-    
+
     @Override
     public EntityExample buildExample(BoundedContext boundedContext, Object coatingObject) {
         DefaultCoatingAssembler defaultCoatingAssembler = (DefaultCoatingAssembler) classCoatingAssemblerMap.get(coatingObject.getClass());
@@ -76,8 +77,8 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
 
             EntityDefinition entityDefinition = definitionRepository.getEntityDefinition();
 
-            for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
-                String absoluteAccessPath = prefixAccessPath + bindingDefinition.getBelongAccessPath();
+            for (PropertyEntityBinder propertyEntityBinder : definitionRepository.getBoundEntityBinders()) {
+                String absoluteAccessPath = prefixAccessPath + propertyEntityBinder.getBelongAccessPath();
                 ChainCriterion targetChainCriterion = criterionMap.get(absoluteAccessPath);
                 if (targetChainCriterion != null) {
                     EntityExample targetEntityExample = targetChainCriterion.getEntityExample();
@@ -89,11 +90,11 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
             }
 
             if (!entityExample.isEmptyQuery()) {
-                for (BindingDefinition bindingDefinition : entityDefinition.getContextBindingDefinitions()) {
-                    Object boundValue = boundedContext.get(bindingDefinition.getBindAttribute());
-                    if (boundValue != null) {
-                        String aliasAttribute = bindingDefinition.getAliasAttribute();
-                        entityExample.eq(aliasAttribute, boundValue);
+                for (EntityBinder entityBinder : definitionRepository.getContextEntityBinders()) {
+                    String columnName = entityBinder.getColumnName();
+                    Object queryParameter = entityBinder.getBoundValue(boundedContext, null);
+                    if (queryParameter != null) {
+                        entityExample.eq(columnName, queryParameter);
                     }
                 }
             }
@@ -108,8 +109,8 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                 entities = configuredRepository.selectByExample(boundedContext, entityExample);
             }
 
-            for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
-                String absoluteAccessPath = prefixAccessPath + bindingDefinition.getBelongAccessPath();
+            for (PropertyEntityBinder propertyEntityBinder : definitionRepository.getBoundEntityBinders()) {
+                String absoluteAccessPath = prefixAccessPath + propertyEntityBinder.getBelongAccessPath();
                 ChainCriterion targetChainCriterion = criterionMap.get(absoluteAccessPath);
                 if (targetChainCriterion != null) {
                     EntityExample targetEntityExample = targetChainCriterion.getEntityExample();
@@ -118,12 +119,13 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
                         continue;
                     }
 
-                    List<Object> fieldValues = collectFieldValues(entities, bindingDefinition);
+                    List<Object> fieldValues = collectFieldValues(boundedContext, entities, propertyEntityBinder);
                     if (fieldValues.isEmpty()) {
                         targetEntityExample.setEmptyQuery(true);
                         continue;
                     }
 
+                    BindingDefinition bindingDefinition = propertyEntityBinder.getBindingDefinition();
                     String bindAliasAttribute = bindingDefinition.getBindAliasAttribute();
                     Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
                     targetEntityExample.eq(bindAliasAttribute, fieldValue);
@@ -132,11 +134,10 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         });
     }
 
-    protected List<Object> collectFieldValues(List<Object> entities, BindingDefinition bindingDefinition) {
-        EntityPropertyChain fieldEntityPropertyChain = bindingDefinition.getFieldEntityPropertyChain();
+    protected List<Object> collectFieldValues(BoundedContext boundedContext, List<Object> entities, EntityBinder entityBinder) {
         List<Object> fieldValues = new ArrayList<>();
         for (Object entity : entities) {
-            Object fieldValue = fieldEntityPropertyChain.getValue(entity);
+            Object fieldValue = entityBinder.getFieldValue(boundedContext, entity);
             if (fieldValue != null) {
                 fieldValues.add(fieldValue);
             }

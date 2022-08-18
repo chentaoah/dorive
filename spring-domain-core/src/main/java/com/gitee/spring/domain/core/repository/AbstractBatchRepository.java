@@ -1,17 +1,13 @@
 package com.gitee.spring.domain.core.repository;
 
+import com.gitee.spring.domain.core.api.EntityBinder;
 import com.gitee.spring.domain.core.api.EntityIndex;
 import com.gitee.spring.domain.core.api.EntityProperty;
-import com.gitee.spring.domain.core.api.PropertyConverter;
 import com.gitee.spring.domain.core.entity.*;
 import com.gitee.spring.domain.core.impl.DefaultEntityIndex;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepository<E, PK> {
@@ -49,7 +45,7 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                 EntityExample entityExample = newExampleByRootEntities(boundedContext, rootEntities, configuredRepository, foreignKeys);
                 if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
                     List<Object> entities = configuredRepository.selectByExample(boundedContext, entityExample);
-                    EntityIndex entityIndex = buildEntityIndex(configuredRepository, entities);
+                    EntityIndex entityIndex = buildEntityIndex(boundedContext, entities, configuredRepository);
                     assembleRootEntities(rootEntities, configuredRepository, foreignKeys, entityIndex);
                 }
             }
@@ -58,49 +54,44 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
 
     protected EntityExample newExampleByRootEntities(BoundedContext boundedContext, List<Object> rootEntities,
                                                      ConfiguredRepository configuredRepository, List<ForeignKey> foreignKeys) {
-        EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         EntityExample entityExample = new EntityExample();
         for (Object rootEntity : rootEntities) {
-            foreignKeys.add(buildForeignKey(configuredRepository, rootEntity));
+            foreignKeys.add(buildForeignKey(rootEntity, configuredRepository));
         }
-        for (BindingDefinition bindingDefinition : entityDefinition.getBoundBindingDefinitions()) {
-            EntityPropertyChain boundEntityPropertyChain = bindingDefinition.getBoundEntityPropertyChain();
-            PropertyConverter propertyConverter = bindingDefinition.getPropertyConverter();
-            String aliasAttribute = bindingDefinition.getAliasAttribute();
+        for (EntityBinder entityBinder : configuredRepository.getBoundEntityBinders()) {
+            String columnName = entityBinder.getColumnName();
             List<Object> fieldValues = new ArrayList<>();
             for (int index = 0; index < rootEntities.size(); index++) {
                 Object rootEntity = rootEntities.get(index);
-                Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
-                if (boundValue != null) {
-                    boundValue = propertyConverter.convert(boundedContext, boundValue);
-                    if (boundValue instanceof Collection) {
-                        fieldValues.addAll((Collection<?>) boundValue);
-                    } else {
-                        fieldValues.add(boundValue);
-                    }
+                Object queryParameter = entityBinder.getBoundValue(boundedContext, rootEntity);
+                if (queryParameter instanceof Collection) {
+                    fieldValues.addAll((Collection<?>) queryParameter);
+
+                } else if (queryParameter != null) {
+                    fieldValues.add(queryParameter);
                 }
                 ForeignKey foreignKey = foreignKeys.get(index);
-                foreignKey.mergeFieldValue(aliasAttribute, boundValue);
+                foreignKey.mergeFieldValue(columnName, queryParameter);
             }
             if (!fieldValues.isEmpty()) {
-                entityExample.eq(aliasAttribute, fieldValues);
+                entityExample.eq(columnName, fieldValues);
             } else {
                 entityExample.setEmptyQuery(true);
                 break;
             }
         }
         if (!entityExample.isEmptyQuery() && entityExample.isDirtyQuery()) {
-            newCriterionByContext(boundedContext, configuredRepository, entityExample);
+            newCriterionByContext(boundedContext, null, configuredRepository, entityExample);
         }
         return entityExample;
     }
 
-    protected ForeignKey buildForeignKey(ConfiguredRepository configuredRepository, Object rootEntity) {
-        return new ForeignKey(configuredRepository, rootEntity);
+    protected ForeignKey buildForeignKey(Object rootEntity, ConfiguredRepository configuredRepository) {
+        return new ForeignKey(rootEntity, configuredRepository);
     }
 
-    protected EntityIndex buildEntityIndex(ConfiguredRepository configuredRepository, List<Object> entities) {
-        return new DefaultEntityIndex(configuredRepository, entities);
+    protected EntityIndex buildEntityIndex(BoundedContext boundedContext, List<Object> entities, ConfiguredRepository configuredRepository) {
+        return new DefaultEntityIndex(boundedContext, entities, configuredRepository);
     }
 
     protected void assembleRootEntities(List<Object> rootEntities, ConfiguredRepository configuredRepository,

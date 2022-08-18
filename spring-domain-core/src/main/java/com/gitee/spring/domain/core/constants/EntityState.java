@@ -7,5 +7,6 @@ public interface EntityState {
     int DELETE = 0x00000004;
     int INSERT_OR_UPDATE = INSERT | UPDATE;
     int UPDATE_OR_DELETE = UPDATE | DELETE;
+    int IGNORE = 0x00000008;
     int FORCE_INSERT = 0x00000008 | INSERT;
 }

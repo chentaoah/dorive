@@ -17,6 +17,7 @@ public interface Attribute {
     String FIELD_ATTRIBUTE = "field";
     String ALIAS_ATTRIBUTE = "alias";
     String BIND_ATTRIBUTE = "bind";
+    String BIND_EXP_ATTRIBUTE = "bindExp";
     String BIND_ALIAS_ATTRIBUTE = "bindAlias";
     String PROPERTY_ATTRIBUTE = "property";
     String CONVERTER_ATTRIBUTE = "converter";
