@@ -89,6 +89,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         for (EntityBinder entityBinder : configuredRepository.getBoundEntityBinders()) {
             String columnName = entityBinder.getColumnName();
             Object queryParameter = entityBinder.getBoundValue(boundedContext, rootEntity);
+            if (queryParameter instanceof Collection) {
+                queryParameter = !((Collection<?>) queryParameter).isEmpty() ? queryParameter : null;
+            }
             if (queryParameter != null) {
                 entityExample.eq(columnName, queryParameter);
             } else {

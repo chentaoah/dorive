@@ -64,12 +64,11 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
             for (int index = 0; index < rootEntities.size(); index++) {
                 Object rootEntity = rootEntities.get(index);
                 Object queryParameter = entityBinder.getBoundValue(boundedContext, rootEntity);
-                if (queryParameter != null) {
-                    if (queryParameter instanceof Collection) {
-                        fieldValues.addAll((Collection<?>) queryParameter);
-                    } else {
-                        fieldValues.add(queryParameter);
-                    }
+                if (queryParameter instanceof Collection) {
+                    fieldValues.addAll((Collection<?>) queryParameter);
+
+                } else if (queryParameter != null) {
+                    fieldValues.add(queryParameter);
                 }
                 ForeignKey foreignKey = foreignKeys.get(index);
                 foreignKey.mergeFieldValue(columnName, queryParameter);
