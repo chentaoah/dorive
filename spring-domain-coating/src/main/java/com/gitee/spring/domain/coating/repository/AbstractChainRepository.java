@@ -134,10 +134,10 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         });
     }
 
-    protected List<Object> collectFieldValues(BoundedContext boundedContext, List<Object> entities, PropertyEntityBinder propertyEntityBinder) {
+    protected List<Object> collectFieldValues(BoundedContext boundedContext, List<Object> entities, EntityBinder entityBinder) {
         List<Object> fieldValues = new ArrayList<>();
         for (Object entity : entities) {
-            Object fieldValue = propertyEntityBinder.getFieldValue(boundedContext, entity);
+            Object fieldValue = entityBinder.getFieldValue(boundedContext, entity);
             if (fieldValue != null) {
                 fieldValues.add(fieldValue);
             }
