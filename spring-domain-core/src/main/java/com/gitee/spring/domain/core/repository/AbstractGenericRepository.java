@@ -214,16 +214,12 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     public int updateByExample(BoundedContext boundedContext, Object entity, Object example) {
         Assert.notNull(entity, "The entity cannot be null!");
         int totalCount = 0;
-        boolean ignoreRoot = boundedContext.containsKey("#ignoreRoot");
-        if (ignoreRoot) {
-            boundedContext.remove("#ignoreRoot");
-        }
-        if (!ignoreRoot && isMatchScenes(boundedContext, getRootRepository())) {
-            totalCount += getRootRepository().updateByExample(boundedContext, entity, example);
-        }
-        for (ConfiguredRepository configuredRepository : getSubRepositories()) {
+        for (ConfiguredRepository configuredRepository : getOrderedRepositories()) {
             if (isMatchScenes(boundedContext, configuredRepository)) {
-                totalCount += configuredRepository.updateByExample(boundedContext, entity, example);
+                int contextEntityState = entityStateResolver.resolveEntityStateByContext(boundedContext, configuredRepository);
+                if (contextEntityState == EntityState.NONE) {
+                    totalCount += configuredRepository.updateByExample(boundedContext, entity, example);
+                }
             }
         }
         return totalCount;
@@ -248,16 +244,12 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     @Override
     public int deleteByExample(BoundedContext boundedContext, Object example) {
         int totalCount = 0;
-        boolean ignoreRoot = boundedContext.containsKey("#ignoreRoot");
-        if (ignoreRoot) {
-            boundedContext.remove("#ignoreRoot");
-        }
-        if (!ignoreRoot && isMatchScenes(boundedContext, getRootRepository())) {
-            totalCount += getRootRepository().deleteByExample(boundedContext, example);
-        }
-        for (ConfiguredRepository configuredRepository : getSubRepositories()) {
+        for (ConfiguredRepository configuredRepository : getOrderedRepositories()) {
             if (isMatchScenes(boundedContext, configuredRepository)) {
-                totalCount += configuredRepository.deleteByExample(boundedContext, example);
+                int contextEntityState = entityStateResolver.resolveEntityStateByContext(boundedContext, configuredRepository);
+                if (contextEntityState == EntityState.NONE) {
+                    totalCount += configuredRepository.deleteByExample(boundedContext, example);
+                }
             }
         }
         return totalCount;
