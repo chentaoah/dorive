@@ -6,7 +6,6 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -52,8 +51,8 @@ public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
 
     @Override
     public List<Object> selectByExample(BoundedContext boundedContext, Object example) {
-        if (example instanceof QueryWrapper) {
-            return baseMapper.selectList((QueryWrapper<Object>) example);
+        if (example instanceof Wrapper) {
+            return baseMapper.selectList((Wrapper<Object>) example);
 
         } else if (example instanceof Map) {
             return baseMapper.selectByMap((Map<String, Object>) example);
@@ -63,7 +62,7 @@ public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
 
     @Override
     public <T> T selectPageByExample(BoundedContext boundedContext, Object example, Object page) {
-        return (T) baseMapper.selectPage((IPage<Object>) page, (QueryWrapper<Object>) example);
+        return (T) baseMapper.selectPage((IPage<Object>) page, (Wrapper<Object>) example);
     }
 
     @Override
@@ -118,7 +117,7 @@ public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
 
     @Override
     public int deleteByExample(BoundedContext boundedContext, Object example) {
-        return baseMapper.delete((QueryWrapper<Object>) example);
+        return baseMapper.delete((Wrapper<Object>) example);
     }
 
 }
