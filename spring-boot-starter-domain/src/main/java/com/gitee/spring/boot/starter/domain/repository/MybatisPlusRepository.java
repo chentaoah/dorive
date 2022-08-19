@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings("unchecked")
 public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
@@ -81,9 +82,13 @@ public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
         if (primaryKey != null) {
             UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
             updateWrapper.eq("id", primaryKey);
+            Set<String> fieldNames = (Set<String>) boundedContext.get("#forceUpdate");
             for (Pair<String, String> fieldColumnPair : fieldColumnPairs) {
-                Object fieldValue = BeanUtil.getFieldValue(entity, fieldColumnPair.getKey());
-                updateWrapper.set(true, fieldColumnPair.getValue(), fieldValue);
+                String fieldName = fieldColumnPair.getKey();
+                Object fieldValue = BeanUtil.getFieldValue(entity, fieldName);
+                if (fieldValue != null || (fieldNames != null && fieldNames.contains(fieldName))) {
+                    updateWrapper.set(true, fieldColumnPair.getValue(), fieldValue);
+                }
             }
             return baseMapper.update(null, updateWrapper);
         }
