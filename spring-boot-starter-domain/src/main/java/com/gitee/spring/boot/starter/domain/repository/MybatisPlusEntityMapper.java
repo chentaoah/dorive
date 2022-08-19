@@ -85,8 +85,18 @@ public class MybatisPlusEntityMapper implements EntityMapper {
             ExampleBuilder exampleBuilder = operatorExampleBuilderMap.get(operator);
             exampleBuilder.appendCriterion(queryWrapper, StrUtil.toUnderlineCase(fieldName), fieldValue);
         }
-        String[] orderBy = entityExample.getOrderBy() != null ? entityExample.getOrderBy() : entityDefinition.getOrderBy();
-        String sort = entityExample.getSort() != null ? entityExample.getSort() : entityDefinition.getSort();
+        String[] orderBy;
+        if (entityExample.getOrderBy() != null) {
+            orderBy = entityExample.getOrderBy();
+        } else {
+            orderBy = entityDefinition.getOrderBy();
+        }
+        String sort;
+        if (entityExample.getSort() != null) {
+            sort = entityExample.getSort();
+        } else {
+            sort = entityDefinition.getSort();
+        }
         if (orderBy != null && sort != null) {
             if ("asc".equals(sort)) {
                 queryWrapper.orderByAsc(orderBy);
