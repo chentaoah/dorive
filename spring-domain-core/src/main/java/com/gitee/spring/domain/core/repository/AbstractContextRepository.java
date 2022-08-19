@@ -302,7 +302,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 entityClass, isCollection, genericEntityClass, fieldName,
                 attributes, idAttribute, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
-                boundColumns, false, new LinkedHashSet<>(), new LinkedHashMap<>());
+                boundColumns.toArray(new String[0]), false, new LinkedHashSet<>(), new LinkedHashMap<>());
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {
