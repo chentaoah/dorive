@@ -12,6 +12,8 @@ public interface BaseRepository<E, PK> extends IRepository<E, PK> {
 
     int insert(E entity);
 
+    int updateSelective(E entity);
+
     int update(E entity);
 
     int insertOrUpdate(E entity);

@@ -37,6 +37,11 @@ public class ProxyRepository extends AbstractRepository<Object, Object> {
     }
 
     @Override
+    public int updateSelective(BoundedContext boundedContext, Object entity) {
+        return proxyRepository.updateSelective(boundedContext, entity);
+    }
+
+    @Override
     public int update(BoundedContext boundedContext, Object entity) {
         return proxyRepository.update(boundedContext, entity);
     }

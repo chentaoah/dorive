@@ -50,6 +50,14 @@ public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
     }
 
     @Override
+    public int updateSelective(BoundedContext boundedContext, Object entity) {
+        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+        QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", primaryKey);
+        return baseMapper.update(entity, queryWrapper);
+    }
+    
+    @Override
     public int update(BoundedContext boundedContext, Object entity) {
         return baseMapper.updateById(entity);
     }
