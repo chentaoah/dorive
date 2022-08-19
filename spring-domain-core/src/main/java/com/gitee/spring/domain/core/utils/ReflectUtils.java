@@ -1,14 +1,9 @@
 package com.gitee.spring.domain.core.utils;
 
-import cn.hutool.core.util.ReflectUtil;
-
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ReflectUtils {
 
@@ -35,15 +30,6 @@ public class ReflectUtils {
         }
         Collections.reverse(superClasses);
         return superClasses;
-    }
-
-    public static Set<String> getFieldNames(Class<?> clazz) {
-        Field[] fields = ReflectUtil.getFields(clazz);
-        Set<String> fieldNames = new LinkedHashSet<>();
-        for (Field field : fields) {
-            fieldNames.add(field.getName());
-        }
-        return fieldNames;
     }
 
 }

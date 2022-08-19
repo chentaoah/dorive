@@ -2,7 +2,9 @@ package com.gitee.spring.boot.starter.domain.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Pair;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -11,28 +13,32 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.repository.AbstractRepository;
-import com.gitee.spring.domain.core.utils.ReflectUtils;
 
 import java.io.Serializable;
-import java.util.LinkedHashSet;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @SuppressWarnings("unchecked")
 public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
 
     protected EntityDefinition entityDefinition;
     protected BaseMapper<Object> baseMapper;
-    protected Set<Pair<String, String>> fieldColumnPairs;
+    protected List<Pair<String, String>> fieldColumnPairs;
 
     public MybatisPlusRepository(EntityDefinition entityDefinition) {
         this.entityDefinition = entityDefinition;
         this.baseMapper = (BaseMapper<Object>) entityDefinition.getMapper();
         Class<?> pojoClass = entityDefinition.getPojoClass();
         if (pojoClass != null) {
-            this.fieldColumnPairs = new LinkedHashSet<>();
-            for (String fieldName : ReflectUtils.getFieldNames(pojoClass)) {
+            this.fieldColumnPairs = new ArrayList<>();
+            for (Field field : ReflectUtil.getFields(pojoClass)) {
+                boolean isTableId = field.isAnnotationPresent(TableId.class);
+                String fieldName = field.getName();
+                if (isTableId || "id".equals(fieldName)) {
+                    continue;
+                }
                 fieldColumnPairs.add(new Pair<>(fieldName, StrUtil.toUnderlineCase(fieldName)));
             }
         }
@@ -79,7 +85,7 @@ public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
                 Object fieldValue = BeanUtil.getFieldValue(entity, fieldColumnPair.getKey());
                 updateWrapper.set(true, fieldColumnPair.getValue(), fieldValue);
             }
-            return baseMapper.update(entity, updateWrapper);
+            return baseMapper.update(null, updateWrapper);
         }
         return 0;
     }
