@@ -343,7 +343,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         ConfiguredRepository configuredRepository = new ConfiguredRepository(
                 (AbstractRepository<Object, Object>) repository,
                 entityPropertyChain, entityDefinition,
-                allEntityBinders, boundEntityBinders, contextEntityBinders, null, boundIdEntityBinder,
+                allEntityBinders, boundEntityBinders, contextEntityBinders, new ArrayList<>(), boundIdEntityBinder,
                 entityMapper, entityAssembler);
 
         return postProcessRepository(configuredRepository);
@@ -386,7 +386,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 prefixAccessPath = "/";
             }
 
-            List<EntityBinder> boundValueEntityBinders = new ArrayList<>();
+            List<EntityBinder> boundValueEntityBinders = configuredRepository.getBoundValueEntityBinders();
             for (EntityBinder entityBinder : configuredRepository.getAllEntityBinders()) {
                 BindingDefinition bindingDefinition = entityBinder.getBindingDefinition();
 
@@ -413,7 +413,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                     boundValueEntityBinders.add(entityBinder);
                 }
             }
-            configuredRepository.setBoundValueEntityBinders(boundValueEntityBinders);
         });
     }
 
