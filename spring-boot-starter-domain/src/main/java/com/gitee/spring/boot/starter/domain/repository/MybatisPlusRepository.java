@@ -1,26 +1,41 @@
 package com.gitee.spring.boot.starter.domain.repository;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Pair;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.repository.AbstractRepository;
+import com.gitee.spring.domain.core.utils.ReflectUtils;
 
 import java.io.Serializable;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings("unchecked")
 public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
 
     protected EntityDefinition entityDefinition;
     protected BaseMapper<Object> baseMapper;
+    protected Set<Pair<String, String>> fieldColumnPairs;
 
-    public MybatisPlusRepository(EntityDefinition entityDefinition, BaseMapper<Object> baseMapper) {
+    public MybatisPlusRepository(EntityDefinition entityDefinition) {
         this.entityDefinition = entityDefinition;
-        this.baseMapper = baseMapper;
+        this.baseMapper = (BaseMapper<Object>) entityDefinition.getMapper();
+        Class<?> pojoClass = entityDefinition.getPojoClass();
+        if (pojoClass != null) {
+            this.fieldColumnPairs = new LinkedHashSet<>();
+            for (String fieldName : ReflectUtils.getFieldNames(pojoClass)) {
+                fieldColumnPairs.add(new Pair<>(fieldName, StrUtil.toUnderlineCase(fieldName)));
+            }
+        }
     }
 
     @Override
@@ -51,20 +66,27 @@ public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
 
     @Override
     public int updateSelective(BoundedContext boundedContext, Object entity) {
-        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-        QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", primaryKey);
-        return baseMapper.update(entity, queryWrapper);
-    }
-    
-    @Override
-    public int update(BoundedContext boundedContext, Object entity) {
         return baseMapper.updateById(entity);
     }
 
     @Override
+    public int update(BoundedContext boundedContext, Object entity) {
+        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+        if (primaryKey != null) {
+            UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.eq("id", primaryKey);
+            for (Pair<String, String> fieldColumnPair : fieldColumnPairs) {
+                Object fieldValue = BeanUtil.getFieldValue(entity, fieldColumnPair.getKey());
+                updateWrapper.set(true, fieldColumnPair.getValue(), fieldValue);
+            }
+            return baseMapper.update(entity, updateWrapper);
+        }
+        return 0;
+    }
+
+    @Override
     public int updateByExample(BoundedContext boundedContext, Object entity, Object example) {
-        return baseMapper.update(entity, (QueryWrapper<Object>) example);
+        return baseMapper.update(entity, (Wrapper<Object>) example);
     }
 
     @Override
