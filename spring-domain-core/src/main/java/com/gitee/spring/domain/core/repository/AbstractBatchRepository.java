@@ -3,11 +3,20 @@ package com.gitee.spring.domain.core.repository;
 import com.gitee.spring.domain.core.api.EntityBinder;
 import com.gitee.spring.domain.core.api.EntityIndex;
 import com.gitee.spring.domain.core.api.EntityProperty;
-import com.gitee.spring.domain.core.entity.*;
+import com.gitee.spring.domain.core.api.ForeignKey;
+import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.EntityExample;
+import com.gitee.spring.domain.core.entity.EntityPropertyChain;
+import com.gitee.spring.domain.core.entity.MultipleForeignKey;
+import com.gitee.spring.domain.core.entity.SingleForeignKey;
 import com.gitee.spring.domain.core.impl.DefaultEntityIndex;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepository<E, PK> {
@@ -55,9 +64,6 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
     protected EntityExample newExampleByRootEntities(BoundedContext boundedContext, List<Object> rootEntities,
                                                      ConfiguredRepository configuredRepository, List<ForeignKey> foreignKeys) {
         EntityExample entityExample = new EntityExample();
-        for (Object rootEntity : rootEntities) {
-            foreignKeys.add(buildForeignKey(rootEntity, configuredRepository));
-        }
         for (EntityBinder entityBinder : configuredRepository.getBoundEntityBinders()) {
             String columnName = entityBinder.getColumnName();
             List<Object> fieldValues = new ArrayList<>();
@@ -71,6 +77,10 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                     fieldValues.add(queryParameter);
                 }
                 ForeignKey foreignKey = foreignKeys.get(index);
+                if (foreignKey == null) {
+                    foreignKey = buildForeignKey(queryParameter, configuredRepository);
+                    foreignKeys.add(foreignKey);
+                }
                 foreignKey.mergeFieldValue(columnName, queryParameter);
             }
             if (!fieldValues.isEmpty()) {
@@ -86,8 +96,14 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
         return entityExample;
     }
 
-    protected ForeignKey buildForeignKey(Object rootEntity, ConfiguredRepository configuredRepository) {
-        return new ForeignKey(rootEntity, configuredRepository);
+    protected ForeignKey buildForeignKey(Object queryParameter, ConfiguredRepository configuredRepository) {
+        if (queryParameter instanceof Collection) {
+            return new MultipleForeignKey(new ArrayList<>(((Collection<?>) queryParameter).size()));
+
+        } else if (configuredRepository.getBoundEntityBinders().size() == 1) {
+            return new SingleForeignKey();
+        }
+        return new MultipleForeignKey(new ArrayList<>(1));
     }
 
     protected EntityIndex buildEntityIndex(BoundedContext boundedContext, List<Object> entities, ConfiguredRepository configuredRepository) {

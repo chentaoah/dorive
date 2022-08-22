@@ -2,8 +2,8 @@ package com.gitee.spring.domain.core.impl;
 
 import com.gitee.spring.domain.core.api.EntityBinder;
 import com.gitee.spring.domain.core.api.EntityIndex;
+import com.gitee.spring.domain.core.api.ForeignKey;
 import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.ForeignKey;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 
 import java.util.ArrayList;
@@ -49,25 +49,24 @@ public class DefaultEntityIndex implements EntityIndex {
     @Override
     @SuppressWarnings("unchecked")
     public List<Object> selectList(Object rootEntity, ForeignKey foreignKey) {
-        List<String> keys = foreignKey.getKeys();
-        if (keys.isEmpty()) {
+        if (foreignKey.isEmpty()) {
             return Collections.emptyList();
 
-        } else if (keys.size() == 1) {
-            Object existEntity = entitiesMap.get(keys.get(0));
-            if (existEntity != null) {
-                if (existEntity instanceof Collection) {
-                    return (List<Object>) existEntity;
-                } else {
-                    return Collections.singletonList(existEntity);
-                }
+        } else if (foreignKey.size() == 1) {
+            Object existEntity = entitiesMap.get(foreignKey.getKey(0));
+            if (existEntity instanceof Collection) {
+                return (List<Object>) existEntity;
+
+            } else if (existEntity != null) {
+                return Collections.singletonList(existEntity);
+
             } else {
                 return Collections.emptyList();
             }
-
         } else {
             List<Object> fieldValues = new ArrayList<>();
-            for (String key : keys) {
+            for (int index = 0; index < foreignKey.size(); index++) {
+                String key = foreignKey.getKey(index);
                 Object existEntity = entitiesMap.get(key);
                 if (existEntity != null) {
                     if (existEntity instanceof Collection) {
