@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core.entity;
+package com.gitee.spring.domain.core.impl.key;
 
 import com.gitee.spring.domain.core.api.ForeignKey;
 

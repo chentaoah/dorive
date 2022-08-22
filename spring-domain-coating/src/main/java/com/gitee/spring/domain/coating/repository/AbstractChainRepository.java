@@ -8,7 +8,7 @@ import com.gitee.spring.domain.coating.entity.RepositoryDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
 import com.gitee.spring.domain.coating.impl.DefaultCoatingAssembler;
 import com.gitee.spring.domain.core.api.EntityBinder;
-import com.gitee.spring.domain.core.binder.PropertyEntityBinder;
+import com.gitee.spring.domain.core.impl.binder.PropertyEntityBinder;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityCriterion;

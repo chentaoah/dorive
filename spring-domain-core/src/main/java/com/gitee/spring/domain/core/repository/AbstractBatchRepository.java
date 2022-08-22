@@ -7,8 +7,8 @@ import com.gitee.spring.domain.core.api.ForeignKey;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityExample;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
-import com.gitee.spring.domain.core.entity.MultipleForeignKey;
-import com.gitee.spring.domain.core.entity.SingleForeignKey;
+import com.gitee.spring.domain.core.impl.key.MultipleForeignKey;
+import com.gitee.spring.domain.core.impl.key.SingleForeignKey;
 import com.gitee.spring.domain.core.impl.DefaultEntityIndex;
 import lombok.extern.slf4j.Slf4j;
 

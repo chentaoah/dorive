@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core.binder;
+package com.gitee.spring.domain.core.impl.binder;
 
 import com.gitee.spring.domain.core.api.EntityBinder;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
