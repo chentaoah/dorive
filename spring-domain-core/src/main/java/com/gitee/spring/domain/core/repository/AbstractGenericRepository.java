@@ -136,6 +136,11 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
     }
 
     @Override
+    public int updateSelective(BoundedContext boundedContext, E entity) {
+        return operateEntityByState(boundedContext, entity, EntityState.UPDATE_SELECTIVE);
+    }
+
+    @Override
     public int update(BoundedContext boundedContext, E entity) {
         return operateEntityByState(boundedContext, entity, EntityState.UPDATE);
     }
@@ -160,6 +165,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
                             getBoundValueFromContext(boundedContext, entity, configuredRepository, eachEntity);
                             totalCount += configuredRepository.insert(boundedContext, eachEntity);
 
+                        } else if (entityState == EntityState.UPDATE_SELECTIVE) {
+                            totalCount += configuredRepository.updateSelective(boundedContext, eachEntity);
+
                         } else if (entityState == EntityState.UPDATE) {
                             totalCount += configuredRepository.update(boundedContext, eachEntity);
 
@@ -178,6 +186,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
                         getBoundValueFromContext(boundedContext, entity, configuredRepository, targetEntity);
                         totalCount += configuredRepository.insert(boundedContext, targetEntity);
                         setBoundIdForBoundEntity(boundedContext, entity, configuredRepository, targetEntity);
+
+                    } else if (entityState == EntityState.UPDATE_SELECTIVE) {
+                        totalCount += configuredRepository.updateSelective(boundedContext, targetEntity);
 
                     } else if (entityState == EntityState.UPDATE) {
                         totalCount += configuredRepository.update(boundedContext, targetEntity);

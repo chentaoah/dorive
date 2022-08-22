@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core.mapper;
+package com.gitee.spring.domain.core.impl.mapper;
 
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;

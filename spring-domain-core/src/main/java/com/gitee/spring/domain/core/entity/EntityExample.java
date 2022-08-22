@@ -7,14 +7,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
 public class EntityExample {
 
     protected boolean emptyQuery = false;
-    protected Set<String> selectColumns;
+    protected String[] selectColumns;
     protected List<EntityCriterion> entityCriteria = new ArrayList<>();
     protected String[] orderBy;
     protected String sort;
@@ -25,6 +24,10 @@ public class EntityExample {
 
     public boolean isAllQuery() {
         return !emptyQuery && !isDirtyQuery();
+    }
+
+    public void setSelectColumns(String... columns) {
+        selectColumns = StringUtils.toUnderlineCase(columns);
     }
 
     public void addCriterion(EntityCriterion entityCriterion) {

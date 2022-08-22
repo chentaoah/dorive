@@ -6,7 +6,6 @@ import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
-import com.gitee.spring.domain.core.entity.EntityExample;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -91,16 +90,27 @@ public class DefaultRepository extends ProxyRepository {
     }
 
     @Override
-    public int update(BoundedContext boundedContext, Object entity) {
+    public int updateSelective(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-        return primaryKey != null ? doUpdate(boundedContext, entity, primaryKey) : 0;
+        if (primaryKey != null) {
+            Object persistentObject = entityAssembler.disassemble(boundedContext, entity);
+            if (persistentObject != null) {
+                return super.updateSelective(boundedContext, persistentObject);
+            }
+        }
+        return 0;
     }
 
-    protected int doUpdate(BoundedContext boundedContext, Object entity, Object primaryKey) {
-        EntityExample entityExample = new EntityExample();
-        entityExample.eq("id", primaryKey);
-        Object example = entityMapper.buildExample(boundedContext, entityExample);
-        return updateByExample(boundedContext, entity, example);
+    @Override
+    public int update(BoundedContext boundedContext, Object entity) {
+        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+        if (primaryKey != null) {
+            Object persistentObject = entityAssembler.disassemble(boundedContext, entity);
+            if (persistentObject != null) {
+                return super.update(boundedContext, persistentObject);
+            }
+        }
+        return 0;
     }
 
     @Override
@@ -122,7 +132,7 @@ public class DefaultRepository extends ProxyRepository {
         if (primaryKey == null) {
             return insert(boundedContext, entity);
         } else {
-            return doUpdate(boundedContext, entity, primaryKey);
+            return update(boundedContext, entity);
         }
     }
 

@@ -28,6 +28,11 @@ public abstract class AbstractRepository<E, PK> implements BaseRepository<E, PK>
     }
 
     @Override
+    public int updateSelective(E entity) {
+        return updateSelective(new BoundedContext(), entity);
+    }
+
+    @Override
     public int update(E entity) {
         return update(new BoundedContext(), entity);
     }

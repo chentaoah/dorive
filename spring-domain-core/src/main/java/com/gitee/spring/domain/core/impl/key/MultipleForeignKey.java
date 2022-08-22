@@ -1,6 +1,7 @@
-package com.gitee.spring.domain.core.entity;
+package com.gitee.spring.domain.core.impl.key;
 
-import com.gitee.spring.domain.core.repository.ConfiguredRepository;
+import com.gitee.spring.domain.core.api.ForeignKey;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -8,23 +9,30 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
-public class ForeignKey {
-    
-    protected Object rootEntity;
-    protected ConfiguredRepository configuredRepository;
+@AllArgsConstructor
+public class MultipleForeignKey implements ForeignKey {
+
     protected List<String> keys;
 
-    public ForeignKey(Object rootEntity, ConfiguredRepository configuredRepository) {
-        this.rootEntity = rootEntity;
-        this.configuredRepository = configuredRepository;
+    @Override
+    public int size() {
+        return keys.size();
     }
 
+    @Override
+    public boolean isEmpty() {
+        return keys.isEmpty();
+    }
+
+    @Override
+    public String getKey(int index) {
+        return keys.get(index);
+    }
+
+    @Override
     public void mergeFieldValue(String fieldName, Object fieldValue) {
         if (fieldValue instanceof Collection) {
             Collection<?> fieldValues = (Collection<?>) fieldValue;
-            if (keys == null) {
-                keys = new ArrayList<>(fieldValues.size());
-            }
             if (keys.isEmpty()) {
                 for (Object eachFieldValue : fieldValues) {
                     keys.add(fieldName + ": " + eachFieldValue);
@@ -39,9 +47,6 @@ public class ForeignKey {
                 keys = newKeys;
             }
         } else {
-            if (keys == null) {
-                keys = new ArrayList<>(1);
-            }
             if (keys.isEmpty()) {
                 keys.add(fieldName + ": " + fieldValue);
             } else {

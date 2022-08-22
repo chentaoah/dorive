@@ -5,7 +5,18 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.spring.boot.starter.domain.api.ExampleBuilder;
-import com.gitee.spring.boot.starter.domain.builder.*;
+import com.gitee.spring.boot.starter.domain.builder.EQExampleBuilder;
+import com.gitee.spring.boot.starter.domain.builder.GEExampleBuilder;
+import com.gitee.spring.boot.starter.domain.builder.GTExampleBuilder;
+import com.gitee.spring.boot.starter.domain.builder.InExampleBuilder;
+import com.gitee.spring.boot.starter.domain.builder.IsNotNullExampleBuilder;
+import com.gitee.spring.boot.starter.domain.builder.IsNullExampleBuilder;
+import com.gitee.spring.boot.starter.domain.builder.LEExampleBuilder;
+import com.gitee.spring.boot.starter.domain.builder.LTExampleBuilder;
+import com.gitee.spring.boot.starter.domain.builder.LikeExampleBuilder;
+import com.gitee.spring.boot.starter.domain.builder.NEExampleBuilder;
+import com.gitee.spring.boot.starter.domain.builder.NotInExampleBuilder;
+import com.gitee.spring.boot.starter.domain.builder.NotLikeExampleBuilder;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.entity.BoundedContext;
@@ -15,7 +26,6 @@ import com.gitee.spring.domain.core.entity.EntityExample;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MybatisPlusEntityMapper implements EntityMapper {
@@ -64,9 +74,9 @@ public class MybatisPlusEntityMapper implements EntityMapper {
     @Override
     public Object buildExample(BoundedContext boundedContext, EntityExample entityExample) {
         QueryWrapper<?> queryWrapper = new QueryWrapper<>();
-        Set<String> selectColumns = entityExample.getSelectColumns();
+        String[] selectColumns = entityExample.getSelectColumns();
         if (selectColumns != null) {
-            queryWrapper.select(selectColumns.toArray(new String[0]));
+            queryWrapper.select(selectColumns);
         }
         for (EntityCriterion entityCriterion : entityExample.getEntityCriteria()) {
             String fieldName = entityCriterion.getFieldName();
@@ -75,8 +85,18 @@ public class MybatisPlusEntityMapper implements EntityMapper {
             ExampleBuilder exampleBuilder = operatorExampleBuilderMap.get(operator);
             exampleBuilder.appendCriterion(queryWrapper, StrUtil.toUnderlineCase(fieldName), fieldValue);
         }
-        String[] orderBy = entityExample.getOrderBy() != null ? entityExample.getOrderBy() : entityDefinition.getOrderBy();
-        String sort = entityExample.getSort() != null ? entityExample.getSort() : entityDefinition.getSort();
+        String[] orderBy;
+        if (entityExample.getOrderBy() != null) {
+            orderBy = entityExample.getOrderBy();
+        } else {
+            orderBy = entityDefinition.getOrderBy();
+        }
+        String sort;
+        if (entityExample.getSort() != null) {
+            sort = entityExample.getSort();
+        } else {
+            sort = entityDefinition.getSort();
+        }
         if (orderBy != null && sort != null) {
             if ("asc".equals(sort)) {
                 queryWrapper.orderByAsc(orderBy);

@@ -1,6 +1,5 @@
 package com.gitee.spring.boot.starter.domain.repository;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.repository.AbstractRepository;
@@ -16,10 +15,8 @@ public class MybatisPlusGenericRepository<E, PK extends Serializable> extends Ab
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected AbstractRepository<Object, Object> newRepository(EntityDefinition entityDefinition) {
-        BaseMapper<Object> baseMapper = (BaseMapper<Object>) entityDefinition.getMapper();
-        return new MybatisPlusRepository(entityDefinition, baseMapper);
+        return new MybatisPlusRepository(entityDefinition);
     }
 
 }

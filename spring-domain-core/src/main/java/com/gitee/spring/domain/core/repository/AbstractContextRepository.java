@@ -9,9 +9,9 @@ import com.gitee.spring.domain.core.api.EntityAssembler;
 import com.gitee.spring.domain.core.api.EntityBinder;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.api.PropertyConverter;
-import com.gitee.spring.domain.core.binder.AbstractEntityBuilder;
-import com.gitee.spring.domain.core.binder.ContextEntityBinder;
-import com.gitee.spring.domain.core.binder.PropertyEntityBinder;
+import com.gitee.spring.domain.core.impl.binder.AbstractEntityBuilder;
+import com.gitee.spring.domain.core.impl.binder.ContextEntityBinder;
+import com.gitee.spring.domain.core.impl.binder.PropertyEntityBinder;
 import com.gitee.spring.domain.core.constants.Attribute;
 import com.gitee.spring.domain.core.entity.BindingDefinition;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
@@ -19,7 +19,7 @@ import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.impl.DefaultEntityAssembler;
 import com.gitee.spring.domain.core.impl.DefaultPropertyConverter;
 import com.gitee.spring.domain.core.impl.EntityPropertiesResolver;
-import com.gitee.spring.domain.core.mapper.MapEntityMapper;
+import com.gitee.spring.domain.core.impl.mapper.MapEntityMapper;
 import com.gitee.spring.domain.core.utils.PathUtils;
 import com.gitee.spring.domain.core.utils.ReflectUtils;
 import lombok.Data;
@@ -302,7 +302,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 entityClass, isCollection, genericEntityClass, fieldName,
                 attributes, idAttribute, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
-                boundColumns, false, new LinkedHashSet<>(), new LinkedHashMap<>());
+                boundColumns.toArray(new String[0]), false, new LinkedHashSet<>(), new LinkedHashMap<>());
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {
@@ -343,7 +343,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         ConfiguredRepository configuredRepository = new ConfiguredRepository(
                 (AbstractRepository<Object, Object>) repository,
                 entityPropertyChain, entityDefinition,
-                allEntityBinders, boundEntityBinders, contextEntityBinders, null, boundIdEntityBinder,
+                allEntityBinders, boundEntityBinders, contextEntityBinders, new ArrayList<>(), boundIdEntityBinder,
                 entityMapper, entityAssembler);
 
         return postProcessRepository(configuredRepository);
@@ -386,7 +386,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 prefixAccessPath = "/";
             }
 
-            List<EntityBinder> boundValueEntityBinders = new ArrayList<>();
+            List<EntityBinder> boundValueEntityBinders = configuredRepository.getBoundValueEntityBinders();
             for (EntityBinder entityBinder : configuredRepository.getAllEntityBinders()) {
                 BindingDefinition bindingDefinition = entityBinder.getBindingDefinition();
 
@@ -413,7 +413,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                     boundValueEntityBinders.add(entityBinder);
                 }
             }
-            configuredRepository.setBoundValueEntityBinders(boundValueEntityBinders);
         });
     }
 

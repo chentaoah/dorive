@@ -32,7 +32,7 @@ public class EntityDefinition {
     private String[] orderBy;
     private String sort;
     private int orderAttribute;
-    private Set<String> boundColumns;
+    private String[] boundColumns;
     private boolean boundEntity;
     private Set<String> fieldNames;
     private Map<String, EntityPropertyChain> entityPropertyChainMap;

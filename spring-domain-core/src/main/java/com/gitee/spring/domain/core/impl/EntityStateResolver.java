@@ -13,8 +13,8 @@ public class EntityStateResolver {
         String idAttribute = entityDefinition.getIdAttribute();
         if (idAttribute != null) {
             Object boundValue = boundedContext.get(idAttribute);
-            if ("#ignore".equals(boundValue)) {
-                return EntityState.IGNORE;
+            if ("#forceIgnore".equals(boundValue)) {
+                return EntityState.FORCE_IGNORE;
 
             } else if ("#forceInsert".equals(boundValue)) {
                 return EntityState.FORCE_INSERT;
@@ -24,8 +24,8 @@ public class EntityStateResolver {
     }
 
     public int resolveEntityState(int expectedEntityState, int contextEntityState, Object entity) {
-        if (contextEntityState == EntityState.IGNORE) {
-            return EntityState.IGNORE;
+        if (contextEntityState == EntityState.FORCE_IGNORE) {
+            return EntityState.FORCE_IGNORE;
 
         } else if (contextEntityState == EntityState.FORCE_INSERT) {
             return expectedEntityState & contextEntityState;
@@ -35,7 +35,7 @@ public class EntityStateResolver {
 
         } else {
             Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-            contextEntityState = primaryKey == null ? EntityState.INSERT : EntityState.UPDATE_OR_DELETE;
+            contextEntityState = primaryKey == null ? EntityState.INSERT : EntityState.UPDATE_SELECTIVE_OR_UPDATE_OR_DELETE;
             return expectedEntityState & contextEntityState;
         }
     }

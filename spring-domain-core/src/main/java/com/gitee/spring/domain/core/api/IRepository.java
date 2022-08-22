@@ -14,6 +14,8 @@ public interface IRepository<E, PK> {
 
     int insert(BoundedContext boundedContext, E entity);
 
+    int updateSelective(BoundedContext boundedContext, E entity);
+
     int update(BoundedContext boundedContext, E entity);
 
     int updateByExample(BoundedContext boundedContext, Object entity, Object example);
