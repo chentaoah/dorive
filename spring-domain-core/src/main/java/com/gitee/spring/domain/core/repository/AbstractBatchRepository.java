@@ -7,6 +7,7 @@ import com.gitee.spring.domain.core.api.ForeignKey;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityExample;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
+import com.gitee.spring.domain.core.impl.binder.PropertyEntityBinder;
 import com.gitee.spring.domain.core.impl.key.MultipleForeignKey;
 import com.gitee.spring.domain.core.impl.key.SingleForeignKey;
 import com.gitee.spring.domain.core.impl.DefaultEntityIndex;
@@ -64,7 +65,9 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
     protected EntityExample newExampleByRootEntities(BoundedContext boundedContext, List<Object> rootEntities,
                                                      ConfiguredRepository configuredRepository, List<ForeignKey> foreignKeys) {
         EntityExample entityExample = new EntityExample();
-        for (EntityBinder entityBinder : configuredRepository.getBoundEntityBinders()) {
+        List<PropertyEntityBinder> boundEntityBinders = configuredRepository.getBoundEntityBinders();
+        for (int binderIndex = 0; binderIndex < boundEntityBinders.size(); binderIndex++) {
+            EntityBinder entityBinder = boundEntityBinders.get(binderIndex);
             String columnName = entityBinder.getColumnName();
             List<Object> fieldValues = new ArrayList<>();
             for (int index = 0; index < rootEntities.size(); index++) {
@@ -76,10 +79,12 @@ public abstract class AbstractBatchRepository<E, PK> extends AbstractGenericRepo
                 } else if (queryParameter != null) {
                     fieldValues.add(queryParameter);
                 }
-                ForeignKey foreignKey = foreignKeys.get(index);
-                if (foreignKey == null) {
+                ForeignKey foreignKey;
+                if (binderIndex == 0) {
                     foreignKey = buildForeignKey(queryParameter, configuredRepository);
                     foreignKeys.add(foreignKey);
+                } else {
+                    foreignKey = foreignKeys.get(index);
                 }
                 foreignKey.mergeFieldValue(columnName, queryParameter);
             }
