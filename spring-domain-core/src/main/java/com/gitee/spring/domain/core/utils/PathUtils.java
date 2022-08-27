@@ -21,11 +21,10 @@ public class PathUtils {
     }
 
     public static String getBelongPath(Set<String> allAccessPath, String accessPath) {
-        String lastAccessPath = getLastAccessPath(accessPath);
-        while (!allAccessPath.contains(lastAccessPath) && !"/".equals(lastAccessPath)) {
-            lastAccessPath = PathUtils.getLastAccessPath(lastAccessPath);
+        while (!allAccessPath.contains(accessPath) && !"/".equals(accessPath)) {
+            accessPath = PathUtils.getLastAccessPath(accessPath);
         }
-        return lastAccessPath;
+        return accessPath;
     }
 
 }

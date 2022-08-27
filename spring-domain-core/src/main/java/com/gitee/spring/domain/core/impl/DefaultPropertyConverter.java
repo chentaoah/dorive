@@ -39,4 +39,9 @@ public class DefaultPropertyConverter implements PropertyConverter {
         }
     }
 
+    @Override
+    public Object reverseConvert(BoundedContext boundedContext, Object property) {
+        return property;
+    }
+    
 }

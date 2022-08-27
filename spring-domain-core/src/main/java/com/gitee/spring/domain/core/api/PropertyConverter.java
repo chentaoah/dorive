@@ -6,4 +6,6 @@ public interface PropertyConverter {
 
     Object convert(BoundedContext boundedContext, Object property);
 
+    Object reverseConvert(BoundedContext boundedContext, Object property);
+
 }

@@ -240,7 +240,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             boolean isBoundId = !isFromContext && isIdField;
 
             if (!isFromContext && StringUtils.isBlank(bindAliasAttribute)) {
-                bindAliasAttribute = PathUtils.getFieldName(bindAttribute);
+                if (StringUtils.isBlank(propertyAttribute)) {
+                    bindAliasAttribute = PathUtils.getFieldName(bindAttribute);
+                } else {
+                    bindAliasAttribute = propertyAttribute;
+                }
             }
 
             if (!isFromContext) {
