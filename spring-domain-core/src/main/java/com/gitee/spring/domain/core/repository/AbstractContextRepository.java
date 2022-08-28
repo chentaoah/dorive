@@ -235,26 +235,22 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 bindExpAttribute = bindAttribute;
             }
 
-            boolean isFromContext = !bindAttribute.startsWith("/");
+            boolean isBindProperty = bindAttribute.startsWith("/");
             boolean isIdField = "id".equals(fieldAttribute);
-            boolean isBoundId = !isFromContext && isIdField;
+            boolean isBoundId = isBindProperty && isIdField;
 
-            if (!isFromContext && StringUtils.isBlank(bindAliasAttribute)) {
-                if (StringUtils.isBlank(propertyAttribute)) {
-                    bindAliasAttribute = PathUtils.getFieldName(bindAttribute);
-                } else {
-                    bindAliasAttribute = propertyAttribute;
-                }
+            if (isBindProperty && StringUtils.isBlank(bindAliasAttribute)) {
+                bindAliasAttribute = StringUtils.isBlank(propertyAttribute) ? PathUtils.getFieldName(bindAttribute) : propertyAttribute;
             }
 
-            if (!isFromContext) {
+            if (isBindProperty) {
                 boundColumns.add(StrUtil.toUnderlineCase(aliasAttribute));
             }
 
             BindingDefinition bindingDefinition = new BindingDefinition(
                     bindingAttributes, fieldAttribute, aliasAttribute, bindAttribute, bindExpAttribute, bindAliasAttribute, propertyAttribute);
 
-            if (!isFromContext) {
+            if (isBindProperty) {
                 String belongAccessPath = PathUtils.getBelongPath(allConfiguredRepositoryMap.keySet(), bindAttribute);
                 ConfiguredRepository belongConfiguredRepository = allConfiguredRepositoryMap.get(belongAccessPath);
                 Assert.notNull(belongConfiguredRepository, "The belong repository cannot be null!");
@@ -286,6 +282,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
                 allEntityBinders.add(propertyEntityBinder);
                 boundEntityBinders.add(propertyEntityBinder);
+                
                 if (isBoundId) {
                     boundIdEntityBinder = propertyEntityBinder;
                 }
