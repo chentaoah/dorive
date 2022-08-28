@@ -30,6 +30,11 @@ public class PropertyEntityBinder extends AbstractEntityBuilder {
         this.propertyConverter = propertyConverter;
     }
 
+    public boolean isSameType() {
+        return boundEntityPropertyChain.getEntityClass() == fieldEntityPropertyChain.getEntityClass()
+                && boundEntityPropertyChain.getGenericEntityClass() == fieldEntityPropertyChain.getGenericEntityClass();
+    }
+
     @Override
     public Object getBoundValue(BoundedContext boundedContext, Object rootEntity) {
         Object boundValue = boundEntityPropertyChain.getValue(rootEntity);
