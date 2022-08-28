@@ -282,7 +282,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
                 allEntityBinders.add(propertyEntityBinder);
                 boundEntityBinders.add(propertyEntityBinder);
-                
+
                 if (isBoundId) {
                     boundIdEntityBinder = propertyEntityBinder;
                 }
@@ -300,10 +300,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         EntityDefinition entityDefinition = new EntityDefinition(
                 isAggregateRoot, accessPath, annotatedElement,
-                entityClass, isCollection, genericEntityClass, fieldName,
+                entityClass, isCollection, genericEntityClass, fieldName, ReflectUtils.getFieldNames(genericEntityClass),
                 attributes, idAttribute, sceneAttribute, mapper, pojoClass, sameType, mappedClass,
                 useEntityExample, mapAsExample, orderByAsc, orderByDesc, orderBy, sort, orderAttribute,
-                boundColumns.toArray(new String[0]), false, new LinkedHashSet<>(), new LinkedHashMap<>());
+                boundColumns.toArray(new String[0]), false);
 
         EntityMapper entityMapper = newEntityMapper(entityDefinition);
         if (mapAsExample) {
@@ -345,7 +345,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 (AbstractRepository<Object, Object>) repository,
                 entityPropertyChain, entityDefinition,
                 allEntityBinders, boundEntityBinders, contextEntityBinders, new ArrayList<>(), boundIdEntityBinder,
-                entityMapper, entityAssembler);
+                entityMapper, entityAssembler, new LinkedHashMap<>());
 
         return postProcessRepository(configuredRepository);
     }
@@ -357,16 +357,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected void postProcessAllRepositories() {
         Map<String, EntityPropertyChain> allEntityPropertyChainMap = entityPropertiesResolver.getAllEntityPropertyChainMap();
         allEntityPropertyChainMap.forEach((accessPath, entityPropertyChain) -> {
-            String belongAccessPath = PathUtils.getBelongPath(allConfiguredRepositoryMap.keySet(), accessPath);
+            String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
+            String belongAccessPath = PathUtils.getBelongPath(allConfiguredRepositoryMap.keySet(), lastAccessPath);
             ConfiguredRepository belongConfiguredRepository = allConfiguredRepositoryMap.get(belongAccessPath);
             Assert.notNull(belongConfiguredRepository, "The belong repository cannot be null!");
-            EntityDefinition entityDefinition = belongConfiguredRepository.getEntityDefinition();
-
-            Set<String> fieldNames = entityDefinition.getFieldNames();
-            fieldNames.add(entityPropertyChain.getFieldName());
-
-            Map<String, EntityPropertyChain> entityPropertyChainMap = entityDefinition.getEntityPropertyChainMap();
-            String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
+            Map<String, EntityPropertyChain> entityPropertyChainMap = belongConfiguredRepository.getEntityPropertyChainMap();
             EntityPropertyChain lastEntityPropertyChain = entityPropertyChainMap.get(lastAccessPath);
             EntityPropertyChain newEntityPropertyChain = new EntityPropertyChain(lastEntityPropertyChain, entityPropertyChain);
             entityPropertyChainMap.put(accessPath, newEntityPropertyChain);
@@ -374,15 +369,13 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         allConfiguredRepositoryMap.forEach((accessPath, configuredRepository) -> {
             EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
-            Set<String> fieldNames = entityDefinition.getFieldNames();
-            Map<String, EntityPropertyChain> entityPropertyChainMap = entityDefinition.getEntityPropertyChainMap();
+            Map<String, EntityPropertyChain> entityPropertyChainMap = configuredRepository.getEntityPropertyChainMap();
             String prefixAccessPath = entityDefinition.isAggregateRoot() ? "/" : entityDefinition.getAccessPath() + "/";
 
             if (entityPropertyChainMap.isEmpty() && entityDefinition.isCollection()) {
                 EntityPropertiesResolver entityPropertiesResolver = new EntityPropertiesResolver();
                 entityPropertiesResolver.resolveEntityProperties("", entityDefinition.getGenericEntityClass());
                 Map<String, EntityPropertyChain> subAllEntityPropertyChainMap = entityPropertiesResolver.getAllEntityPropertyChainMap();
-                subAllEntityPropertyChainMap.values().forEach(entityPropertyChain -> fieldNames.add(entityPropertyChain.getFieldName()));
                 entityPropertyChainMap.putAll(subAllEntityPropertyChainMap);
                 prefixAccessPath = "/";
             }
