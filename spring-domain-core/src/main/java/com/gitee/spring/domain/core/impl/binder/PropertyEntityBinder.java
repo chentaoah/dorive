@@ -44,13 +44,4 @@ public class PropertyEntityBinder extends AbstractEntityBuilder {
         boundEntityPropertyChain.setValue(rootEntity, property);
     }
 
-    @Override
-    public Object getFieldValue(BoundedContext boundedContext, Object entity) {
-        Object fieldValue = fieldEntityPropertyChain.getValue(entity);
-        if (fieldValue != null) {
-            fieldValue = propertyConverter.reverseConvert(boundedContext, fieldValue);
-        }
-        return fieldValue;
-    }
-
 }

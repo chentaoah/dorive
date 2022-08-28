@@ -8,20 +8,13 @@ import com.gitee.spring.domain.coating.entity.RepositoryDefinition;
 import com.gitee.spring.domain.coating.entity.RepositoryLocation;
 import com.gitee.spring.domain.coating.impl.DefaultCoatingAssembler;
 import com.gitee.spring.domain.core.api.EntityBinder;
+import com.gitee.spring.domain.core.api.PropertyConverter;
+import com.gitee.spring.domain.core.entity.*;
 import com.gitee.spring.domain.core.impl.binder.PropertyEntityBinder;
-import com.gitee.spring.domain.core.entity.BindingDefinition;
-import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.EntityCriterion;
-import com.gitee.spring.domain.core.entity.EntityDefinition;
-import com.gitee.spring.domain.core.entity.EntityExample;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
@@ -134,11 +127,13 @@ public abstract class AbstractChainRepository<E, PK> extends AbstractCoatingRepo
         });
     }
 
-    protected List<Object> collectFieldValues(BoundedContext boundedContext, List<Object> entities, EntityBinder entityBinder) {
+    protected List<Object> collectFieldValues(BoundedContext boundedContext, List<Object> entities, PropertyEntityBinder propertyEntityBinder) {
+        PropertyConverter propertyConverter = propertyEntityBinder.getPropertyConverter();
         List<Object> fieldValues = new ArrayList<>();
         for (Object entity : entities) {
-            Object fieldValue = entityBinder.getFieldValue(boundedContext, entity);
+            Object fieldValue = propertyEntityBinder.getFieldValue(boundedContext, entity);
             if (fieldValue != null) {
+                fieldValue = propertyConverter.reverseConvert(boundedContext, fieldValue);
                 fieldValues.add(fieldValue);
             }
         }
