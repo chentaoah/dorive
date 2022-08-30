@@ -204,7 +204,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Class<?> assemblerClass = attributes.getClass(Attribute.ASSEMBLER_ATTRIBUTE);
         Class<?> repositoryClass = attributes.getClass(Attribute.REPOSITORY_ATTRIBUTE);
 
-        boolean isBoundId = false;
         Set<String> boundColumns = new LinkedHashSet<>();
 
         List<EntityBinder> allEntityBinders = new ArrayList<>();
@@ -236,8 +235,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
 
             boolean isBindProperty = bindAttribute.startsWith("/");
-            boolean isIdField = "id".equals(fieldAttribute);
-            isBoundId = !isBoundId && isBindProperty && isIdField;
 
             if (isBindProperty && StringUtils.isBlank(bindAliasAttribute)) {
                 bindAliasAttribute = StringUtils.isBlank(propertyAttribute) ? PathUtils.getFieldName(bindAttribute) : propertyAttribute;
@@ -289,10 +286,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                 allEntityBinders.add(contextEntityBinder);
                 contextEntityBinders.add(contextEntityBinder);
             }
-        }
-
-        if (isBoundId && orderAttribute == 0) {
-            orderAttribute = -1;
         }
 
         EntityDefinition entityDefinition = new EntityDefinition(
@@ -397,6 +390,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
                         if (!"id".equals(fieldAttribute)) {
                             boundValueEntityBinders.add(entityBinder);
                         } else {
+                            if (entityDefinition.getOrderAttribute() == 0) {
+                                entityDefinition.setOrderAttribute(-1);
+                            }
                             configuredRepository.setBoundIdEntityBinder(propertyEntityBinder);
                         }
                     }

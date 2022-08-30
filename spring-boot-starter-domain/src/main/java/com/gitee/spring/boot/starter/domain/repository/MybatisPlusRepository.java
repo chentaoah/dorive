@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -39,7 +40,9 @@ public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
                 if (isTableId || "id".equals(fieldName)) {
                     continue;
                 }
-                fieldColumnPairs.add(new Pair<>(fieldName, StrUtil.toUnderlineCase(fieldName)));
+                TableField tableField = field.getAnnotation(TableField.class);
+                String columnName = tableField != null ? tableField.value() : StrUtil.toUnderlineCase(fieldName);
+                fieldColumnPairs.add(new Pair<>(fieldName, columnName));
             }
         }
     }
