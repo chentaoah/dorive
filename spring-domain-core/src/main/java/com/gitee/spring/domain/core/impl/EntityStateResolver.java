@@ -8,7 +8,7 @@ import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 
 public class EntityStateResolver {
 
-    public int resolveEntityStateByContext(BoundedContext boundedContext, ConfiguredRepository configuredRepository) {
+    public int resolveContextEntityState(BoundedContext boundedContext, ConfiguredRepository configuredRepository) {
         EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
         String idAttribute = entityDefinition.getIdAttribute();
         if (idAttribute != null) {
