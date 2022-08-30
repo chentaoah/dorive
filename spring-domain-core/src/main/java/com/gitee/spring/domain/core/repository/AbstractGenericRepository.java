@@ -210,11 +210,11 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
                         totalCount += doOperateEntityByState(boundedContext, entity, configuredRepository, eachEntity, entityState);
                     }
                 } else {
+                    int entityState = entityStateResolver.resolveEntityState(expectedEntityState, contextEntityState, targetEntity);
+                    totalCount += doOperateEntityByState(boundedContext, entity, configuredRepository, targetEntity, entityState);
                     if (expectedEntityState == EntityState.INSERT_OR_UPDATE || expectedEntityState == EntityState.INSERT) {
                         setBoundIdForBoundEntity(boundedContext, entity, configuredRepository, targetEntity);
                     }
-                    int entityState = entityStateResolver.resolveEntityState(expectedEntityState, contextEntityState, targetEntity);
-                    totalCount += doOperateEntityByState(boundedContext, entity, configuredRepository, targetEntity, entityState);
                 }
             }
         }
