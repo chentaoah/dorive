@@ -150,6 +150,51 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         return operateEntityByState(boundedContext, entity, EntityState.UPDATE);
     }
 
+    @Override
+    public int updateByExample(BoundedContext boundedContext, Object entity, Object example) {
+        Assert.notNull(entity, "The entity cannot be null!");
+        int totalCount = 0;
+        for (ConfiguredRepository configuredRepository : getOrderedRepositories()) {
+            if (isMatchScenes(boundedContext, configuredRepository)) {
+                int contextEntityState = entityStateResolver.resolveContextEntityState(boundedContext, configuredRepository);
+                if (contextEntityState == EntityState.NONE) {
+                    totalCount += configuredRepository.updateByExample(boundedContext, entity, example);
+                }
+            }
+        }
+        return totalCount;
+    }
+
+    @Override
+    public int insertOrUpdate(BoundedContext boundedContext, E entity) {
+        return operateEntityByState(boundedContext, entity, EntityState.INSERT_OR_UPDATE);
+    }
+
+    @Override
+    public int delete(BoundedContext boundedContext, E entity) {
+        return operateEntityByState(boundedContext, entity, EntityState.DELETE);
+    }
+
+    @Override
+    public int deleteByPrimaryKey(BoundedContext boundedContext, PK primaryKey) {
+        E entity = selectByPrimaryKey(boundedContext, primaryKey);
+        return delete(boundedContext, entity);
+    }
+
+    @Override
+    public int deleteByExample(BoundedContext boundedContext, Object example) {
+        int totalCount = 0;
+        for (ConfiguredRepository configuredRepository : getOrderedRepositories()) {
+            if (isMatchScenes(boundedContext, configuredRepository)) {
+                int contextEntityState = entityStateResolver.resolveContextEntityState(boundedContext, configuredRepository);
+                if (contextEntityState == EntityState.NONE) {
+                    totalCount += configuredRepository.deleteByExample(boundedContext, example);
+                }
+            }
+        }
+        return totalCount;
+    }
+
     protected int operateEntityByState(BoundedContext boundedContext, E entity, int expectedEntityState) {
         Assert.notNull(entity, "The entity cannot be null!");
         int totalCount = 0;
@@ -218,51 +263,6 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
                 entityBinder.setBoundValue(boundedContext, rootEntity, primaryKey);
             }
         }
-    }
-
-    @Override
-    public int updateByExample(BoundedContext boundedContext, Object entity, Object example) {
-        Assert.notNull(entity, "The entity cannot be null!");
-        int totalCount = 0;
-        for (ConfiguredRepository configuredRepository : getOrderedRepositories()) {
-            if (isMatchScenes(boundedContext, configuredRepository)) {
-                int contextEntityState = entityStateResolver.resolveContextEntityState(boundedContext, configuredRepository);
-                if (contextEntityState == EntityState.NONE) {
-                    totalCount += configuredRepository.updateByExample(boundedContext, entity, example);
-                }
-            }
-        }
-        return totalCount;
-    }
-
-    @Override
-    public int insertOrUpdate(BoundedContext boundedContext, E entity) {
-        return operateEntityByState(boundedContext, entity, EntityState.INSERT_OR_UPDATE);
-    }
-
-    @Override
-    public int delete(BoundedContext boundedContext, E entity) {
-        return operateEntityByState(boundedContext, entity, EntityState.DELETE);
-    }
-
-    @Override
-    public int deleteByPrimaryKey(BoundedContext boundedContext, PK primaryKey) {
-        E entity = selectByPrimaryKey(boundedContext, primaryKey);
-        return delete(boundedContext, entity);
-    }
-
-    @Override
-    public int deleteByExample(BoundedContext boundedContext, Object example) {
-        int totalCount = 0;
-        for (ConfiguredRepository configuredRepository : getOrderedRepositories()) {
-            if (isMatchScenes(boundedContext, configuredRepository)) {
-                int contextEntityState = entityStateResolver.resolveContextEntityState(boundedContext, configuredRepository);
-                if (contextEntityState == EntityState.NONE) {
-                    totalCount += configuredRepository.deleteByExample(boundedContext, example);
-                }
-            }
-        }
-        return totalCount;
     }
 
     @Override
