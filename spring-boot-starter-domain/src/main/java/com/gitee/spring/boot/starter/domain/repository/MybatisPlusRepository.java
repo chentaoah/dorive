@@ -82,17 +82,21 @@ public class MybatisPlusRepository extends AbstractRepository<Object, Object> {
     public int update(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
         if (primaryKey != null) {
-            UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.eq("id", primaryKey);
             Set<String> fieldNames = (Set<String>) boundedContext.get("#forceUpdate");
-            for (Pair<String, String> fieldColumnPair : fieldColumnPairs) {
-                String fieldName = fieldColumnPair.getKey();
-                Object fieldValue = BeanUtil.getFieldValue(entity, fieldName);
-                if (fieldValue != null || (fieldNames != null && fieldNames.contains(fieldName))) {
-                    updateWrapper.set(true, fieldColumnPair.getValue(), fieldValue);
+            if (fieldNames != null && !fieldNames.isEmpty()) {
+                UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
+                updateWrapper.eq("id", primaryKey);
+                for (Pair<String, String> fieldColumnPair : fieldColumnPairs) {
+                    String fieldName = fieldColumnPair.getKey();
+                    Object fieldValue = BeanUtil.getFieldValue(entity, fieldName);
+                    if (fieldValue != null || fieldNames.contains(fieldName)) {
+                        updateWrapper.set(true, fieldColumnPair.getValue(), fieldValue);
+                    }
                 }
+                return baseMapper.update(null, updateWrapper);
+            } else {
+                return baseMapper.updateById(entity);
             }
-            return baseMapper.update(null, updateWrapper);
         }
         return 0;
     }
