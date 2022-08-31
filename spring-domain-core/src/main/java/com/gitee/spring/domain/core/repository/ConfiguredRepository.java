@@ -14,6 +14,7 @@ import lombok.Setter;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -28,6 +29,7 @@ public class ConfiguredRepository extends ProxyRepository {
     protected PropertyEntityBinder boundIdEntityBinder;
     protected EntityMapper entityMapper;
     protected EntityAssembler entityAssembler;
+    protected Map<String, EntityPropertyChain> entityPropertyChainMap;
 
     public ConfiguredRepository(AbstractRepository<Object, Object> repository,
                                 EntityPropertyChain entityPropertyChain,
@@ -38,7 +40,8 @@ public class ConfiguredRepository extends ProxyRepository {
                                 List<EntityBinder> boundValueEntityBinders,
                                 PropertyEntityBinder boundIdEntityBinder,
                                 EntityMapper entityMapper,
-                                EntityAssembler entityAssembler) {
+                                EntityAssembler entityAssembler,
+                                Map<String, EntityPropertyChain> entityPropertyChainMap) {
         super(repository);
         this.entityPropertyChain = entityPropertyChain;
         this.entityDefinition = entityDefinition;
@@ -49,6 +52,7 @@ public class ConfiguredRepository extends ProxyRepository {
         this.boundIdEntityBinder = boundIdEntityBinder;
         this.entityMapper = entityMapper;
         this.entityAssembler = entityAssembler;
+        this.entityPropertyChainMap = entityPropertyChainMap;
     }
 
     public ConfiguredRepository(ConfiguredRepository configuredRepository) {
@@ -62,6 +66,7 @@ public class ConfiguredRepository extends ProxyRepository {
         this.boundIdEntityBinder = configuredRepository.getBoundIdEntityBinder();
         this.entityMapper = configuredRepository.getEntityMapper();
         this.entityAssembler = configuredRepository.getEntityAssembler();
+        this.entityPropertyChainMap = configuredRepository.getEntityPropertyChainMap();
     }
 
     @Override

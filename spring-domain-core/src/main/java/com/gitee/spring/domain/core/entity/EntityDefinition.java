@@ -5,7 +5,6 @@ import lombok.Data;
 import org.springframework.core.annotation.AnnotationAttributes;
 
 import java.lang.reflect.AnnotatedElement;
-import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -18,6 +17,7 @@ public class EntityDefinition {
     private boolean collection;
     private Class<?> genericEntityClass;
     private String fieldName;
+    private Set<String> fieldNames;
     private AnnotationAttributes attributes;
     private String idAttribute;
     private Set<String> sceneAttribute;
@@ -34,6 +34,4 @@ public class EntityDefinition {
     private int orderAttribute;
     private String[] boundColumns;
     private boolean boundEntity;
-    private Set<String> fieldNames;
-    private Map<String, EntityPropertyChain> entityPropertyChainMap;
 }

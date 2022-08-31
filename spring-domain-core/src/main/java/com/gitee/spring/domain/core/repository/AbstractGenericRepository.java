@@ -1,10 +1,15 @@
 package com.gitee.spring.domain.core.repository;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.core.api.*;
+import com.gitee.spring.domain.core.api.EntityBinder;
+import com.gitee.spring.domain.core.api.EntityMapper;
+import com.gitee.spring.domain.core.api.EntityProperty;
+import com.gitee.spring.domain.core.api.GenericRepository;
 import com.gitee.spring.domain.core.constants.EntityState;
-import com.gitee.spring.domain.core.entity.*;
+import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.EntityDefinition;
+import com.gitee.spring.domain.core.entity.EntityExample;
+import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.impl.EntityStateResolver;
 import com.gitee.spring.domain.core.utils.StringUtils;
 
@@ -145,92 +150,13 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         return operateEntityByState(boundedContext, entity, EntityState.UPDATE);
     }
 
-    protected int operateEntityByState(BoundedContext boundedContext, E entity, int expectedEntityState) {
-        Assert.notNull(entity, "The entity cannot be null!");
-        int totalCount = 0;
-        AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(entity);
-        for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getOrderedRepositories()) {
-            EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
-            Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
-            if (targetEntity != null && isMatchScenes(boundedContext, configuredRepository)) {
-                int contextEntityState = entityStateResolver.resolveEntityStateByContext(boundedContext, configuredRepository);
-                if (targetEntity instanceof Collection) {
-                    for (Object eachEntity : (Collection<?>) targetEntity) {
-                        int entityState = entityStateResolver.resolveEntityState(expectedEntityState, contextEntityState, eachEntity);
-                        if (entityState == EntityState.INSERT_OR_UPDATE) {
-                            getBoundValueFromContext(boundedContext, entity, configuredRepository, eachEntity);
-                            totalCount += configuredRepository.insertOrUpdate(boundedContext, eachEntity);
-
-                        } else if (entityState == EntityState.INSERT) {
-                            getBoundValueFromContext(boundedContext, entity, configuredRepository, eachEntity);
-                            totalCount += configuredRepository.insert(boundedContext, eachEntity);
-
-                        } else if (entityState == EntityState.UPDATE_SELECTIVE) {
-                            totalCount += configuredRepository.updateSelective(boundedContext, eachEntity);
-
-                        } else if (entityState == EntityState.UPDATE) {
-                            totalCount += configuredRepository.update(boundedContext, eachEntity);
-
-                        } else if (entityState == EntityState.DELETE) {
-                            totalCount += configuredRepository.delete(boundedContext, eachEntity);
-                        }
-                    }
-                } else {
-                    int entityState = entityStateResolver.resolveEntityState(expectedEntityState, contextEntityState, targetEntity);
-                    if (entityState == EntityState.INSERT_OR_UPDATE) {
-                        getBoundValueFromContext(boundedContext, entity, configuredRepository, targetEntity);
-                        totalCount += configuredRepository.insertOrUpdate(boundedContext, targetEntity);
-                        setBoundIdForBoundEntity(boundedContext, entity, configuredRepository, targetEntity);
-
-                    } else if (entityState == EntityState.INSERT) {
-                        getBoundValueFromContext(boundedContext, entity, configuredRepository, targetEntity);
-                        totalCount += configuredRepository.insert(boundedContext, targetEntity);
-                        setBoundIdForBoundEntity(boundedContext, entity, configuredRepository, targetEntity);
-
-                    } else if (entityState == EntityState.UPDATE_SELECTIVE) {
-                        totalCount += configuredRepository.updateSelective(boundedContext, targetEntity);
-
-                    } else if (entityState == EntityState.UPDATE) {
-                        totalCount += configuredRepository.update(boundedContext, targetEntity);
-
-                    } else if (entityState == EntityState.DELETE) {
-                        totalCount += configuredRepository.delete(boundedContext, targetEntity);
-                    }
-                }
-            }
-        }
-        return totalCount;
-    }
-
-    protected void getBoundValueFromContext(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository, Object entity) {
-        for (EntityBinder entityBinder : configuredRepository.getBoundValueEntityBinders()) {
-            Object fieldValue = entityBinder.getFieldValue(boundedContext, entity);
-            if (fieldValue == null) {
-                Object boundValue = entityBinder.getBoundValue(boundedContext, rootEntity);
-                if (boundValue != null) {
-                    entityBinder.setFieldValue(boundedContext, entity, boundValue);
-                }
-            }
-        }
-    }
-
-    protected void setBoundIdForBoundEntity(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository, Object entity) {
-        EntityBinder entityBinder = configuredRepository.getBoundIdEntityBinder();
-        if (entityBinder != null) {
-            Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-            if (primaryKey != null) {
-                entityBinder.setBoundValue(boundedContext, rootEntity, primaryKey);
-            }
-        }
-    }
-
     @Override
     public int updateByExample(BoundedContext boundedContext, Object entity, Object example) {
         Assert.notNull(entity, "The entity cannot be null!");
         int totalCount = 0;
         for (ConfiguredRepository configuredRepository : getOrderedRepositories()) {
             if (isMatchScenes(boundedContext, configuredRepository)) {
-                int contextEntityState = entityStateResolver.resolveEntityStateByContext(boundedContext, configuredRepository);
+                int contextEntityState = entityStateResolver.resolveContextEntityState(boundedContext, configuredRepository);
                 if (contextEntityState == EntityState.NONE) {
                     totalCount += configuredRepository.updateByExample(boundedContext, entity, example);
                 }
@@ -260,13 +186,83 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
         int totalCount = 0;
         for (ConfiguredRepository configuredRepository : getOrderedRepositories()) {
             if (isMatchScenes(boundedContext, configuredRepository)) {
-                int contextEntityState = entityStateResolver.resolveEntityStateByContext(boundedContext, configuredRepository);
+                int contextEntityState = entityStateResolver.resolveContextEntityState(boundedContext, configuredRepository);
                 if (contextEntityState == EntityState.NONE) {
                     totalCount += configuredRepository.deleteByExample(boundedContext, example);
                 }
             }
         }
         return totalCount;
+    }
+
+    protected int operateEntityByState(BoundedContext boundedContext, E entity, int expectedEntityState) {
+        Assert.notNull(entity, "The entity cannot be null!");
+        int totalCount = 0;
+        AbstractDelegateRepository<?, ?> abstractDelegateRepository = adaptiveRepository(entity);
+        for (ConfiguredRepository configuredRepository : abstractDelegateRepository.getOrderedRepositories()) {
+            EntityPropertyChain entityPropertyChain = configuredRepository.getEntityPropertyChain();
+            Object targetEntity = entityPropertyChain == null ? entity : entityPropertyChain.getValue(entity);
+            if (targetEntity != null && isMatchScenes(boundedContext, configuredRepository)) {
+                int contextEntityState = entityStateResolver.resolveContextEntityState(boundedContext, configuredRepository);
+                if (targetEntity instanceof Collection) {
+                    for (Object eachEntity : (Collection<?>) targetEntity) {
+                        int entityState = entityStateResolver.resolveEntityState(expectedEntityState, contextEntityState, eachEntity);
+                        totalCount += doOperateEntityByState(boundedContext, entity, configuredRepository, eachEntity, entityState);
+                    }
+                } else {
+                    int entityState = entityStateResolver.resolveEntityState(expectedEntityState, contextEntityState, targetEntity);
+                    totalCount += doOperateEntityByState(boundedContext, entity, configuredRepository, targetEntity, entityState);
+                    if (expectedEntityState == EntityState.INSERT_OR_UPDATE || expectedEntityState == EntityState.INSERT) {
+                        setBoundIdForBoundEntity(boundedContext, entity, configuredRepository, targetEntity);
+                    }
+                }
+            }
+        }
+        return totalCount;
+    }
+
+    protected int doOperateEntityByState(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository, Object entity,
+                                         int entityState) {
+        if (entityState == EntityState.INSERT_OR_UPDATE) {
+            getBoundValueFromContext(boundedContext, rootEntity, configuredRepository, entity);
+            return configuredRepository.insertOrUpdate(boundedContext, entity);
+
+        } else if (entityState == EntityState.INSERT) {
+            getBoundValueFromContext(boundedContext, rootEntity, configuredRepository, entity);
+            return configuredRepository.insert(boundedContext, entity);
+
+        } else if (entityState == EntityState.UPDATE_SELECTIVE) {
+            return configuredRepository.updateSelective(boundedContext, entity);
+
+        } else if (entityState == EntityState.UPDATE) {
+            return configuredRepository.update(boundedContext, entity);
+
+        } else if (entityState == EntityState.DELETE) {
+            return configuredRepository.delete(boundedContext, entity);
+        }
+        return 0;
+    }
+
+    protected void getBoundValueFromContext(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository, Object entity) {
+        for (EntityBinder entityBinder : configuredRepository.getBoundValueEntityBinders()) {
+            Object fieldValue = entityBinder.getFieldValue(boundedContext, entity);
+            if (fieldValue == null) {
+                Object boundValue = entityBinder.getBoundValue(boundedContext, rootEntity);
+                if (boundValue != null) {
+                    entityBinder.setFieldValue(boundedContext, entity, boundValue);
+                }
+            }
+        }
+    }
+
+    protected void setBoundIdForBoundEntity(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository configuredRepository, Object entity) {
+        EntityBinder entityBinder = configuredRepository.getBoundIdEntityBinder();
+        if (entityBinder != null) {
+            Object primaryKey = entityBinder.getFieldValue(boundedContext, entity);
+            if (primaryKey != null) {
+                entityBinder.setBoundValue(boundedContext, rootEntity, primaryKey);
+            }
+        }
     }
 
     @Override

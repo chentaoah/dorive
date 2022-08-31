@@ -14,4 +14,5 @@ public class BindingDefinition {
     private String bindExpAttribute;
     private String bindAliasAttribute;
     private String propertyAttribute;
+    private Class<?> converterClass;
 }
