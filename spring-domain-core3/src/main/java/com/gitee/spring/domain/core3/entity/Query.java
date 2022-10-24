@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core3.entity.operation;
+package com.gitee.spring.domain.core3.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -7,5 +7,5 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Update extends Operation {
+public class Query extends Operation {
 }

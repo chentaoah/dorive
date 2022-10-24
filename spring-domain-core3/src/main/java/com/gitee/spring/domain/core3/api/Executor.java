@@ -3,11 +3,8 @@ package com.gitee.spring.domain.core3.api;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.Example;
 import com.gitee.spring.domain.core3.entity.Result;
-import com.gitee.spring.domain.core3.entity.operation.Delete;
-import com.gitee.spring.domain.core3.entity.operation.Insert;
-import com.gitee.spring.domain.core3.entity.operation.Operation;
-import com.gitee.spring.domain.core3.entity.operation.Query;
-import com.gitee.spring.domain.core3.entity.operation.Update;
+import com.gitee.spring.domain.core3.entity.Operation;
+import com.gitee.spring.domain.core3.entity.Query;
 
 public interface Executor {
 
@@ -17,19 +14,19 @@ public interface Executor {
 
     Result executeQuery(BoundedContext boundedContext, Query query);
 
-    Insert buildInsert(BoundedContext boundedContext, Object entity);
+    Operation buildInsert(BoundedContext boundedContext, Object entity);
 
-    Update buildUpdate(BoundedContext boundedContext, Object entity);
+    Operation buildUpdate(BoundedContext boundedContext, Object entity);
 
-    Update buildUpdate(BoundedContext boundedContext, Object entity, Example example);
+    Operation buildUpdate(BoundedContext boundedContext, Object entity, Example example);
 
     Operation buildInsertOrUpdate(BoundedContext boundedContext, Object entity);
 
-    Delete buildDelete(BoundedContext boundedContext, Object entity);
+    Operation buildDelete(BoundedContext boundedContext, Object entity);
 
-    Delete buildDeleteByPK(BoundedContext boundedContext, Object primaryKey);
+    Operation buildDeleteByPK(BoundedContext boundedContext, Object primaryKey);
 
-    Delete buildDelete(BoundedContext boundedContext, Example example);
+    Operation buildDelete(BoundedContext boundedContext, Example example);
 
     int execute(BoundedContext boundedContext, Operation operation);
 
