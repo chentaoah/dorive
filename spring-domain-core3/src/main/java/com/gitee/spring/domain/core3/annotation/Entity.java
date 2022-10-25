@@ -14,8 +14,6 @@ public @interface Entity {
 
     Class<?> mapper() default Object.class;
 
-    String method() default "";
-
     String orderByAsc() default "";
 
     String orderByDesc() default "";

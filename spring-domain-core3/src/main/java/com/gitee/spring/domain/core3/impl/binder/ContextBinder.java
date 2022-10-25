@@ -12,12 +12,13 @@ public class ContextBinder extends AbstractBinder {
 
     @Override
     public Object getBoundValue(BoundedContext boundedContext, Object rootEntity) {
-        return null;
+        String bindCtx = bindingDefinition.getBindCtx();
+        return boundedContext.get(bindCtx);
     }
 
     @Override
     public void setBoundValue(BoundedContext boundedContext, Object rootEntity, Object property) {
-
+        // ignore
     }
 
 }

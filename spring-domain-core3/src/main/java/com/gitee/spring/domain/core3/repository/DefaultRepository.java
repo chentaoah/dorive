@@ -4,6 +4,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class DefaultRepository extends AbstractRepository<Object, Object> {
 }

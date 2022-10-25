@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
-public class PropertiesResolver {
+public class PropertyResolver {
 
     private Map<String, EntityPropertyChain> allEntityPropertyChainMap = new LinkedHashMap<>();
     private Map<String, EntityPropertyChain> fieldEntityPropertyChainMap = new LinkedHashMap<>();

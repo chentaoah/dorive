@@ -14,7 +14,6 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK> {
 
     protected ElementDefinition elementDefinition;
     protected EntityDefinition entityDefinition;
-    protected boolean boundEntity;
     protected Executor executor;
 
     @Override
