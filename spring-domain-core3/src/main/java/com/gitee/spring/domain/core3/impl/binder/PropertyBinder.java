@@ -4,7 +4,11 @@ import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.BindingDefinition;
 import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class PropertyBinder extends AbstractBinder {
 
     protected String belongAccessPath;

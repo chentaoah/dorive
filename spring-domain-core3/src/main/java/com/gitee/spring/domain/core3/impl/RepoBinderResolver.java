@@ -70,7 +70,10 @@ public class RepoBinderResolver {
     }
 
     private boolean isSameType(PropertyBinder propertyBinder) {
-        return false;
+        PropertyChain fieldPropertyChain = propertyBinder.getFieldPropertyChain();
+        PropertyChain boundPropertyChain = propertyBinder.getBoundPropertyChain();
+        return fieldPropertyChain.getEntityClass() == boundPropertyChain.getEntityClass()
+                && fieldPropertyChain.getGenericEntityClass() == boundPropertyChain.getGenericEntityClass();
     }
 
 }
