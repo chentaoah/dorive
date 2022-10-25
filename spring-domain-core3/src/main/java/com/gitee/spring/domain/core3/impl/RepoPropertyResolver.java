@@ -20,7 +20,7 @@ public class RepoPropertyResolver {
         PropertyResolver propertyResolver = repository.getPropertyResolver();
         Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
 
-        Map<String, EntityPropertyChain> allEntityPropertyChainMap = propertyResolver.getAllEntityPropertyChainMap();
+        Map<String, EntityPropertyChain> allEntityPropertyChainMap = propertyResolver.getProperties();
         allEntityPropertyChainMap.forEach((accessPath, entityPropertyChain) -> {
 
             String lastAccessPath = PathUtils.getLastAccessPath(accessPath);

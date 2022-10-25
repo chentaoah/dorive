@@ -94,16 +94,16 @@ public class BinderResolver {
     private PropertyBinder newPropertyBinder(BindingDefinition bindingDefinition) {
         Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
         String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), bindingDefinition.getBindProp());
-        ConfiguredRepository belongConfiguredRepository = allRepositoryMap.get(belongAccessPath);
-        Assert.notNull(belongConfiguredRepository, "The belong repository cannot be null!");
-        belongConfiguredRepository.setBoundEntity(true);
+        ConfiguredRepository belongRepository = allRepositoryMap.get(belongAccessPath);
+        Assert.notNull(belongRepository, "The belong repository cannot be null!");
+        belongRepository.setBoundEntity(true);
 
-        Map<String, EntityPropertyChain> allEntityPropertyChainMap = repository.getPropertyResolver().getAllEntityPropertyChainMap();
-        EntityPropertyChain boundEntityPropertyChain = allEntityPropertyChainMap.get(bindingDefinition.getBindProp());
-        Assert.notNull(boundEntityPropertyChain, "The bound entity property cannot be null!");
-        boundEntityPropertyChain.initialize();
+        Map<String, EntityPropertyChain> properties = repository.getPropertyResolver().getProperties();
+        EntityPropertyChain boundProperty = properties.get(bindingDefinition.getBindProp());
+        Assert.notNull(boundProperty, "The bound entity property cannot be null!");
+        boundProperty.initialize();
 
-        return new PropertyBinder(bindingDefinition, null, belongAccessPath, belongConfiguredRepository, boundEntityPropertyChain);
+        return new PropertyBinder(bindingDefinition, null, belongAccessPath, belongRepository, boundProperty);
     }
 
     private ContextBinder newContextBinder(BindingDefinition bindingDefinition) {

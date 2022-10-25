@@ -33,7 +33,7 @@ public class RepoBinderResolver {
             if (properties.isEmpty() && configuredRepository.getElementDefinition().isCollection()) {
                 PropertyResolver propertyResolver = new PropertyResolver();
                 propertyResolver.resolveProperties("", configuredRepository.getElementDefinition().getGenericEntityClass());
-                Map<String, EntityPropertyChain> subAllEntityPropertyChainMap = propertyResolver.getAllEntityPropertyChainMap();
+                Map<String, EntityPropertyChain> subAllEntityPropertyChainMap = propertyResolver.getProperties();
                 properties.putAll(subAllEntityPropertyChainMap);
                 prefixAccessPath = "/";
             }
@@ -52,7 +52,7 @@ public class RepoBinderResolver {
                     EntityPropertyChain entityPropertyChain = properties.get(fieldAccessPath);
                     Assert.notNull(entityPropertyChain, "The field entity property cannot be null!");
                     entityPropertyChain.initialize();
-                    ((AbstractBinder) binder).setFieldEntityPropertyChain(entityPropertyChain);
+                    ((AbstractBinder) binder).setFieldProperty(entityPropertyChain);
                 }
 
                 if (binder instanceof PropertyBinder) {

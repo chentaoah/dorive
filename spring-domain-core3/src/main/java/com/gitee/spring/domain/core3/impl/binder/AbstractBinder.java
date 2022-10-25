@@ -12,7 +12,7 @@ import lombok.Data;
 public abstract class AbstractBinder implements Binder {
 
     protected BindingDefinition bindingDefinition;
-    protected EntityPropertyChain fieldEntityPropertyChain;
+    protected EntityPropertyChain fieldProperty;
 
     @Override
     public BindingDefinition getBindingDefinition() {
@@ -21,12 +21,12 @@ public abstract class AbstractBinder implements Binder {
 
     @Override
     public Object getFieldValue(BoundedContext boundedContext, Object entity) {
-        return fieldEntityPropertyChain.getValue(entity);
+        return fieldProperty.getValue(entity);
     }
 
     @Override
     public void setFieldValue(BoundedContext boundedContext, Object entity, Object property) {
-        fieldEntityPropertyChain.setValue(entity, property);
+        fieldProperty.setValue(entity, property);
     }
 
 }

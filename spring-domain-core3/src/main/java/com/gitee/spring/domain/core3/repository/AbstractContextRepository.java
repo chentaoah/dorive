@@ -54,29 +54,29 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         superClasses.forEach(superClass -> propertyResolver.resolveProperties("", superClass));
         propertyResolver.resolveProperties("", entityClass);
 
-        ConfiguredRepository rootConfiguredRepository = newConfiguredRepository("/", entityClass);
-        allRepositoryMap.put("/", rootConfiguredRepository);
-        this.rootRepository = rootConfiguredRepository;
-        orderedRepositories.add(rootConfiguredRepository);
+        ConfiguredRepository rootRepository = newRepository("/", entityClass);
+        allRepositoryMap.put("/", rootRepository);
+        this.rootRepository = rootRepository;
+        orderedRepositories.add(rootRepository);
 
-        Map<String, EntityPropertyChain> allEntityPropertyChainMap = propertyResolver.getAllEntityPropertyChainMap();
-        allEntityPropertyChainMap.forEach((accessPath, entityPropertyChain) -> {
-            if (entityPropertyChain.isAnnotatedEntity()) {
-                ConfiguredRepository configuredRepository = newConfiguredRepository(accessPath, entityPropertyChain.getDeclaredField());
-                allRepositoryMap.put(accessPath, configuredRepository);
-                subRepositories.add(configuredRepository);
-                orderedRepositories.add(configuredRepository);
+        Map<String, EntityPropertyChain> properties = propertyResolver.getProperties();
+        properties.forEach((accessPath, property) -> {
+            if (property.isAnnotatedEntity()) {
+                ConfiguredRepository subRepository = newRepository(accessPath, property.getDeclaredField());
+                allRepositoryMap.put(accessPath, subRepository);
+                subRepositories.add(subRepository);
+                orderedRepositories.add(subRepository);
             }
         });
 
         new RepoPropertyResolver(this).resolveProperties();
         new RepoBinderResolver(this).resolveBinders();
 
-        orderedRepositories.sort(Comparator.comparingInt(configuredRepository -> configuredRepository.getEntityDefinition().getOrder()));
+        orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityDefinition().getOrder()));
     }
 
     @SuppressWarnings("unchecked")
-    private ConfiguredRepository newConfiguredRepository(String accessPath, AnnotatedElement annotatedElement) {
+    private ConfiguredRepository newRepository(String accessPath, AnnotatedElement annotatedElement) {
         ElementDefinition elementDefinition = ElementDefinition.newElementDefinition(annotatedElement);
         EntityDefinition entityDefinition = EntityDefinition.newEntityDefinition(elementDefinition);
 
@@ -105,8 +105,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         BinderResolver binderResolver = new BinderResolver(this);
         binderResolver.resolveBinders(accessPath, elementDefinition);
 
-        Map<String, EntityPropertyChain> allEntityPropertyChainMap = propertyResolver.getAllEntityPropertyChainMap();
-        EntityPropertyChain entityPropertyChain = allEntityPropertyChainMap.get(accessPath);
+        Map<String, EntityPropertyChain> properties = propertyResolver.getProperties();
+        EntityPropertyChain property = properties.get(accessPath);
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository();
         configuredRepository.setElementDefinition(elementDefinition);
@@ -116,7 +116,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         configuredRepository.setAccessPath(accessPath);
         configuredRepository.setBinderResolver(binderResolver);
         configuredRepository.setBoundEntity(false);
-        configuredRepository.setAnchorPoint(entityPropertyChain);
+        configuredRepository.setAnchorPoint(property);
         configuredRepository.setProperties(new LinkedHashMap<>());
 
         return configuredRepository;

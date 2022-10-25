@@ -8,28 +8,28 @@ import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
 public class PropertyBinder extends AbstractBinder {
 
     protected String belongAccessPath;
-    protected ConfiguredRepository belongConfiguredRepository;
-    protected EntityPropertyChain boundEntityPropertyChain;
+    protected ConfiguredRepository belongRepository;
+    protected EntityPropertyChain boundProperty;
 
     public PropertyBinder(BindingDefinition bindingDefinition,
-                          EntityPropertyChain fieldEntityPropertyChain,
+                          EntityPropertyChain fieldProperty,
                           String belongAccessPath,
-                          ConfiguredRepository belongConfiguredRepository,
-                          EntityPropertyChain boundEntityPropertyChain) {
-        super(bindingDefinition, fieldEntityPropertyChain);
+                          ConfiguredRepository belongRepository,
+                          EntityPropertyChain boundProperty) {
+        super(bindingDefinition, fieldProperty);
         this.belongAccessPath = belongAccessPath;
-        this.belongConfiguredRepository = belongConfiguredRepository;
-        this.boundEntityPropertyChain = boundEntityPropertyChain;
+        this.belongRepository = belongRepository;
+        this.boundProperty = boundProperty;
     }
 
     @Override
     public Object getBoundValue(BoundedContext boundedContext, Object rootEntity) {
-        return boundEntityPropertyChain.getValue(rootEntity);
+        return boundProperty.getValue(rootEntity);
     }
 
     @Override
     public void setBoundValue(BoundedContext boundedContext, Object rootEntity, Object property) {
-        boundEntityPropertyChain.setValue(rootEntity, property);
+        boundProperty.setValue(rootEntity, property);
     }
 
 }

@@ -6,8 +6,8 @@ import com.gitee.spring.domain.core3.entity.definition.BindingDefinition;
 
 public class ContextBinder extends AbstractBinder {
 
-    public ContextBinder(BindingDefinition bindingDefinition, EntityPropertyChain fieldEntityPropertyChain) {
-        super(bindingDefinition, fieldEntityPropertyChain);
+    public ContextBinder(BindingDefinition bindingDefinition, EntityPropertyChain fieldProperty) {
+        super(bindingDefinition, fieldProperty);
     }
 
     @Override
