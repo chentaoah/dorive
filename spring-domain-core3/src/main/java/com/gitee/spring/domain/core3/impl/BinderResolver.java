@@ -10,7 +10,7 @@ import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core3.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core3.repository.AbstractContextRepository;
-import com.gitee.spring.domain.core3.repository.BindRepository;
+import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -92,18 +92,18 @@ public class BinderResolver {
     }
 
     private PropertyBinder newPropertyBinder(BindingDefinition bindingDefinition) {
-        Map<String, BindRepository> allRepositoryMap = repository.getAllRepositoryMap();
+        Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
         String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), bindingDefinition.getBindProp());
-        BindRepository belongBindRepository = allRepositoryMap.get(belongAccessPath);
-        Assert.notNull(belongBindRepository, "The belong repository cannot be null!");
-        belongBindRepository.setBoundEntity(true);
+        ConfiguredRepository belongConfiguredRepository = allRepositoryMap.get(belongAccessPath);
+        Assert.notNull(belongConfiguredRepository, "The belong repository cannot be null!");
+        belongConfiguredRepository.setBoundEntity(true);
 
         Map<String, EntityPropertyChain> allEntityPropertyChainMap = repository.getPropertyResolver().getAllEntityPropertyChainMap();
         EntityPropertyChain boundEntityPropertyChain = allEntityPropertyChainMap.get(bindingDefinition.getBindProp());
         Assert.notNull(boundEntityPropertyChain, "The bound entity property cannot be null!");
         boundEntityPropertyChain.initialize();
 
-        return new PropertyBinder(bindingDefinition, null, belongAccessPath, belongBindRepository, boundEntityPropertyChain);
+        return new PropertyBinder(bindingDefinition, null, belongAccessPath, belongConfiguredRepository, boundEntityPropertyChain);
     }
 
     private ContextBinder newContextBinder(BindingDefinition bindingDefinition) {

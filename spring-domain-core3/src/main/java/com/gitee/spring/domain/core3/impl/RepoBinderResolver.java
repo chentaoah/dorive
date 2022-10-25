@@ -9,7 +9,7 @@ import com.gitee.spring.domain.core3.impl.binder.AbstractBinder;
 import com.gitee.spring.domain.core3.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core3.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core3.repository.AbstractContextRepository;
-import com.gitee.spring.domain.core3.repository.BindRepository;
+import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,21 +24,21 @@ public class RepoBinderResolver {
     }
 
     public void resolveBinders() {
-        Map<String, BindRepository> allRepositoryMap = repository.getAllRepositoryMap();
-        allRepositoryMap.forEach((accessPath, bindRepository) -> {
+        Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
+        allRepositoryMap.forEach((accessPath, configuredRepository) -> {
 
-            String prefixAccessPath = bindRepository.isAggregateRoot() ? "/" : bindRepository.getAccessPath() + "/";
-            Map<String, EntityPropertyChain> properties = bindRepository.getProperties();
+            String prefixAccessPath = configuredRepository.isAggregateRoot() ? "/" : configuredRepository.getAccessPath() + "/";
+            Map<String, EntityPropertyChain> properties = configuredRepository.getProperties();
 
-            if (properties.isEmpty() && bindRepository.getElementDefinition().isCollection()) {
+            if (properties.isEmpty() && configuredRepository.getElementDefinition().isCollection()) {
                 PropertyResolver propertyResolver = new PropertyResolver();
-                propertyResolver.resolveProperties("", bindRepository.getElementDefinition().getGenericEntityClass());
+                propertyResolver.resolveProperties("", configuredRepository.getElementDefinition().getGenericEntityClass());
                 Map<String, EntityPropertyChain> subAllEntityPropertyChainMap = propertyResolver.getAllEntityPropertyChainMap();
                 properties.putAll(subAllEntityPropertyChainMap);
                 prefixAccessPath = "/";
             }
 
-            BinderResolver binderResolver = bindRepository.getBinderResolver();
+            BinderResolver binderResolver = configuredRepository.getBinderResolver();
 
             List<Binder> boundValueBinders = new ArrayList<>();
             PropertyBinder boundIdBinder = null;
@@ -61,7 +61,7 @@ public class RepoBinderResolver {
                         if (!"id".equals(field)) {
                             boundValueBinders.add(propertyBinder);
                         } else {
-                            EntityDefinition entityDefinition = bindRepository.getEntityDefinition();
+                            EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
                             if (entityDefinition.getOrder() == 0) {
                                 entityDefinition.setOrder(-1);
                             }

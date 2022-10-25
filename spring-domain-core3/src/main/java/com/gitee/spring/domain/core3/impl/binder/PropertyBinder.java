@@ -3,22 +3,22 @@ package com.gitee.spring.domain.core3.impl.binder;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.definition.BindingDefinition;
-import com.gitee.spring.domain.core3.repository.BindRepository;
+import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
 
 public class PropertyBinder extends AbstractBinder {
 
     protected String belongAccessPath;
-    protected BindRepository belongBindRepository;
+    protected ConfiguredRepository belongConfiguredRepository;
     protected EntityPropertyChain boundEntityPropertyChain;
 
     public PropertyBinder(BindingDefinition bindingDefinition,
                           EntityPropertyChain fieldEntityPropertyChain,
                           String belongAccessPath,
-                          BindRepository belongBindRepository,
+                          ConfiguredRepository belongConfiguredRepository,
                           EntityPropertyChain boundEntityPropertyChain) {
         super(bindingDefinition, fieldEntityPropertyChain);
         this.belongAccessPath = belongAccessPath;
-        this.belongBindRepository = belongBindRepository;
+        this.belongConfiguredRepository = belongConfiguredRepository;
         this.boundEntityPropertyChain = boundEntityPropertyChain;
     }
 

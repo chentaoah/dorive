@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class BindRepository extends ProxyRepository {
+public class ConfiguredRepository extends ProxyRepository {
     protected boolean aggregateRoot;
     protected String accessPath;
     protected BinderResolver binderResolver;
