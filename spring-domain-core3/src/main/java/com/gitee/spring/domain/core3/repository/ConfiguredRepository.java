@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.core3.repository;
 
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
+import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.impl.BinderResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,6 +14,7 @@ public class ConfiguredRepository extends ProxyRepository {
     protected String accessPath;
     protected BinderResolver binderResolver;
     protected boolean boundEntity;
-    protected EntityPropertyChain anchorPoint;
-    protected Map<String, EntityPropertyChain> properties;
+    protected PropertyChain anchorPoint;
+    protected String prefixAccessPath;
+    protected Map<String, PropertyChain> propertyChains;
 }

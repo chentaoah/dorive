@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.core3.impl;
 
 import com.gitee.spring.domain.core.annotation.Entity;
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
+import com.gitee.spring.domain.core3.entity.PropertyChain;
 import lombok.Data;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ReflectionUtils;
@@ -15,8 +15,8 @@ import java.util.Map;
 @Data
 public class PropertyResolver {
 
-    private Map<String, EntityPropertyChain> properties = new LinkedHashMap<>();
-    private Map<String, EntityPropertyChain> fieldPropertyMap = new LinkedHashMap<>();
+    private Map<String, PropertyChain> propertyChains = new LinkedHashMap<>();
+    private Map<String, PropertyChain> fieldPropertyChains = new LinkedHashMap<>();
 
     public void resolveProperties(String lastAccessPath, Class<?> entityClass) {
         ReflectionUtils.doWithLocalFields(entityClass, declaredField -> {
@@ -32,12 +32,12 @@ public class PropertyResolver {
                 fieldGenericEntityClass = (Class<?>) actualTypeArgument;
             }
 
-            EntityPropertyChain lastEntityPropertyChain = properties.get(lastAccessPath);
+            PropertyChain lastPropertyChain = propertyChains.get(lastAccessPath);
             String fieldAccessPath = lastAccessPath + "/" + fieldName;
             boolean isAnnotatedEntity = AnnotatedElementUtils.isAnnotated(declaredField, Entity.class);
 
-            EntityPropertyChain entityPropertyChain = new EntityPropertyChain(
-                    lastEntityPropertyChain,
+            PropertyChain propertyChain = new PropertyChain(
+                    lastPropertyChain,
                     entityClass,
                     fieldAccessPath,
                     declaredField,
@@ -49,11 +49,11 @@ public class PropertyResolver {
                     null);
 
             if (isAnnotatedEntity) {
-                entityPropertyChain.initialize();
+                propertyChain.initialize();
             }
 
-            properties.put(fieldAccessPath, entityPropertyChain);
-            fieldPropertyMap.putIfAbsent(fieldName, entityPropertyChain);
+            propertyChains.put(fieldAccessPath, propertyChain);
+            fieldPropertyChains.putIfAbsent(fieldName, propertyChain);
 
             if (!filterEntityClass(fieldEntityClass)) {
                 resolveProperties(fieldAccessPath, fieldEntityClass);

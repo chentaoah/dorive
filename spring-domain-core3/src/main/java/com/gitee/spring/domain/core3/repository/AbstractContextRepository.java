@@ -1,8 +1,8 @@
 package com.gitee.spring.domain.core3.repository;
 
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.utils.ReflectUtils;
 import com.gitee.spring.domain.core3.api.Executor;
+import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core3.impl.BinderResolver;
@@ -19,11 +19,7 @@ import org.springframework.context.ApplicationContextAware;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -59,18 +55,18 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         this.rootRepository = rootRepository;
         orderedRepositories.add(rootRepository);
 
-        Map<String, EntityPropertyChain> properties = propertyResolver.getProperties();
-        properties.forEach((accessPath, property) -> {
-            if (property.isAnnotatedEntity()) {
-                ConfiguredRepository subRepository = newRepository(accessPath, property.getDeclaredField());
+        Map<String, PropertyChain> propertyChains = propertyResolver.getPropertyChains();
+        propertyChains.forEach((accessPath, propertyChain) -> {
+            if (propertyChain.isAnnotatedEntity()) {
+                ConfiguredRepository subRepository = newRepository(accessPath, propertyChain.getDeclaredField());
                 allRepositoryMap.put(accessPath, subRepository);
                 subRepositories.add(subRepository);
                 orderedRepositories.add(subRepository);
             }
         });
 
-        new RepoPropertyResolver(this).resolveProperties();
-        new RepoBinderResolver(this).resolveBinders();
+        new RepoPropertyResolver(this).resolvePropertyChains();
+        new RepoBinderResolver(this).resolveValueBinders();
 
         orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityDefinition().getOrder()));
     }
@@ -105,8 +101,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         BinderResolver binderResolver = new BinderResolver(this);
         binderResolver.resolveBinders(accessPath, elementDefinition);
 
-        Map<String, EntityPropertyChain> properties = propertyResolver.getProperties();
-        EntityPropertyChain property = properties.get(accessPath);
+        Map<String, PropertyChain> propertyChains = propertyResolver.getPropertyChains();
+        PropertyChain propertyChain = propertyChains.get(accessPath);
+
+        String prefixAccessPath = aggregateRoot ? "/" : accessPath + "/";
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository();
         configuredRepository.setElementDefinition(elementDefinition);
@@ -116,8 +114,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         configuredRepository.setAccessPath(accessPath);
         configuredRepository.setBinderResolver(binderResolver);
         configuredRepository.setBoundEntity(false);
-        configuredRepository.setAnchorPoint(property);
-        configuredRepository.setProperties(new LinkedHashMap<>());
+        configuredRepository.setAnchorPoint(propertyChain);
+        configuredRepository.setPrefixAccessPath(prefixAccessPath);
+        configuredRepository.setPropertyChains(new LinkedHashMap<>());
 
         return configuredRepository;
     }

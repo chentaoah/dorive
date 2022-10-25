@@ -1,8 +1,9 @@
 package com.gitee.spring.domain.core3.impl;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.utils.PathUtils;
+import com.gitee.spring.domain.core3.entity.PropertyChain;
+import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
 
@@ -16,23 +17,34 @@ public class RepoPropertyResolver {
         this.repository = repository;
     }
 
-    public void resolveProperties() {
-        PropertyResolver propertyResolver = repository.getPropertyResolver();
+    public void resolvePropertyChains() {
+        Map<String, PropertyChain> propertyChains = repository.getPropertyResolver().getPropertyChains();
         Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
 
-        Map<String, EntityPropertyChain> allEntityPropertyChainMap = propertyResolver.getProperties();
-        allEntityPropertyChainMap.forEach((accessPath, entityPropertyChain) -> {
-
+        propertyChains.forEach((accessPath, propertyChain) -> {
             String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
             String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), lastAccessPath);
 
-            ConfiguredRepository belongConfiguredRepository = allRepositoryMap.get(belongAccessPath);
-            Assert.notNull(belongConfiguredRepository, "The belong repository cannot be null!");
+            ConfiguredRepository belongRepository = allRepositoryMap.get(belongAccessPath);
+            Assert.notNull(belongRepository, "The belong repository cannot be null!");
 
-            Map<String, EntityPropertyChain> properties = belongConfiguredRepository.getProperties();
-            EntityPropertyChain lastEntityPropertyChain = properties.get(lastAccessPath);
-            EntityPropertyChain newEntityPropertyChain = new EntityPropertyChain(lastEntityPropertyChain, entityPropertyChain);
-            properties.put(accessPath, newEntityPropertyChain);
+            Map<String, PropertyChain> repoPropertyChains = belongRepository.getPropertyChains();
+            PropertyChain lastPropertyChain = repoPropertyChains.get(lastAccessPath);
+            PropertyChain newPropertyChain = new PropertyChain(lastPropertyChain, propertyChain);
+            repoPropertyChains.put(accessPath, newPropertyChain);
+        });
+
+        allRepositoryMap.forEach((accessPath, repository) -> {
+            ElementDefinition elementDefinition = repository.getElementDefinition();
+            Map<String, PropertyChain> repoPropertyChains = repository.getPropertyChains();
+
+            if (repoPropertyChains.isEmpty() && elementDefinition.isCollection()) {
+                PropertyResolver propertyResolver = new PropertyResolver();
+                propertyResolver.resolveProperties("", elementDefinition.getGenericEntityClass());
+                Map<String, PropertyChain> subPropertyChains = propertyResolver.getPropertyChains();
+                repoPropertyChains.putAll(subPropertyChains);
+                repository.setPrefixAccessPath("/");
+            }
         });
     }
 

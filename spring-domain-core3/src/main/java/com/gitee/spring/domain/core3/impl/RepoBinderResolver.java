@@ -1,8 +1,8 @@
 package com.gitee.spring.domain.core3.impl;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core3.api.Binder;
+import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.BindingDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core3.impl.binder.AbstractBinder;
@@ -23,36 +23,26 @@ public class RepoBinderResolver {
         this.repository = repository;
     }
 
-    public void resolveBinders() {
+    public void resolveValueBinders() {
         Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
-        allRepositoryMap.forEach((accessPath, configuredRepository) -> {
+        allRepositoryMap.forEach((accessPath, repository) -> {
 
-            String prefixAccessPath = configuredRepository.isAggregateRoot() ? "/" : configuredRepository.getAccessPath() + "/";
-            Map<String, EntityPropertyChain> properties = configuredRepository.getProperties();
-
-            if (properties.isEmpty() && configuredRepository.getElementDefinition().isCollection()) {
-                PropertyResolver propertyResolver = new PropertyResolver();
-                propertyResolver.resolveProperties("", configuredRepository.getElementDefinition().getGenericEntityClass());
-                Map<String, EntityPropertyChain> subAllEntityPropertyChainMap = propertyResolver.getProperties();
-                properties.putAll(subAllEntityPropertyChainMap);
-                prefixAccessPath = "/";
-            }
-
-            BinderResolver binderResolver = configuredRepository.getBinderResolver();
+            BinderResolver binderResolver = repository.getBinderResolver();
+            Map<String, PropertyChain> propertyChains = repository.getPropertyChains();
 
             List<Binder> boundValueBinders = new ArrayList<>();
             PropertyBinder boundIdBinder = null;
-            for (Binder binder : binderResolver.getAllBinders()) {
 
+            for (Binder binder : binderResolver.getAllBinders()) {
                 BindingDefinition bindingDefinition = binder.getBindingDefinition();
                 String field = bindingDefinition.getField();
 
                 if (binder instanceof AbstractBinder) {
-                    String fieldAccessPath = prefixAccessPath + field;
-                    EntityPropertyChain entityPropertyChain = properties.get(fieldAccessPath);
-                    Assert.notNull(entityPropertyChain, "The field entity property cannot be null!");
-                    entityPropertyChain.initialize();
-                    ((AbstractBinder) binder).setFieldProperty(entityPropertyChain);
+                    String fieldAccessPath = repository.getPrefixAccessPath() + field;
+                    PropertyChain fieldPropertyChain = propertyChains.get(fieldAccessPath);
+                    Assert.notNull(fieldPropertyChain, "The field property chain cannot be null!");
+                    fieldPropertyChain.initialize();
+                    ((AbstractBinder) binder).setFieldPropertyChain(fieldPropertyChain);
                 }
 
                 if (binder instanceof PropertyBinder) {
@@ -61,7 +51,7 @@ public class RepoBinderResolver {
                         if (!"id".equals(field)) {
                             boundValueBinders.add(propertyBinder);
                         } else {
-                            EntityDefinition entityDefinition = configuredRepository.getEntityDefinition();
+                            EntityDefinition entityDefinition = repository.getEntityDefinition();
                             if (entityDefinition.getOrder() == 0) {
                                 entityDefinition.setOrder(-1);
                             }

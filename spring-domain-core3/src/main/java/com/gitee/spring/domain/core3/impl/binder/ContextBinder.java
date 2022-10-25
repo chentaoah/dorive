@@ -1,13 +1,13 @@
 package com.gitee.spring.domain.core3.impl.binder;
 
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
+import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.BindingDefinition;
 
 public class ContextBinder extends AbstractBinder {
 
-    public ContextBinder(BindingDefinition bindingDefinition, EntityPropertyChain fieldProperty) {
-        super(bindingDefinition, fieldProperty);
+    public ContextBinder(BindingDefinition bindingDefinition, PropertyChain fieldPropertyChain) {
+        super(bindingDefinition, fieldPropertyChain);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.core3.impl.binder;
 
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
+import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.BindingDefinition;
 import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
 
@@ -9,27 +9,27 @@ public class PropertyBinder extends AbstractBinder {
 
     protected String belongAccessPath;
     protected ConfiguredRepository belongRepository;
-    protected EntityPropertyChain boundProperty;
+    protected PropertyChain boundPropertyChain;
 
     public PropertyBinder(BindingDefinition bindingDefinition,
-                          EntityPropertyChain fieldProperty,
+                          PropertyChain fieldPropertyChain,
                           String belongAccessPath,
                           ConfiguredRepository belongRepository,
-                          EntityPropertyChain boundProperty) {
-        super(bindingDefinition, fieldProperty);
+                          PropertyChain boundPropertyChain) {
+        super(bindingDefinition, fieldPropertyChain);
         this.belongAccessPath = belongAccessPath;
         this.belongRepository = belongRepository;
-        this.boundProperty = boundProperty;
+        this.boundPropertyChain = boundPropertyChain;
     }
 
     @Override
     public Object getBoundValue(BoundedContext boundedContext, Object rootEntity) {
-        return boundProperty.getValue(rootEntity);
+        return boundPropertyChain.getValue(rootEntity);
     }
 
     @Override
     public void setBoundValue(BoundedContext boundedContext, Object rootEntity, Object property) {
-        boundProperty.setValue(rootEntity, property);
+        boundPropertyChain.setValue(rootEntity, property);
     }
 
 }

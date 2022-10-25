@@ -2,9 +2,9 @@ package com.gitee.spring.domain.core3.impl;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.utils.PathUtils;
 import com.gitee.spring.domain.core3.api.Binder;
+import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.BindingDefinition;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.impl.binder.ContextBinder;
@@ -14,11 +14,7 @@ import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Data
 public class BinderResolver {
@@ -98,12 +94,12 @@ public class BinderResolver {
         Assert.notNull(belongRepository, "The belong repository cannot be null!");
         belongRepository.setBoundEntity(true);
 
-        Map<String, EntityPropertyChain> properties = repository.getPropertyResolver().getProperties();
-        EntityPropertyChain boundProperty = properties.get(bindingDefinition.getBindProp());
-        Assert.notNull(boundProperty, "The bound entity property cannot be null!");
-        boundProperty.initialize();
+        Map<String, PropertyChain> propertyChains = repository.getPropertyResolver().getPropertyChains();
+        PropertyChain boundPropertyChain = propertyChains.get(bindingDefinition.getBindProp());
+        Assert.notNull(boundPropertyChain, "The bound entity property cannot be null!");
+        boundPropertyChain.initialize();
 
-        return new PropertyBinder(bindingDefinition, null, belongAccessPath, belongRepository, boundProperty);
+        return new PropertyBinder(bindingDefinition, null, belongAccessPath, belongRepository, boundPropertyChain);
     }
 
     private ContextBinder newContextBinder(BindingDefinition bindingDefinition) {

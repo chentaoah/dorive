@@ -1,8 +1,8 @@
 package com.gitee.spring.domain.core3.impl.binder;
 
-import com.gitee.spring.domain.core3.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core3.api.Binder;
+import com.gitee.spring.domain.core3.entity.BoundedContext;
+import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.BindingDefinition;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +12,7 @@ import lombok.Data;
 public abstract class AbstractBinder implements Binder {
 
     protected BindingDefinition bindingDefinition;
-    protected EntityPropertyChain fieldProperty;
+    protected PropertyChain fieldPropertyChain;
 
     @Override
     public BindingDefinition getBindingDefinition() {
@@ -21,12 +21,12 @@ public abstract class AbstractBinder implements Binder {
 
     @Override
     public Object getFieldValue(BoundedContext boundedContext, Object entity) {
-        return fieldProperty.getValue(entity);
+        return fieldPropertyChain.getValue(entity);
     }
 
     @Override
     public void setFieldValue(BoundedContext boundedContext, Object entity, Object property) {
-        fieldProperty.setValue(entity, property);
+        fieldPropertyChain.setValue(entity, property);
     }
 
 }
