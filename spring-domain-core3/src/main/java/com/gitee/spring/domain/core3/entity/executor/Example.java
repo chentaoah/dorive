@@ -19,7 +19,6 @@ public class Example {
     private String sort;
     private Integer pageNum;
     private Integer pageSize;
-    private String sqlStr;
 
     public boolean isDirtyQuery() {
         return criteria.size() > 0;
