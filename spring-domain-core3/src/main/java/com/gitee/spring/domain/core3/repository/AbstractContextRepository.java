@@ -5,10 +5,11 @@ import com.gitee.spring.domain.core3.api.Executor;
 import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
-import com.gitee.spring.domain.core3.impl.BinderResolver;
-import com.gitee.spring.domain.core3.impl.PropertyResolver;
-import com.gitee.spring.domain.core3.impl.RepoBinderResolver;
-import com.gitee.spring.domain.core3.impl.RepoPropertyResolver;
+import com.gitee.spring.domain.core3.impl.executor.ChainExecutor;
+import com.gitee.spring.domain.core3.impl.resolver.BinderResolver;
+import com.gitee.spring.domain.core3.impl.resolver.PropertyResolver;
+import com.gitee.spring.domain.core3.impl.resolver.RepoBinderResolver;
+import com.gitee.spring.domain.core3.impl.resolver.RepoPropertyResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.BeansException;
@@ -57,7 +58,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         setElementDefinition(rootRepository.getElementDefinition());
         setEntityDefinition(rootRepository.getEntityDefinition());
-        
+        setExecutor(new ChainExecutor(this));
+
         Map<String, PropertyChain> propertyChains = propertyResolver.getPropertyChains();
         propertyChains.forEach((accessPath, propertyChain) -> {
             if (propertyChain.isAnnotatedEntity()) {

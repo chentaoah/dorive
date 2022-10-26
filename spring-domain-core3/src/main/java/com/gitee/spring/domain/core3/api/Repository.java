@@ -1,7 +1,8 @@
 package com.gitee.spring.domain.core3.api;
 
 import com.gitee.spring.domain.core3.entity.BoundedContext;
-import com.gitee.spring.domain.core3.entity.Example;
+import com.gitee.spring.domain.core3.entity.executor.Example;
+import com.gitee.spring.domain.core3.entity.executor.Page;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public interface Repository<E, PK> {
 
     List<E> selectByExample(BoundedContext boundedContext, Example example);
 
-    <T> T selectPageByExample(BoundedContext boundedContext, Example example);
+    Page<E> selectPageByExample(BoundedContext boundedContext, Example example);
 
     int insert(BoundedContext boundedContext, E entity);
 

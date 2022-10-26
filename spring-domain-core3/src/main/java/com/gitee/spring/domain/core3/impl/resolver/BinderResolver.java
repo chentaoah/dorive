@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core3.impl;
+package com.gitee.spring.domain.core3.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;

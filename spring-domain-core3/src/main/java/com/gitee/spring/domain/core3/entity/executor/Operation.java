@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core3.entity;
+package com.gitee.spring.domain.core3.entity.executor;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

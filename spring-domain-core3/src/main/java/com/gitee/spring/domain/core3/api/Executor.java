@@ -1,10 +1,10 @@
 package com.gitee.spring.domain.core3.api;
 
 import com.gitee.spring.domain.core3.entity.BoundedContext;
-import com.gitee.spring.domain.core3.entity.Example;
-import com.gitee.spring.domain.core3.entity.Result;
-import com.gitee.spring.domain.core3.entity.Operation;
-import com.gitee.spring.domain.core3.entity.Query;
+import com.gitee.spring.domain.core3.entity.executor.Example;
+import com.gitee.spring.domain.core3.entity.executor.Result;
+import com.gitee.spring.domain.core3.entity.executor.Operation;
+import com.gitee.spring.domain.core3.entity.executor.Query;
 
 public interface Executor {
 

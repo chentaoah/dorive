@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.core3.repository;
 
 import com.gitee.spring.domain.core3.entity.PropertyChain;
-import com.gitee.spring.domain.core3.impl.BinderResolver;
+import com.gitee.spring.domain.core3.impl.resolver.BinderResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core3.impl;
+package com.gitee.spring.domain.core3.impl.resolver;
 
 import com.gitee.spring.domain.core.annotation.Entity;
 import com.gitee.spring.domain.core3.entity.PropertyChain;
