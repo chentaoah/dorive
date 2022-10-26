@@ -55,6 +55,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         this.rootRepository = rootRepository;
         orderedRepositories.add(rootRepository);
 
+        setElementDefinition(rootRepository.getElementDefinition());
+        setEntityDefinition(rootRepository.getEntityDefinition());
+        
         Map<String, PropertyChain> propertyChains = propertyResolver.getPropertyChains();
         propertyChains.forEach((accessPath, propertyChain) -> {
             if (propertyChain.isAnnotatedEntity()) {
