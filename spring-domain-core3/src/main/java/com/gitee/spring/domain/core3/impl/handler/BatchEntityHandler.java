@@ -1,10 +1,20 @@
 package com.gitee.spring.domain.core3.impl.handler;
 
+import com.gitee.spring.domain.core.api.EntityProperty;
+import com.gitee.spring.domain.core.utils.StringUtils;
 import com.gitee.spring.domain.core3.api.EntityHandler;
+import com.gitee.spring.domain.core3.api.EntityIndex;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
+import com.gitee.spring.domain.core3.entity.PropertyChain;
+import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
+import com.gitee.spring.domain.core3.entity.executor.Example;
+import com.gitee.spring.domain.core3.entity.executor.UnionExample;
+import com.gitee.spring.domain.core3.impl.binder.ContextBinder;
+import com.gitee.spring.domain.core3.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core3.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
 
+import java.util.Collection;
 import java.util.List;
 
 public class BatchEntityHandler implements EntityHandler {
@@ -19,9 +29,77 @@ public class BatchEntityHandler implements EntityHandler {
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
         for (ConfiguredRepository subRepository : repository.getSubRepositories()) {
             if (subRepository.matchContext(boundedContext)) {
-
+                PropertyChain anchorPoint = subRepository.getAnchorPoint();
+                PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
+                UnionExample unionExample = new UnionExample();
+                for (Object rootEntity : rootEntities) {
+                    Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
+                    if (lastEntity != null) {
+                        Example example = newExampleByContext(subRepository, boundedContext, rootEntity);
+                        unionExample.mergeExample(example);
+                    }
+                }
+                List<Object> entities = subRepository.selectByExample(boundedContext, unionExample);
+                EntityIndex entityIndex = repository.newEntityIndex(subRepository, entities);
+                for (Object rootEntity : rootEntities) {
+                    Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
+                    if (lastEntity != null) {
+                        List<Object> subEntities = entityIndex.selectList(rootEntity);
+                        Object entity = convertManyToOneEntity(subRepository, subEntities);
+                        if (entity != null) {
+                            EntityProperty entityProperty = anchorPoint.getEntityProperty();
+                            entityProperty.setValue(lastEntity, entity);
+                        }
+                    }
+                }
             }
         }
+    }
+
+    private Example newExampleByContext(ConfiguredRepository repository, BoundedContext boundedContext, Object rootEntity) {
+        Example example = new Example();
+        for (PropertyBinder propertyBinder : repository.getBinderResolver().getPropertyBinders()) {
+            String alias = propertyBinder.getBindingDefinition().getAlias();
+            Object boundValue = propertyBinder.getBoundValue(boundedContext, rootEntity);
+            if (boundValue instanceof Collection) {
+                boundValue = !((Collection<?>) boundValue).isEmpty() ? boundValue : null;
+            }
+            if (boundValue != null) {
+                example.eq(alias, boundValue);
+            } else {
+                example.setEmptyQuery(true);
+                break;
+            }
+        }
+        if (!example.isEmptyQuery() && example.isDirtyQuery()) {
+            newCriterionByContext(repository, boundedContext, rootEntity, example);
+        }
+        return example;
+    }
+
+    private void newCriterionByContext(ConfiguredRepository repository, BoundedContext boundedContext, Object rootEntity, Example example) {
+        for (ContextBinder contextBinder : repository.getBinderResolver().getContextBinders()) {
+            String alias = contextBinder.getBindingDefinition().getAlias();
+            Object boundValue = contextBinder.getBoundValue(boundedContext, rootEntity);
+            if (boundValue != null) {
+                if (boundValue instanceof String && StringUtils.isLike((String) boundValue)) {
+                    boundValue = StringUtils.stripLike((String) boundValue);
+                    example.like(alias, boundValue);
+                } else {
+                    example.eq(alias, boundValue);
+                }
+            }
+        }
+    }
+
+    private Object convertManyToOneEntity(ConfiguredRepository repository, List<?> entities) {
+        ElementDefinition elementDefinition = repository.getElementDefinition();
+        if (elementDefinition.isCollection()) {
+            return entities;
+        } else if (!entities.isEmpty()) {
+            return entities.get(0);
+        }
+        return null;
     }
 
 }
