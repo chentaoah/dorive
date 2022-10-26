@@ -17,8 +17,8 @@ public class Example {
     private List<Criterion> criteria = new ArrayList<>();
     private String[] orderBy;
     private String sort;
-    private Integer pageNum;
-    private Integer pageSize;
+    private Long pageNum;
+    private Long pageSize;
 
     public boolean isDirtyQuery() {
         return criteria.size() > 0;
@@ -108,7 +108,7 @@ public class Example {
         return this;
     }
 
-    public Example startPage(Integer pageNum, Integer pageSize) {
+    public Example startPage(Long pageNum, Long pageSize) {
         this.pageNum = pageNum;
         this.pageSize = pageSize;
         return this;

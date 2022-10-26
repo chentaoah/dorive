@@ -19,9 +19,9 @@ import java.util.Set;
 @AllArgsConstructor
 public class ElementDefinition {
 
-    private AnnotatedElement annotatedElement;
     private Entity entityAnnotation;
     private Set<Binding> bindingAnnotations;
+    private AnnotatedElement annotatedElement;
     private Class<?> entityClass;
     private boolean collection;
     private Class<?> genericEntityClass;
@@ -30,16 +30,15 @@ public class ElementDefinition {
 
     public static ElementDefinition newElementDefinition(AnnotatedElement annotatedElement) {
         Entity entityAnnotation = AnnotatedElementUtils.getMergedAnnotation(annotatedElement, Entity.class);
-        Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(annotatedElement, Binding.class);
-
         Assert.notNull(entityAnnotation, "The annotation @Entity cannot be null!");
+        Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(annotatedElement, Binding.class);
 
         if (annotatedElement instanceof Class) {
             Class<?> entityClass = (Class<?>) annotatedElement;
             return new ElementDefinition(
-                    annotatedElement,
                     entityAnnotation,
                     bindingAnnotations,
+                    annotatedElement,
                     entityClass,
                     false,
                     entityClass,
@@ -61,9 +60,9 @@ public class ElementDefinition {
             }
 
             return new ElementDefinition(
-                    annotatedElement,
                     entityAnnotation,
                     bindingAnnotations,
+                    annotatedElement,
                     fieldEntityClass,
                     isCollection,
                     fieldGenericEntityClass,

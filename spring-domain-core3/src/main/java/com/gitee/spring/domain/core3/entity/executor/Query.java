@@ -20,11 +20,6 @@ public class Query extends Operation {
         this.example = example;
     }
 
-    public Query buildExampleByPK() {
-        example = new Example().eq("id", primaryKey);
-        return this;
-    }
-
     public boolean startPage() {
         return example.getPageNum() != null && example.getPageSize() != null;
     }

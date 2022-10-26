@@ -1,6 +1,7 @@
 package com.gitee.spring.domain.core3.annotation;
 
 import com.gitee.spring.domain.core.repository.DefaultRepository;
+import com.gitee.spring.domain.core3.impl.DefaultEntityFactory;
 
 import java.lang.annotation.*;
 
@@ -24,7 +25,7 @@ public @interface Entity {
 
     int order() default 0;
 
-    Class<?> factory() default Object.class;
+    Class<?> factory() default DefaultEntityFactory.class;
 
     Class<?> repository() default DefaultRepository.class;
 

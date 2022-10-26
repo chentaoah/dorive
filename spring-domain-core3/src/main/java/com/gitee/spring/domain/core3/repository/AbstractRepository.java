@@ -27,7 +27,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK> {
     public E selectByPrimaryKey(BoundedContext boundedContext, PK primaryKey) {
         Query query = executor.buildQueryByPK(boundedContext, primaryKey);
         Result result = executor.executeQuery(boundedContext, query);
-        return (E) result.getOne();
+        return (E) result.getRecord();
     }
 
     @Override

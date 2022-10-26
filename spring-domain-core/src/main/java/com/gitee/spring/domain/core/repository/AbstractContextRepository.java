@@ -195,7 +195,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             sort = "asc";
         }
         if (StringUtils.isNotBlank(orderByDesc)) {
-            orderByAsc = StrUtil.toUnderlineCase(orderByAsc);
+            orderByDesc = StrUtil.toUnderlineCase(orderByDesc);
             orderBy = StrUtil.splitTrim(orderByDesc, ",").toArray(new String[0]);
             sort = "desc";
         }
