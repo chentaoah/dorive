@@ -3,6 +3,7 @@ package com.gitee.spring.domain.core3.impl.handler;
 import com.gitee.spring.domain.core3.api.EntityHandler;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.repository.AbstractContextRepository;
+import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
 
 import java.util.List;
 
@@ -16,7 +17,11 @@ public class BatchEntityHandler implements EntityHandler {
 
     @Override
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
+        for (ConfiguredRepository subRepository : repository.getSubRepositories()) {
+            if (subRepository.matchContext(boundedContext)) {
 
+            }
+        }
     }
 
 }

@@ -5,13 +5,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
 public class Result {
-
-    private List<Map<String, Object>> resultSet = Collections.emptyList();
 
     private List<Object> records = Collections.emptyList();
     private Page<Object> page;
