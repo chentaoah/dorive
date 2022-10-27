@@ -110,19 +110,15 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     private QueryWrapper<Object> buildQueryWrapper(UnionExample unionExample) {
         List<Example> examples = unionExample.getExamples();
         Assert.notEmpty(examples, "The examples cannot be empty!");
-        if (examples.size() == 1) {
-            return buildQueryWrapper(examples.get(0));
-        } else {
-            Example example = examples.get(0);
-            QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
-            for (int index = 1; index < examples.size(); index++) {
-                Example nextExample = examples.get(index);
-                QueryWrapper<Object> nextQueryWrapper = buildQueryWrapper(nextExample);
-                String sql = "\nunion (select " + nextQueryWrapper.getSqlSelect() + " where " + nextQueryWrapper.getSqlSegment() + ")";
-                queryWrapper.last(sql);
-            }
-            return queryWrapper;
+        Example example = examples.get(0);
+        QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
+        for (int index = 1; index < examples.size(); index++) {
+            Example nextExample = examples.get(index);
+            QueryWrapper<Object> nextQueryWrapper = buildQueryWrapper(nextExample);
+            String sql = "\nunion (select " + nextQueryWrapper.getSqlSelect() + " where " + nextQueryWrapper.getSqlSegment() + ")";
+            queryWrapper.last(sql);
         }
+        return queryWrapper;
     }
 
     @Override
