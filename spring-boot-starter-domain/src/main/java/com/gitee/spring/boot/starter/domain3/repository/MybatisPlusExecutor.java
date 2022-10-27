@@ -1,12 +1,16 @@
 package com.gitee.spring.boot.starter.domain3.repository;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gitee.spring.boot.starter.domain.api.CriterionBuilder;
+import com.gitee.spring.boot.starter.domain.repository.MybatisPlusEntityMapper;
 import com.gitee.spring.domain.core3.api.EntityFactory;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
+import com.gitee.spring.domain.core3.entity.executor.Criterion;
 import com.gitee.spring.domain.core3.entity.executor.Example;
 import com.gitee.spring.domain.core3.entity.executor.Operation;
 import com.gitee.spring.domain.core3.entity.executor.Query;
@@ -76,7 +80,25 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     }
 
     private QueryWrapper<Object> buildQueryWrapper(Example example) {
-        return null;
+        QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
+        String[] selectColumns = example.getSelectColumns();
+        if (selectColumns != null) {
+            queryWrapper.select(selectColumns);
+        }
+        for (Criterion criterion : example.getCriteria()) {
+            CriterionBuilder criterionBuilder = MybatisPlusEntityMapper.operatorCriterionBuilderMap.get(criterion.getOperator());
+            criterionBuilder.appendCriterion(queryWrapper, StrUtil.toUnderlineCase(criterion.getProperty()), criterion.getValue());
+        }
+        String[] orderBy = example.getOrderBy() != null ? example.getOrderBy() : this.orderBy;
+        String sort = example.getSort() != null ? example.getSort() : this.sort;
+        if (orderBy != null && sort != null) {
+            if ("asc".equals(sort)) {
+                queryWrapper.orderByAsc(orderBy);
+            } else if ("desc".equals(sort)) {
+                queryWrapper.orderByDesc(orderBy);
+            }
+        }
+        return queryWrapper;
     }
 
     @Override
