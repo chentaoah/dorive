@@ -30,22 +30,22 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MybatisPlusEntityMapper implements EntityMapper {
 
-    public static Map<String, CriterionAppender> operatorCriterionBuilderMap = new ConcurrentHashMap<>();
+    public static Map<String, CriterionAppender> operatorCriterionAppenderMap = new ConcurrentHashMap<>();
     protected EntityDefinition entityDefinition;
 
     static {
-        operatorCriterionBuilderMap.put(Operator.EQ, new EQCriterionAppender());
-        operatorCriterionBuilderMap.put(Operator.NE, new NECriterionAppender());
-        operatorCriterionBuilderMap.put(Operator.IN, new InCriterionAppender());
-        operatorCriterionBuilderMap.put(Operator.NOT_IN, new NotInCriterionAppender());
-        operatorCriterionBuilderMap.put(Operator.IS_NULL, new IsNullCriterionAppender());
-        operatorCriterionBuilderMap.put(Operator.IS_NOT_NULL, new IsNotNullCriterionAppender());
-        operatorCriterionBuilderMap.put(Operator.LIKE, new LikeCriterionAppender());
-        operatorCriterionBuilderMap.put(Operator.NOT_LIKE, new NotLikeCriterionAppender());
-        operatorCriterionBuilderMap.put(Operator.GT, new GTCriterionAppender());
-        operatorCriterionBuilderMap.put(Operator.GE, new GECriterionAppender());
-        operatorCriterionBuilderMap.put(Operator.LT, new LTCriterionAppender());
-        operatorCriterionBuilderMap.put(Operator.LE, new LECriterionAppender());
+        operatorCriterionAppenderMap.put(Operator.EQ, new EQCriterionAppender());
+        operatorCriterionAppenderMap.put(Operator.NE, new NECriterionAppender());
+        operatorCriterionAppenderMap.put(Operator.IN, new InCriterionAppender());
+        operatorCriterionAppenderMap.put(Operator.NOT_IN, new NotInCriterionAppender());
+        operatorCriterionAppenderMap.put(Operator.IS_NULL, new IsNullCriterionAppender());
+        operatorCriterionAppenderMap.put(Operator.IS_NOT_NULL, new IsNotNullCriterionAppender());
+        operatorCriterionAppenderMap.put(Operator.LIKE, new LikeCriterionAppender());
+        operatorCriterionAppenderMap.put(Operator.NOT_LIKE, new NotLikeCriterionAppender());
+        operatorCriterionAppenderMap.put(Operator.GT, new GTCriterionAppender());
+        operatorCriterionAppenderMap.put(Operator.GE, new GECriterionAppender());
+        operatorCriterionAppenderMap.put(Operator.LT, new LTCriterionAppender());
+        operatorCriterionAppenderMap.put(Operator.LE, new LECriterionAppender());
     }
 
     public MybatisPlusEntityMapper(EntityDefinition entityDefinition) {
@@ -82,7 +82,7 @@ public class MybatisPlusEntityMapper implements EntityMapper {
             String fieldName = entityCriterion.getFieldName();
             String operator = entityCriterion.getOperator();
             Object fieldValue = entityCriterion.getFieldValue();
-            CriterionAppender criterionAppender = operatorCriterionBuilderMap.get(operator);
+            CriterionAppender criterionAppender = operatorCriterionAppenderMap.get(operator);
             criterionAppender.appendCriterion(queryWrapper, StrUtil.toUnderlineCase(fieldName), fieldValue);
         }
         String[] orderBy;

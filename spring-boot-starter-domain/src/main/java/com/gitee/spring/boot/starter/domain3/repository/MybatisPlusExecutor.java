@@ -86,7 +86,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             queryWrapper.select(selectColumns);
         }
         for (Criterion criterion : example.getCriteria()) {
-            CriterionAppender criterionAppender = MybatisPlusEntityMapper.operatorCriterionBuilderMap.get(criterion.getOperator());
+            CriterionAppender criterionAppender = MybatisPlusEntityMapper.operatorCriterionAppenderMap.get(criterion.getOperator());
             criterionAppender.appendCriterion(queryWrapper, StrUtil.toUnderlineCase(criterion.getProperty()), criterion.getValue());
         }
         String[] orderBy = example.getOrderBy() != null ? example.getOrderBy() : this.orderBy;
