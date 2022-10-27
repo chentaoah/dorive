@@ -13,7 +13,7 @@
     <dependencies>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>spring-domain-core3</artifactId>
+            <artifactId>spring-domain-core</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
