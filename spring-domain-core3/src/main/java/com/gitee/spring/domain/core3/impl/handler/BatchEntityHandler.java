@@ -9,7 +9,9 @@ import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.executor.Example;
+import com.gitee.spring.domain.core3.entity.executor.Fishhook;
 import com.gitee.spring.domain.core3.entity.executor.UnionExample;
+import com.gitee.spring.domain.core3.impl.DefaultEntityIndex;
 import com.gitee.spring.domain.core3.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core3.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core3.repository.AbstractContextRepository;
@@ -17,6 +19,7 @@ import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class BatchEntityHandler implements EntityHandler {
 
@@ -42,8 +45,13 @@ public class BatchEntityHandler implements EntityHandler {
                         unionExample.mergeExample(example);
                     }
                 }
+
+                Fishhook fishhook = new Fishhook(null);
+                boundedContext.put("#fishhook", fishhook);
                 List<Object> entities = subRepository.selectByExample(boundedContext, unionExample);
-                EntityIndex entityIndex = repository.newEntityIndex(subRepository, boundedContext, entities);
+                boundedContext.remove("#fishhook");
+
+                EntityIndex entityIndex = newEntityIndex(fishhook.getSource(), entities);
                 for (Object rootEntity : rootEntities) {
                     Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
                     if (lastEntity != null) {
@@ -93,6 +101,15 @@ public class BatchEntityHandler implements EntityHandler {
                 }
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private EntityIndex newEntityIndex(Object source, List<Object> entities) {
+        if (source instanceof List) {
+            List<Map<String, Object>> resultMaps = (List<Map<String, Object>>) source;
+            return new DefaultEntityIndex(resultMaps, entities);
+        }
+        throw new RuntimeException("Unsupported type!");
     }
 
     private Object convertManyToOneEntity(ConfiguredRepository repository, List<?> entities) {

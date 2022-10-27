@@ -44,18 +44,18 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         if (query.getPrimaryKey() != null) {
             QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("id", query.getPrimaryKey());
-            List<Map<String, Object>> resultMap = baseMapper.selectMaps(queryWrapper);
+            List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
             Object entity = null;
-            if (!resultMap.isEmpty()) {
-                entity = entityFactory.reconstitute(boundedContext, resultMap.get(0));
+            if (!resultMaps.isEmpty()) {
+                entity = entityFactory.reconstitute(boundedContext, resultMaps.get(0));
             }
             return new Result(entity);
 
         } else if (!query.startPage()) {
             QueryWrapper<Object> queryWrapper = buildQueryWrapper(query.getExample());
-            List<Map<String, Object>> resultMap = baseMapper.selectMaps(queryWrapper);
+            List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
             List<Object> entities = new ArrayList<>();
-            for (Map<String, Object> record : resultMap) {
+            for (Map<String, Object> record : resultMaps) {
                 Object entity = entityFactory.reconstitute(boundedContext, record);
                 entities.add(entity);
             }
