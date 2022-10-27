@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gitee.spring.boot.starter.domain.api.CriterionBuilder;
+import com.gitee.spring.boot.starter.domain.api.CriterionAppender;
 import com.gitee.spring.boot.starter.domain.repository.MybatisPlusEntityMapper;
 import com.gitee.spring.domain.core3.api.EntityFactory;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
@@ -86,8 +86,8 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             queryWrapper.select(selectColumns);
         }
         for (Criterion criterion : example.getCriteria()) {
-            CriterionBuilder criterionBuilder = MybatisPlusEntityMapper.operatorCriterionBuilderMap.get(criterion.getOperator());
-            criterionBuilder.appendCriterion(queryWrapper, StrUtil.toUnderlineCase(criterion.getProperty()), criterion.getValue());
+            CriterionAppender criterionAppender = MybatisPlusEntityMapper.operatorCriterionBuilderMap.get(criterion.getOperator());
+            criterionAppender.appendCriterion(queryWrapper, StrUtil.toUnderlineCase(criterion.getProperty()), criterion.getValue());
         }
         String[] orderBy = example.getOrderBy() != null ? example.getOrderBy() : this.orderBy;
         String sort = example.getSort() != null ? example.getSort() : this.sort;

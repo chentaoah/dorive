@@ -1,13 +1,13 @@
 package com.gitee.spring.boot.starter.domain.builder;
 
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
-import com.gitee.spring.boot.starter.domain.api.CriterionBuilder;
+import com.gitee.spring.boot.starter.domain.api.CriterionAppender;
 
-public class IsNotNullCriterionBuilder implements CriterionBuilder {
+public class NotLikeCriterionAppender implements CriterionAppender {
 
     @Override
     public void appendCriterion(AbstractWrapper<?, String, ?> abstractWrapper, String property, Object value) {
-        abstractWrapper.isNotNull(property);
+        abstractWrapper.notLike(property, value);
     }
 
 }

@@ -4,19 +4,19 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gitee.spring.boot.starter.domain.api.CriterionBuilder;
-import com.gitee.spring.boot.starter.domain.builder.EQCriterionBuilder;
-import com.gitee.spring.boot.starter.domain.builder.GECriterionBuilder;
-import com.gitee.spring.boot.starter.domain.builder.GTCriterionBuilder;
-import com.gitee.spring.boot.starter.domain.builder.InCriterionBuilder;
-import com.gitee.spring.boot.starter.domain.builder.IsNotNullCriterionBuilder;
-import com.gitee.spring.boot.starter.domain.builder.IsNullCriterionBuilder;
-import com.gitee.spring.boot.starter.domain.builder.LECriterionBuilder;
-import com.gitee.spring.boot.starter.domain.builder.LTCriterionBuilder;
-import com.gitee.spring.boot.starter.domain.builder.LikeCriterionBuilder;
-import com.gitee.spring.boot.starter.domain.builder.NECriterionBuilder;
-import com.gitee.spring.boot.starter.domain.builder.NotInCriterionBuilder;
-import com.gitee.spring.boot.starter.domain.builder.NotLikeCriterionBuilder;
+import com.gitee.spring.boot.starter.domain.api.CriterionAppender;
+import com.gitee.spring.boot.starter.domain.builder.EQCriterionAppender;
+import com.gitee.spring.boot.starter.domain.builder.GECriterionAppender;
+import com.gitee.spring.boot.starter.domain.builder.GTCriterionAppender;
+import com.gitee.spring.boot.starter.domain.builder.InCriterionAppender;
+import com.gitee.spring.boot.starter.domain.builder.IsNotNullCriterionAppender;
+import com.gitee.spring.boot.starter.domain.builder.IsNullCriterionAppender;
+import com.gitee.spring.boot.starter.domain.builder.LECriterionAppender;
+import com.gitee.spring.boot.starter.domain.builder.LTCriterionAppender;
+import com.gitee.spring.boot.starter.domain.builder.LikeCriterionAppender;
+import com.gitee.spring.boot.starter.domain.builder.NECriterionAppender;
+import com.gitee.spring.boot.starter.domain.builder.NotInCriterionAppender;
+import com.gitee.spring.boot.starter.domain.builder.NotLikeCriterionAppender;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.entity.BoundedContext;
@@ -30,22 +30,22 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MybatisPlusEntityMapper implements EntityMapper {
 
-    public static Map<String, CriterionBuilder> operatorCriterionBuilderMap = new ConcurrentHashMap<>();
+    public static Map<String, CriterionAppender> operatorCriterionBuilderMap = new ConcurrentHashMap<>();
     protected EntityDefinition entityDefinition;
 
     static {
-        operatorCriterionBuilderMap.put(Operator.EQ, new EQCriterionBuilder());
-        operatorCriterionBuilderMap.put(Operator.NE, new NECriterionBuilder());
-        operatorCriterionBuilderMap.put(Operator.IN, new InCriterionBuilder());
-        operatorCriterionBuilderMap.put(Operator.NOT_IN, new NotInCriterionBuilder());
-        operatorCriterionBuilderMap.put(Operator.IS_NULL, new IsNullCriterionBuilder());
-        operatorCriterionBuilderMap.put(Operator.IS_NOT_NULL, new IsNotNullCriterionBuilder());
-        operatorCriterionBuilderMap.put(Operator.LIKE, new LikeCriterionBuilder());
-        operatorCriterionBuilderMap.put(Operator.NOT_LIKE, new NotLikeCriterionBuilder());
-        operatorCriterionBuilderMap.put(Operator.GT, new GTCriterionBuilder());
-        operatorCriterionBuilderMap.put(Operator.GE, new GECriterionBuilder());
-        operatorCriterionBuilderMap.put(Operator.LT, new LTCriterionBuilder());
-        operatorCriterionBuilderMap.put(Operator.LE, new LECriterionBuilder());
+        operatorCriterionBuilderMap.put(Operator.EQ, new EQCriterionAppender());
+        operatorCriterionBuilderMap.put(Operator.NE, new NECriterionAppender());
+        operatorCriterionBuilderMap.put(Operator.IN, new InCriterionAppender());
+        operatorCriterionBuilderMap.put(Operator.NOT_IN, new NotInCriterionAppender());
+        operatorCriterionBuilderMap.put(Operator.IS_NULL, new IsNullCriterionAppender());
+        operatorCriterionBuilderMap.put(Operator.IS_NOT_NULL, new IsNotNullCriterionAppender());
+        operatorCriterionBuilderMap.put(Operator.LIKE, new LikeCriterionAppender());
+        operatorCriterionBuilderMap.put(Operator.NOT_LIKE, new NotLikeCriterionAppender());
+        operatorCriterionBuilderMap.put(Operator.GT, new GTCriterionAppender());
+        operatorCriterionBuilderMap.put(Operator.GE, new GECriterionAppender());
+        operatorCriterionBuilderMap.put(Operator.LT, new LTCriterionAppender());
+        operatorCriterionBuilderMap.put(Operator.LE, new LECriterionAppender());
     }
 
     public MybatisPlusEntityMapper(EntityDefinition entityDefinition) {
@@ -82,8 +82,8 @@ public class MybatisPlusEntityMapper implements EntityMapper {
             String fieldName = entityCriterion.getFieldName();
             String operator = entityCriterion.getOperator();
             Object fieldValue = entityCriterion.getFieldValue();
-            CriterionBuilder criterionBuilder = operatorCriterionBuilderMap.get(operator);
-            criterionBuilder.appendCriterion(queryWrapper, StrUtil.toUnderlineCase(fieldName), fieldValue);
+            CriterionAppender criterionAppender = operatorCriterionBuilderMap.get(operator);
+            criterionAppender.appendCriterion(queryWrapper, StrUtil.toUnderlineCase(fieldName), fieldValue);
         }
         String[] orderBy;
         if (entityExample.getOrderBy() != null) {
