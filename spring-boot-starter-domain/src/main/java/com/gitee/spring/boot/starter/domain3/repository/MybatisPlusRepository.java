@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gitee.spring.domain.core3.api.EntityFactory;
 import com.gitee.spring.domain.core3.api.EntityIndex;
 import com.gitee.spring.domain.core3.api.Executor;
+import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core3.impl.DefaultEntityFactory;
@@ -70,7 +71,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractContextRepository<E, P
         executor.setElementDefinition(elementDefinition);
         executor.setEntityDefinition(entityDefinition);
         executor.setBaseMapper((BaseMapper<Object>) mapper);
-        executor.setPojoClass(pojoClass);
+        executor.setPojoClass((Class<Object>) pojoClass);
         executor.setOrderBy(orderBy);
         executor.setSort(sort);
         executor.setEntityFactory(entityFactory);
@@ -78,7 +79,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractContextRepository<E, P
     }
 
     @Override
-    public EntityIndex newEntityIndex(ConfiguredRepository repository, List<Object> entities) {
+    public EntityIndex newEntityIndex(ConfiguredRepository repository, BoundedContext boundedContext, List<Object> entities) {
         return null;
     }
 

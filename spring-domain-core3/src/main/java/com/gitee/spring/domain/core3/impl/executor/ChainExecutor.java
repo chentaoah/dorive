@@ -25,17 +25,24 @@ public class ChainExecutor extends AbstractExecutor {
         ConfiguredRepository rootRepository = repository.getRootRepository();
         if (query.getPrimaryKey() != null) {
             Object rootEntity = rootRepository.selectByPrimaryKey(boundedContext, query.getPrimaryKey());
-            entityHandler.handleEntities(boundedContext, Collections.singletonList(rootEntity));
+            if (rootEntity != null) {
+                entityHandler.handleEntities(boundedContext, Collections.singletonList(rootEntity));
+            }
             return new Result(rootEntity);
 
         } else if (!query.startPage()) {
             List<Object> rootEntities = rootRepository.selectByExample(boundedContext, query.getExample());
-            entityHandler.handleEntities(boundedContext, rootEntities);
+            if (!rootEntities.isEmpty()) {
+                entityHandler.handleEntities(boundedContext, rootEntities);
+            }
             return new Result(rootEntities);
 
         } else {
             Page<Object> page = rootRepository.selectPageByExample(boundedContext, query.getExample());
-            entityHandler.handleEntities(boundedContext, page.getRecords());
+            List<Object> rootEntities = page.getRecords();
+            if (!rootEntities.isEmpty()) {
+                entityHandler.handleEntities(boundedContext, rootEntities);
+            }
             return new Result(page);
         }
     }

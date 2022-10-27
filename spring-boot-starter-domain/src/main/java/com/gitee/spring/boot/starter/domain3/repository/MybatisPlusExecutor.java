@@ -1,5 +1,6 @@
 package com.gitee.spring.boot.starter.domain3.repository;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -15,6 +16,7 @@ import com.gitee.spring.domain.core3.entity.executor.Example;
 import com.gitee.spring.domain.core3.entity.executor.Operation;
 import com.gitee.spring.domain.core3.entity.executor.Query;
 import com.gitee.spring.domain.core3.entity.executor.Result;
+import com.gitee.spring.domain.core3.entity.executor.UnionExample;
 import com.gitee.spring.domain.core3.impl.executor.AbstractExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,7 +34,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     private ElementDefinition elementDefinition;
     private EntityDefinition entityDefinition;
     private BaseMapper<Object> baseMapper;
-    private Class<?> pojoClass;
+    private Class<Object> pojoClass;
     private String[] orderBy;
     private String sort;
     private EntityFactory entityFactory;
@@ -80,14 +82,18 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     }
 
     private QueryWrapper<Object> buildQueryWrapper(Example example) {
+        if (example instanceof UnionExample) {
+            return buildQueryWrapper((UnionExample) example);
+        }
         QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
         String[] selectColumns = example.getSelectColumns();
         if (selectColumns != null) {
-            queryWrapper.select(selectColumns);
+            queryWrapper.select(pojoClass, i -> true).select(selectColumns);
         }
         for (Criterion criterion : example.getCriteria()) {
             CriterionAppender criterionAppender = MybatisPlusEntityMapper.operatorCriterionAppenderMap.get(criterion.getOperator());
-            criterionAppender.appendCriterion(queryWrapper, StrUtil.toUnderlineCase(criterion.getProperty()), criterion.getValue());
+            String property = StrUtil.toUnderlineCase(criterion.getProperty());
+            criterionAppender.appendCriterion(queryWrapper, property, criterion.getValue());
         }
         String[] orderBy = example.getOrderBy() != null ? example.getOrderBy() : this.orderBy;
         String sort = example.getSort() != null ? example.getSort() : this.sort;
@@ -99,6 +105,24 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             }
         }
         return queryWrapper;
+    }
+
+    private QueryWrapper<Object> buildQueryWrapper(UnionExample unionExample) {
+        List<Example> examples = unionExample.getExamples();
+        Assert.notEmpty(examples, "The examples cannot be empty!");
+        if (examples.size() == 1) {
+            return buildQueryWrapper(examples.get(0));
+        } else {
+            Example example = examples.get(0);
+            QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
+            for (int index = 1; index < examples.size(); index++) {
+                Example nextExample = examples.get(index);
+                QueryWrapper<Object> nextQueryWrapper = buildQueryWrapper(nextExample);
+                String sql = "\nunion (select " + nextQueryWrapper.getSqlSelect() + " where " + nextQueryWrapper.getSqlSegment() + ")";
+                queryWrapper.last(sql);
+            }
+            return queryWrapper;
+        }
     }
 
     @Override

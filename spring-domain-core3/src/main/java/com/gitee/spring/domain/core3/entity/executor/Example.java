@@ -1,5 +1,6 @@
 package com.gitee.spring.domain.core3.entity.executor;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.gitee.spring.domain.core.constants.Operator;
 import com.gitee.spring.domain.core.utils.StringUtils;
 import lombok.Data;
@@ -28,8 +29,8 @@ public class Example {
         return !emptyQuery && !isDirtyQuery();
     }
 
-    public void setSelectColumns(String... columns) {
-        selectColumns = StringUtils.toUnderlineCase(columns);
+    public void selectColumns(String... columns) {
+        selectColumns = selectColumns == null ? columns : ArrayUtil.addAll(selectColumns, columns);
     }
 
     public void addCriterion(Criterion entityCriterion) {

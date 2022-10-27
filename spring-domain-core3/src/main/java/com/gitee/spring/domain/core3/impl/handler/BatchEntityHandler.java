@@ -1,5 +1,6 @@
 package com.gitee.spring.domain.core3.impl.handler;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core.api.EntityProperty;
 import com.gitee.spring.domain.core.utils.StringUtils;
 import com.gitee.spring.domain.core3.api.EntityHandler;
@@ -36,11 +37,13 @@ public class BatchEntityHandler implements EntityHandler {
                     Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
                     if (lastEntity != null) {
                         Example example = newExampleByContext(subRepository, boundedContext, rootEntity);
+                        Object primaryKey = BeanUtil.getFieldValue(rootEntity, "id");
+                        example.selectColumns(primaryKey + " as $id");
                         unionExample.mergeExample(example);
                     }
                 }
                 List<Object> entities = subRepository.selectByExample(boundedContext, unionExample);
-                EntityIndex entityIndex = repository.newEntityIndex(subRepository, entities);
+                EntityIndex entityIndex = repository.newEntityIndex(subRepository, boundedContext, entities);
                 for (Object rootEntity : rootEntities) {
                     Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
                     if (lastEntity != null) {

@@ -3,6 +3,7 @@ package com.gitee.spring.domain.core3.repository;
 import com.gitee.spring.domain.core.utils.ReflectUtils;
 import com.gitee.spring.domain.core3.api.EntityIndex;
 import com.gitee.spring.domain.core3.api.Executor;
+import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
@@ -129,6 +130,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     protected abstract Executor newExecutor(ElementDefinition elementDefinition, EntityDefinition entityDefinition);
 
-    public abstract EntityIndex newEntityIndex(ConfiguredRepository repository, List<Object> entities);
+    public abstract EntityIndex newEntityIndex(ConfiguredRepository repository, BoundedContext boundedContext, List<Object> entities);
 
 }

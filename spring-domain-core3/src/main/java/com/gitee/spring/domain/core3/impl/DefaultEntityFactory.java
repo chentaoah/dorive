@@ -1,12 +1,15 @@
 package com.gitee.spring.domain.core3.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.api.EntityFactory;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -17,7 +20,11 @@ public class DefaultEntityFactory implements EntityFactory {
 
     @Override
     public Object reconstitute(BoundedContext boundedContext, Object persistentObject) {
-        return BeanUtil.copyProperties(persistentObject, elementDefinition.getGenericEntityClass());
+        if (persistentObject instanceof Map) {
+            return BeanUtil.mapToBean((Map<?, ?>) persistentObject, elementDefinition.getGenericEntityClass(), true, CopyOptions.create().ignoreNullValue());
+        } else {
+            return BeanUtil.copyProperties(persistentObject, elementDefinition.getGenericEntityClass());
+        }
     }
 
 }
