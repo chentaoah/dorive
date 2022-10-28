@@ -10,4 +10,15 @@ import java.util.LinkedHashMap;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class BoundedContext extends LinkedHashMap<String, Object> {
+
+    public BoundedContext(String... keywords) {
+        put(keywords);
+    }
+
+    public void put(String... keywords) {
+        for (String keyword : keywords) {
+            put(keyword, true);
+        }
+    }
+
 }
