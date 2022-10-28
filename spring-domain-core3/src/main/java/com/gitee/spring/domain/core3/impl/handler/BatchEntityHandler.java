@@ -106,8 +106,7 @@ public class BatchEntityHandler implements EntityHandler {
     @SuppressWarnings("unchecked")
     private EntityIndex newEntityIndex(Object source, List<Object> entities) {
         if (source instanceof List) {
-            List<Map<String, Object>> resultMaps = (List<Map<String, Object>>) source;
-            return new DefaultEntityIndex(resultMaps, entities);
+            return new DefaultEntityIndex((List<Map<String, Object>>) source, entities);
         }
         throw new RuntimeException("Unsupported type!");
     }

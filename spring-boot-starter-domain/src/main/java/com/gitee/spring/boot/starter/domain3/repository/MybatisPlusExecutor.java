@@ -13,6 +13,7 @@ import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core3.entity.executor.Criterion;
 import com.gitee.spring.domain.core3.entity.executor.Example;
+import com.gitee.spring.domain.core3.entity.executor.Fishhook;
 import com.gitee.spring.domain.core3.entity.executor.Operation;
 import com.gitee.spring.domain.core3.entity.executor.Query;
 import com.gitee.spring.domain.core3.entity.executor.Result;
@@ -54,6 +55,11 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         } else if (!query.startPage()) {
             QueryWrapper<Object> queryWrapper = buildQueryWrapper(query.getExample());
             List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
+            if (boundedContext.containsKey("#fishhook")) {
+                Fishhook fishhook = (Fishhook) boundedContext.get("#fishhook");
+                fishhook.setSource(resultMaps);
+                boundedContext.remove("#fishhook");
+            }
             List<Object> entities = new ArrayList<>();
             for (Map<String, Object> record : resultMaps) {
                 Object entity = entityFactory.reconstitute(boundedContext, record);
@@ -115,7 +121,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         for (int index = 1; index < examples.size(); index++) {
             Example nextExample = examples.get(index);
             QueryWrapper<Object> nextQueryWrapper = buildQueryWrapper(nextExample);
-            String sql = "\nunion (select " + nextQueryWrapper.getSqlSelect() + " where " + nextQueryWrapper.getSqlSegment() + ")";
+            String sql = "\nunion all (select " + nextQueryWrapper.getSqlSelect() + " where " + nextQueryWrapper.getSqlSegment() + ")";
             queryWrapper.last(sql);
         }
         return queryWrapper;
