@@ -7,6 +7,7 @@ import com.gitee.spring.domain.web.repository.AbstractWebRepository;
 
 import java.io.Serializable;
 
+@Deprecated
 public class MybatisPlusGenericRepository<E, PK extends Serializable> extends AbstractWebRepository<E, PK> {
 
     @Override
