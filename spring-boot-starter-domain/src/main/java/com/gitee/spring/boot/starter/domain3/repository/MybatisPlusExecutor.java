@@ -127,7 +127,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             Example nextExample = examples.get(index);
             QueryWrapper<Object> nextQueryWrapper = buildQueryWrapper(nextExample);
             String tableName = TableInfoHelper.getTableInfo(pojoClass).getTableName();
-            String sqlTemplate = "\nUNION ALL (SELECT %s FROM %s WHERE %s)";
+            String sqlTemplate = "UNION ALL (SELECT %s FROM %s WHERE %s)";
             String sql = String.format(sqlTemplate, nextQueryWrapper.getSqlSelect(), tableName, buildCriteria(example));
             queryWrapper.last(sql);
         }
