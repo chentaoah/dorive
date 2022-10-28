@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@Deprecated
 @NoArgsConstructor
 public class EntityExample {
 

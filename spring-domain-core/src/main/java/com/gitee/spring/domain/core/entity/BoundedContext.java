@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import java.util.LinkedHashMap;
 
 @Data
+@Deprecated
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class BoundedContext extends LinkedHashMap<String, Object> {
