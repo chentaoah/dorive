@@ -1,5 +1,6 @@
 package com.gitee.spring.domain.core3.entity.executor;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,7 +14,7 @@ public class Criterion {
 
     @Override
     public String toString() {
-        return property + " " + operator + " " + value;
+        return StrUtil.toUnderlineCase(property) + " " + operator + " " + value;
     }
 
 }
