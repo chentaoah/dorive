@@ -6,6 +6,7 @@ import java.lang.annotation.*;
 
 @Inherited
 @Documented
+@Deprecated
 @Repeatable(Bindings.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
