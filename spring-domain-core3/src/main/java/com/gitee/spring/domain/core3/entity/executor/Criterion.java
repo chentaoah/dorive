@@ -6,7 +6,14 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class Criterion {
-    protected String property;
-    protected String operator;
-    protected Object value;
+
+    private String property;
+    private String operator;
+    private Object value;
+
+    @Override
+    public String toString() {
+        return property + " " + operator + " " + value;
+    }
+
 }
