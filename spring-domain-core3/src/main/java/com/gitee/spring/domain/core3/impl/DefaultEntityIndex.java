@@ -18,9 +18,15 @@ public class DefaultEntityIndex implements EntityIndex {
     public DefaultEntityIndex(List<Map<String, Object>> resultMaps, List<Object> entities) {
         for (Map<String, Object> resultMap : resultMaps) {
             Long rootPrimaryKey = (Long) resultMap.get("$id");
-            Long primaryKey = (Long) resultMap.get("id");
-            List<Long> primaryKeys = primaryKeyMapping.computeIfAbsent(rootPrimaryKey, key -> new ArrayList<>());
-            primaryKeys.add(primaryKey);
+            List<Long> existPrimaryKeys = primaryKeyMapping.computeIfAbsent(rootPrimaryKey, key -> new ArrayList<>());
+
+            Object primaryKey = resultMap.get("id");
+            if (primaryKey instanceof Long) {
+                existPrimaryKeys.add((Long) primaryKey);
+
+            } else if (primaryKey instanceof Integer) {
+                existPrimaryKeys.add(Convert.convert(Long.class, primaryKey));
+            }
         }
         for (Object entity : entities) {
             Object primaryKey = BeanUtil.getFieldValue(entity, "id");
@@ -33,10 +39,10 @@ public class DefaultEntityIndex implements EntityIndex {
     public List<Object> selectList(Object rootEntity) {
         Object rootPrimaryKey = BeanUtil.getFieldValue(rootEntity, "id");
         Long number = Convert.convert(Long.class, rootPrimaryKey);
-        List<Long> primaryKeys = primaryKeyMapping.get(number);
-        if (primaryKeys != null && !primaryKeys.isEmpty()) {
-            List<Object> entities = new ArrayList<>(primaryKeys.size());
-            for (Long primaryKey : primaryKeys) {
+        List<Long> existPrimaryKeys = primaryKeyMapping.get(number);
+        if (existPrimaryKeys != null && !existPrimaryKeys.isEmpty()) {
+            List<Object> entities = new ArrayList<>(existPrimaryKeys.size());
+            for (Long primaryKey : existPrimaryKeys) {
                 Object entity = primaryKeyEntityMap.get(primaryKey);
                 entities.add(entity);
             }
