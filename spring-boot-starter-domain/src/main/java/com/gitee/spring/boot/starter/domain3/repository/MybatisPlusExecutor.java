@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.spring.boot.starter.domain.api.CriterionAppender;
-import com.gitee.spring.boot.starter.domain.repository.MybatisPlusEntityMapper;
 import com.gitee.spring.domain.core3.api.EntityFactory;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
@@ -26,6 +25,8 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.gitee.spring.boot.starter.domain.appender.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
 
 @Data
 @NoArgsConstructor
@@ -97,7 +98,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             queryWrapper.select(pojoClass, i -> true).select(selectColumns);
         }
         for (Criterion criterion : example.getCriteria()) {
-            CriterionAppender criterionAppender = MybatisPlusEntityMapper.operatorCriterionAppenderMap.get(criterion.getOperator());
+            CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
             String property = StrUtil.toUnderlineCase(criterion.getProperty());
             criterionAppender.appendCriterion(queryWrapper, property, criterion.getValue());
         }
