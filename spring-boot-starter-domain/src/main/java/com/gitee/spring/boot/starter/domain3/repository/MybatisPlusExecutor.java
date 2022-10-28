@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.spring.boot.starter.domain.api.CriterionAppender;
@@ -125,7 +126,9 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         for (int index = 1; index < examples.size(); index++) {
             Example nextExample = examples.get(index);
             QueryWrapper<Object> nextQueryWrapper = buildQueryWrapper(nextExample);
-            String sql = "\nUNION ALL (SELECT " + nextQueryWrapper.getSqlSelect() + " WHERE " + buildCriteria(example) + ")";
+            String tableName = TableInfoHelper.getTableInfo(pojoClass).getTableName();
+            String sqlTemplate = "\nUNION ALL (SELECT %s FROM %s WHERE %s)";
+            String sql = String.format(sqlTemplate, nextQueryWrapper.getSqlSelect(), tableName, buildCriteria(example));
             queryWrapper.last(sql);
         }
         return queryWrapper;
