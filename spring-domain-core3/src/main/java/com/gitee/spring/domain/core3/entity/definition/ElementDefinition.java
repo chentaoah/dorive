@@ -2,7 +2,6 @@ package com.gitee.spring.domain.core3.entity.definition;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.utils.ReflectUtils;
-import com.gitee.spring.domain.core.utils.StringUtils;
 import com.gitee.spring.domain.core3.annotation.Binding;
 import com.gitee.spring.domain.core3.annotation.Entity;
 import lombok.AllArgsConstructor;
@@ -28,7 +27,6 @@ public class ElementDefinition {
     private Class<?> genericEntityClass;
     private String fieldName;
     private Set<String> properties;
-    private String[] selectColumns;
 
     public static ElementDefinition newElementDefinition(AnnotatedElement annotatedElement) {
         Entity entityAnnotation = AnnotatedElementUtils.getMergedAnnotation(annotatedElement, Entity.class);
@@ -37,9 +35,6 @@ public class ElementDefinition {
 
         if (annotatedElement instanceof Class) {
             Class<?> entityClass = (Class<?>) annotatedElement;
-            Set<String> properties = ReflectUtils.getFieldNames(entityClass);
-            String[] selectColumns = StringUtils.toUnderlineCase(properties.toArray(new String[0]));
-
             return new ElementDefinition(
                     entityAnnotation,
                     bindingAnnotations,
@@ -48,8 +43,7 @@ public class ElementDefinition {
                     false,
                     entityClass,
                     null,
-                    properties,
-                    selectColumns);
+                    ReflectUtils.getFieldNames(entityClass));
 
         } else if (annotatedElement instanceof Field) {
             Field declaredField = (Field) annotatedElement;
@@ -65,9 +59,6 @@ public class ElementDefinition {
                 fieldGenericEntityClass = (Class<?>) actualTypeArgument;
             }
 
-            Set<String> properties = ReflectUtils.getFieldNames(fieldGenericEntityClass);
-            String[] selectColumns = StringUtils.toUnderlineCase(properties.toArray(new String[0]));
-
             return new ElementDefinition(
                     entityAnnotation,
                     bindingAnnotations,
@@ -76,8 +67,7 @@ public class ElementDefinition {
                     isCollection,
                     fieldGenericEntityClass,
                     fieldName,
-                    properties,
-                    selectColumns);
+                    ReflectUtils.getFieldNames(fieldGenericEntityClass));
         }
 
         throw new RuntimeException("Unknown type!");
