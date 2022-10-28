@@ -125,14 +125,14 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         for (int index = 1; index < examples.size(); index++) {
             Example nextExample = examples.get(index);
             QueryWrapper<Object> nextQueryWrapper = buildQueryWrapper(nextExample);
-            String sql = "\nunion all (select " + nextQueryWrapper.getSqlSelect() + " where " + buildCriteria(example) + ")";
+            String sql = "\nUNION ALL (SELECT " + nextQueryWrapper.getSqlSelect() + " WHERE " + buildCriteria(example) + ")";
             queryWrapper.last(sql);
         }
         return queryWrapper;
     }
 
     private String buildCriteria(Example example) {
-        return StrUtil.join(" and ", example.getCriteria());
+        return StrUtil.join(" AND ", example.getCriteria());
     }
 
     @Override
