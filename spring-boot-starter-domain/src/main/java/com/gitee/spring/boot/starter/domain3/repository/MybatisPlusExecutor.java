@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.spring.boot.starter.domain.api.CriterionAppender;
 import com.gitee.spring.domain.core3.api.EntityFactory;
@@ -95,7 +96,9 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
         String[] selectColumns = example.getSelectColumns();
         if (selectColumns != null) {
-            queryWrapper.select(pojoClass, i -> true).select(selectColumns);
+            String sqlSelect = queryWrapper.select(pojoClass, i -> true).getSqlSelect();
+            sqlSelect = sqlSelect + StringPool.COMMA + queryWrapper.select(selectColumns).getSqlSelect();
+            queryWrapper.select(sqlSelect);
         }
         for (Criterion criterion : example.getCriteria()) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
