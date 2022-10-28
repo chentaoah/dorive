@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.core3.annotation;
 
-import com.gitee.spring.domain.core.repository.DefaultRepository;
+import com.gitee.spring.domain.core3.repository.DefaultRepository;
 import com.gitee.spring.domain.core3.impl.DefaultEntityFactory;
 
 import java.lang.annotation.*;
