@@ -15,7 +15,7 @@ public class Example {
 
     private boolean emptyQuery = false;
     private String[] selectColumns;
-    private List<Criterion> criteria = new ArrayList<>();
+    private List<Criterion> criteria = new ArrayList<>(4);
     private String[] orderBy;
     private String sort;
     private Long pageNum;
