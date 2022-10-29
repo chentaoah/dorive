@@ -149,7 +149,9 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             }
             lastSql.append(sql);
         }
-        queryWrapper.last(lastSql.toString());
+        if (lastSql.length() > 0) {
+            queryWrapper.last(lastSql.toString());
+        }
         return queryWrapper;
     }
 
