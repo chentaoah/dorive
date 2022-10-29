@@ -17,7 +17,7 @@ public class ConfiguredRepository extends ProxyRepository {
     protected BinderResolver binderResolver;
     protected boolean boundEntity;
     protected PropertyChain anchorPoint;
-    protected String prefixAccessPath;
+    protected String fieldPrefix;
     protected Map<String, PropertyChain> propertyChains;
 
     public boolean matchContext(BoundedContext boundedContext) {

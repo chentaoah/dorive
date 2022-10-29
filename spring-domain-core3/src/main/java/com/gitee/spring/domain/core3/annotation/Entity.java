@@ -19,9 +19,7 @@ public @interface Entity {
 
     String orderByDesc() default "";
 
-    String pageNum() default "";
-
-    String pageSize() default "";
+    String page() default "";
 
     int order() default 0;
 

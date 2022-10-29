@@ -41,8 +41,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK> {
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByExample(BoundedContext boundedContext, Example example) {
-        Assert.notNull(example.getPageNum(), "The pageNum cannot be null!");
-        Assert.notNull(example.getPageSize(), "The pageSize cannot be null!");
+        Assert.notNull(example.getPage(), "The page cannot be null!");
         Query query = executor.buildQuery(boundedContext, example);
         Result result = executor.executeQuery(boundedContext, query);
         return (Page<E>) result.getPage();

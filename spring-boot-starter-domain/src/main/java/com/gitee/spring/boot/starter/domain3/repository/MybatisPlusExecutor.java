@@ -78,22 +78,23 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
         } else {
             Example example = query.getExample();
-            Page<Map<String, Object>> page = new Page<>(example.getPageNum(), example.getPageSize());
+            com.gitee.spring.domain.core3.entity.executor.Page<Object> page = example.getPage();
+
+            Page<Map<String, Object>> dataPage = new Page<>(page.getCurrent(), page.getSize());
             QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
-            page = baseMapper.selectMapsPage(page, queryWrapper);
-            List<Map<String, Object>> resultMaps = page.getRecords();
+            dataPage = baseMapper.selectMapsPage(dataPage, queryWrapper);
+
+            page.setTotal(dataPage.getTotal());
+
+            List<Map<String, Object>> resultMaps = dataPage.getRecords();
             List<Object> entities = new ArrayList<>(resultMaps.size());
             for (Map<String, Object> resultMap : resultMaps) {
                 Object entity = entityFactory.reconstitute(boundedContext, resultMap);
                 entities.add(entity);
             }
-            com.gitee.spring.domain.core3.entity.executor.Page<Object> newPage =
-                    new com.gitee.spring.domain.core3.entity.executor.Page<>();
-            newPage.setTotal(page.getTotal());
-            newPage.setCurrent(page.getCurrent());
-            newPage.setSize(page.getSize());
-            newPage.setRecords(entities);
-            return new Result(newPage);
+            page.setRecords(entities);
+
+            return new Result(page);
         }
     }
 
@@ -127,16 +128,28 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         Assert.notEmpty(examples, "The examples cannot be empty!");
         Example example = examples.get(0);
         QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
+        StringBuilder lastSql = new StringBuilder();
+        if (example.getPage() != null) {
+            lastSql.append(example.getPage().toString()).append(" ");
+        }
         for (int index = 1; index < examples.size(); index++) {
             Example nextExample = examples.get(index);
             QueryWrapper<Object> nextQueryWrapper = buildQueryWrapper(nextExample);
-            String sqlTemplate = "UNION ALL (SELECT %s FROM %s WHERE %s)";
+
             String sqlSelect = nextQueryWrapper.getSqlSelect();
             String tableName = TableInfoHelper.getTableInfo(pojoClass).getTableName();
-            String criteria = buildCriteria(example);
-            String sql = String.format(sqlTemplate, sqlSelect, tableName, criteria);
-            queryWrapper.last(sql);
+            String criteria = buildCriteria(nextExample);
+
+            String sql;
+            if (nextExample.getPage() == null) {
+                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s)", sqlSelect, tableName, criteria);
+            } else {
+                String limit = nextExample.getPage().toString();
+                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s %s)", sqlSelect, tableName, criteria, limit);
+            }
+            lastSql.append(sql);
         }
+        queryWrapper.last(lastSql.toString());
         return queryWrapper;
     }
 

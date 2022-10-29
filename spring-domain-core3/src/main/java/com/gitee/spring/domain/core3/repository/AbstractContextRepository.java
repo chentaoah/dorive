@@ -113,7 +113,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Map<String, PropertyChain> propertyChains = propertyResolver.getPropertyChains();
         PropertyChain propertyChain = propertyChains.get(accessPath);
 
-        String prefixAccessPath = aggregateRoot ? "/" : accessPath + "/";
+        String fieldPrefix = aggregateRoot ? "/" : accessPath + "/";
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository();
         configuredRepository.setElementDefinition(elementDefinition);
@@ -124,7 +124,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         configuredRepository.setBinderResolver(binderResolver);
         configuredRepository.setBoundEntity(false);
         configuredRepository.setAnchorPoint(propertyChain);
-        configuredRepository.setPrefixAccessPath(prefixAccessPath);
+        configuredRepository.setFieldPrefix(fieldPrefix);
         configuredRepository.setPropertyChains(new LinkedHashMap<>());
 
         return configuredRepository;

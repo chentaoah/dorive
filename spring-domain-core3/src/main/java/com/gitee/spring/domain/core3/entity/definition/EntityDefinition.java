@@ -18,8 +18,7 @@ public class EntityDefinition {
     private Class<?> mapper;
     private String orderByAsc;
     private String orderByDesc;
-    private String pageNum;
-    private String pageSize;
+    private String page;
     private int order;
     private Class<?> factory;
     private Class<?> repository;

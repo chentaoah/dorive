@@ -21,7 +21,7 @@ public class Query extends Operation {
     }
 
     public boolean startPage() {
-        return example.getPageNum() != null && example.getPageSize() != null;
+        return example.getPage() != null;
     }
 
 }

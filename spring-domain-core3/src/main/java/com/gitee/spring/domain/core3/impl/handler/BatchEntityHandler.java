@@ -10,6 +10,7 @@ import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.executor.Example;
 import com.gitee.spring.domain.core3.entity.executor.Fishhook;
+import com.gitee.spring.domain.core3.entity.executor.Page;
 import com.gitee.spring.domain.core3.entity.executor.UnionExample;
 import com.gitee.spring.domain.core3.impl.DefaultEntityIndex;
 import com.gitee.spring.domain.core3.impl.binder.ContextBinder;
@@ -30,18 +31,23 @@ public class BatchEntityHandler implements EntityHandler {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
         for (ConfiguredRepository subRepository : repository.getSubRepositories()) {
             if (subRepository.matchContext(boundedContext)) {
+                String keyOfPage = subRepository.getEntityDefinition().getPage();
+                Page<Object> page = (Page<Object>) boundedContext.get(keyOfPage);
+
+                UnionExample unionExample = new UnionExample();
                 PropertyChain anchorPoint = subRepository.getAnchorPoint();
                 PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
-                UnionExample unionExample = new UnionExample();
                 for (Object rootEntity : rootEntities) {
                     Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
                     if (lastEntity != null) {
                         Example example = newExampleByContext(subRepository, boundedContext, rootEntity);
                         Object primaryKey = BeanUtil.getFieldValue(rootEntity, "id");
                         example.selectColumns(primaryKey + " as $id");
+                        example.setPage(page);
                         unionExample.mergeExample(example);
                     }
                 }

@@ -18,14 +18,13 @@ public class Example {
     private List<Criterion> criteria = new ArrayList<>(4);
     private String[] orderBy;
     private String sort;
-    private Long pageNum;
-    private Long pageSize;
+    private Page<Object> page;
 
     public boolean isDirtyQuery() {
         return criteria.size() > 0;
     }
 
-    public boolean isAllQuery() {
+    public boolean isQueryAll() {
         return !emptyQuery && !isDirtyQuery();
     }
 
@@ -33,8 +32,8 @@ public class Example {
         selectColumns = selectColumns == null ? columns : ArrayUtil.addAll(selectColumns, columns);
     }
 
-    public void addCriterion(Criterion entityCriterion) {
-        criteria.add(entityCriterion);
+    public void addCriterion(Criterion criterion) {
+        criteria.add(criterion);
     }
 
     public Example eq(String property, Object value) {
@@ -109,9 +108,13 @@ public class Example {
         return this;
     }
 
-    public Example startPage(Long pageNum, Long pageSize) {
-        this.pageNum = pageNum;
-        this.pageSize = pageSize;
+    public Example startPage(long pageNum, long pageSize) {
+        page = new Page<>(pageNum, pageSize);
+        return this;
+    }
+
+    public Example startPage() {
+        page = new Page<>();
         return this;
     }
 

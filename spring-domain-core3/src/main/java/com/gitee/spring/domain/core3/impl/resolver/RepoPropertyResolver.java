@@ -43,7 +43,7 @@ public class RepoPropertyResolver {
                 propertyResolver.resolveProperties("", elementDefinition.getGenericEntityClass());
                 Map<String, PropertyChain> subPropertyChains = propertyResolver.getPropertyChains();
                 repoPropertyChains.putAll(subPropertyChains);
-                repository.setPrefixAccessPath("/");
+                repository.setFieldPrefix("/");
             }
         });
     }
