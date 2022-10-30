@@ -15,10 +15,11 @@ public class DefaultEntityIndex implements EntityIndex {
     private final Map<Long, List<Long>> primaryKeyMapping = new HashMap<>();
     private final Map<Long, Object> primaryKeyEntityMap = new HashMap<>();
 
-    public DefaultEntityIndex(List<Map<String, Object>> resultMaps, List<Object> entities) {
+    public DefaultEntityIndex(List<Object> rootEntities, List<Map<String, Object>> resultMaps, List<Object> entities) {
+        int initialCapacity = Math.max(resultMaps.size() / rootEntities.size(), 1);
         for (Map<String, Object> resultMap : resultMaps) {
             Long rootPrimaryKey = (Long) resultMap.get("$id");
-            List<Long> existPrimaryKeys = primaryKeyMapping.computeIfAbsent(rootPrimaryKey, key -> new ArrayList<>());
+            List<Long> existPrimaryKeys = primaryKeyMapping.computeIfAbsent(rootPrimaryKey, key -> new ArrayList<>(initialCapacity));
 
             Object primaryKey = resultMap.get("id");
             if (primaryKey instanceof Long) {

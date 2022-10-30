@@ -58,7 +58,7 @@ public class BatchEntityHandler implements EntityHandler {
                 List<Object> entities = subRepository.selectByExample(boundedContext, unionExample);
                 boundedContext.remove("#fishhook");
 
-                EntityIndex entityIndex = newEntityIndex(fishhook.getSource(), entities);
+                EntityIndex entityIndex = newEntityIndex(rootEntities, fishhook.getSource(), entities);
                 for (Object rootEntity : rootEntities) {
                     Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
                     if (lastEntity != null) {
@@ -111,9 +111,9 @@ public class BatchEntityHandler implements EntityHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private EntityIndex newEntityIndex(Object source, List<Object> entities) {
+    private EntityIndex newEntityIndex(List<Object> rootEntities, Object source, List<Object> entities) {
         if (source instanceof List) {
-            return new DefaultEntityIndex((List<Map<String, Object>>) source, entities);
+            return new DefaultEntityIndex(rootEntities, (List<Map<String, Object>>) source, entities);
         }
         throw new RuntimeException("Unsupported type!");
     }
