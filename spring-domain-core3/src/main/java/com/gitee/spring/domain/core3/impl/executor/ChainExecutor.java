@@ -3,7 +3,6 @@ package com.gitee.spring.domain.core3.impl.executor;
 import com.gitee.spring.domain.core3.api.EntityHandler;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.executor.*;
-import com.gitee.spring.domain.core3.impl.handler.BatchEntityHandler;
 import com.gitee.spring.domain.core3.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
 
@@ -15,9 +14,9 @@ public class ChainExecutor extends AbstractExecutor {
     private final AbstractContextRepository<?, ?> repository;
     private final EntityHandler entityHandler;
 
-    public ChainExecutor(AbstractContextRepository<?, ?> repository) {
+    public ChainExecutor(AbstractContextRepository<?, ?> repository, EntityHandler entityHandler) {
         this.repository = repository;
-        this.entityHandler = new BatchEntityHandler(repository);
+        this.entityHandler = entityHandler;
     }
 
     @Override
@@ -49,6 +48,13 @@ public class ChainExecutor extends AbstractExecutor {
 
     @Override
     public int execute(BoundedContext boundedContext, Operation operation) {
+        if (operation instanceof Insert) {
+
+        } else if (operation instanceof Update) {
+
+        } else if (operation instanceof Delete) {
+
+        }
         return 0;
     }
 

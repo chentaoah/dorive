@@ -6,11 +6,7 @@ import com.gitee.spring.domain.core3.api.Repository;
 import com.gitee.spring.domain.core3.entity.*;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
-import com.gitee.spring.domain.core3.entity.executor.Example;
-import com.gitee.spring.domain.core3.entity.executor.Operation;
-import com.gitee.spring.domain.core3.entity.executor.Page;
-import com.gitee.spring.domain.core3.entity.executor.Query;
-import com.gitee.spring.domain.core3.entity.executor.Result;
+import com.gitee.spring.domain.core3.entity.executor.*;
 import lombok.Data;
 
 import java.util.List;
@@ -49,20 +45,20 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK> {
 
     @Override
     public int insert(BoundedContext boundedContext, E entity) {
-        Operation operation = executor.buildInsert(boundedContext, entity);
-        return executor.execute(boundedContext, operation);
+        Insert insert = executor.buildInsert(boundedContext, entity);
+        return executor.execute(boundedContext, insert);
     }
 
     @Override
     public int update(BoundedContext boundedContext, E entity) {
-        Operation operation = executor.buildUpdate(boundedContext, entity);
-        return executor.execute(boundedContext, operation);
+        Update update = executor.buildUpdate(boundedContext, entity);
+        return executor.execute(boundedContext, update);
     }
 
     @Override
     public int updateByExample(BoundedContext boundedContext, Object entity, Example example) {
-        Operation operation = executor.buildUpdate(boundedContext, entity, example);
-        return executor.execute(boundedContext, operation);
+        Update update = executor.buildUpdate(boundedContext, entity, example);
+        return executor.execute(boundedContext, update);
     }
 
     @Override
@@ -73,20 +69,20 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK> {
 
     @Override
     public int delete(BoundedContext boundedContext, E entity) {
-        Operation operation = executor.buildDelete(boundedContext, entity);
-        return executor.execute(boundedContext, operation);
+        Delete delete = executor.buildDelete(boundedContext, entity);
+        return executor.execute(boundedContext, delete);
     }
 
     @Override
     public int deleteByPrimaryKey(BoundedContext boundedContext, PK primaryKey) {
-        Operation operation = executor.buildDeleteByPK(boundedContext, primaryKey);
-        return executor.execute(boundedContext, operation);
+        Delete delete = executor.buildDeleteByPK(boundedContext, primaryKey);
+        return executor.execute(boundedContext, delete);
     }
 
     @Override
     public int deleteByExample(BoundedContext boundedContext, Example example) {
-        Operation operation = executor.buildDelete(boundedContext, example);
-        return executor.execute(boundedContext, operation);
+        Delete delete = executor.buildDelete(boundedContext, example);
+        return executor.execute(boundedContext, delete);
     }
 
 }

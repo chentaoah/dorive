@@ -1,10 +1,9 @@
 package com.gitee.spring.domain.core3.impl.executor;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core3.api.Executor;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
-import com.gitee.spring.domain.core3.entity.executor.Example;
-import com.gitee.spring.domain.core3.entity.executor.Operation;
-import com.gitee.spring.domain.core3.entity.executor.Query;
+import com.gitee.spring.domain.core3.entity.executor.*;
 
 public abstract class AbstractExecutor implements Executor {
 
@@ -19,38 +18,42 @@ public abstract class AbstractExecutor implements Executor {
     }
 
     @Override
-    public Operation buildInsert(BoundedContext boundedContext, Object entity) {
-        return null;
+    public Insert buildInsert(BoundedContext boundedContext, Object entity) {
+        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+        return primaryKey == null ? new Insert(entity) : null;
     }
 
     @Override
-    public Operation buildUpdate(BoundedContext boundedContext, Object entity) {
-        return null;
+    public Update buildUpdate(BoundedContext boundedContext, Object entity) {
+        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+        return primaryKey != null ? new Update(entity, primaryKey) : null;
     }
 
     @Override
-    public Operation buildUpdate(BoundedContext boundedContext, Object entity, Example example) {
-        return null;
+    public Update buildUpdate(BoundedContext boundedContext, Object entity, Example example) {
+        return new Update(entity, example);
     }
 
     @Override
     public Operation buildInsertOrUpdate(BoundedContext boundedContext, Object entity) {
-        return null;
+        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+        return primaryKey == null ? new Insert(entity) : new Update(entity, primaryKey);
     }
 
     @Override
-    public Operation buildDelete(BoundedContext boundedContext, Object entity) {
-        return null;
+    public Delete buildDelete(BoundedContext boundedContext, Object entity) {
+        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+        return primaryKey != null ? new Delete(primaryKey) : null;
     }
 
     @Override
-    public Operation buildDeleteByPK(BoundedContext boundedContext, Object primaryKey) {
-        return null;
+    public Delete buildDeleteByPK(BoundedContext boundedContext, Object primaryKey) {
+        return new Delete(primaryKey);
     }
 
     @Override
-    public Operation buildDelete(BoundedContext boundedContext, Example example) {
-        return null;
+    public Delete buildDelete(BoundedContext boundedContext, Example example) {
+        return new Delete(example);
     }
 
 }

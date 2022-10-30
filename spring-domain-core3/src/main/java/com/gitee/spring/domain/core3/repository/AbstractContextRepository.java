@@ -6,6 +6,7 @@ import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core3.impl.executor.ChainExecutor;
+import com.gitee.spring.domain.core3.impl.handler.BatchEntityHandler;
 import com.gitee.spring.domain.core3.impl.resolver.BinderResolver;
 import com.gitee.spring.domain.core3.impl.resolver.PropertyResolver;
 import com.gitee.spring.domain.core3.impl.resolver.RepoBinderResolver;
@@ -30,7 +31,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     protected PropertyResolver propertyResolver = new PropertyResolver();
 
-    protected Map<String, ConfiguredRepository> allRepositoryMap = new LinkedHashMap<>();
+    protected Map<String, ConfiguredRepository> accessPathRepositoryMap = new LinkedHashMap<>();
     protected ConfiguredRepository rootRepository;
     protected List<ConfiguredRepository> subRepositories = new ArrayList<>();
     protected List<ConfiguredRepository> orderedRepositories = new ArrayList<>();
@@ -52,19 +53,19 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         propertyResolver.resolveProperties("", entityClass);
 
         ConfiguredRepository rootRepository = newRepository("/", entityClass);
-        allRepositoryMap.put("/", rootRepository);
+        accessPathRepositoryMap.put("/", rootRepository);
         this.rootRepository = rootRepository;
         orderedRepositories.add(rootRepository);
 
         setElementDefinition(rootRepository.getElementDefinition());
         setEntityDefinition(rootRepository.getEntityDefinition());
-        setExecutor(new ChainExecutor(this));
+        setExecutor(new ChainExecutor(this, new BatchEntityHandler(this)));
 
         Map<String, PropertyChain> propertyChains = propertyResolver.getPropertyChains();
         propertyChains.forEach((accessPath, propertyChain) -> {
             if (propertyChain.isAnnotatedEntity()) {
                 ConfiguredRepository subRepository = newRepository(accessPath, propertyChain.getDeclaredField());
-                allRepositoryMap.put(accessPath, subRepository);
+                accessPathRepositoryMap.put(accessPath, subRepository);
                 subRepositories.add(subRepository);
                 orderedRepositories.add(subRepository);
             }
