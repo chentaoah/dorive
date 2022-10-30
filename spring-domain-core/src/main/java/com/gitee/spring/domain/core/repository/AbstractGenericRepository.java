@@ -1,6 +1,7 @@
 package com.gitee.spring.domain.core.repository;
 
 import cn.hutool.core.lang.Assert;
+import com.gitee.spring.domain.common.utils.ContextUtils;
 import com.gitee.spring.domain.core.api.EntityBinder;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.common.api.EntityProperty;
@@ -11,7 +12,6 @@ import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.impl.EntityStateResolver;
-import com.gitee.spring.domain.common.utils.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -115,8 +115,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractDelegateR
             String columnName = entityBinder.getColumnName();
             Object queryParameter = entityBinder.getBoundValue(boundedContext, rootEntity);
             if (queryParameter != null) {
-                if (queryParameter instanceof String && StringUtils.isLike((String) queryParameter)) {
-                    queryParameter = StringUtils.stripLike((String) queryParameter);
+                if (queryParameter instanceof String && ContextUtils.isLike((String) queryParameter)) {
+                    queryParameter = ContextUtils.stripLike((String) queryParameter);
                     entityExample.like(columnName, queryParameter);
                 } else {
                     entityExample.eq(columnName, queryParameter);

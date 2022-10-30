@@ -2,6 +2,7 @@ package com.gitee.spring.domain.core3.impl.handler;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.common.api.EntityProperty;
+import com.gitee.spring.domain.common.utils.ContextUtils;
 import com.gitee.spring.domain.core3.api.EntityHandler;
 import com.gitee.spring.domain.core3.api.EntityIndex;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
@@ -99,8 +100,8 @@ public class BatchEntityHandler implements EntityHandler {
             String alias = contextBinder.getBindingDefinition().getAlias();
             Object boundValue = contextBinder.getBoundValue(boundedContext, rootEntity);
             if (boundValue != null) {
-                if (boundValue instanceof String && com.gitee.spring.domain.common.utils.StringUtils.isLike((String) boundValue)) {
-                    boundValue = com.gitee.spring.domain.common.utils.StringUtils.stripLike((String) boundValue);
+                if (boundValue instanceof String && ContextUtils.isLike((String) boundValue)) {
+                    boundValue = ContextUtils.stripLike((String) boundValue);
                     example.like(alias, boundValue);
                 } else {
                     example.eq(alias, boundValue);
