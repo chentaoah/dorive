@@ -2,7 +2,6 @@ package com.gitee.spring.domain.core3.impl.handler;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core.api.EntityProperty;
-import com.gitee.spring.domain.core.utils.StringUtils;
 import com.gitee.spring.domain.core3.api.EntityHandler;
 import com.gitee.spring.domain.core3.api.EntityIndex;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
@@ -17,6 +16,7 @@ import com.gitee.spring.domain.core3.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core3.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core3.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -36,7 +36,7 @@ public class BatchEntityHandler implements EntityHandler {
         for (ConfiguredRepository subRepository : repository.getSubRepositories()) {
             if (subRepository.matchContext(boundedContext)) {
                 String keyOfPage = subRepository.getEntityDefinition().getPage();
-                Page<Object> page = (Page<Object>) boundedContext.get(keyOfPage);
+                Page<Object> page = StringUtils.isNotBlank(keyOfPage) ? (Page<Object>) boundedContext.get(keyOfPage) : null;
 
                 UnionExample unionExample = new UnionExample();
                 PropertyChain anchorPoint = subRepository.getAnchorPoint();
@@ -99,8 +99,8 @@ public class BatchEntityHandler implements EntityHandler {
             String alias = contextBinder.getBindingDefinition().getAlias();
             Object boundValue = contextBinder.getBoundValue(boundedContext, rootEntity);
             if (boundValue != null) {
-                if (boundValue instanceof String && StringUtils.isLike((String) boundValue)) {
-                    boundValue = StringUtils.stripLike((String) boundValue);
+                if (boundValue instanceof String && com.gitee.spring.domain.core.utils.StringUtils.isLike((String) boundValue)) {
+                    boundValue = com.gitee.spring.domain.core.utils.StringUtils.stripLike((String) boundValue);
                     example.like(alias, boundValue);
                 } else {
                     example.eq(alias, boundValue);
