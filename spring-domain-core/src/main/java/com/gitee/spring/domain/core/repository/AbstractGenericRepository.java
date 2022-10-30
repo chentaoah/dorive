@@ -1,12 +1,12 @@
 package com.gitee.spring.domain.core.repository;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.common.utils.ContextUtils;
+import com.gitee.spring.domain.common.util.ContextUtils;
 import com.gitee.spring.domain.core.api.EntityBinder;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.common.api.EntityProperty;
 import com.gitee.spring.domain.core.api.GenericRepository;
-import com.gitee.spring.domain.core.constants.EntityState;
+import com.gitee.spring.domain.core.constant.EntityState;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;

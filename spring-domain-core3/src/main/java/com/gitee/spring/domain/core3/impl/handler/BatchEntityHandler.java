@@ -2,7 +2,7 @@ package com.gitee.spring.domain.core3.impl.handler;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.common.api.EntityProperty;
-import com.gitee.spring.domain.common.utils.ContextUtils;
+import com.gitee.spring.domain.common.util.ContextUtils;
 import com.gitee.spring.domain.core3.api.EntityHandler;
 import com.gitee.spring.domain.core3.api.EntityIndex;
 import com.gitee.spring.domain.core3.entity.BoundedContext;

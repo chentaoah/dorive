@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core.utils;
+package com.gitee.spring.domain.core.util;
 
 import cn.hutool.core.collection.CollUtil;
 

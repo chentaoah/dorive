@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core.constants;
+package com.gitee.spring.domain.core.constant;
 
 public interface EntityState {
     int NONE = 0x00000000;

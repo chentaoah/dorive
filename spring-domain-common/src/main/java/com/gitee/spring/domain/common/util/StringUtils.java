@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.common.utils;
+package com.gitee.spring.domain.common.util;
 
 import cn.hutool.core.util.StrUtil;
 

@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.core3.repository;
 
-import com.gitee.spring.domain.common.utils.ReflectUtils;
+import com.gitee.spring.domain.common.util.ReflectUtils;
 import com.gitee.spring.domain.core3.api.Executor;
 import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;

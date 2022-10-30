@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.common.api.EntityProperty;
 import com.gitee.spring.domain.common.compile.ProxyCompiler;
 import com.gitee.spring.domain.common.compile.JavassistCompiler;
-import com.gitee.spring.domain.common.utils.ReflectUtils;
+import com.gitee.spring.domain.common.util.ReflectUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

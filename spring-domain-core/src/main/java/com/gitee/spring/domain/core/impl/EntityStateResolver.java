@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.core.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.spring.domain.core.constants.EntityState;
+import com.gitee.spring.domain.core.constant.EntityState;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;

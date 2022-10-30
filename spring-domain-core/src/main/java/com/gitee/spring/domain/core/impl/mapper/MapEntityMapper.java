@@ -4,7 +4,7 @@ import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityCriterion;
 import com.gitee.spring.domain.core.entity.EntityExample;
-import com.gitee.spring.domain.core.utils.DataUtils;
+import com.gitee.spring.domain.core.util.DataUtils;
 
 import java.util.LinkedHashMap;
 import java.util.List;

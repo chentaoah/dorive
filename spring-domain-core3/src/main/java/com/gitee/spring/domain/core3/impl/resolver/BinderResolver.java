@@ -2,7 +2,7 @@ package com.gitee.spring.domain.core3.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.spring.domain.common.utils.PathUtils;
+import com.gitee.spring.domain.common.util.PathUtils;
 import com.gitee.spring.domain.core3.api.Binder;
 import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.BindingDefinition;
