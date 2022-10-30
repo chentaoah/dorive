@@ -16,7 +16,7 @@ public class DefaultEntityIndex implements EntityIndex {
     private final Map<Long, Object> primaryKeyEntityMap = new HashMap<>();
 
     public DefaultEntityIndex(List<Object> rootEntities, List<Map<String, Object>> resultMaps, List<Object> entities) {
-        int initialCapacity = Math.max(resultMaps.size() / rootEntities.size(), 1);
+        int initialCapacity = resultMaps.size() / rootEntities.size() + 1;
         for (Map<String, Object> resultMap : resultMaps) {
             Long rootPrimaryKey = (Long) resultMap.get("$id");
             List<Long> existPrimaryKeys = primaryKeyMapping.computeIfAbsent(rootPrimaryKey, key -> new ArrayList<>(initialCapacity));
