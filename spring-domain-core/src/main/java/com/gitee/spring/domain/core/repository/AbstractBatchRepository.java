@@ -2,7 +2,7 @@ package com.gitee.spring.domain.core.repository;
 
 import com.gitee.spring.domain.core.api.EntityBinder;
 import com.gitee.spring.domain.core.api.EntityIndex;
-import com.gitee.spring.domain.core.api.EntityProperty;
+import com.gitee.spring.domain.common.api.EntityProperty;
 import com.gitee.spring.domain.core.api.ForeignKey;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityExample;

@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core.api;
+package com.gitee.spring.domain.common.api;
 
 public interface EntityProperty {
 

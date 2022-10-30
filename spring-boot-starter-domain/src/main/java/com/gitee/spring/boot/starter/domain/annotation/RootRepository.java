@@ -1,7 +1,7 @@
 package com.gitee.spring.boot.starter.domain.annotation;
 
 import com.gitee.spring.domain.coating.annotation.CoatingScan;
-import com.gitee.spring.domain.core.annotation.Repository;
+import com.gitee.spring.domain.common.annotation.Repository;
 import com.gitee.spring.domain.event.annotation.EnableEvent;
 import com.gitee.spring.domain.injection.annotation.Root;
 import com.gitee.spring.domain.web.annotation.EnableWeb;

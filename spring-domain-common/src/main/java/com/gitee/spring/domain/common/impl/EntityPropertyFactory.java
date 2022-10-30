@@ -1,10 +1,10 @@
-package com.gitee.spring.domain.core.impl;
+package com.gitee.spring.domain.common.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.spring.domain.core.api.EntityProperty;
-import com.gitee.spring.domain.core.api.ProxyCompiler;
-import com.gitee.spring.domain.core.compile.JavassistCompiler;
-import com.gitee.spring.domain.core.utils.ReflectUtils;
+import com.gitee.spring.domain.common.api.EntityProperty;
+import com.gitee.spring.domain.common.compile.ProxyCompiler;
+import com.gitee.spring.domain.common.compile.JavassistCompiler;
+import com.gitee.spring.domain.common.utils.ReflectUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

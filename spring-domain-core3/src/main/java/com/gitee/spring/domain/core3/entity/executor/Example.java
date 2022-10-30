@@ -1,8 +1,8 @@
 package com.gitee.spring.domain.core3.entity.executor;
 
 import cn.hutool.core.util.ArrayUtil;
-import com.gitee.spring.domain.core.constants.Operator;
-import com.gitee.spring.domain.core.utils.StringUtils;
+import com.gitee.spring.domain.common.constants.Operator;
+import com.gitee.spring.domain.common.utils.StringUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

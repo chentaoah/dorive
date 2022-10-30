@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.core3.repository;
 
-import com.gitee.spring.domain.core.utils.ReflectUtils;
+import com.gitee.spring.domain.common.utils.ReflectUtils;
 import com.gitee.spring.domain.core3.api.Executor;
 import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
@@ -20,11 +20,7 @@ import org.springframework.context.ApplicationContextAware;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 @EqualsAndHashCode(callSuper = false)

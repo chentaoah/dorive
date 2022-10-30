@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.core.entity;
 
-import com.gitee.spring.domain.core.api.EntityProperty;
-import com.gitee.spring.domain.core.impl.EntityPropertyFactory;
+import com.gitee.spring.domain.common.api.EntityProperty;
+import com.gitee.spring.domain.common.impl.EntityPropertyFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;

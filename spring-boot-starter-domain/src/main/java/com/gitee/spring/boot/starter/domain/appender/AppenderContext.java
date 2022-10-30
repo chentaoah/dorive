@@ -3,7 +3,7 @@ package com.gitee.spring.boot.starter.domain.appender;
 import com.baomidou.mybatisplus.core.conditions.interfaces.Compare;
 import com.baomidou.mybatisplus.core.conditions.interfaces.Func;
 import com.gitee.spring.boot.starter.domain.api.CriterionAppender;
-import com.gitee.spring.domain.core.constants.Operator;
+import com.gitee.spring.domain.common.constants.Operator;
 
 import java.util.Collection;
 import java.util.Map;

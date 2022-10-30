@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core.constants;
+package com.gitee.spring.domain.common.constants;
 
 public interface Operator {
     String EQ = "=";

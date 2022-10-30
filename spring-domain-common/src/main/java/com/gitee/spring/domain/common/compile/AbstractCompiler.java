@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.domain.core.compile;
-
-import com.gitee.spring.domain.core.api.ProxyCompiler;
+package com.gitee.spring.domain.common.compile;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

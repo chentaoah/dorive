@@ -3,7 +3,7 @@ package com.gitee.spring.domain.core.repository;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.EntityBinder;
 import com.gitee.spring.domain.core.api.EntityMapper;
-import com.gitee.spring.domain.core.api.EntityProperty;
+import com.gitee.spring.domain.common.api.EntityProperty;
 import com.gitee.spring.domain.core.api.GenericRepository;
 import com.gitee.spring.domain.core.constants.EntityState;
 import com.gitee.spring.domain.core.entity.BoundedContext;
@@ -11,7 +11,7 @@ import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.entity.EntityExample;
 import com.gitee.spring.domain.core.entity.EntityPropertyChain;
 import com.gitee.spring.domain.core.impl.EntityStateResolver;
-import com.gitee.spring.domain.core.utils.StringUtils;
+import com.gitee.spring.domain.common.utils.StringUtils;
 
 import java.util.Collection;
 import java.util.List;

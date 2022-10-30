@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.core3.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.core.utils.PathUtils;
+import com.gitee.spring.domain.common.utils.PathUtils;
 import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.repository.AbstractContextRepository;

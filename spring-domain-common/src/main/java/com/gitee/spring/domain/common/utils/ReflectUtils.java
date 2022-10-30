@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.core.utils;
+package com.gitee.spring.domain.common.utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.core.entity;
 
-import com.gitee.spring.domain.core.constants.Operator;
-import com.gitee.spring.domain.core.utils.StringUtils;
+import com.gitee.spring.domain.common.constants.Operator;
+import com.gitee.spring.domain.common.utils.StringUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
