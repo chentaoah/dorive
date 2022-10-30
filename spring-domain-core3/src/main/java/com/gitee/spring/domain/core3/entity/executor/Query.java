@@ -20,8 +20,8 @@ public class Query extends Operation {
         this.example = example;
     }
 
-    public boolean startPage() {
-        return example.getPage() != null;
+    public boolean withoutPage() {
+        return example.getPage() == null;
     }
 
 }

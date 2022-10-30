@@ -30,7 +30,7 @@ public class ChainExecutor extends AbstractExecutor {
             }
             return new Result(rootEntity);
 
-        } else if (!query.startPage()) {
+        } else if (query.withoutPage()) {
             List<Object> rootEntities = rootRepository.selectByExample(boundedContext, query.getExample());
             if (!rootEntities.isEmpty()) {
                 entityHandler.handleEntities(boundedContext, rootEntities);

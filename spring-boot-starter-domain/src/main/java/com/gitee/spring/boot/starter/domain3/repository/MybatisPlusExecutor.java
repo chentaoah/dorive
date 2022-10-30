@@ -44,7 +44,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             Object entity = !resultMaps.isEmpty() ? entityFactory.reconstitute(boundedContext, resultMaps.get(0)) : null;
             return new Result(entity);
 
-        } else if (!query.startPage()) {
+        } else if (query.withoutPage()) {
             Example example = query.getExample();
             if (example instanceof UnionExample) {
                 QueryWrapper<Object> queryWrapper = buildQueryWrapper((UnionExample) example);
