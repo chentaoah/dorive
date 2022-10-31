@@ -61,8 +61,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setEntityDefinition(rootRepository.getEntityDefinition());
         setExecutor(new ChainExecutor(this, new BatchEntityHandler(this)));
 
-        Map<String, PropertyChain> propertyChains = propertyResolver.getPropertyChains();
-        propertyChains.forEach((accessPath, propertyChain) -> {
+        Map<String, PropertyChain> allPropertyChains = propertyResolver.getAllPropertyChains();
+        allPropertyChains.forEach((accessPath, propertyChain) -> {
             if (propertyChain.isAnnotatedEntity()) {
                 ConfiguredRepository subRepository = newRepository(accessPath, propertyChain.getDeclaredField());
                 allRepositoryMap.put(accessPath, subRepository);
@@ -107,8 +107,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         BinderResolver binderResolver = new BinderResolver(this);
         binderResolver.resolveBinders(accessPath, elementDefinition);
 
-        Map<String, PropertyChain> propertyChains = propertyResolver.getPropertyChains();
-        PropertyChain propertyChain = propertyChains.get(accessPath);
+        Map<String, PropertyChain> allPropertyChains = propertyResolver.getAllPropertyChains();
+        PropertyChain propertyChain = allPropertyChains.get(accessPath);
 
         String fieldPrefix = aggregateRoot ? "/" : accessPath + "/";
 

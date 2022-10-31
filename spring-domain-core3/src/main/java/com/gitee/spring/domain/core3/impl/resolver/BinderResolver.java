@@ -94,8 +94,8 @@ public class BinderResolver {
         Assert.notNull(belongRepository, "The belong repository cannot be null!");
         belongRepository.setBoundEntity(true);
 
-        Map<String, PropertyChain> propertyChains = repository.getPropertyResolver().getPropertyChains();
-        PropertyChain boundPropertyChain = propertyChains.get(bindingDefinition.getBindProp());
+        Map<String, PropertyChain> allPropertyChains = repository.getPropertyResolver().getAllPropertyChains();
+        PropertyChain boundPropertyChain = allPropertyChains.get(bindingDefinition.getBindProp());
         Assert.notNull(boundPropertyChain, "The bound property chain cannot be null!");
         boundPropertyChain.initialize();
 

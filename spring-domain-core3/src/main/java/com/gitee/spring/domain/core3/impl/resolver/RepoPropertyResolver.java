@@ -18,10 +18,10 @@ public class RepoPropertyResolver {
     }
 
     public void resolvePropertyChains() {
-        Map<String, PropertyChain> propertyChains = repository.getPropertyResolver().getPropertyChains();
+        Map<String, PropertyChain> allPropertyChains = repository.getPropertyResolver().getAllPropertyChains();
         Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
 
-        propertyChains.forEach((accessPath, propertyChain) -> {
+        allPropertyChains.forEach((accessPath, propertyChain) -> {
             String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
             String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), lastAccessPath);
 
@@ -41,7 +41,7 @@ public class RepoPropertyResolver {
             if (repoPropertyChains.isEmpty() && elementDefinition.isCollection()) {
                 PropertyResolver propertyResolver = new PropertyResolver();
                 propertyResolver.resolveProperties("", elementDefinition.getGenericEntityClass());
-                Map<String, PropertyChain> subPropertyChains = propertyResolver.getPropertyChains();
+                Map<String, PropertyChain> subPropertyChains = propertyResolver.getAllPropertyChains();
                 repoPropertyChains.putAll(subPropertyChains);
                 repository.setFieldPrefix("/");
             }
