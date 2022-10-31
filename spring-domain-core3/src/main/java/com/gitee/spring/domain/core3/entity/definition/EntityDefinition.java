@@ -14,12 +14,13 @@ import java.util.Map;
 @AllArgsConstructor
 public class EntityDefinition {
 
-    private String[] context;
+    private String[] triggers;
     private Class<?> mapper;
     private String orderByAsc;
     private String orderByDesc;
-    private String page;
+    private String pageKey;
     private int order;
+    private String nullableKey;
     private Class<?> factory;
     private Class<?> repository;
 

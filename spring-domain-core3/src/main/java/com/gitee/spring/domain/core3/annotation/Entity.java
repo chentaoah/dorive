@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Entity {
 
-    String[] context() default {};
+    String[] triggers() default {};
 
     Class<?> mapper() default Object.class;
 
@@ -19,9 +19,11 @@ public @interface Entity {
 
     String orderByDesc() default "";
 
-    String page() default "";
+    String pageKey() default "";
 
     int order() default 0;
+
+    String nullableKey() default "";
 
     Class<?> factory() default DefaultEntityFactory.class;
 

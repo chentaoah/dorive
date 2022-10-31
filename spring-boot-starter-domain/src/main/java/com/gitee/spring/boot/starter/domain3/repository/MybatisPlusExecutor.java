@@ -1,10 +1,12 @@
 package com.gitee.spring.boot.starter.domain3.repository;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -27,6 +29,7 @@ import com.gitee.spring.domain.core3.impl.executor.AbstractExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -175,6 +178,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public int execute(BoundedContext boundedContext, Operation operation) {
         Object entity = operation.getEntity();
         if (entity != null) {
@@ -184,8 +188,18 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             return baseMapper.insert(entity);
 
         } else if (operation instanceof Update) {
-            Object primaryKey = ((Update) operation).getPrimaryKey();
-            Example example = ((Update) operation).getExample();
+            Update update = (Update) operation;
+            Object primaryKey = update.getPrimaryKey();
+            Example example = update.getExample();
+            String nullableKey = entityDefinition.getNullableKey();
+            if (StringUtils.isNotBlank(nullableKey)) {
+                Set<String> nullableProperties = (Set<String>) boundedContext.get(nullableKey);
+                if (nullableProperties != null && !nullableProperties.isEmpty()) {
+                    example = primaryKey != null ? new Example().eq("id", primaryKey) : example;
+                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(entity, nullableProperties, example);
+                    return baseMapper.update(null, updateWrapper);
+                }
+            }
             if (primaryKey != null) {
                 return baseMapper.updateById(entity);
 
@@ -194,8 +208,9 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             }
 
         } else if (operation instanceof Delete) {
-            Object primaryKey = ((Delete) operation).getPrimaryKey();
-            Example example = ((Delete) operation).getExample();
+            Delete delete = (Delete) operation;
+            Object primaryKey = delete.getPrimaryKey();
+            Example example = delete.getExample();
             if (primaryKey != null) {
                 return baseMapper.deleteById((Serializable) primaryKey);
 
@@ -208,6 +223,24 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
     private UpdateWrapper<Object> buildUpdateWrapper(Example example) {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
+        for (Criterion criterion : example.getCriteria()) {
+            CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
+            String property = StrUtil.toUnderlineCase(criterion.getProperty());
+            criterionAppender.appendCriterion(updateWrapper, property, criterion.getValue());
+        }
+        return updateWrapper;
+    }
+
+    private UpdateWrapper<Object> buildUpdateWrapper(Object entity, Set<String> nullableProperties, Example example) {
+        UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
+        List<TableFieldInfo> fieldList = TableInfoHelper.getTableInfo(pojoClass).getFieldList();
+        for (TableFieldInfo tableFieldInfo : fieldList) {
+            String property = tableFieldInfo.getProperty();
+            Object value = BeanUtil.getFieldValue(entity, property);
+            if (value != null || nullableProperties.contains(property)) {
+                updateWrapper.set(true, tableFieldInfo.getColumn(), value);
+            }
+        }
         for (Criterion criterion : example.getCriteria()) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
             String property = StrUtil.toUnderlineCase(criterion.getProperty());

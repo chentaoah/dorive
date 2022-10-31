@@ -21,12 +21,12 @@ public class ConfiguredRepository extends ProxyRepository {
     protected Map<String, PropertyChain> propertyChains;
 
     public boolean matchContext(BoundedContext boundedContext) {
-        String[] context = entityDefinition.getContext();
-        if (context == null || context.length == 0) {
+        String[] triggers = entityDefinition.getTriggers();
+        if (triggers == null || triggers.length == 0) {
             return true;
         }
-        for (String eachContext : context) {
-            if (boundedContext.containsKey(eachContext)) {
+        for (String trigger : triggers) {
+            if (boundedContext.containsKey(trigger)) {
                 return true;
             }
         }

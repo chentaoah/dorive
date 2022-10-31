@@ -36,8 +36,8 @@ public class BatchEntityHandler implements EntityHandler {
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
         for (ConfiguredRepository subRepository : repository.getSubRepositories()) {
             if (subRepository.matchContext(boundedContext)) {
-                String keyOfPage = subRepository.getEntityDefinition().getPage();
-                Page<Object> page = StringUtils.isNotBlank(keyOfPage) ? (Page<Object>) boundedContext.get(keyOfPage) : null;
+                String pageKey = subRepository.getEntityDefinition().getPageKey();
+                Page<Object> page = StringUtils.isNotBlank(pageKey) ? (Page<Object>) boundedContext.get(pageKey) : null;
 
                 UnionExample unionExample = new UnionExample();
                 PropertyChain anchorPoint = subRepository.getAnchorPoint();
