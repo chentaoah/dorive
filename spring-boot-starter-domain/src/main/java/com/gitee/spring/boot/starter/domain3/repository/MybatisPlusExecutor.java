@@ -15,16 +15,8 @@ import com.gitee.spring.domain.core3.api.EntityFactory;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
-import com.gitee.spring.domain.core3.entity.executor.Criterion;
-import com.gitee.spring.domain.core3.entity.executor.Example;
-import com.gitee.spring.domain.core3.entity.executor.Fishhook;
-import com.gitee.spring.domain.core3.entity.executor.Result;
-import com.gitee.spring.domain.core3.entity.executor.UnionExample;
-import com.gitee.spring.domain.core3.entity.operation.Delete;
-import com.gitee.spring.domain.core3.entity.operation.Insert;
-import com.gitee.spring.domain.core3.entity.operation.Operation;
-import com.gitee.spring.domain.core3.entity.operation.Query;
-import com.gitee.spring.domain.core3.entity.operation.Update;
+import com.gitee.spring.domain.core3.entity.executor.*;
+import com.gitee.spring.domain.core3.entity.operation.*;
 import com.gitee.spring.domain.core3.impl.executor.AbstractExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,11 +24,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.gitee.spring.boot.starter.domain.appender.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
 
@@ -181,11 +169,12 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     @SuppressWarnings("unchecked")
     public int execute(BoundedContext boundedContext, Operation operation) {
         Object entity = operation.getEntity();
-        if (entity != null) {
-            entity = entityFactory.deconstruct(boundedContext, entity);
-        }
+        Object persistentObject = entity != null ? entityFactory.deconstruct(boundedContext, entity) : null;
         if (operation instanceof Insert) {
-            return baseMapper.insert(entity);
+            int count = baseMapper.insert(persistentObject);
+            Object primaryKey = BeanUtil.getFieldValue(persistentObject, "id");
+            BeanUtil.setFieldValue(entity, "id", primaryKey);
+            return count;
 
         } else if (operation instanceof Update) {
             Update update = (Update) operation;
@@ -194,24 +183,24 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
             String forceInsertKey = entityDefinition.getForceInsertKey();
             if (StringUtils.isNotBlank(forceInsertKey) && boundedContext.containsKey(forceInsertKey)) {
-                return baseMapper.insert(entity);
+                return baseMapper.insert(persistentObject);
             }
-            
+
             String nullableKey = entityDefinition.getNullableKey();
             if (StringUtils.isNotBlank(nullableKey)) {
                 Set<String> nullableProperties = (Set<String>) boundedContext.get(nullableKey);
                 if (nullableProperties != null && !nullableProperties.isEmpty()) {
                     example = primaryKey != null ? new Example().eq("id", primaryKey) : example;
-                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(entity, nullableProperties, example);
+                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistentObject, nullableProperties, example);
                     return baseMapper.update(null, updateWrapper);
                 }
             }
 
             if (primaryKey != null) {
-                return baseMapper.updateById(entity);
+                return baseMapper.updateById(persistentObject);
 
             } else if (example != null) {
-                return baseMapper.update(entity, buildUpdateWrapper(example));
+                return baseMapper.update(persistentObject, buildUpdateWrapper(example));
             }
 
         } else if (operation instanceof Delete) {
@@ -238,12 +227,12 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         return updateWrapper;
     }
 
-    private UpdateWrapper<Object> buildUpdateWrapper(Object entity, Set<String> nullableProperties, Example example) {
+    private UpdateWrapper<Object> buildUpdateWrapper(Object persistentObject, Set<String> nullableProperties, Example example) {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
         List<TableFieldInfo> fieldList = TableInfoHelper.getTableInfo(pojoClass).getFieldList();
         for (TableFieldInfo tableFieldInfo : fieldList) {
             String property = tableFieldInfo.getProperty();
-            Object value = BeanUtil.getFieldValue(entity, property);
+            Object value = BeanUtil.getFieldValue(persistentObject, property);
             if (value != null || nullableProperties.contains(property)) {
                 updateWrapper.set(true, tableFieldInfo.getColumn(), value);
             }
