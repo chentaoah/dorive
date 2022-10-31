@@ -153,7 +153,7 @@ public class ChainExecutor extends AbstractExecutor {
     }
 
     private void getBoundValueFromContext(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository repository, Object entity) {
-        for (Binder binder : repository.getBinderResolver().getPropertyBinders()) {
+        for (Binder binder : repository.getBinderResolver().getBoundValueBinders()) {
             Object fieldValue = binder.getFieldValue(boundedContext, entity);
             if (fieldValue == null) {
                 Object boundValue = binder.getBoundValue(boundedContext, rootEntity);
