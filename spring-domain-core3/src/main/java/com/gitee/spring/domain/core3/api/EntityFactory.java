@@ -6,4 +6,6 @@ public interface EntityFactory {
 
     Object reconstitute(BoundedContext boundedContext, Object persistentObject);
 
+    Object deconstruct(BoundedContext boundedContext, Object entity);
+
 }

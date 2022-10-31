@@ -17,6 +17,7 @@ import java.util.Map;
 public class DefaultEntityFactory implements EntityFactory {
 
     private ElementDefinition elementDefinition;
+    private Class<?> pojoClass;
 
     @Override
     public Object reconstitute(BoundedContext boundedContext, Object persistentObject) {
@@ -25,6 +26,11 @@ public class DefaultEntityFactory implements EntityFactory {
         } else {
             return BeanUtil.copyProperties(persistentObject, elementDefinition.getGenericEntityClass());
         }
+    }
+
+    @Override
+    public Object deconstruct(BoundedContext boundedContext, Object entity) {
+        return BeanUtil.copyProperties(entity, pojoClass);
     }
 
 }

@@ -7,6 +7,11 @@ import com.gitee.spring.domain.core3.entity.*;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.executor.*;
+import com.gitee.spring.domain.core3.entity.operation.Delete;
+import com.gitee.spring.domain.core3.entity.operation.Insert;
+import com.gitee.spring.domain.core3.entity.operation.Operation;
+import com.gitee.spring.domain.core3.entity.operation.Query;
+import com.gitee.spring.domain.core3.entity.operation.Update;
 import lombok.Data;
 
 import java.util.List;

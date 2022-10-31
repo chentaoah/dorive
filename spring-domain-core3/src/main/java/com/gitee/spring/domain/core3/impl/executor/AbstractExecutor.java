@@ -4,6 +4,11 @@ import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core3.api.Executor;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.executor.*;
+import com.gitee.spring.domain.core3.entity.operation.Delete;
+import com.gitee.spring.domain.core3.entity.operation.Insert;
+import com.gitee.spring.domain.core3.entity.operation.Operation;
+import com.gitee.spring.domain.core3.entity.operation.Query;
+import com.gitee.spring.domain.core3.entity.operation.Update;
 
 public abstract class AbstractExecutor implements Executor {
 
@@ -19,14 +24,13 @@ public abstract class AbstractExecutor implements Executor {
 
     @Override
     public Insert buildInsert(BoundedContext boundedContext, Object entity) {
-        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-        return primaryKey == null ? new Insert(entity) : null;
+        return new Insert(entity);
     }
 
     @Override
     public Update buildUpdate(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-        return primaryKey != null ? new Update(entity, primaryKey) : null;
+        return new Update(entity, primaryKey);
     }
 
     @Override
@@ -43,7 +47,7 @@ public abstract class AbstractExecutor implements Executor {
     @Override
     public Delete buildDelete(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-        return primaryKey != null ? new Delete(primaryKey) : null;
+        return new Delete(primaryKey);
     }
 
     @Override

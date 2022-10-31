@@ -3,6 +3,7 @@ package com.gitee.spring.boot.starter.domain3.repository;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
@@ -12,13 +13,27 @@ import com.gitee.spring.domain.core3.api.EntityFactory;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
-import com.gitee.spring.domain.core3.entity.executor.*;
+import com.gitee.spring.domain.core3.entity.executor.Criterion;
+import com.gitee.spring.domain.core3.entity.executor.Example;
+import com.gitee.spring.domain.core3.entity.executor.Fishhook;
+import com.gitee.spring.domain.core3.entity.executor.Result;
+import com.gitee.spring.domain.core3.entity.executor.UnionExample;
+import com.gitee.spring.domain.core3.entity.operation.Delete;
+import com.gitee.spring.domain.core3.entity.operation.Insert;
+import com.gitee.spring.domain.core3.entity.operation.Operation;
+import com.gitee.spring.domain.core3.entity.operation.Query;
+import com.gitee.spring.domain.core3.entity.operation.Update;
 import com.gitee.spring.domain.core3.impl.executor.AbstractExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.gitee.spring.boot.starter.domain.appender.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
 
@@ -161,7 +176,44 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
     @Override
     public int execute(BoundedContext boundedContext, Operation operation) {
+        Object entity = operation.getEntity();
+        if (entity != null) {
+            entity = entityFactory.deconstruct(boundedContext, entity);
+        }
+        if (operation instanceof Insert) {
+            return baseMapper.insert(entity);
+
+        } else if (operation instanceof Update) {
+            Object primaryKey = ((Update) operation).getPrimaryKey();
+            Example example = ((Update) operation).getExample();
+            if (primaryKey != null) {
+                return baseMapper.updateById(entity);
+
+            } else if (example != null) {
+                return baseMapper.update(entity, buildUpdateWrapper(example));
+            }
+
+        } else if (operation instanceof Delete) {
+            Object primaryKey = ((Delete) operation).getPrimaryKey();
+            Example example = ((Delete) operation).getExample();
+            if (primaryKey != null) {
+                return baseMapper.deleteById((Serializable) primaryKey);
+
+            } else if (example != null) {
+                return baseMapper.delete(buildUpdateWrapper(example));
+            }
+        }
         return 0;
+    }
+
+    private UpdateWrapper<Object> buildUpdateWrapper(Example example) {
+        UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
+        for (Criterion criterion : example.getCriteria()) {
+            CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
+            String property = StrUtil.toUnderlineCase(criterion.getProperty());
+            criterionAppender.appendCriterion(updateWrapper, property, criterion.getValue());
+        }
+        return updateWrapper;
     }
 
 }

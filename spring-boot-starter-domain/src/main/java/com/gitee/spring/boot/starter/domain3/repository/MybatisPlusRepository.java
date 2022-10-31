@@ -7,13 +7,13 @@ import com.gitee.spring.domain.core3.api.Executor;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core3.impl.DefaultEntityFactory;
-import com.gitee.spring.domain.core3.repository.AbstractContextRepository;
+import com.gitee.spring.domain.core3.repository.AbstractGenericRepository;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-public class MybatisPlusRepository<E, PK> extends AbstractContextRepository<E, PK> {
+public class MybatisPlusRepository<E, PK> extends AbstractGenericRepository<E, PK> {
 
     @Override
     @SuppressWarnings("unchecked")
@@ -52,11 +52,12 @@ public class MybatisPlusRepository<E, PK> extends AbstractContextRepository<E, P
         Class<?> factoryClass = entityDefinition.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == DefaultEntityFactory.class) {
-            entityFactory = new DefaultEntityFactory(elementDefinition);
+            entityFactory = new DefaultEntityFactory(elementDefinition, pojoClass);
 
         } else if (DefaultEntityFactory.class.isAssignableFrom(factoryClass)) {
             DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) applicationContext.getBean(factoryClass);
             defaultEntityFactory.setElementDefinition(elementDefinition);
+            defaultEntityFactory.setPojoClass(pojoClass);
             entityFactory = defaultEntityFactory;
 
         } else {

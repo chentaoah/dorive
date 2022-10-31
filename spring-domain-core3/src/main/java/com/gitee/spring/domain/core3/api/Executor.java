@@ -2,6 +2,11 @@ package com.gitee.spring.domain.core3.api;
 
 import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.executor.*;
+import com.gitee.spring.domain.core3.entity.operation.Delete;
+import com.gitee.spring.domain.core3.entity.operation.Insert;
+import com.gitee.spring.domain.core3.entity.operation.Operation;
+import com.gitee.spring.domain.core3.entity.operation.Query;
+import com.gitee.spring.domain.core3.entity.operation.Update;
 
 public interface Executor {
 
