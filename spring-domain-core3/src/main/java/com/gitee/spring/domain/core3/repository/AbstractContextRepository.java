@@ -31,7 +31,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     protected PropertyResolver propertyResolver = new PropertyResolver();
 
-    protected Map<String, ConfiguredRepository> accessPathRepositoryMap = new LinkedHashMap<>();
+    protected Map<String, ConfiguredRepository> allRepositoryMap = new LinkedHashMap<>();
     protected ConfiguredRepository rootRepository;
     protected List<ConfiguredRepository> subRepositories = new ArrayList<>();
     protected List<ConfiguredRepository> orderedRepositories = new ArrayList<>();
@@ -53,7 +53,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         propertyResolver.resolveProperties("", entityClass);
 
         ConfiguredRepository rootRepository = newRepository("/", entityClass);
-        accessPathRepositoryMap.put("/", rootRepository);
+        allRepositoryMap.put("/", rootRepository);
         this.rootRepository = rootRepository;
         orderedRepositories.add(rootRepository);
 
@@ -65,7 +65,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         propertyChains.forEach((accessPath, propertyChain) -> {
             if (propertyChain.isAnnotatedEntity()) {
                 ConfiguredRepository subRepository = newRepository(accessPath, propertyChain.getDeclaredField());
-                accessPathRepositoryMap.put(accessPath, subRepository);
+                allRepositoryMap.put(accessPath, subRepository);
                 subRepositories.add(subRepository);
                 orderedRepositories.add(subRepository);
             }

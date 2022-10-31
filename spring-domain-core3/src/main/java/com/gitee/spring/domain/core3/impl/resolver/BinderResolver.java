@@ -88,9 +88,9 @@ public class BinderResolver {
     }
 
     private PropertyBinder newPropertyBinder(BindingDefinition bindingDefinition) {
-        Map<String, ConfiguredRepository> accessPathRepositoryMap = repository.getAccessPathRepositoryMap();
-        String belongAccessPath = PathUtils.getBelongPath(accessPathRepositoryMap.keySet(), bindingDefinition.getBindProp());
-        ConfiguredRepository belongRepository = accessPathRepositoryMap.get(belongAccessPath);
+        Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
+        String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), bindingDefinition.getBindProp());
+        ConfiguredRepository belongRepository = allRepositoryMap.get(belongAccessPath);
         Assert.notNull(belongRepository, "The belong repository cannot be null!");
         belongRepository.setBoundEntity(true);
 

@@ -19,13 +19,13 @@ public class RepoPropertyResolver {
 
     public void resolvePropertyChains() {
         Map<String, PropertyChain> propertyChains = repository.getPropertyResolver().getPropertyChains();
-        Map<String, ConfiguredRepository> accessPathRepositoryMap = repository.getAccessPathRepositoryMap();
+        Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
 
         propertyChains.forEach((accessPath, propertyChain) -> {
             String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
-            String belongAccessPath = PathUtils.getBelongPath(accessPathRepositoryMap.keySet(), lastAccessPath);
+            String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), lastAccessPath);
 
-            ConfiguredRepository belongRepository = accessPathRepositoryMap.get(belongAccessPath);
+            ConfiguredRepository belongRepository = allRepositoryMap.get(belongAccessPath);
             Assert.notNull(belongRepository, "The belong repository cannot be null!");
 
             Map<String, PropertyChain> repoPropertyChains = belongRepository.getPropertyChains();
@@ -34,7 +34,7 @@ public class RepoPropertyResolver {
             repoPropertyChains.put(accessPath, newPropertyChain);
         });
 
-        accessPathRepositoryMap.forEach((accessPath, repository) -> {
+        allRepositoryMap.forEach((accessPath, repository) -> {
             ElementDefinition elementDefinition = repository.getElementDefinition();
             Map<String, PropertyChain> repoPropertyChains = repository.getPropertyChains();
 

@@ -24,8 +24,8 @@ public class RepoBinderResolver {
     }
 
     public void resolveValueBinders() {
-        Map<String, ConfiguredRepository> accessPathRepositoryMap = repository.getAccessPathRepositoryMap();
-        accessPathRepositoryMap.forEach((accessPath, repository) -> {
+        Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
+        allRepositoryMap.forEach((accessPath, repository) -> {
 
             BinderResolver binderResolver = repository.getBinderResolver();
             Map<String, PropertyChain> propertyChains = repository.getPropertyChains();
