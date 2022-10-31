@@ -23,6 +23,8 @@ public @interface Entity {
 
     int order() default 0;
 
+    String forceInsertKey() default "";
+
     String nullableKey() default "";
 
     Class<?> factory() default DefaultEntityFactory.class;

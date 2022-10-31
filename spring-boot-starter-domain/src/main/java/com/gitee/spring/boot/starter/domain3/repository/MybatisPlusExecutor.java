@@ -191,6 +191,12 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             Update update = (Update) operation;
             Object primaryKey = update.getPrimaryKey();
             Example example = update.getExample();
+
+            String forceInsertKey = entityDefinition.getForceInsertKey();
+            if (StringUtils.isNotBlank(forceInsertKey) && boundedContext.containsKey(forceInsertKey)) {
+                return baseMapper.insert(entity);
+            }
+            
             String nullableKey = entityDefinition.getNullableKey();
             if (StringUtils.isNotBlank(nullableKey)) {
                 Set<String> nullableProperties = (Set<String>) boundedContext.get(nullableKey);
@@ -200,6 +206,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                     return baseMapper.update(null, updateWrapper);
                 }
             }
+
             if (primaryKey != null) {
                 return baseMapper.updateById(entity);
 
