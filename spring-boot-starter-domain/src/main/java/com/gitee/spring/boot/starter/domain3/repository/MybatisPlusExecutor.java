@@ -171,6 +171,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     public int execute(BoundedContext boundedContext, Operation operation) {
         Object entity = operation.getEntity();
         Object persistentObject = entity != null ? entityFactory.deconstruct(boundedContext, entity) : null;
+
         if (operation instanceof Insert) {
             int count = baseMapper.insert(persistentObject);
             Object primaryKey = BeanUtil.getFieldValue(persistentObject, "id");
