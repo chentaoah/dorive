@@ -36,12 +36,13 @@ public class BatchEntityHandler implements EntityHandler {
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
         for (ConfiguredRepository subRepository : repository.getSubRepositories()) {
             if (subRepository.matchContext(boundedContext)) {
+                PropertyChain anchorPoint = subRepository.getAnchorPoint();
+                PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
+
                 String pageKey = subRepository.getEntityDefinition().getPageKey();
                 Page<Object> page = StringUtils.isNotBlank(pageKey) ? (Page<Object>) boundedContext.get(pageKey) : null;
 
                 UnionExample unionExample = new UnionExample();
-                PropertyChain anchorPoint = subRepository.getAnchorPoint();
-                PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
                 for (Object rootEntity : rootEntities) {
                     Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
                     if (lastEntity != null) {
@@ -55,15 +56,16 @@ public class BatchEntityHandler implements EntityHandler {
 
                 Fishhook fishhook = new Fishhook(null);
                 boundedContext.put("#fishhook", fishhook);
-                List<Object> entities = subRepository.selectByExample(boundedContext, unionExample);
+                List<Object> allEntities = subRepository.selectByExample(boundedContext, unionExample);
                 boundedContext.remove("#fishhook");
 
-                EntityIndex entityIndex = newEntityIndex(rootEntities, fishhook.getSource(), entities);
+                EntityIndex entityIndex = newEntityIndex(rootEntities, fishhook.getSource(), allEntities);
+
                 for (Object rootEntity : rootEntities) {
                     Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
                     if (lastEntity != null) {
-                        List<Object> subEntities = entityIndex.selectList(rootEntity);
-                        Object entity = convertManyToOneEntity(subRepository, subEntities);
+                        List<Object> entities = entityIndex.selectList(rootEntity);
+                        Object entity = convertManyToOneEntity(subRepository, entities);
                         if (entity != null) {
                             EntityProperty entityProperty = anchorPoint.getEntityProperty();
                             entityProperty.setValue(lastEntity, entity);

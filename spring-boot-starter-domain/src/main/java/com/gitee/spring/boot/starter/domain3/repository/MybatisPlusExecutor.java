@@ -60,8 +60,8 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                     fishhook.setSource(resultMaps);
                     boundedContext.remove("#fishhook");
                 }
-                List<Object> entities = new ArrayList<>(resultMaps.size());
                 Set<Object> existIds = new HashSet<>();
+                List<Object> entities = new ArrayList<>(resultMaps.size());
                 for (Map<String, Object> resultMap : resultMaps) {
                     Object id = resultMap.get("id");
                     if (existIds.add(id)) {
@@ -122,6 +122,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         if (orderBy != null && sort != null) {
             if ("asc".equals(sort)) {
                 queryWrapper.orderByAsc(orderBy);
+
             } else if ("desc".equals(sort)) {
                 queryWrapper.orderByDesc(orderBy);
             }
