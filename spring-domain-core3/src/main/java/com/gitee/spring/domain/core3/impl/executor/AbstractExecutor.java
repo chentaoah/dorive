@@ -14,50 +14,68 @@ public abstract class AbstractExecutor implements Executor {
 
     @Override
     public Query buildQueryByPK(BoundedContext boundedContext, Object primaryKey) {
-        return new Query(primaryKey);
+        Query query = new Query(Operation.SELECT, null);
+        query.setPrimaryKey(primaryKey);
+        return query;
     }
 
     @Override
     public Query buildQuery(BoundedContext boundedContext, Example example) {
-        return new Query(example);
+        Query query = new Query(Operation.SELECT, null);
+        query.setExample(example);
+        return query;
     }
 
     @Override
     public Insert buildInsert(BoundedContext boundedContext, Object entity) {
-        return new Insert(entity);
+        return new Insert(Operation.INSERT, entity);
     }
 
     @Override
     public Update buildUpdate(BoundedContext boundedContext, Object entity) {
-        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-        return new Update(entity, primaryKey);
+        Update update = new Update(Operation.UPDATE, entity);
+        update.setPrimaryKey(BeanUtil.getFieldValue(entity, "id"));
+        return update;
     }
 
     @Override
     public Update buildUpdate(BoundedContext boundedContext, Object entity, Example example) {
-        return new Update(entity, example);
+        Update update = new Update(Operation.UPDATE, entity);
+        update.setExample(example);
+        return update;
     }
 
     @Override
     public Operation buildInsertOrUpdate(BoundedContext boundedContext, Object entity) {
         Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-        return primaryKey == null ? new Insert(entity) : new Update(entity, primaryKey);
+        if (primaryKey == null) {
+            return new Insert(Operation.INSERT, entity);
+        } else {
+            Update update = new Update(Operation.UPDATE, entity);
+            update.setPrimaryKey(primaryKey);
+            return update;
+        }
     }
 
     @Override
     public Delete buildDelete(BoundedContext boundedContext, Object entity) {
-        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-        return new Delete(primaryKey);
+        Delete delete = new Delete(Operation.DELETE, entity);
+        delete.setPrimaryKey(BeanUtil.getFieldValue(entity, "id"));
+        return delete;
     }
 
     @Override
     public Delete buildDeleteByPK(BoundedContext boundedContext, Object primaryKey) {
-        return new Delete(primaryKey);
+        Delete delete = new Delete(Operation.DELETE, null);
+        delete.setPrimaryKey(primaryKey);
+        return delete;
     }
 
     @Override
     public Delete buildDelete(BoundedContext boundedContext, Example example) {
-        return new Delete(example);
+        Delete delete = new Delete(Operation.DELETE, null);
+        delete.setExample(example);
+        return delete;
     }
 
 }
