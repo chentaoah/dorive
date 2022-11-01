@@ -60,7 +60,6 @@ public class BatchEntityHandler implements EntityHandler {
                 boundedContext.remove("#fishhook");
 
                 EntityIndex entityIndex = newEntityIndex(rootEntities, fishhook.getSource(), allEntities);
-
                 for (Object rootEntity : rootEntities) {
                     Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
                     if (lastEntity != null) {
