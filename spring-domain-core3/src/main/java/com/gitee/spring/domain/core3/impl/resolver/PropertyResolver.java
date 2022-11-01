@@ -15,8 +15,8 @@ import java.util.Map;
 @Data
 public class PropertyResolver {
 
-    private Map<String, PropertyChain> allPropertyChains = new LinkedHashMap<>();
-    private Map<String, PropertyChain> fieldPropertyChains = new LinkedHashMap<>();
+    private Map<String, PropertyChain> allPropertyChainMap = new LinkedHashMap<>();
+    private Map<String, PropertyChain> fieldPropertyChainMap = new LinkedHashMap<>();
 
     public void resolveProperties(String lastAccessPath, Class<?> entityClass) {
         ReflectionUtils.doWithLocalFields(entityClass, declaredField -> {
@@ -32,7 +32,7 @@ public class PropertyResolver {
                 fieldGenericEntityClass = (Class<?>) actualTypeArgument;
             }
 
-            PropertyChain lastPropertyChain = allPropertyChains.get(lastAccessPath);
+            PropertyChain lastPropertyChain = allPropertyChainMap.get(lastAccessPath);
             String fieldAccessPath = lastAccessPath + "/" + fieldName;
             boolean isAnnotatedEntity = AnnotatedElementUtils.isAnnotated(declaredField, Entity.class);
 
@@ -52,8 +52,8 @@ public class PropertyResolver {
                 propertyChain.initialize();
             }
 
-            allPropertyChains.put(fieldAccessPath, propertyChain);
-            fieldPropertyChains.putIfAbsent(fieldName, propertyChain);
+            allPropertyChainMap.put(fieldAccessPath, propertyChain);
+            fieldPropertyChainMap.putIfAbsent(fieldName, propertyChain);
 
             if (!filterEntityClass(fieldEntityClass)) {
                 resolveProperties(fieldAccessPath, fieldEntityClass);
