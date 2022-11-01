@@ -4,7 +4,6 @@ import com.gitee.spring.domain.coating.annotation.CoatingScan;
 import com.gitee.spring.domain.common.annotation.Repository;
 import com.gitee.spring.domain.event.annotation.EnableEvent;
 import com.gitee.spring.domain.injection.annotation.Root;
-import com.gitee.spring.domain.web.annotation.EnableWeb;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
@@ -13,7 +12,6 @@ import java.lang.annotation.*;
 @Repository
 @EnableEvent
 @CoatingScan
-@EnableWeb
 @Inherited
 @Documented
 @Target(ElementType.TYPE)
@@ -22,9 +20,6 @@ public @interface RootRepository {
 
     @AliasFor(annotation = Repository.class)
     String value() default "";
-
-    @AliasFor(annotation = Repository.class)
-    String name() default "";
 
     @AliasFor(annotation = CoatingScan.class, attribute = "value")
     String[] scanPackages() default {};

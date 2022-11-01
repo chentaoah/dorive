@@ -1,19 +1,18 @@
 package com.gitee.spring.domain.common.annotation;
 
 import org.springframework.core.annotation.AliasFor;
+import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
 
+@Component
 @Inherited
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@org.springframework.stereotype.Repository
 public @interface Repository {
 
-    @AliasFor(annotation = org.springframework.stereotype.Repository.class)
+    @AliasFor(annotation = Component.class)
     String value() default "";
-
-    String name() default "";
 
 }
