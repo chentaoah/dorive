@@ -12,13 +12,14 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = false)
 public class ConfiguredRepository extends ProxyRepository {
 
+    protected boolean aggregated;
     protected boolean aggregateRoot;
     protected String accessPath;
     protected BinderResolver binderResolver;
     protected boolean boundEntity;
     protected PropertyChain anchorPoint;
     protected String fieldPrefix;
-    protected Map<String, PropertyChain> propertyChains;
+    protected Map<String, PropertyChain> propertyChainMap;
 
     public boolean matchContext(BoundedContext boundedContext) {
         String[] triggers = entityDefinition.getTriggers();

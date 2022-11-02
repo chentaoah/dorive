@@ -20,6 +20,7 @@ public class EntityDefinition {
     private String orderByDesc;
     private String pageKey;
     private int order;
+    private String forceIgnoreKey;
     private String forceInsertKey;
     private String nullableKey;
     private Class<?> factory;

@@ -102,6 +102,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             repository = applicationContext.getBean(repositoryClass);
         }
 
+        boolean aggregated = !(repository instanceof DefaultRepository);
         boolean aggregateRoot = "/".equals(accessPath);
 
         BinderResolver binderResolver = new BinderResolver(this);
@@ -116,14 +117,14 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         configuredRepository.setElementDefinition(elementDefinition);
         configuredRepository.setEntityDefinition(entityDefinition);
         configuredRepository.setProxyRepository((AbstractRepository<Object, Object>) repository);
+        configuredRepository.setAggregated(aggregated);
         configuredRepository.setAggregateRoot(aggregateRoot);
         configuredRepository.setAccessPath(accessPath);
         configuredRepository.setBinderResolver(binderResolver);
         configuredRepository.setBoundEntity(false);
         configuredRepository.setAnchorPoint(propertyChain);
         configuredRepository.setFieldPrefix(fieldPrefix);
-        configuredRepository.setPropertyChains(new LinkedHashMap<>());
-
+        configuredRepository.setPropertyChainMap(new LinkedHashMap<>());
         return configuredRepository;
     }
 

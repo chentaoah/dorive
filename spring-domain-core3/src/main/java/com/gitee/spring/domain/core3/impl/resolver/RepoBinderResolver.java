@@ -28,7 +28,7 @@ public class RepoBinderResolver {
         allRepositoryMap.forEach((accessPath, repository) -> {
 
             BinderResolver binderResolver = repository.getBinderResolver();
-            Map<String, PropertyChain> propertyChains = repository.getPropertyChains();
+            Map<String, PropertyChain> propertyChainMap = repository.getPropertyChainMap();
 
             List<Binder> boundValueBinders = new ArrayList<>();
             PropertyBinder boundIdBinder = null;
@@ -39,7 +39,7 @@ public class RepoBinderResolver {
 
                 if (binder instanceof AbstractBinder) {
                     String fieldAccessPath = repository.getFieldPrefix() + field;
-                    PropertyChain fieldPropertyChain = propertyChains.get(fieldAccessPath);
+                    PropertyChain fieldPropertyChain = propertyChainMap.get(fieldAccessPath);
                     Assert.notNull(fieldPropertyChain, "The field property chain cannot be null!");
                     fieldPropertyChain.initialize();
                     ((AbstractBinder) binder).setFieldPropertyChain(fieldPropertyChain);

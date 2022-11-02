@@ -14,7 +14,9 @@ public class Operation {
     public static final int DELETE = 0x00000008;
     public static final int INSERT_OR_UPDATE = INSERT | UPDATE;
     public static final int UPDATE_OR_DELETE = UPDATE | DELETE;
-
+    public static final int FORCE_IGNORE = 0x00000010;
+    public static final int FORCE_INSERT = 0x00000010 | INSERT;
+    
     protected int type;
     protected Object entity;
 
