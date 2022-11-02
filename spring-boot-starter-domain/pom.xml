@@ -18,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>spring-domain-web</artifactId>
+            <artifactId>spring-domain-coating</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

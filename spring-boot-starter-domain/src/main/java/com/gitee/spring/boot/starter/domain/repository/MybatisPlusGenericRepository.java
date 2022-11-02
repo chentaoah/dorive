@@ -1,14 +1,14 @@
 package com.gitee.spring.boot.starter.domain.repository;
 
+import com.gitee.spring.domain.coating.repository.AbstractChainRepository;
 import com.gitee.spring.domain.core.api.EntityMapper;
 import com.gitee.spring.domain.core.entity.EntityDefinition;
 import com.gitee.spring.domain.core.repository.AbstractRepository;
-import com.gitee.spring.domain.web.repository.AbstractWebRepository;
 
 import java.io.Serializable;
 
 @Deprecated
-public class MybatisPlusGenericRepository<E, PK extends Serializable> extends AbstractWebRepository<E, PK> {
+public class MybatisPlusGenericRepository<E, PK extends Serializable> extends AbstractChainRepository<E, PK> {
 
     @Override
     protected EntityMapper newEntityMapper(EntityDefinition entityDefinition) {

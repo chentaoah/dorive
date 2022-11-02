@@ -15,7 +15,6 @@
         <module>spring-domain-core3</module>
         <module>spring-domain-event</module>
         <module>spring-domain-coating</module>
-        <module>spring-domain-web</module>
         <module>spring-boot-starter-domain</module>
     </modules>
 
