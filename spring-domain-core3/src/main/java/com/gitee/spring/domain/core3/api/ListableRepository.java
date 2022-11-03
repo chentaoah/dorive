@@ -4,7 +4,7 @@ import com.gitee.spring.domain.core3.entity.BoundedContext;
 
 import java.util.List;
 
-public interface GenericRepository<E, PK> extends Repository<E, PK> {
+public interface ListableRepository<E, PK> extends Repository<E, PK> {
 
     int insertList(BoundedContext boundedContext, List<E> entities);
 

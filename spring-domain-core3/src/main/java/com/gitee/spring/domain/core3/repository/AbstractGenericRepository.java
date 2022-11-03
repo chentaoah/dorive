@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.core3.repository;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.core3.api.GenericRepository;
+import com.gitee.spring.domain.core3.api.ListableRepository;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.executor.Example;
 import lombok.Data;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK> implements GenericRepository<E, PK> {
+public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK> implements ListableRepository<E, PK> {
 
     @Override
     public int updateByExample(BoundedContext boundedContext, Object entity, Example example) {
