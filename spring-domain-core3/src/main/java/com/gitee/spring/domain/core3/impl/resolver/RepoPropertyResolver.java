@@ -17,7 +17,7 @@ public class RepoPropertyResolver {
         this.repository = repository;
     }
 
-    public void resolvePropertyChains() {
+    public void resolvePropertyChainMap() {
         Map<String, PropertyChain> allPropertyChainMap = repository.getPropertyResolver().getAllPropertyChainMap();
         Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
 

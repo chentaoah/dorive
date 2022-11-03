@@ -1,13 +1,16 @@
 package com.gitee.spring.domain.core3.repository;
 
 import com.gitee.spring.domain.common.util.ReflectUtils;
+import com.gitee.spring.domain.core3.api.EntityHandler;
 import com.gitee.spring.domain.core3.api.Executor;
 import com.gitee.spring.domain.core3.entity.PropertyChain;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
+import com.gitee.spring.domain.core3.impl.executor.AdaptiveExecutor;
 import com.gitee.spring.domain.core3.impl.executor.ChainExecutor;
 import com.gitee.spring.domain.core3.impl.handler.BatchEntityHandler;
 import com.gitee.spring.domain.core3.impl.resolver.BinderResolver;
+import com.gitee.spring.domain.core3.impl.resolver.DelegateResolver;
 import com.gitee.spring.domain.core3.impl.resolver.PropertyResolver;
 import com.gitee.spring.domain.core3.impl.resolver.RepoBinderResolver;
 import com.gitee.spring.domain.core3.impl.resolver.RepoPropertyResolver;
@@ -29,6 +32,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     protected ApplicationContext applicationContext;
 
+    protected Class<?> entityClass;
+
+    protected DelegateResolver delegateResolver = new DelegateResolver(this);
     protected PropertyResolver propertyResolver = new PropertyResolver();
 
     protected Map<String, ConfiguredRepository> allRepositoryMap = new LinkedHashMap<>();
@@ -46,7 +52,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Type genericSuperclass = this.getClass().getGenericSuperclass();
         ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-        Class<?> entityClass = (Class<?>) actualTypeArgument;
+        entityClass = (Class<?>) actualTypeArgument;
+
+        delegateResolver.resolveRepositoryMap();
 
         List<Class<?>> superClasses = ReflectUtils.getAllSuperClasses(entityClass, Object.class);
         superClasses.forEach(superClass -> propertyResolver.resolveProperties("", superClass));
@@ -59,7 +67,13 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         setElementDefinition(rootRepository.getElementDefinition());
         setEntityDefinition(rootRepository.getEntityDefinition());
-        setExecutor(new ChainExecutor(this, new BatchEntityHandler(this)));
+
+        EntityHandler entityHandler = new BatchEntityHandler(this);
+        if (delegateResolver.isDelegated()) {
+            setExecutor(new AdaptiveExecutor(this, entityHandler));
+        } else {
+            setExecutor(new ChainExecutor(this, entityHandler));
+        }
 
         Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
         allPropertyChainMap.forEach((accessPath, propertyChain) -> {
@@ -71,7 +85,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         });
 
-        new RepoPropertyResolver(this).resolvePropertyChains();
+        new RepoPropertyResolver(this).resolvePropertyChainMap();
         new RepoBinderResolver(this).resolveValueBinders();
 
         orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityDefinition().getOrder()));

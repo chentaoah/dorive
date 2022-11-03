@@ -12,12 +12,16 @@ import com.gitee.spring.domain.core3.entity.operation.Query;
 import com.gitee.spring.domain.core3.impl.OperationTypeResolver;
 import com.gitee.spring.domain.core3.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ChainExecutor extends AbstractExecutor {
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
     private final AbstractContextRepository<?, ?> repository;
     private final EntityHandler entityHandler;
@@ -35,14 +39,14 @@ public class ChainExecutor extends AbstractExecutor {
         if (query.getPrimaryKey() != null) {
             Object rootEntity = rootRepository.selectByPrimaryKey(boundedContext, query.getPrimaryKey());
             if (rootEntity != null) {
-                entityHandler.handleEntities(boundedContext, Collections.singletonList(rootEntity));
+                handleEntities(boundedContext, Collections.singletonList(rootEntity));
             }
             return new Result(rootEntity);
 
         } else if (query.withoutPage()) {
             List<Object> rootEntities = rootRepository.selectByExample(boundedContext, query.getExample());
             if (!rootEntities.isEmpty()) {
-                entityHandler.handleEntities(boundedContext, rootEntities);
+                handleEntities(boundedContext, rootEntities);
             }
             return new Result(rootEntities);
 
@@ -50,10 +54,19 @@ public class ChainExecutor extends AbstractExecutor {
             Page<Object> page = rootRepository.selectPageByExample(boundedContext, query.getExample());
             List<Object> rootEntities = page.getRecords();
             if (!rootEntities.isEmpty()) {
-                entityHandler.handleEntities(boundedContext, rootEntities);
+                handleEntities(boundedContext, rootEntities);
             }
             return new Result(page);
         }
+    }
+
+    @Override
+    public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
+        doHandleEntities(boundedContext, rootEntities);
+    }
+
+    protected void doHandleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
+        entityHandler.handleEntities(boundedContext, rootEntities);
     }
 
     @Override
@@ -70,7 +83,8 @@ public class ChainExecutor extends AbstractExecutor {
         Assert.notNull(rootEntity, "The rootEntity cannot be null!");
 
         int totalCount = 0;
-        for (ConfiguredRepository orderedRepository : repository.getOrderedRepositories()) {
+        AbstractContextRepository<?, ?> delegateRepository = repository.getDelegateResolver().delegateRepository(rootEntity);
+        for (ConfiguredRepository orderedRepository : delegateRepository.getOrderedRepositories()) {
             PropertyChain anchorPoint = orderedRepository.getAnchorPoint();
             Object targetEntity = anchorPoint == null ? rootEntity : anchorPoint.getValue(rootEntity);
             if (targetEntity != null && orderedRepository.matchContext(boundedContext)) {
