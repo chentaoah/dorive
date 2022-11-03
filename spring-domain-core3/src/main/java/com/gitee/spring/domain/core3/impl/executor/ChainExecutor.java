@@ -10,6 +10,7 @@ import com.gitee.spring.domain.core3.entity.executor.Result;
 import com.gitee.spring.domain.core3.entity.operation.Operation;
 import com.gitee.spring.domain.core3.entity.operation.Query;
 import com.gitee.spring.domain.core3.impl.OperationTypeResolver;
+import com.gitee.spring.domain.core3.impl.resolver.DelegateResolver;
 import com.gitee.spring.domain.core3.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core3.repository.ConfiguredRepository;
 import lombok.Data;
@@ -81,9 +82,11 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
         Object rootEntity = operation.getEntity();
         Assert.notNull(rootEntity, "The rootEntity cannot be null!");
+        
+        DelegateResolver delegateResolver = repository.getDelegateResolver();
+        AbstractContextRepository<?, ?> delegateRepository = delegateResolver.delegateRepository(rootEntity);
 
         int totalCount = 0;
-        AbstractContextRepository<?, ?> delegateRepository = repository.getDelegateResolver().delegateRepository(rootEntity);
         for (ConfiguredRepository orderedRepository : delegateRepository.getOrderedRepositories()) {
             PropertyChain anchorPoint = orderedRepository.getAnchorPoint();
             Object targetEntity = anchorPoint == null ? rootEntity : anchorPoint.getValue(rootEntity);
