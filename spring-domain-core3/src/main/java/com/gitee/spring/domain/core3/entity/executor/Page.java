@@ -24,7 +24,7 @@ public class Page<T> {
 
     @Override
     public String toString() {
-        return "limit " + (current - 1) * size + ", " + size;
+        return "LIMIT " + (current - 1) * size + ", " + size;
     }
 
 }
