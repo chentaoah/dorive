@@ -16,6 +16,7 @@ public class EntityDefinition {
 
     private String[] triggers;
     private Class<?> mapper;
+    private String orderByKey;
     private String orderByAsc;
     private String orderByDesc;
     private String pageKey;

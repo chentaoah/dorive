@@ -37,12 +37,21 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     private EntityDefinition entityDefinition;
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;
-    private String[] orderBy;
-    private String sort;
+    private OrderBy orderBy;
     private EntityFactory entityFactory;
 
     @Override
     public Result executeQuery(BoundedContext boundedContext, Query query) {
+
+        Example example = query.getExample();
+        if (example != null && example.getOrderBy() == null) {
+            String orderByKey = entityDefinition.getOrderByKey();
+            if (StringUtils.isNotBlank(orderByKey)) {
+                OrderBy orderBy = (OrderBy) boundedContext.get(orderByKey);
+                example.setOrderBy(orderBy);
+            }
+        }
+
         if (query.getPrimaryKey() != null) {
             QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("id", query.getPrimaryKey());
@@ -51,7 +60,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             return new Result(entity);
 
         } else if (query.withoutPage()) {
-            Example example = query.getExample();
+            assert example != null;
             if (example instanceof UnionExample) {
                 QueryWrapper<Object> queryWrapper = buildQueryWrapper((UnionExample) example);
                 List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
@@ -83,7 +92,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             }
 
         } else {
-            Example example = query.getExample();
+            assert example != null;
             com.gitee.spring.domain.core3.entity.executor.Page<Object> page = example.getPage();
 
             Page<Map<String, Object>> dataPage = new Page<>(page.getCurrent(), page.getSize());
@@ -106,27 +115,31 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
     private QueryWrapper<Object> buildQueryWrapper(Example example) {
         QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
+
         String[] selectColumns = example.getSelectColumns();
         if (selectColumns != null) {
             String sqlSelect = queryWrapper.select(pojoClass, i -> true).getSqlSelect();
             sqlSelect = sqlSelect + StringPool.COMMA + queryWrapper.select(selectColumns).getSqlSelect();
             queryWrapper.select(sqlSelect);
         }
+
         for (Criterion criterion : example.getCriteria()) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
             String property = StrUtil.toUnderlineCase(criterion.getProperty());
             criterionAppender.appendCriterion(queryWrapper, property, criterion.getValue());
         }
-        String[] orderBy = example.getOrderBy() != null ? example.getOrderBy() : this.orderBy;
-        String sort = example.getSort() != null ? example.getSort() : this.sort;
-        if (orderBy != null && sort != null) {
+
+        OrderBy orderBy = example.getOrderBy() != null ? example.getOrderBy() : this.orderBy;
+        if (orderBy != null) {
+            String sort = orderBy.getSort();
             if ("asc".equals(sort)) {
-                queryWrapper.orderByAsc(orderBy);
+                queryWrapper.orderByAsc(orderBy.getColumns());
 
             } else if ("desc".equals(sort)) {
-                queryWrapper.orderByDesc(orderBy);
+                queryWrapper.orderByDesc(orderBy.getColumns());
             }
         }
+
         return queryWrapper;
     }
 
@@ -182,7 +195,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             Update update = (Update) operation;
             Object primaryKey = update.getPrimaryKey();
             Example example = update.getExample();
-            
+
             String nullableKey = entityDefinition.getNullableKey();
             if (StringUtils.isNotBlank(nullableKey)) {
                 Set<String> nullableProperties = (Set<String>) boundedContext.get(nullableKey);

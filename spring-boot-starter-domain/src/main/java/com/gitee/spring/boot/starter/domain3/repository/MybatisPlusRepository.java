@@ -6,6 +6,7 @@ import com.gitee.spring.domain.core3.api.EntityFactory;
 import com.gitee.spring.domain.core3.api.Executor;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
+import com.gitee.spring.domain.core3.entity.executor.OrderBy;
 import com.gitee.spring.domain.core3.impl.DefaultEntityFactory;
 import com.gitee.spring.domain.core3.repository.AbstractGenericRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -36,17 +37,14 @@ public class MybatisPlusRepository<E, PK> extends AbstractGenericRepository<E, P
 
         String orderByAsc = entityDefinition.getOrderByAsc();
         String orderByDesc = entityDefinition.getOrderByDesc();
-        String[] orderBy = null;
-        String sort = null;
+        OrderBy orderBy = null;
         if (StringUtils.isNotBlank(orderByAsc)) {
             orderByAsc = StrUtil.toUnderlineCase(orderByAsc);
-            orderBy = StrUtil.splitTrim(orderByAsc, ",").toArray(new String[0]);
-            sort = "asc";
-        }
-        if (StringUtils.isNotBlank(orderByDesc)) {
+            orderBy = new OrderBy(StrUtil.splitTrim(orderByAsc, ",").toArray(new String[0]), "asc");
+
+        } else if (StringUtils.isNotBlank(orderByDesc)) {
             orderByDesc = StrUtil.toUnderlineCase(orderByDesc);
-            orderBy = StrUtil.splitTrim(orderByDesc, ",").toArray(new String[0]);
-            sort = "desc";
+            orderBy = new OrderBy(StrUtil.splitTrim(orderByDesc, ",").toArray(new String[0]), "desc");
         }
 
         Class<?> factoryClass = entityDefinition.getFactory();
@@ -70,7 +68,6 @@ public class MybatisPlusRepository<E, PK> extends AbstractGenericRepository<E, P
         mybatisPlusExecutor.setBaseMapper((BaseMapper<Object>) mapper);
         mybatisPlusExecutor.setPojoClass((Class<Object>) pojoClass);
         mybatisPlusExecutor.setOrderBy(orderBy);
-        mybatisPlusExecutor.setSort(sort);
         mybatisPlusExecutor.setEntityFactory(entityFactory);
         return mybatisPlusExecutor;
     }

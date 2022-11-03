@@ -16,8 +16,7 @@ public class Example {
     private boolean emptyQuery = false;
     private String[] selectColumns;
     private List<Criterion> criteria = new ArrayList<>(4);
-    private String[] orderBy;
-    private String sort;
+    private OrderBy orderBy;
     private Page<Object> page;
 
     public boolean isDirtyQuery() {
@@ -97,14 +96,12 @@ public class Example {
     }
 
     public Example orderByAsc(String... columns) {
-        orderBy = StringUtils.toUnderlineCase(columns);
-        sort = "asc";
+        orderBy = new OrderBy(StringUtils.toUnderlineCase(columns), "asc");
         return this;
     }
 
     public Example orderByDesc(String... columns) {
-        orderBy = StringUtils.toUnderlineCase(columns);
-        sort = "desc";
+        orderBy = new OrderBy(StringUtils.toUnderlineCase(columns), "desc");
         return this;
     }
 
