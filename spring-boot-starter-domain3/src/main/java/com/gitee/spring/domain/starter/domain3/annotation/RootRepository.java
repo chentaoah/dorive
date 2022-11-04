@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.starter.domain3.annotation;
 
-import com.gitee.spring.domain.common.annotation.Repository;
+import com.gitee.spring.domain.core3.annotation.Repository;
 import com.gitee.spring.domain.injection.annotation.Root;
 import org.springframework.core.annotation.AliasFor;
 

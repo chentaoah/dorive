@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.core3.entity.definition;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.common.util.ReflectUtils;
+import com.gitee.spring.domain.core3.util.ReflectUtils;
 import com.gitee.spring.domain.core3.annotation.Binding;
 import com.gitee.spring.domain.core3.annotation.Entity;
 import com.gitee.spring.domain.core3.entity.Property;
