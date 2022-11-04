@@ -2,19 +2,19 @@ package com.gitee.spring.domain.starter.domain3.repository;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gitee.spring.domain.coating3.repository.AbstractCoatingRepository;
 import com.gitee.spring.domain.core3.api.EntityFactory;
 import com.gitee.spring.domain.core3.api.Executor;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core3.entity.executor.OrderBy;
 import com.gitee.spring.domain.core3.impl.DefaultEntityFactory;
-import com.gitee.spring.domain.event3.repository.AbstractEventRepository;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-public class MybatisPlusRepository<E, PK> extends AbstractEventRepository<E, PK> {
+public class MybatisPlusRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
 
     @Override
     @SuppressWarnings("unchecked")
