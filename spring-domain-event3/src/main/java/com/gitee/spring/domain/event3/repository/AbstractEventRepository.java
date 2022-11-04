@@ -12,7 +12,7 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
     protected boolean enableEvent;
 
     @Override
-    public void afterPropertiesSet() {
+    public void afterPropertiesSet() throws Exception {
         EnableEvent enableEvent = AnnotationUtils.getAnnotation(this.getClass(), EnableEvent.class);
         this.enableEvent = enableEvent != null;
         super.afterPropertiesSet();

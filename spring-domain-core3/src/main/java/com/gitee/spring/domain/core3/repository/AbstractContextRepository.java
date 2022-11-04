@@ -48,7 +48,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     @Override
-    public void afterPropertiesSet() {
+    public void afterPropertiesSet() throws Exception {
         Type genericSuperclass = this.getClass().getGenericSuperclass();
         ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
