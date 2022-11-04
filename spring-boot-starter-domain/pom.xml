@@ -23,7 +23,7 @@
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>spring-domain-event3</artifactId>
+            <artifactId>spring-domain-coating3</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
