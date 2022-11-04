@@ -24,7 +24,11 @@ import org.springframework.context.ApplicationContextAware;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -78,7 +82,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
         allPropertyChainMap.forEach((accessPath, propertyChain) -> {
             if (propertyChain.isAnnotatedEntity()) {
-                ConfiguredRepository subRepository = newRepository(accessPath, propertyChain.getDeclaredField());
+                ConfiguredRepository subRepository = newRepository(accessPath, propertyChain.getProperty().getDeclaredField());
                 allRepositoryMap.put(accessPath, subRepository);
                 subRepositories.add(subRepository);
                 orderedRepositories.add(subRepository);
