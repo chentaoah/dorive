@@ -4,15 +4,13 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.common.util.ReflectUtils;
 import com.gitee.spring.domain.core3.annotation.Binding;
 import com.gitee.spring.domain.core3.annotation.Entity;
+import com.gitee.spring.domain.core3.entity.Property;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Collection;
 import java.util.Set;
 
 @Data
@@ -46,31 +44,20 @@ public class ElementDefinition {
                     ReflectUtils.getFieldNames(entityClass));
 
         } else if (annotatedElement instanceof Field) {
-            Field declaredField = (Field) annotatedElement;
-            Class<?> fieldEntityClass = declaredField.getType();
-            boolean isCollection = false;
-            Class<?> fieldGenericEntityClass = fieldEntityClass;
-            String fieldName = declaredField.getName();
-
-            if (Collection.class.isAssignableFrom(fieldEntityClass)) {
-                isCollection = true;
-                ParameterizedType parameterizedType = (ParameterizedType) declaredField.getGenericType();
-                Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-                fieldGenericEntityClass = (Class<?>) actualTypeArgument;
-            }
-
+            Property property = new Property((Field) annotatedElement);
             return new ElementDefinition(
                     entityAnnotation,
                     bindingAnnotations,
                     annotatedElement,
-                    fieldEntityClass,
-                    isCollection,
-                    fieldGenericEntityClass,
-                    fieldName,
-                    ReflectUtils.getFieldNames(fieldGenericEntityClass));
-        }
+                    property.getFieldClass(),
+                    property.isCollection(),
+                    property.getGenericFieldClass(),
+                    property.getFieldName(),
+                    ReflectUtils.getFieldNames(property.getGenericFieldClass()));
 
-        throw new RuntimeException("Unknown type!");
+        } else {
+            throw new RuntimeException("Unknown type!");
+        }
     }
 
 }
