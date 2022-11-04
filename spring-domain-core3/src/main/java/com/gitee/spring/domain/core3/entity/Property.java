@@ -36,4 +36,8 @@ public class Property {
         this.fieldName = fieldName;
     }
 
+    public boolean isSameType(Property property) {
+        return fieldClass == property.getFieldClass() && genericFieldClass == property.getGenericFieldClass();
+    }
+
 }

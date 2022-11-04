@@ -72,8 +72,7 @@ public class RepoBinderResolver {
     private boolean isSameType(PropertyBinder propertyBinder) {
         PropertyChain fieldPropertyChain = propertyBinder.getFieldPropertyChain();
         PropertyChain boundPropertyChain = propertyBinder.getBoundPropertyChain();
-        return fieldPropertyChain.getEntityClass() == boundPropertyChain.getEntityClass()
-                && fieldPropertyChain.getGenericEntityClass() == boundPropertyChain.getGenericEntityClass();
+        return fieldPropertyChain.getProperty().isSameType(boundPropertyChain.getProperty());
     }
 
 }
