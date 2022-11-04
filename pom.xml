@@ -14,10 +14,11 @@
         <module>spring-domain-core</module>
         <module>spring-domain-event</module>
         <module>spring-domain-coating</module>
+        <module>spring-boot-starter-domain</module>
         <module>spring-domain-core3</module>
         <module>spring-domain-event3</module>
         <module>spring-domain-coating3</module>
-        <module>spring-boot-starter-domain</module>
+        <module>spring-boot-starter-domain3</module>
     </modules>
 
     <properties>
