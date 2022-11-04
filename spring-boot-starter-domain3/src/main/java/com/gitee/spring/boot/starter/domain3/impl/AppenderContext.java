@@ -1,9 +1,9 @@
-package com.gitee.spring.domain.starter.domain3.impl;
+package com.gitee.spring.boot.starter.domain3.impl;
 
 import com.baomidou.mybatisplus.core.conditions.interfaces.Compare;
 import com.baomidou.mybatisplus.core.conditions.interfaces.Func;
+import com.gitee.spring.boot.starter.domain3.api.CriterionAppender;
 import com.gitee.spring.domain.core3.api.Operator;
-import com.gitee.spring.domain.starter.domain3.api.CriterionAppender;
 
 import java.util.Collection;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.starter.domain3.repository;
+package com.gitee.spring.boot.starter.domain3.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gitee.spring.boot.starter.domain3.api.CriterionAppender;
 import com.gitee.spring.domain.core3.api.EntityFactory;
 import com.gitee.spring.domain.core3.entity.BoundedContext;
 import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
@@ -26,7 +27,6 @@ import com.gitee.spring.domain.core3.entity.operation.Operation;
 import com.gitee.spring.domain.core3.entity.operation.Query;
 import com.gitee.spring.domain.core3.entity.operation.Update;
 import com.gitee.spring.domain.core3.impl.executor.AbstractExecutor;
-import com.gitee.spring.domain.starter.domain3.api.CriterionAppender;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.gitee.spring.domain.starter.domain3.impl.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
+import static com.gitee.spring.boot.starter.domain3.impl.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
 
 @Data
 @NoArgsConstructor

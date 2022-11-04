@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.starter.domain3.annotation;
+package com.gitee.spring.boot.starter.domain3.annotation;
 
 import com.gitee.spring.domain.core3.annotation.Repository;
 import com.gitee.spring.domain.injection.annotation.Root;

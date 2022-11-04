@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.starter.domain3.repository;
+package com.gitee.spring.boot.starter.domain3.repository;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

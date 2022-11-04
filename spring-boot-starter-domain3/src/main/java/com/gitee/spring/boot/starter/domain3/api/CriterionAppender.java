@@ -1,4 +1,4 @@
-package com.gitee.spring.domain.starter.domain3.api;
+package com.gitee.spring.boot.starter.domain3.api;
 
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 
