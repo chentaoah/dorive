@@ -116,9 +116,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             repository = applicationContext.getBean(repositoryClass);
         }
 
+        boolean aggregated = !(repository instanceof DefaultRepository);
+
         repository = postProcessRepository((AbstractRepository<Object, Object>) repository);
 
-        boolean aggregated = !(repository instanceof DefaultRepository);
         boolean aggregateRoot = "/".equals(accessPath);
 
         BinderResolver binderResolver = new BinderResolver(this);
