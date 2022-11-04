@@ -116,6 +116,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             repository = applicationContext.getBean(repositoryClass);
         }
 
+        repository = postProcessRepository((AbstractRepository<Object, Object>) repository);
+
         boolean aggregated = !(repository instanceof DefaultRepository);
         boolean aggregateRoot = "/".equals(accessPath);
 
@@ -143,5 +145,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     protected abstract Executor newExecutor(ElementDefinition elementDefinition, EntityDefinition entityDefinition);
+
+    protected abstract AbstractRepository<Object, Object> postProcessRepository(AbstractRepository<Object, Object> repository);
 
 }

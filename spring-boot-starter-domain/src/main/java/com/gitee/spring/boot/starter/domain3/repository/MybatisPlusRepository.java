@@ -8,13 +8,13 @@ import com.gitee.spring.domain.core3.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core3.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core3.entity.executor.OrderBy;
 import com.gitee.spring.domain.core3.impl.DefaultEntityFactory;
-import com.gitee.spring.domain.core3.repository.AbstractGenericRepository;
+import com.gitee.spring.domain.event3.repository.AbstractEventRepository;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-public class MybatisPlusRepository<E, PK> extends AbstractGenericRepository<E, PK> {
+public class MybatisPlusRepository<E, PK> extends AbstractEventRepository<E, PK> {
 
     @Override
     @SuppressWarnings("unchecked")
