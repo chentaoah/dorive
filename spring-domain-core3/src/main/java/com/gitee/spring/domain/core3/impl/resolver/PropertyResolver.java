@@ -1,14 +1,12 @@
 package com.gitee.spring.domain.core3.impl.resolver;
 
 import com.gitee.spring.domain.core3.annotation.Entity;
+import com.gitee.spring.domain.core3.entity.Property;
 import com.gitee.spring.domain.core3.entity.PropertyChain;
 import lombok.Data;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -20,32 +18,22 @@ public class PropertyResolver {
 
     public void resolveProperties(String lastAccessPath, Class<?> entityClass) {
         ReflectionUtils.doWithLocalFields(entityClass, declaredField -> {
-            Class<?> fieldEntityClass = declaredField.getType();
-            boolean isCollection = false;
-            Class<?> fieldGenericEntityClass = fieldEntityClass;
-            String fieldName = declaredField.getName();
-
-            if (Collection.class.isAssignableFrom(fieldEntityClass)) {
-                isCollection = true;
-                ParameterizedType parameterizedType = (ParameterizedType) declaredField.getGenericType();
-                Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-                fieldGenericEntityClass = (Class<?>) actualTypeArgument;
-            }
 
             PropertyChain lastPropertyChain = allPropertyChainMap.get(lastAccessPath);
+
+            Property property = new Property(declaredField);
+            Class<?> fieldEntityClass = property.getFieldClass();
+            String fieldName = property.getFieldName();
+
             String fieldAccessPath = lastAccessPath + "/" + fieldName;
             boolean isAnnotatedEntity = AnnotatedElementUtils.isAnnotated(declaredField, Entity.class);
 
             PropertyChain propertyChain = new PropertyChain(
                     lastPropertyChain,
                     entityClass,
+                    property,
                     fieldAccessPath,
-                    declaredField,
                     isAnnotatedEntity,
-                    fieldEntityClass,
-                    isCollection,
-                    fieldGenericEntityClass,
-                    fieldName,
                     null);
 
             if (isAnnotatedEntity) {
