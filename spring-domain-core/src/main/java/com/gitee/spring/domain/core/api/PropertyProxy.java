@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.core.api;
 
-public interface EntityProperty {
+public interface PropertyProxy {
 
     Object getValue(Object entity);
 

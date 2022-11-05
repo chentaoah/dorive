@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.core.impl.handler;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.spring.domain.core.api.EntityProperty;
+import com.gitee.spring.domain.core.api.PropertyProxy;
 import com.gitee.spring.domain.core.util.ContextUtils;
 import com.gitee.spring.domain.core.api.EntityHandler;
 import com.gitee.spring.domain.core.api.EntityIndex;
@@ -66,8 +66,8 @@ public class BatchEntityHandler implements EntityHandler {
                         List<Object> entities = entityIndex.selectList(rootEntity);
                         Object entity = convertManyToOneEntity(subRepository, entities);
                         if (entity != null) {
-                            EntityProperty entityProperty = anchorPoint.getEntityProperty();
-                            entityProperty.setValue(lastEntity, entity);
+                            PropertyProxy propertyProxy = anchorPoint.getPropertyProxy();
+                            propertyProxy.setValue(lastEntity, entity);
                         }
                     }
                 }

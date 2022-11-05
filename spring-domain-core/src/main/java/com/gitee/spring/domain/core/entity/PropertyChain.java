@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.core.entity;
 
-import com.gitee.spring.domain.core.api.EntityProperty;
-import com.gitee.spring.domain.core.impl.EntityPropertyFactory;
+import com.gitee.spring.domain.core.api.PropertyProxy;
+import com.gitee.spring.domain.core.impl.PropertyProxyFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
@@ -9,14 +9,14 @@ import lombok.ToString;
 @Data
 @AllArgsConstructor
 @ToString(exclude = "lastPropertyChain")
-public class PropertyChain implements EntityProperty {
+public class PropertyChain implements PropertyProxy {
 
     private PropertyChain lastPropertyChain;
     private Class<?> lastEntityClass;
     private Property property;
     private String accessPath;
     private boolean annotatedEntity;
-    private EntityProperty entityProperty;
+    private PropertyProxy propertyProxy;
 
     public PropertyChain(PropertyChain lastPropertyChain,
                          PropertyChain propertyChain) {
@@ -25,12 +25,12 @@ public class PropertyChain implements EntityProperty {
         this.property = propertyChain.getProperty();
         this.accessPath = propertyChain.getAccessPath();
         this.annotatedEntity = propertyChain.isAnnotatedEntity();
-        this.entityProperty = propertyChain.getEntityProperty();
+        this.propertyProxy = propertyChain.getPropertyProxy();
     }
 
     public void initialize() {
-        if (entityProperty == null) {
-            entityProperty = EntityPropertyFactory.newEntityProperty(lastEntityClass, property.getFieldClass(), property.getFieldName());
+        if (propertyProxy == null) {
+            propertyProxy = PropertyProxyFactory.newPropertyProxy(lastEntityClass, property.getFieldClass(), property.getFieldName());
             if (lastPropertyChain != null) {
                 lastPropertyChain.initialize();
             }
@@ -42,7 +42,7 @@ public class PropertyChain implements EntityProperty {
         if (lastPropertyChain != null) {
             entity = lastPropertyChain.getValue(entity);
         }
-        return entity != null ? entityProperty.getValue(entity) : null;
+        return entity != null ? propertyProxy.getValue(entity) : null;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class PropertyChain implements EntityProperty {
             entity = lastPropertyChain.getValue(entity);
         }
         if (entity != null) {
-            entityProperty.setValue(entity, property);
+            propertyProxy.setValue(entity, property);
         }
     }
 

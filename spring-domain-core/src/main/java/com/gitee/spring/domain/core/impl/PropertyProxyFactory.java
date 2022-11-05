@@ -1,7 +1,7 @@
 package com.gitee.spring.domain.core.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.spring.domain.core.api.EntityProperty;
+import com.gitee.spring.domain.core.api.PropertyProxy;
 import com.gitee.spring.domain.proxy.ProxyCompiler;
 import com.gitee.spring.domain.proxy.JavassistCompiler;
 import com.gitee.spring.domain.core.util.ReflectUtils;
@@ -10,13 +10,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class EntityPropertyFactory {
+public class PropertyProxyFactory {
 
     private static final AtomicInteger COUNT = new AtomicInteger(0);
     private static final ProxyCompiler PROXY_COMPILER = new JavassistCompiler();
-    private static final Map<String, EntityProperty> GENERATED_PROXY_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, PropertyProxy> GENERATED_PROXY_CACHE = new ConcurrentHashMap<>();
 
-    public static EntityProperty newEntityProperty(Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
+    public static PropertyProxy newPropertyProxy(Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
         String cacheKey = lastEntityClass.getTypeName() + ":" + entityClass.getTypeName() + ":" + fieldName;
         if (!GENERATED_PROXY_CACHE.containsKey(cacheKey)) {
             synchronized (GENERATED_PROXY_CACHE) {
@@ -24,8 +24,8 @@ public class EntityPropertyFactory {
                     try {
                         String generatedCode = generateCode(lastEntityClass, entityClass, fieldName);
                         Class<?> generatedClass = PROXY_COMPILER.compile(generatedCode, null);
-                        EntityProperty entityProperty = (EntityProperty) ReflectUtils.newInstance(generatedClass);
-                        GENERATED_PROXY_CACHE.put(cacheKey, entityProperty);
+                        PropertyProxy propertyProxy = (PropertyProxy) ReflectUtils.newInstance(generatedClass);
+                        GENERATED_PROXY_CACHE.put(cacheKey, propertyProxy);
 
                     } catch (Exception e) {
                         throw new RuntimeException("Failed to generate class!", e);
@@ -37,7 +37,7 @@ public class EntityPropertyFactory {
     }
 
     private static String generateCode(Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
-        Class<?> interfaceClass = EntityProperty.class;
+        Class<?> interfaceClass = PropertyProxy.class;
         StringBuilder builder = new StringBuilder();
         String simpleName = interfaceClass.getSimpleName() + "$Proxy" + COUNT.getAndIncrement();
         builder.append(String.format("package %s;\n", interfaceClass.getPackage().getName()));
