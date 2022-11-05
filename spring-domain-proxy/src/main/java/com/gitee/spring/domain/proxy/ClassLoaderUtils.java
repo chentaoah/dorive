@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.domain.core3.impl.proxy;
+package com.gitee.spring.domain.proxy;
 
 import java.lang.reflect.Array;
 import java.util.*;

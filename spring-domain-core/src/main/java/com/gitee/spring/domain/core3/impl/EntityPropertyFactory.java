@@ -2,8 +2,8 @@ package com.gitee.spring.domain.core3.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core3.api.EntityProperty;
-import com.gitee.spring.domain.core3.impl.proxy.ProxyCompiler;
-import com.gitee.spring.domain.core3.impl.proxy.JavassistCompiler;
+import com.gitee.spring.domain.proxy.ProxyCompiler;
+import com.gitee.spring.domain.proxy.JavassistCompiler;
 import com.gitee.spring.domain.core3.util.ReflectUtils;
 
 import java.util.Map;

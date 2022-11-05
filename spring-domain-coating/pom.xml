@@ -8,22 +8,13 @@
         <artifactId>spring-domain</artifactId>
         <version>3.0.0</version>
     </parent>
-    <artifactId>spring-boot-starter-domain3</artifactId>
+    <artifactId>spring-domain-coating</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>spring-domain-injection</artifactId>
+            <artifactId>spring-domain-event</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>spring-domain-coating3</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
     </dependencies>
 </project>
