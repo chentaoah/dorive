@@ -1,6 +1,6 @@
 package com.gitee.spring.domain.coating.repository;
 
-import com.gitee.spring.domain.coating.annotation.EnableCoating;
+import com.gitee.spring.domain.coating.annotation.CoatingScan;
 import com.gitee.spring.domain.coating.api.ExampleBuilder;
 import com.gitee.spring.domain.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.spring.domain.coating.impl.DefaultExampleBuilder;
@@ -23,10 +23,10 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        EnableCoating enableCoating = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), EnableCoating.class);
-        if (enableCoating != null) {
+        CoatingScan coatingScan = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), CoatingScan.class);
+        if (coatingScan != null) {
             repoDefinitionResolver.resolveRepositoryDefinitionMap();
-            coatingWrapperResolver.resolveCoatingWrapperMap(enableCoating.value());
+            coatingWrapperResolver.resolveCoatingWrapperMap(coatingScan.value());
         }
     }
 
