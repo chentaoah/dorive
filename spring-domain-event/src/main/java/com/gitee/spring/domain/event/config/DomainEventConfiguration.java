@@ -1,17 +1,17 @@
 package com.gitee.spring.domain.event.config;
 
-import com.gitee.spring.domain.event.listener.RepositoryListenerV3;
+import com.gitee.spring.domain.event.listener.RepositoryListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
 @Order(-100)
 @Configuration
-public class DomainEventConfigurationV3 {
+public class DomainEventConfiguration {
 
     @Bean
-    public RepositoryListenerV3 repositoryListenerV3() {
-        return new RepositoryListenerV3();
+    public RepositoryListener repositoryListener() {
+        return new RepositoryListener();
     }
 
 }

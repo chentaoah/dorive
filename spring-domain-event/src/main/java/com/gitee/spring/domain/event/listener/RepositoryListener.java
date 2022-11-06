@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public class RepositoryListenerV3 implements ApplicationListener<RepositoryEvent>, ApplicationContextAware, InitializingBean {
+public class RepositoryListener implements ApplicationListener<RepositoryEvent>, ApplicationContextAware, InitializingBean {
 
     private ApplicationContext applicationContext;
 
