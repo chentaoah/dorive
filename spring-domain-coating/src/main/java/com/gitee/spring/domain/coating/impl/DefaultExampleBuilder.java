@@ -151,10 +151,10 @@ public class DefaultExampleBuilder implements ExampleBuilder {
         });
     }
 
-    private List<Object> collectFieldValues(BoundedContext boundedContext, List<Object> entities, PropertyBinder propertyEntityBinder) {
+    private List<Object> collectFieldValues(BoundedContext boundedContext, List<Object> entities, PropertyBinder propertyBinder) {
         List<Object> fieldValues = new ArrayList<>();
         for (Object entity : entities) {
-            Object fieldValue = propertyEntityBinder.getFieldValue(boundedContext, entity);
+            Object fieldValue = propertyBinder.getFieldValue(boundedContext, entity);
             if (fieldValue != null) {
                 fieldValues.add(fieldValue);
             }
