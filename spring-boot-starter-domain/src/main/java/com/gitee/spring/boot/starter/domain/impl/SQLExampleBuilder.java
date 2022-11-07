@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.spring.boot.starter.domain.entity.Metadata;
 import com.gitee.spring.domain.coating.api.ExampleBuilder;
 import com.gitee.spring.domain.coating.entity.CoatingWrapper;
@@ -20,6 +21,7 @@ import com.gitee.spring.domain.core.entity.Property;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
 import com.gitee.spring.domain.core.entity.executor.Criterion;
 import com.gitee.spring.domain.core.entity.executor.Example;
+import com.gitee.spring.domain.core.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
@@ -58,6 +60,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
             Example example = newExampleByCoating(repositoryWrapper, coatingObject);
             if ("/".equals(absoluteAccessPath) || example.isDirtyQuery()) {
+                appendCriteriaByContext(boundedContext, repositoryWrapper, example);
                 String tableAlias = aliases.substring(aliasIndex, aliasIndex + 1);
                 aliasIndex++;
                 buildSQL(sqlBuilder, tableAliasMap, tableAlias, repositoryWrapper);
@@ -69,7 +72,26 @@ public class SQLExampleBuilder implements ExampleBuilder {
             sqlBuilder.append("WHERE ").append(sqlCriteriaBuilder);
         }
 
-        return null;
+        Example example = new Example();
+
+        if (sqlBuilder.length() == 0) {
+            example.setEmptyQuery(true);
+            return example;
+        }
+
+        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sqlBuilder.toString());
+        List<Object> primaryKeys = new ArrayList<>(resultMaps.size());
+        for (Map<String, Object> resultMap : resultMaps) {
+            Object primaryKey = resultMap.get("id");
+            primaryKeys.add(primaryKey);
+        }
+
+        if (primaryKeys.isEmpty()) {
+            example.setEmptyQuery(true);
+            return example;
+        }
+
+        return example.eq("id", primaryKeys);
     }
 
     private Example newExampleByCoating(RepositoryWrapper repositoryWrapper, Object coatingObject) {
@@ -86,6 +108,20 @@ public class SQLExampleBuilder implements ExampleBuilder {
             }
         }
         return example;
+    }
+
+    private void appendCriteriaByContext(BoundedContext boundedContext, RepositoryWrapper repositoryWrapper, Example example) {
+        RepositoryDefinition repositoryDefinition = repositoryWrapper.getRepositoryDefinition();
+        ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
+        BinderResolver binderResolver = definitionRepository.getBinderResolver();
+        for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
+            Object boundValue = contextBinder.getBoundValue(boundedContext, null);
+            if (boundValue != null) {
+                BindingDefinition bindingDefinition = contextBinder.getBindingDefinition();
+                String alias = bindingDefinition.getAlias();
+                example.eq(alias, boundValue);
+            }
+        }
     }
 
     private void buildSQL(StringBuilder sqlBuilder, Map<String, String> tableAliasMap, String tableAlias, RepositoryWrapper repositoryWrapper) {

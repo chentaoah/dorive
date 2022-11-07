@@ -2,6 +2,7 @@ package com.gitee.spring.boot.starter.domain.repository;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gitee.spring.boot.starter.domain.impl.SQLExampleBuilder;
 import com.gitee.spring.domain.coating.repository.AbstractCoatingRepository;
 import com.gitee.spring.domain.core.api.EntityFactory;
 import com.gitee.spring.domain.core.api.Executor;
@@ -15,6 +16,12 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 public class MybatisPlusRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        super.afterPropertiesSet();
+        this.exampleBuilder = new SQLExampleBuilder(this);
+    }
 
     @Override
     @SuppressWarnings("unchecked")
