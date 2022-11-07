@@ -116,10 +116,8 @@ public class SQLExampleBuilder implements ExampleBuilder {
             List<String> sqlCriteriaList = new ArrayList<>();
             for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
                 BindingDefinition bindingDefinition = propertyBinder.getBindingDefinition();
-                String alias = bindingDefinition.getAlias();
-                String bindAlias = bindingDefinition.getBindAlias();
-                alias = StrUtil.toUnderlineCase(alias);
-                bindAlias = StrUtil.toUnderlineCase(bindAlias);
+                String alias = StrUtil.toUnderlineCase(bindingDefinition.getAlias());
+                String bindAlias = StrUtil.toUnderlineCase(bindingDefinition.getBindAlias());
 
                 TableInfo joinTableInfo = getTableInfo(propertyBinder.getBelongRepository());
                 String joinTableName = joinTableInfo.getTableName();
