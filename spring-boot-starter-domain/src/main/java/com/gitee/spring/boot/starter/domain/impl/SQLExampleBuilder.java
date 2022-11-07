@@ -3,7 +3,6 @@ package com.gitee.spring.boot.starter.domain.impl;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
@@ -50,7 +49,6 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         StringBuilder sqlBuilder = new StringBuilder();
         List<String> sqlCriteria = new ArrayList<>();
-        List<String> arguments = new ArrayList<>();
 
         Map<String, String> tableAliasMap = new LinkedHashMap<>();
         char letter = 'a';
@@ -68,8 +66,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
                 buildSQL(sqlBuilder, tableAliasMap, tableAlias, repositoryWrapper);
 
                 for (Criterion criterion : example.getCriteria()) {
-                    sqlCriteria.add(tableAlias + "." + criterion.toExpression(arguments.size()));
-                    arguments.add(Criterion.convert(criterion.getValue()));
+                    sqlCriteria.add(tableAlias + "." + criterion);
                 }
             }
         }
@@ -85,7 +82,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             return example;
         }
 
-        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sqlBuilder.toString(), arguments.toArray());
+        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sqlBuilder.toString());
         List<Object> primaryKeys = new ArrayList<>(resultMaps.size());
         for (Map<String, Object> resultMap : resultMaps) {
             Object primaryKey = resultMap.get("id");
@@ -142,15 +139,8 @@ public class SQLExampleBuilder implements ExampleBuilder {
         tableAliasMap.put(tableName, tableAlias);
 
         if ("/".equals(absoluteAccessPath)) {
-            String sqlTemplate = "SELECT %s FROM %s %s ";
-            List<String> sqlSelectList = new ArrayList<>();
-            sqlSelectList.add(tableAlias + ".id");
-            List<TableFieldInfo> fieldList = tableInfo.getFieldList();
-            for (TableFieldInfo tableFieldInfo : fieldList) {
-                sqlSelectList.add(tableAlias + "." + tableFieldInfo.getColumn());
-            }
-            String sqlSelect = StrUtil.join(",", sqlSelectList);
-            String sqlString = String.format(sqlTemplate, sqlSelect, tableName, tableAlias);
+            String sqlTemplate = "SELECT %s.id FROM %s %s ";
+            String sqlString = String.format(sqlTemplate, tableAlias, tableName, tableAlias);
             sqlBuilder.append(sqlString);
 
         } else {
