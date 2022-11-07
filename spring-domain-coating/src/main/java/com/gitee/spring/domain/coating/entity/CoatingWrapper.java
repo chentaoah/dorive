@@ -22,7 +22,9 @@ public class CoatingWrapper {
         if (pageNumPropertyWrapper != null && pageSizePropertyWrapper != null) {
             Object pageNum = pageNumPropertyWrapper.getProperty().getFieldValue(object);
             Object pageSize = pageSizePropertyWrapper.getProperty().getFieldValue(object);
-            return new Page<>(Convert.convert(Long.class, pageNum), Convert.convert(Long.class, pageSize));
+            if (pageNum != null && pageSize != null) {
+                return new Page<>(Convert.convert(Long.class, pageNum), Convert.convert(Long.class, pageSize));
+            }
         }
         return null;
     }
