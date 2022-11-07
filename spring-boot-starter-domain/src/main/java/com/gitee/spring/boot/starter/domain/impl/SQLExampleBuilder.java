@@ -50,6 +50,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         StringBuilder sqlBuilder = new StringBuilder();
         List<String> sqlCriteria = new ArrayList<>();
+        List<String> arguments = new ArrayList<>();
 
         Map<String, String> tableAliasMap = new LinkedHashMap<>();
         String aliases = "abcdefghijklmnopqrstuvwxyz";
@@ -61,10 +62,16 @@ public class SQLExampleBuilder implements ExampleBuilder {
             Example example = newExampleByCoating(repositoryWrapper, coatingObject);
             if ("/".equals(absoluteAccessPath) || example.isDirtyQuery()) {
                 appendCriteriaByContext(boundedContext, repositoryWrapper, example);
+
                 String tableAlias = aliases.substring(aliasIndex, aliasIndex + 1);
                 aliasIndex++;
+
                 buildSQL(sqlBuilder, tableAliasMap, tableAlias, repositoryWrapper);
-                buildSQL(sqlCriteria, tableAlias, example);
+
+                for (Criterion criterion : example.getCriteria()) {
+                    sqlCriteria.add(tableAlias + "." + criterion.toExpression(arguments.size()));
+                    arguments.add(Criterion.convert(criterion.getValue()));
+                }
             }
         }
 
@@ -79,7 +86,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             return example;
         }
 
-        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sqlBuilder.toString());
+        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sqlBuilder.toString(), arguments.toArray());
         List<Object> primaryKeys = new ArrayList<>(resultMaps.size());
         for (Map<String, Object> resultMap : resultMaps) {
             Object primaryKey = resultMap.get("id");
@@ -170,12 +177,6 @@ public class SQLExampleBuilder implements ExampleBuilder {
         Metadata metadata = (Metadata) repository.getMetadata();
         Class<?> pojoClass = metadata.getPojoClass();
         return TableInfoHelper.getTableInfo(pojoClass);
-    }
-
-    private void buildSQL(List<String> sqlCriteria, String tableAlias, Example example) {
-        for (Criterion criterion : example.getCriteria()) {
-            sqlCriteria.add(tableAlias + "." + criterion);
-        }
     }
 
 }

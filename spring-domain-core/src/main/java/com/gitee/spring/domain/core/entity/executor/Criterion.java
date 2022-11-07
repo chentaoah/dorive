@@ -17,12 +17,7 @@ public class Criterion {
     private String operator;
     private Object value;
 
-    @Override
-    public String toString() {
-        return StrUtil.toUnderlineCase(property) + " " + operator + " " + convert(value);
-    }
-
-    private String convert(Object value) {
+    public static String convert(Object value) {
         if (value instanceof Number) {
             return String.valueOf(value);
 
@@ -33,6 +28,15 @@ public class Criterion {
             return "'" + SQL_DATE_FORMAT.format((Date) value) + "'";
         }
         return value.toString();
+    }
+
+    @Override
+    public String toString() {
+        return StrUtil.toUnderlineCase(property) + " " + operator + " " + convert(value);
+    }
+
+    public String toExpression(int argNumber) {
+        return StrUtil.toUnderlineCase(property) + " " + operator + " {" + argNumber + "}";
     }
 
 }
