@@ -45,6 +45,7 @@ public class CoatingWrapperResolver {
                 Map<String, PropertyWrapper> allPropertyWrapperMap = new LinkedHashMap<>();
                 Map<String, List<PropertyWrapper>> locationPropertyWrappersMap = new LinkedHashMap<>();
                 Map<String, PropertyWrapper> fieldPropertyWrapperMap = new LinkedHashMap<>();
+                PropertyWrapper[] pagePropertyWrappers = new PropertyWrapper[2];
 
                 ReflectionUtils.doWithLocalFields(coatingClass, declaredField -> {
                     Property property = new Property(declaredField);
@@ -62,6 +63,15 @@ public class CoatingWrapperResolver {
                     }
 
                     PropertyWrapper propertyWrapper = new PropertyWrapper(property, propertyDefinition);
+                    if ("pageNum".equals(fieldName)) {
+                        pagePropertyWrappers[0] = propertyWrapper;
+                        return;
+
+                    } else if ("pageSize".equals(fieldName)) {
+                        pagePropertyWrappers[1] = propertyWrapper;
+                        return;
+                    }
+
                     allPropertyWrapperMap.put(fieldName, propertyWrapper);
 
                     String location = propertyDefinition.getLocation();
@@ -81,7 +91,12 @@ public class CoatingWrapperResolver {
                 Collections.reverse(reversedRepositoryWrappers);
 
                 CoatingDefinition coatingDefinition = CoatingDefinition.newCoatingDefinition(coatingClass);
-                CoatingWrapper coatingWrapper = new CoatingWrapper(coatingDefinition, repositoryWrappers, reversedRepositoryWrappers);
+                CoatingWrapper coatingWrapper = new CoatingWrapper(
+                        coatingDefinition,
+                        repositoryWrappers,
+                        reversedRepositoryWrappers,
+                        pagePropertyWrappers[0],
+                        pagePropertyWrappers[1]);
                 coatingWrapperMap.put(coatingClass, coatingWrapper);
             }
         }

@@ -1,7 +1,6 @@
 package com.gitee.spring.boot.starter.domain.impl;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
@@ -20,12 +19,12 @@ import com.gitee.spring.domain.core.entity.Property;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
 import com.gitee.spring.domain.core.entity.executor.Criterion;
 import com.gitee.spring.domain.core.entity.executor.Example;
+import com.gitee.spring.domain.core.entity.executor.Page;
 import com.gitee.spring.domain.core.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,6 +48,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         StringBuilder sqlBuilder = new StringBuilder();
         List<String> sqlCriteria = new ArrayList<>();
+        Page<Object> pageInfo = coatingWrapper.getPageInfo(coatingObject);
 
         Map<String, String> tableAliasMap = new LinkedHashMap<>();
         char letter = 'a';
@@ -71,8 +71,13 @@ public class SQLExampleBuilder implements ExampleBuilder {
             }
         }
 
-        if (!sqlCriteria.isEmpty()) {
-            sqlBuilder.append("WHERE ").append(StrUtil.join(" AND ", sqlCriteria));
+        if (sqlBuilder.length() > 0) {
+            if (!sqlCriteria.isEmpty()) {
+                sqlBuilder.append("WHERE ").append(StrUtil.join(" AND ", sqlCriteria));
+            }
+            if (pageInfo != null) {
+                sqlBuilder.append(" ").append(pageInfo);
+            }
         }
 
         Example example = new Example();
@@ -101,8 +106,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         Example example = new Example();
         for (PropertyWrapper propertyWrapper : repositoryWrapper.getCollectedPropertyWrappers()) {
             Property property = propertyWrapper.getProperty();
-            Field declaredField = property.getDeclaredField();
-            Object fieldValue = ReflectUtil.getFieldValue(coatingObject, declaredField);
+            Object fieldValue = property.getFieldValue(coatingObject);
             if (fieldValue != null) {
                 PropertyDefinition propertyDefinition = propertyWrapper.getPropertyDefinition();
                 String alias = propertyDefinition.getAlias();

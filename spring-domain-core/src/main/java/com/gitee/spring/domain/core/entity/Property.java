@@ -1,5 +1,6 @@
 package com.gitee.spring.domain.core.entity;
 
+import cn.hutool.core.util.ReflectUtil;
 import lombok.Data;
 
 import java.lang.reflect.Field;
@@ -38,6 +39,10 @@ public class Property {
 
     public boolean isSameType(Property property) {
         return fieldClass == property.getFieldClass() && genericFieldClass == property.getGenericFieldClass();
+    }
+
+    public Object getFieldValue(Object object) {
+        return ReflectUtil.getFieldValue(object, declaredField);
     }
 
 }

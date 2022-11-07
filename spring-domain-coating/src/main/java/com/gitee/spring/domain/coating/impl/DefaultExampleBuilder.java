@@ -1,7 +1,6 @@
 package com.gitee.spring.domain.coating.impl;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ReflectUtil;
 import com.gitee.spring.domain.coating.api.ExampleBuilder;
 import com.gitee.spring.domain.coating.entity.CoatingWrapper;
 import com.gitee.spring.domain.coating.entity.PropertyWrapper;
@@ -21,12 +20,7 @@ import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DefaultExampleBuilder implements ExampleBuilder {
 
@@ -67,8 +61,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
         Example example = repoCriterion.getExample();
         for (PropertyWrapper propertyWrapper : repositoryWrapper.getCollectedPropertyWrappers()) {
             Property property = propertyWrapper.getProperty();
-            Field declaredField = property.getDeclaredField();
-            Object fieldValue = ReflectUtil.getFieldValue(coatingObject, declaredField);
+            Object fieldValue = property.getFieldValue(coatingObject);
             if (fieldValue != null) {
                 PropertyDefinition propertyDefinition = propertyWrapper.getPropertyDefinition();
                 String alias = propertyDefinition.getAlias();
