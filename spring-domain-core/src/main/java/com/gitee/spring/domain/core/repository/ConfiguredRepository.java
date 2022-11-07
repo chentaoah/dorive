@@ -3,10 +3,14 @@ package com.gitee.spring.domain.core.repository;
 import com.gitee.spring.domain.core.api.MetadataGetter;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.PropertyChain;
+import com.gitee.spring.domain.core.entity.executor.Example;
+import com.gitee.spring.domain.core.entity.executor.Page;
 import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -42,6 +46,38 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataGet
             return ((MetadataGetter) proxyRepository).getMetadata();
         }
         return null;
+    }
+
+    @Override
+    public List<Object> selectByExample(BoundedContext boundedContext, Example example) {
+        if (example.isEmptyQuery()) {
+            return Collections.emptyList();
+        }
+        return super.selectByExample(boundedContext, example);
+    }
+
+    @Override
+    public Page<Object> selectPageByExample(BoundedContext boundedContext, Example example) {
+        if (example.isEmptyQuery()) {
+            return new Page<>();
+        }
+        return super.selectPageByExample(boundedContext, example);
+    }
+
+    @Override
+    public int updateByExample(BoundedContext boundedContext, Object entity, Example example) {
+        if (example.isEmptyQuery()) {
+            return 0;
+        }
+        return super.updateByExample(boundedContext, entity, example);
+    }
+
+    @Override
+    public int deleteByExample(BoundedContext boundedContext, Example example) {
+        if (example.isEmptyQuery()) {
+            return 0;
+        }
+        return super.deleteByExample(boundedContext, example);
     }
 
 }
