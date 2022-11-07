@@ -72,11 +72,13 @@ public class CoatingWrapperResolver {
 
                 RepoDefinitionResolver repoDefinitionResolver = repository.getRepoDefinitionResolver();
                 List<RepositoryWrapper> repositoryWrappers = repoDefinitionResolver.collectRepositoryWrappers(locationPropertyWrappersMap, fieldPropertyWrapperMap);
-                Collections.reverse(repositoryWrappers);
                 checkFieldNames(coatingClass, allPropertyWrapperMap.keySet(), repositoryWrappers);
 
+                List<RepositoryWrapper> reversedRepositoryWrappers = new ArrayList<>(repositoryWrappers);
+                Collections.reverse(reversedRepositoryWrappers);
+
                 CoatingDefinition coatingDefinition = CoatingDefinition.newCoatingDefinition(coatingClass);
-                CoatingWrapper coatingWrapper = new CoatingWrapper(coatingDefinition, repositoryWrappers);
+                CoatingWrapper coatingWrapper = new CoatingWrapper(coatingDefinition, repositoryWrappers, reversedRepositoryWrappers);
                 coatingWrapperMap.put(coatingClass, coatingWrapper);
             }
         }

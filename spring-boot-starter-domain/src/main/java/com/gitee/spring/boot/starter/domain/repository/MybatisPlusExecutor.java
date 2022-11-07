@@ -11,7 +11,9 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.spring.boot.starter.domain.api.CriterionAppender;
+import com.gitee.spring.boot.starter.domain.entity.Metadata;
 import com.gitee.spring.domain.core.api.EntityFactory;
+import com.gitee.spring.domain.core.api.MetadataGetter;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
@@ -44,7 +46,7 @@ import static com.gitee.spring.boot.starter.domain.impl.AppenderContext.OPERATOR
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class MybatisPlusExecutor extends AbstractExecutor {
+public class MybatisPlusExecutor extends AbstractExecutor implements MetadataGetter {
 
     private ElementDefinition elementDefinition;
     private EntityDefinition entityDefinition;
@@ -52,6 +54,11 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     private Class<Object> pojoClass;
     private OrderBy orderBy;
     private EntityFactory entityFactory;
+
+    @Override
+    public Object getMetadata() {
+        return new Metadata(pojoClass);
+    }
 
     @Override
     public Result executeQuery(BoundedContext boundedContext, Query query) {

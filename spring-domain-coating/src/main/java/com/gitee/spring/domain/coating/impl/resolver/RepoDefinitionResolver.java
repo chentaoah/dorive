@@ -27,12 +27,13 @@ public class RepoDefinitionResolver {
     }
 
     public void resolveRepositoryDefinitionMap() {
+        ConfiguredRepository rootRepository = repository.getRootRepository();
         RepositoryDefinition repositoryDefinition = new RepositoryDefinition(
                 "",
                 "/",
                 false,
-                repository.getRootRepository(),
-                repository.getRootRepository());
+                rootRepository,
+                rootRepository);
         repositoryDefinitionMap.put("/", repositoryDefinition);
         resolveRepositoryDefinitionMap(new ArrayList<>(), repository);
     }
@@ -47,13 +48,14 @@ public class RepoDefinitionResolver {
             AbstractRepository<Object, Object> abstractRepository = subRepository.getProxyRepository();
             if (abstractRepository instanceof AbstractContextRepository) {
                 AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) abstractRepository;
+                ConfiguredRepository rootRepository = abstractContextRepository.getRootRepository();
 
                 RepositoryDefinition repositoryDefinition = new RepositoryDefinition(
                         prefixAccessPath,
                         absoluteAccessPath,
                         true,
                         subRepository,
-                        abstractContextRepository.getRootRepository());
+                        rootRepository);
                 repositoryDefinitionMap.put(absoluteAccessPath, repositoryDefinition);
 
                 List<String> newMultiAccessPath = new ArrayList<>(multiAccessPath);

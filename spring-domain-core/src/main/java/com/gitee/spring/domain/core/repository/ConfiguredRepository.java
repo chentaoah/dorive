@@ -1,5 +1,6 @@
 package com.gitee.spring.domain.core.repository;
 
+import com.gitee.spring.domain.core.api.MetadataGetter;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
@@ -10,7 +11,7 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ConfiguredRepository extends ProxyRepository {
+public class ConfiguredRepository extends ProxyRepository implements MetadataGetter {
 
     protected boolean aggregated;
     protected boolean aggregateRoot;
@@ -32,6 +33,15 @@ public class ConfiguredRepository extends ProxyRepository {
             }
         }
         return false;
+    }
+
+    @Override
+    public Object getMetadata() {
+        AbstractRepository<Object, Object> proxyRepository = getProxyRepository();
+        if (proxyRepository instanceof MetadataGetter) {
+            return ((MetadataGetter) proxyRepository).getMetadata();
+        }
+        return null;
     }
 
 }

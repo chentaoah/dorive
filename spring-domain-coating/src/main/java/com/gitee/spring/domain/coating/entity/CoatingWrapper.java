@@ -10,5 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 public class CoatingWrapper {
     private CoatingDefinition coatingDefinition;
+    private List<RepositoryWrapper> repositoryWrappers;
     private List<RepositoryWrapper> reversedRepositoryWrappers;
 }
