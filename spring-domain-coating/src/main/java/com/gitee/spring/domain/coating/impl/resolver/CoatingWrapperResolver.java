@@ -57,13 +57,16 @@ public class CoatingWrapperResolver {
                     if (StringUtils.isBlank(propertyDefinition.getAlias())) {
                         propertyDefinition.setAlias(fieldName);
                     }
+                    if (StringUtils.isBlank(propertyDefinition.getOperator())) {
+                        propertyDefinition.setOperator("=");
+                    }
 
                     PropertyWrapper propertyWrapper = new PropertyWrapper(property, propertyDefinition);
                     allPropertyWrapperMap.put(fieldName, propertyWrapper);
 
-                    boolean isBoundLocation = propertyDefinition.getLocation().startsWith("/");
-                    if (isBoundLocation) {
-                        List<PropertyWrapper> propertyWrappers = locationPropertyWrappersMap.computeIfAbsent(propertyDefinition.getLocation(), key -> new ArrayList<>());
+                    String location = propertyDefinition.getLocation();
+                    if (StringUtils.isNotBlank(location) && location.startsWith("/")) {
+                        List<PropertyWrapper> propertyWrappers = locationPropertyWrappersMap.computeIfAbsent(location, key -> new ArrayList<>());
                         propertyWrappers.add(propertyWrapper);
                     } else {
                         fieldPropertyWrapperMap.put(fieldName, propertyWrapper);
