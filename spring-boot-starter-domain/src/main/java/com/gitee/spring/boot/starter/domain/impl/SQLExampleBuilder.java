@@ -53,8 +53,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         List<String> arguments = new ArrayList<>();
 
         Map<String, String> tableAliasMap = new LinkedHashMap<>();
-        String aliases = "abcdefghijklmnopqrstuvwxyz";
-        int aliasIndex = 0;
+        char letter = 'a';
 
         for (RepositoryWrapper repositoryWrapper : coatingWrapper.getRepositoryWrappers()) {
             RepositoryDefinition repositoryDefinition = repositoryWrapper.getRepositoryDefinition();
@@ -63,8 +62,8 @@ public class SQLExampleBuilder implements ExampleBuilder {
             if ("/".equals(absoluteAccessPath) || example.isDirtyQuery()) {
                 appendCriteriaByContext(boundedContext, repositoryWrapper, example);
 
-                String tableAlias = aliases.substring(aliasIndex, aliasIndex + 1);
-                aliasIndex++;
+                String tableAlias = String.valueOf(letter);
+                letter = (char) (letter + 1);
 
                 buildSQL(sqlBuilder, tableAliasMap, tableAlias, repositoryWrapper);
 
