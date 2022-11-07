@@ -49,7 +49,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         Assert.notNull(coatingWrapper, "No coating wrapper exists!");
 
         StringBuilder sqlBuilder = new StringBuilder();
-        StringBuilder sqlCriteriaBuilder = new StringBuilder();
+        List<String> sqlCriteria = new ArrayList<>();
 
         Map<String, String> tableAliasMap = new LinkedHashMap<>();
         String aliases = "abcdefghijklmnopqrstuvwxyz";
@@ -64,12 +64,12 @@ public class SQLExampleBuilder implements ExampleBuilder {
                 String tableAlias = aliases.substring(aliasIndex, aliasIndex + 1);
                 aliasIndex++;
                 buildSQL(sqlBuilder, tableAliasMap, tableAlias, repositoryWrapper);
-                buildSQL(sqlCriteriaBuilder, tableAlias, example);
+                buildSQL(sqlCriteria, tableAlias, example);
             }
         }
 
-        if (sqlCriteriaBuilder.length() > 0) {
-            sqlBuilder.append("WHERE ").append(sqlCriteriaBuilder);
+        if (!sqlCriteria.isEmpty()) {
+            sqlBuilder.append("WHERE ").append(StrUtil.join(" AND ", sqlCriteria));
         }
 
         Example example = new Example();
@@ -172,12 +172,10 @@ public class SQLExampleBuilder implements ExampleBuilder {
         return TableInfoHelper.getTableInfo(pojoClass);
     }
 
-    private void buildSQL(StringBuilder sqlCriteriaBuilder, String tableAlias, Example example) {
-        List<String> criteria = new ArrayList<>();
+    private void buildSQL(List<String> sqlCriteria, String tableAlias, Example example) {
         for (Criterion criterion : example.getCriteria()) {
-            criteria.add(tableAlias + "." + criterion);
+            sqlCriteria.add(tableAlias + "." + criterion);
         }
-        sqlCriteriaBuilder.append(StrUtil.join(" AND ", criteria));
     }
 
 }
