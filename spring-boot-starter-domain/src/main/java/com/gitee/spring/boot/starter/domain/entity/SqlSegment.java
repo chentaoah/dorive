@@ -8,11 +8,13 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 public class SqlSegment {
-    
-    private String sql;
+
     private String tableName;
     private String tableAlias;
-    private boolean toHandle;
+    private String sql;
+    private String sqlCriteria;
+    private boolean rootReachable;
+    private boolean dirtyQuery;
     private Set<String> dependentTables;
 
     @Override

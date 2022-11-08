@@ -27,7 +27,6 @@ import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,13 +49,10 @@ public class SQLExampleBuilder implements ExampleBuilder {
         CoatingWrapper coatingWrapper = coatingWrapperMap.get(coatingObject.getClass());
         Assert.notNull(coatingWrapper, "No coating wrapper exists!");
 
-        Page<Object> pageInfo = coatingWrapper.getPageInfo(coatingObject);
-
-        char letter = 'a';
-
         Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>();
         SqlSegment rootSqlSegment = null;
-        List<SqlSegment> sqlCriteria = new ArrayList<>();
+        Page<Object> pageInfo = coatingWrapper.getPageInfo(coatingObject);
+        char letter = 'a';
 
         for (RepositoryWrapper repositoryWrapper : coatingWrapper.getRepositoryWrappers()) {
             RepositoryDefinition repositoryDefinition = repositoryWrapper.getRepositoryDefinition();
@@ -77,62 +73,57 @@ public class SQLExampleBuilder implements ExampleBuilder {
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
-            boolean isToHandle = example.isDirtyQuery();
-            if (isToHandle) {
-                for (Criterion criterion : example.getCriteria()) {
-                    sqlCriteria.add(new SqlSegment(tableAlias + "." + criterion, tableName, tableAlias, true, Collections.emptySet()));
-                }
-            }
-
             if ("/".equals(absoluteAccessPath)) {
                 String sql = String.format("SELECT %s.id FROM %s %s ", tableAlias, tableName, tableAlias);
-                rootSqlSegment = new SqlSegment(sql, tableName, tableAlias, isToHandle, new HashSet<>(8));
+                String sqlCriteria = example.isDirtyQuery() ? buildCriteria(tableAlias, example) : null;
+                rootSqlSegment = new SqlSegment(tableName, tableAlias, sql, sqlCriteria, true, example.isDirtyQuery(), new HashSet<>(4));
                 sqlSegmentMap.put(tableName, rootSqlSegment);
 
             } else {
                 String sql = buildSQL(sqlSegmentMap, tableName, tableAlias, binderResolver);
-                sqlSegmentMap.put(tableName, new SqlSegment(sql, tableName, tableAlias, isToHandle, new HashSet<>(8)));
+                String sqlCriteria = example.isDirtyQuery() ? buildCriteria(tableAlias, example) : null;
+                SqlSegment sqlSegment = new SqlSegment(tableName, tableAlias, sql, sqlCriteria, false, example.isDirtyQuery(), new HashSet<>(4));
+                sqlSegmentMap.put(tableName, sqlSegment);
             }
         }
 
         assert rootSqlSegment != null;
         findAllSqlToHandle(sqlSegmentMap, rootSqlSegment);
 
+        if (!rootSqlSegment.isDirtyQuery()) {
+            return new Example();
+        }
+
         StringBuilder sqlBuilder = new StringBuilder();
-        if (!sqlSegmentMap.isEmpty()) {
-            for (SqlSegment sqlSegment : sqlSegmentMap.values()) {
-                if (sqlSegment.isToHandle()) {
-                    sqlBuilder.append(sqlSegment.getSql());
+        List<String> sqlCriteriaList = new ArrayList<>(sqlSegmentMap.size());
+        for (SqlSegment sqlSegment : sqlSegmentMap.values()) {
+            if (sqlSegment.isRootReachable() && sqlSegment.isDirtyQuery()) {
+                sqlBuilder.append(sqlSegment);
+                String sqlCriteria = sqlSegment.getSqlCriteria();
+                if (sqlCriteria != null) {
+                    sqlCriteriaList.add(sqlCriteria);
                 }
             }
-            if (!sqlCriteria.isEmpty()) {
-                sqlBuilder.append("WHERE ").append(StrUtil.join(" AND ", sqlCriteria));
-            }
-            if (pageInfo != null) {
-                sqlBuilder.append(" ").append(pageInfo);
-            }
+        }
+        sqlBuilder.append("WHERE ").append(StrUtil.join(" AND ", sqlCriteriaList));
+        if (pageInfo != null) {
+            sqlBuilder.append(" ").append(pageInfo);
         }
 
         Example example = new Example();
-
-        if (sqlBuilder.length() == 0) {
-            example.setEmptyQuery(true);
-            return example;
-        }
-
         List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sqlBuilder.toString());
-        List<Object> primaryKeys = new ArrayList<>(resultMaps.size());
-        for (Map<String, Object> resultMap : resultMaps) {
-            Object primaryKey = resultMap.get("id");
-            primaryKeys.add(primaryKey);
-        }
+        if (!resultMaps.isEmpty()) {
+            List<Object> primaryKeys = new ArrayList<>(resultMaps.size());
+            for (Map<String, Object> resultMap : resultMaps) {
+                Object primaryKey = resultMap.get("id");
+                primaryKeys.add(primaryKey);
+            }
+            return example.eq("id", primaryKeys);
 
-        if (primaryKeys.isEmpty()) {
+        } else {
             example.setEmptyQuery(true);
             return example;
         }
-
-        return example.eq("id", primaryKeys);
     }
 
     private Example newExampleByCoating(RepositoryWrapper repositoryWrapper, Object coatingObject) {
@@ -164,8 +155,17 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
     }
 
+    private String buildCriteria(String tableAlias, Example example) {
+        List<Criterion> criteria = example.getCriteria();
+        List<String> sqlCriteria = new ArrayList<>(criteria.size());
+        for (Criterion criterion : criteria) {
+            sqlCriteria.add(tableAlias + "." + criterion);
+        }
+        return StrUtil.join(" AND ", sqlCriteria);
+    }
+
     private String buildSQL(Map<String, SqlSegment> sqlSegmentMap, String tableName, String tableAlias, BinderResolver binderResolver) {
-        List<String> sqlCriteriaList = new ArrayList<>();
+        List<String> sqlCriteria = new ArrayList<>();
         for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
             BindingDefinition bindingDefinition = propertyBinder.getBindingDefinition();
             String alias = StrUtil.toUnderlineCase(bindingDefinition.getAlias());
@@ -180,11 +180,11 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
                 String joinTableAlias = sqlSegment.getTableAlias();
                 String bindAlias = StrUtil.toUnderlineCase(bindingDefinition.getBindAlias());
-                sqlCriteriaList.add(tableAlias + "." + alias + " = " + joinTableAlias + "." + bindAlias);
+                sqlCriteria.add(tableAlias + "." + alias + " = " + joinTableAlias + "." + bindAlias);
             }
         }
-        String sqlCriteria = StrUtil.join(" AND ", sqlCriteriaList);
-        return String.format("LEFT JOIN %s %s ON %s ", tableName, tableAlias, sqlCriteria);
+        String criteria = StrUtil.join(" AND ", sqlCriteria);
+        return String.format("LEFT JOIN %s %s ON %s ", tableName, tableAlias, criteria);
     }
 
     private TableInfo getTableInfo(ConfiguredRepository repository) {
@@ -198,9 +198,10 @@ public class SQLExampleBuilder implements ExampleBuilder {
         for (String dependentTable : dependentTables) {
             SqlSegment sqlSegment = sqlSegmentMap.get(dependentTable);
             if (sqlSegment != null) {
+                sqlSegment.setRootReachable(true);
                 findAllSqlToHandle(sqlSegmentMap, sqlSegment);
-                if (sqlSegment.isToHandle()) {
-                    lastSqlSegment.setToHandle(true);
+                if (sqlSegment.isDirtyQuery()) {
+                    lastSqlSegment.setDirtyQuery(true);
                 }
             }
         }
