@@ -88,7 +88,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
 
         assert rootSqlSegment != null;
-        findAllSqlToHandle(sqlSegmentMap, rootSqlSegment);
+        handleDependencies(sqlSegmentMap, rootSqlSegment);
 
         if (!rootSqlSegment.isDirtyQuery()) {
             return new Example();
@@ -193,14 +193,14 @@ public class SQLExampleBuilder implements ExampleBuilder {
         return TableInfoHelper.getTableInfo(pojoClass);
     }
 
-    private void findAllSqlToHandle(Map<String, SqlSegment> sqlSegmentMap, SqlSegment lastSqlSegment) {
+    private void handleDependencies(Map<String, SqlSegment> sqlSegmentMap, SqlSegment lastSqlSegment) {
         Set<String> dependentTables = lastSqlSegment.getDependentTables();
         for (String dependentTable : dependentTables) {
-            SqlSegment sqlSegment = sqlSegmentMap.get(dependentTable);
-            if (sqlSegment != null) {
-                sqlSegment.setRootReachable(true);
-                findAllSqlToHandle(sqlSegmentMap, sqlSegment);
-                if (sqlSegment.isDirtyQuery()) {
+            SqlSegment dependentSqlSegment = sqlSegmentMap.get(dependentTable);
+            if (dependentSqlSegment != null) {
+                dependentSqlSegment.setRootReachable(true);
+                handleDependencies(sqlSegmentMap, dependentSqlSegment);
+                if (dependentSqlSegment.isDirtyQuery()) {
                     lastSqlSegment.setDirtyQuery(true);
                 }
             }
