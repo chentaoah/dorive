@@ -104,7 +104,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
                 sqlBuilder.append(sqlSegment);
 
                 List<JoinSegment> availableJoinSegments = getAvailableJoinSegments(sqlSegmentMap, sqlSegment);
-                sqlBuilder.append(StrUtil.join(" AND ", availableJoinSegments));
+                sqlBuilder.append(StrUtil.join(" AND ", availableJoinSegments)).append(" ");
 
                 if (sqlSegment.getSqlCriteria() != null) {
                     sqlCriteria.add(sqlSegment.getSqlCriteria());
