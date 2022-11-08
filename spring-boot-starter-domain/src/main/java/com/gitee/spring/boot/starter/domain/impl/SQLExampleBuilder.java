@@ -119,6 +119,8 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
 
         Example example = new Example();
+        example.setPage(pageInfo);
+
         List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sqlBuilder.toString());
         if (!resultMaps.isEmpty()) {
             List<Object> primaryKeys = new ArrayList<>(resultMaps.size());
