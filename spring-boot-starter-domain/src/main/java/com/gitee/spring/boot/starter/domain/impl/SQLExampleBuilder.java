@@ -28,7 +28,6 @@ import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -76,20 +75,17 @@ public class SQLExampleBuilder implements ExampleBuilder {
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
+            List<JoinSegment> joinSegments = getJoinSegments(sqlSegmentMap, binderResolver, tableName, tableAlias);
+            String sqlCriteria = example.isDirtyQuery() ? buildSqlCriteria(tableAlias, example) : null;
+
             if ("/".equals(absoluteAccessPath)) {
                 String sql = String.format("SELECT %s.id FROM %s %s ", tableAlias, tableName, tableAlias);
-                List<JoinSegment> joinSegments = Collections.emptyList();
-                String sqlCriteria = example.isDirtyQuery() ? buildSqlCriteria(tableAlias, example) : null;
-                rootSqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, sqlCriteria,
-                        true, example.isDirtyQuery(), new HashSet<>(4));
+                rootSqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, sqlCriteria, true, example.isDirtyQuery(), new HashSet<>(4));
                 sqlSegmentMap.put(tableName, rootSqlSegment);
 
             } else {
                 String sql = String.format("LEFT JOIN %s %s ON ", tableName, tableAlias);
-                List<JoinSegment> joinSegments = getJoinSegments(sqlSegmentMap, binderResolver, tableName, tableAlias);
-                String sqlCriteria = example.isDirtyQuery() ? buildSqlCriteria(tableAlias, example) : null;
-                SqlSegment sqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, sqlCriteria,
-                        false, example.isDirtyQuery(), new HashSet<>(4));
+                SqlSegment sqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, sqlCriteria, false, example.isDirtyQuery(), new HashSet<>(4));
                 sqlSegmentMap.put(tableName, sqlSegment);
             }
         }
@@ -172,8 +168,9 @@ public class SQLExampleBuilder implements ExampleBuilder {
     }
 
     private List<JoinSegment> getJoinSegments(Map<String, SqlSegment> sqlSegmentMap, BinderResolver binderResolver, String tableName, String tableAlias) {
-        List<JoinSegment> joinSegments = new ArrayList<>();
-        for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
+        List<PropertyBinder> propertyBinders = binderResolver.getPropertyBinders();
+        List<JoinSegment> joinSegments = new ArrayList<>(propertyBinders.size());
+        for (PropertyBinder propertyBinder : propertyBinders) {
             TableInfo joinTableInfo = getTableInfo(propertyBinder.getBelongRepository());
             String joinTableName = joinTableInfo.getTableName();
 
