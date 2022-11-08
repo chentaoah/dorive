@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
+import com.gitee.spring.boot.starter.domain.entity.JoinSegment;
 import com.gitee.spring.boot.starter.domain.entity.Metadata;
 import com.gitee.spring.boot.starter.domain.entity.SqlSegment;
 import com.gitee.spring.domain.coating.api.ExampleBuilder;
@@ -27,6 +28,7 @@ import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,13 +50,14 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         CoatingWrapper coatingWrapper = coatingWrapperMap.get(coatingObject.getClass());
         Assert.notNull(coatingWrapper, "No coating wrapper exists!");
+        List<RepositoryWrapper> repositoryWrappers = coatingWrapper.getRepositoryWrappers();
 
-        Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>();
+        Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>(repositoryWrappers.size() * 4 / 3 + 1);
         SqlSegment rootSqlSegment = null;
         Page<Object> pageInfo = coatingWrapper.getPageInfo(coatingObject);
         char letter = 'a';
 
-        for (RepositoryWrapper repositoryWrapper : coatingWrapper.getRepositoryWrappers()) {
+        for (RepositoryWrapper repositoryWrapper : repositoryWrappers) {
             RepositoryDefinition repositoryDefinition = repositoryWrapper.getRepositoryDefinition();
             String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
             ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
@@ -75,37 +78,44 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
             if ("/".equals(absoluteAccessPath)) {
                 String sql = String.format("SELECT %s.id FROM %s %s ", tableAlias, tableName, tableAlias);
-                String sqlCriteria = example.isDirtyQuery() ? buildCriteria(tableAlias, example) : null;
-                rootSqlSegment = new SqlSegment(tableName, tableAlias, sql, sqlCriteria, true, example.isDirtyQuery(), new HashSet<>(4));
+                List<JoinSegment> joinSegments = Collections.emptyList();
+                String sqlCriteria = example.isDirtyQuery() ? buildSqlCriteria(tableAlias, example) : null;
+                rootSqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, sqlCriteria,
+                        true, example.isDirtyQuery(), new HashSet<>(4));
                 sqlSegmentMap.put(tableName, rootSqlSegment);
 
             } else {
-                String sql = buildSQL(sqlSegmentMap, tableName, tableAlias, binderResolver);
-                String sqlCriteria = example.isDirtyQuery() ? buildCriteria(tableAlias, example) : null;
-                SqlSegment sqlSegment = new SqlSegment(tableName, tableAlias, sql, sqlCriteria, false, example.isDirtyQuery(), new HashSet<>(4));
+                String sql = String.format("LEFT JOIN %s %s ON ", tableName, tableAlias);
+                List<JoinSegment> joinSegments = getJoinSegments(sqlSegmentMap, binderResolver, tableName, tableAlias);
+                String sqlCriteria = example.isDirtyQuery() ? buildSqlCriteria(tableAlias, example) : null;
+                SqlSegment sqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, sqlCriteria,
+                        false, example.isDirtyQuery(), new HashSet<>(4));
                 sqlSegmentMap.put(tableName, sqlSegment);
             }
         }
 
         assert rootSqlSegment != null;
-        handleDependencies(sqlSegmentMap, rootSqlSegment);
+        markReachableAndDirty(sqlSegmentMap, rootSqlSegment);
 
         if (!rootSqlSegment.isDirtyQuery()) {
             return new Example();
         }
 
         StringBuilder sqlBuilder = new StringBuilder();
-        List<String> sqlCriteriaList = new ArrayList<>(sqlSegmentMap.size());
+        List<String> sqlCriteria = new ArrayList<>(sqlSegmentMap.size());
         for (SqlSegment sqlSegment : sqlSegmentMap.values()) {
             if (sqlSegment.isRootReachable() && sqlSegment.isDirtyQuery()) {
                 sqlBuilder.append(sqlSegment);
-                String sqlCriteria = sqlSegment.getSqlCriteria();
-                if (sqlCriteria != null) {
-                    sqlCriteriaList.add(sqlCriteria);
+
+                List<JoinSegment> availableJoinSegments = getAvailableJoinSegments(sqlSegmentMap, sqlSegment);
+                sqlBuilder.append(StrUtil.join(" AND ", availableJoinSegments));
+
+                if (sqlSegment.getSqlCriteria() != null) {
+                    sqlCriteria.add(sqlSegment.getSqlCriteria());
                 }
             }
         }
-        sqlBuilder.append("WHERE ").append(StrUtil.join(" AND ", sqlCriteriaList));
+        sqlBuilder.append("WHERE ").append(StrUtil.join(" AND ", sqlCriteria));
         if (pageInfo != null) {
             sqlBuilder.append(" ").append(pageInfo);
         }
@@ -155,7 +165,37 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
     }
 
-    private String buildCriteria(String tableAlias, Example example) {
+    private TableInfo getTableInfo(ConfiguredRepository repository) {
+        Metadata metadata = (Metadata) repository.getMetadata();
+        Class<?> pojoClass = metadata.getPojoClass();
+        return TableInfoHelper.getTableInfo(pojoClass);
+    }
+
+    private List<JoinSegment> getJoinSegments(Map<String, SqlSegment> sqlSegmentMap, BinderResolver binderResolver, String tableName, String tableAlias) {
+        List<JoinSegment> joinSegments = new ArrayList<>();
+        for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
+            TableInfo joinTableInfo = getTableInfo(propertyBinder.getBelongRepository());
+            String joinTableName = joinTableInfo.getTableName();
+
+            SqlSegment sqlSegment = sqlSegmentMap.get(joinTableName);
+            if (sqlSegment != null) {
+                String joinTableAlias = sqlSegment.getTableAlias();
+                Set<String> joinTableNames = sqlSegment.getJoinTableNames();
+                joinTableNames.add(tableName);
+
+                BindingDefinition bindingDefinition = propertyBinder.getBindingDefinition();
+                String alias = StrUtil.toUnderlineCase(bindingDefinition.getAlias());
+                String bindAlias = StrUtil.toUnderlineCase(bindingDefinition.getBindAlias());
+
+                String sqlCriteria = tableAlias + "." + alias + " = " + joinTableAlias + "." + bindAlias;
+                JoinSegment joinSegment = new JoinSegment(joinTableName, joinTableAlias, sqlCriteria);
+                joinSegments.add(joinSegment);
+            }
+        }
+        return joinSegments;
+    }
+
+    private String buildSqlCriteria(String tableAlias, Example example) {
         List<Criterion> criteria = example.getCriteria();
         List<String> sqlCriteria = new ArrayList<>(criteria.size());
         for (Criterion criterion : criteria) {
@@ -164,47 +204,31 @@ public class SQLExampleBuilder implements ExampleBuilder {
         return StrUtil.join(" AND ", sqlCriteria);
     }
 
-    private String buildSQL(Map<String, SqlSegment> sqlSegmentMap, String tableName, String tableAlias, BinderResolver binderResolver) {
-        List<String> sqlCriteria = new ArrayList<>();
-        for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
-            BindingDefinition bindingDefinition = propertyBinder.getBindingDefinition();
-            String alias = StrUtil.toUnderlineCase(bindingDefinition.getAlias());
-
-            TableInfo joinTableInfo = getTableInfo(propertyBinder.getBelongRepository());
-            String joinTableName = joinTableInfo.getTableName();
-
-            SqlSegment sqlSegment = sqlSegmentMap.get(joinTableName);
-            if (sqlSegment != null) {
-                Set<String> dependentTables = sqlSegment.getDependentTables();
-                dependentTables.add(tableName);
-
-                String joinTableAlias = sqlSegment.getTableAlias();
-                String bindAlias = StrUtil.toUnderlineCase(bindingDefinition.getBindAlias());
-                sqlCriteria.add(tableAlias + "." + alias + " = " + joinTableAlias + "." + bindAlias);
-            }
-        }
-        String criteria = StrUtil.join(" AND ", sqlCriteria);
-        return String.format("LEFT JOIN %s %s ON %s ", tableName, tableAlias, criteria);
-    }
-
-    private TableInfo getTableInfo(ConfiguredRepository repository) {
-        Metadata metadata = (Metadata) repository.getMetadata();
-        Class<?> pojoClass = metadata.getPojoClass();
-        return TableInfoHelper.getTableInfo(pojoClass);
-    }
-
-    private void handleDependencies(Map<String, SqlSegment> sqlSegmentMap, SqlSegment lastSqlSegment) {
-        Set<String> dependentTables = lastSqlSegment.getDependentTables();
-        for (String dependentTable : dependentTables) {
-            SqlSegment dependentSqlSegment = sqlSegmentMap.get(dependentTable);
-            if (dependentSqlSegment != null) {
-                dependentSqlSegment.setRootReachable(true);
-                handleDependencies(sqlSegmentMap, dependentSqlSegment);
-                if (dependentSqlSegment.isDirtyQuery()) {
+    private void markReachableAndDirty(Map<String, SqlSegment> sqlSegmentMap, SqlSegment lastSqlSegment) {
+        Set<String> joinTableNames = lastSqlSegment.getJoinTableNames();
+        for (String joinTableName : joinTableNames) {
+            SqlSegment joinSqlSegment = sqlSegmentMap.get(joinTableName);
+            if (joinSqlSegment != null) {
+                joinSqlSegment.setRootReachable(true);
+                markReachableAndDirty(sqlSegmentMap, joinSqlSegment);
+                if (joinSqlSegment.isDirtyQuery()) {
                     lastSqlSegment.setDirtyQuery(true);
                 }
             }
         }
+    }
+
+    private List<JoinSegment> getAvailableJoinSegments(Map<String, SqlSegment> sqlSegmentMap, SqlSegment sqlSegment) {
+        List<JoinSegment> joinSegments = sqlSegment.getJoinSegments();
+        List<JoinSegment> availableJoinSegments = new ArrayList<>(joinSegments.size());
+        for (JoinSegment joinSegment : joinSegments) {
+            String joinTableName = joinSegment.getJoinTableName();
+            SqlSegment joinSqlSegment = sqlSegmentMap.get(joinTableName);
+            if (joinSqlSegment.isRootReachable() && joinSqlSegment.isDirtyQuery()) {
+                availableJoinSegments.add(joinSegment);
+            }
+        }
+        return availableJoinSegments;
     }
 
 }
