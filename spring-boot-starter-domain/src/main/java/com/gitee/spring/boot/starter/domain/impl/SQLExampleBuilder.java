@@ -103,8 +103,8 @@ public class SQLExampleBuilder implements ExampleBuilder {
             if (sqlSegment.isRootReachable() && sqlSegment.isDirtyQuery()) {
                 sqlBuilder.append(sqlSegment);
 
-                List<JoinSegment> availableJoinSegments = getAvailableJoinSegments(sqlSegmentMap, sqlSegment);
-                sqlBuilder.append(StrUtil.join(" AND ", availableJoinSegments)).append(" ");
+                List<JoinSegment> joinSegments = getAvailableJoinSegments(sqlSegmentMap, sqlSegment);
+                sqlBuilder.append(StrUtil.join(" AND ", joinSegments)).append(" ");
 
                 if (sqlSegment.getSqlCriteria() != null) {
                     sqlCriteria.add(sqlSegment.getSqlCriteria());
