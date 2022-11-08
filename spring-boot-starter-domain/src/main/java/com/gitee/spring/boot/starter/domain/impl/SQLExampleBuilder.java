@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.spring.boot.starter.domain.entity.Metadata;
+import com.gitee.spring.boot.starter.domain.entity.SqlSegment;
 import com.gitee.spring.domain.coating.api.ExampleBuilder;
 import com.gitee.spring.domain.coating.entity.CoatingWrapper;
 import com.gitee.spring.domain.coating.entity.PropertyWrapper;
@@ -26,9 +27,12 @@ import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SQLExampleBuilder implements ExampleBuilder {
 
@@ -46,32 +50,61 @@ public class SQLExampleBuilder implements ExampleBuilder {
         CoatingWrapper coatingWrapper = coatingWrapperMap.get(coatingObject.getClass());
         Assert.notNull(coatingWrapper, "No coating wrapper exists!");
 
-        StringBuilder sqlBuilder = new StringBuilder();
-        List<String> sqlCriteria = new ArrayList<>();
         Page<Object> pageInfo = coatingWrapper.getPageInfo(coatingObject);
 
-        Map<String, String> tableAliasMap = new LinkedHashMap<>();
         char letter = 'a';
+
+        Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>();
+        SqlSegment rootSqlSegment = null;
+        List<SqlSegment> sqlCriteria = new ArrayList<>();
 
         for (RepositoryWrapper repositoryWrapper : coatingWrapper.getRepositoryWrappers()) {
             RepositoryDefinition repositoryDefinition = repositoryWrapper.getRepositoryDefinition();
             String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
+            ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
+            ConfiguredRepository configuredRepository = repositoryDefinition.getConfiguredRepository();
+
+            BinderResolver binderResolver = definitionRepository.getBinderResolver();
+
             Example example = newExampleByCoating(repositoryWrapper, coatingObject);
-            if ("/".equals(absoluteAccessPath) || example.isDirtyQuery()) {
+            if (example.isDirtyQuery()) {
                 appendCriteriaByContext(boundedContext, repositoryWrapper, example);
+            }
 
-                String tableAlias = String.valueOf(letter);
-                letter = (char) (letter + 1);
+            TableInfo tableInfo = getTableInfo(configuredRepository);
+            String tableName = tableInfo.getTableName();
 
-                buildSQL(sqlBuilder, tableAliasMap, tableAlias, repositoryWrapper);
+            String tableAlias = String.valueOf(letter);
+            letter = (char) (letter + 1);
 
+            boolean isToHandle = example.isDirtyQuery();
+            if (isToHandle) {
                 for (Criterion criterion : example.getCriteria()) {
-                    sqlCriteria.add(tableAlias + "." + criterion);
+                    sqlCriteria.add(new SqlSegment(tableAlias + "." + criterion, tableName, tableAlias, true, Collections.emptySet()));
                 }
+            }
+
+            if ("/".equals(absoluteAccessPath)) {
+                String sql = String.format("SELECT %s.id FROM %s %s ", tableAlias, tableName, tableAlias);
+                rootSqlSegment = new SqlSegment(sql, tableName, tableAlias, isToHandle, new HashSet<>(8));
+                sqlSegmentMap.put(tableName, rootSqlSegment);
+
+            } else {
+                String sql = buildSQL(sqlSegmentMap, tableName, tableAlias, binderResolver);
+                sqlSegmentMap.put(tableName, new SqlSegment(sql, tableName, tableAlias, isToHandle, new HashSet<>(8)));
             }
         }
 
-        if (sqlBuilder.length() > 0) {
+        assert rootSqlSegment != null;
+        findAllSqlToHandle(sqlSegmentMap, rootSqlSegment);
+
+        StringBuilder sqlBuilder = new StringBuilder();
+        if (!sqlSegmentMap.isEmpty()) {
+            for (SqlSegment sqlSegment : sqlSegmentMap.values()) {
+                if (sqlSegment.isToHandle()) {
+                    sqlBuilder.append(sqlSegment.getSql());
+                }
+            }
             if (!sqlCriteria.isEmpty()) {
                 sqlBuilder.append("WHERE ").append(StrUtil.join(" AND ", sqlCriteria));
             }
@@ -131,45 +164,46 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
     }
 
-    private void buildSQL(StringBuilder sqlBuilder, Map<String, String> tableAliasMap, String tableAlias, RepositoryWrapper repositoryWrapper) {
-        RepositoryDefinition repositoryDefinition = repositoryWrapper.getRepositoryDefinition();
-        String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
-        ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
-        ConfiguredRepository configuredRepository = repositoryDefinition.getConfiguredRepository();
+    private String buildSQL(Map<String, SqlSegment> sqlSegmentMap, String tableName, String tableAlias, BinderResolver binderResolver) {
+        List<String> sqlCriteriaList = new ArrayList<>();
+        for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
+            BindingDefinition bindingDefinition = propertyBinder.getBindingDefinition();
+            String alias = StrUtil.toUnderlineCase(bindingDefinition.getAlias());
 
-        BinderResolver binderResolver = definitionRepository.getBinderResolver();
-        TableInfo tableInfo = getTableInfo(configuredRepository);
-        String tableName = tableInfo.getTableName();
-        tableAliasMap.put(tableName, tableAlias);
+            TableInfo joinTableInfo = getTableInfo(propertyBinder.getBelongRepository());
+            String joinTableName = joinTableInfo.getTableName();
 
-        if ("/".equals(absoluteAccessPath)) {
-            String sqlTemplate = "SELECT %s.id FROM %s %s ";
-            String sqlString = String.format(sqlTemplate, tableAlias, tableName, tableAlias);
-            sqlBuilder.append(sqlString);
+            SqlSegment sqlSegment = sqlSegmentMap.get(joinTableName);
+            if (sqlSegment != null) {
+                Set<String> dependentTables = sqlSegment.getDependentTables();
+                dependentTables.add(tableName);
 
-        } else {
-            String sqlTemplate = "LEFT JOIN %s %s ON %s ";
-            List<String> sqlCriteriaList = new ArrayList<>();
-            for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
-                BindingDefinition bindingDefinition = propertyBinder.getBindingDefinition();
-                String alias = StrUtil.toUnderlineCase(bindingDefinition.getAlias());
+                String joinTableAlias = sqlSegment.getTableAlias();
                 String bindAlias = StrUtil.toUnderlineCase(bindingDefinition.getBindAlias());
-
-                TableInfo joinTableInfo = getTableInfo(propertyBinder.getBelongRepository());
-                String joinTableName = joinTableInfo.getTableName();
-                String joinTableAlias = tableAliasMap.get(joinTableName);
                 sqlCriteriaList.add(tableAlias + "." + alias + " = " + joinTableAlias + "." + bindAlias);
             }
-            String sqlCriteria = StrUtil.join(" AND ", sqlCriteriaList);
-            String sqlString = String.format(sqlTemplate, tableName, tableAlias, sqlCriteria);
-            sqlBuilder.append(sqlString);
         }
+        String sqlCriteria = StrUtil.join(" AND ", sqlCriteriaList);
+        return String.format("LEFT JOIN %s %s ON %s ", tableName, tableAlias, sqlCriteria);
     }
 
     private TableInfo getTableInfo(ConfiguredRepository repository) {
         Metadata metadata = (Metadata) repository.getMetadata();
         Class<?> pojoClass = metadata.getPojoClass();
         return TableInfoHelper.getTableInfo(pojoClass);
+    }
+
+    private void findAllSqlToHandle(Map<String, SqlSegment> sqlSegmentMap, SqlSegment lastSqlSegment) {
+        Set<String> dependentTables = lastSqlSegment.getDependentTables();
+        for (String dependentTable : dependentTables) {
+            SqlSegment sqlSegment = sqlSegmentMap.get(dependentTable);
+            if (sqlSegment != null) {
+                findAllSqlToHandle(sqlSegmentMap, sqlSegment);
+                if (sqlSegment.isToHandle()) {
+                    lastSqlSegment.setToHandle(true);
+                }
+            }
+        }
     }
 
 }
