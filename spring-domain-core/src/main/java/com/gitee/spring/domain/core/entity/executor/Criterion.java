@@ -17,11 +17,15 @@
 package com.gitee.spring.domain.core.entity.executor;
 
 import cn.hutool.core.util.StrUtil;
+import com.gitee.spring.domain.core.api.Operator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -33,7 +37,29 @@ public class Criterion {
     private String operator;
     private Object value;
 
-    public static String convert(Object value) {
+    @Override
+    public String toString() {
+        String property = StrUtil.toUnderlineCase(this.property);
+        String value = convert(operator, this.value);
+        return property + " " + operator + " " + value;
+    }
+
+    private String convert(String operator, Object value) {
+        if (value instanceof Collection) {
+            Collection<?> collection = (Collection<?>) value;
+            List<String> values = new ArrayList<>(collection.size());
+            for (Object item : collection) {
+                values.add(doConvert(operator, item));
+            }
+            return " (" + StrUtil.join(",", values) + ") ";
+
+        } else if (operator.endsWith(Operator.IN)) {
+            return " (" + doConvert(operator, value) + ") ";
+        }
+        return doConvert(operator, value);
+    }
+
+    private String doConvert(String operator, Object value) {
         if (value instanceof Number) {
             return String.valueOf(value);
 
@@ -42,17 +68,11 @@ public class Criterion {
 
         } else if (value instanceof Date) {
             return "'" + SQL_DATE_FORMAT.format((Date) value) + "'";
+
+        } else if (value == null || operator.startsWith(Operator.IS)) {
+            return "NULL";
         }
         return value.toString();
-    }
-
-    @Override
-    public String toString() {
-        return StrUtil.toUnderlineCase(property) + " " + operator + " " + convert(value);
-    }
-
-    public String toExpression(int argNumber) {
-        return StrUtil.toUnderlineCase(property) + " " + operator + " {" + argNumber + "}";
     }
 
 }

@@ -46,8 +46,8 @@ public class AppenderContext {
         });
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IN, Func::in);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_IN, Func::notIn);
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNull(property));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NOT_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNotNull(property));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS, (abstractWrapper, property, value) -> abstractWrapper.isNull(property));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NOT, (abstractWrapper, property, value) -> abstractWrapper.isNotNull(property));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LIKE, Compare::like);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_LIKE, Compare::notLike);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.GT, Compare::gt);
