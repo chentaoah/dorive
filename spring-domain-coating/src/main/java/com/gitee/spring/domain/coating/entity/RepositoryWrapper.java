@@ -16,7 +16,16 @@
  */
 package com.gitee.spring.domain.coating.entity;
 
+import com.gitee.spring.domain.coating.entity.definition.PropertyDefinition;
 import com.gitee.spring.domain.coating.entity.definition.RepositoryDefinition;
+import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.Property;
+import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
+import com.gitee.spring.domain.core.entity.executor.Criterion;
+import com.gitee.spring.domain.core.entity.executor.Example;
+import com.gitee.spring.domain.core.impl.binder.ContextBinder;
+import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
+import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -25,6 +34,39 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class RepositoryWrapper {
+
     private RepositoryDefinition repositoryDefinition;
     private List<PropertyWrapper> collectedPropertyWrappers;
+
+    public Example newExampleByCoating(BoundedContext boundedContext, Object coatingObject) {
+        Example example = new Example();
+        for (PropertyWrapper propertyWrapper : collectedPropertyWrappers) {
+            Property property = propertyWrapper.getProperty();
+            Object fieldValue = property.getFieldValue(coatingObject);
+            if (fieldValue != null) {
+                PropertyDefinition propertyDefinition = propertyWrapper.getPropertyDefinition();
+                String alias = propertyDefinition.getAlias();
+                String operator = propertyDefinition.getOperator();
+                example.addCriterion(new Criterion(alias, operator, fieldValue));
+            }
+        }
+        if (example.isDirtyQuery()) {
+            appendCriteriaByContext(boundedContext, example);
+        }
+        return example;
+    }
+
+    private void appendCriteriaByContext(BoundedContext boundedContext, Example example) {
+        ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
+        BinderResolver binderResolver = definitionRepository.getBinderResolver();
+        for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
+            Object boundValue = contextBinder.getBoundValue(boundedContext, null);
+            if (boundValue != null) {
+                BindingDefinition bindingDefinition = contextBinder.getBindingDefinition();
+                String alias = bindingDefinition.getAlias();
+                example.eq(alias, boundValue);
+            }
+        }
+    }
+
 }

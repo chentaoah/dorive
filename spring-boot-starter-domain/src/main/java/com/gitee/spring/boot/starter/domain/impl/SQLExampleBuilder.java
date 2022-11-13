@@ -26,20 +26,16 @@ import com.gitee.spring.boot.starter.domain.entity.Metadata;
 import com.gitee.spring.boot.starter.domain.entity.SqlSegment;
 import com.gitee.spring.domain.coating.api.ExampleBuilder;
 import com.gitee.spring.domain.coating.entity.CoatingWrapper;
-import com.gitee.spring.domain.coating.entity.PropertyWrapper;
 import com.gitee.spring.domain.coating.entity.RepositoryWrapper;
-import com.gitee.spring.domain.coating.entity.definition.PropertyDefinition;
 import com.gitee.spring.domain.coating.entity.definition.RepositoryDefinition;
 import com.gitee.spring.domain.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.spring.domain.coating.repository.AbstractCoatingRepository;
 import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.Property;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
 import com.gitee.spring.domain.core.entity.executor.Criterion;
 import com.gitee.spring.domain.core.entity.executor.Example;
 import com.gitee.spring.domain.core.entity.executor.OrderBy;
 import com.gitee.spring.domain.core.entity.executor.Page;
-import com.gitee.spring.domain.core.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
@@ -79,10 +75,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
             BinderResolver binderResolver = definitionRepository.getBinderResolver();
 
-            Example example = newExampleByCoating(repositoryWrapper, coatingObject);
-            if (example.isDirtyQuery()) {
-                appendCriteriaByContext(boundedContext, repositoryWrapper, example);
-            }
+            Example example = repositoryWrapper.newExampleByCoating(boundedContext, coatingObject);
 
             TableInfo tableInfo = getTableInfo(configuredRepository);
             String tableName = tableInfo.getTableName();
@@ -125,35 +118,6 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
 
         return example;
-    }
-
-    private Example newExampleByCoating(RepositoryWrapper repositoryWrapper, Object coatingObject) {
-        Example example = new Example();
-        for (PropertyWrapper propertyWrapper : repositoryWrapper.getCollectedPropertyWrappers()) {
-            Property property = propertyWrapper.getProperty();
-            Object fieldValue = property.getFieldValue(coatingObject);
-            if (fieldValue != null) {
-                PropertyDefinition propertyDefinition = propertyWrapper.getPropertyDefinition();
-                String alias = propertyDefinition.getAlias();
-                String operator = propertyDefinition.getOperator();
-                example.addCriterion(new Criterion(alias, operator, fieldValue));
-            }
-        }
-        return example;
-    }
-
-    private void appendCriteriaByContext(BoundedContext boundedContext, RepositoryWrapper repositoryWrapper, Example example) {
-        RepositoryDefinition repositoryDefinition = repositoryWrapper.getRepositoryDefinition();
-        ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
-        BinderResolver binderResolver = definitionRepository.getBinderResolver();
-        for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
-            Object boundValue = contextBinder.getBoundValue(boundedContext, null);
-            if (boundValue != null) {
-                BindingDefinition bindingDefinition = contextBinder.getBindingDefinition();
-                String alias = bindingDefinition.getAlias();
-                example.eq(alias, boundValue);
-            }
-        }
     }
 
     private TableInfo getTableInfo(ConfiguredRepository repository) {
