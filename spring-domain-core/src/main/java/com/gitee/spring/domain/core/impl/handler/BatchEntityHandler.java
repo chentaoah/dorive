@@ -63,11 +63,17 @@ public class BatchEntityHandler implements EntityHandler {
                     Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
                     if (lastEntity != null) {
                         Example example = newExampleByContext(subRepository, boundedContext, rootEntity);
-                        Object primaryKey = BeanUtil.getFieldValue(rootEntity, "id");
-                        example.selectColumns(primaryKey + " as $id");
-                        example.setPage(page);
-                        unionExample.mergeExample(example);
+                        if (!example.isEmptyQuery() && example.isDirtyQuery()) {
+                            Object primaryKey = BeanUtil.getFieldValue(rootEntity, "id");
+                            example.selectColumns(primaryKey + " as $id");
+                            example.setPage(page);
+                            unionExample.mergeExample(example);
+                        }
                     }
+                }
+
+                if (!unionExample.isDirtyQuery()) {
+                    continue;
                 }
 
                 Fishhook fishhook = new Fishhook(null);

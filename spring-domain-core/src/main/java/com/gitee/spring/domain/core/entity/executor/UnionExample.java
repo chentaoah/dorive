@@ -30,6 +30,11 @@ public class UnionExample extends Example {
 
     private List<Example> examples = new ArrayList<>();
 
+    @Override
+    public boolean isDirtyQuery() {
+        return examples.size() > 0;
+    }
+
     public void mergeExample(Example example) {
         examples.add(example);
     }
