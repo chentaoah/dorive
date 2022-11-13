@@ -58,8 +58,8 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         CoatingWrapper coatingWrapper = coatingWrapperMap.get(coatingObject.getClass());
         Assert.notNull(coatingWrapper, "No coating wrapper exists!");
+        
         List<RepositoryWrapper> repositoryWrappers = coatingWrapper.getRepositoryWrappers();
-
         OrderBy orderByInfo = coatingWrapper.getOrderByInfo(coatingObject);
         Page<Object> pageInfo = coatingWrapper.getPageInfo(coatingObject);
 
