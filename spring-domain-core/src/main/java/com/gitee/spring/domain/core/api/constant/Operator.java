@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.domain.core.api;
+package com.gitee.spring.domain.core.api.constant;
 
 public interface Operator {
     String EQ = "=";

@@ -17,7 +17,8 @@
 package com.gitee.spring.domain.core.entity.executor;
 
 import cn.hutool.core.util.ArrayUtil;
-import com.gitee.spring.domain.core.api.Operator;
+import com.gitee.spring.domain.core.api.constant.Operator;
+import com.gitee.spring.domain.core.api.constant.Order;
 import com.gitee.spring.domain.core.util.StringUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -112,12 +113,12 @@ public class Example {
     }
 
     public Example orderByAsc(String... columns) {
-        orderBy = new OrderBy(StringUtils.toUnderlineCase(columns), "asc");
+        orderBy = new OrderBy(StringUtils.toUnderlineCase(columns), Order.ASC);
         return this;
     }
 
     public Example orderByDesc(String... columns) {
-        orderBy = new OrderBy(StringUtils.toUnderlineCase(columns), "desc");
+        orderBy = new OrderBy(StringUtils.toUnderlineCase(columns), Order.DESC);
         return this;
     }
 

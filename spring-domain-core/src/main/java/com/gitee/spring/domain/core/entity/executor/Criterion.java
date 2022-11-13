@@ -17,7 +17,7 @@
 package com.gitee.spring.domain.core.entity.executor;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.spring.domain.core.api.Operator;
+import com.gitee.spring.domain.core.api.constant.Operator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

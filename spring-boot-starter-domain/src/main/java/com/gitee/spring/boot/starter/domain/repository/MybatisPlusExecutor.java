@@ -30,6 +30,7 @@ import com.gitee.spring.boot.starter.domain.api.CriterionAppender;
 import com.gitee.spring.boot.starter.domain.entity.Metadata;
 import com.gitee.spring.domain.core.api.EntityFactory;
 import com.gitee.spring.domain.core.api.MetadataGetter;
+import com.gitee.spring.domain.core.api.constant.Order;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
@@ -167,11 +168,11 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataGet
 
         OrderBy orderBy = example.getOrderBy() != null ? example.getOrderBy() : this.orderBy;
         if (orderBy != null) {
-            String sort = orderBy.getSort();
-            if ("asc".equals(sort)) {
+            String order = orderBy.getOrder();
+            if (Order.ASC.equals(order)) {
                 queryWrapper.orderByAsc(orderBy.getColumns());
 
-            } else if ("desc".equals(sort)) {
+            } else if (Order.DESC.equals(order)) {
                 queryWrapper.orderByDesc(orderBy.getColumns());
             }
         }

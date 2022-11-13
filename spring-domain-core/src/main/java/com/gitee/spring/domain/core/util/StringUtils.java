@@ -18,6 +18,8 @@ package com.gitee.spring.domain.core.util;
 
 import cn.hutool.core.util.StrUtil;
 
+import java.util.Collection;
+
 public class StringUtils {
 
     public static String[] toUnderlineCase(String... columns) {
@@ -26,6 +28,25 @@ public class StringUtils {
             newColumns[index] = StrUtil.toUnderlineCase(columns[index]);
         }
         return newColumns;
+    }
+
+    public static String[] toStringArray(Object object) {
+        if (object instanceof String) {
+            return new String[]{(String) object};
+
+        } else if (object instanceof String[]) {
+            return (String[]) object;
+
+        } else if (object instanceof Collection) {
+            Collection<?> collection = (Collection<?>) object;
+            String[] stringArray = new String[collection.size()];
+            int index = 0;
+            for (Object item : collection) {
+                stringArray[index++] = item.toString();
+            }
+            return stringArray;
+        }
+        return null;
     }
 
 }

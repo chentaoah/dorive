@@ -37,6 +37,7 @@ import com.gitee.spring.domain.core.entity.Property;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
 import com.gitee.spring.domain.core.entity.executor.Criterion;
 import com.gitee.spring.domain.core.entity.executor.Example;
+import com.gitee.spring.domain.core.entity.executor.OrderBy;
 import com.gitee.spring.domain.core.entity.executor.Page;
 import com.gitee.spring.domain.core.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
@@ -69,7 +70,10 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>(repositoryWrappers.size() * 4 / 3 + 1);
         SqlSegment rootSqlSegment = null;
+
+        OrderBy orderByInfo = coatingWrapper.getOrderByInfo(coatingObject);
         Page<Object> pageInfo = coatingWrapper.getPageInfo(coatingObject);
+
         char letter = 'a';
 
         for (RepositoryWrapper repositoryWrapper : repositoryWrappers) {
@@ -130,6 +134,9 @@ public class SQLExampleBuilder implements ExampleBuilder {
             }
         }
         sqlBuilder.append("WHERE ").append(StrUtil.join(" AND ", sqlCriteria));
+        if (orderByInfo != null) {
+            sqlBuilder.append(" ").append(orderByInfo);
+        }
         if (pageInfo != null) {
             sqlBuilder.append(" ").append(pageInfo);
         }

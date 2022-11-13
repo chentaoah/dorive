@@ -14,24 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.domain.core.entity.executor;
+package com.gitee.spring.domain.core.api.constant;
 
-import cn.hutool.core.util.StrUtil;
-import com.gitee.spring.domain.core.util.StringUtils;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-@Data
-@AllArgsConstructor
-public class OrderBy {
-
-    private String[] columns;
-    private String order;
-
-    @Override
-    public String toString() {
-        String[] columns = StringUtils.toUnderlineCase(this.columns);
-        return "ORDER BY " + StrUtil.join(",", (Object) columns) + " " + order.toUpperCase();
-    }
-
+public interface Order {
+    String ASC = "ASC";
+    String DESC = "DESC";
 }

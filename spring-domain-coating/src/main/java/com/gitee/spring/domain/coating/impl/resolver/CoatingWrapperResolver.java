@@ -61,7 +61,7 @@ public class CoatingWrapperResolver {
                 Map<String, PropertyWrapper> allPropertyWrapperMap = new LinkedHashMap<>();
                 Map<String, List<PropertyWrapper>> locationPropertyWrappersMap = new LinkedHashMap<>();
                 Map<String, PropertyWrapper> fieldPropertyWrapperMap = new LinkedHashMap<>();
-                PropertyWrapper[] pagePropertyWrappers = new PropertyWrapper[2];
+                PropertyWrapper[] specificPropertyWrappers = new PropertyWrapper[4];
 
                 ReflectionUtils.doWithLocalFields(coatingClass, declaredField -> {
                     Property property = new Property(declaredField);
@@ -79,12 +79,20 @@ public class CoatingWrapperResolver {
                     }
 
                     PropertyWrapper propertyWrapper = new PropertyWrapper(property, propertyDefinition);
-                    if ("pageNum".equals(fieldName)) {
-                        pagePropertyWrappers[0] = propertyWrapper;
+                    if ("orderByAsc".equals(fieldName)) {
+                        specificPropertyWrappers[0] = propertyWrapper;
+                        return;
+
+                    } else if ("orderByDesc".equals(fieldName)) {
+                        specificPropertyWrappers[1] = propertyWrapper;
+                        return;
+
+                    } else if ("pageNum".equals(fieldName)) {
+                        specificPropertyWrappers[2] = propertyWrapper;
                         return;
 
                     } else if ("pageSize".equals(fieldName)) {
-                        pagePropertyWrappers[1] = propertyWrapper;
+                        specificPropertyWrappers[3] = propertyWrapper;
                         return;
                     }
 
@@ -111,8 +119,10 @@ public class CoatingWrapperResolver {
                         coatingDefinition,
                         repositoryWrappers,
                         reversedRepositoryWrappers,
-                        pagePropertyWrappers[0],
-                        pagePropertyWrappers[1]);
+                        specificPropertyWrappers[0],
+                        specificPropertyWrappers[1],
+                        specificPropertyWrappers[2],
+                        specificPropertyWrappers[3]);
                 coatingWrapperMap.put(coatingClass, coatingWrapper);
             }
         }

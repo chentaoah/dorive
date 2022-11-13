@@ -22,6 +22,7 @@ import com.gitee.spring.boot.starter.domain.impl.SQLExampleBuilder;
 import com.gitee.spring.domain.coating.repository.AbstractCoatingRepository;
 import com.gitee.spring.domain.core.api.EntityFactory;
 import com.gitee.spring.domain.core.api.Executor;
+import com.gitee.spring.domain.core.api.constant.Order;
 import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core.entity.executor.OrderBy;
@@ -63,11 +64,11 @@ public class MybatisPlusRepository<E, PK> extends AbstractCoatingRepository<E, P
         OrderBy orderBy = null;
         if (StringUtils.isNotBlank(orderByAsc)) {
             orderByAsc = StrUtil.toUnderlineCase(orderByAsc);
-            orderBy = new OrderBy(StrUtil.splitTrim(orderByAsc, ",").toArray(new String[0]), "asc");
+            orderBy = new OrderBy(StrUtil.splitTrim(orderByAsc, ",").toArray(new String[0]), Order.ASC);
 
         } else if (StringUtils.isNotBlank(orderByDesc)) {
             orderByDesc = StrUtil.toUnderlineCase(orderByDesc);
-            orderBy = new OrderBy(StrUtil.splitTrim(orderByDesc, ",").toArray(new String[0]), "desc");
+            orderBy = new OrderBy(StrUtil.splitTrim(orderByDesc, ",").toArray(new String[0]), Order.DESC);
         }
 
         Class<?> factoryClass = entityDefinition.getFactory();
