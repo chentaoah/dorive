@@ -16,6 +16,7 @@
  */
 package com.gitee.spring.boot.starter.domain.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
@@ -32,7 +33,6 @@ import com.gitee.spring.domain.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.spring.domain.coating.repository.AbstractCoatingRepository;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
-import com.gitee.spring.domain.core.entity.executor.Criterion;
 import com.gitee.spring.domain.core.entity.executor.Example;
 import com.gitee.spring.domain.core.entity.executor.OrderBy;
 import com.gitee.spring.domain.core.entity.executor.Page;
@@ -73,8 +73,6 @@ public class SQLExampleBuilder implements ExampleBuilder {
             ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
             ConfiguredRepository configuredRepository = repositoryDefinition.getConfiguredRepository();
 
-            BinderResolver binderResolver = definitionRepository.getBinderResolver();
-
             Example example = repositoryWrapper.newExampleByCoating(boundedContext, coatingObject);
 
             TableInfo tableInfo = getTableInfo(configuredRepository);
@@ -83,8 +81,12 @@ public class SQLExampleBuilder implements ExampleBuilder {
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
-            List<JoinSegment> joinSegments = getJoinSegments(sqlSegmentMap, binderResolver, tableName, tableAlias);
-            String sqlCriteria = example.isDirtyQuery() ? buildSqlCriteria(tableAlias, example) : null;
+            List<JoinSegment> joinSegments = getJoinSegments(sqlSegmentMap, definitionRepository.getBinderResolver(), tableName, tableAlias);
+
+            String sqlCriteria = null;
+            if (example.isDirtyQuery()) {
+                sqlCriteria = CollUtil.join(example.getCriteria(), " AND ", tableAlias + ".", null);
+            }
 
             if ("/".equals(absoluteAccessPath)) {
                 String sql = String.format("SELECT %s.id FROM %s %s ", tableAlias, tableName, tableAlias);
@@ -149,15 +151,6 @@ public class SQLExampleBuilder implements ExampleBuilder {
             }
         }
         return joinSegments;
-    }
-
-    private String buildSqlCriteria(String tableAlias, Example example) {
-        List<Criterion> criteria = example.getCriteria();
-        List<String> sqlCriteria = new ArrayList<>(criteria.size());
-        for (Criterion criterion : criteria) {
-            sqlCriteria.add(tableAlias + "." + criterion);
-        }
-        return StrUtil.join(" AND ", sqlCriteria);
     }
 
     private void markReachableAndDirty(Map<String, SqlSegment> sqlSegmentMap, SqlSegment lastSqlSegment) {
