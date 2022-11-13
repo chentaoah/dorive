@@ -115,31 +115,8 @@ public class SQLExampleBuilder implements ExampleBuilder {
             return example;
         }
 
-        StringBuilder sqlBuilder = new StringBuilder();
-        List<String> sqlCriteria = new ArrayList<>(sqlSegmentMap.size());
-        for (SqlSegment sqlSegment : sqlSegmentMap.values()) {
-            if (sqlSegment.isRootReachable() && sqlSegment.isDirtyQuery()) {
-                sqlBuilder.append(sqlSegment);
-
-                List<JoinSegment> joinSegments = getAvailableJoinSegments(sqlSegmentMap, sqlSegment);
-                if (!joinSegments.isEmpty()) {
-                    sqlBuilder.append(StrUtil.join(" AND ", joinSegments)).append(" ");
-                }
-
-                if (sqlSegment.getSqlCriteria() != null) {
-                    sqlCriteria.add(sqlSegment.getSqlCriteria());
-                }
-            }
-        }
-        sqlBuilder.append("WHERE ").append(StrUtil.join(" AND ", sqlCriteria));
-        if (orderByInfo != null) {
-            sqlBuilder.append(" ").append(orderByInfo);
-        }
-        if (pageInfo != null) {
-            sqlBuilder.append(" ").append(pageInfo);
-        }
-
-        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sqlBuilder.toString());
+        String sql = buildSQL(sqlSegmentMap, example);
+        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sql);
         List<Object> primaryKeys = resultMaps.stream().map(map -> map.get("id")).filter(Objects::nonNull).collect(Collectors.toList());
         if (!primaryKeys.isEmpty()) {
             return example.in("id", primaryKeys);
@@ -231,6 +208,38 @@ public class SQLExampleBuilder implements ExampleBuilder {
                 }
             }
         }
+    }
+
+    private String buildSQL(Map<String, SqlSegment> sqlSegmentMap, Example example) {
+        StringBuilder sqlBuilder = new StringBuilder();
+        List<String> sqlCriteria = new ArrayList<>(sqlSegmentMap.size());
+        for (SqlSegment sqlSegment : sqlSegmentMap.values()) {
+            if (sqlSegment.isRootReachable() && sqlSegment.isDirtyQuery()) {
+                sqlBuilder.append(sqlSegment);
+
+                List<JoinSegment> joinSegments = getAvailableJoinSegments(sqlSegmentMap, sqlSegment);
+                if (!joinSegments.isEmpty()) {
+                    sqlBuilder.append(StrUtil.join(" AND ", joinSegments)).append(" ");
+                }
+
+                if (sqlSegment.getSqlCriteria() != null) {
+                    sqlCriteria.add(sqlSegment.getSqlCriteria());
+                }
+            }
+        }
+        sqlBuilder.append("WHERE ").append(StrUtil.join(" AND ", sqlCriteria));
+
+        OrderBy orderBy = example.getOrderBy();
+        if (orderBy != null) {
+            sqlBuilder.append(" ").append(orderBy);
+        }
+
+        Page<Object> page = example.getPage();
+        if (page != null) {
+            sqlBuilder.append(" ").append(page);
+        }
+
+        return sqlBuilder.toString();
     }
 
     private List<JoinSegment> getAvailableJoinSegments(Map<String, SqlSegment> sqlSegmentMap, SqlSegment sqlSegment) {
