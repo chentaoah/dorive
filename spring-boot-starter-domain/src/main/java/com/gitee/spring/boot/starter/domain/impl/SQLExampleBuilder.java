@@ -177,11 +177,17 @@ public class SQLExampleBuilder implements ExampleBuilder {
     private String buildSQL(Map<String, SqlSegment> sqlSegmentMap, Example example) {
         StringBuilder sqlBuilder = new StringBuilder();
         List<String> sqlCriteria = new ArrayList<>(sqlSegmentMap.size());
+
         for (SqlSegment sqlSegment : sqlSegmentMap.values()) {
             if (sqlSegment.isRootReachable() && sqlSegment.isDirtyQuery()) {
                 sqlBuilder.append(sqlSegment);
 
-                List<JoinSegment> joinSegments = getAvailableJoinSegments(sqlSegmentMap, sqlSegment);
+                List<JoinSegment> joinSegments = sqlSegment.getJoinSegments();
+                joinSegments = joinSegments.stream().filter(joinSegment -> {
+                    SqlSegment joinSqlSegment = sqlSegmentMap.get(joinSegment.getJoinTableName());
+                    return joinSqlSegment.isRootReachable() && joinSqlSegment.isDirtyQuery();
+                }).collect(Collectors.toList());
+
                 if (!joinSegments.isEmpty()) {
                     sqlBuilder.append(StrUtil.join(" AND ", joinSegments)).append(" ");
                 }
@@ -191,6 +197,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
                 }
             }
         }
+
         sqlBuilder.append("WHERE ").append(StrUtil.join(" AND ", sqlCriteria));
 
         OrderBy orderBy = example.getOrderBy();
@@ -204,19 +211,6 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
 
         return sqlBuilder.toString();
-    }
-
-    private List<JoinSegment> getAvailableJoinSegments(Map<String, SqlSegment> sqlSegmentMap, SqlSegment sqlSegment) {
-        List<JoinSegment> joinSegments = sqlSegment.getJoinSegments();
-        List<JoinSegment> availableJoinSegments = new ArrayList<>(joinSegments.size());
-        for (JoinSegment joinSegment : joinSegments) {
-            String joinTableName = joinSegment.getJoinTableName();
-            SqlSegment joinSqlSegment = sqlSegmentMap.get(joinTableName);
-            if (joinSqlSegment.isRootReachable() && joinSqlSegment.isDirtyQuery()) {
-                availableJoinSegments.add(joinSegment);
-            }
-        }
-        return availableJoinSegments;
     }
 
 }
