@@ -81,7 +81,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
-            List<JoinSegment> joinSegments = getJoinSegments(sqlSegmentMap, definitionRepository.getBinderResolver(), tableName, tableAlias);
+            List<JoinSegment> joinSegments = newJoinSegments(sqlSegmentMap, definitionRepository.getBinderResolver(), tableName, tableAlias);
 
             String sqlCriteria = null;
             if (example.isDirtyQuery()) {
@@ -128,7 +128,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         return TableInfoHelper.getTableInfo(pojoClass);
     }
 
-    private List<JoinSegment> getJoinSegments(Map<String, SqlSegment> sqlSegmentMap, BinderResolver binderResolver, String tableName, String tableAlias) {
+    private List<JoinSegment> newJoinSegments(Map<String, SqlSegment> sqlSegmentMap, BinderResolver binderResolver, String tableName, String tableAlias) {
         List<PropertyBinder> propertyBinders = binderResolver.getPropertyBinders();
         List<JoinSegment> joinSegments = new ArrayList<>(propertyBinders.size());
         for (PropertyBinder propertyBinder : propertyBinders) {
