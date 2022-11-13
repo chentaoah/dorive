@@ -89,6 +89,7 @@ public class BinderResolver {
         String bindCtx = bindingDefinition.getBindCtx();
         String alias = bindingDefinition.getAlias();
         String bindAlias = bindingDefinition.getBindAlias();
+        Class<?> processor = bindingDefinition.getProcessor();
 
         Assert.notBlank(bindProp + bindCtx, "The bindProp and bindCtx cannot be blank at the same time!");
 
@@ -97,6 +98,7 @@ public class BinderResolver {
         }
 
         if (StringUtils.isNotBlank(bindProp)) {
+            Assert.isTrue(bindProp.startsWith("/") || bindProp.startsWith("."), "The bindProp must be a path!");
             if (bindProp.startsWith(".")) {
                 bindProp = PathUtils.getAbsolutePath(accessPath, bindProp);
             }
@@ -110,6 +112,7 @@ public class BinderResolver {
         bindingDefinition.setBindCtx(bindCtx);
         bindingDefinition.setAlias(alias);
         bindingDefinition.setBindAlias(bindAlias);
+        bindingDefinition.setProcessor(processor);
     }
 
     private PropertyBinder newPropertyBinder(BindingDefinition bindingDefinition, Processor processor) {
