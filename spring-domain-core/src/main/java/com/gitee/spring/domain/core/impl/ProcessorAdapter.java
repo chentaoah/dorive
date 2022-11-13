@@ -14,30 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.domain.core.impl.binder;
+package com.gitee.spring.domain.core.impl;
 
 import com.gitee.spring.domain.core.api.Processor;
 import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.PropertyChain;
-import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
 
-public class ContextBinder extends AbstractBinder {
-
-    public ContextBinder(BindingDefinition bindingDefinition,
-                         PropertyChain fieldPropertyChain,
-                         Processor processor) {
-        super(bindingDefinition, fieldPropertyChain, processor);
-    }
+public class ProcessorAdapter implements Processor {
 
     @Override
-    public Object getBoundValue(BoundedContext boundedContext, Object rootEntity) {
-        String bindCtx = bindingDefinition.getBindCtx();
-        return boundedContext.get(bindCtx);
+    public Object input(BoundedContext boundedContext, Object value) {
+        return value;
     }
-
+    
     @Override
-    public void setBoundValue(BoundedContext boundedContext, Object rootEntity, Object property) {
-        // ignore
+    public Object output(BoundedContext boundedContext, Object value) {
+        return value;
     }
 
 }

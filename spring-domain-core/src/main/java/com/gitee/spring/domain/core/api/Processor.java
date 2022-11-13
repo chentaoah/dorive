@@ -14,27 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.domain.core.annotation;
+package com.gitee.spring.domain.core.api;
 
-import java.lang.annotation.*;
+import com.gitee.spring.domain.core.entity.BoundedContext;
 
-@Inherited
-@Documented
-@Repeatable(Bindings.class)
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
-public @interface Binding {
+public interface Processor {
 
-    String field();
+    Object input(BoundedContext boundedContext, Object value);
 
-    String bindProp() default "";
-
-    String bindCtx() default "";
-
-    String alias() default "";
-
-    String bindAlias() default "";
-
-    Class<?> processor() default Object.class;
+    Object output(BoundedContext boundedContext, Object value);
 
 }

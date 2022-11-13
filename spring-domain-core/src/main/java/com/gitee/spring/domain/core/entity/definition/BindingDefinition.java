@@ -35,6 +35,7 @@ public class BindingDefinition {
     private String bindCtx;
     private String alias;
     private String bindAlias;
+    private Class<?> processor;
 
     public static List<BindingDefinition> newBindingDefinitions(ElementDefinition elementDefinition) {
         List<BindingDefinition> bindingDefinitions = new ArrayList<>();

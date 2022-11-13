@@ -17,6 +17,7 @@
 package com.gitee.spring.domain.core.impl.binder;
 
 import com.gitee.spring.domain.core.api.Binder;
+import com.gitee.spring.domain.core.api.Processor;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
@@ -25,10 +26,11 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public abstract class AbstractBinder implements Binder {
+public abstract class AbstractBinder implements Binder, Processor {
 
     protected BindingDefinition bindingDefinition;
     protected PropertyChain fieldPropertyChain;
+    protected Processor processor;
 
     @Override
     public BindingDefinition getBindingDefinition() {
@@ -43,6 +45,22 @@ public abstract class AbstractBinder implements Binder {
     @Override
     public void setFieldValue(BoundedContext boundedContext, Object entity, Object property) {
         fieldPropertyChain.setValue(entity, property);
+    }
+
+    @Override
+    public Object input(BoundedContext boundedContext, Object value) {
+        if (processor != null) {
+            return processor.input(boundedContext, value);
+        }
+        return value;
+    }
+
+    @Override
+    public Object output(BoundedContext boundedContext, Object value) {
+        if (processor != null) {
+            return processor.output(boundedContext, value);
+        }
+        return value;
     }
 
 }

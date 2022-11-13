@@ -16,6 +16,7 @@
  */
 package com.gitee.spring.domain.core.impl.binder;
 
+import com.gitee.spring.domain.core.api.Processor;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
@@ -33,10 +34,11 @@ public class PropertyBinder extends AbstractBinder {
 
     public PropertyBinder(BindingDefinition bindingDefinition,
                           PropertyChain fieldPropertyChain,
+                          Processor processor,
                           String belongAccessPath,
                           ConfiguredRepository belongRepository,
                           PropertyChain boundPropertyChain) {
-        super(bindingDefinition, fieldPropertyChain);
+        super(bindingDefinition, fieldPropertyChain, processor);
         this.belongAccessPath = belongAccessPath;
         this.belongRepository = belongRepository;
         this.boundPropertyChain = boundPropertyChain;

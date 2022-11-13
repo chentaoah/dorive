@@ -100,6 +100,7 @@ public class BatchEntityHandler implements EntityHandler {
                 boundValue = !((Collection<?>) boundValue).isEmpty() ? boundValue : null;
             }
             if (boundValue != null) {
+                boundValue = propertyBinder.input(boundedContext, boundValue);
                 example.eq(alias, boundValue);
             } else {
                 example.setEmptyQuery(true);

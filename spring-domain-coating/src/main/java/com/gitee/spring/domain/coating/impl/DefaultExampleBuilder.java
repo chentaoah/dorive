@@ -123,6 +123,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                     BindingDefinition bindingDefinition = propertyBinder.getBindingDefinition();
                     String bindAlias = bindingDefinition.getBindAlias();
                     Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
+                    fieldValue = propertyBinder.output(boundedContext, fieldValue);
                     targetExample.eq(bindAlias, fieldValue);
                 }
             }
