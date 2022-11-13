@@ -58,7 +58,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         CoatingWrapper coatingWrapper = coatingWrapperMap.get(coatingObject.getClass());
         Assert.notNull(coatingWrapper, "No coating wrapper exists!");
-        
+
         List<RepositoryWrapper> repositoryWrappers = coatingWrapper.getRepositoryWrappers();
         OrderBy orderByInfo = coatingWrapper.getOrderByInfo(coatingObject);
         Page<Object> pageInfo = coatingWrapper.getPageInfo(coatingObject);
@@ -73,8 +73,6 @@ public class SQLExampleBuilder implements ExampleBuilder {
             ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
             ConfiguredRepository configuredRepository = repositoryDefinition.getConfiguredRepository();
 
-            Example example = repositoryWrapper.newExampleByCoating(boundedContext, coatingObject);
-
             TableInfo tableInfo = getTableInfo(configuredRepository);
             String tableName = tableInfo.getTableName();
 
@@ -83,6 +81,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
             List<JoinSegment> joinSegments = newJoinSegments(sqlSegmentMap, definitionRepository.getBinderResolver(), tableName, tableAlias);
 
+            Example example = repositoryWrapper.newExampleByCoating(boundedContext, coatingObject);
             String sqlCriteria = null;
             if (example.isDirtyQuery()) {
                 sqlCriteria = CollUtil.join(example.getCriteria(), " AND ", tableAlias + ".", null);
