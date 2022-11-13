@@ -68,12 +68,11 @@ public class SQLExampleBuilder implements ExampleBuilder {
         Assert.notNull(coatingWrapper, "No coating wrapper exists!");
         List<RepositoryWrapper> repositoryWrappers = coatingWrapper.getRepositoryWrappers();
 
-        Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>(repositoryWrappers.size() * 4 / 3 + 1);
-        SqlSegment rootSqlSegment = null;
-
         OrderBy orderByInfo = coatingWrapper.getOrderByInfo(coatingObject);
         Page<Object> pageInfo = coatingWrapper.getPageInfo(coatingObject);
 
+        Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>(repositoryWrappers.size() * 4 / 3 + 1);
+        SqlSegment rootSqlSegment = null;
         char letter = 'a';
 
         for (RepositoryWrapper repositoryWrapper : repositoryWrappers) {
@@ -110,11 +109,14 @@ public class SQLExampleBuilder implements ExampleBuilder {
             }
         }
 
+        Example example = new Example();
+        example.setOrderBy(orderByInfo);
+        example.setPage(pageInfo);
+
         assert rootSqlSegment != null;
         markReachableAndDirty(sqlSegmentMap, rootSqlSegment);
-
         if (!rootSqlSegment.isDirtyQuery()) {
-            return new Example();
+            return example;
         }
 
         StringBuilder sqlBuilder = new StringBuilder();
@@ -141,9 +143,6 @@ public class SQLExampleBuilder implements ExampleBuilder {
             sqlBuilder.append(" ").append(pageInfo);
         }
 
-        Example example = new Example();
-        example.setPage(pageInfo);
-
         List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sqlBuilder.toString());
         if (!resultMaps.isEmpty()) {
             List<Object> primaryKeys = new ArrayList<>(resultMaps.size());
@@ -151,12 +150,13 @@ public class SQLExampleBuilder implements ExampleBuilder {
                 Object primaryKey = resultMap.get("id");
                 primaryKeys.add(primaryKey);
             }
-            return example.eq("id", primaryKeys);
+            return example.in("id", primaryKeys);
 
         } else {
             example.setEmptyQuery(true);
-            return example;
         }
+
+        return example;
     }
 
     private Example newExampleByCoating(RepositoryWrapper repositoryWrapper, Object coatingObject) {
