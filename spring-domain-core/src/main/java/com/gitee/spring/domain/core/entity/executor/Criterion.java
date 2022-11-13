@@ -40,26 +40,32 @@ public class Criterion {
     @Override
     public String toString() {
         String property = StrUtil.toUnderlineCase(this.property);
-        String value = convert(operator, this.value);
+        String value = convert(this.value);
         return property + " " + operator + " " + value;
     }
 
-    private String convert(String operator, Object value) {
+    private String convert(Object value) {
         if (value instanceof Collection) {
             Collection<?> collection = (Collection<?>) value;
             List<String> values = new ArrayList<>(collection.size());
             for (Object item : collection) {
-                values.add(doConvert(operator, item));
+                values.add(doConvert(item));
+            }
+            if (Operator.EQ.equals(operator)) {
+                operator = Operator.IN;
+
+            } else if (Operator.NE.equals(operator)) {
+                operator = Operator.NOT_IN;
             }
             return " (" + StrUtil.join(",", values) + ") ";
 
         } else if (operator.endsWith(Operator.IN)) {
-            return " (" + doConvert(operator, value) + ") ";
+            return " (" + doConvert(value) + ") ";
         }
-        return doConvert(operator, value);
+        return doConvert(value);
     }
 
-    private String doConvert(String operator, Object value) {
+    private String doConvert(Object value) {
         if (value instanceof Number) {
             return String.valueOf(value);
 
