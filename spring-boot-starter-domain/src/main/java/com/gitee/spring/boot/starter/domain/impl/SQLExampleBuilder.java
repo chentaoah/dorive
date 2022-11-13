@@ -90,12 +90,12 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
             if ("/".equals(absoluteAccessPath)) {
                 String sql = String.format("SELECT %s.id FROM %s %s ", tableAlias, tableName, tableAlias);
-                rootSqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, sqlCriteria, true, example.isDirtyQuery(), new HashSet<>(4));
+                rootSqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, sqlCriteria, true, example.isDirtyQuery(), new HashSet<>(8));
                 sqlSegmentMap.put(tableName, rootSqlSegment);
 
             } else {
                 String sql = String.format("LEFT JOIN %s %s ON ", tableName, tableAlias);
-                SqlSegment sqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, sqlCriteria, false, example.isDirtyQuery(), new HashSet<>(4));
+                SqlSegment sqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, sqlCriteria, false, example.isDirtyQuery(), new HashSet<>(8));
                 sqlSegmentMap.put(tableName, sqlSegment);
             }
         }
