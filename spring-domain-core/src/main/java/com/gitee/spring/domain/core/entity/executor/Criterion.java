@@ -22,10 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -57,10 +54,10 @@ public class Criterion {
             } else if (Operator.NE.equals(operator)) {
                 operator = Operator.NOT_IN;
             }
-            return " (" + StrUtil.join(",", values) + ") ";
+            return "(" + StrUtil.join(", ", values) + ")";
 
         } else if (operator.endsWith(Operator.IN)) {
-            return " (" + doConvert(value) + ") ";
+            return "(" + doConvert(value) + ")";
         }
         return doConvert(value);
     }
