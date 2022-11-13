@@ -44,12 +44,8 @@ import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SQLExampleBuilder implements ExampleBuilder {
 
@@ -144,14 +140,9 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
 
         List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sqlBuilder.toString());
-        if (!resultMaps.isEmpty()) {
-            List<Object> primaryKeys = new ArrayList<>(resultMaps.size());
-            for (Map<String, Object> resultMap : resultMaps) {
-                Object primaryKey = resultMap.get("id");
-                primaryKeys.add(primaryKey);
-            }
+        List<Object> primaryKeys = resultMaps.stream().map(map -> map.get("id")).filter(Objects::nonNull).collect(Collectors.toList());
+        if (!primaryKeys.isEmpty()) {
             return example.in("id", primaryKeys);
-
         } else {
             example.setEmptyQuery(true);
         }

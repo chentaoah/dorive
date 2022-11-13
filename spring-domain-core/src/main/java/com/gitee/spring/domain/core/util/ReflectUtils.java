@@ -16,19 +16,10 @@
  */
 package com.gitee.spring.domain.core.util;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ReflectUtils {
-
-    public static Constructor<?> getConstructor(Class<?> type, Class<?>[] parameterTypes) {
-        return org.springframework.cglib.core.ReflectUtils.getConstructor(type, parameterTypes);
-    }
 
     public static Object newInstance(Class<?> type) {
         return org.springframework.cglib.core.ReflectUtils.newInstance(type);
