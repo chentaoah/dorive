@@ -19,22 +19,18 @@ package com.gitee.spring.domain.coating.impl;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.coating.api.ExampleBuilder;
 import com.gitee.spring.domain.coating.entity.CoatingWrapper;
-import com.gitee.spring.domain.coating.entity.PropertyWrapper;
-import com.gitee.spring.domain.coating.entity.RepoCriterion;
 import com.gitee.spring.domain.coating.entity.RepositoryWrapper;
-import com.gitee.spring.domain.coating.entity.definition.PropertyDefinition;
 import com.gitee.spring.domain.coating.entity.definition.RepositoryDefinition;
 import com.gitee.spring.domain.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.spring.domain.coating.repository.AbstractCoatingRepository;
 import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.Property;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
-import com.gitee.spring.domain.core.entity.executor.Criterion;
 import com.gitee.spring.domain.core.entity.executor.Example;
-import com.gitee.spring.domain.core.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.util.*;
 
@@ -56,8 +52,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
         Map<String, RepoCriterion> repoCriterionMap = new LinkedHashMap<>();
         for (RepositoryWrapper repositoryWrapper : coatingWrapper.getReversedRepositoryWrappers()) {
-            RepoCriterion repoCriterion = new RepoCriterion(repositoryWrapper, new Example());
-            appendCriterionToExample(repoCriterion, coatingObject);
+            Example example = repositoryWrapper.newExampleByCoating(boundedContext, coatingObject);
+            RepoCriterion repoCriterion = new RepoCriterion(repositoryWrapper, example);
 
             RepositoryDefinition repositoryDefinition = repositoryWrapper.getRepositoryDefinition();
             String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
@@ -72,21 +68,6 @@ public class DefaultExampleBuilder implements ExampleBuilder {
         return repoCriterion.getExample();
     }
 
-    private void appendCriterionToExample(RepoCriterion repoCriterion, Object coatingObject) {
-        RepositoryWrapper repositoryWrapper = repoCriterion.getRepositoryWrapper();
-        Example example = repoCriterion.getExample();
-        for (PropertyWrapper propertyWrapper : repositoryWrapper.getCollectedPropertyWrappers()) {
-            Property property = propertyWrapper.getProperty();
-            Object fieldValue = property.getFieldValue(coatingObject);
-            if (fieldValue != null) {
-                PropertyDefinition propertyDefinition = propertyWrapper.getPropertyDefinition();
-                String alias = propertyDefinition.getAlias();
-                String operator = propertyDefinition.getOperator();
-                example.addCriterion(new Criterion(alias, operator, fieldValue));
-            }
-        }
-    }
-
     private void executeChainQuery(BoundedContext boundedContext, Map<String, RepoCriterion> repoCriterionMap) {
         repoCriterionMap.forEach((accessPath, repoCriterion) -> {
             if ("/".equals(accessPath)) return;
@@ -95,7 +76,6 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             Example example = repoCriterion.getExample();
 
             RepositoryDefinition repositoryDefinition = repositoryWrapper.getRepositoryDefinition();
-
             String prefixAccessPath = repositoryDefinition.getPrefixAccessPath();
             ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
             ConfiguredRepository configuredRepository = repositoryDefinition.getConfiguredRepository();
@@ -110,17 +90,6 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                     if (targetExample.isEmptyQuery()) {
                         example.setEmptyQuery(true);
                         break;
-                    }
-                }
-            }
-
-            if (!example.isEmptyQuery()) {
-                for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
-                    BindingDefinition bindingDefinition = contextBinder.getBindingDefinition();
-                    String alias = bindingDefinition.getAlias();
-                    Object boundValue = contextBinder.getBoundValue(boundedContext, null);
-                    if (boundValue != null) {
-                        example.eq(alias, boundValue);
                     }
                 }
             }
@@ -169,6 +138,13 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             }
         }
         return fieldValues;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class RepoCriterion {
+        private RepositoryWrapper repositoryWrapper;
+        private Example example;
     }
 
 }

@@ -50,13 +50,6 @@ public class RepositoryWrapper {
                 example.addCriterion(new Criterion(alias, operator, fieldValue));
             }
         }
-        if (example.isDirtyQuery()) {
-            appendCriteriaByContext(boundedContext, example);
-        }
-        return example;
-    }
-
-    private void appendCriteriaByContext(BoundedContext boundedContext, Example example) {
         ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
         BinderResolver binderResolver = definitionRepository.getBinderResolver();
         for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
@@ -67,6 +60,7 @@ public class RepositoryWrapper {
                 example.eq(alias, boundValue);
             }
         }
+        return example;
     }
 
 }
