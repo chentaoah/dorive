@@ -112,7 +112,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         String sql = buildSQL(sqlSegmentMap, example);
         List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sql);
-        List<Object> primaryKeys = resultMaps.stream().map(map -> map.get("id")).filter(Objects::nonNull).collect(Collectors.toList());
+        List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
         if (!primaryKeys.isEmpty()) {
             return example.in("id", primaryKeys);
         } else {
