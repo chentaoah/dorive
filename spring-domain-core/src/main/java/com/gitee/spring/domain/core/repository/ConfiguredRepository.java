@@ -43,12 +43,12 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataGet
     protected Map<String, PropertyChain> propertyChainMap;
 
     public boolean matchContext(BoundedContext boundedContext) {
-        String[] triggers = entityDefinition.getTriggers();
-        if (triggers == null || triggers.length == 0) {
+        String[] matchKeys = entityDefinition.getMatchKeys();
+        if (matchKeys == null || matchKeys.length == 0) {
             return true;
         }
-        for (String trigger : triggers) {
-            if (boundedContext.containsKey(trigger)) {
+        for (String matchKey : matchKeys) {
+            if (boundedContext.containsKey(matchKey)) {
                 return true;
             }
         }

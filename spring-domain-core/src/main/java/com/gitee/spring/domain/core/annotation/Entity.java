@@ -27,7 +27,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Entity {
 
-    String[] triggers() default {};
+    String[] matchKeys() default {};
 
     Class<?> mapper() default Object.class;
 

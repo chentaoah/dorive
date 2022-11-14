@@ -30,7 +30,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class EntityDefinition {
 
-    private String[] triggers;
+    private String[] matchKeys;
     private Class<?> mapper;
     private String orderByKey;
     private String orderByAsc;
