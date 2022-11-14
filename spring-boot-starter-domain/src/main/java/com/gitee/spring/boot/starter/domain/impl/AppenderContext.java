@@ -17,7 +17,6 @@
 package com.gitee.spring.boot.starter.domain.impl;
 
 import com.baomidou.mybatisplus.core.conditions.interfaces.Compare;
-import com.baomidou.mybatisplus.core.conditions.interfaces.Func;
 import com.gitee.spring.boot.starter.domain.api.CriterionAppender;
 import com.gitee.spring.domain.core.api.constant.Operator;
 
@@ -44,8 +43,8 @@ public class AppenderContext {
                 abstractWrapper.ne(property, value);
             }
         });
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IN, Func::in);
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_IN, Func::notIn);
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IN, (abstractWrapper, property, value) -> abstractWrapper.in(property, (Collection<?>) value));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_IN, (abstractWrapper, property, value) -> abstractWrapper.notIn(property, (Collection<?>) value));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS, (abstractWrapper, property, value) -> abstractWrapper.isNull(property));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NOT, (abstractWrapper, property, value) -> abstractWrapper.isNotNull(property));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LIKE, Compare::like);
