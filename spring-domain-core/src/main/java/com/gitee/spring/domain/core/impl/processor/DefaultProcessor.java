@@ -18,13 +18,11 @@ package com.gitee.spring.domain.core.impl.processor;
 
 import com.gitee.spring.domain.core.api.Processor;
 import com.gitee.spring.domain.core.entity.BoundedContext;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class DefaultProcessor implements Processor {
 
     @Override
