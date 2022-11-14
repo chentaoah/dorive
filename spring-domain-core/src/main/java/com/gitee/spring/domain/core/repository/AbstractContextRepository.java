@@ -16,8 +16,6 @@
  */
 package com.gitee.spring.domain.core.repository;
 
-import com.gitee.spring.domain.core.util.ReflectUtils;
-import com.gitee.spring.domain.core.api.EntityHandler;
 import com.gitee.spring.domain.core.api.Executor;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
@@ -30,6 +28,7 @@ import com.gitee.spring.domain.core.impl.resolver.DelegateResolver;
 import com.gitee.spring.domain.core.impl.resolver.PropertyResolver;
 import com.gitee.spring.domain.core.impl.resolver.RepoBinderResolver;
 import com.gitee.spring.domain.core.impl.resolver.RepoPropertyResolver;
+import com.gitee.spring.domain.core.util.ReflectUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.BeansException;
@@ -87,12 +86,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         setElementDefinition(rootRepository.getElementDefinition());
         setEntityDefinition(rootRepository.getEntityDefinition());
-
-        EntityHandler entityHandler = new BatchEntityHandler(this);
+        
         if (delegateResolver.isDelegated()) {
-            setExecutor(new AdaptiveExecutor(this, entityHandler));
+            setExecutor(new AdaptiveExecutor(this, new BatchEntityHandler(this)));
         } else {
-            setExecutor(new ChainExecutor(this, entityHandler));
+            setExecutor(new ChainExecutor(this, new BatchEntityHandler(this)));
         }
 
         Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();

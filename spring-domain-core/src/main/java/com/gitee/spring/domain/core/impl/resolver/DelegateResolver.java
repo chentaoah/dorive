@@ -55,8 +55,13 @@ public class DelegateResolver {
         return delegateRepositoryMap.size() > 1;
     }
 
+    public int getDelegateCount() {
+        return delegateRepositoryMap.size();
+    }
+
     public AbstractContextRepository<?, ?> delegateRepository(Object rootEntity) {
-        return delegateRepositoryMap.get(rootEntity.getClass());
+        AbstractContextRepository<?, ?> abstractContextRepository = delegateRepositoryMap.get(rootEntity.getClass());
+        return abstractContextRepository != null ? abstractContextRepository : repository;
     }
 
 }

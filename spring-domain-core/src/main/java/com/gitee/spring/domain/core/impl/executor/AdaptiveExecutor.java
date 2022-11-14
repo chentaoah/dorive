@@ -45,11 +45,12 @@ public class AdaptiveExecutor extends ChainExecutor {
     }
 
     private Map<AbstractContextRepository<?, ?>, List<Object>> collectRepositoryEntitiesMap(List<Object> rootEntities) {
-        Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>();
+        DelegateResolver delegateResolver = getRepository().getDelegateResolver();
+        int delegateCount = delegateResolver.getDelegateCount();
+        Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>(delegateCount * 4 / 3 + 1);
         for (Object rootEntity : rootEntities) {
-            DelegateResolver delegateResolver = getRepository().getDelegateResolver();
-            AbstractContextRepository<?, ?> abstractContextRepository = delegateResolver.delegateRepository(rootEntity);
-            List<Object> entities = repositoryEntitiesMap.computeIfAbsent(abstractContextRepository, key -> new ArrayList<>(rootEntities.size()));
+            AbstractContextRepository<?, ?> repository = delegateResolver.delegateRepository(rootEntity);
+            List<Object> entities = repositoryEntitiesMap.computeIfAbsent(repository, key -> new ArrayList<>(rootEntities.size()));
             entities.add(rootEntity);
         }
         return repositoryEntitiesMap;
