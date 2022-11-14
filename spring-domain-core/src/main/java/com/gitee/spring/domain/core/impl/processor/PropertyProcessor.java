@@ -21,9 +21,13 @@ package com.gitee.spring.domain.core.impl.processor;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.spring.domain.core.entity.BoundedContext;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Collection;
 
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class PropertyProcessor extends DefaultProcessor {
 
     @Override
