@@ -31,7 +31,7 @@ public class OrderBy {
     @Override
     public String toString() {
         String[] columns = StringUtils.toUnderlineCase(this.columns);
-        return "ORDER BY " + StrUtil.join(",", (Object) columns) + " " + order.toUpperCase();
+        return "ORDER BY " + StrUtil.join(", ", (Object) columns) + " " + order.toUpperCase();
     }
 
 }

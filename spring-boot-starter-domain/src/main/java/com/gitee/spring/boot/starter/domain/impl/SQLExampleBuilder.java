@@ -113,7 +113,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sql);
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
         if (!primaryKeys.isEmpty()) {
-            return example.eq("id", primaryKeys);
+            example.eq("id", primaryKeys);
         } else {
             example.setEmptyQuery(true);
         }

@@ -37,6 +37,15 @@ public class Criterion {
     @Override
     public String toString() {
         String property = StrUtil.toUnderlineCase(this.property);
+        String operator = this.operator;
+        if (this.value instanceof Collection) {
+            if (Operator.EQ.equals(operator)) {
+                operator = Operator.IN;
+
+            } else if (Operator.NE.equals(operator)) {
+                operator = Operator.NOT_IN;
+            }
+        }
         String value = convert(this.value);
         return property + " " + operator + " " + value;
     }
@@ -47,12 +56,6 @@ public class Criterion {
             List<String> values = new ArrayList<>(collection.size());
             for (Object item : collection) {
                 values.add(doConvert(item));
-            }
-            if (Operator.EQ.equals(operator)) {
-                operator = Operator.IN;
-
-            } else if (Operator.NE.equals(operator)) {
-                operator = Operator.NOT_IN;
             }
             return "(" + StrUtil.join(", ", values) + ")";
 
