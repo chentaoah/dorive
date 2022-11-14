@@ -18,12 +18,15 @@ package com.gitee.spring.domain.core.impl.processor;
 
 import com.gitee.spring.domain.core.api.Processor;
 import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 public class DefaultProcessor implements Processor {
+
+    protected BindingDefinition bindingDefinition;
 
     @Override
     public Object input(BoundedContext boundedContext, Object valueObject) {

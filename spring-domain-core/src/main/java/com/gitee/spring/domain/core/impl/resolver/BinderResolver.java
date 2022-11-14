@@ -23,9 +23,9 @@ import com.gitee.spring.domain.core.api.Processor;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
 import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
-import com.gitee.spring.domain.core.impl.processor.DefaultProcessor;
 import com.gitee.spring.domain.core.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
+import com.gitee.spring.domain.core.impl.processor.DefaultProcessor;
 import com.gitee.spring.domain.core.impl.processor.PropertyProcessor;
 import com.gitee.spring.domain.core.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
@@ -82,10 +82,12 @@ public class BinderResolver {
                     processor = (Processor) ReflectUtils.newInstance(processorClass);
                 }
             }
+            if (processor instanceof DefaultProcessor) {
+                DefaultProcessor defaultProcessor = (DefaultProcessor) processor;
+                defaultProcessor.setBindingDefinition(bindingDefinition);
+            }
             if (processor instanceof PropertyProcessor) {
                 Assert.notBlank(bindingDefinition.getProperty(), "The property of PropertyProcessor cannot be blank!");
-                PropertyProcessor propertyProcessor = (PropertyProcessor) processor;
-                propertyProcessor.setProperty(bindingDefinition.getProperty());
             }
 
             if (StringUtils.isNotBlank(bindingDefinition.getBindProp())) {
