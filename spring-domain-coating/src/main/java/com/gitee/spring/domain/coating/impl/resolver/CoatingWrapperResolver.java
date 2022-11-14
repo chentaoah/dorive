@@ -27,6 +27,7 @@ import com.gitee.spring.domain.coating.util.ResourceUtils;
 import com.gitee.spring.domain.core.entity.Property;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.util.ArrayList;
@@ -54,7 +55,11 @@ public class CoatingWrapperResolver {
             List<Class<?>> classes = ResourceUtils.resolveClasses(scanPackage);
             for (Class<?> coatingClass : classes) {
 
-                if (!coatingClass.isAnnotationPresent(Coating.class)) {
+                Coating coatingAnnotation = AnnotationUtils.getAnnotation(coatingClass, Coating.class);
+                if (coatingAnnotation == null) {
+                    continue;
+                }
+                if (coatingAnnotation.qualifier() != Object.class && coatingAnnotation.qualifier() != repository.getEntityClass()) {
                     continue;
                 }
 
