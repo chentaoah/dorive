@@ -30,9 +30,10 @@ import java.util.Collection;
 @EqualsAndHashCode(callSuper = false)
 public class PropertyProcessor extends DefaultProcessor {
 
+    private String property;
+
     @Override
     public Object input(BoundedContext boundedContext, Object valueObject) {
-        String property = processorDefinition.getProperty();
         if (valueObject instanceof Collection) {
             return CollUtil.map((Collection<?>) valueObject, item -> BeanUtil.getFieldValue(item, property), true);
         } else {

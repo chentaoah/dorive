@@ -32,10 +32,11 @@ public class BindingDefinition {
 
     private String field;
     private String bindProp;
+    private String property;
+    private Class<?> processor;
     private String bindCtx;
     private String alias;
     private String bindAlias;
-    private Class<?> processor;
 
     public static List<BindingDefinition> newBindingDefinitions(ElementDefinition elementDefinition) {
         List<BindingDefinition> bindingDefinitions = new ArrayList<>();
