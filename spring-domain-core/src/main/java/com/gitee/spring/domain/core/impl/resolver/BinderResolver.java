@@ -18,21 +18,27 @@ package com.gitee.spring.domain.core.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.spring.domain.core.api.Processor;
-import com.gitee.spring.domain.core.util.PathUtils;
 import com.gitee.spring.domain.core.api.Binder;
+import com.gitee.spring.domain.core.api.Processor;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
 import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
+import com.gitee.spring.domain.core.impl.DefaultProcessor;
 import com.gitee.spring.domain.core.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
+import com.gitee.spring.domain.core.util.PathUtils;
 import com.gitee.spring.domain.core.util.ReflectUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationContext;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Data
 public class BinderResolver {
@@ -63,8 +69,17 @@ public class BinderResolver {
 
             Class<?> processorClass = bindingDefinition.getProcessor();
             Processor processor = null;
-            if (processorClass != Object.class) {
-                processor = (Processor) ReflectUtils.newInstance(processorClass);
+            if (processorClass == DefaultProcessor.class) {
+                processor = new DefaultProcessor();
+            } else {
+                ApplicationContext applicationContext = repository.getApplicationContext();
+                String[] beanNamesForType = applicationContext.getBeanNamesForType(processorClass);
+                if (beanNamesForType.length > 0) {
+                    processor = (DefaultProcessor) applicationContext.getBean(beanNamesForType[0]);
+                }
+                if (processor == null) {
+                    processor = (DefaultProcessor) ReflectUtils.newInstance(processorClass);
+                }
             }
 
             if (StringUtils.isNotBlank(bindingDefinition.getBindProp())) {

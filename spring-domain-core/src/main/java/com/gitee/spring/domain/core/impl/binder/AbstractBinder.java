@@ -49,18 +49,12 @@ public abstract class AbstractBinder implements Binder, Processor {
 
     @Override
     public Object input(BoundedContext boundedContext, Object value) {
-        if (processor != null) {
-            return processor.input(boundedContext, value);
-        }
-        return value;
+        return processor.input(boundedContext, value);
     }
 
     @Override
     public Object output(BoundedContext boundedContext, Object value) {
-        if (processor != null) {
-            return processor.output(boundedContext, value);
-        }
-        return value;
+        return processor.output(boundedContext, value);
     }
 
 }

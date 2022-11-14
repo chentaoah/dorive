@@ -16,6 +16,8 @@
  */
 package com.gitee.spring.domain.core.annotation;
 
+import com.gitee.spring.domain.core.impl.DefaultProcessor;
+
 import java.lang.annotation.*;
 
 @Inherited
@@ -35,6 +37,6 @@ public @interface Binding {
 
     String bindAlias() default "";
 
-    Class<?> processor() default Object.class;
+    Class<?> processor() default DefaultProcessor.class;
 
 }

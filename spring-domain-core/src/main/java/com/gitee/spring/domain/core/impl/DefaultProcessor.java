@@ -19,7 +19,7 @@ package com.gitee.spring.domain.core.impl;
 import com.gitee.spring.domain.core.api.Processor;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 
-public class ProcessorAdapter implements Processor {
+public class DefaultProcessor implements Processor {
 
     @Override
     public Object input(BoundedContext boundedContext, Object value) {
