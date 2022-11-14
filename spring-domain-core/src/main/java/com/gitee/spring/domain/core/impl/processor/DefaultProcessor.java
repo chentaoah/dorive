@@ -14,21 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.domain.core.impl;
+package com.gitee.spring.domain.core.impl.processor;
 
 import com.gitee.spring.domain.core.api.Processor;
 import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.definition.ProcessorDefinition;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DefaultProcessor implements Processor {
 
+    protected ProcessorDefinition processorDefinition;
+
     @Override
-    public Object input(BoundedContext boundedContext, Object value) {
-        return value;
+    public Object input(BoundedContext boundedContext, Object valueObject) {
+        return valueObject;
     }
-    
+
     @Override
-    public Object output(BoundedContext boundedContext, Object value) {
-        return value;
+    public Object output(BoundedContext boundedContext, Object valueObject) {
+        return valueObject;
     }
 
 }

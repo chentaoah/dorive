@@ -20,8 +20,8 @@ import com.gitee.spring.domain.core.entity.BoundedContext;
 
 public interface Processor {
 
-    Object input(BoundedContext boundedContext, Object value);
+    Object input(BoundedContext boundedContext, Object valueObject);
 
-    Object output(BoundedContext boundedContext, Object value);
+    Object output(BoundedContext boundedContext, Object valueObject);
 
 }

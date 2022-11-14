@@ -16,27 +16,19 @@
  */
 package com.gitee.spring.domain.core.annotation;
 
-import com.gitee.spring.domain.core.impl.processor.DefaultProcessor;
-
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 @Inherited
 @Documented
-@Repeatable(Bindings.class)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
-public @interface Binding {
+public @interface Processor {
 
-    String field();
-
-    String bindProp() default "";
-
-    String bindCtx() default "";
-
-    String alias() default "";
-
-    String bindAlias() default "";
-
-    Class<?> processor() default DefaultProcessor.class;
+    String property() default "";
 
 }

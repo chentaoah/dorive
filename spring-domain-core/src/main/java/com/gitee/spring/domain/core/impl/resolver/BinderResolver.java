@@ -23,7 +23,8 @@ import com.gitee.spring.domain.core.api.Processor;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
 import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
-import com.gitee.spring.domain.core.impl.DefaultProcessor;
+import com.gitee.spring.domain.core.entity.definition.ProcessorDefinition;
+import com.gitee.spring.domain.core.impl.processor.DefaultProcessor;
 import com.gitee.spring.domain.core.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.repository.AbstractContextRepository;
@@ -68,18 +69,24 @@ public class BinderResolver {
             renewBindingDefinition(accessPath, bindingDefinition);
 
             Class<?> processorClass = bindingDefinition.getProcessor();
+            ProcessorDefinition processorDefinition = ProcessorDefinition.newProcessorDefinition(processorClass);
             Processor processor = null;
             if (processorClass == DefaultProcessor.class) {
                 processor = new DefaultProcessor();
+
             } else {
                 ApplicationContext applicationContext = repository.getApplicationContext();
                 String[] beanNamesForType = applicationContext.getBeanNamesForType(processorClass);
                 if (beanNamesForType.length > 0) {
-                    processor = (DefaultProcessor) applicationContext.getBean(beanNamesForType[0]);
+                    processor = (Processor) applicationContext.getBean(beanNamesForType[0]);
                 }
                 if (processor == null) {
-                    processor = (DefaultProcessor) ReflectUtils.newInstance(processorClass);
+                    processor = (Processor) ReflectUtils.newInstance(processorClass);
                 }
+            }
+            if (processor instanceof DefaultProcessor) {
+                DefaultProcessor defaultProcessor = (DefaultProcessor) processor;
+                defaultProcessor.setProcessorDefinition(processorDefinition);
             }
 
             if (StringUtils.isNotBlank(bindingDefinition.getBindProp())) {
