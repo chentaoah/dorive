@@ -107,15 +107,20 @@ public class BinderResolver {
     private void renewBindingDefinition(String accessPath, BindingDefinition bindingDefinition) {
         String field = bindingDefinition.getField();
         String bindProp = bindingDefinition.getBindProp();
+        String property = bindingDefinition.getProperty();
+        Class<?> processor = bindingDefinition.getProcessor();
         String bindCtx = bindingDefinition.getBindCtx();
         String alias = bindingDefinition.getAlias();
         String bindAlias = bindingDefinition.getBindAlias();
-        Class<?> processor = bindingDefinition.getProcessor();
 
         Assert.notBlank(bindProp + bindCtx, "The bindProp and bindCtx cannot be blank at the same time!");
 
         if (StringUtils.isBlank(alias)) {
             alias = field;
+        }
+
+        if (StringUtils.isBlank(bindAlias)) {
+            bindAlias = property;
         }
 
         if (StringUtils.isNotBlank(bindProp)) {
@@ -130,10 +135,11 @@ public class BinderResolver {
 
         bindingDefinition.setField(field);
         bindingDefinition.setBindProp(bindProp);
+        bindingDefinition.setProperty(property);
+        bindingDefinition.setProcessor(processor);
         bindingDefinition.setBindCtx(bindCtx);
         bindingDefinition.setAlias(alias);
         bindingDefinition.setBindAlias(bindAlias);
-        bindingDefinition.setProcessor(processor);
     }
 
     private PropertyBinder newPropertyBinder(BindingDefinition bindingDefinition, Processor processor) {
