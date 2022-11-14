@@ -74,16 +74,14 @@ public class MybatisPlusRepository<E, PK> extends AbstractCoatingRepository<E, P
         Class<?> factoryClass = entityDefinition.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == DefaultEntityFactory.class) {
-            entityFactory = new DefaultEntityFactory(elementDefinition, pojoClass);
-
-        } else if (DefaultEntityFactory.class.isAssignableFrom(factoryClass)) {
-            DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) applicationContext.getBean(factoryClass);
-            defaultEntityFactory.setElementDefinition(elementDefinition);
-            defaultEntityFactory.setPojoClass(pojoClass);
-            entityFactory = defaultEntityFactory;
-
+            entityFactory = new DefaultEntityFactory();
         } else {
             entityFactory = (EntityFactory) applicationContext.getBean(factoryClass);
+        }
+        if (entityFactory instanceof DefaultEntityFactory) {
+            DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
+            defaultEntityFactory.setElementDefinition(elementDefinition);
+            defaultEntityFactory.setPojoClass(pojoClass);
         }
 
         MybatisPlusExecutor mybatisPlusExecutor = new MybatisPlusExecutor();

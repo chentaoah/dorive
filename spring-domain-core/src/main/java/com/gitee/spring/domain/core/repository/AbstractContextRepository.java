@@ -119,21 +119,15 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Class<?> repositoryClass = entityDefinition.getRepository();
         Object repository;
         if (repositoryClass == DefaultRepository.class) {
-            DefaultRepository defaultRepository = new DefaultRepository();
-            defaultRepository.setElementDefinition(elementDefinition);
-            defaultRepository.setEntityDefinition(entityDefinition);
-            defaultRepository.setExecutor(newExecutor(elementDefinition, entityDefinition));
-            repository = defaultRepository;
-
-        } else if (DefaultRepository.class.isAssignableFrom(repositoryClass)) {
-            DefaultRepository defaultRepository = (DefaultRepository) applicationContext.getBean(repositoryClass);
-            defaultRepository.setElementDefinition(elementDefinition);
-            defaultRepository.setEntityDefinition(entityDefinition);
-            defaultRepository.setExecutor(newExecutor(elementDefinition, entityDefinition));
-            repository = defaultRepository;
-
+            repository = new DefaultRepository();
         } else {
             repository = applicationContext.getBean(repositoryClass);
+        }
+        if (repository instanceof DefaultRepository) {
+            DefaultRepository defaultRepository = (DefaultRepository) repository;
+            defaultRepository.setElementDefinition(elementDefinition);
+            defaultRepository.setEntityDefinition(entityDefinition);
+            defaultRepository.setExecutor(newExecutor(elementDefinition, entityDefinition));
         }
 
         boolean aggregated = !(repository instanceof DefaultRepository);

@@ -73,7 +73,6 @@ public class BinderResolver {
             Processor processor = null;
             if (processorClass == DefaultProcessor.class) {
                 processor = new DefaultProcessor();
-
             } else {
                 ApplicationContext applicationContext = repository.getApplicationContext();
                 String[] beanNamesForType = applicationContext.getBeanNamesForType(processorClass);
