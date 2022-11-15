@@ -42,7 +42,7 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataGet
     protected String fieldPrefix;
     protected Map<String, PropertyChain> propertyChainMap;
 
-    public boolean matchContext(BoundedContext boundedContext) {
+    public boolean matchKeys(BoundedContext boundedContext) {
         String[] matchKeys = entityDefinition.getMatchKeys();
         if (matchKeys == null || matchKeys.length == 0) {
             return true;

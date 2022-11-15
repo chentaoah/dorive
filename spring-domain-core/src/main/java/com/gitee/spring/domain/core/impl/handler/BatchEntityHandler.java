@@ -51,7 +51,7 @@ public class BatchEntityHandler implements EntityHandler {
     @SuppressWarnings("unchecked")
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
         for (ConfiguredRepository subRepository : repository.getSubRepositories()) {
-            if (subRepository.matchContext(boundedContext)) {
+            if (subRepository.matchKeys(boundedContext)) {
                 PropertyChain anchorPoint = subRepository.getAnchorPoint();
                 PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
 

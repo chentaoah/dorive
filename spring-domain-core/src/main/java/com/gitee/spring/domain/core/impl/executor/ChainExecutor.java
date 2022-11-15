@@ -106,7 +106,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         for (ConfiguredRepository orderedRepository : delegateRepository.getOrderedRepositories()) {
             PropertyChain anchorPoint = orderedRepository.getAnchorPoint();
             Object targetEntity = anchorPoint == null ? rootEntity : anchorPoint.getValue(rootEntity);
-            if (targetEntity != null && orderedRepository.matchContext(boundedContext)) {
+            if (targetEntity != null && orderedRepository.matchKeys(boundedContext)) {
                 int contextOperationType = operationTypeResolver.resolveOperationType(boundedContext, orderedRepository);
 
                 if (targetEntity instanceof Collection) {
