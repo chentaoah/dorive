@@ -28,10 +28,10 @@ import java.util.LinkedHashMap;
 public class BoundedContext extends LinkedHashMap<String, Object> {
 
     public BoundedContext(String... keys) {
-        put(keys);
+        putKeys(keys);
     }
 
-    public void put(String... keys) {
+    public void putKeys(String... keys) {
         for (String key : keys) {
             put(key, true);
         }
