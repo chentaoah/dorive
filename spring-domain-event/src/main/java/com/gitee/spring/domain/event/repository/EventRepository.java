@@ -22,19 +22,17 @@ import com.gitee.spring.domain.core.entity.operation.Condition;
 import com.gitee.spring.domain.core.entity.operation.Operation;
 import com.gitee.spring.domain.core.repository.ProxyRepository;
 import com.gitee.spring.domain.event.listener.RepositoryEvent;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.context.ApplicationContext;
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class EventRepository extends ProxyRepository {
 
     protected ApplicationContext applicationContext;
-
-    public EventRepository(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
 
     @Override
     public int insert(BoundedContext boundedContext, Object entity) {

@@ -16,7 +16,6 @@
  */
 package com.gitee.spring.domain.event.repository;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core.repository.AbstractGenericRepository;
 import com.gitee.spring.domain.core.repository.AbstractRepository;
 import com.gitee.spring.domain.core.repository.DefaultRepository;
@@ -37,8 +36,11 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
     @Override
     protected AbstractRepository<Object, Object> postProcessRepository(AbstractRepository<Object, Object> repository) {
         if (enableEvent && (repository instanceof DefaultRepository)) {
+            DefaultRepository defaultRepository = (DefaultRepository) repository;
             EventRepository eventRepository = new EventRepository(applicationContext);
-            BeanUtil.copyProperties(repository, eventRepository);
+            eventRepository.setElementDefinition(defaultRepository.getElementDefinition());
+            eventRepository.setEntityDefinition(defaultRepository.getEntityDefinition());
+            eventRepository.setExecutor(defaultRepository.getExecutor());
             eventRepository.setProxyRepository(repository);
             return eventRepository;
         }
