@@ -27,13 +27,13 @@ import java.util.LinkedHashMap;
 @EqualsAndHashCode(callSuper = false)
 public class BoundedContext extends LinkedHashMap<String, Object> {
 
-    public BoundedContext(String... keywords) {
-        put(keywords);
+    public BoundedContext(String... keys) {
+        put(keys);
     }
 
-    public void put(String... keywords) {
-        for (String keyword : keywords) {
-            put(keyword, true);
+    public void put(String... keys) {
+        for (String key : keys) {
+            put(key, true);
         }
     }
 
