@@ -56,7 +56,7 @@ public class RepoBinderResolver {
                 if (binder instanceof AbstractBinder) {
                     String fieldAccessPath = repository.getFieldPrefix() + field;
                     PropertyChain fieldPropertyChain = propertyChainMap.get(fieldAccessPath);
-                    Assert.notNull(fieldPropertyChain, "The field property chain cannot be null!");
+                    Assert.notNull(fieldPropertyChain, "The field property chain cannot be null! fieldAccessPath: {}", fieldAccessPath);
                     fieldPropertyChain.initialize();
                     ((AbstractBinder) binder).setFieldPropertyChain(fieldPropertyChain);
                 }
