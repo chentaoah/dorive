@@ -25,8 +25,8 @@ import org.springframework.core.annotation.Order;
 public class DomainStarterConfiguration {
 
     @Bean
-    public EnvironmentInitializer environmentInitializer() {
-        return new EnvironmentInitializer();
+    public EnvironmentProcessor environmentProcessor() {
+        return new EnvironmentProcessor();
     }
 
 }

@@ -27,7 +27,7 @@ import org.springframework.core.env.PropertiesPropertySource;
 
 import java.util.Properties;
 
-public class EnvironmentInitializer implements EnvironmentPostProcessor, Ordered {
+public class EnvironmentProcessor implements EnvironmentPostProcessor, Ordered {
 
     private static final String PROPERTY_KEY = "mybatis-plus.global-config.enable-sql-runner";
 
@@ -44,7 +44,7 @@ public class EnvironmentInitializer implements EnvironmentPostProcessor, Ordered
 
     @Override
     public int getOrder() {
-        return Integer.MIN_VALUE;
+        return Ordered.LOWEST_PRECEDENCE;
     }
 
 }
