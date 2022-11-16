@@ -20,13 +20,14 @@ package com.gitee.spring.boot.starter.domain.config;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 
 import java.util.Properties;
 
-public class EnvironmentInitializer implements EnvironmentPostProcessor {
+public class EnvironmentInitializer implements EnvironmentPostProcessor, Ordered {
 
     private static final String PROPERTY_KEY = "mybatis-plus.global-config.enable-sql-runner";
 
@@ -39,6 +40,11 @@ public class EnvironmentInitializer implements EnvironmentPostProcessor {
             MutablePropertySources propertySources = environment.getPropertySources();
             propertySources.addLast(propertySource);
         }
+    }
+
+    @Override
+    public int getOrder() {
+        return Integer.MIN_VALUE;
     }
 
 }
