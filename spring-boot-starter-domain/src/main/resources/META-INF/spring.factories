@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.gitee.spring.boot.starter.domain.config.DomainStarterConfiguration
+org.springframework.boot.env.EnvironmentPostProcessor=com.gitee.spring.boot.starter.domain.config.EnvironmentProcessor

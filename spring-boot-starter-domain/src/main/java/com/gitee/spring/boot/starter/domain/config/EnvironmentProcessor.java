@@ -22,7 +22,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 
 import java.util.Properties;
@@ -36,9 +35,8 @@ public class EnvironmentProcessor implements EnvironmentPostProcessor, Ordered {
         if (!environment.containsProperty(PROPERTY_KEY)) {
             Properties properties = new Properties();
             properties.setProperty(PROPERTY_KEY, "true");
-            PropertiesPropertySource propertySource = new PropertiesPropertySource("spring-domain", properties);
-            MutablePropertySources propertySources = environment.getPropertySources();
-            propertySources.addLast(propertySource);
+            PropertiesPropertySource propertySource = new PropertiesPropertySource(PROPERTY_KEY, properties);
+            environment.getPropertySources().addLast(propertySource);
         }
     }
 
