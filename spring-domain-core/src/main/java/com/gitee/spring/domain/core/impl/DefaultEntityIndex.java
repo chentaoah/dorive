@@ -19,6 +19,7 @@ package com.gitee.spring.domain.core.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import com.gitee.spring.domain.core.api.EntityIndex;
+import com.gitee.spring.domain.core.util.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,29 +35,21 @@ public class DefaultEntityIndex implements EntityIndex {
     public DefaultEntityIndex(List<Object> rootEntities, List<Map<String, Object>> resultMaps, List<Object> entities) {
         int initialCapacity = resultMaps.size() / rootEntities.size() + 1;
         for (Map<String, Object> resultMap : resultMaps) {
-            Long rootPrimaryKey = (Long) resultMap.get("$id");
+            Long rootPrimaryKey = NumberUtils.longValue(resultMap.get("$id"));
             List<Long> existPrimaryKeys = primaryKeyMapping.computeIfAbsent(rootPrimaryKey, key -> new ArrayList<>(initialCapacity));
-
-            Object primaryKey = resultMap.get("id");
-            if (primaryKey instanceof Long) {
-                existPrimaryKeys.add((Long) primaryKey);
-
-            } else if (primaryKey instanceof Integer) {
-                existPrimaryKeys.add(Convert.convert(Long.class, primaryKey));
-            }
+            Long primaryKey = NumberUtils.longValue(resultMap.get("id"));
+            existPrimaryKeys.add(primaryKey);
         }
         for (Object entity : entities) {
-            Object primaryKey = BeanUtil.getFieldValue(entity, "id");
-            Long number = Convert.convert(Long.class, primaryKey);
-            primaryKeyEntityMap.put(number, entity);
+            Long primaryKey = NumberUtils.longValue(BeanUtil.getFieldValue(entity, "id"));
+            primaryKeyEntityMap.put(primaryKey, entity);
         }
     }
 
     @Override
     public List<Object> selectList(Object rootEntity) {
-        Object rootPrimaryKey = BeanUtil.getFieldValue(rootEntity, "id");
-        Long number = Convert.convert(Long.class, rootPrimaryKey);
-        List<Long> existPrimaryKeys = primaryKeyMapping.get(number);
+        Long rootPrimaryKey = NumberUtils.longValue(BeanUtil.getFieldValue(rootEntity, "id"));
+        List<Long> existPrimaryKeys = primaryKeyMapping.get(rootPrimaryKey);
         if (existPrimaryKeys != null && !existPrimaryKeys.isEmpty()) {
             List<Object> entities = new ArrayList<>(existPrimaryKeys.size());
             for (Long primaryKey : existPrimaryKeys) {
