@@ -17,27 +17,26 @@
 package com.gitee.spring.domain.core.impl.handler;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.spring.domain.core.api.PropertyProxy;
-import com.gitee.spring.domain.core.util.ContextUtils;
+import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.EntityHandler;
 import com.gitee.spring.domain.core.api.EntityIndex;
+import com.gitee.spring.domain.core.api.PropertyProxy;
 import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.EntityElement;
+import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.executor.Example;
-import com.gitee.spring.domain.core.entity.executor.Fishhook;
 import com.gitee.spring.domain.core.entity.executor.Page;
+import com.gitee.spring.domain.core.entity.executor.Result;
 import com.gitee.spring.domain.core.entity.executor.UnionExample;
-import com.gitee.spring.domain.core.impl.DefaultEntityIndex;
 import com.gitee.spring.domain.core.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
+import com.gitee.spring.domain.core.util.ContextUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public class BatchEntityHandler implements EntityHandler {
 
@@ -76,12 +75,11 @@ public class BatchEntityHandler implements EntityHandler {
                     continue;
                 }
 
-                Fishhook fishhook = new Fishhook(null);
-                boundedContext.put("#fishhook", fishhook);
-                List<Object> allEntities = subRepository.selectByExample(boundedContext, unionExample);
-                boundedContext.remove("#fishhook");
+                Result<Object> result = subRepository.selectResultByExample(boundedContext, unionExample);
+                Assert.isTrue(result instanceof EntityIndex, "The result must be an instance of EntityIndex!");
+                assert result instanceof EntityIndex;
+                EntityIndex entityIndex = (EntityIndex) result;
 
-                EntityIndex entityIndex = newEntityIndex(rootEntities, fishhook.getSource(), allEntities);
                 for (Object rootEntity : rootEntities) {
                     Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
                     if (lastEntity != null) {
@@ -132,14 +130,6 @@ public class BatchEntityHandler implements EntityHandler {
                 }
             }
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private EntityIndex newEntityIndex(List<Object> rootEntities, Object source, List<Object> entities) {
-        if (source instanceof List) {
-            return new DefaultEntityIndex(rootEntities, (List<Map<String, Object>>) source, entities);
-        }
-        throw new RuntimeException("Unsupported type!");
     }
 
     private Object convertManyToOneEntity(ConfiguredRepository repository, List<?> entities) {

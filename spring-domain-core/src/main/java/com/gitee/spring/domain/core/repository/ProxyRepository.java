@@ -19,6 +19,7 @@ package com.gitee.spring.domain.core.repository;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.executor.Example;
 import com.gitee.spring.domain.core.entity.executor.Page;
+import com.gitee.spring.domain.core.entity.executor.Result;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -61,6 +62,11 @@ public class ProxyRepository extends AbstractRepository<Object, Object> {
     @Override
     public Page<Object> selectPageByExample(BoundedContext boundedContext, Example example) {
         return proxyRepository.selectPageByExample(boundedContext, example);
+    }
+
+    @Override
+    public Result<Object> selectResultByExample(BoundedContext boundedContext, Example example) {
+        return proxyRepository.selectResultByExample(boundedContext, example);
     }
 
     @Override

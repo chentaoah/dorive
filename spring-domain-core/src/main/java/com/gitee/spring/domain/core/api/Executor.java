@@ -30,7 +30,7 @@ public interface Executor {
 
     Query buildQuery(BoundedContext boundedContext, Example example);
 
-    Result executeQuery(BoundedContext boundedContext, Query query);
+    Result<Object> executeQuery(BoundedContext boundedContext, Query query);
 
     Insert buildInsert(BoundedContext boundedContext, Object entity);
 

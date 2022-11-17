@@ -21,7 +21,6 @@ import com.gitee.spring.domain.core.api.Binder;
 import com.gitee.spring.domain.core.api.EntityHandler;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.PropertyChain;
-import com.gitee.spring.domain.core.entity.executor.Page;
 import com.gitee.spring.domain.core.entity.executor.Result;
 import com.gitee.spring.domain.core.entity.operation.Operation;
 import com.gitee.spring.domain.core.entity.operation.Query;
@@ -51,30 +50,24 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     }
 
     @Override
-    public Result executeQuery(BoundedContext boundedContext, Query query) {
+    public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
         ConfiguredRepository rootRepository = repository.getRootRepository();
         if (query.getPrimaryKey() != null) {
             Object rootEntity = rootRepository.selectByPrimaryKey(boundedContext, query.getPrimaryKey());
             if (rootEntity != null) {
                 handleEntities(boundedContext, Collections.singletonList(rootEntity));
             }
-            return new Result(rootEntity);
+            return new Result<>(rootEntity);
 
-        } else if (query.withoutPage()) {
-            List<Object> rootEntities = rootRepository.selectByExample(boundedContext, query.getExample());
+        } else if (query.getExample() != null) {
+            Result<Object> result = rootRepository.selectResultByExample(boundedContext, query.getExample());
+            List<Object> rootEntities = result.getRecords();
             if (!rootEntities.isEmpty()) {
                 handleEntities(boundedContext, rootEntities);
             }
-            return new Result(rootEntities);
-
-        } else {
-            Page<Object> page = rootRepository.selectPageByExample(boundedContext, query.getExample());
-            List<Object> rootEntities = page.getRecords();
-            if (!rootEntities.isEmpty()) {
-                handleEntities(boundedContext, rootEntities);
-            }
-            return new Result(page);
+            return result;
         }
+        return new Result<>();
     }
 
     @Override
@@ -98,7 +91,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
         Object rootEntity = operation.getEntity();
         Assert.notNull(rootEntity, "The rootEntity cannot be null!");
-        
+
         DelegateResolver delegateResolver = repository.getDelegateResolver();
         AbstractContextRepository<?, ?> delegateRepository = delegateResolver.delegateRepository(rootEntity);
 

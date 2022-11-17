@@ -24,22 +24,22 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class Result {
+public class Result<E> {
 
-    private Object record;
-    private List<Object> records = Collections.emptyList();
-    private Page<Object> page;
+    private E record;
+    private List<E> records = Collections.emptyList();
+    private Page<E> page;
 
-    public Result(Object record) {
+    public Result(E record) {
         this.record = record;
     }
 
-    public Result(List<Object> records) {
+    public Result(List<E> records) {
         this.records = records;
         this.record = !records.isEmpty() ? records.get(0) : null;
     }
 
-    public Result(Page<Object> page) {
+    public Result(Page<E> page) {
         this.page = page;
         this.records = page.getRecords();
         this.record = !records.isEmpty() ? records.get(0) : null;

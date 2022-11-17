@@ -28,23 +28,15 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.spring.boot.starter.domain.api.CriterionAppender;
 import com.gitee.spring.boot.starter.domain.entity.Metadata;
+import com.gitee.spring.boot.starter.domain.impl.IndexResult;
 import com.gitee.spring.domain.core.api.EntityFactory;
 import com.gitee.spring.domain.core.api.MetadataHolder;
 import com.gitee.spring.domain.core.api.constant.Order;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
-import com.gitee.spring.domain.core.entity.executor.Criterion;
-import com.gitee.spring.domain.core.entity.executor.Example;
-import com.gitee.spring.domain.core.entity.executor.Fishhook;
-import com.gitee.spring.domain.core.entity.executor.OrderBy;
-import com.gitee.spring.domain.core.entity.executor.Result;
-import com.gitee.spring.domain.core.entity.executor.UnionExample;
-import com.gitee.spring.domain.core.entity.operation.Delete;
-import com.gitee.spring.domain.core.entity.operation.Insert;
-import com.gitee.spring.domain.core.entity.operation.Operation;
-import com.gitee.spring.domain.core.entity.operation.Query;
-import com.gitee.spring.domain.core.entity.operation.Update;
+import com.gitee.spring.domain.core.entity.executor.*;
+import com.gitee.spring.domain.core.entity.operation.*;
 import com.gitee.spring.domain.core.impl.executor.AbstractExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -52,11 +44,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.gitee.spring.boot.starter.domain.impl.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
 
@@ -78,7 +66,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
     }
 
     @Override
-    public Result executeQuery(BoundedContext boundedContext, Query query) {
+    public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
 
         Example example = query.getExample();
         if (example != null && example.getOrderBy() == null) {
@@ -94,18 +82,14 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
             queryWrapper.eq("id", query.getPrimaryKey());
             List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
             Object entity = !resultMaps.isEmpty() ? entityFactory.reconstitute(boundedContext, resultMaps.get(0)) : null;
-            return new Result(entity);
+            return new Result<>(entity);
 
         } else if (query.withoutPage()) {
             assert example != null;
             if (example instanceof UnionExample) {
-                QueryWrapper<Object> queryWrapper = buildQueryWrapper((UnionExample) example);
+                UnionExample unionExample= (UnionExample) example;
+                QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
                 List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                if (boundedContext.containsKey("#fishhook")) {
-                    Fishhook fishhook = (Fishhook) boundedContext.get("#fishhook");
-                    fishhook.setSource(resultMaps);
-                    boundedContext.remove("#fishhook");
-                }
                 Set<Object> existIds = new HashSet<>();
                 List<Object> entities = new ArrayList<>(resultMaps.size());
                 for (Map<String, Object> resultMap : resultMaps) {
@@ -115,7 +99,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                         entities.add(entity);
                     }
                 }
-                return new Result(entities);
+                return new IndexResult(unionExample.getCriteria().size(), resultMaps, entities);
 
             } else {
                 QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
@@ -125,7 +109,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                     Object entity = entityFactory.reconstitute(boundedContext, resultMap);
                     entities.add(entity);
                 }
-                return new Result(entities);
+                return new Result<>(entities);
             }
 
         } else {
@@ -146,7 +130,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
             }
             page.setRecords(entities);
 
-            return new Result(page);
+            return new Result<>(page);
         }
     }
 

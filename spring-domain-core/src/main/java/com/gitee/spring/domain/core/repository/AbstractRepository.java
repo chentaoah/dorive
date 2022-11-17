@@ -43,7 +43,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK> {
     @SuppressWarnings("unchecked")
     public E selectByPrimaryKey(BoundedContext boundedContext, PK primaryKey) {
         Query query = executor.buildQueryByPK(boundedContext, primaryKey);
-        Result result = executor.executeQuery(boundedContext, query);
+        Result<Object> result = executor.executeQuery(boundedContext, query);
         return (E) result.getRecord();
     }
 
@@ -51,7 +51,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK> {
     @SuppressWarnings("unchecked")
     public List<E> selectByExample(BoundedContext boundedContext, Example example) {
         Query query = executor.buildQuery(boundedContext, example);
-        Result result = executor.executeQuery(boundedContext, query);
+        Result<Object> result = executor.executeQuery(boundedContext, query);
         return (List<E>) result.getRecords();
     }
 
@@ -60,8 +60,15 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK> {
     public Page<E> selectPageByExample(BoundedContext boundedContext, Example example) {
         Assert.notNull(example.getPage(), "The page cannot be null!");
         Query query = executor.buildQuery(boundedContext, example);
-        Result result = executor.executeQuery(boundedContext, query);
+        Result<Object> result = executor.executeQuery(boundedContext, query);
         return (Page<E>) result.getPage();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Result<E> selectResultByExample(BoundedContext boundedContext, Example example) {
+        Query query = executor.buildQuery(boundedContext, example);
+        return (Result<E>) executor.executeQuery(boundedContext, query);
     }
 
     @Override
