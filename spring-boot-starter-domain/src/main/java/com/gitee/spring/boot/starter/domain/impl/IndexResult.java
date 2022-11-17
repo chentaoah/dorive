@@ -28,9 +28,9 @@ public class IndexResult extends Result<Object> implements EntityIndex {
     private final Map<Long, List<Long>> primaryKeyMapping = new HashMap<>();
     private final Map<Long, Object> primaryKeyEntityMap = new HashMap<>();
 
-    public IndexResult(Integer rootSize, List<Map<String, Object>> resultMaps, List<Object> entities) {
+    public IndexResult(Integer exampleSize, List<Map<String, Object>> resultMaps, List<Object> entities) {
         super(entities);
-        int initialCapacity = resultMaps.size() / rootSize + 1;
+        int initialCapacity = resultMaps.size() / exampleSize + 1;
         for (Map<String, Object> resultMap : resultMaps) {
             Long rootPrimaryKey = NumberUtils.longValue(resultMap.get("$id"));
             List<Long> existPrimaryKeys = primaryKeyMapping.computeIfAbsent(rootPrimaryKey, key -> new ArrayList<>(initialCapacity));

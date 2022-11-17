@@ -99,7 +99,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                         entities.add(entity);
                     }
                 }
-                return new IndexResult(unionExample.getCriteria().size(), resultMaps, entities);
+                return new IndexResult(unionExample.getExamples().size(), resultMaps, entities);
 
             } else {
                 QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
