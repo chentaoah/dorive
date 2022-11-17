@@ -18,7 +18,7 @@ package com.gitee.spring.domain.core.repository;
 
 import com.gitee.spring.domain.core.api.Executor;
 import com.gitee.spring.domain.core.entity.PropertyChain;
-import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
+import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core.impl.executor.AdaptiveExecutor;
 import com.gitee.spring.domain.core.impl.executor.ChainExecutor;
@@ -84,7 +84,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         this.rootRepository = rootRepository;
         orderedRepositories.add(rootRepository);
 
-        setElementDefinition(rootRepository.getElementDefinition());
+        setEntityElement(rootRepository.getEntityElement());
         setEntityDefinition(rootRepository.getEntityDefinition());
         
         if (delegateResolver.isDelegated()) {
@@ -111,8 +111,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @SuppressWarnings("unchecked")
     private ConfiguredRepository newRepository(String accessPath, AnnotatedElement annotatedElement) {
-        ElementDefinition elementDefinition = ElementDefinition.newElementDefinition(annotatedElement);
-        EntityDefinition entityDefinition = EntityDefinition.newEntityDefinition(elementDefinition);
+        EntityElement entityElement = EntityElement.newEntityElement(annotatedElement);
+        EntityDefinition entityDefinition = EntityDefinition.newEntityDefinition(entityElement);
 
         Class<?> repositoryClass = entityDefinition.getRepository();
         Object repository;
@@ -123,9 +123,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
         if (repository instanceof DefaultRepository) {
             DefaultRepository defaultRepository = (DefaultRepository) repository;
-            defaultRepository.setElementDefinition(elementDefinition);
+            defaultRepository.setEntityElement(entityElement);
             defaultRepository.setEntityDefinition(entityDefinition);
-            defaultRepository.setExecutor(newExecutor(elementDefinition, entityDefinition));
+            defaultRepository.setExecutor(newExecutor(entityElement, entityDefinition));
         }
 
         boolean aggregated = !(repository instanceof DefaultRepository);
@@ -135,7 +135,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         boolean aggregateRoot = "/".equals(accessPath);
 
         BinderResolver binderResolver = new BinderResolver(this);
-        binderResolver.resolveBinders(accessPath, elementDefinition);
+        binderResolver.resolveBinders(accessPath, entityElement);
 
         Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
         PropertyChain propertyChain = allPropertyChainMap.get(accessPath);
@@ -143,7 +143,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         String fieldPrefix = aggregateRoot ? "/" : accessPath + "/";
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository();
-        configuredRepository.setElementDefinition(elementDefinition);
+        configuredRepository.setEntityElement(entityElement);
         configuredRepository.setEntityDefinition(entityDefinition);
         configuredRepository.setProxyRepository((AbstractRepository<Object, Object>) repository);
         configuredRepository.setAggregated(aggregated);
@@ -157,7 +157,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return configuredRepository;
     }
 
-    protected abstract Executor newExecutor(ElementDefinition elementDefinition, EntityDefinition entityDefinition);
+    protected abstract Executor newExecutor(EntityElement entityElement, EntityDefinition entityDefinition);
 
     protected abstract AbstractRepository<Object, Object> postProcessRepository(AbstractRepository<Object, Object> repository);
 

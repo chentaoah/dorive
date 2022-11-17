@@ -18,6 +18,7 @@ package com.gitee.spring.domain.core.entity.definition;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core.annotation.Binding;
+import com.gitee.spring.domain.core.entity.EntityElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -38,9 +39,9 @@ public class BindingDefinition {
     private String alias;
     private String bindAlias;
 
-    public static List<BindingDefinition> newBindingDefinitions(ElementDefinition elementDefinition) {
+    public static List<BindingDefinition> newBindingDefinitions(EntityElement entityElement) {
         List<BindingDefinition> bindingDefinitions = new ArrayList<>();
-        for (Binding bindingAnnotation : elementDefinition.getBindingAnnotations()) {
+        for (Binding bindingAnnotation : entityElement.getBindingAnnotations()) {
             Map<String, Object> annotationAttributes = AnnotationUtils.getAnnotationAttributes(bindingAnnotation);
             bindingDefinitions.add(BeanUtil.copyProperties(annotationAttributes, BindingDefinition.class));
         }

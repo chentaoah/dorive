@@ -62,12 +62,12 @@ public class PropertyChain implements PropertyProxy {
     }
 
     @Override
-    public void setValue(Object entity, Object property) {
+    public void setValue(Object entity, Object value) {
         if (lastPropertyChain != null) {
             entity = lastPropertyChain.getValue(entity);
         }
         if (entity != null) {
-            propertyProxy.setValue(entity, property);
+            propertyProxy.setValue(entity, value);
         }
     }
 

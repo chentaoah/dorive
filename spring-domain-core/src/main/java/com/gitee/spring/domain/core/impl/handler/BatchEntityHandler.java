@@ -23,7 +23,7 @@ import com.gitee.spring.domain.core.api.EntityHandler;
 import com.gitee.spring.domain.core.api.EntityIndex;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.PropertyChain;
-import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
+import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.executor.Example;
 import com.gitee.spring.domain.core.entity.executor.Fishhook;
 import com.gitee.spring.domain.core.entity.executor.Page;
@@ -143,8 +143,8 @@ public class BatchEntityHandler implements EntityHandler {
     }
 
     private Object convertManyToOneEntity(ConfiguredRepository repository, List<?> entities) {
-        ElementDefinition elementDefinition = repository.getElementDefinition();
-        if (elementDefinition.isCollection()) {
+        EntityElement entityElement = repository.getEntityElement();
+        if (entityElement.isCollection()) {
             return entities;
         } else if (!entities.isEmpty()) {
             return entities.get(0);

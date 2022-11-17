@@ -18,6 +18,7 @@ package com.gitee.spring.domain.core.entity.definition;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core.annotation.Entity;
+import com.gitee.spring.domain.core.entity.EntityElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,8 +44,8 @@ public class EntityDefinition {
     private Class<?> factory;
     private Class<?> repository;
 
-    public static EntityDefinition newEntityDefinition(ElementDefinition elementDefinition) {
-        Entity entityAnnotation = elementDefinition.getEntityAnnotation();
+    public static EntityDefinition newEntityDefinition(EntityElement entityElement) {
+        Entity entityAnnotation = entityElement.getEntityAnnotation();
         Map<String, Object> annotationAttributes = AnnotationUtils.getAnnotationAttributes(entityAnnotation);
         return BeanUtil.copyProperties(annotationAttributes, EntityDefinition.class);
     }

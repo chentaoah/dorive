@@ -20,7 +20,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.api.EntityFactory;
-import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
+import com.gitee.spring.domain.core.entity.EntityElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,15 +32,15 @@ import java.util.Map;
 @AllArgsConstructor
 public class DefaultEntityFactory implements EntityFactory {
 
-    private ElementDefinition elementDefinition;
+    private EntityElement entityElement;
     private Class<?> pojoClass;
 
     @Override
     public Object reconstitute(BoundedContext boundedContext, Object persistentObject) {
         if (persistentObject instanceof Map) {
-            return BeanUtil.mapToBean((Map<?, ?>) persistentObject, elementDefinition.getGenericEntityClass(), true, CopyOptions.create().ignoreNullValue());
+            return BeanUtil.mapToBean((Map<?, ?>) persistentObject, entityElement.getGenericEntityClass(), true, CopyOptions.create().ignoreNullValue());
         } else {
-            return BeanUtil.copyProperties(persistentObject, elementDefinition.getGenericEntityClass());
+            return BeanUtil.copyProperties(persistentObject, entityElement.getGenericEntityClass());
         }
     }
 

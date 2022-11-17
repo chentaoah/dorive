@@ -20,7 +20,7 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.coating.entity.PropertyWrapper;
 import com.gitee.spring.domain.coating.entity.RepositoryWrapper;
 import com.gitee.spring.domain.coating.entity.definition.RepositoryDefinition;
-import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
+import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core.repository.AbstractRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
@@ -97,7 +97,7 @@ public class RepoDefinitionResolver {
         for (RepositoryDefinition repositoryDefinition : repositoryDefinitionMap.values()) {
             String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
             ConfiguredRepository repository = repositoryDefinition.getConfiguredRepository();
-            ElementDefinition elementDefinition = repository.getElementDefinition();
+            EntityElement entityElement = repository.getEntityElement();
 
             List<PropertyWrapper> propertyWrappers = new ArrayList<>();
 
@@ -106,7 +106,7 @@ public class RepoDefinitionResolver {
                 propertyWrappers.addAll(locationPropertyWrappers);
             }
 
-            for (String fieldName : elementDefinition.getProperties()) {
+            for (String fieldName : entityElement.getProperties()) {
                 PropertyWrapper propertyWrapper = fieldPropertyWrapperMap.get(fieldName);
                 if (propertyWrapper != null) {
                     propertyWrappers.add(propertyWrapper);

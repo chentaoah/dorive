@@ -21,7 +21,7 @@ import com.gitee.spring.domain.core.api.Executor;
 import com.gitee.spring.domain.core.api.Repository;
 import com.gitee.spring.domain.core.entity.*;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
-import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
+import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.executor.*;
 import com.gitee.spring.domain.core.entity.operation.Delete;
 import com.gitee.spring.domain.core.entity.operation.Insert;
@@ -35,7 +35,7 @@ import java.util.List;
 @Data
 public abstract class AbstractRepository<E, PK> implements Repository<E, PK> {
 
-    protected ElementDefinition elementDefinition;
+    protected EntityElement entityElement;
     protected EntityDefinition entityDefinition;
     protected Executor executor;
 

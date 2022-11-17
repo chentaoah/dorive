@@ -32,7 +32,7 @@ import com.gitee.spring.domain.core.api.EntityFactory;
 import com.gitee.spring.domain.core.api.MetadataGetter;
 import com.gitee.spring.domain.core.api.constant.Order;
 import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
+import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core.entity.executor.Criterion;
 import com.gitee.spring.domain.core.entity.executor.Example;
@@ -65,7 +65,7 @@ import static com.gitee.spring.boot.starter.domain.impl.AppenderContext.OPERATOR
 @EqualsAndHashCode(callSuper = false)
 public class MybatisPlusExecutor extends AbstractExecutor implements MetadataGetter {
 
-    private ElementDefinition elementDefinition;
+    private EntityElement entityElement;
     private EntityDefinition entityDefinition;
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;

@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.domain.core.entity.definition;
+package com.gitee.spring.domain.core.entity;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.util.ReflectUtils;
 import com.gitee.spring.domain.core.annotation.Binding;
 import com.gitee.spring.domain.core.annotation.Entity;
-import com.gitee.spring.domain.core.entity.Property;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -31,7 +30,7 @@ import java.util.Set;
 
 @Data
 @AllArgsConstructor
-public class ElementDefinition {
+public class EntityElement {
 
     private Entity entityAnnotation;
     private Set<Binding> bindingAnnotations;
@@ -42,14 +41,14 @@ public class ElementDefinition {
     private String fieldName;
     private Set<String> properties;
 
-    public static ElementDefinition newElementDefinition(AnnotatedElement annotatedElement) {
+    public static EntityElement newEntityElement(AnnotatedElement annotatedElement) {
         Entity entityAnnotation = AnnotatedElementUtils.getMergedAnnotation(annotatedElement, Entity.class);
         Assert.notNull(entityAnnotation, "The annotation @Entity cannot be null!");
         Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(annotatedElement, Binding.class);
 
         if (annotatedElement instanceof Class) {
             Class<?> entityClass = (Class<?>) annotatedElement;
-            return new ElementDefinition(
+            return new EntityElement(
                     entityAnnotation,
                     bindingAnnotations,
                     annotatedElement,
@@ -61,7 +60,7 @@ public class ElementDefinition {
 
         } else if (annotatedElement instanceof Field) {
             Property property = new Property((Field) annotatedElement);
-            return new ElementDefinition(
+            return new EntityElement(
                     entityAnnotation,
                     bindingAnnotations,
                     annotatedElement,

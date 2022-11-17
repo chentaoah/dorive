@@ -22,7 +22,7 @@ import com.gitee.spring.domain.core.api.Binder;
 import com.gitee.spring.domain.core.api.Processor;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
-import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
+import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.impl.processor.DefaultProcessor;
@@ -58,13 +58,13 @@ public class BinderResolver {
         this.repository = repository;
     }
 
-    public void resolveBinders(String accessPath, ElementDefinition elementDefinition) {
+    public void resolveBinders(String accessPath, EntityElement entityElement) {
         allBinders = new ArrayList<>();
         propertyBinders = new ArrayList<>();
         contextBinders = new ArrayList<>();
         Set<String> boundColumns = new LinkedHashSet<>();
 
-        List<BindingDefinition> bindingDefinitions = BindingDefinition.newBindingDefinitions(elementDefinition);
+        List<BindingDefinition> bindingDefinitions = BindingDefinition.newBindingDefinitions(entityElement);
         for (BindingDefinition bindingDefinition : bindingDefinitions) {
             renewBindingDefinition(accessPath, bindingDefinition);
 

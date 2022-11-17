@@ -23,7 +23,7 @@ import com.gitee.spring.domain.coating.repository.AbstractCoatingRepository;
 import com.gitee.spring.domain.core.api.EntityFactory;
 import com.gitee.spring.domain.core.api.Executor;
 import com.gitee.spring.domain.core.api.constant.Order;
-import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
+import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core.entity.executor.OrderBy;
 import com.gitee.spring.domain.core.impl.DefaultEntityFactory;
@@ -42,7 +42,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractCoatingRepository<E, P
 
     @Override
     @SuppressWarnings("unchecked")
-    protected Executor newExecutor(ElementDefinition elementDefinition, EntityDefinition entityDefinition) {
+    protected Executor newExecutor(EntityElement entityElement, EntityDefinition entityDefinition) {
         Class<?> mapperClass = entityDefinition.getMapper();
         Object mapper = null;
         Class<?> pojoClass = null;
@@ -80,12 +80,12 @@ public class MybatisPlusRepository<E, PK> extends AbstractCoatingRepository<E, P
         }
         if (entityFactory instanceof DefaultEntityFactory) {
             DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
-            defaultEntityFactory.setElementDefinition(elementDefinition);
+            defaultEntityFactory.setEntityElement(entityElement);
             defaultEntityFactory.setPojoClass(pojoClass);
         }
 
         MybatisPlusExecutor mybatisPlusExecutor = new MybatisPlusExecutor();
-        mybatisPlusExecutor.setElementDefinition(elementDefinition);
+        mybatisPlusExecutor.setEntityElement(entityElement);
         mybatisPlusExecutor.setEntityDefinition(entityDefinition);
         mybatisPlusExecutor.setBaseMapper((BaseMapper<Object>) mapper);
         mybatisPlusExecutor.setPojoClass((Class<Object>) pojoClass);

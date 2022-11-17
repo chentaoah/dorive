@@ -16,7 +16,7 @@
  */
 package com.gitee.spring.domain.event.listener;
 
-import com.gitee.spring.domain.core.entity.definition.ElementDefinition;
+import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.event.annotation.Listener;
 import com.gitee.spring.domain.event.api.EntityListener;
 import com.gitee.spring.domain.event.repository.EventRepository;
@@ -64,8 +64,8 @@ public class RepositoryListener implements ApplicationListener<RepositoryEvent>,
     @Override
     public void onApplicationEvent(RepositoryEvent event) {
         EventRepository eventRepository = (EventRepository) event.getSource();
-        ElementDefinition elementDefinition = eventRepository.getElementDefinition();
-        Class<?> entityClass = elementDefinition.getGenericEntityClass();
+        EntityElement entityElement = eventRepository.getEntityElement();
+        Class<?> entityClass = entityElement.getGenericEntityClass();
         List<EntityListener> entityListeners = classEventListenersMap.get(entityClass);
         if (entityListeners != null && !entityListeners.isEmpty()) {
             for (EntityListener entityListener : entityListeners) {

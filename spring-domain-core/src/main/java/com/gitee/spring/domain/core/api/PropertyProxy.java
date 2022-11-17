@@ -20,6 +20,6 @@ public interface PropertyProxy {
 
     Object getValue(Object entity);
 
-    void setValue(Object entity, Object property);
+    void setValue(Object entity, Object value);
 
 }
