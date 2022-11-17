@@ -87,7 +87,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         } else if (query.withoutPage()) {
             assert example != null;
             if (example instanceof UnionExample) {
-                UnionExample unionExample= (UnionExample) example;
+                UnionExample unionExample = (UnionExample) example;
                 QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
                 List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
                 Set<Object> existIds = new HashSet<>();
