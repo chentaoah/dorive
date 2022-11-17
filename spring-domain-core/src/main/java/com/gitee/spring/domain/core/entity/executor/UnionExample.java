@@ -32,10 +32,10 @@ public class UnionExample extends Example {
 
     @Override
     public boolean isDirtyQuery() {
-        return examples.size() > 0;
+        return !examples.isEmpty();
     }
-
-    public void mergeExample(Example example) {
+    
+    public void addExample(Example example) {
         examples.add(example);
     }
 

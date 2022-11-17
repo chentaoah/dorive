@@ -37,7 +37,7 @@ public class Example {
     private Page<Object> page;
 
     public boolean isDirtyQuery() {
-        return criteria.size() > 0;
+        return !criteria.isEmpty();
     }
 
     public boolean isQueryAll() {

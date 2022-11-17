@@ -67,7 +67,7 @@ public class BatchEntityHandler implements EntityHandler {
                             Object primaryKey = BeanUtil.getFieldValue(rootEntity, "id");
                             example.selectColumns(primaryKey + " as $id");
                             example.setPage(page);
-                            unionExample.mergeExample(example);
+                            unionExample.addExample(example);
                         }
                     }
                 }
