@@ -17,15 +17,10 @@
 package com.gitee.spring.domain.core.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.convert.Convert;
 import com.gitee.spring.domain.core.api.EntityIndex;
 import com.gitee.spring.domain.core.util.NumberUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DefaultEntityIndex implements EntityIndex {
 
