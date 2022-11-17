@@ -29,7 +29,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.spring.boot.starter.domain.api.CriterionAppender;
 import com.gitee.spring.boot.starter.domain.entity.Metadata;
 import com.gitee.spring.domain.core.api.EntityFactory;
-import com.gitee.spring.domain.core.api.MetadataGetter;
+import com.gitee.spring.domain.core.api.MetadataHolder;
 import com.gitee.spring.domain.core.api.constant.Order;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityElement;
@@ -63,7 +63,7 @@ import static com.gitee.spring.boot.starter.domain.impl.AppenderContext.OPERATOR
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class MybatisPlusExecutor extends AbstractExecutor implements MetadataGetter {
+public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHolder {
 
     private EntityElement entityElement;
     private EntityDefinition entityDefinition;

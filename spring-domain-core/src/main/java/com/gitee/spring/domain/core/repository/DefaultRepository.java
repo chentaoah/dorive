@@ -16,18 +16,18 @@
  */
 package com.gitee.spring.domain.core.repository;
 
-import com.gitee.spring.domain.core.api.MetadataGetter;
+import com.gitee.spring.domain.core.api.MetadataHolder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class DefaultRepository extends AbstractRepository<Object, Object> implements MetadataGetter {
+public class DefaultRepository extends AbstractRepository<Object, Object> implements MetadataHolder {
 
     @Override
     public Object getMetadata() {
-        if (executor instanceof MetadataGetter) {
-            return ((MetadataGetter) executor).getMetadata();
+        if (executor instanceof MetadataHolder) {
+            return ((MetadataHolder) executor).getMetadata();
         }
         return null;
     }

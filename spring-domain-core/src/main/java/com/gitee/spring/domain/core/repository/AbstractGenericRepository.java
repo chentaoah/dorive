@@ -18,7 +18,7 @@ package com.gitee.spring.domain.core.repository;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.ListableRepository;
-import com.gitee.spring.domain.core.api.MetadataGetter;
+import com.gitee.spring.domain.core.api.MetadataHolder;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.executor.Example;
 import lombok.Data;
@@ -29,7 +29,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK>
-        implements ListableRepository<E, PK>, MetadataGetter {
+        implements ListableRepository<E, PK>, MetadataHolder {
 
     @Override
     public int updateByExample(BoundedContext boundedContext, Object entity, Example example) {

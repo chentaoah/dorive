@@ -16,7 +16,7 @@
  */
 package com.gitee.spring.domain.core.api;
 
-public interface MetadataGetter {
+public interface MetadataHolder {
 
     Object getMetadata();
 
