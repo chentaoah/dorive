@@ -33,10 +33,9 @@ public class EntityDefinition {
 
     private String[] matchKeys;
     private Class<?> mapper;
-    private String orderByKey;
+    private String exampleKey;
     private String orderByAsc;
     private String orderByDesc;
-    private String pageKey;
     private int order;
     private String forceIgnoreKey;
     private String forceInsertKey;

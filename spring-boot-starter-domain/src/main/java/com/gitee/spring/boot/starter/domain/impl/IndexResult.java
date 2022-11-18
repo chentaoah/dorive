@@ -19,6 +19,7 @@ package com.gitee.spring.boot.starter.domain.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core.api.EntityIndex;
 import com.gitee.spring.domain.core.entity.executor.Result;
+import com.gitee.spring.domain.core.entity.executor.UnionExample;
 import com.gitee.spring.domain.core.util.NumberUtils;
 
 import java.util.*;
@@ -28,9 +29,9 @@ public class IndexResult extends Result<Object> implements EntityIndex {
     private final Map<Long, List<Long>> primaryKeyMapping = new HashMap<>();
     private final Map<Long, Object> primaryKeyEntityMap = new HashMap<>();
 
-    public IndexResult(Integer exampleSize, List<Map<String, Object>> resultMaps, List<Object> entities) {
+    public IndexResult(UnionExample unionExample, List<Map<String, Object>> resultMaps, List<Object> entities) {
         super(entities);
-        int initialCapacity = resultMaps.size() / exampleSize + 1;
+        int initialCapacity = resultMaps.size() / unionExample.getExamples().size() + 1;
         for (Map<String, Object> resultMap : resultMaps) {
             Long rootPrimaryKey = NumberUtils.longValue(resultMap.get("$id"));
             List<Long> existPrimaryKeys = primaryKeyMapping.computeIfAbsent(rootPrimaryKey, key -> new ArrayList<>(initialCapacity));

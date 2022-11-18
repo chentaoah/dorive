@@ -17,6 +17,7 @@
 package com.gitee.spring.domain.core.entity.executor;
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core.api.constant.Operator;
 import com.gitee.spring.domain.core.api.constant.Order;
 import com.gitee.spring.domain.core.util.StringUtils;
@@ -50,6 +51,17 @@ public class Example {
 
     public void addCriterion(Criterion criterion) {
         criteria.add(criterion);
+    }
+
+    public void mergeExample(Example example) {
+        selectColumns = example.getSelectColumns();
+        criteria.addAll(example.getCriteria());
+        orderBy = example.getOrderBy();
+        page = example.getPage();
+    }
+
+    public String buildCriteria() {
+        return StrUtil.join(" AND ", criteria);
     }
 
     public Example eq(String property, Object value) {

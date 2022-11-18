@@ -31,13 +31,11 @@ public @interface Entity {
 
     Class<?> mapper() default Object.class;
 
-    String orderByKey() default "";
+    String exampleKey() default "";
 
     String orderByAsc() default "";
 
     String orderByDesc() default "";
-
-    String pageKey() default "";
 
     int order() default 0;
 

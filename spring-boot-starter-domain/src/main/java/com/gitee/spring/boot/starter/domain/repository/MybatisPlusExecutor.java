@@ -67,71 +67,66 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
 
     @Override
     public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
-
-        Example example = query.getExample();
-        if (example != null && example.getOrderBy() == null) {
-            String orderByKey = entityDefinition.getOrderByKey();
-            if (StringUtils.isNotBlank(orderByKey)) {
-                OrderBy orderBy = (OrderBy) boundedContext.get(orderByKey);
-                example.setOrderBy(orderBy);
-            }
-        }
-
         if (query.getPrimaryKey() != null) {
             QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("id", query.getPrimaryKey());
             List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-            Object entity = !resultMaps.isEmpty() ? entityFactory.reconstitute(boundedContext, resultMaps.get(0)) : null;
-            return new Result<>(entity);
+            List<Object> entities = reconstitute(boundedContext, resultMaps);
+            return new Result<>(entities);
 
-        } else if (query.withoutPage()) {
-            assert example != null;
-            if (example instanceof UnionExample) {
-                UnionExample unionExample = (UnionExample) example;
-                QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
-                List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                Set<Object> existIds = new HashSet<>();
-                List<Object> entities = new ArrayList<>(resultMaps.size());
-                for (Map<String, Object> resultMap : resultMaps) {
-                    Object id = resultMap.get("id");
-                    if (existIds.add(id)) {
-                        Object entity = entityFactory.reconstitute(boundedContext, resultMap);
-                        entities.add(entity);
+        } else if (query.getExample() != null) {
+            Example example = query.getExample();
+            if (query.withoutPage()) {
+                if (example instanceof UnionExample) {
+                    UnionExample unionExample = (UnionExample) example;
+                    QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
+                    List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
+                    int resultSize = resultMaps.size();
+                    Set<Object> existIds = new HashSet<>(resultSize * 4 / 3 + 1);
+                    List<Object> entities = new ArrayList<>(resultSize);
+                    for (Map<String, Object> resultMap : resultMaps) {
+                        Object id = resultMap.get("id");
+                        if (existIds.add(id)) {
+                            Object entity = entityFactory.reconstitute(boundedContext, resultMap);
+                            entities.add(entity);
+                        }
                     }
+                    return new IndexResult(unionExample, resultMaps, entities);
+
+                } else {
+                    QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
+                    List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
+                    List<Object> entities = reconstitute(boundedContext, resultMaps);
+                    return new Result<>(entities);
                 }
-                return new IndexResult(unionExample.getExamples().size(), resultMaps, entities);
 
             } else {
+                com.gitee.spring.domain.core.entity.executor.Page<Object> page = example.getPage();
+                Page<Map<String, Object>> dataPage = new Page<>(page.getCurrent(), page.getSize());
                 QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
-                List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                List<Object> entities = new ArrayList<>(resultMaps.size());
-                for (Map<String, Object> resultMap : resultMaps) {
-                    Object entity = entityFactory.reconstitute(boundedContext, resultMap);
-                    entities.add(entity);
-                }
-                return new Result<>(entities);
+
+                dataPage = baseMapper.selectMapsPage(dataPage, queryWrapper);
+                page.setTotal(dataPage.getTotal());
+
+                List<Map<String, Object>> resultMaps = dataPage.getRecords();
+                List<Object> entities = reconstitute(boundedContext, resultMaps);
+                page.setRecords(entities);
+
+                return new Result<>(page);
             }
 
         } else {
-            assert example != null;
-            com.gitee.spring.domain.core.entity.executor.Page<Object> page = example.getPage();
-
-            Page<Map<String, Object>> dataPage = new Page<>(page.getCurrent(), page.getSize());
-            QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
-            dataPage = baseMapper.selectMapsPage(dataPage, queryWrapper);
-
-            page.setTotal(dataPage.getTotal());
-
-            List<Map<String, Object>> resultMaps = dataPage.getRecords();
-            List<Object> entities = new ArrayList<>(resultMaps.size());
-            for (Map<String, Object> resultMap : resultMaps) {
-                Object entity = entityFactory.reconstitute(boundedContext, resultMap);
-                entities.add(entity);
-            }
-            page.setRecords(entities);
-
-            return new Result<>(page);
+            throw new RuntimeException("Unsupported query method!");
         }
+    }
+
+    private List<Object> reconstitute(BoundedContext boundedContext, List<Map<String, Object>> resultMaps) {
+        List<Object> entities = new ArrayList<>(resultMaps.size());
+        for (Map<String, Object> resultMap : resultMaps) {
+            Object entity = entityFactory.reconstitute(boundedContext, resultMap);
+            entities.add(entity);
+        }
+        return entities;
     }
 
     private QueryWrapper<Object> buildQueryWrapper(Example example) {
@@ -151,6 +146,12 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         }
 
         OrderBy orderBy = example.getOrderBy() != null ? example.getOrderBy() : this.orderBy;
+        setOrderByForQueryWrapper(queryWrapper, orderBy);
+
+        return queryWrapper;
+    }
+
+    private void setOrderByForQueryWrapper(QueryWrapper<Object> queryWrapper, OrderBy orderBy) {
         if (orderBy != null) {
             String order = orderBy.getOrder();
             if (Order.ASC.equals(order)) {
@@ -160,44 +161,48 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                 queryWrapper.orderByDesc(orderBy.getColumns());
             }
         }
-
-        return queryWrapper;
     }
 
     private QueryWrapper<Object> buildQueryWrapper(UnionExample unionExample) {
         List<Example> examples = unionExample.getExamples();
         Assert.notEmpty(examples, "The examples cannot be empty!");
+
         Example example = examples.get(0);
         QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
+
         StringBuilder lastSql = new StringBuilder();
         if (example.getPage() != null) {
-            lastSql.append(example.getPage().toString()).append(" ");
+            lastSql.append(example.getPage()).append(" ");
         }
+
         for (int index = 1; index < examples.size(); index++) {
             Example nextExample = examples.get(index);
             QueryWrapper<Object> nextQueryWrapper = buildQueryWrapper(nextExample);
 
             String sqlSelect = nextQueryWrapper.getSqlSelect();
             String tableName = TableInfoHelper.getTableInfo(pojoClass).getTableName();
-            String criteria = buildCriteria(nextExample);
+            String criteria = nextExample.buildCriteria();
 
-            String sql;
-            if (nextExample.getPage() == null) {
+            String sql = "";
+            if (nextExample.getOrderBy() == null && nextExample.getPage() == null) {
                 sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s)", sqlSelect, tableName, criteria);
-            } else {
-                String limit = nextExample.getPage().toString();
-                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s %s)", sqlSelect, tableName, criteria, limit);
+
+            } else if (nextExample.getOrderBy() != null && nextExample.getPage() != null) {
+                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s %s %s)", sqlSelect, tableName, criteria, nextExample.getOrderBy(), nextExample.getPage());
+
+            } else if (nextExample.getOrderBy() != null) {
+                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s %s)", sqlSelect, tableName, criteria, nextExample.getOrderBy());
+
+            } else if (nextExample.getPage() != null) {
+                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s %s)", sqlSelect, tableName, criteria, nextExample.getPage());
             }
             lastSql.append(sql);
         }
+
         if (lastSql.length() > 0) {
             queryWrapper.last(lastSql.toString());
         }
         return queryWrapper;
-    }
-
-    private String buildCriteria(Example example) {
-        return StrUtil.join(" AND ", example.getCriteria());
     }
 
     @Override
