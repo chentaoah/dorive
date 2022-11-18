@@ -18,9 +18,9 @@ package com.gitee.spring.domain.coating.repository;
 
 import com.gitee.spring.domain.coating.annotation.CoatingScan;
 import com.gitee.spring.domain.coating.api.CoatingRepository;
-import com.gitee.spring.domain.coating.api.CoatingConverter;
+import com.gitee.spring.domain.coating.api.ExampleConverter;
 import com.gitee.spring.domain.coating.impl.resolver.CoatingWrapperResolver;
-import com.gitee.spring.domain.coating.impl.DefaultCoatingConverter;
+import com.gitee.spring.domain.coating.impl.DefaultExampleConverter;
 import com.gitee.spring.domain.coating.impl.resolver.RepoDefinitionResolver;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.executor.Example;
@@ -34,11 +34,11 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> implements CoatingConverter, CoatingRepository<E, PK> {
+public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> implements ExampleConverter, CoatingRepository<E, PK> {
 
     protected RepoDefinitionResolver repoDefinitionResolver = new RepoDefinitionResolver(this);
     protected CoatingWrapperResolver coatingWrapperResolver = new CoatingWrapperResolver(this);
-    protected CoatingConverter coatingConverter = new DefaultCoatingConverter(this);
+    protected ExampleConverter exampleConverter = new DefaultExampleConverter(this);
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -52,7 +52,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
     @Override
     public Example buildExample(BoundedContext boundedContext, Object coatingObject) {
-        return coatingConverter.buildExample(boundedContext, coatingObject);
+        return exampleConverter.buildExample(boundedContext, coatingObject);
     }
 
     @Override
