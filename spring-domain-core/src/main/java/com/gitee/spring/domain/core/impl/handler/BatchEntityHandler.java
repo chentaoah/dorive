@@ -20,6 +20,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.EntityHandler;
 import com.gitee.spring.domain.core.api.EntityIndex;
+import com.gitee.spring.domain.core.api.ExampleBuilder;
 import com.gitee.spring.domain.core.api.PropertyProxy;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.EntityElement;
@@ -51,18 +52,18 @@ public class BatchEntityHandler implements EntityHandler {
                 PropertyChain anchorPoint = subRepository.getAnchorPoint();
                 PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
 
-                String exampleKey = subRepository.getEntityDefinition().getExampleKey();
-                Example exampleInContext = StringUtils.isNotBlank(exampleKey) ? (Example) boundedContext.get(exampleKey) : null;
+                String builderKey = subRepository.getEntityDefinition().getBuilderKey();
+                ExampleBuilder exampleBuilder = StringUtils.isNotBlank(builderKey) ? (ExampleBuilder) boundedContext.get(builderKey) : null;
 
                 UnionExample unionExample = new UnionExample();
                 for (Object rootEntity : rootEntities) {
                     Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
                     if (lastEntity != null) {
                         Example example = newExampleByContext(subRepository, boundedContext, rootEntity);
-                        if (!example.isEmptyQuery() && example.isDirtyQuery()) {
-                            if (exampleInContext != null) {
-                                example.mergeExample(exampleInContext);
-                            }
+                        if (exampleBuilder != null) {
+                            example = exampleBuilder.buildExample(boundedContext, rootEntity, example);
+                        }
+                        if (example.isDirtyQuery()) {
                             Object primaryKey = BeanUtil.getFieldValue(rootEntity, "id");
                             example.selectColumns(primaryKey + " as $id");
                             unionExample.addExample(example);
@@ -106,11 +107,11 @@ public class BatchEntityHandler implements EntityHandler {
                 boundValue = propertyBinder.input(boundedContext, boundValue);
                 example.eq(alias, boundValue);
             } else {
-                example.setEmptyQuery(true);
+                example.getCriteria().clear();
                 break;
             }
         }
-        if (!example.isEmptyQuery() && example.isDirtyQuery()) {
+        if (example.isDirtyQuery()) {
             for (ContextBinder contextBinder : repository.getBinderResolver().getContextBinders()) {
                 String alias = contextBinder.getBindingDefinition().getAlias();
                 Object boundValue = contextBinder.getBoundValue(boundedContext, rootEntity);

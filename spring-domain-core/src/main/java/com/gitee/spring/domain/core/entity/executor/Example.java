@@ -53,13 +53,6 @@ public class Example {
         criteria.add(criterion);
     }
 
-    public void mergeExample(Example example) {
-        selectColumns = example.getSelectColumns();
-        criteria.addAll(example.getCriteria());
-        orderBy = example.getOrderBy();
-        page = example.getPage();
-    }
-
     public String buildCriteria() {
         return StrUtil.join(" AND ", criteria);
     }

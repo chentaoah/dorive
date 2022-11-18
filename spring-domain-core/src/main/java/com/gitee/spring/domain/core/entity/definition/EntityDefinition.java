@@ -33,7 +33,7 @@ public class EntityDefinition {
 
     private String[] matchKeys;
     private Class<?> mapper;
-    private String exampleKey;
+    private String builderKey;
     private String orderByAsc;
     private String orderByDesc;
     private int order;

@@ -14,40 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.domain.core.annotation;
+package com.gitee.spring.domain.core.api;
 
-import com.gitee.spring.domain.core.repository.DefaultRepository;
-import com.gitee.spring.domain.core.impl.DefaultEntityFactory;
+import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.executor.Example;
 
-import java.lang.annotation.*;
+public interface ExampleBuilder {
 
-@Inherited
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
-public @interface Entity {
-
-    String[] matchKeys() default {};
-
-    Class<?> mapper() default Object.class;
-
-    String builderKey() default "";
-
-    String orderByAsc() default "";
-
-    String orderByDesc() default "";
-
-    int order() default 0;
-
-    String forceIgnoreKey() default "";
-
-    String forceInsertKey() default "";
-
-    String nullableKey() default "";
-
-    Class<?> factory() default DefaultEntityFactory.class;
-
-    Class<?> repository() default DefaultRepository.class;
+    Example buildExample(BoundedContext boundedContext, Object rootEntity, Example example);
 
 }
-
