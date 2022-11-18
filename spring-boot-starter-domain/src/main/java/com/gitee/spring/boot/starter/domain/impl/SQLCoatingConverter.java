@@ -25,7 +25,7 @@ import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.spring.boot.starter.domain.entity.JoinSegment;
 import com.gitee.spring.boot.starter.domain.entity.Metadata;
 import com.gitee.spring.boot.starter.domain.entity.SqlSegment;
-import com.gitee.spring.domain.coating.api.ExampleBuilder;
+import com.gitee.spring.domain.coating.api.CoatingConverter;
 import com.gitee.spring.domain.coating.entity.CoatingWrapper;
 import com.gitee.spring.domain.coating.entity.RepositoryWrapper;
 import com.gitee.spring.domain.coating.entity.definition.RepositoryDefinition;
@@ -43,11 +43,11 @@ import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SQLExampleBuilder implements ExampleBuilder {
+public class SQLCoatingConverter implements CoatingConverter {
 
     private final AbstractCoatingRepository<?, ?> repository;
 
-    public SQLExampleBuilder(AbstractCoatingRepository<?, ?> repository) {
+    public SQLCoatingConverter(AbstractCoatingRepository<?, ?> repository) {
         this.repository = repository;
     }
 
