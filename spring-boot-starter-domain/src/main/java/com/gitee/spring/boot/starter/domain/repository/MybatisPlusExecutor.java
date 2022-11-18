@@ -28,7 +28,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.spring.boot.starter.domain.api.CriterionAppender;
 import com.gitee.spring.boot.starter.domain.entity.Metadata;
-import com.gitee.spring.boot.starter.domain.impl.IndexResult;
+import com.gitee.spring.boot.starter.domain.impl.EntityIndexResult;
 import com.gitee.spring.domain.core.api.EntityFactory;
 import com.gitee.spring.domain.core.api.MetadataHolder;
 import com.gitee.spring.domain.core.api.constant.Order;
@@ -91,7 +91,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                             entities.add(entity);
                         }
                     }
-                    return new IndexResult(unionExample, resultMaps, entities);
+                    return new EntityIndexResult(unionExample, resultMaps, entities);
 
                 } else {
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);

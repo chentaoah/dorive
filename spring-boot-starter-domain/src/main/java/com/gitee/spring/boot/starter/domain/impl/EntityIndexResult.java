@@ -24,12 +24,12 @@ import com.gitee.spring.domain.core.util.NumberUtils;
 
 import java.util.*;
 
-public class IndexResult extends Result<Object> implements EntityIndex {
+public class EntityIndexResult extends Result<Object> implements EntityIndex {
 
     private final Map<Long, List<Long>> primaryKeyMapping = new HashMap<>();
     private final Map<Long, Object> primaryKeyEntityMap = new HashMap<>();
 
-    public IndexResult(UnionExample unionExample, List<Map<String, Object>> resultMaps, List<Object> entities) {
+    public EntityIndexResult(UnionExample unionExample, List<Map<String, Object>> resultMaps, List<Object> entities) {
         super(entities);
         int initialCapacity = resultMaps.size() / unionExample.getExamples().size() + 1;
         for (Map<String, Object> resultMap : resultMaps) {
