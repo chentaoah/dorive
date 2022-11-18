@@ -38,7 +38,7 @@ public class BoundedContext extends LinkedHashMap<String, Object> {
         }
     }
 
-    public void builder(String key, ExampleBuilder builder) {
+    public void putBuilder(String key, ExampleBuilder builder) {
         put(key, builder);
     }
 
