@@ -14,33 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.domain.core.impl.executor;
+package com.gitee.spring.domain.core.impl.handler;
 
 import com.gitee.spring.domain.core.api.EntityHandler;
 import com.gitee.spring.domain.core.api.Executor;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.impl.resolver.DelegateResolver;
 import com.gitee.spring.domain.core.repository.AbstractContextRepository;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AdaptiveExecutor extends ChainExecutor {
+@Data
+public class AdaptiveEntityHandler implements EntityHandler {
 
-    public AdaptiveExecutor(AbstractContextRepository<?, ?> repository, EntityHandler entityHandler) {
-        super(repository, entityHandler);
+    private final AbstractContextRepository<?, ?> repository;
+    private final EntityHandler entityHandler;
+
+    public AdaptiveEntityHandler(AbstractContextRepository<?, ?> repository, EntityHandler entityHandler) {
+        this.repository = repository;
+        this.entityHandler = entityHandler;
     }
 
     @Override
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
         List<Object> newRootEntities = new ArrayList<>(rootEntities.size());
-        int delegateCount = getRepository().getDelegateResolver().getDelegateCount();
+        int delegateCount = repository.getDelegateResolver().getDelegateCount();
         Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>(delegateCount * 4 / 3 + 1);
         filterRootEntities(rootEntities, newRootEntities, repositoryEntitiesMap);
         if (!newRootEntities.isEmpty()) {
-            super.handleEntities(boundedContext, newRootEntities);
+            entityHandler.handleEntities(boundedContext, newRootEntities);
         }
         repositoryEntitiesMap.forEach((repository, entities) -> {
             Executor executor = repository.getExecutor();
@@ -52,7 +58,7 @@ public class AdaptiveExecutor extends ChainExecutor {
 
     private void filterRootEntities(List<Object> rootEntities, List<Object> newRootEntities,
                                     Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap) {
-        DelegateResolver delegateResolver = getRepository().getDelegateResolver();
+        DelegateResolver delegateResolver = repository.getDelegateResolver();
         for (Object rootEntity : rootEntities) {
             AbstractContextRepository<?, ?> repository = delegateResolver.delegateRepository(rootEntity);
             if (repository == null) {

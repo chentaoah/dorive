@@ -16,11 +16,12 @@
  */
 package com.gitee.spring.domain.core.repository;
 
+import com.gitee.spring.domain.core.api.EntityHandler;
 import com.gitee.spring.domain.core.api.Executor;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
-import com.gitee.spring.domain.core.impl.executor.AdaptiveExecutor;
+import com.gitee.spring.domain.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.spring.domain.core.impl.executor.ChainExecutor;
 import com.gitee.spring.domain.core.impl.handler.BatchEntityHandler;
 import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
@@ -86,12 +87,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         setEntityElement(rootRepository.getEntityElement());
         setEntityDefinition(rootRepository.getEntityDefinition());
-        
+
+        EntityHandler entityHandler = new BatchEntityHandler(this);
         if (delegateResolver.isDelegated()) {
-            setExecutor(new AdaptiveExecutor(this, new BatchEntityHandler(this)));
-        } else {
-            setExecutor(new ChainExecutor(this, new BatchEntityHandler(this)));
+            entityHandler = new AdaptiveEntityHandler(this, entityHandler);
         }
+        setExecutor(new ChainExecutor(this, entityHandler));
 
         Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
         allPropertyChainMap.forEach((accessPath, propertyChain) -> {
