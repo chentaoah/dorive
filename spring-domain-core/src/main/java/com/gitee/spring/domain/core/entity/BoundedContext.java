@@ -16,6 +16,7 @@
  */
 package com.gitee.spring.domain.core.entity;
 
+import com.gitee.spring.domain.core.api.ExampleBuilder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,10 @@ public class BoundedContext extends LinkedHashMap<String, Object> {
         for (String key : keys) {
             put(key, true);
         }
+    }
+
+    public void builder(String key, ExampleBuilder builder) {
+        put(key, builder);
     }
 
 }
