@@ -74,10 +74,6 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
     @Override
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
-        doHandleEntities(boundedContext, rootEntities);
-    }
-
-    protected void doHandleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
         entityHandler.handleEntities(boundedContext, rootEntities);
     }
 

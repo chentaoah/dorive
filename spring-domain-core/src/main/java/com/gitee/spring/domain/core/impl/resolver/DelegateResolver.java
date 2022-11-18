@@ -36,7 +36,6 @@ public class DelegateResolver {
     }
 
     public void resolveRepositoryMap() {
-        delegateRepositoryMap.put(repository.getEntityClass(), repository);
         ReflectionUtils.doWithLocalFields(repository.getClass(), declaredField -> {
             Class<?> fieldClass = declaredField.getType();
             if (AbstractContextRepository.class.isAssignableFrom(fieldClass)) {
@@ -52,7 +51,7 @@ public class DelegateResolver {
     }
 
     public boolean isDelegated() {
-        return delegateRepositoryMap.size() > 1;
+        return !delegateRepositoryMap.isEmpty();
     }
 
     public int getDelegateCount() {
@@ -60,8 +59,7 @@ public class DelegateResolver {
     }
 
     public AbstractContextRepository<?, ?> delegateRepository(Object rootEntity) {
-        AbstractContextRepository<?, ?> abstractContextRepository = delegateRepositoryMap.get(rootEntity.getClass());
-        return abstractContextRepository != null ? abstractContextRepository : repository;
+        return delegateRepositoryMap.get(rootEntity.getClass());
     }
 
 }

@@ -35,25 +35,32 @@ public class AdaptiveExecutor extends ChainExecutor {
 
     @Override
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
-        Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = collectRepositoryEntitiesMap(rootEntities);
+        List<Object> newRootEntities = new ArrayList<>(rootEntities.size());
+        int delegateCount = getRepository().getDelegateResolver().getDelegateCount();
+        Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>(delegateCount * 4 / 3 + 1);
+        filterRootEntities(rootEntities, newRootEntities, repositoryEntitiesMap);
+
+        super.handleEntities(boundedContext, newRootEntities);
         repositoryEntitiesMap.forEach((repository, entities) -> {
             Executor executor = repository.getExecutor();
-            if (executor instanceof ChainExecutor) {
-                ((ChainExecutor) executor).doHandleEntities(boundedContext, entities);
+            if (executor instanceof EntityHandler) {
+                ((EntityHandler) executor).handleEntities(boundedContext, entities);
             }
         });
     }
 
-    private Map<AbstractContextRepository<?, ?>, List<Object>> collectRepositoryEntitiesMap(List<Object> rootEntities) {
+    private void filterRootEntities(List<Object> rootEntities, List<Object> newRootEntities,
+                                    Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap) {
         DelegateResolver delegateResolver = getRepository().getDelegateResolver();
-        int delegateCount = delegateResolver.getDelegateCount();
-        Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>(delegateCount * 4 / 3 + 1);
         for (Object rootEntity : rootEntities) {
             AbstractContextRepository<?, ?> repository = delegateResolver.delegateRepository(rootEntity);
-            List<Object> entities = repositoryEntitiesMap.computeIfAbsent(repository, key -> new ArrayList<>(rootEntities.size()));
-            entities.add(rootEntity);
+            if (repository == null) {
+                newRootEntities.add(rootEntity);
+            } else {
+                List<Object> existRootEntities = repositoryEntitiesMap.computeIfAbsent(repository, key -> new ArrayList<>(rootEntities.size()));
+                existRootEntities.add(rootEntity);
+            }
         }
-        return repositoryEntitiesMap;
     }
 
 }
