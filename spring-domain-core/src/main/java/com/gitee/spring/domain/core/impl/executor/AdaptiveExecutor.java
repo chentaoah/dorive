@@ -39,8 +39,9 @@ public class AdaptiveExecutor extends ChainExecutor {
         int delegateCount = getRepository().getDelegateResolver().getDelegateCount();
         Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>(delegateCount * 4 / 3 + 1);
         filterRootEntities(rootEntities, newRootEntities, repositoryEntitiesMap);
-
-        super.handleEntities(boundedContext, newRootEntities);
+        if (!newRootEntities.isEmpty()) {
+            super.handleEntities(boundedContext, newRootEntities);
+        }
         repositoryEntitiesMap.forEach((repository, entities) -> {
             Executor executor = repository.getExecutor();
             if (executor instanceof EntityHandler) {
