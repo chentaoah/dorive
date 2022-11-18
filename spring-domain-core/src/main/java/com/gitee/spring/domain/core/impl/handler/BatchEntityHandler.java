@@ -32,7 +32,6 @@ import com.gitee.spring.domain.core.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
-import com.gitee.spring.domain.core.util.ContextUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
@@ -112,24 +111,15 @@ public class BatchEntityHandler implements EntityHandler {
             }
         }
         if (!example.isEmptyQuery() && example.isDirtyQuery()) {
-            newCriterionByContext(repository, boundedContext, rootEntity, example);
-        }
-        return example;
-    }
-
-    private void newCriterionByContext(ConfiguredRepository repository, BoundedContext boundedContext, Object rootEntity, Example example) {
-        for (ContextBinder contextBinder : repository.getBinderResolver().getContextBinders()) {
-            String alias = contextBinder.getBindingDefinition().getAlias();
-            Object boundValue = contextBinder.getBoundValue(boundedContext, rootEntity);
-            if (boundValue != null) {
-                if (boundValue instanceof String && ContextUtils.isLike((String) boundValue)) {
-                    boundValue = ContextUtils.stripLike((String) boundValue);
-                    example.like(alias, boundValue);
-                } else {
+            for (ContextBinder contextBinder : repository.getBinderResolver().getContextBinders()) {
+                String alias = contextBinder.getBindingDefinition().getAlias();
+                Object boundValue = contextBinder.getBoundValue(boundedContext, rootEntity);
+                if (boundValue != null) {
                     example.eq(alias, boundValue);
                 }
             }
         }
+        return example;
     }
 
     private Object convertManyToOneEntity(ConfiguredRepository repository, List<?> entities) {
