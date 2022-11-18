@@ -185,16 +185,16 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
 
             String sql = "";
             if (nextExample.getOrderBy() == null && nextExample.getPage() == null) {
-                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s)", sqlSelect, tableName, criteria);
+                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s) ", sqlSelect, tableName, criteria);
 
             } else if (nextExample.getOrderBy() != null && nextExample.getPage() != null) {
-                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s %s %s)", sqlSelect, tableName, criteria, nextExample.getOrderBy(), nextExample.getPage());
+                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s %s %s) ", sqlSelect, tableName, criteria, nextExample.getOrderBy(), nextExample.getPage());
 
             } else if (nextExample.getOrderBy() != null) {
-                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s %s)", sqlSelect, tableName, criteria, nextExample.getOrderBy());
+                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s %s) ", sqlSelect, tableName, criteria, nextExample.getOrderBy());
 
             } else if (nextExample.getPage() != null) {
-                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s %s)", sqlSelect, tableName, criteria, nextExample.getPage());
+                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s %s) ", sqlSelect, tableName, criteria, nextExample.getPage());
             }
             lastSql.append(sql);
         }
