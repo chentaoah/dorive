@@ -92,6 +92,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
         DelegateResolver delegateResolver = repository.getDelegateResolver();
         AbstractContextRepository<?, ?> delegateRepository = delegateResolver.delegateRepository(rootEntity);
+        delegateRepository = delegateRepository == null ? repository : delegateRepository;
 
         int totalCount = 0;
         for (ConfiguredRepository orderedRepository : delegateRepository.getOrderedRepositories()) {
