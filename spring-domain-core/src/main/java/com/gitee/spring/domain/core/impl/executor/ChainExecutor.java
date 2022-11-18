@@ -66,8 +66,10 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                 handleEntities(boundedContext, rootEntities);
             }
             return result;
+
+        } else {
+            throw new RuntimeException("Unsupported query method!");
         }
-        return new Result<>();
     }
 
     @Override
