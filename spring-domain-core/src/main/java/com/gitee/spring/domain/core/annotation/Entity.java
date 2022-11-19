@@ -29,19 +29,19 @@ public @interface Entity {
 
     String[] matchKeys() default {};
 
+    int order() default 0;
+
     Class<?> mapper() default Object.class;
 
     Class<?> factory() default DefaultEntityFactory.class;
 
     Class<?> repository() default DefaultRepository.class;
 
-    String builderKey() default "";
-
     String orderByAsc() default "";
 
     String orderByDesc() default "";
 
-    int order() default 0;
+    String builderKey() default "";
 
     String commandKey() default "";
 

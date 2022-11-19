@@ -32,13 +32,13 @@ import java.util.Map;
 public class EntityDefinition {
 
     private String[] matchKeys;
+    private int order;
     private Class<?> mapper;
     private Class<?> factory;
     private Class<?> repository;
-    private String builderKey;
     private String orderByAsc;
     private String orderByDesc;
-    private int order;
+    private String builderKey;
     private String commandKey;
 
     public static EntityDefinition newEntityDefinition(EntityElement entityElement) {
