@@ -16,11 +16,14 @@
  */
 package com.gitee.spring.domain.core.repository;
 
+import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core.api.EntityHandler;
 import com.gitee.spring.domain.core.api.Executor;
+import com.gitee.spring.domain.core.api.constant.Order;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
+import com.gitee.spring.domain.core.entity.executor.OrderBy;
 import com.gitee.spring.domain.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.spring.domain.core.impl.executor.ChainExecutor;
 import com.gitee.spring.domain.core.impl.handler.BatchEntityHandler;
@@ -32,6 +35,7 @@ import com.gitee.spring.domain.core.impl.resolver.RepoPropertyResolver;
 import com.gitee.spring.domain.core.util.ReflectUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -129,6 +133,18 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultRepository.setExecutor(newExecutor(entityElement, entityDefinition));
         }
 
+        OrderBy orderBy = null;
+        String orderByAsc = entityDefinition.getOrderByAsc();
+        if (StringUtils.isNotBlank(orderByAsc)) {
+            orderByAsc = StrUtil.toUnderlineCase(orderByAsc);
+            orderBy = new OrderBy(StrUtil.splitTrim(orderByAsc, ",").toArray(new String[0]), Order.ASC);
+        }
+        String orderByDesc = entityDefinition.getOrderByDesc();
+        if (StringUtils.isNotBlank(orderByDesc)) {
+            orderByDesc = StrUtil.toUnderlineCase(orderByDesc);
+            orderBy = new OrderBy(StrUtil.splitTrim(orderByDesc, ",").toArray(new String[0]), Order.DESC);
+        }
+
         boolean aggregated = !(repository instanceof DefaultRepository);
 
         repository = postProcessRepository((AbstractRepository<Object, Object>) repository);
@@ -150,6 +166,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         configuredRepository.setAggregated(aggregated);
         configuredRepository.setAggregateRoot(aggregateRoot);
         configuredRepository.setAccessPath(accessPath);
+        configuredRepository.setOrderBy(orderBy);
         configuredRepository.setBinderResolver(binderResolver);
         configuredRepository.setBoundEntity(false);
         configuredRepository.setAnchorPoint(propertyChain);

@@ -58,7 +58,6 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
     private EntityDefinition entityDefinition;
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;
-    private OrderBy orderBy;
     private EntityFactory entityFactory;
 
     @Override
@@ -145,14 +144,8 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
             String property = StrUtil.toUnderlineCase(criterion.getProperty());
             criterionAppender.appendCriterion(queryWrapper, property, criterion.getValue());
         }
-
-        OrderBy orderBy = example.getOrderBy() != null ? example.getOrderBy() : this.orderBy;
-        setOrderByForQueryWrapper(queryWrapper, orderBy);
-
-        return queryWrapper;
-    }
-
-    private void setOrderByForQueryWrapper(QueryWrapper<Object> queryWrapper, OrderBy orderBy) {
+        
+        OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
             String order = orderBy.getOrder();
             if (Order.ASC.equals(order)) {
@@ -162,6 +155,8 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                 queryWrapper.orderByDesc(orderBy.getColumns());
             }
         }
+
+        return queryWrapper;
     }
 
     private QueryWrapper<Object> buildQueryWrapper(UnionExample unionExample) {

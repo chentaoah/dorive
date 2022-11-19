@@ -20,7 +20,9 @@ import com.gitee.spring.domain.core.api.MetadataHolder;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.executor.Example;
+import com.gitee.spring.domain.core.entity.executor.OrderBy;
 import com.gitee.spring.domain.core.entity.executor.Page;
+import com.gitee.spring.domain.core.entity.executor.Result;
 import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -36,6 +38,7 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
     protected boolean aggregated;
     protected boolean aggregateRoot;
     protected String accessPath;
+    protected OrderBy orderBy;
     protected BinderResolver binderResolver;
     protected boolean boundEntity;
     protected PropertyChain anchorPoint;
@@ -69,15 +72,34 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
         if (example.isEmptyQuery()) {
             return Collections.emptyList();
         }
+        if (example.getOrderBy() == null) {
+            example.setOrderBy(orderBy);
+        }
         return super.selectByExample(boundedContext, example);
     }
 
     @Override
     public Page<Object> selectPageByExample(BoundedContext boundedContext, Example example) {
         if (example.isEmptyQuery()) {
-            return new Page<>();
+            Page<Object> page = example.getPage();
+            return page != null ? page : new Page<>();
+        }
+        if (example.getOrderBy() == null) {
+            example.setOrderBy(orderBy);
         }
         return super.selectPageByExample(boundedContext, example);
+    }
+
+    @Override
+    public Result<Object> selectResultByExample(BoundedContext boundedContext, Example example) {
+        if (example.isEmptyQuery()) {
+            Page<Object> page = example.getPage();
+            return page != null ? new Result<>(page) : new Result<>();
+        }
+        if (example.getOrderBy() == null) {
+            example.setOrderBy(orderBy);
+        }
+        return super.selectResultByExample(boundedContext, example);
     }
 
     @Override
