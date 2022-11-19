@@ -33,15 +33,13 @@ public class EntityDefinition {
 
     private String[] matchKeys;
     private Class<?> mapper;
+    private Class<?> factory;
+    private Class<?> repository;
     private String builderKey;
     private String orderByAsc;
     private String orderByDesc;
     private int order;
-    private String forceIgnoreKey;
-    private String forceInsertKey;
-    private String nullableKey;
-    private Class<?> factory;
-    private Class<?> repository;
+    private String commandKey;
 
     public static EntityDefinition newEntityDefinition(EntityElement entityElement) {
         Entity entityAnnotation = entityElement.getEntityAnnotation();

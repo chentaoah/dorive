@@ -18,6 +18,7 @@ package com.gitee.spring.domain.core.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.Command;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core.entity.operation.Operation;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
@@ -27,17 +28,16 @@ public class OperationTypeResolver {
 
     public int resolveOperationType(BoundedContext boundedContext, ConfiguredRepository repository) {
         EntityDefinition entityDefinition = repository.getEntityDefinition();
+        String commandKey = entityDefinition.getCommandKey();
+        if (StringUtils.isNotBlank(commandKey) && boundedContext.containsKey(commandKey)) {
+            Command command = (Command) boundedContext.get(commandKey);
+            if (command.isForceIgnore()) {
+                return Operation.FORCE_IGNORE;
 
-        String forceIgnoreKey = entityDefinition.getForceIgnoreKey();
-        if (StringUtils.isNotBlank(forceIgnoreKey) && boundedContext.containsKey(forceIgnoreKey)) {
-            return Operation.FORCE_IGNORE;
+            } else if (command.isForceInsert()) {
+                return Operation.FORCE_INSERT;
+            }
         }
-
-        String forceInsertKey = entityDefinition.getForceInsertKey();
-        if (StringUtils.isNotBlank(forceInsertKey) && boundedContext.containsKey(forceInsertKey)) {
-            return Operation.FORCE_INSERT;
-        }
-
         return Operation.NONE;
     }
 

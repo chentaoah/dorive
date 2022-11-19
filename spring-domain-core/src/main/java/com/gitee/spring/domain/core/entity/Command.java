@@ -14,36 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.domain.core.annotation;
+package com.gitee.spring.domain.core.entity;
 
-import com.gitee.spring.domain.core.repository.DefaultRepository;
-import com.gitee.spring.domain.core.impl.DefaultEntityFactory;
+import lombok.Data;
 
-import java.lang.annotation.*;
+import java.util.Set;
 
-@Inherited
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
-public @interface Entity {
-
-    String[] matchKeys() default {};
-
-    Class<?> mapper() default Object.class;
-
-    Class<?> factory() default DefaultEntityFactory.class;
-
-    Class<?> repository() default DefaultRepository.class;
-
-    String builderKey() default "";
-
-    String orderByAsc() default "";
-
-    String orderByDesc() default "";
-
-    int order() default 0;
-
-    String commandKey() default "";
-
+@Data
+public class Command {
+    private boolean forceIgnore;
+    private boolean forceInsert;
+    private Set<String> nullableProperties;
 }
-

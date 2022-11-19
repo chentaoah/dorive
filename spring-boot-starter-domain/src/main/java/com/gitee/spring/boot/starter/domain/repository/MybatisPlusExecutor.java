@@ -33,6 +33,7 @@ import com.gitee.spring.domain.core.api.EntityFactory;
 import com.gitee.spring.domain.core.api.MetadataHolder;
 import com.gitee.spring.domain.core.api.constant.Order;
 import com.gitee.spring.domain.core.entity.BoundedContext;
+import com.gitee.spring.domain.core.entity.Command;
 import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core.entity.executor.*;
@@ -206,7 +207,6 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public int execute(BoundedContext boundedContext, Operation operation) {
         Object entity = operation.getEntity();
         Object persistentObject = entity != null ? entityFactory.deconstruct(boundedContext, entity) : null;
@@ -222,9 +222,10 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
             Object primaryKey = update.getPrimaryKey();
             Example example = update.getExample();
 
-            String nullableKey = entityDefinition.getNullableKey();
-            if (StringUtils.isNotBlank(nullableKey)) {
-                Set<String> nullableProperties = (Set<String>) boundedContext.get(nullableKey);
+            String commandKey = entityDefinition.getCommandKey();
+            if (StringUtils.isNotBlank(commandKey) && boundedContext.containsKey(commandKey)) {
+                Command command = (Command) boundedContext.get(commandKey);
+                Set<String> nullableProperties = command.getNullableProperties();
                 if (nullableProperties != null && !nullableProperties.isEmpty()) {
                     example = primaryKey != null ? new Example().eq("id", primaryKey) : example;
                     UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistentObject, nullableProperties, example);
