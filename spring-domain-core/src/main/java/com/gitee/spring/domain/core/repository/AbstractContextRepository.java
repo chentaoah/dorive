@@ -145,11 +145,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             orderBy = new OrderBy(StrUtil.splitTrim(orderByDesc, ",").toArray(new String[0]), Order.DESC);
         }
 
-        boolean aggregated = !(repository instanceof DefaultRepository);
-
-        repository = postProcessRepository((AbstractRepository<Object, Object>) repository);
-
         boolean aggregateRoot = "/".equals(accessPath);
+        boolean aggregated = !(repository instanceof DefaultRepository);
+        repository = postProcessRepository((AbstractRepository<Object, Object>) repository);
 
         BinderResolver binderResolver = new BinderResolver(this);
         binderResolver.resolveBinders(accessPath, entityElement);
@@ -163,9 +161,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         configuredRepository.setEntityElement(entityElement);
         configuredRepository.setEntityDefinition(entityDefinition);
         configuredRepository.setProxyRepository((AbstractRepository<Object, Object>) repository);
-        configuredRepository.setAggregated(aggregated);
-        configuredRepository.setAggregateRoot(aggregateRoot);
         configuredRepository.setAccessPath(accessPath);
+        configuredRepository.setAggregateRoot(aggregateRoot);
+        configuredRepository.setAggregated(aggregated);
         configuredRepository.setOrderBy(orderBy);
         configuredRepository.setBinderResolver(binderResolver);
         configuredRepository.setBoundEntity(false);
