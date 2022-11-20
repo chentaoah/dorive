@@ -26,16 +26,16 @@ public class ReflectUtils {
     }
 
     public static List<Class<?>> getAllSuperClasses(Class<?> type, Class<?> ignoredType) {
-        List<Class<?>> superClasses = new ArrayList<>();
-        Class<?> superClass = type.getSuperclass();
-        while (superClass != null) {
-            if (superClass != ignoredType) {
-                superClasses.add(superClass);
+        List<Class<?>> superclasses = new ArrayList<>();
+        Class<?> superclass = type.getSuperclass();
+        while (superclass != null) {
+            if (superclass != ignoredType) {
+                superclasses.add(superclass);
             }
-            superClass = superClass.getSuperclass();
+            superclass = superclass.getSuperclass();
         }
-        Collections.reverse(superClasses);
-        return superClasses;
+        Collections.reverse(superclasses);
+        return superclasses;
     }
 
     public static Set<String> getFieldNames(Class<?> type) {
