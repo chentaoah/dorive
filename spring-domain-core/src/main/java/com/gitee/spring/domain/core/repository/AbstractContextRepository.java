@@ -20,18 +20,14 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core.api.EntityHandler;
 import com.gitee.spring.domain.core.api.Executor;
 import com.gitee.spring.domain.core.api.constant.Order;
-import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.EntityElement;
+import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core.entity.executor.OrderBy;
-import com.gitee.spring.domain.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.spring.domain.core.impl.executor.ChainExecutor;
+import com.gitee.spring.domain.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.spring.domain.core.impl.handler.BatchEntityHandler;
-import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
-import com.gitee.spring.domain.core.impl.resolver.DelegateResolver;
-import com.gitee.spring.domain.core.impl.resolver.PropertyResolver;
-import com.gitee.spring.domain.core.impl.resolver.RepoBinderResolver;
-import com.gitee.spring.domain.core.impl.resolver.RepoPropertyResolver;
+import com.gitee.spring.domain.core.impl.resolver.*;
 import com.gitee.spring.domain.core.util.ReflectUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -42,13 +38,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -73,16 +63,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Type genericSuperclass = this.getClass().getGenericSuperclass();
-        ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
-        Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-        entityClass = (Class<?>) actualTypeArgument;
-
+        entityClass = ReflectUtils.getFirstArgumentType(this.getClass());
         delegateResolver.resolveDelegateRepositoryMap();
 
-        List<Class<?>> superClasses = ReflectUtils.getAllSuperclasses(entityClass, Object.class);
-        superClasses.forEach(superClass -> propertyResolver.resolveProperties("", superClass));
-        propertyResolver.resolveProperties("", entityClass);
+        List<Class<?>> allClasses = ReflectUtils.getAllSuperclasses(entityClass, Object.class);
+        allClasses.add(entityClass);
+        allClasses.forEach(clazz -> propertyResolver.resolveProperties("", clazz));
 
         ConfiguredRepository rootRepository = newRepository("/", entityClass);
         allRepositoryMap.put("/", rootRepository);

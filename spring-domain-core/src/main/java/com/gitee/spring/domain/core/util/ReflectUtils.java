@@ -17,9 +17,18 @@
 package com.gitee.spring.domain.core.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 
 public class ReflectUtils {
+
+    public static Class<?> getFirstArgumentType(Class<?> type) {
+        Type genericSuperclass = type.getGenericSuperclass();
+        ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
+        Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
+        return (Class<?>) actualTypeArgument;
+    }
 
     public static Object newInstance(Class<?> type) {
         return org.springframework.cglib.core.ReflectUtils.newInstance(type);
