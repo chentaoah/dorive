@@ -29,18 +29,18 @@ public class PropertyChain implements PropertyProxy {
 
     private PropertyChain lastPropertyChain;
     private Class<?> lastEntityClass;
-    private Property property;
     private String accessPath;
     private boolean annotatedEntity;
+    private Property property;
     private PropertyProxy propertyProxy;
 
     public PropertyChain(PropertyChain lastPropertyChain,
                          PropertyChain propertyChain) {
         this.lastPropertyChain = lastPropertyChain;
         this.lastEntityClass = propertyChain.getLastEntityClass();
-        this.property = propertyChain.getProperty();
         this.accessPath = propertyChain.getAccessPath();
         this.annotatedEntity = propertyChain.isAnnotatedEntity();
+        this.property = propertyChain.getProperty();
         this.propertyProxy = propertyChain.getPropertyProxy();
     }
 

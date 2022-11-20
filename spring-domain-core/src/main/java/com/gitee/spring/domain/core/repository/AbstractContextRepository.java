@@ -65,10 +65,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     public void afterPropertiesSet() throws Exception {
         entityClass = ReflectUtils.getFirstArgumentType(this.getClass());
         delegateResolver.resolveDelegateRepositoryMap();
-
-        List<Class<?>> allClasses = ReflectUtils.getAllSuperclasses(entityClass, Object.class);
-        allClasses.add(entityClass);
-        allClasses.forEach(clazz -> propertyResolver.resolveProperties("", clazz));
+        propertyResolver.resolveAllPropertyChainMap(entityClass);
 
         ConfiguredRepository rootRepository = newRepository("/", entityClass);
         allRepositoryMap.put("/", rootRepository);
