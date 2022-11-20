@@ -39,14 +39,14 @@ public class RepoBinderResolver {
         this.repository = repository;
     }
 
-    public void resolveValueBinders() {
+    public void resolveRepoAllBinders() {
         Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
         allRepositoryMap.forEach((accessPath, repository) -> {
 
             BinderResolver binderResolver = repository.getBinderResolver();
             Map<String, PropertyChain> propertyChainMap = repository.getPropertyChainMap();
 
-            List<Binder> boundValueBinders = new ArrayList<>();
+            List<Binder> boundValueBinders = new ArrayList<>(binderResolver.getAllBinders().size());
             PropertyBinder boundIdBinder = null;
 
             for (Binder binder : binderResolver.getAllBinders()) {
@@ -56,14 +56,15 @@ public class RepoBinderResolver {
                 if (binder instanceof AbstractBinder) {
                     String fieldAccessPath = repository.getFieldPrefix() + field;
                     PropertyChain fieldPropertyChain = propertyChainMap.get(fieldAccessPath);
-                    Assert.notNull(fieldPropertyChain, "The field property chain cannot be null! fieldAccessPath: {}", fieldAccessPath);
+                    Assert.notNull(fieldPropertyChain, "The field property chain cannot be null! entity: {}, field: {}",
+                            repository.getEntityElement().getGenericEntityClass().getSimpleName(), field);
                     fieldPropertyChain.initialize();
                     ((AbstractBinder) binder).setFieldPropertyChain(fieldPropertyChain);
                 }
 
                 if (binder instanceof PropertyBinder) {
                     PropertyBinder propertyBinder = (PropertyBinder) binder;
-                    if (isSameType(propertyBinder)) {
+                    if (propertyBinder.isSameType()) {
                         if (!"id".equals(field)) {
                             boundValueBinders.add(propertyBinder);
                         } else {
@@ -83,12 +84,6 @@ public class RepoBinderResolver {
             binderResolver.setBoundValueBinders(boundValueBinders);
             binderResolver.setBoundIdBinder(boundIdBinder);
         });
-    }
-
-    private boolean isSameType(PropertyBinder propertyBinder) {
-        PropertyChain fieldPropertyChain = propertyBinder.getFieldPropertyChain();
-        PropertyChain boundPropertyChain = propertyBinder.getBoundPropertyChain();
-        return fieldPropertyChain.getProperty().isSameType(boundPropertyChain.getProperty());
     }
 
 }
