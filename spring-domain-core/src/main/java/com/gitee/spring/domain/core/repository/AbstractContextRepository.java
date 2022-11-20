@@ -78,7 +78,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
         entityClass = (Class<?>) actualTypeArgument;
 
-        delegateResolver.resolveRepositoryMap();
+        delegateResolver.resolveDelegateRepositoryMap();
 
         List<Class<?>> superClasses = ReflectUtils.getAllSuperClasses(entityClass, Object.class);
         superClasses.forEach(superClass -> propertyResolver.resolveProperties("", superClass));
