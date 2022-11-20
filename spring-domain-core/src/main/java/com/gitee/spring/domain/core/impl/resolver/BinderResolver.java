@@ -73,7 +73,8 @@ public class BinderResolver {
             PropertyChain fieldPropertyChain = propertyChainMap.get(fieldPrefix + field);
             Assert.notNull(fieldPropertyChain, "The field property chain cannot be null! entity: {}, field: {}",
                     entityElement.getGenericEntityClass().getSimpleName(), field);
-
+            fieldPropertyChain.initialize();
+            
             Processor processor = newProcessor(bindingDefinition);
 
             if (StringUtils.isNotBlank(bindingDefinition.getBindProp())) {
