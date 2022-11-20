@@ -39,12 +39,12 @@ public class RepoPropertyResolver {
 
         allPropertyChainMap.forEach((accessPath, propertyChain) -> {
             String lastAccessPath = PathUtils.getLastAccessPath(accessPath);
-            String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), lastAccessPath);
 
+            String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), lastAccessPath);
             ConfiguredRepository belongRepository = allRepositoryMap.get(belongAccessPath);
             Assert.notNull(belongRepository, "The belong repository cannot be null!");
-
             Map<String, PropertyChain> repoPropertyChainMap = belongRepository.getPropertyChainMap();
+
             PropertyChain lastPropertyChain = repoPropertyChainMap.get(lastAccessPath);
             PropertyChain newPropertyChain = new PropertyChain(lastPropertyChain, propertyChain);
             repoPropertyChainMap.put(accessPath, newPropertyChain);
@@ -53,13 +53,11 @@ public class RepoPropertyResolver {
         allRepositoryMap.forEach((accessPath, repository) -> {
             EntityElement entityElement = repository.getEntityElement();
             Map<String, PropertyChain> repoPropertyChainMap = repository.getPropertyChainMap();
-
             if (repoPropertyChainMap.isEmpty() && entityElement.isCollection()) {
+                repository.setFieldPrefix("/");
                 PropertyResolver propertyResolver = new PropertyResolver();
                 propertyResolver.resolveProperties("", entityElement.getGenericEntityClass());
-                Map<String, PropertyChain> subPropertyChainMap = propertyResolver.getAllPropertyChainMap();
-                repoPropertyChainMap.putAll(subPropertyChainMap);
-                repository.setFieldPrefix("/");
+                repoPropertyChainMap.putAll(propertyResolver.getAllPropertyChainMap());
             }
         });
     }
