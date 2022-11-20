@@ -88,9 +88,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         });
 
-        new RepoPropertyResolver(this).resolveRepoPropertyChainMap();
-        new RepoBinderResolver(this).resolveRepoAllBinders();
-
         orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityDefinition().getOrder()));
     }
 
@@ -117,13 +114,18 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         boolean aggregated = !(repository instanceof DefaultRepository);
         repository = postProcessRepository((AbstractRepository<Object, Object>) repository);
 
-        BinderResolver binderResolver = new BinderResolver(this);
-        binderResolver.resolveAllBinders(accessPath, entityElement);
-        OrderBy defaultOrderBy = entityDefinition.getDefaultOrderBy();
-
         Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
         PropertyChain anchorPoint = allPropertyChainMap.get(accessPath);
-        String fieldPrefix = aggregateRoot ? "/" : accessPath + "/";
+
+        String lastAccessPath = aggregateRoot || entityElement.isCollection() ? "" : accessPath;
+        String fieldPrefix = lastAccessPath + "/";
+        PropertyResolver propertyResolver = new PropertyResolver();
+        propertyResolver.resolveProperties(lastAccessPath, entityElement.getGenericEntityClass(), true);
+        Map<String, PropertyChain> propertyChainMap = propertyResolver.getAllPropertyChainMap();
+
+        BinderResolver binderResolver = new BinderResolver(this);
+        binderResolver.resolveAllBinders(accessPath, entityElement, entityDefinition, fieldPrefix, propertyChainMap);
+        OrderBy defaultOrderBy = entityDefinition.getDefaultOrderBy();
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository();
         configuredRepository.setEntityElement(entityElement);
@@ -132,11 +134,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         configuredRepository.setAccessPath(accessPath);
         configuredRepository.setAggregateRoot(aggregateRoot);
         configuredRepository.setAggregated(aggregated);
-        configuredRepository.setBinderResolver(binderResolver);
-        configuredRepository.setDefaultOrderBy(defaultOrderBy);
         configuredRepository.setAnchorPoint(anchorPoint);
         configuredRepository.setFieldPrefix(fieldPrefix);
-        configuredRepository.setPropertyChainMap(new LinkedHashMap<>());
+        configuredRepository.setPropertyChainMap(propertyChainMap);
+        configuredRepository.setBinderResolver(binderResolver);
+        configuredRepository.setDefaultOrderBy(defaultOrderBy);
         configuredRepository.setBoundEntity(false);
         return configuredRepository;
     }

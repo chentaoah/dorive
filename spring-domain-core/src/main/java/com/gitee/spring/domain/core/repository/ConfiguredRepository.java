@@ -34,15 +34,15 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class ConfiguredRepository extends ProxyRepository implements MetadataHolder {
-    
+
     protected String accessPath;
     protected boolean aggregateRoot;
     protected boolean aggregated;
-    protected BinderResolver binderResolver;
-    protected OrderBy defaultOrderBy;
     protected PropertyChain anchorPoint;
     protected String fieldPrefix;
     protected Map<String, PropertyChain> propertyChainMap;
+    protected BinderResolver binderResolver;
+    protected OrderBy defaultOrderBy;
     protected boolean boundEntity;
 
     public boolean matchKeys(BoundedContext boundedContext) {

@@ -34,16 +34,6 @@ public class PropertyChain implements PropertyProxy {
     private Property property;
     private PropertyProxy propertyProxy;
 
-    public PropertyChain(PropertyChain lastPropertyChain,
-                         PropertyChain propertyChain) {
-        this.lastPropertyChain = lastPropertyChain;
-        this.lastEntityClass = propertyChain.getLastEntityClass();
-        this.accessPath = propertyChain.getAccessPath();
-        this.annotatedEntity = propertyChain.isAnnotatedEntity();
-        this.property = propertyChain.getProperty();
-        this.propertyProxy = propertyChain.getPropertyProxy();
-    }
-
     public void initialize() {
         if (propertyProxy == null) {
             propertyProxy = PropertyProxyFactory.newPropertyProxy(lastEntityClass, property.getFieldClass(), property.getFieldName());

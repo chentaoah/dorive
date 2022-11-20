@@ -23,6 +23,7 @@ import com.gitee.spring.domain.core.api.Processor;
 import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
+import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
 import com.gitee.spring.domain.core.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.impl.processor.DefaultProcessor;
@@ -54,28 +55,49 @@ public class BinderResolver {
         this.repository = repository;
     }
 
-    public void resolveAllBinders(String accessPath, EntityElement entityElement) {
+    public void resolveAllBinders(String accessPath, EntityElement entityElement, EntityDefinition entityDefinition,
+                                  String fieldPrefix, Map<String, PropertyChain> propertyChainMap) {
         List<BindingDefinition> bindingDefinitions = BindingDefinition.newBindingDefinitions(entityElement);
 
         allBinders = new ArrayList<>(bindingDefinitions.size());
         propertyBinders = new ArrayList<>(bindingDefinitions.size());
         Set<String> boundColumns = new LinkedHashSet<>(bindingDefinitions.size() * 4 / 3 + 1);
         contextBinders = new ArrayList<>(bindingDefinitions.size());
+        boundValueBinders = new ArrayList<>(bindingDefinitions.size());
+        boundIdBinder = null;
 
         for (BindingDefinition bindingDefinition : bindingDefinitions) {
             renewBindingDefinition(accessPath, bindingDefinition);
+
+            String field = bindingDefinition.getField();
+            PropertyChain fieldPropertyChain = propertyChainMap.get(fieldPrefix + field);
+            Assert.notNull(fieldPropertyChain, "The field property chain cannot be null! entity: {}, field: {}",
+                    entityElement.getGenericEntityClass().getSimpleName(), field);
+
             Processor processor = newProcessor(bindingDefinition);
 
             if (StringUtils.isNotBlank(bindingDefinition.getBindProp())) {
-                PropertyBinder propertyBinder = newPropertyBinder(bindingDefinition, processor);
+                PropertyBinder propertyBinder = newPropertyBinder(bindingDefinition, fieldPropertyChain, processor);
                 allBinders.add(propertyBinder);
                 propertyBinders.add(propertyBinder);
                 boundColumns.add(StrUtil.toUnderlineCase(bindingDefinition.getAlias()));
 
+                if (propertyBinder.isSameType()) {
+                    if (!"id".equals(field)) {
+                        boundValueBinders.add(propertyBinder);
+                    } else {
+                        if (entityDefinition.getOrder() == 0) {
+                            entityDefinition.setOrder(-1);
+                        }
+                        boundIdBinder = propertyBinder;
+                    }
+                }
+
             } else {
-                ContextBinder contextBinder = new ContextBinder(bindingDefinition, null, processor);
+                ContextBinder contextBinder = new ContextBinder(bindingDefinition, fieldPropertyChain, processor);
                 allBinders.add(contextBinder);
                 contextBinders.add(contextBinder);
+                boundValueBinders.add(contextBinder);
             }
         }
 
@@ -148,7 +170,7 @@ public class BinderResolver {
         return processor;
     }
 
-    private PropertyBinder newPropertyBinder(BindingDefinition bindingDefinition, Processor processor) {
+    private PropertyBinder newPropertyBinder(BindingDefinition bindingDefinition, PropertyChain fieldPropertyChain, Processor processor) {
         Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
         String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), bindingDefinition.getBindProp());
         ConfiguredRepository belongRepository = allRepositoryMap.get(belongAccessPath);
@@ -160,7 +182,7 @@ public class BinderResolver {
         Assert.notNull(boundPropertyChain, "The bound property chain cannot be null!");
         boundPropertyChain.initialize();
 
-        return new PropertyBinder(bindingDefinition, null, processor, belongAccessPath, belongRepository, boundPropertyChain);
+        return new PropertyBinder(bindingDefinition, fieldPropertyChain, processor, belongAccessPath, belongRepository, boundPropertyChain);
     }
 
 }

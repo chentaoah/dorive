@@ -32,7 +32,6 @@ import java.util.Map;
 public class PropertyResolver {
 
     private Map<String, PropertyChain> allPropertyChainMap = new LinkedHashMap<>();
-    private Map<String, PropertyChain> fieldPropertyChainMap = new LinkedHashMap<>();
 
     public void resolveAllPropertyChainMap(Class<?> entityClass) {
         List<Class<?>> allClasses = ReflectUtils.getAllSuperclasses(entityClass, Object.class);
@@ -41,14 +40,15 @@ public class PropertyResolver {
     }
 
     public void resolveProperties(String lastAccessPath, Class<?> entityClass) {
+        resolveProperties(lastAccessPath, entityClass, false);
+    }
+
+    public void resolveProperties(String lastAccessPath, Class<?> entityClass, boolean ignoreAnnotated) {
         PropertyChain lastPropertyChain = allPropertyChainMap.get(lastAccessPath);
         ReflectionUtils.doWithLocalFields(entityClass, declaredField -> {
-            Property property = new Property(declaredField);
-            Class<?> fieldClass = property.getFieldClass();
-            String fieldName = property.getFieldName();
-
-            String accessPath = lastAccessPath + "/" + fieldName;
+            String accessPath = lastAccessPath + "/" + declaredField.getName();
             boolean isAnnotatedEntity = AnnotatedElementUtils.isAnnotated(declaredField, Entity.class);
+            Property property = new Property(declaredField);
 
             PropertyChain propertyChain = new PropertyChain(
                     lastPropertyChain,
@@ -63,10 +63,14 @@ public class PropertyResolver {
             }
 
             allPropertyChainMap.put(accessPath, propertyChain);
-            fieldPropertyChainMap.putIfAbsent(fieldName, propertyChain);
 
+            if (ignoreAnnotated && isAnnotatedEntity) {
+                return;
+            }
+
+            Class<?> fieldClass = property.getFieldClass();
             if (!filterEntityClass(fieldClass)) {
-                resolveProperties(accessPath, fieldClass);
+                resolveProperties(accessPath, fieldClass, ignoreAnnotated);
             }
         });
     }
