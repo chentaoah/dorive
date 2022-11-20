@@ -29,7 +29,7 @@ public class DelegateResolver {
 
     private AbstractContextRepository<?, ?> repository;
 
-    private Map<Class<?>, AbstractContextRepository<?, ?>> delegateRepositoryMap = new LinkedHashMap<>();
+    private Map<Class<?>, AbstractContextRepository<?, ?>> delegateRepositoryMap = new LinkedHashMap<>(3 * 4 / 3 + 1);
 
     public DelegateResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;

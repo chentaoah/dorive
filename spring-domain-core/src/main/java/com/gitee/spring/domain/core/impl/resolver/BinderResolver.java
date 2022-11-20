@@ -20,9 +20,9 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core.api.Binder;
 import com.gitee.spring.domain.core.api.Processor;
+import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
-import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.impl.binder.ContextBinder;
 import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.impl.processor.DefaultProcessor;
@@ -35,11 +35,7 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Data
 public class BinderResolver {
@@ -48,8 +44,8 @@ public class BinderResolver {
 
     private List<Binder> allBinders;
     private List<PropertyBinder> propertyBinders;
-    private List<ContextBinder> contextBinders;
     private String[] boundColumns;
+    private List<ContextBinder> contextBinders;
 
     private List<Binder> boundValueBinders;
     private PropertyBinder boundIdBinder;
@@ -58,41 +54,17 @@ public class BinderResolver {
         this.repository = repository;
     }
 
-    public void resolveBinders(String accessPath, EntityElement entityElement) {
-        allBinders = new ArrayList<>();
-        propertyBinders = new ArrayList<>();
-        contextBinders = new ArrayList<>();
-        Set<String> boundColumns = new LinkedHashSet<>();
-
+    public void resolveAllBinders(String accessPath, EntityElement entityElement) {
         List<BindingDefinition> bindingDefinitions = BindingDefinition.newBindingDefinitions(entityElement);
+
+        allBinders = new ArrayList<>(bindingDefinitions.size());
+        propertyBinders = new ArrayList<>(bindingDefinitions.size());
+        Set<String> boundColumns = new LinkedHashSet<>(bindingDefinitions.size() * 4 / 3 + 1);
+        contextBinders = new ArrayList<>(bindingDefinitions.size());
+
         for (BindingDefinition bindingDefinition : bindingDefinitions) {
             renewBindingDefinition(accessPath, bindingDefinition);
-
-            Class<?> processorClass = bindingDefinition.getProcessor();
-            Processor processor = null;
-            if (processorClass == DefaultProcessor.class) {
-                if (StringUtils.isBlank(bindingDefinition.getProperty())) {
-                    processor = new DefaultProcessor();
-                } else {
-                    processor = new PropertyProcessor();
-                }
-            } else {
-                ApplicationContext applicationContext = repository.getApplicationContext();
-                String[] beanNamesForType = applicationContext.getBeanNamesForType(processorClass);
-                if (beanNamesForType.length > 0) {
-                    processor = (Processor) applicationContext.getBean(beanNamesForType[0]);
-                }
-                if (processor == null) {
-                    processor = (Processor) ReflectUtils.newInstance(processorClass);
-                }
-            }
-            if (processor instanceof DefaultProcessor) {
-                DefaultProcessor defaultProcessor = (DefaultProcessor) processor;
-                defaultProcessor.setBindingDefinition(bindingDefinition);
-            }
-            if (processor instanceof PropertyProcessor) {
-                Assert.notBlank(bindingDefinition.getProperty(), "The property of PropertyProcessor cannot be blank!");
-            }
+            Processor processor = newProcessor(bindingDefinition);
 
             if (StringUtils.isNotBlank(bindingDefinition.getBindProp())) {
                 PropertyBinder propertyBinder = newPropertyBinder(bindingDefinition, processor);
@@ -101,7 +73,7 @@ public class BinderResolver {
                 boundColumns.add(StrUtil.toUnderlineCase(bindingDefinition.getAlias()));
 
             } else {
-                ContextBinder contextBinder = newContextBinder(bindingDefinition, processor);
+                ContextBinder contextBinder = new ContextBinder(bindingDefinition, null, processor);
                 allBinders.add(contextBinder);
                 contextBinders.add(contextBinder);
             }
@@ -124,7 +96,6 @@ public class BinderResolver {
         if (StringUtils.isBlank(alias)) {
             alias = field;
         }
-
         if (StringUtils.isBlank(bindAlias)) {
             bindAlias = property;
         }
@@ -148,6 +119,35 @@ public class BinderResolver {
         bindingDefinition.setBindAlias(bindAlias);
     }
 
+    private Processor newProcessor(BindingDefinition bindingDefinition) {
+        Class<?> processorClass = bindingDefinition.getProcessor();
+        Processor processor = null;
+        if (processorClass == DefaultProcessor.class) {
+            if (StringUtils.isBlank(bindingDefinition.getProperty())) {
+                processor = new DefaultProcessor();
+            } else {
+                processor = new PropertyProcessor();
+            }
+        } else {
+            ApplicationContext applicationContext = repository.getApplicationContext();
+            String[] beanNamesForType = applicationContext.getBeanNamesForType(processorClass);
+            if (beanNamesForType.length > 0) {
+                processor = (Processor) applicationContext.getBean(beanNamesForType[0]);
+            }
+            if (processor == null) {
+                processor = (Processor) ReflectUtils.newInstance(processorClass);
+            }
+        }
+        if (processor instanceof DefaultProcessor) {
+            DefaultProcessor defaultProcessor = (DefaultProcessor) processor;
+            defaultProcessor.setBindingDefinition(bindingDefinition);
+        }
+        if (processor instanceof PropertyProcessor) {
+            Assert.notBlank(bindingDefinition.getProperty(), "The property of PropertyProcessor cannot be blank!");
+        }
+        return processor;
+    }
+
     private PropertyBinder newPropertyBinder(BindingDefinition bindingDefinition, Processor processor) {
         Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
         String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), bindingDefinition.getBindProp());
@@ -161,10 +161,6 @@ public class BinderResolver {
         boundPropertyChain.initialize();
 
         return new PropertyBinder(bindingDefinition, null, processor, belongAccessPath, belongRepository, boundPropertyChain);
-    }
-
-    private ContextBinder newContextBinder(BindingDefinition bindingDefinition, Processor processor) {
-        return new ContextBinder(bindingDefinition, null, processor);
     }
 
 }

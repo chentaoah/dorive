@@ -118,7 +118,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         repository = postProcessRepository((AbstractRepository<Object, Object>) repository);
 
         BinderResolver binderResolver = new BinderResolver(this);
-        binderResolver.resolveBinders(accessPath, entityElement);
+        binderResolver.resolveAllBinders(accessPath, entityElement);
         OrderBy defaultOrderBy = entityDefinition.getDefaultOrderBy();
 
         Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
