@@ -80,7 +80,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         delegateResolver.resolveDelegateRepositoryMap();
 
-        List<Class<?>> superClasses = ReflectUtils.getAllSuperClasses(entityClass, Object.class);
+        List<Class<?>> superClasses = ReflectUtils.getAllSuperclasses(entityClass, Object.class);
         superClasses.forEach(superClass -> propertyResolver.resolveProperties("", superClass));
         propertyResolver.resolveProperties("", entityClass);
 

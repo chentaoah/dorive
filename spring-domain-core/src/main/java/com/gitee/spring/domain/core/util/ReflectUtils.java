@@ -25,7 +25,7 @@ public class ReflectUtils {
         return org.springframework.cglib.core.ReflectUtils.newInstance(type);
     }
 
-    public static List<Class<?>> getAllSuperClasses(Class<?> type, Class<?> ignoredType) {
+    public static List<Class<?>> getAllSuperclasses(Class<?> type, Class<?> ignoredType) {
         List<Class<?>> superclasses = new ArrayList<>();
         Class<?> superclass = type.getSuperclass();
         while (superclass != null) {
