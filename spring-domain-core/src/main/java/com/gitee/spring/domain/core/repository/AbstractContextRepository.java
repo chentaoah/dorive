@@ -88,7 +88,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         });
 
-        new RepoPropertyResolver(this).resolvePropertyChainMap();
+        new RepoPropertyResolver(this).resolveRepoPropertyChainMap();
         new RepoBinderResolver(this).resolveValueBinders();
 
         orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityDefinition().getOrder()));
