@@ -38,12 +38,12 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
     protected String accessPath;
     protected boolean aggregateRoot;
     protected boolean aggregated;
-    protected OrderBy orderBy;
     protected BinderResolver binderResolver;
-    protected boolean boundEntity;
+    protected OrderBy defaultOrderBy;
     protected PropertyChain anchorPoint;
     protected String fieldPrefix;
     protected Map<String, PropertyChain> propertyChainMap;
+    protected boolean boundEntity;
 
     public boolean matchKeys(BoundedContext boundedContext) {
         String[] matchKeys = entityDefinition.getMatchKeys();
@@ -73,7 +73,7 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
             return Collections.emptyList();
         }
         if (example.getOrderBy() == null) {
-            example.setOrderBy(orderBy);
+            example.setOrderBy(defaultOrderBy);
         }
         return super.selectByExample(boundedContext, example);
     }
@@ -85,7 +85,7 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
             return page != null ? page : new Page<>();
         }
         if (example.getOrderBy() == null) {
-            example.setOrderBy(orderBy);
+            example.setOrderBy(defaultOrderBy);
         }
         return super.selectPageByExample(boundedContext, example);
     }
@@ -97,7 +97,7 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
             return page != null ? new Result<>(page) : new Result<>();
         }
         if (example.getOrderBy() == null) {
-            example.setOrderBy(orderBy);
+            example.setOrderBy(defaultOrderBy);
         }
         return super.selectResultByExample(boundedContext, example);
     }

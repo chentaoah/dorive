@@ -17,11 +17,15 @@
 package com.gitee.spring.domain.core.entity.definition;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core.annotation.Entity;
+import com.gitee.spring.domain.core.api.constant.Order;
 import com.gitee.spring.domain.core.entity.EntityElement;
+import com.gitee.spring.domain.core.entity.executor.OrderBy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import java.util.Map;
@@ -45,6 +49,20 @@ public class EntityDefinition {
         Entity entityAnnotation = entityElement.getEntityAnnotation();
         Map<String, Object> annotationAttributes = AnnotationUtils.getAnnotationAttributes(entityAnnotation);
         return BeanUtil.copyProperties(annotationAttributes, EntityDefinition.class);
+    }
+
+    public OrderBy getDefaultOrderBy() {
+        if (StringUtils.isNotBlank(this.orderByAsc)) {
+            String orderByAsc = StrUtil.toUnderlineCase(this.orderByAsc);
+            String[] columns = StrUtil.splitTrim(orderByAsc, ",").toArray(new String[0]);
+            return new OrderBy(columns, Order.ASC);
+        }
+        if (StringUtils.isNotBlank(this.orderByDesc)) {
+            String orderByDesc = StrUtil.toUnderlineCase(this.orderByDesc);
+            String[] columns = StrUtil.splitTrim(orderByDesc, ",").toArray(new String[0]);
+            return new OrderBy(columns, Order.DESC);
+        }
+        return null;
     }
 
 }

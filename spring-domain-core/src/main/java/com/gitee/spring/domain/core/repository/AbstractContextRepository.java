@@ -16,10 +16,8 @@
  */
 package com.gitee.spring.domain.core.repository;
 
-import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core.api.EntityHandler;
 import com.gitee.spring.domain.core.api.Executor;
-import com.gitee.spring.domain.core.api.constant.Order;
 import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
@@ -31,7 +29,6 @@ import com.gitee.spring.domain.core.impl.resolver.*;
 import com.gitee.spring.domain.core.util.ReflectUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -116,28 +113,16 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultRepository.setExecutor(newExecutor(entityElement, entityDefinition));
         }
 
-        OrderBy orderBy = null;
-        String orderByAsc = entityDefinition.getOrderByAsc();
-        if (StringUtils.isNotBlank(orderByAsc)) {
-            orderByAsc = StrUtil.toUnderlineCase(orderByAsc);
-            orderBy = new OrderBy(StrUtil.splitTrim(orderByAsc, ",").toArray(new String[0]), Order.ASC);
-        }
-        String orderByDesc = entityDefinition.getOrderByDesc();
-        if (StringUtils.isNotBlank(orderByDesc)) {
-            orderByDesc = StrUtil.toUnderlineCase(orderByDesc);
-            orderBy = new OrderBy(StrUtil.splitTrim(orderByDesc, ",").toArray(new String[0]), Order.DESC);
-        }
-
         boolean aggregateRoot = "/".equals(accessPath);
         boolean aggregated = !(repository instanceof DefaultRepository);
         repository = postProcessRepository((AbstractRepository<Object, Object>) repository);
 
         BinderResolver binderResolver = new BinderResolver(this);
         binderResolver.resolveBinders(accessPath, entityElement);
+        OrderBy defaultOrderBy = entityDefinition.getDefaultOrderBy();
 
         Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
-        PropertyChain propertyChain = allPropertyChainMap.get(accessPath);
-
+        PropertyChain anchorPoint = allPropertyChainMap.get(accessPath);
         String fieldPrefix = aggregateRoot ? "/" : accessPath + "/";
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository();
@@ -147,12 +132,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         configuredRepository.setAccessPath(accessPath);
         configuredRepository.setAggregateRoot(aggregateRoot);
         configuredRepository.setAggregated(aggregated);
-        configuredRepository.setOrderBy(orderBy);
         configuredRepository.setBinderResolver(binderResolver);
-        configuredRepository.setBoundEntity(false);
-        configuredRepository.setAnchorPoint(propertyChain);
+        configuredRepository.setDefaultOrderBy(defaultOrderBy);
+        configuredRepository.setAnchorPoint(anchorPoint);
         configuredRepository.setFieldPrefix(fieldPrefix);
         configuredRepository.setPropertyChainMap(new LinkedHashMap<>());
+        configuredRepository.setBoundEntity(false);
         return configuredRepository;
     }
 
