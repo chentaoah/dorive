@@ -23,11 +23,14 @@ import com.gitee.spring.domain.core.entity.executor.Example;
 import com.gitee.spring.domain.core.entity.executor.OrderBy;
 import com.gitee.spring.domain.core.entity.executor.Page;
 import com.gitee.spring.domain.core.entity.executor.Result;
+import com.gitee.spring.domain.core.impl.binder.ContextBinder;
+import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
 import com.gitee.spring.domain.core.impl.resolver.PropertyResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,28 +47,6 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
     protected String fieldPrefix;
     protected BinderResolver binderResolver;
     protected boolean boundEntity;
-
-    public boolean matchKeys(BoundedContext boundedContext) {
-        String[] matchKeys = entityDefinition.getMatchKeys();
-        if (matchKeys == null || matchKeys.length == 0) {
-            return true;
-        }
-        for (String matchKey : matchKeys) {
-            if (boundedContext.containsKey(matchKey)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public Object getMetadata() {
-        AbstractRepository<Object, Object> proxyRepository = getProxyRepository();
-        if (proxyRepository instanceof MetadataHolder) {
-            return ((MetadataHolder) proxyRepository).getMetadata();
-        }
-        return null;
-    }
 
     @Override
     public List<Object> selectByExample(BoundedContext boundedContext, Example example) {
@@ -116,6 +97,56 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
             return 0;
         }
         return super.deleteByExample(boundedContext, example);
+    }
+
+    @Override
+    public Object getMetadata() {
+        AbstractRepository<Object, Object> proxyRepository = getProxyRepository();
+        if (proxyRepository instanceof MetadataHolder) {
+            return ((MetadataHolder) proxyRepository).getMetadata();
+        }
+        return null;
+    }
+
+    public boolean matchKeys(BoundedContext boundedContext) {
+        String[] matchKeys = entityDefinition.getMatchKeys();
+        if (matchKeys == null || matchKeys.length == 0) {
+            return true;
+        }
+        for (String matchKey : matchKeys) {
+            if (boundedContext.containsKey(matchKey)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Example newExampleByContext(BoundedContext boundedContext, Object rootEntity) {
+        Example example = new Example();
+        for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
+            String alias = propertyBinder.getBindingDefinition().getAlias();
+            Object boundValue = propertyBinder.getBoundValue(boundedContext, rootEntity);
+            if (boundValue instanceof Collection) {
+                boundValue = !((Collection<?>) boundValue).isEmpty() ? boundValue : null;
+            }
+            if (boundValue != null) {
+                boundValue = propertyBinder.input(boundedContext, boundValue);
+                example.eq(alias, boundValue);
+            } else {
+                example.getCriteria().clear();
+                break;
+            }
+        }
+        if (example.isDirtyQuery()) {
+            for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
+                String alias = contextBinder.getBindingDefinition().getAlias();
+                Object boundValue = contextBinder.getBoundValue(boundedContext, rootEntity);
+                if (boundValue != null) {
+                    example.eq(alias, boundValue);
+                }
+            }
+        }
+        return example;
     }
 
 }

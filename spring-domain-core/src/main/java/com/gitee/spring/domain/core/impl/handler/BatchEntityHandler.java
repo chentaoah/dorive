@@ -28,13 +28,10 @@ import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.executor.Example;
 import com.gitee.spring.domain.core.entity.executor.Result;
 import com.gitee.spring.domain.core.entity.executor.UnionExample;
-import com.gitee.spring.domain.core.impl.binder.ContextBinder;
-import com.gitee.spring.domain.core.impl.binder.PropertyBinder;
 import com.gitee.spring.domain.core.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Collection;
 import java.util.List;
 
 public class BatchEntityHandler implements EntityHandler {
@@ -59,7 +56,7 @@ public class BatchEntityHandler implements EntityHandler {
                 for (Object rootEntity : rootEntities) {
                     Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
                     if (lastEntity != null) {
-                        Example example = newExampleByContext(subRepository, boundedContext, rootEntity);
+                        Example example = subRepository.newExampleByContext(boundedContext, rootEntity);
                         if (exampleBuilder != null) {
                             example = exampleBuilder.buildExample(boundedContext, rootEntity, example);
                         }
@@ -93,34 +90,6 @@ public class BatchEntityHandler implements EntityHandler {
                 }
             }
         }
-    }
-
-    private Example newExampleByContext(ConfiguredRepository repository, BoundedContext boundedContext, Object rootEntity) {
-        Example example = new Example();
-        for (PropertyBinder propertyBinder : repository.getBinderResolver().getPropertyBinders()) {
-            String alias = propertyBinder.getBindingDefinition().getAlias();
-            Object boundValue = propertyBinder.getBoundValue(boundedContext, rootEntity);
-            if (boundValue instanceof Collection) {
-                boundValue = !((Collection<?>) boundValue).isEmpty() ? boundValue : null;
-            }
-            if (boundValue != null) {
-                boundValue = propertyBinder.input(boundedContext, boundValue);
-                example.eq(alias, boundValue);
-            } else {
-                example.getCriteria().clear();
-                break;
-            }
-        }
-        if (example.isDirtyQuery()) {
-            for (ContextBinder contextBinder : repository.getBinderResolver().getContextBinders()) {
-                String alias = contextBinder.getBindingDefinition().getAlias();
-                Object boundValue = contextBinder.getBoundValue(boundedContext, rootEntity);
-                if (boundValue != null) {
-                    example.eq(alias, boundValue);
-                }
-            }
-        }
-        return example;
     }
 
     private Object convertManyToOneEntity(ConfiguredRepository repository, List<?> entities) {
