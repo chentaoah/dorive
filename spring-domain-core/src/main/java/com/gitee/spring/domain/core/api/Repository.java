@@ -96,8 +96,8 @@ public interface Repository<E, PK> {
     int updateByExample(BoundedContext boundedContext, Object entity, Example example);
 
     /**
-     * 根据实体的主键，插入或者修改一个实体
-     * 主键为空则插入，主键不为空则修改
+     * 根据实体的主键，插入或者修改一个实体。
+     * 主键为空则插入，主键不为空则修改。
      *
      * @param boundedContext 边界上下文
      * @param entity         实体
