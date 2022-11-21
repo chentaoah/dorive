@@ -72,15 +72,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         this.rootRepository = rootRepository;
         orderedRepositories.add(rootRepository);
 
-        setEntityElement(rootRepository.getEntityElement());
-        setEntityDefinition(rootRepository.getEntityDefinition());
-
-        EntityHandler entityHandler = new BatchEntityHandler(this);
-        if (delegateResolver.isDelegated()) {
-            entityHandler = new AdaptiveEntityHandler(this, entityHandler);
-        }
-        setExecutor(new ChainExecutor(this, entityHandler));
-
         Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
         allPropertyChainMap.forEach((accessPath, propertyChain) -> {
             if (propertyChain.isAnnotatedEntity()) {
@@ -92,6 +83,15 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         });
 
         orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityDefinition().getOrder()));
+
+        setEntityElement(rootRepository.getEntityElement());
+        setEntityDefinition(rootRepository.getEntityDefinition());
+
+        EntityHandler entityHandler = new BatchEntityHandler(this);
+        if (delegateResolver.isDelegated()) {
+            entityHandler = new AdaptiveEntityHandler(this, entityHandler);
+        }
+        setExecutor(new ChainExecutor(this, entityHandler));
     }
 
     @SuppressWarnings("unchecked")
