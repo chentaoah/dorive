@@ -34,6 +34,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     @Override
     public int updateByExample(BoundedContext boundedContext, Object entity, Example example) {
         Assert.notNull(entity, "The entity cannot be null!");
+        Assert.notNull(example, "The example cannot be null!");
         int totalCount = 0;
         for (ConfiguredRepository repository : getOrderedRepositories()) {
             if (repository.matchKeys(boundedContext)) {
@@ -45,12 +46,14 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
 
     @Override
     public int deleteByPrimaryKey(BoundedContext boundedContext, PK primaryKey) {
+        Assert.notNull(primaryKey, "The primaryKey cannot be null!");
         E entity = selectByPrimaryKey(boundedContext, primaryKey);
         return delete(boundedContext, entity);
     }
 
     @Override
     public int deleteByExample(BoundedContext boundedContext, Example example) {
+        Assert.notNull(example, "The example cannot be null!");
         int totalCount = 0;
         for (ConfiguredRepository repository : getOrderedRepositories()) {
             if (repository.matchKeys(boundedContext)) {
