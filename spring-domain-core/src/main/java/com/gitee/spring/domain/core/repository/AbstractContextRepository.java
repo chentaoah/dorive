@@ -46,7 +46,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected Class<?> entityClass;
 
     protected DelegateResolver delegateResolver = new DelegateResolver(this);
-    protected PropertyResolver propertyResolver = new PropertyResolver();
+    protected PropertyResolver propertyResolver = new PropertyResolver(false);
 
     protected Map<String, ConfiguredRepository> allRepositoryMap = new LinkedHashMap<>();
     protected ConfiguredRepository rootRepository;
@@ -62,7 +62,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     public void afterPropertiesSet() throws Exception {
         entityClass = ReflectUtils.getFirstArgumentType(this.getClass());
         delegateResolver.resolveDelegateRepositoryMap();
-        propertyResolver.resolveAllPropertyChainMap(entityClass);
+
+        List<Class<?>> allClasses = ReflectUtils.getAllSuperclasses(entityClass, Object.class);
+        allClasses.add(entityClass);
+        allClasses.forEach(clazz -> propertyResolver.resolveProperties(clazz));
 
         ConfiguredRepository rootRepository = newRepository("/", entityClass);
         allRepositoryMap.put("/", rootRepository);
@@ -117,15 +120,15 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
         PropertyChain anchorPoint = allPropertyChainMap.get(accessPath);
 
+        PropertyResolver propertyResolver = new PropertyResolver(true);
         String lastAccessPath = aggregateRoot || entityElement.isCollection() ? "" : accessPath;
-        String fieldPrefix = lastAccessPath + "/";
-        PropertyResolver propertyResolver = new PropertyResolver();
-        propertyResolver.resolveProperties(lastAccessPath, entityElement.getGenericEntityClass(), true);
-        Map<String, PropertyChain> propertyChainMap = propertyResolver.getAllPropertyChainMap();
+        propertyResolver.resolveProperties(lastAccessPath, entityElement.getGenericEntityClass());
+
+        OrderBy defaultOrderBy = entityDefinition.getDefaultOrderBy();
 
         BinderResolver binderResolver = new BinderResolver(this);
-        binderResolver.resolveAllBinders(accessPath, entityElement, entityDefinition, fieldPrefix, propertyChainMap);
-        OrderBy defaultOrderBy = entityDefinition.getDefaultOrderBy();
+        String fieldPrefix = lastAccessPath + "/";
+        binderResolver.resolveAllBinders(accessPath, entityElement, entityDefinition, fieldPrefix, propertyResolver);
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository();
         configuredRepository.setEntityElement(entityElement);
@@ -135,10 +138,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         configuredRepository.setAggregateRoot(aggregateRoot);
         configuredRepository.setAggregated(aggregated);
         configuredRepository.setAnchorPoint(anchorPoint);
-        configuredRepository.setFieldPrefix(fieldPrefix);
-        configuredRepository.setPropertyChainMap(propertyChainMap);
-        configuredRepository.setBinderResolver(binderResolver);
+        configuredRepository.setPropertyResolver(propertyResolver);
         configuredRepository.setDefaultOrderBy(defaultOrderBy);
+        configuredRepository.setFieldPrefix(fieldPrefix);
+        configuredRepository.setBinderResolver(binderResolver);
         configuredRepository.setBoundEntity(false);
         return configuredRepository;
     }

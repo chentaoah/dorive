@@ -19,31 +19,28 @@ package com.gitee.spring.domain.core.impl.resolver;
 import com.gitee.spring.domain.core.annotation.Entity;
 import com.gitee.spring.domain.core.entity.Property;
 import com.gitee.spring.domain.core.entity.PropertyChain;
-import com.gitee.spring.domain.core.util.ReflectUtils;
 import lombok.Data;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 @Data
 public class PropertyResolver {
 
     private Map<String, PropertyChain> allPropertyChainMap = new LinkedHashMap<>();
+    private boolean ignoreAnnotated;
 
-    public void resolveAllPropertyChainMap(Class<?> entityClass) {
-        List<Class<?>> allClasses = ReflectUtils.getAllSuperclasses(entityClass, Object.class);
-        allClasses.add(entityClass);
-        allClasses.forEach(clazz -> resolveProperties("", clazz));
+    public PropertyResolver(boolean ignoreAnnotated) {
+        this.ignoreAnnotated = ignoreAnnotated;
+    }
+
+    public void resolveProperties(Class<?> entityClass) {
+        resolveProperties("", entityClass);
     }
 
     public void resolveProperties(String lastAccessPath, Class<?> entityClass) {
-        resolveProperties(lastAccessPath, entityClass, false);
-    }
-
-    public void resolveProperties(String lastAccessPath, Class<?> entityClass, boolean ignoreAnnotated) {
         PropertyChain lastPropertyChain = allPropertyChainMap.get(lastAccessPath);
         ReflectionUtils.doWithLocalFields(entityClass, declaredField -> {
             String accessPath = lastAccessPath + "/" + declaredField.getName();
@@ -70,7 +67,7 @@ public class PropertyResolver {
 
             Class<?> fieldClass = property.getFieldClass();
             if (!filterEntityClass(fieldClass)) {
-                resolveProperties(accessPath, fieldClass, ignoreAnnotated);
+                resolveProperties(accessPath, fieldClass);
             }
         });
     }

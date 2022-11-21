@@ -24,12 +24,12 @@ import com.gitee.spring.domain.core.entity.executor.OrderBy;
 import com.gitee.spring.domain.core.entity.executor.Page;
 import com.gitee.spring.domain.core.entity.executor.Result;
 import com.gitee.spring.domain.core.impl.resolver.BinderResolver;
+import com.gitee.spring.domain.core.impl.resolver.PropertyResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -39,10 +39,10 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
     protected boolean aggregateRoot;
     protected boolean aggregated;
     protected PropertyChain anchorPoint;
-    protected String fieldPrefix;
-    protected Map<String, PropertyChain> propertyChainMap;
-    protected BinderResolver binderResolver;
+    protected PropertyResolver propertyResolver;
     protected OrderBy defaultOrderBy;
+    protected String fieldPrefix;
+    protected BinderResolver binderResolver;
     protected boolean boundEntity;
 
     public boolean matchKeys(BoundedContext boundedContext) {

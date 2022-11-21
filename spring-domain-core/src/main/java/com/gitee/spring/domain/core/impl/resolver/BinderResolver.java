@@ -47,7 +47,6 @@ public class BinderResolver {
     private List<PropertyBinder> propertyBinders;
     private String[] boundColumns;
     private List<ContextBinder> contextBinders;
-
     private List<Binder> boundValueBinders;
     private PropertyBinder boundIdBinder;
 
@@ -56,8 +55,10 @@ public class BinderResolver {
     }
 
     public void resolveAllBinders(String accessPath, EntityElement entityElement, EntityDefinition entityDefinition,
-                                  String fieldPrefix, Map<String, PropertyChain> propertyChainMap) {
+                                  String fieldPrefix, PropertyResolver propertyResolver) {
+
         List<BindingDefinition> bindingDefinitions = BindingDefinition.newBindingDefinitions(entityElement);
+        Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
 
         allBinders = new ArrayList<>(bindingDefinitions.size());
         propertyBinders = new ArrayList<>(bindingDefinitions.size());
@@ -70,11 +71,11 @@ public class BinderResolver {
             renewBindingDefinition(accessPath, bindingDefinition);
 
             String field = bindingDefinition.getField();
-            PropertyChain fieldPropertyChain = propertyChainMap.get(fieldPrefix + field);
+            PropertyChain fieldPropertyChain = allPropertyChainMap.get(fieldPrefix + field);
             Assert.notNull(fieldPropertyChain, "The field property chain cannot be null! entity: {}, field: {}",
                     entityElement.getGenericEntityClass().getSimpleName(), field);
             fieldPropertyChain.initialize();
-            
+
             Processor processor = newProcessor(bindingDefinition);
 
             if (StringUtils.isNotBlank(bindingDefinition.getBindProp())) {
