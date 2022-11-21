@@ -17,7 +17,6 @@
 package com.gitee.spring.domain.core.impl.handler;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.core.api.EntityHandler;
 import com.gitee.spring.domain.core.api.EntityIndex;
 import com.gitee.spring.domain.core.api.ExampleBuilder;
@@ -43,49 +42,57 @@ public class BatchEntityHandler implements EntityHandler {
 
     @Override
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
-        for (ConfiguredRepository subRepository : repository.getSubRepositories()) {
-            if (subRepository.matchKeys(boundedContext)) {
-                PropertyChain anchorPoint = subRepository.getAnchorPoint();
-                PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
-
-                String builderKey = subRepository.getEntityDefinition().getBuilderKey();
-                ExampleBuilder exampleBuilder = StringUtils.isNotBlank(builderKey) ? (ExampleBuilder) boundedContext.get(builderKey) : null;
-
-                UnionExample unionExample = new UnionExample();
-                for (Object rootEntity : rootEntities) {
-                    Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
-                    if (lastEntity != null) {
-                        Example example = subRepository.newExampleByContext(boundedContext, rootEntity);
-                        if (exampleBuilder != null) {
-                            example = exampleBuilder.buildExample(boundedContext, rootEntity, example);
-                        }
-                        if (example.isDirtyQuery()) {
-                            Object primaryKey = BeanUtil.getFieldValue(rootEntity, "id");
-                            example.selectColumns(primaryKey + " as $id");
-                            unionExample.addExample(example);
-                        }
-                    }
-                }
-
+        for (ConfiguredRepository repository : this.repository.getSubRepositories()) {
+            if (repository.matchKeys(boundedContext)) {
+                UnionExample unionExample = newUnionExample(repository, boundedContext, rootEntities);
                 if (!unionExample.isDirtyQuery()) {
                     continue;
                 }
+                Result<Object> result = repository.selectResultByExample(boundedContext, unionExample);
+                if (!(result instanceof EntityIndex)) {
+                    continue;
+                }
+                setValueForRootEntities(repository, rootEntities, (EntityIndex) result);
+            }
+        }
+    }
 
-                Result<Object> result = subRepository.selectResultByExample(boundedContext, unionExample);
-                Assert.isTrue(result instanceof EntityIndex, "The result must be an instance of EntityIndex!");
-                assert result instanceof EntityIndex;
-                EntityIndex entityIndex = (EntityIndex) result;
+    private UnionExample newUnionExample(ConfiguredRepository repository, BoundedContext boundedContext, List<Object> rootEntities) {
+        PropertyChain anchorPoint = repository.getAnchorPoint();
+        PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
 
-                for (Object rootEntity : rootEntities) {
-                    Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
-                    if (lastEntity != null) {
-                        List<Object> entities = entityIndex.selectList(rootEntity);
-                        Object entity = subRepository.convertManyToOne(entities);
-                        if (entity != null) {
-                            PropertyProxy propertyProxy = anchorPoint.getPropertyProxy();
-                            propertyProxy.setValue(lastEntity, entity);
-                        }
-                    }
+        String builderKey = repository.getEntityDefinition().getBuilderKey();
+        ExampleBuilder exampleBuilder = StringUtils.isNotBlank(builderKey) ? (ExampleBuilder) boundedContext.get(builderKey) : null;
+
+        UnionExample unionExample = new UnionExample();
+        for (Object rootEntity : rootEntities) {
+            Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
+            if (lastEntity != null) {
+                Example example = repository.newExampleByContext(boundedContext, rootEntity);
+                if (exampleBuilder != null) {
+                    example = exampleBuilder.buildExample(boundedContext, rootEntity, example);
+                }
+                if (example.isDirtyQuery()) {
+                    Object primaryKey = BeanUtil.getFieldValue(rootEntity, "id");
+                    example.selectColumns(primaryKey + " as $id");
+                    unionExample.addExample(example);
+                }
+            }
+        }
+        return unionExample;
+    }
+
+    private void setValueForRootEntities(ConfiguredRepository repository, List<Object> rootEntities, EntityIndex entityIndex) {
+        PropertyChain anchorPoint = repository.getAnchorPoint();
+        PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
+        PropertyProxy propertyProxy = anchorPoint.getPropertyProxy();
+        for (Object rootEntity : rootEntities) {
+            Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
+            if (lastEntity != null) {
+                List<Object> entities = entityIndex.selectList(rootEntity);
+                Object entity = repository.convertManyToOne(entities);
+                if (entity != null) {
+                    propertyProxy.setValue(lastEntity, entity);
                 }
             }
         }
