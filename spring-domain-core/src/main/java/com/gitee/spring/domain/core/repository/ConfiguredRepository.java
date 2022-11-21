@@ -149,4 +149,13 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
         return example;
     }
 
+    public Object convertManyToOne(List<?> entities) {
+        if (entityElement.isCollection()) {
+            return entities;
+        } else if (!entities.isEmpty()) {
+            return entities.get(0);
+        }
+        return null;
+    }
+
 }

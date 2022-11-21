@@ -23,7 +23,6 @@ import com.gitee.spring.domain.core.api.EntityIndex;
 import com.gitee.spring.domain.core.api.ExampleBuilder;
 import com.gitee.spring.domain.core.api.PropertyProxy;
 import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.executor.Example;
 import com.gitee.spring.domain.core.entity.executor.Result;
@@ -81,7 +80,7 @@ public class BatchEntityHandler implements EntityHandler {
                     Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
                     if (lastEntity != null) {
                         List<Object> entities = entityIndex.selectList(rootEntity);
-                        Object entity = convertManyToOneEntity(subRepository, entities);
+                        Object entity = subRepository.convertManyToOne(entities);
                         if (entity != null) {
                             PropertyProxy propertyProxy = anchorPoint.getPropertyProxy();
                             propertyProxy.setValue(lastEntity, entity);
@@ -90,16 +89,6 @@ public class BatchEntityHandler implements EntityHandler {
                 }
             }
         }
-    }
-
-    private Object convertManyToOneEntity(ConfiguredRepository repository, List<?> entities) {
-        EntityElement entityElement = repository.getEntityElement();
-        if (entityElement.isCollection()) {
-            return entities;
-        } else if (!entities.isEmpty()) {
-            return entities.get(0);
-        }
-        return null;
     }
 
 }
