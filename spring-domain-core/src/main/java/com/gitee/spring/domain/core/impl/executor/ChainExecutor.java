@@ -95,31 +95,31 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         delegateRepository = delegateRepository == null ? repository : delegateRepository;
 
         int totalCount = 0;
-        for (ConfiguredRepository orderedRepository : delegateRepository.getOrderedRepositories()) {
-            PropertyChain anchorPoint = orderedRepository.getAnchorPoint();
+        for (ConfiguredRepository repository : delegateRepository.getOrderedRepositories()) {
+            PropertyChain anchorPoint = repository.getAnchorPoint();
             Object targetEntity = anchorPoint == null ? rootEntity : anchorPoint.getValue(rootEntity);
-            if (targetEntity != null && orderedRepository.matchKeys(boundedContext)) {
-                int contextOperationType = operationTypeResolver.resolveOperationType(boundedContext, orderedRepository);
+            if (targetEntity != null && repository.matchKeys(boundedContext)) {
+                int contextOperationType = operationTypeResolver.resolveOperationType(boundedContext, repository);
 
                 if (targetEntity instanceof Collection) {
                     for (Object eachEntity : (Collection<?>) targetEntity) {
                         int operationType = operationTypeResolver.mergeOperationType(expectedOperationType, contextOperationType, eachEntity);
                         if ((operationType & Operation.INSERT) == Operation.INSERT) {
-                            getBoundValueFromContext(boundedContext, rootEntity, orderedRepository, eachEntity);
+                            getBoundValueFromContext(boundedContext, rootEntity, repository, eachEntity);
                         }
-                        operationType = orderedRepository.isAggregated() ? expectedOperationType : operationType;
-                        totalCount += doExecute(boundedContext, orderedRepository, eachEntity, operationType);
+                        operationType = repository.isAggregated() ? expectedOperationType : operationType;
+                        totalCount += doExecute(boundedContext, repository, eachEntity, operationType);
                     }
                 } else {
                     int operationType = operationTypeResolver.mergeOperationType(expectedOperationType, contextOperationType, targetEntity);
                     if ((operationType & Operation.INSERT) == Operation.INSERT) {
-                        getBoundValueFromContext(boundedContext, rootEntity, orderedRepository, targetEntity);
+                        getBoundValueFromContext(boundedContext, rootEntity, repository, targetEntity);
                     }
-                    operationType = orderedRepository.isAggregated() ? expectedOperationType : operationType;
-                    totalCount += doExecute(boundedContext, orderedRepository, targetEntity, operationType);
+                    operationType = repository.isAggregated() ? expectedOperationType : operationType;
+                    totalCount += doExecute(boundedContext, repository, targetEntity, operationType);
 
                     if (isInsertContext) {
-                        setBoundIdForBoundEntity(boundedContext, rootEntity, orderedRepository, targetEntity);
+                        setBoundIdForBoundEntity(boundedContext, rootEntity, repository, targetEntity);
                     }
                 }
             }
