@@ -28,9 +28,9 @@ import java.util.Map;
 
 @Data
 public class PropertyResolver {
-
-    private Map<String, PropertyChain> allPropertyChainMap = new LinkedHashMap<>();
+    
     private boolean ignoreAnnotated;
+    private Map<String, PropertyChain> allPropertyChainMap = new LinkedHashMap<>();
 
     public PropertyResolver(boolean ignoreAnnotated) {
         this.ignoreAnnotated = ignoreAnnotated;
