@@ -39,7 +39,6 @@ import java.util.Map;
 public class RepositoryListener implements ApplicationListener<RepositoryEvent>, ApplicationContextAware, InitializingBean {
 
     private ApplicationContext applicationContext;
-
     private final Map<Class<?>, List<EntityListener>> classEventListenersMap = new LinkedHashMap<>();
 
     @Override
