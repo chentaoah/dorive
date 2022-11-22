@@ -21,7 +21,7 @@ import com.gitee.spring.domain.core.entity.executor.Example;
 import com.gitee.spring.domain.core.entity.operation.Condition;
 import com.gitee.spring.domain.core.entity.operation.Operation;
 import com.gitee.spring.domain.core.repository.ProxyRepository;
-import com.gitee.spring.domain.event.listener.RepositoryEvent;
+import com.gitee.spring.domain.event.entity.RepositoryEvent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
