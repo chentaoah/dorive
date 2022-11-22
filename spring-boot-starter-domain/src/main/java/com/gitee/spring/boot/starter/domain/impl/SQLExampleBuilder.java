@@ -28,7 +28,7 @@ import com.gitee.spring.boot.starter.domain.entity.SqlSegment;
 import com.gitee.spring.domain.coating.api.ExampleBuilder;
 import com.gitee.spring.domain.coating.entity.CoatingWrapper;
 import com.gitee.spring.domain.coating.entity.RepositoryWrapper;
-import com.gitee.spring.domain.coating.entity.definition.RepositoryDefinition;
+import com.gitee.spring.domain.coating.entity.MergedRepository;
 import com.gitee.spring.domain.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.spring.domain.coating.repository.AbstractCoatingRepository;
 import com.gitee.spring.domain.core.entity.BoundedContext;
@@ -68,10 +68,10 @@ public class SQLExampleBuilder implements ExampleBuilder {
         char letter = 'a';
 
         for (RepositoryWrapper repositoryWrapper : repositoryWrappers) {
-            RepositoryDefinition repositoryDefinition = repositoryWrapper.getRepositoryDefinition();
-            String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
-            ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
-            ConfiguredRepository configuredRepository = repositoryDefinition.getConfiguredRepository();
+            MergedRepository mergedRepository = repositoryWrapper.getMergedRepository();
+            String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
+            ConfiguredRepository definitionRepository = mergedRepository.getDefinitionRepository();
+            ConfiguredRepository configuredRepository = mergedRepository.getConfiguredRepository();
 
             TableInfo tableInfo = getTableInfo(configuredRepository);
             String tableName = tableInfo.getTableName();

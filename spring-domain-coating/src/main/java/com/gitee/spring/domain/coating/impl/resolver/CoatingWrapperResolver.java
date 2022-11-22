@@ -112,8 +112,8 @@ public class CoatingWrapperResolver {
                     }
                 });
 
-                RepoDefinitionResolver repoDefinitionResolver = repository.getRepoDefinitionResolver();
-                List<RepositoryWrapper> repositoryWrappers = repoDefinitionResolver.collectRepositoryWrappers(accessPathPropertyWrappersMap, fieldPropertyWrapperMap);
+                MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
+                List<RepositoryWrapper> repositoryWrappers = mergedRepositoryResolver.collectRepositoryWrappers(accessPathPropertyWrappersMap, fieldPropertyWrapperMap);
                 checkFieldNames(coatingClass, allPropertyWrapperMap.keySet(), repositoryWrappers);
 
                 List<RepositoryWrapper> reversedRepositoryWrappers = new ArrayList<>(repositoryWrappers);

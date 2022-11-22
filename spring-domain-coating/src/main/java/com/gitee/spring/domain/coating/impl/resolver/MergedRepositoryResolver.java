@@ -19,7 +19,7 @@ package com.gitee.spring.domain.coating.impl.resolver;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.coating.entity.PropertyWrapper;
 import com.gitee.spring.domain.coating.entity.RepositoryWrapper;
-import com.gitee.spring.domain.coating.entity.definition.RepositoryDefinition;
+import com.gitee.spring.domain.coating.entity.MergedRepository;
 import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core.repository.AbstractRepository;
@@ -32,29 +32,29 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class RepoDefinitionResolver {
+public class MergedRepositoryResolver {
 
     private AbstractContextRepository<?, ?> repository;
 
-    private Map<String, RepositoryDefinition> repositoryDefinitionMap = new LinkedHashMap<>();
+    private Map<String, MergedRepository> mergedRepositoryMap = new LinkedHashMap<>();
 
-    public RepoDefinitionResolver(AbstractContextRepository<?, ?> repository) {
+    public MergedRepositoryResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
     }
 
-    public void resolveRepositoryDefinitionMap() {
+    public void resolveMergedRepositoryMap() {
         ConfiguredRepository rootRepository = repository.getRootRepository();
-        RepositoryDefinition repositoryDefinition = new RepositoryDefinition(
+        MergedRepository mergedRepository = new MergedRepository(
                 "",
                 "/",
                 false,
                 rootRepository,
                 rootRepository);
-        repositoryDefinitionMap.put("/", repositoryDefinition);
-        resolveRepositoryDefinitionMap(new ArrayList<>(), repository);
+        mergedRepositoryMap.put("/", mergedRepository);
+        resolveMergedRepositoryMap(new ArrayList<>(), repository);
     }
 
-    private void resolveRepositoryDefinitionMap(List<String> multiAccessPath, AbstractContextRepository<?, ?> repository) {
+    private void resolveMergedRepositoryMap(List<String> multiAccessPath, AbstractContextRepository<?, ?> repository) {
         String prefixAccessPath = StrUtil.join("", multiAccessPath);
 
         for (ConfiguredRepository subRepository : repository.getSubRepositories()) {
@@ -66,26 +66,26 @@ public class RepoDefinitionResolver {
                 AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) abstractRepository;
                 ConfiguredRepository rootRepository = abstractContextRepository.getRootRepository();
 
-                RepositoryDefinition repositoryDefinition = new RepositoryDefinition(
+                MergedRepository mergedRepository = new MergedRepository(
                         prefixAccessPath,
                         absoluteAccessPath,
                         true,
                         subRepository,
                         rootRepository);
-                repositoryDefinitionMap.put(absoluteAccessPath, repositoryDefinition);
+                mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
 
                 List<String> newMultiAccessPath = new ArrayList<>(multiAccessPath);
                 newMultiAccessPath.add(accessPath);
-                resolveRepositoryDefinitionMap(newMultiAccessPath, abstractContextRepository);
+                resolveMergedRepositoryMap(newMultiAccessPath, abstractContextRepository);
 
             } else {
-                RepositoryDefinition repositoryDefinition = new RepositoryDefinition(
+                MergedRepository mergedRepository = new MergedRepository(
                         prefixAccessPath,
                         absoluteAccessPath,
                         false,
                         subRepository,
                         subRepository);
-                repositoryDefinitionMap.put(absoluteAccessPath, repositoryDefinition);
+                mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
             }
         }
     }
@@ -94,9 +94,9 @@ public class RepoDefinitionResolver {
                                                              Map<String, PropertyWrapper> fieldPropertyWrapperMap) {
         List<RepositoryWrapper> repositoryWrappers = new ArrayList<>();
 
-        for (RepositoryDefinition repositoryDefinition : repositoryDefinitionMap.values()) {
-            String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
-            ConfiguredRepository repository = repositoryDefinition.getConfiguredRepository();
+        for (MergedRepository mergedRepository : mergedRepositoryMap.values()) {
+            String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
+            ConfiguredRepository repository = mergedRepository.getConfiguredRepository();
             EntityElement entityElement = repository.getEntityElement();
 
             List<PropertyWrapper> propertyWrappers = new ArrayList<>();
@@ -114,7 +114,7 @@ public class RepoDefinitionResolver {
             }
 
             if (!propertyWrappers.isEmpty() || repository.isBoundEntity()) {
-                RepositoryWrapper repositoryWrapper = new RepositoryWrapper(repositoryDefinition, propertyWrappers);
+                RepositoryWrapper repositoryWrapper = new RepositoryWrapper(mergedRepository, propertyWrappers);
                 repositoryWrappers.add(repositoryWrapper);
             }
         }

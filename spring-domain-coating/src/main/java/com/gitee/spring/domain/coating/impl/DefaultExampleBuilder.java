@@ -20,7 +20,7 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.spring.domain.coating.api.ExampleBuilder;
 import com.gitee.spring.domain.coating.entity.CoatingWrapper;
 import com.gitee.spring.domain.coating.entity.RepositoryWrapper;
-import com.gitee.spring.domain.coating.entity.definition.RepositoryDefinition;
+import com.gitee.spring.domain.coating.entity.MergedRepository;
 import com.gitee.spring.domain.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.spring.domain.coating.repository.AbstractCoatingRepository;
 import com.gitee.spring.domain.core.entity.BoundedContext;
@@ -55,9 +55,9 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             Example example = repositoryWrapper.newExampleByCoating(boundedContext, coatingObject);
             RepoCriterion repoCriterion = new RepoCriterion(repositoryWrapper, example);
 
-            RepositoryDefinition repositoryDefinition = repositoryWrapper.getRepositoryDefinition();
-            String absoluteAccessPath = repositoryDefinition.getAbsoluteAccessPath();
-            absoluteAccessPath = repositoryDefinition.isDelegateRoot() ? absoluteAccessPath + "/" : absoluteAccessPath;
+            MergedRepository mergedRepository = repositoryWrapper.getMergedRepository();
+            String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
+            absoluteAccessPath = mergedRepository.isDelegateRoot() ? absoluteAccessPath + "/" : absoluteAccessPath;
             repoCriterionMap.put(absoluteAccessPath, repoCriterion);
         }
 
@@ -75,10 +75,10 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             RepositoryWrapper repositoryWrapper = repoCriterion.getRepositoryWrapper();
             Example example = repoCriterion.getExample();
 
-            RepositoryDefinition repositoryDefinition = repositoryWrapper.getRepositoryDefinition();
-            String prefixAccessPath = repositoryDefinition.getPrefixAccessPath();
-            ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
-            ConfiguredRepository configuredRepository = repositoryDefinition.getConfiguredRepository();
+            MergedRepository mergedRepository = repositoryWrapper.getMergedRepository();
+            String prefixAccessPath = mergedRepository.getPrefixAccessPath();
+            ConfiguredRepository definitionRepository = mergedRepository.getDefinitionRepository();
+            ConfiguredRepository configuredRepository = mergedRepository.getConfiguredRepository();
 
             BinderResolver binderResolver = definitionRepository.getBinderResolver();
 

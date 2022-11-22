@@ -21,7 +21,7 @@ import com.gitee.spring.domain.coating.api.CoatingRepository;
 import com.gitee.spring.domain.coating.api.ExampleBuilder;
 import com.gitee.spring.domain.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.spring.domain.coating.impl.DefaultExampleBuilder;
-import com.gitee.spring.domain.coating.impl.resolver.RepoDefinitionResolver;
+import com.gitee.spring.domain.coating.impl.resolver.MergedRepositoryResolver;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.executor.Example;
 import com.gitee.spring.domain.core.entity.executor.Page;
@@ -36,7 +36,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> implements ExampleBuilder, CoatingRepository<E, PK> {
 
-    protected RepoDefinitionResolver repoDefinitionResolver = new RepoDefinitionResolver(this);
+    protected MergedRepositoryResolver mergedRepositoryResolver = new MergedRepositoryResolver(this);
     protected CoatingWrapperResolver coatingWrapperResolver = new CoatingWrapperResolver(this);
     protected ExampleBuilder exampleBuilder = new DefaultExampleBuilder(this);
 
@@ -45,7 +45,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
         super.afterPropertiesSet();
         CoatingScan coatingScan = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), CoatingScan.class);
         if (coatingScan != null) {
-            repoDefinitionResolver.resolveRepositoryDefinitionMap();
+            mergedRepositoryResolver.resolveMergedRepositoryMap();
             coatingWrapperResolver.resolveCoatingWrapperMap(coatingScan.value());
         }
     }

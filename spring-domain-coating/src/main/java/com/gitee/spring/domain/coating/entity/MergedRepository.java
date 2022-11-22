@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.domain.coating.entity.definition;
+package com.gitee.spring.domain.coating.entity;
 
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class RepositoryDefinition {
+public class MergedRepository {
     private String prefixAccessPath;
     private String absoluteAccessPath;
     private boolean delegateRoot;

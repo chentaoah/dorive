@@ -17,7 +17,6 @@
 package com.gitee.spring.domain.coating.entity;
 
 import com.gitee.spring.domain.coating.entity.definition.PropertyDefinition;
-import com.gitee.spring.domain.coating.entity.definition.RepositoryDefinition;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.Property;
 import com.gitee.spring.domain.core.entity.definition.BindingDefinition;
@@ -35,7 +34,7 @@ import java.util.List;
 @AllArgsConstructor
 public class RepositoryWrapper {
 
-    private RepositoryDefinition repositoryDefinition;
+    private MergedRepository mergedRepository;
     private List<PropertyWrapper> collectedPropertyWrappers;
 
     public Example newExampleByCoating(BoundedContext boundedContext, Object coatingObject) {
@@ -50,7 +49,7 @@ public class RepositoryWrapper {
                 example.addCriterion(new Criterion(alias, operator, fieldValue));
             }
         }
-        ConfiguredRepository definitionRepository = repositoryDefinition.getDefinitionRepository();
+        ConfiguredRepository definitionRepository = mergedRepository.getDefinitionRepository();
         BinderResolver binderResolver = definitionRepository.getBinderResolver();
         for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
             Object boundValue = contextBinder.getBoundValue(boundedContext, null);
