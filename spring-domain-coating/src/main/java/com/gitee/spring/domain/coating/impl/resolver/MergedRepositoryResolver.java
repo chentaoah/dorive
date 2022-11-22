@@ -54,23 +54,23 @@ public class MergedRepositoryResolver {
         resolveMergedRepositoryMap(new ArrayList<>(), repository);
     }
 
-    private void resolveMergedRepositoryMap(List<String> multiAccessPath, AbstractContextRepository<?, ?> repository) {
-        String prefixAccessPath = StrUtil.join("", multiAccessPath);
+    private void resolveMergedRepositoryMap(List<String> multiAccessPath, AbstractContextRepository<?, ?> lastRepository) {
+        String lastAccessPath = StrUtil.join("", multiAccessPath);
 
-        for (ConfiguredRepository subRepository : repository.getSubRepositories()) {
-            String accessPath = subRepository.getAccessPath();
-            String absoluteAccessPath = prefixAccessPath + accessPath;
+        for (ConfiguredRepository repository : lastRepository.getSubRepositories()) {
+            String accessPath = repository.getAccessPath();
+            String absoluteAccessPath = lastAccessPath + accessPath;
+            AbstractRepository<Object, Object> abstractRepository = repository.getProxyRepository();
 
-            AbstractRepository<Object, Object> abstractRepository = subRepository.getProxyRepository();
             if (abstractRepository instanceof AbstractContextRepository) {
                 AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) abstractRepository;
                 ConfiguredRepository rootRepository = abstractContextRepository.getRootRepository();
 
                 MergedRepository mergedRepository = new MergedRepository(
-                        prefixAccessPath,
+                        lastAccessPath,
                         absoluteAccessPath,
                         true,
-                        subRepository,
+                        repository,
                         rootRepository);
                 mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
 
@@ -80,11 +80,11 @@ public class MergedRepositoryResolver {
 
             } else {
                 MergedRepository mergedRepository = new MergedRepository(
-                        prefixAccessPath,
+                        lastAccessPath,
                         absoluteAccessPath,
                         false,
-                        subRepository,
-                        subRepository);
+                        repository,
+                        repository);
                 mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
             }
         }

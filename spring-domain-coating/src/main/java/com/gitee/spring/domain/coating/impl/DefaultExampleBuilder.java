@@ -57,7 +57,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
             MergedRepository mergedRepository = repositoryWrapper.getMergedRepository();
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-            absoluteAccessPath = mergedRepository.isDelegateRoot() ? absoluteAccessPath + "/" : absoluteAccessPath;
+            absoluteAccessPath = mergedRepository.isMerged() ? absoluteAccessPath + "/" : absoluteAccessPath;
             repoCriterionMap.put(absoluteAccessPath, repoCriterion);
         }
 
@@ -76,14 +76,14 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             Example example = repoCriterion.getExample();
 
             MergedRepository mergedRepository = repositoryWrapper.getMergedRepository();
-            String prefixAccessPath = mergedRepository.getPrefixAccessPath();
-            ConfiguredRepository definitionRepository = mergedRepository.getDefinitionRepository();
+            String lastAccessPath = mergedRepository.getLastAccessPath();
+            ConfiguredRepository definedRepository = mergedRepository.getDefinedRepository();
             ConfiguredRepository configuredRepository = mergedRepository.getConfiguredRepository();
 
-            BinderResolver binderResolver = definitionRepository.getBinderResolver();
+            BinderResolver binderResolver = definedRepository.getBinderResolver();
 
             for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
-                String absoluteAccessPath = prefixAccessPath + propertyBinder.getBelongAccessPath();
+                String absoluteAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
                 RepoCriterion targetRepoCriterion = repoCriterionMap.get(absoluteAccessPath);
                 if (targetRepoCriterion != null) {
                     Example targetExample = targetRepoCriterion.getExample();
@@ -105,7 +105,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             }
 
             for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
-                String absoluteAccessPath = prefixAccessPath + propertyBinder.getBelongAccessPath();
+                String absoluteAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
                 RepoCriterion targetRepoCriterion = repoCriterionMap.get(absoluteAccessPath);
                 if (targetRepoCriterion != null) {
                     Example targetExample = targetRepoCriterion.getExample();

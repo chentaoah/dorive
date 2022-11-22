@@ -20,6 +20,7 @@ import com.gitee.spring.domain.coating.annotation.Coating;
 import com.gitee.spring.domain.coating.entity.CoatingWrapper;
 import com.gitee.spring.domain.coating.entity.PropertyWrapper;
 import com.gitee.spring.domain.coating.entity.RepositoryWrapper;
+import com.gitee.spring.domain.coating.entity.SpecificProperties;
 import com.gitee.spring.domain.coating.entity.definition.CoatingDefinition;
 import com.gitee.spring.domain.coating.entity.definition.PropertyDefinition;
 import com.gitee.spring.domain.coating.repository.AbstractCoatingRepository;
@@ -66,68 +67,43 @@ public class CoatingWrapperResolver {
                 Map<String, PropertyWrapper> allPropertyWrapperMap = new LinkedHashMap<>();
                 Map<String, List<PropertyWrapper>> accessPathPropertyWrappersMap = new LinkedHashMap<>();
                 Map<String, PropertyWrapper> fieldPropertyWrapperMap = new LinkedHashMap<>();
-                PropertyWrapper[] specificPropertyWrappers = new PropertyWrapper[4];
+                SpecificProperties specificProperties = new SpecificProperties();
 
                 ReflectionUtils.doWithLocalFields(coatingClass, declaredField -> {
                     Property property = new Property(declaredField);
                     String fieldName = property.getFieldName();
 
                     PropertyDefinition propertyDefinition = PropertyDefinition.newPropertyDefinition(declaredField);
+                    PropertyDefinition.renewPropertyDefinition(fieldName, propertyDefinition);
                     if (propertyDefinition.isIgnore()) {
                         return;
                     }
-                    if (StringUtils.isBlank(propertyDefinition.getAlias())) {
-                        propertyDefinition.setAlias(fieldName);
-                    }
-                    if (StringUtils.isBlank(propertyDefinition.getOperator())) {
-                        propertyDefinition.setOperator("=");
-                    }
 
                     PropertyWrapper propertyWrapper = new PropertyWrapper(property, propertyDefinition);
-                    if ("orderByAsc".equals(fieldName)) {
-                        specificPropertyWrappers[0] = propertyWrapper;
-                        return;
-
-                    } else if ("orderByDesc".equals(fieldName)) {
-                        specificPropertyWrappers[1] = propertyWrapper;
-                        return;
-
-                    } else if ("pageNum".equals(fieldName)) {
-                        specificPropertyWrappers[2] = propertyWrapper;
-                        return;
-
-                    } else if ("pageSize".equals(fieldName)) {
-                        specificPropertyWrappers[3] = propertyWrapper;
+                    if (specificProperties.addProperty(fieldName, propertyWrapper)) {
                         return;
                     }
-
                     allPropertyWrapperMap.put(fieldName, propertyWrapper);
 
                     String accessPath = propertyDefinition.getAccessPath();
                     if (StringUtils.isNotBlank(accessPath) && accessPath.startsWith("/")) {
-                        List<PropertyWrapper> propertyWrappers = accessPathPropertyWrappersMap.computeIfAbsent(accessPath, key -> new ArrayList<>());
-                        propertyWrappers.add(propertyWrapper);
+                        List<PropertyWrapper> existPropertyWrappers = accessPathPropertyWrappersMap.computeIfAbsent(accessPath, key -> new ArrayList<>());
+                        existPropertyWrappers.add(propertyWrapper);
                     } else {
                         fieldPropertyWrapperMap.put(fieldName, propertyWrapper);
                     }
                 });
 
                 MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
-                List<RepositoryWrapper> repositoryWrappers = mergedRepositoryResolver.collectRepositoryWrappers(accessPathPropertyWrappersMap, fieldPropertyWrapperMap);
+                List<RepositoryWrapper> repositoryWrappers = mergedRepositoryResolver.collectRepositoryWrappers(
+                        accessPathPropertyWrappersMap, fieldPropertyWrapperMap);
                 checkFieldNames(coatingClass, allPropertyWrapperMap.keySet(), repositoryWrappers);
 
                 List<RepositoryWrapper> reversedRepositoryWrappers = new ArrayList<>(repositoryWrappers);
                 Collections.reverse(reversedRepositoryWrappers);
 
                 CoatingDefinition coatingDefinition = CoatingDefinition.newCoatingDefinition(coatingClass);
-                CoatingWrapper coatingWrapper = new CoatingWrapper(
-                        coatingDefinition,
-                        repositoryWrappers,
-                        reversedRepositoryWrappers,
-                        specificPropertyWrappers[0],
-                        specificPropertyWrappers[1],
-                        specificPropertyWrappers[2],
-                        specificPropertyWrappers[3]);
+                CoatingWrapper coatingWrapper = new CoatingWrapper(coatingDefinition, repositoryWrappers, reversedRepositoryWrappers, specificProperties);
                 coatingWrapperMap.put(coatingClass, coatingWrapper);
             }
         }

@@ -49,8 +49,8 @@ public class RepositoryWrapper {
                 example.addCriterion(new Criterion(alias, operator, fieldValue));
             }
         }
-        ConfiguredRepository definitionRepository = mergedRepository.getDefinitionRepository();
-        BinderResolver binderResolver = definitionRepository.getBinderResolver();
+        ConfiguredRepository definedRepository = mergedRepository.getDefinedRepository();
+        BinderResolver binderResolver = definedRepository.getBinderResolver();
         for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
             Object boundValue = contextBinder.getBoundValue(boundedContext, null);
             if (boundValue != null) {

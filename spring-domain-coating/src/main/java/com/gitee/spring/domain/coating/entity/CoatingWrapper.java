@@ -16,12 +16,7 @@
  */
 package com.gitee.spring.domain.coating.entity;
 
-import cn.hutool.core.convert.Convert;
 import com.gitee.spring.domain.coating.entity.definition.CoatingDefinition;
-import com.gitee.spring.domain.core.api.constant.Order;
-import com.gitee.spring.domain.core.entity.executor.OrderBy;
-import com.gitee.spring.domain.core.entity.executor.Page;
-import com.gitee.spring.domain.core.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -30,46 +25,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class CoatingWrapper {
-
     private CoatingDefinition coatingDefinition;
     private List<RepositoryWrapper> repositoryWrappers;
     private List<RepositoryWrapper> reversedRepositoryWrappers;
-    private PropertyWrapper orderByAscProperty;
-    private PropertyWrapper orderByDescProperty;
-    private PropertyWrapper pageNumProperty;
-    private PropertyWrapper pageSizeProperty;
-
-    public OrderBy getOrderByInfo(Object coatingObject) {
-        if (orderByAscProperty != null) {
-            Object orderByAsc = orderByAscProperty.getProperty().getFieldValue(coatingObject);
-            if (orderByAsc != null) {
-                String[] columns = StringUtils.toStringArray(orderByAsc);
-                if (columns != null && columns.length > 0) {
-                    return new OrderBy(columns, Order.ASC);
-                }
-            }
-        }
-        if (orderByDescProperty != null) {
-            Object orderByDesc = orderByDescProperty.getProperty().getFieldValue(coatingObject);
-            if (orderByDesc != null) {
-                String[] columns = StringUtils.toStringArray(orderByDesc);
-                if (columns != null && columns.length > 0) {
-                    return new OrderBy(columns, Order.DESC);
-                }
-            }
-        }
-        return null;
-    }
-
-    public Page<Object> getPageInfo(Object coatingObject) {
-        if (pageNumProperty != null && pageSizeProperty != null) {
-            Object pageNum = pageNumProperty.getProperty().getFieldValue(coatingObject);
-            Object pageSize = pageSizeProperty.getProperty().getFieldValue(coatingObject);
-            if (pageNum != null && pageSize != null) {
-                return new Page<>(Convert.convert(Long.class, pageNum), Convert.convert(Long.class, pageSize));
-            }
-        }
-        return null;
-    }
-
+    private SpecificProperties specificProperties;
 }

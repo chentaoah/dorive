@@ -23,9 +23,9 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class MergedRepository {
-    private String prefixAccessPath;
+    private String lastAccessPath;
     private String absoluteAccessPath;
-    private boolean delegateRoot;
-    private ConfiguredRepository definitionRepository;
+    private boolean merged;
+    private ConfiguredRepository definedRepository;
     private ConfiguredRepository configuredRepository;
 }

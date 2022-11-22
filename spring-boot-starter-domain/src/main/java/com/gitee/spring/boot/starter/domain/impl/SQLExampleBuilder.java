@@ -29,6 +29,7 @@ import com.gitee.spring.domain.coating.api.ExampleBuilder;
 import com.gitee.spring.domain.coating.entity.CoatingWrapper;
 import com.gitee.spring.domain.coating.entity.RepositoryWrapper;
 import com.gitee.spring.domain.coating.entity.MergedRepository;
+import com.gitee.spring.domain.coating.entity.SpecificProperties;
 import com.gitee.spring.domain.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.spring.domain.coating.repository.AbstractCoatingRepository;
 import com.gitee.spring.domain.core.entity.BoundedContext;
@@ -60,8 +61,9 @@ public class SQLExampleBuilder implements ExampleBuilder {
         Assert.notNull(coatingWrapper, "No coating wrapper exists!");
 
         List<RepositoryWrapper> repositoryWrappers = coatingWrapper.getRepositoryWrappers();
-        OrderBy orderByInfo = coatingWrapper.getOrderByInfo(coatingObject);
-        Page<Object> pageInfo = coatingWrapper.getPageInfo(coatingObject);
+        SpecificProperties specificProperties = coatingWrapper.getSpecificProperties();
+        OrderBy orderByInfo = specificProperties.getOrderBy(coatingObject);
+        Page<Object> pageInfo = specificProperties.getPage(coatingObject);
 
         Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>(repositoryWrappers.size() * 4 / 3 + 1);
         SqlSegment rootSqlSegment = null;
@@ -70,7 +72,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         for (RepositoryWrapper repositoryWrapper : repositoryWrappers) {
             MergedRepository mergedRepository = repositoryWrapper.getMergedRepository();
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-            ConfiguredRepository definitionRepository = mergedRepository.getDefinitionRepository();
+            ConfiguredRepository definedRepository = mergedRepository.getDefinedRepository();
             ConfiguredRepository configuredRepository = mergedRepository.getConfiguredRepository();
 
             TableInfo tableInfo = getTableInfo(configuredRepository);
@@ -79,7 +81,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
-            List<JoinSegment> joinSegments = newJoinSegments(sqlSegmentMap, definitionRepository.getBinderResolver(), tableName, tableAlias);
+            List<JoinSegment> joinSegments = newJoinSegments(sqlSegmentMap, definedRepository.getBinderResolver(), tableName, tableAlias);
 
             Example example = repositoryWrapper.newExampleByCoating(boundedContext, coatingObject);
             String sqlCriteria = null;
