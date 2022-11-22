@@ -17,10 +17,7 @@
 package com.gitee.spring.domain.coating.impl.resolver;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.spring.domain.coating.entity.PropertyWrapper;
-import com.gitee.spring.domain.coating.entity.RepositoryWrapper;
 import com.gitee.spring.domain.coating.entity.MergedRepository;
-import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core.repository.AbstractRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
@@ -88,38 +85,6 @@ public class MergedRepositoryResolver {
                 mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
             }
         }
-    }
-
-    public List<RepositoryWrapper> collectRepositoryWrappers(Map<String, List<PropertyWrapper>> accessPathPropertyWrappersMap,
-                                                             Map<String, PropertyWrapper> fieldPropertyWrapperMap) {
-        List<RepositoryWrapper> repositoryWrappers = new ArrayList<>();
-
-        for (MergedRepository mergedRepository : mergedRepositoryMap.values()) {
-            String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-            ConfiguredRepository repository = mergedRepository.getConfiguredRepository();
-            EntityElement entityElement = repository.getEntityElement();
-
-            List<PropertyWrapper> propertyWrappers = new ArrayList<>();
-
-            List<PropertyWrapper> accessPathPropertyWrappers = accessPathPropertyWrappersMap.get(absoluteAccessPath);
-            if (accessPathPropertyWrappers != null) {
-                propertyWrappers.addAll(accessPathPropertyWrappers);
-            }
-
-            for (String fieldName : entityElement.getProperties()) {
-                PropertyWrapper propertyWrapper = fieldPropertyWrapperMap.get(fieldName);
-                if (propertyWrapper != null) {
-                    propertyWrappers.add(propertyWrapper);
-                }
-            }
-
-            if (!propertyWrappers.isEmpty() || repository.isBoundEntity()) {
-                RepositoryWrapper repositoryWrapper = new RepositoryWrapper(mergedRepository, propertyWrappers);
-                repositoryWrappers.add(repositoryWrapper);
-            }
-        }
-
-        return repositoryWrappers;
     }
 
 }

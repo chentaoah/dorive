@@ -17,15 +17,14 @@
 package com.gitee.spring.domain.coating.impl.resolver;
 
 import com.gitee.spring.domain.coating.annotation.Coating;
-import com.gitee.spring.domain.coating.entity.CoatingWrapper;
-import com.gitee.spring.domain.coating.entity.PropertyWrapper;
-import com.gitee.spring.domain.coating.entity.RepositoryWrapper;
-import com.gitee.spring.domain.coating.entity.SpecificProperties;
+import com.gitee.spring.domain.coating.entity.*;
 import com.gitee.spring.domain.coating.entity.definition.CoatingDefinition;
 import com.gitee.spring.domain.coating.entity.definition.PropertyDefinition;
 import com.gitee.spring.domain.coating.repository.AbstractCoatingRepository;
 import com.gitee.spring.domain.coating.util.ResourceUtils;
+import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.Property;
+import com.gitee.spring.domain.core.repository.ConfiguredRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -94,9 +93,7 @@ public class CoatingWrapperResolver {
                     }
                 });
 
-                MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
-                List<RepositoryWrapper> repositoryWrappers = mergedRepositoryResolver.collectRepositoryWrappers(
-                        accessPathPropertyWrappersMap, fieldPropertyWrapperMap);
+                List<RepositoryWrapper> repositoryWrappers = collectRepositoryWrappers(accessPathPropertyWrappersMap, fieldPropertyWrapperMap);
                 checkFieldNames(coatingClass, allPropertyWrapperMap.keySet(), repositoryWrappers);
 
                 List<RepositoryWrapper> reversedRepositoryWrappers = new ArrayList<>(repositoryWrappers);
@@ -107,6 +104,41 @@ public class CoatingWrapperResolver {
                 coatingWrapperMap.put(coatingClass, coatingWrapper);
             }
         }
+    }
+
+    public List<RepositoryWrapper> collectRepositoryWrappers(Map<String, List<PropertyWrapper>> accessPathPropertyWrappersMap,
+                                                             Map<String, PropertyWrapper> fieldPropertyWrapperMap) {
+        MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
+        Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
+
+        List<RepositoryWrapper> repositoryWrappers = new ArrayList<>();
+
+        for (MergedRepository mergedRepository : mergedRepositoryMap.values()) {
+            String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
+            ConfiguredRepository repository = mergedRepository.getConfiguredRepository();
+            EntityElement entityElement = repository.getEntityElement();
+
+            List<PropertyWrapper> propertyWrappers = new ArrayList<>();
+
+            List<PropertyWrapper> accessPathPropertyWrappers = accessPathPropertyWrappersMap.get(absoluteAccessPath);
+            if (accessPathPropertyWrappers != null) {
+                propertyWrappers.addAll(accessPathPropertyWrappers);
+            }
+
+            for (String fieldName : entityElement.getProperties()) {
+                PropertyWrapper propertyWrapper = fieldPropertyWrapperMap.get(fieldName);
+                if (propertyWrapper != null) {
+                    propertyWrappers.add(propertyWrapper);
+                }
+            }
+
+            if (!propertyWrappers.isEmpty() || repository.isBoundEntity()) {
+                RepositoryWrapper repositoryWrapper = new RepositoryWrapper(mergedRepository, propertyWrappers);
+                repositoryWrappers.add(repositoryWrapper);
+            }
+        }
+
+        return repositoryWrappers;
     }
 
     private void checkFieldNames(Class<?> coatingClass, Set<String> fieldNames, List<RepositoryWrapper> repositoryWrappers) {
