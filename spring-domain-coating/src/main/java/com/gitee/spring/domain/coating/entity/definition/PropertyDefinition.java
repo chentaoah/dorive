@@ -18,7 +18,9 @@ package com.gitee.spring.domain.coating.entity.definition;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.coating.annotation.Property;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
@@ -26,6 +28,8 @@ import java.lang.reflect.AnnotatedElement;
 import java.util.Map;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PropertyDefinition {
 
     private String accessPath;
@@ -35,6 +39,9 @@ public class PropertyDefinition {
 
     public static PropertyDefinition newPropertyDefinition(AnnotatedElement annotatedElement) {
         Map<String, Object> annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Property.class);
+        if (annotationAttributes == null) {
+            return new PropertyDefinition("", "", "=", false);
+        }
         return BeanUtil.copyProperties(annotationAttributes, PropertyDefinition.class);
     }
 
