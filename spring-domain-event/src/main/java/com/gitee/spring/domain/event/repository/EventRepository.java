@@ -18,8 +18,10 @@ package com.gitee.spring.domain.event.repository;
 
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.executor.Example;
-import com.gitee.spring.domain.core.entity.operation.Condition;
+import com.gitee.spring.domain.core.entity.operation.Delete;
+import com.gitee.spring.domain.core.entity.operation.Insert;
 import com.gitee.spring.domain.core.entity.operation.Operation;
+import com.gitee.spring.domain.core.entity.operation.Update;
 import com.gitee.spring.domain.core.repository.ProxyRepository;
 import com.gitee.spring.domain.event.entity.RepositoryEvent;
 import lombok.AllArgsConstructor;
@@ -41,7 +43,7 @@ public class EventRepository extends ProxyRepository {
             RepositoryEvent repositoryEvent = new RepositoryEvent(this);
             repositoryEvent.setMethodName("insert");
             repositoryEvent.setBoundedContext(boundedContext);
-            repositoryEvent.setCondition(new Condition(Operation.INSERT, entity));
+            repositoryEvent.setOperation(new Insert(Operation.INSERT, entity));
             applicationContext.publishEvent(repositoryEvent);
         }
         return count;
@@ -54,7 +56,7 @@ public class EventRepository extends ProxyRepository {
             RepositoryEvent repositoryEvent = new RepositoryEvent(this);
             repositoryEvent.setMethodName("update");
             repositoryEvent.setBoundedContext(boundedContext);
-            repositoryEvent.setCondition(new Condition(Operation.UPDATE, entity));
+            repositoryEvent.setOperation(new Update(Operation.UPDATE, entity));
             applicationContext.publishEvent(repositoryEvent);
         }
         return count;
@@ -67,9 +69,9 @@ public class EventRepository extends ProxyRepository {
             RepositoryEvent repositoryEvent = new RepositoryEvent(this);
             repositoryEvent.setMethodName("updateByExample");
             repositoryEvent.setBoundedContext(boundedContext);
-            Condition condition = new Condition(Operation.UPDATE, entity);
-            condition.setExample(example);
-            repositoryEvent.setCondition(condition);
+            Update update = new Update(Operation.UPDATE, entity);
+            update.setExample(example);
+            repositoryEvent.setOperation(update);
             applicationContext.publishEvent(repositoryEvent);
         }
         return count;
@@ -82,7 +84,7 @@ public class EventRepository extends ProxyRepository {
             RepositoryEvent repositoryEvent = new RepositoryEvent(this);
             repositoryEvent.setMethodName("insertOrUpdate");
             repositoryEvent.setBoundedContext(boundedContext);
-            repositoryEvent.setCondition(new Condition(Operation.INSERT_OR_UPDATE, entity));
+            repositoryEvent.setOperation(new Operation(Operation.INSERT_OR_UPDATE, entity));
             applicationContext.publishEvent(repositoryEvent);
         }
         return count;
@@ -95,7 +97,7 @@ public class EventRepository extends ProxyRepository {
             RepositoryEvent repositoryEvent = new RepositoryEvent(this);
             repositoryEvent.setMethodName("delete");
             repositoryEvent.setBoundedContext(boundedContext);
-            repositoryEvent.setCondition(new Condition(Operation.DELETE, entity));
+            repositoryEvent.setOperation(new Delete(Operation.DELETE, entity));
             applicationContext.publishEvent(repositoryEvent);
         }
         return count;
@@ -108,9 +110,9 @@ public class EventRepository extends ProxyRepository {
             RepositoryEvent repositoryEvent = new RepositoryEvent(this);
             repositoryEvent.setMethodName("deleteByPrimaryKey");
             repositoryEvent.setBoundedContext(boundedContext);
-            Condition condition = new Condition(Operation.DELETE, null);
-            condition.setPrimaryKey(primaryKey);
-            repositoryEvent.setCondition(condition);
+            Delete delete = new Delete(Operation.DELETE, null);
+            delete.setPrimaryKey(primaryKey);
+            repositoryEvent.setOperation(delete);
             applicationContext.publishEvent(repositoryEvent);
         }
         return count;
@@ -123,9 +125,9 @@ public class EventRepository extends ProxyRepository {
             RepositoryEvent repositoryEvent = new RepositoryEvent(this);
             repositoryEvent.setMethodName("deleteByExample");
             repositoryEvent.setBoundedContext(boundedContext);
-            Condition condition = new Condition(Operation.DELETE, null);
-            condition.setExample(example);
-            repositoryEvent.setCondition(condition);
+            Delete delete = new Delete(Operation.DELETE, null);
+            delete.setExample(example);
+            repositoryEvent.setOperation(delete);
             applicationContext.publishEvent(repositoryEvent);
         }
         return count;

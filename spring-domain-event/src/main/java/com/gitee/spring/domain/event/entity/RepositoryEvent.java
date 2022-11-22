@@ -17,7 +17,7 @@
 package com.gitee.spring.domain.event.entity;
 
 import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.operation.Condition;
+import com.gitee.spring.domain.core.entity.operation.Operation;
 import com.gitee.spring.domain.event.repository.EventRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +29,7 @@ public class RepositoryEvent extends ApplicationEvent {
 
     private String methodName;
     private BoundedContext boundedContext;
-    private Condition condition;
+    private Operation operation;
 
     public RepositoryEvent(EventRepository eventRepository) {
         super(eventRepository);
