@@ -63,7 +63,7 @@ public class CoatingWrapperResolver {
                     continue;
                 }
 
-                Map<String, PropertyWrapper> allPropertyWrapperMap = new LinkedHashMap<>();
+                Set<String> fieldNames = new LinkedHashSet<>();
                 Map<String, List<PropertyWrapper>> accessPathPropertyWrappersMap = new LinkedHashMap<>();
                 Map<String, PropertyWrapper> fieldPropertyWrapperMap = new LinkedHashMap<>();
                 SpecificProperties specificProperties = new SpecificProperties();
@@ -82,7 +82,7 @@ public class CoatingWrapperResolver {
                     if (specificProperties.addProperty(fieldName, propertyWrapper)) {
                         return;
                     }
-                    allPropertyWrapperMap.put(fieldName, propertyWrapper);
+                    fieldNames.add(fieldName);
 
                     String accessPath = propertyDefinition.getAccessPath();
                     if (StringUtils.isNotBlank(accessPath) && accessPath.startsWith("/")) {
@@ -94,7 +94,7 @@ public class CoatingWrapperResolver {
                 });
 
                 List<RepositoryWrapper> repositoryWrappers = collectRepositoryWrappers(accessPathPropertyWrappersMap, fieldPropertyWrapperMap);
-                checkFieldNames(coatingClass, allPropertyWrapperMap.keySet(), repositoryWrappers);
+                checkFieldNames(coatingClass, fieldNames, repositoryWrappers);
 
                 List<RepositoryWrapper> reversedRepositoryWrappers = new ArrayList<>(repositoryWrappers);
                 Collections.reverse(reversedRepositoryWrappers);
