@@ -82,6 +82,7 @@ public class CoatingWrapperResolver {
                     if (specificProperties.addProperty(fieldName, propertyWrapper)) {
                         return;
                     }
+
                     fieldNames.add(fieldName);
 
                     String accessPath = propertyDefinition.getAccessPath();
