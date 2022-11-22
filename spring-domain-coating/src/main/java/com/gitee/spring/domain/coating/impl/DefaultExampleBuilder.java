@@ -17,7 +17,7 @@
 package com.gitee.spring.domain.coating.impl;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.spring.domain.coating.api.ExampleConverter;
+import com.gitee.spring.domain.coating.api.ExampleBuilder;
 import com.gitee.spring.domain.coating.entity.CoatingWrapper;
 import com.gitee.spring.domain.coating.entity.RepositoryWrapper;
 import com.gitee.spring.domain.coating.entity.definition.RepositoryDefinition;
@@ -34,11 +34,11 @@ import lombok.Data;
 
 import java.util.*;
 
-public class DefaultExampleConverter implements ExampleConverter {
+public class DefaultExampleBuilder implements ExampleBuilder {
 
     private final AbstractCoatingRepository<?, ?> repository;
 
-    public DefaultExampleConverter(AbstractCoatingRepository<?, ?> repository) {
+    public DefaultExampleBuilder(AbstractCoatingRepository<?, ?> repository) {
         this.repository = repository;
     }
 
