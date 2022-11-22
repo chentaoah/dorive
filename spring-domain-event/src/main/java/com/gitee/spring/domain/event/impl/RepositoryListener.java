@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.domain.event.listener;
+package com.gitee.spring.domain.event.impl;
 
 import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.event.annotation.Listener;
