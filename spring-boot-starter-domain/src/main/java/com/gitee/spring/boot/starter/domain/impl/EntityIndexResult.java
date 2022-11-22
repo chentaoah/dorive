@@ -20,7 +20,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core.api.EntityIndex;
 import com.gitee.spring.domain.core.entity.executor.Result;
 import com.gitee.spring.domain.core.entity.executor.UnionExample;
-import com.gitee.spring.domain.core.util.NumberUtils;
+import com.gitee.spring.boot.starter.domain.util.NumberUtils;
 
 import java.util.*;
 
