@@ -90,7 +90,7 @@ public class RepoDefinitionResolver {
         }
     }
 
-    public List<RepositoryWrapper> collectRepositoryWrappers(Map<String, List<PropertyWrapper>> locationPropertyWrappersMap,
+    public List<RepositoryWrapper> collectRepositoryWrappers(Map<String, List<PropertyWrapper>> accessPathPropertyWrappersMap,
                                                              Map<String, PropertyWrapper> fieldPropertyWrapperMap) {
         List<RepositoryWrapper> repositoryWrappers = new ArrayList<>();
 
@@ -101,9 +101,9 @@ public class RepoDefinitionResolver {
 
             List<PropertyWrapper> propertyWrappers = new ArrayList<>();
 
-            List<PropertyWrapper> locationPropertyWrappers = locationPropertyWrappersMap.get(absoluteAccessPath);
-            if (locationPropertyWrappers != null) {
-                propertyWrappers.addAll(locationPropertyWrappers);
+            List<PropertyWrapper> accessPathPropertyWrappers = accessPathPropertyWrappersMap.get(absoluteAccessPath);
+            if (accessPathPropertyWrappers != null) {
+                propertyWrappers.addAll(accessPathPropertyWrappers);
             }
 
             for (String fieldName : entityElement.getProperties()) {

@@ -27,7 +27,7 @@ import java.util.Map;
 @Data
 public class PropertyDefinition {
 
-    private String location;
+    private String accessPath;
     private String alias;
     private String operator;
     private boolean ignore;

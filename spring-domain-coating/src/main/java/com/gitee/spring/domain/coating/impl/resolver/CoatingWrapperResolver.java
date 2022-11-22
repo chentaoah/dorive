@@ -64,7 +64,7 @@ public class CoatingWrapperResolver {
                 }
 
                 Map<String, PropertyWrapper> allPropertyWrapperMap = new LinkedHashMap<>();
-                Map<String, List<PropertyWrapper>> locationPropertyWrappersMap = new LinkedHashMap<>();
+                Map<String, List<PropertyWrapper>> accessPathPropertyWrappersMap = new LinkedHashMap<>();
                 Map<String, PropertyWrapper> fieldPropertyWrapperMap = new LinkedHashMap<>();
                 PropertyWrapper[] specificPropertyWrappers = new PropertyWrapper[4];
 
@@ -103,9 +103,9 @@ public class CoatingWrapperResolver {
 
                     allPropertyWrapperMap.put(fieldName, propertyWrapper);
 
-                    String location = propertyDefinition.getLocation();
-                    if (StringUtils.isNotBlank(location) && location.startsWith("/")) {
-                        List<PropertyWrapper> propertyWrappers = locationPropertyWrappersMap.computeIfAbsent(location, key -> new ArrayList<>());
+                    String accessPath = propertyDefinition.getAccessPath();
+                    if (StringUtils.isNotBlank(accessPath) && accessPath.startsWith("/")) {
+                        List<PropertyWrapper> propertyWrappers = accessPathPropertyWrappersMap.computeIfAbsent(accessPath, key -> new ArrayList<>());
                         propertyWrappers.add(propertyWrapper);
                     } else {
                         fieldPropertyWrapperMap.put(fieldName, propertyWrapper);
@@ -113,7 +113,7 @@ public class CoatingWrapperResolver {
                 });
 
                 RepoDefinitionResolver repoDefinitionResolver = repository.getRepoDefinitionResolver();
-                List<RepositoryWrapper> repositoryWrappers = repoDefinitionResolver.collectRepositoryWrappers(locationPropertyWrappersMap, fieldPropertyWrapperMap);
+                List<RepositoryWrapper> repositoryWrappers = repoDefinitionResolver.collectRepositoryWrappers(accessPathPropertyWrappersMap, fieldPropertyWrapperMap);
                 checkFieldNames(coatingClass, allPropertyWrapperMap.keySet(), repositoryWrappers);
 
                 List<RepositoryWrapper> reversedRepositoryWrappers = new ArrayList<>(repositoryWrappers);
