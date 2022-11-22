@@ -106,8 +106,8 @@ public class CoatingWrapperResolver {
         }
     }
 
-    public List<RepositoryWrapper> collectRepositoryWrappers(Map<String, List<PropertyWrapper>> accessPathPropertyWrappersMap,
-                                                             Map<String, PropertyWrapper> fieldPropertyWrapperMap) {
+    private List<RepositoryWrapper> collectRepositoryWrappers(Map<String, List<PropertyWrapper>> accessPathPropertyWrappersMap,
+                                                              Map<String, PropertyWrapper> fieldPropertyWrapperMap) {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
 
