@@ -16,6 +16,7 @@
  */
 package com.gitee.spring.domain.core.impl;
 
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.spring.domain.core.api.PropertyProxy;
 import com.gitee.spring.domain.proxy.ProxyCompiler;
@@ -39,7 +40,7 @@ public class PropertyProxyFactory {
 
     public static PropertyProxy newPropertyProxy(Class<?> entityClass, String fieldName) {
         try {
-            Field field = entityClass.getField(fieldName);
+            Field field = ReflectUtil.getField(entityClass, fieldName);
             Class<?> fieldClass = field.getType();
             return newPropertyProxy(entityClass, fieldClass, fieldName);
 
