@@ -57,8 +57,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
             MergedRepository mergedRepository = repositoryWrapper.getMergedRepository();
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-            absoluteAccessPath = mergedRepository.isMerged() ? absoluteAccessPath + "/" : absoluteAccessPath;
-            repoCriterionMap.put(absoluteAccessPath, repoCriterion);
+            String relativeAccessPath = mergedRepository.isMerged() ? absoluteAccessPath + "/" : absoluteAccessPath;
+            repoCriterionMap.put(relativeAccessPath, repoCriterion);
         }
 
         executeChainQuery(boundedContext, repoCriterionMap);
