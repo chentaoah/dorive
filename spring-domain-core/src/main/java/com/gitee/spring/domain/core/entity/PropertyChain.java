@@ -28,7 +28,7 @@ import lombok.ToString;
 public class PropertyChain implements PropertyProxy {
 
     private PropertyChain lastPropertyChain;
-    private Class<?> lastEntityClass;
+    private Class<?> entityClass;
     private String accessPath;
     private boolean annotatedEntity;
     private Property property;
@@ -36,7 +36,7 @@ public class PropertyChain implements PropertyProxy {
 
     public void initialize() {
         if (propertyProxy == null) {
-            propertyProxy = PropertyProxyFactory.newPropertyProxy(lastEntityClass, property.getFieldClass(), property.getFieldName());
+            propertyProxy = PropertyProxyFactory.newPropertyProxy(entityClass, property.getDeclaredField());
             if (lastPropertyChain != null) {
                 lastPropertyChain.initialize();
             }

@@ -16,7 +16,6 @@
  */
 package com.gitee.spring.domain.core.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.Command;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
@@ -41,7 +40,7 @@ public class OperationTypeResolver {
         return Operation.NONE;
     }
 
-    public int mergeOperationType(int expectedOperationType, int contextOperationType, Object entity) {
+    public int mergeOperationType(int expectedOperationType, int contextOperationType, Object primaryKey) {
         if (contextOperationType == Operation.FORCE_IGNORE) {
             return Operation.FORCE_IGNORE;
 
@@ -52,7 +51,6 @@ public class OperationTypeResolver {
             return Operation.INSERT_OR_UPDATE;
 
         } else {
-            Object primaryKey = BeanUtil.getFieldValue(entity, "id");
             contextOperationType = primaryKey == null ? Operation.INSERT : Operation.UPDATE_OR_DELETE;
             return expectedOperationType & contextOperationType;
         }

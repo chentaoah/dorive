@@ -16,42 +16,53 @@
  */
 package com.gitee.spring.boot.starter.domain.impl;
 
-import cn.hutool.core.bean.BeanUtil;
+import com.gitee.spring.boot.starter.domain.util.NumberUtils;
 import com.gitee.spring.domain.core.api.EntityIndex;
+import com.gitee.spring.domain.core.api.PropertyProxy;
 import com.gitee.spring.domain.core.entity.executor.Result;
 import com.gitee.spring.domain.core.entity.executor.UnionExample;
-import com.gitee.spring.boot.starter.domain.util.NumberUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EntityIndexResult extends Result<Object> implements EntityIndex {
 
-    private final Map<Long, List<Long>> primaryKeyMapping = new HashMap<>();
-    private final Map<Long, Object> primaryKeyEntityMap = new HashMap<>();
+    private final Map<Long, List<Long>> primaryKeyMapping;
+    private final Map<Long, Object> primaryKeyEntityMap;
 
-    public EntityIndexResult(UnionExample unionExample, List<Map<String, Object>> resultMaps, List<Object> entities) {
+    public EntityIndexResult(UnionExample unionExample, List<Map<String, Object>> resultMaps, List<Object> entities, PropertyProxy primaryKeyProxy) {
         super(entities);
-        int initialCapacity = resultMaps.size() / unionExample.getExamples().size() + 1;
+
+        int rootSize = unionExample.getExamples().size();
+        int entitySize = entities.size();
+        primaryKeyMapping = new HashMap<>(rootSize * 4 / 3 + 1);
+        primaryKeyEntityMap = new HashMap<>(entitySize * 4 / 3 + 1);
+
+        int averageSize = resultMaps.size() / rootSize + 1;
         for (Map<String, Object> resultMap : resultMaps) {
             Long rootPrimaryKey = NumberUtils.longValue(resultMap.get("$id"));
-            List<Long> existPrimaryKeys = primaryKeyMapping.computeIfAbsent(rootPrimaryKey, key -> new ArrayList<>(initialCapacity));
+            List<Long> existPrimaryKeys = primaryKeyMapping.computeIfAbsent(rootPrimaryKey, key -> new ArrayList<>(averageSize));
             Long primaryKey = NumberUtils.longValue(resultMap.get("id"));
             existPrimaryKeys.add(primaryKey);
         }
+
         for (Object entity : entities) {
-            Long primaryKey = NumberUtils.longValue(BeanUtil.getFieldValue(entity, "id"));
+            Long primaryKey = NumberUtils.longValue(primaryKeyProxy.getValue(entity));
             primaryKeyEntityMap.put(primaryKey, entity);
         }
     }
 
     @Override
-    public List<Object> selectList(Object rootEntity) {
-        Long rootPrimaryKey = NumberUtils.longValue(BeanUtil.getFieldValue(rootEntity, "id"));
+    public List<Object> selectList(Object rootEntity, Object primaryKey) {
+        Long rootPrimaryKey = NumberUtils.longValue(primaryKey);
         List<Long> existPrimaryKeys = primaryKeyMapping.get(rootPrimaryKey);
         if (existPrimaryKeys != null && !existPrimaryKeys.isEmpty()) {
             List<Object> entities = new ArrayList<>(existPrimaryKeys.size());
-            for (Long primaryKey : existPrimaryKeys) {
-                Object entity = primaryKeyEntityMap.get(primaryKey);
+            for (Long existPrimaryKey : existPrimaryKeys) {
+                Object entity = primaryKeyEntityMap.get(existPrimaryKey);
                 entities.add(entity);
             }
             return entities;

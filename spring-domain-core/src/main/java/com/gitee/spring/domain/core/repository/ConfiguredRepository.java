@@ -17,6 +17,7 @@
 package com.gitee.spring.domain.core.repository;
 
 import com.gitee.spring.domain.core.api.MetadataHolder;
+import com.gitee.spring.domain.core.api.PropertyProxy;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.PropertyChain;
 import com.gitee.spring.domain.core.entity.executor.Example;
@@ -147,6 +148,11 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
             }
         }
         return example;
+    }
+
+    public Object getPrimaryKey(Object entity) {
+        PropertyProxy primaryKeyProxy = entityElement.getPrimaryKeyProxy();
+        return primaryKeyProxy.getValue(entity);
     }
 
     public Object convertManyToOne(List<?> entities) {

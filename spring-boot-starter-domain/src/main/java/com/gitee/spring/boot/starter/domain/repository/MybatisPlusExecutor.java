@@ -31,34 +31,58 @@ import com.gitee.spring.boot.starter.domain.entity.Metadata;
 import com.gitee.spring.boot.starter.domain.impl.EntityIndexResult;
 import com.gitee.spring.domain.core.api.EntityFactory;
 import com.gitee.spring.domain.core.api.MetadataHolder;
+import com.gitee.spring.domain.core.api.PropertyProxy;
 import com.gitee.spring.domain.core.api.constant.Order;
 import com.gitee.spring.domain.core.entity.BoundedContext;
 import com.gitee.spring.domain.core.entity.Command;
 import com.gitee.spring.domain.core.entity.EntityElement;
 import com.gitee.spring.domain.core.entity.definition.EntityDefinition;
-import com.gitee.spring.domain.core.entity.executor.*;
-import com.gitee.spring.domain.core.entity.operation.*;
+import com.gitee.spring.domain.core.entity.executor.Criterion;
+import com.gitee.spring.domain.core.entity.executor.Example;
+import com.gitee.spring.domain.core.entity.executor.OrderBy;
+import com.gitee.spring.domain.core.entity.executor.Result;
+import com.gitee.spring.domain.core.entity.executor.UnionExample;
+import com.gitee.spring.domain.core.entity.operation.Delete;
+import com.gitee.spring.domain.core.entity.operation.Insert;
+import com.gitee.spring.domain.core.entity.operation.Operation;
+import com.gitee.spring.domain.core.entity.operation.Query;
+import com.gitee.spring.domain.core.entity.operation.Update;
 import com.gitee.spring.domain.core.impl.executor.AbstractExecutor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.gitee.spring.boot.starter.domain.impl.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
 
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@Getter
+@Setter
+@ToString
 public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHolder {
 
-    private EntityElement entityElement;
     private EntityDefinition entityDefinition;
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;
     private EntityFactory entityFactory;
+
+    public MybatisPlusExecutor(EntityElement entityElement,
+                               EntityDefinition entityDefinition,
+                               BaseMapper<Object> baseMapper,
+                               Class<Object> pojoClass,
+                               EntityFactory entityFactory) {
+        super(entityElement);
+        this.entityDefinition = entityDefinition;
+        this.baseMapper = baseMapper;
+        this.pojoClass = pojoClass;
+        this.entityFactory = entityFactory;
+    }
 
     @Override
     public Object getMetadata() {
@@ -91,7 +115,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                             entities.add(entity);
                         }
                     }
-                    return new EntityIndexResult(unionExample, resultMaps, entities);
+                    return new EntityIndexResult(unionExample, resultMaps, entities, entityElement.getPrimaryKeyProxy());
 
                 } else {
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
@@ -144,7 +168,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
             String property = StrUtil.toUnderlineCase(criterion.getProperty());
             criterionAppender.appendCriterion(queryWrapper, property, criterion.getValue());
         }
-        
+
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
             String order = orderBy.getOrder();
@@ -209,7 +233,8 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         if (operation instanceof Insert) {
             int count = baseMapper.insert(persistentObject);
             Object primaryKey = BeanUtil.getFieldValue(persistentObject, "id");
-            BeanUtil.setFieldValue(entity, "id", primaryKey);
+            PropertyProxy primaryKeyProxy = entityElement.getPrimaryKeyProxy();
+            primaryKeyProxy.setValue(entity, primaryKey);
             return count;
 
         } else if (operation instanceof Update) {

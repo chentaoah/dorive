@@ -17,6 +17,8 @@
 package com.gitee.spring.domain.core.entity;
 
 import cn.hutool.core.lang.Assert;
+import com.gitee.spring.domain.core.api.PropertyProxy;
+import com.gitee.spring.domain.core.impl.PropertyProxyFactory;
 import com.gitee.spring.domain.core.util.ReflectUtils;
 import com.gitee.spring.domain.core.annotation.Binding;
 import com.gitee.spring.domain.core.annotation.Entity;
@@ -40,6 +42,7 @@ public class EntityElement {
     private Class<?> genericEntityClass;
     private String fieldName;
     private Set<String> properties;
+    private PropertyProxy primaryKeyProxy;
 
     public static EntityElement newEntityElement(AnnotatedElement annotatedElement) {
         Entity entityAnnotation = AnnotatedElementUtils.getMergedAnnotation(annotatedElement, Entity.class);
@@ -56,7 +59,8 @@ public class EntityElement {
                     false,
                     entityClass,
                     null,
-                    ReflectUtils.getFieldNames(entityClass));
+                    ReflectUtils.getFieldNames(entityClass),
+                    PropertyProxyFactory.newPropertyProxy(entityClass, "id"));
 
         } else if (annotatedElement instanceof Field) {
             Property property = new Property((Field) annotatedElement);
@@ -68,7 +72,8 @@ public class EntityElement {
                     property.isCollection(),
                     property.getGenericFieldClass(),
                     property.getFieldName(),
-                    ReflectUtils.getFieldNames(property.getGenericFieldClass()));
+                    ReflectUtils.getFieldNames(property.getGenericFieldClass()),
+                    PropertyProxyFactory.newPropertyProxy(property.getGenericFieldClass(), "id"));
 
         } else {
             throw new RuntimeException("Unknown type!");

@@ -16,17 +16,23 @@
  */
 package com.gitee.spring.domain.core.impl.executor;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core.api.Executor;
 import com.gitee.spring.domain.core.entity.BoundedContext;
-import com.gitee.spring.domain.core.entity.executor.*;
+import com.gitee.spring.domain.core.entity.EntityElement;
+import com.gitee.spring.domain.core.entity.executor.Example;
 import com.gitee.spring.domain.core.entity.operation.Delete;
 import com.gitee.spring.domain.core.entity.operation.Insert;
 import com.gitee.spring.domain.core.entity.operation.Operation;
 import com.gitee.spring.domain.core.entity.operation.Query;
 import com.gitee.spring.domain.core.entity.operation.Update;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
+@Data
+@AllArgsConstructor
 public abstract class AbstractExecutor implements Executor {
+
+    protected EntityElement entityElement;
 
     @Override
     public Query buildQueryByPK(BoundedContext boundedContext, Object primaryKey) {
@@ -50,7 +56,8 @@ public abstract class AbstractExecutor implements Executor {
     @Override
     public Update buildUpdate(BoundedContext boundedContext, Object entity) {
         Update update = new Update(Operation.UPDATE, entity);
-        update.setPrimaryKey(BeanUtil.getFieldValue(entity, "id"));
+        Object primaryKey = entityElement.getPrimaryKeyProxy().getValue(entity);
+        update.setPrimaryKey(primaryKey);
         return update;
     }
 
@@ -63,7 +70,7 @@ public abstract class AbstractExecutor implements Executor {
 
     @Override
     public Operation buildInsertOrUpdate(BoundedContext boundedContext, Object entity) {
-        Object primaryKey = BeanUtil.getFieldValue(entity, "id");
+        Object primaryKey = entityElement.getPrimaryKeyProxy().getValue(entity);
         if (primaryKey == null) {
             return new Insert(Operation.INSERT, entity);
         } else {
@@ -76,7 +83,8 @@ public abstract class AbstractExecutor implements Executor {
     @Override
     public Delete buildDelete(BoundedContext boundedContext, Object entity) {
         Delete delete = new Delete(Operation.DELETE, entity);
-        delete.setPrimaryKey(BeanUtil.getFieldValue(entity, "id"));
+        Object primaryKey = entityElement.getPrimaryKeyProxy().getValue(entity);
+        delete.setPrimaryKey(primaryKey);
         return delete;
     }
 

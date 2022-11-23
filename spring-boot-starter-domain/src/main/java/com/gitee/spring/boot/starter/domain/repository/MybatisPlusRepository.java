@@ -68,13 +68,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractCoatingRepository<E, P
             defaultEntityFactory.setPojoClass(pojoClass);
         }
 
-        MybatisPlusExecutor mybatisPlusExecutor = new MybatisPlusExecutor();
-        mybatisPlusExecutor.setEntityElement(entityElement);
-        mybatisPlusExecutor.setEntityDefinition(entityDefinition);
-        mybatisPlusExecutor.setBaseMapper((BaseMapper<Object>) mapper);
-        mybatisPlusExecutor.setPojoClass((Class<Object>) pojoClass);
-        mybatisPlusExecutor.setEntityFactory(entityFactory);
-        return mybatisPlusExecutor;
+        return new MybatisPlusExecutor(entityElement, entityDefinition, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass, entityFactory);
     }
 
 }

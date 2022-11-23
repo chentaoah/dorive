@@ -22,6 +22,7 @@ import com.gitee.spring.domain.proxy.ProxyCompiler;
 import com.gitee.spring.domain.proxy.JavassistCompiler;
 import com.gitee.spring.domain.core.util.ReflectUtils;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,13 +33,28 @@ public class PropertyProxyFactory {
     private static final ProxyCompiler PROXY_COMPILER = new JavassistCompiler();
     private static final Map<String, PropertyProxy> GENERATED_PROXY_CACHE = new ConcurrentHashMap<>();
 
-    public static PropertyProxy newPropertyProxy(Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
-        String cacheKey = lastEntityClass.getTypeName() + ":" + entityClass.getTypeName() + ":" + fieldName;
+    public static PropertyProxy newPropertyProxy(Class<?> entityClass, Field declaredField) {
+        return newPropertyProxy(entityClass, declaredField.getType(), declaredField.getName());
+    }
+
+    public static PropertyProxy newPropertyProxy(Class<?> entityClass, String fieldName) {
+        try {
+            Field field = entityClass.getField(fieldName);
+            Class<?> fieldClass = field.getType();
+            return newPropertyProxy(entityClass, fieldClass, fieldName);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate class!", e);
+        }
+    }
+
+    public static PropertyProxy newPropertyProxy(Class<?> entityClass, Class<?> fieldClass, String fieldName) {
+        String cacheKey = entityClass.getTypeName() + ":" + fieldClass.getTypeName() + ":" + fieldName;
         if (!GENERATED_PROXY_CACHE.containsKey(cacheKey)) {
             synchronized (GENERATED_PROXY_CACHE) {
                 if (!GENERATED_PROXY_CACHE.containsKey(cacheKey)) {
                     try {
-                        String generatedCode = generateCode(lastEntityClass, entityClass, fieldName);
+                        String generatedCode = generateCode(entityClass, fieldClass, fieldName);
                         Class<?> generatedClass = PROXY_COMPILER.compile(generatedCode, null);
                         PropertyProxy propertyProxy = (PropertyProxy) ReflectUtils.newInstance(generatedClass);
                         GENERATED_PROXY_CACHE.put(cacheKey, propertyProxy);
@@ -52,7 +68,7 @@ public class PropertyProxyFactory {
         return GENERATED_PROXY_CACHE.get(cacheKey);
     }
 
-    private static String generateCode(Class<?> lastEntityClass, Class<?> entityClass, String fieldName) {
+    private static String generateCode(Class<?> entityClass, Class<?> fieldClass, String fieldName) {
         Class<?> interfaceClass = PropertyProxy.class;
         StringBuilder builder = new StringBuilder();
         String simpleName = interfaceClass.getSimpleName() + "$Proxy" + COUNT.getAndIncrement();
@@ -60,13 +76,13 @@ public class PropertyProxyFactory {
         builder.append(String.format("public class %s implements %s {\n", simpleName, interfaceClass.getName()));
 
         builder.append("\t").append(String.format("public %s getValue(%s arg0) {\n", Object.class.getTypeName(), Object.class.getTypeName()));
-        builder.append("\t\t").append(String.format("%s arg1 = (%s)arg0;\n", lastEntityClass.getTypeName(), lastEntityClass.getTypeName()));
+        builder.append("\t\t").append(String.format("%s arg1 = (%s)arg0;\n", entityClass.getTypeName(), entityClass.getTypeName()));
         builder.append("\t\t").append(String.format("return arg1.get%s();\n", StrUtil.upperFirst(fieldName)));
         builder.append("\t").append("}\n");
 
         builder.append("\t").append(String.format("public void setValue(%s arg0, %s arg1) {\n", Object.class.getTypeName(), Object.class.getTypeName()));
-        builder.append("\t\t").append(String.format("%s arg2 = (%s)arg0;\n", lastEntityClass.getTypeName(), lastEntityClass.getTypeName()));
-        builder.append("\t\t").append(String.format("%s arg3 = (%s)arg1;\n", entityClass.getTypeName(), entityClass.getTypeName()));
+        builder.append("\t\t").append(String.format("%s arg2 = (%s)arg0;\n", entityClass.getTypeName(), entityClass.getTypeName()));
+        builder.append("\t\t").append(String.format("%s arg3 = (%s)arg1;\n", fieldClass.getTypeName(), fieldClass.getTypeName()));
         builder.append("\t\t").append(String.format("arg2.set%s(arg3);\n", StrUtil.upperFirst(fieldName)));
         builder.append("\t").append("}\n");
 

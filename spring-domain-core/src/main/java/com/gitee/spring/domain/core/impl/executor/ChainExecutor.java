@@ -28,15 +28,17 @@ import com.gitee.spring.domain.core.impl.OperationTypeResolver;
 import com.gitee.spring.domain.core.impl.resolver.DelegateResolver;
 import com.gitee.spring.domain.core.repository.AbstractContextRepository;
 import com.gitee.spring.domain.core.repository.ConfiguredRepository;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
+@Setter
+@ToString
 public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
     private final AbstractContextRepository<?, ?> repository;
@@ -45,6 +47,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     private final OperationTypeResolver operationTypeResolver = new OperationTypeResolver();
 
     public ChainExecutor(AbstractContextRepository<?, ?> repository, EntityHandler entityHandler) {
+        super(repository.getEntityElement());
         this.repository = repository;
         this.entityHandler = entityHandler;
     }
@@ -112,7 +115,8 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                 }
 
                 for (Object entity : collection) {
-                    int operationType = operationTypeResolver.mergeOperationType(expectedOperationType, contextOperationType, entity);
+                    Object primaryKey = repository.getPrimaryKey(entity);
+                    int operationType = operationTypeResolver.mergeOperationType(expectedOperationType, contextOperationType, primaryKey);
                     if ((operationType & Operation.INSERT) == Operation.INSERT) {
                         getBoundValueFromContext(boundedContext, rootEntity, repository, entity);
                     }

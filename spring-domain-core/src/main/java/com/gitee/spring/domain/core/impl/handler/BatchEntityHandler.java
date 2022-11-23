@@ -16,7 +16,6 @@
  */
 package com.gitee.spring.domain.core.impl.handler;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.gitee.spring.domain.core.api.EntityHandler;
 import com.gitee.spring.domain.core.api.EntityIndex;
 import com.gitee.spring.domain.core.api.ExampleBuilder;
@@ -58,6 +57,8 @@ public class BatchEntityHandler implements EntityHandler {
     }
 
     private UnionExample newUnionExample(ConfiguredRepository repository, BoundedContext boundedContext, List<Object> rootEntities) {
+        ConfiguredRepository rootRepository = this.repository.getRootRepository();
+
         PropertyChain anchorPoint = repository.getAnchorPoint();
         PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
 
@@ -73,7 +74,7 @@ public class BatchEntityHandler implements EntityHandler {
                     example = exampleBuilder.buildExample(boundedContext, rootEntity, example);
                 }
                 if (example.isDirtyQuery()) {
-                    Object primaryKey = BeanUtil.getFieldValue(rootEntity, "id");
+                    Object primaryKey = rootRepository.getPrimaryKey(rootEntity);
                     example.selectColumns(primaryKey + " as $id");
                     unionExample.addExample(example);
                 }
@@ -83,13 +84,17 @@ public class BatchEntityHandler implements EntityHandler {
     }
 
     private void setValueForRootEntities(ConfiguredRepository repository, List<Object> rootEntities, EntityIndex entityIndex) {
+        ConfiguredRepository rootRepository = this.repository.getRootRepository();
+
         PropertyChain anchorPoint = repository.getAnchorPoint();
         PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
         PropertyProxy propertyProxy = anchorPoint.getPropertyProxy();
+
         for (Object rootEntity : rootEntities) {
             Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
             if (lastEntity != null) {
-                List<Object> entities = entityIndex.selectList(rootEntity);
+                Object primaryKey = rootRepository.getPrimaryKey(rootEntity);
+                List<Object> entities = entityIndex.selectList(rootEntity, primaryKey);
                 Object entity = repository.convertManyToOne(entities);
                 if (entity != null) {
                     propertyProxy.setValue(lastEntity, entity);
