@@ -4,17 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.gitee.digital-engine</groupId>
-    <artifactId>spring-domain</artifactId>
-    <version>2.8.3</version>
+    <artifactId>dorive</artifactId>
+    <version>3.0.0</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>spring-domain-injection</module>
-        <module>spring-domain-core</module>
-        <module>spring-domain-event</module>
-        <module>spring-domain-coating</module>
-        <module>spring-domain-web</module>
-        <module>spring-boot-starter-domain</module>
+        <module>dorive-injection</module>
+        <module>dorive-proxy</module>
+        <module>dorive-core</module>
+        <module>dorive-event</module>
+        <module>dorive-coating</module>
+        <module>spring-boot-starter-dorive</module>
     </modules>
 
     <properties>
