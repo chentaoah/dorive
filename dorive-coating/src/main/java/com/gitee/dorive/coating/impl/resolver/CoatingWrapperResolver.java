@@ -23,7 +23,6 @@ import com.gitee.dorive.coating.entity.PropertyWrapper;
 import com.gitee.dorive.coating.entity.RepositoryWrapper;
 import com.gitee.dorive.coating.entity.SpecificProperties;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
-import com.gitee.spring.domain.coating.entity.*;
 import com.gitee.dorive.coating.entity.definition.CoatingDefinition;
 import com.gitee.dorive.coating.entity.definition.PropertyDefinition;
 import com.gitee.dorive.coating.util.ResourceUtils;

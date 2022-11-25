@@ -28,7 +28,6 @@ import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import com.gitee.dorive.core.impl.resolver.PropertyResolver;
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.api.Executor;
-import com.gitee.spring.domain.core.impl.resolver.*;
 import com.gitee.dorive.core.util.ReflectUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -24,7 +24,6 @@ import com.gitee.dorive.core.entity.operation.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.operation.Update;
-import com.gitee.spring.domain.core.entity.executor.*;
 
 public interface Executor {
 

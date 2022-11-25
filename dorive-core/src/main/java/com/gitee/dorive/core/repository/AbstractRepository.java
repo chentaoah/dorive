@@ -30,8 +30,6 @@ import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.api.Executor;
 import com.gitee.dorive.core.api.Repository;
-import com.gitee.spring.domain.core.entity.*;
-import com.gitee.spring.domain.core.entity.executor.*;
 import lombok.Data;
 
 import java.util.List;
