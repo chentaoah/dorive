@@ -5,15 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.gitee.digital-engine</groupId>
-        <artifactId>spring-domain</artifactId>
+        <artifactId>dorive</artifactId>
         <version>3.0.0</version>
     </parent>
-    <artifactId>spring-domain-coating</artifactId>
+    <artifactId>dorive-coating</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>spring-domain-event</artifactId>
+            <artifactId>dorive-event</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

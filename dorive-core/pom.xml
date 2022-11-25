@@ -5,12 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.gitee.digital-engine</groupId>
-        <artifactId>spring-domain</artifactId>
+        <artifactId>dorive</artifactId>
         <version>3.0.0</version>
     </parent>
-    <artifactId>spring-domain-injection</artifactId>
+    <artifactId>dorive-core</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-proxy</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -18,10 +23,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>

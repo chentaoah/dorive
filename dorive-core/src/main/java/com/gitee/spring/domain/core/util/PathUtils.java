@@ -31,9 +31,9 @@ public class PathUtils {
     }
 
     public static String getAbsolutePath(String accessPath, String relativePath) {
-        accessPath = "https://spring-domain" + accessPath;
+        accessPath = "https://dorive" + accessPath;
         accessPath = URLUtil.completeUrl(accessPath, relativePath);
-        return accessPath.replace("https://spring-domain", "");
+        return accessPath.replace("https://dorive", "");
     }
 
     public static String getBelongPath(Set<String> allAccessPath, String accessPath) {
