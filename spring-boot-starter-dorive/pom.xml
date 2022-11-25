@@ -9,7 +9,6 @@
         <version>3.0.0</version>
     </parent>
     <artifactId>spring-boot-starter-dorive</artifactId>
-
     <dependencies>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>

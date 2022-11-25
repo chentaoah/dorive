@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.gitee.spring.domain.event.config.DomainEventConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.gitee.dorive.event.config.DomainEventConfiguration
