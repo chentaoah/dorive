@@ -45,7 +45,7 @@ public class DefaultTypeDomainResolver implements TypeDomainResolver {
     }
 
     @Override
-    public DomainDefinition matchDomainDefinition(Class<?> typeToMatch) {
+    public DomainDefinition getDomainDefinition(Class<?> typeToMatch) {
         return CollUtil.findOne(domainDefinitions, item -> antPathMatcher.match(item.getPattern(), typeToMatch.getName()));
     }
 
@@ -56,12 +56,12 @@ public class DefaultTypeDomainResolver implements TypeDomainResolver {
             return;
         }
 
-        DomainDefinition injectedDomainDefinition = matchDomainDefinition(injectedType);
+        DomainDefinition injectedDomainDefinition = getDomainDefinition(injectedType);
         if (injectedDomainDefinition == null) {
             return;
         }
 
-        DomainDefinition targetDomainDefinition = matchDomainDefinition(targetType);
+        DomainDefinition targetDomainDefinition = getDomainDefinition(targetType);
         if (targetDomainDefinition == null) {
             throwInjectionException(targetType, null, injectedType, injectedDomainDefinition.getName());
             return;
@@ -86,7 +86,7 @@ public class DefaultTypeDomainResolver implements TypeDomainResolver {
 
     @Override
     public void checkDomainProtection(Class<?> targetType) {
-        DomainDefinition domainDefinition = matchDomainDefinition(targetType);
+        DomainDefinition domainDefinition = getDomainDefinition(targetType);
         if (domainDefinition == null) {
             return;
         }

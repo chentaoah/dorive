@@ -22,7 +22,7 @@ public interface TypeDomainResolver {
 
     boolean isUnderScanPackage(Class<?> typeToMatch);
 
-    DomainDefinition matchDomainDefinition(Class<?> typeToMatch);
+    DomainDefinition getDomainDefinition(Class<?> typeToMatch);
 
     void checkDomain(Class<?> targetType, Class<?> injectedType);
 
