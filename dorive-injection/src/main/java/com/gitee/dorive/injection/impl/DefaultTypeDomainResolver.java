@@ -92,10 +92,10 @@ public class DefaultTypeDomainResolver implements TypeDomainResolver {
         }
 
         String protect = domainDefinition.getProtect();
-        String targetTypeName = targetType.getName();
+        String typeName = targetType.getName();
 
-        if (StringUtils.isNotBlank(protect) && antPathMatcher.match(protect, targetTypeName)) {
-            String message = String.format("The type cannot be annotated by @Root! targetType: [%s], protect: [%s]", targetTypeName, protect);
+        if (StringUtils.isNotBlank(protect) && antPathMatcher.match(protect, typeName)) {
+            String message = String.format("The type with @Root annotation is protected! protect: [%s], targetType: [%s]", protect, typeName);
             throw new BeanCreationException(message);
         }
     }
