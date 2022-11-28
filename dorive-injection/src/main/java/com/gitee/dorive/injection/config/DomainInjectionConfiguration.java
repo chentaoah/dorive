@@ -40,8 +40,11 @@ import java.util.List;
 
 @Order(-100)
 @Configuration
-@ConditionalOnProperty(prefix = "spring.domain", name = "enable", havingValue = "true")
+@ConditionalOnProperty(prefix = "dorive", name = "enable", havingValue = "true")
 public class DomainInjectionConfiguration implements BeanFactoryPostProcessor {
+
+    public static final String SCAN_KEY = "dorive.scan";
+    public static final String DOMAINS_KEY = "dorive.domains";
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
@@ -54,9 +57,9 @@ public class DomainInjectionConfiguration implements BeanFactoryPostProcessor {
     @Bean("typeDomainResolverV3")
     @ConditionalOnMissingClass
     public TypeDomainResolver typeDomainResolver(Environment environment) {
-        String scanPackage = environment.getProperty("spring.domain.scan");
+        String scanPackage = environment.getProperty(SCAN_KEY);
         Assert.notBlank(scanPackage, "The configuration item could not be found! name: [spring.domain.scan]");
-        List<DomainDefinition> domainDefinitions = Binder.get(environment).bind("spring.domain.domains", Bindable.listOf(DomainDefinition.class)).get();
+        List<DomainDefinition> domainDefinitions = Binder.get(environment).bind(DOMAINS_KEY, Bindable.listOf(DomainDefinition.class)).get();
         domainDefinitions.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
         return new DefaultTypeDomainResolver(scanPackage, domainDefinitions);
     }
