@@ -24,7 +24,7 @@ import org.springframework.core.annotation.Order;
 @Configuration
 public class DomainCoreConfiguration {
 
-    @Bean
+    @Bean("repositoryContextV3")
     public RepositoryContext repositoryContext() {
         return new RepositoryContext();
     }

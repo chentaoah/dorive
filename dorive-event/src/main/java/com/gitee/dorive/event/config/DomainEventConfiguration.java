@@ -25,7 +25,7 @@ import org.springframework.core.annotation.Order;
 @Configuration
 public class DomainEventConfiguration {
 
-    @Bean
+    @Bean("repositoryListenerV3")
     public RepositoryListener repositoryListener() {
         return new RepositoryListener();
     }

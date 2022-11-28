@@ -51,7 +51,7 @@ public class DomainInjectionConfiguration implements BeanFactoryPostProcessor {
         }
     }
 
-    @Bean
+    @Bean("typeDomainResolverV3")
     @ConditionalOnMissingClass
     public TypeDomainResolver typeDomainResolver(Environment environment) {
         String scanPackage = environment.getProperty("spring.domain.scan");
@@ -61,13 +61,13 @@ public class DomainInjectionConfiguration implements BeanFactoryPostProcessor {
         return new DefaultTypeDomainResolver(scanPackage, domainDefinitions);
     }
 
-    @Bean
+    @Bean("limitedAnnotationBeanPostProcessorV3")
     @ConditionalOnMissingClass
     public LimitedAutowiredBeanPostProcessor limitedAnnotationBeanPostProcessor(TypeDomainResolver typeDomainResolver) {
         return new LimitedAutowiredBeanPostProcessor(typeDomainResolver);
     }
 
-    @Bean
+    @Bean("limitedRootInitializingBeanV3")
     @ConditionalOnMissingClass
     public LimitedRootInitializingBean limitedRootInitializingBean(TypeDomainResolver typeDomainResolver) {
         return new LimitedRootInitializingBean(typeDomainResolver);
