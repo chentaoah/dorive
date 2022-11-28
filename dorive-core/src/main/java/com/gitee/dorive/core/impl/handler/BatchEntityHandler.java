@@ -42,17 +42,18 @@ public class BatchEntityHandler implements EntityHandler {
     @Override
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
         for (ConfiguredRepository repository : this.repository.getSubRepositories()) {
-            if (repository.matchKeys(boundedContext)) {
-                UnionExample unionExample = newUnionExample(repository, boundedContext, rootEntities);
-                if (!unionExample.isDirtyQuery()) {
-                    continue;
-                }
-                Result<Object> result = repository.selectResultByExample(boundedContext, unionExample);
-                if (!(result instanceof EntityIndex)) {
-                    continue;
-                }
-                setValueForRootEntities(repository, rootEntities, (EntityIndex) result);
+            if (!repository.matchKeys(boundedContext)) {
+                continue;
             }
+            UnionExample unionExample = newUnionExample(repository, boundedContext, rootEntities);
+            if (!unionExample.isDirtyQuery()) {
+                continue;
+            }
+            Result<Object> result = repository.selectResultByExample(boundedContext, unionExample);
+            if (!(result instanceof EntityIndex)) {
+                continue;
+            }
+            setValueForRootEntities(repository, rootEntities, (EntityIndex) result);
         }
     }
 
