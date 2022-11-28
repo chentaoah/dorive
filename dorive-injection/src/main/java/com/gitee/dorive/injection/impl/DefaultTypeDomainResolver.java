@@ -95,7 +95,7 @@ public class DefaultTypeDomainResolver implements TypeDomainResolver {
         String typeName = type.getName();
 
         if (StringUtils.isNotBlank(protect) && antPathMatcher.match(protect, typeName)) {
-            String message = String.format("The type with @Root annotation is protected! protect: [%s], typeName: [%s]", protect, typeName);
+            String message = String.format("The type with @Root annotation is protected! protect: [%s], type: [%s]", protect, typeName);
             throw new BeanCreationException(message);
         }
     }
