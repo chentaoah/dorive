@@ -93,7 +93,9 @@ public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPos
     }
 
     private void doCheckAutowiredFieldDomain(Class<?> clazz, Field field) {
-        typeDomainResolver.checkDomain(clazz, field.getType());
+        if (typeDomainResolver.isUnderScanPackage(clazz) && typeDomainResolver.isUnderScanPackage(field.getType())) {
+            typeDomainResolver.checkDomain(clazz, field.getType());
+        }
     }
 
 }
