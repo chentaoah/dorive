@@ -40,7 +40,7 @@ import java.util.List;
 public class ConfiguredRepository extends ProxyRepository implements MetadataHolder {
 
     protected String accessPath;
-    protected boolean aggregateRoot;
+    protected boolean root;
     protected boolean aggregated;
     protected PropertyChain anchorPoint;
     protected PropertyResolver propertyResolver;

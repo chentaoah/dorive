@@ -115,7 +115,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultRepository.setExecutor(newExecutor(entityElement, entityDefinition));
         }
 
-        boolean aggregateRoot = "/".equals(accessPath);
+        boolean isRoot = "/".equals(accessPath);
         boolean aggregated = !(repository instanceof DefaultRepository);
         repository = postProcessRepository((AbstractRepository<Object, Object>) repository);
 
@@ -123,7 +123,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         PropertyChain anchorPoint = allPropertyChainMap.get(accessPath);
 
         PropertyResolver propertyResolver = new PropertyResolver(true);
-        String lastAccessPath = aggregateRoot || entityElement.isCollection() ? "" : accessPath;
+        String lastAccessPath = isRoot || entityElement.isCollection() ? "" : accessPath;
         propertyResolver.resolveProperties(lastAccessPath, entityElement.getGenericEntityClass());
 
         OrderBy defaultOrderBy = entityDefinition.getDefaultOrderBy();
@@ -137,7 +137,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         configuredRepository.setEntityDefinition(entityDefinition);
         configuredRepository.setProxyRepository((AbstractRepository<Object, Object>) repository);
         configuredRepository.setAccessPath(accessPath);
-        configuredRepository.setAggregateRoot(aggregateRoot);
+        configuredRepository.setRoot(isRoot);
         configuredRepository.setAggregated(aggregated);
         configuredRepository.setAnchorPoint(anchorPoint);
         configuredRepository.setPropertyResolver(propertyResolver);
