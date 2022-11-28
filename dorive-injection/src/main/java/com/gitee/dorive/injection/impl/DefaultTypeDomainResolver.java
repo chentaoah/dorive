@@ -85,7 +85,7 @@ public class DefaultTypeDomainResolver implements TypeDomainResolver {
     }
 
     @Override
-    public void checkDomainProtection(Class<?> targetType) {
+    public void checkProtection(Class<?> targetType) {
         DomainDefinition domainDefinition = getDomainDefinition(targetType);
         if (domainDefinition == null) {
             return;

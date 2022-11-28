@@ -26,6 +26,6 @@ public interface TypeDomainResolver {
 
     void checkDomain(Class<?> targetType, Class<?> injectedType);
 
-    void checkDomainProtection(Class<?> targetType);
+    void checkProtection(Class<?> targetType);
 
 }

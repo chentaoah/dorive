@@ -45,7 +45,7 @@ public class LimitedRootInitializingBean implements ApplicationContextAware, Ini
         Map<String, Object> beansWithAnnotation = applicationContext.getBeansWithAnnotation(Root.class);
         beansWithAnnotation.forEach((id, bean) -> {
             Class<?> targetClass = AopUtils.getAnnotatedClass(bean, Root.class);
-            typeDomainResolver.checkDomainProtection(targetClass);
+            typeDomainResolver.checkProtection(targetClass);
         });
     }
 
