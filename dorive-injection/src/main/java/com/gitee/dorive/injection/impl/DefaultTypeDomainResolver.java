@@ -50,9 +50,9 @@ public class DefaultTypeDomainResolver implements TypeDomainResolver {
     }
 
     @Override
-    public void checkDomain(Class<?> targetType, Class<?> injectedType) {
-        Root root = AnnotationUtils.getAnnotation(injectedType, Root.class);
-        if (root != null) {
+    public void checkDomain(Class<?> type, Class<?> injectedType) {
+        Root rootAnnotation = AnnotationUtils.getAnnotation(injectedType, Root.class);
+        if (rootAnnotation != null) {
             return;
         }
 
@@ -61,38 +61,38 @@ public class DefaultTypeDomainResolver implements TypeDomainResolver {
             return;
         }
 
-        DomainDefinition targetDomainDefinition = getDomainDefinition(targetType);
-        if (targetDomainDefinition == null) {
-            throwInjectionException(targetType, null, injectedType, injectedDomainDefinition.getName());
+        DomainDefinition domainDefinition = getDomainDefinition(type);
+        if (domainDefinition == null) {
+            throwInjectionException(type, null, injectedType, injectedDomainDefinition.getName());
             return;
         }
 
-        String targetDomainName = targetDomainDefinition.getName();
+        String domainName = domainDefinition.getName();
         String injectedDomainName = injectedDomainDefinition.getName();
 
-        boolean isSameDomain = Objects.equals(targetDomainName, injectedDomainName);
-        boolean isSubdomain = targetDomainName.startsWith(injectedDomainName + "-");
+        boolean isSameDomain = Objects.equals(domainName, injectedDomainName);
+        boolean isSubdomain = domainName.startsWith(injectedDomainName + "-");
 
         if (!isSameDomain && !isSubdomain) {
-            throwInjectionException(targetType, targetDomainName, injectedType, injectedDomainName);
+            throwInjectionException(type, domainName, injectedType, injectedDomainName);
         }
     }
 
-    private void throwInjectionException(Class<?> targetType, String targetDomainName, Class<?> injectedType, String injectedDomainName) {
-        String message = String.format("Injection of autowired dependencies failed! targetType: [%s], targetDomain: [%s], injectedType: [%s], injectedDomain: [%s]",
-                targetType.getName(), targetDomainName, injectedType.getName(), injectedDomainName);
+    private void throwInjectionException(Class<?> type, String domainName, Class<?> injectedType, String injectedDomainName) {
+        String message = String.format("Injection of autowired dependencies failed! type: [%s], domain: [%s], injectedType: [%s], injectedDomain: [%s]",
+                type.getName(), domainName, injectedType.getName(), injectedDomainName);
         throw new BeanCreationException(message);
     }
 
     @Override
-    public void checkProtection(Class<?> targetType) {
-        DomainDefinition domainDefinition = getDomainDefinition(targetType);
+    public void checkProtection(Class<?> type) {
+        DomainDefinition domainDefinition = getDomainDefinition(type);
         if (domainDefinition == null) {
             return;
         }
 
         String protect = domainDefinition.getProtect();
-        String typeName = targetType.getName();
+        String typeName = type.getName();
 
         if (StringUtils.isNotBlank(protect) && antPathMatcher.match(protect, typeName)) {
             String message = String.format("The type with @Root annotation is protected! protect: [%s], typeName: [%s]", protect, typeName);
