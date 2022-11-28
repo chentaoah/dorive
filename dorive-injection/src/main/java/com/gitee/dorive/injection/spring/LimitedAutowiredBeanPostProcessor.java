@@ -92,7 +92,7 @@ public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPos
         return null;
     }
 
-    protected void doCheckAutowiredFieldDomain(Class<?> clazz, Field field) {
+    private void doCheckAutowiredFieldDomain(Class<?> clazz, Field field) {
         typeDomainResolver.checkDomain(clazz, field.getType());
     }
 

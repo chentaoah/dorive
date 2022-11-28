@@ -78,7 +78,7 @@ public class DefaultTypeDomainResolver implements TypeDomainResolver {
         }
     }
 
-    protected void throwInjectionException(Class<?> targetType, String targetDomainName, Class<?> injectedType, String injectedDomainName) {
+    private void throwInjectionException(Class<?> targetType, String targetDomainName, Class<?> injectedType, String injectedDomainName) {
         String message = String.format("Injection of autowired dependencies failed! targetType: [%s], targetDomain: [%s], injectedType: [%s], injectedDomain: [%s]",
                 targetType.getName(), targetDomainName, injectedType.getName(), injectedDomainName);
         throw new BeanCreationException(message);

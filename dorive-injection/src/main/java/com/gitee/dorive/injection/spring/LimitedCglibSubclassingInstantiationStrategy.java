@@ -43,7 +43,7 @@ public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassi
         return super.instantiate(bd, beanName, owner, ctor, args);
     }
 
-    protected void tryGetResolverFromContext(BeanFactory owner) {
+    private void tryGetResolverFromContext(BeanFactory owner) {
         if (typeDomainResolver == null) {
             synchronized (this) {
                 if (typeDomainResolver == null) {
@@ -53,7 +53,7 @@ public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassi
         }
     }
 
-    protected boolean isNotSpringInternalType(Class<?> typeToMatch) {
+    private boolean isNotSpringInternalType(Class<?> typeToMatch) {
         return !typeToMatch.getName().startsWith("org.springframework.");
     }
 
