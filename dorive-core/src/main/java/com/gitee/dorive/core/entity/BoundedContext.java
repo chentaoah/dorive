@@ -16,26 +16,50 @@
  */
 package com.gitee.dorive.core.entity;
 
+import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.core.api.ExampleBuilder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.LinkedHashMap;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class BoundedContext extends LinkedHashMap<String, Object> {
+public class BoundedContext {
 
-    public BoundedContext(String... keys) {
-        putKeys(keys);
+    private Set<String> scenes = Collections.emptySet();
+    private Map<String, Object> attachments = Collections.emptyMap();
+
+    public BoundedContext(String... scenes) {
+        this.scenes = CollUtil.set(false, scenes);
     }
 
-    public void putKeys(String... keys) {
-        for (String key : keys) {
-            put(key, true);
+    public boolean isConformsScenes(String scene) {
+        return scenes.contains(scene);
+    }
+
+    public Object put(String key, Object value) {
+        if (attachments == Collections.EMPTY_MAP) {
+            attachments = new ConcurrentHashMap<>();
         }
+        return attachments.put(key, value);
+    }
+
+    public boolean containsKey(String key) {
+        return attachments.containsKey(key);
+    }
+
+    public Object get(String key) {
+        return attachments.get(key);
+    }
+
+    public Object remove(String key) {
+        return attachments.remove(key);
     }
 
     public void putBuilder(String key, ExampleBuilder builder) {

@@ -27,7 +27,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Entity {
 
-    String[] matchKeys() default {};
+    String[] scenes() default {};
 
     int order() default 0;
 

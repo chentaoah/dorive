@@ -109,13 +109,13 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
         return null;
     }
 
-    public boolean matchKeys(BoundedContext boundedContext) {
-        String[] matchKeys = entityDefinition.getMatchKeys();
-        if (matchKeys == null || matchKeys.length == 0) {
+    public boolean isConformsScenes(BoundedContext boundedContext) {
+        String[] scenes = entityDefinition.getScenes();
+        if (scenes == null || scenes.length == 0) {
             return true;
         }
-        for (String matchKey : matchKeys) {
-            if (boundedContext.containsKey(matchKey)) {
+        for (String scene : scenes) {
+            if (boundedContext.isConformsScenes(scene)) {
                 return true;
             }
         }

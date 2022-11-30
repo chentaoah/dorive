@@ -54,25 +54,26 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
     @Override
     public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
+        Assert.isTrue(query.getPrimaryKey() != null || query.getExample() != null, "The query criteria cannot be null!");
         ConfiguredRepository rootRepository = repository.getRootRepository();
-        if (query.getPrimaryKey() != null) {
-            Object rootEntity = rootRepository.selectByPrimaryKey(boundedContext, query.getPrimaryKey());
-            if (rootEntity != null) {
-                handleEntities(boundedContext, Collections.singletonList(rootEntity));
-            }
-            return new Result<>(rootEntity);
+        if (rootRepository.isConformsScenes(boundedContext)) {
+            if (query.getPrimaryKey() != null) {
+                Object rootEntity = rootRepository.selectByPrimaryKey(boundedContext, query.getPrimaryKey());
+                if (rootEntity != null) {
+                    handleEntities(boundedContext, Collections.singletonList(rootEntity));
+                }
+                return new Result<>(rootEntity);
 
-        } else if (query.getExample() != null) {
-            Result<Object> result = rootRepository.selectResultByExample(boundedContext, query.getExample());
-            List<Object> rootEntities = result.getRecords();
-            if (!rootEntities.isEmpty()) {
-                handleEntities(boundedContext, rootEntities);
+            } else if (query.getExample() != null) {
+                Result<Object> result = rootRepository.selectResultByExample(boundedContext, query.getExample());
+                List<Object> rootEntities = result.getRecords();
+                if (!rootEntities.isEmpty()) {
+                    handleEntities(boundedContext, rootEntities);
+                }
+                return result;
             }
-            return result;
-
-        } else {
-            throw new RuntimeException("Unsupported query method!");
         }
+        return new Result<>();
     }
 
     @Override
@@ -99,33 +100,36 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
         int totalCount = 0;
         for (ConfiguredRepository repository : delegateRepository.getOrderedRepositories()) {
-            PropertyChain anchorPoint = repository.getAnchorPoint();
-            Object targetEntity = anchorPoint == null ? rootEntity : anchorPoint.getValue(rootEntity);
+            if (repository.isConformsScenes(boundedContext)) {
 
-            if (targetEntity != null && repository.matchKeys(boundedContext)) {
-                int contextOperationType = operationTypeResolver.resolveOperationType(boundedContext, repository);
+                PropertyChain anchorPoint = repository.getAnchorPoint();
+                Object targetEntity = anchorPoint == null ? rootEntity : anchorPoint.getValue(rootEntity);
+                if (targetEntity != null) {
 
-                Collection<?> collection;
-                Object boundIdEntity = null;
-                if (targetEntity instanceof Collection) {
-                    collection = (Collection<?>) targetEntity;
-                } else {
-                    collection = Collections.singletonList(targetEntity);
-                    boundIdEntity = targetEntity;
-                }
+                    int contextOperationType = operationTypeResolver.resolveOperationType(boundedContext, repository);
 
-                for (Object entity : collection) {
-                    Object primaryKey = repository.getPrimaryKey(entity);
-                    int operationType = operationTypeResolver.mergeOperationType(expectedOperationType, contextOperationType, primaryKey);
-                    if ((operationType & Operation.INSERT) == Operation.INSERT) {
-                        getBoundValueFromContext(boundedContext, rootEntity, repository, entity);
+                    Collection<?> collection;
+                    Object boundIdEntity = null;
+                    if (targetEntity instanceof Collection) {
+                        collection = (Collection<?>) targetEntity;
+                    } else {
+                        collection = Collections.singletonList(targetEntity);
+                        boundIdEntity = targetEntity;
                     }
-                    operationType = repository.isAggregated() ? expectedOperationType : operationType;
-                    totalCount += doExecute(boundedContext, repository, entity, operationType);
-                }
 
-                if (isInsertContext && boundIdEntity != null) {
-                    setBoundIdForBoundEntity(boundedContext, rootEntity, repository, boundIdEntity);
+                    for (Object entity : collection) {
+                        Object primaryKey = repository.getPrimaryKey(entity);
+                        int operationType = operationTypeResolver.mergeOperationType(expectedOperationType, contextOperationType, primaryKey);
+                        if ((operationType & Operation.INSERT) == Operation.INSERT) {
+                            getBoundValueFromContext(boundedContext, rootEntity, repository, entity);
+                        }
+                        operationType = repository.isAggregated() ? expectedOperationType : operationType;
+                        totalCount += doExecute(boundedContext, repository, entity, operationType);
+                    }
+
+                    if (isInsertContext && boundIdEntity != null) {
+                        setBoundIdForBoundEntity(boundedContext, rootEntity, repository, boundIdEntity);
+                    }
                 }
             }
         }

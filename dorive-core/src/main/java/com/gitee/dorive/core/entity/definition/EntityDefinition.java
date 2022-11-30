@@ -35,7 +35,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class EntityDefinition {
 
-    private String[] matchKeys;
+    private String[] scenes;
     private int order;
     private Class<?> mapper;
     private Class<?> factory;
