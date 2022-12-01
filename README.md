@@ -1,4 +1,4 @@
-<h3 align="center"><font size="10">Dorive</font></h3>
+<h2 align="center">Dorive</h2>
 <h3 align="center">轻量级领域驱动框架</h3>
 <p align="center">
   <img src="https://img.shields.io/github/license/chentaoah/dorive" alt="license">
