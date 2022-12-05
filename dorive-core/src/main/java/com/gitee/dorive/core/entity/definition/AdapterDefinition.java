@@ -17,7 +17,7 @@
 package com.gitee.dorive.core.entity.definition;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.core.annotation.Selector;
+import com.gitee.dorive.core.annotation.Adapter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -28,16 +28,16 @@ import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class SelectorDefinition {
+public class AdapterDefinition {
 
-    private Class<?> selector;
+    private Class<?> adapter;
     private String[] args;
 
-    public static SelectorDefinition newSelectorDefinition(AnnotatedElement annotatedElement) {
-        Selector selectorAnnotation = AnnotatedElementUtils.getMergedAnnotation(annotatedElement, Selector.class);
-        if (selectorAnnotation != null) {
-            Map<String, Object> annotationAttributes = AnnotationUtils.getAnnotationAttributes(selectorAnnotation);
-            return BeanUtil.copyProperties(annotationAttributes, SelectorDefinition.class);
+    public static AdapterDefinition newAdapterDefinition(AnnotatedElement annotatedElement) {
+        Adapter adapterAnnotation = AnnotatedElementUtils.getMergedAnnotation(annotatedElement, Adapter.class);
+        if (adapterAnnotation != null) {
+            Map<String, Object> annotationAttributes = AnnotationUtils.getAnnotationAttributes(adapterAnnotation);
+            return BeanUtil.copyProperties(annotationAttributes, AdapterDefinition.class);
         }
         return null;
     }

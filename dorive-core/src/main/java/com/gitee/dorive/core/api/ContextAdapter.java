@@ -19,8 +19,8 @@ package com.gitee.dorive.core.api;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.operation.Operation;
 
-public interface Selector {
+public interface ContextAdapter {
 
-    void rebuild(BoundedContext boundedContext, Operation operation);
-    
+    void adapt(BoundedContext boundedContext, Operation operation);
+
 }

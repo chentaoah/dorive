@@ -21,7 +21,7 @@ import com.gitee.dorive.core.entity.PropertyChain;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.executor.ChainExecutor;
-import com.gitee.dorive.core.impl.executor.SelectableExecutor;
+import com.gitee.dorive.core.impl.executor.AdaptiveExecutor;
 import com.gitee.dorive.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
@@ -29,7 +29,7 @@ import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import com.gitee.dorive.core.impl.resolver.PropertyResolver;
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.api.Executor;
-import com.gitee.dorive.core.impl.resolver.SelectorResolver;
+import com.gitee.dorive.core.impl.resolver.AdapterResolver;
 import com.gitee.dorive.core.util.ReflectUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -50,7 +50,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected Class<?> entityClass;
 
     protected DelegateResolver delegateResolver = new DelegateResolver(this);
-    protected SelectorResolver selectorResolver = new SelectorResolver(this);
+    protected AdapterResolver adapterResolver = new AdapterResolver(this);
     protected PropertyResolver propertyResolver = new PropertyResolver(false);
 
     protected Map<String, ConfiguredRepository> allRepositoryMap = new LinkedHashMap<>();
@@ -68,7 +68,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         entityClass = ReflectUtils.getFirstArgumentType(this.getClass());
 
         delegateResolver.resolveDelegateRepositoryMap();
-        selectorResolver.resolveSelector();
+        adapterResolver.resolveAdapter();
 
         List<Class<?>> allClasses = ReflectUtils.getAllSuperclasses(entityClass, Object.class);
         allClasses.add(entityClass);
@@ -99,8 +99,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             entityHandler = new AdaptiveEntityHandler(this, entityHandler);
         }
         Executor executor = new ChainExecutor(this, entityHandler);
-        if (selectorResolver.isSelectable()) {
-            executor = new SelectableExecutor(this, executor);
+        if (adapterResolver.isAdaptive()) {
+            executor = new AdaptiveExecutor(this, executor);
         }
         setExecutor(executor);
     }

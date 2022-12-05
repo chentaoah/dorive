@@ -14,30 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.dorive.core.annotation;
+package com.gitee.dorive.core.impl;
 
-import com.gitee.dorive.core.impl.DefaultSelector;
-import org.springframework.core.annotation.AliasFor;
+import com.gitee.dorive.core.api.ContextAdapter;
+import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.entity.definition.AdapterDefinition;
+import com.gitee.dorive.core.entity.operation.Operation;
+import lombok.Data;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+@Data
+public class DefaultContextAdapter implements ContextAdapter {
 
-@Inherited
-@Documented
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Selector {
+    protected AdapterDefinition adapterDefinition;
 
-    @AliasFor("selector")
-    Class<?> value() default DefaultSelector.class;
-
-    @AliasFor("value")
-    Class<?> selector() default DefaultSelector.class;
-
-    String[] args() default {};
+    @Override
+    public void adapt(BoundedContext boundedContext, Operation operation) {
+        // ignore
+    }
 
 }

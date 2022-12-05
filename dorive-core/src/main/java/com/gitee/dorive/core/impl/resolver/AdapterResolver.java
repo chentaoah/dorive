@@ -16,44 +16,44 @@
  */
 package com.gitee.dorive.core.impl.resolver;
 
-import com.gitee.dorive.core.api.Selector;
-import com.gitee.dorive.core.entity.definition.SelectorDefinition;
-import com.gitee.dorive.core.impl.DefaultSelector;
+import com.gitee.dorive.core.api.ContextAdapter;
+import com.gitee.dorive.core.entity.definition.AdapterDefinition;
+import com.gitee.dorive.core.impl.DefaultContextAdapter;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
 
 @Data
-public class SelectorResolver {
+public class AdapterResolver {
 
     private AbstractContextRepository<?, ?> repository;
 
-    private Selector selector;
+    private ContextAdapter contextAdapter;
 
-    public SelectorResolver(AbstractContextRepository<?, ?> repository) {
+    public AdapterResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
     }
 
-    public void resolveSelector() {
+    public void resolveAdapter() {
         Class<?> entityClass = repository.getEntityClass();
-        SelectorDefinition selectorDefinition = SelectorDefinition.newSelectorDefinition(entityClass);
-        if (selectorDefinition != null) {
-            Class<?> selectorClass = selectorDefinition.getSelector();
-            if (selectorClass == DefaultSelector.class) {
-                selector = new DefaultSelector();
+        AdapterDefinition adapterDefinition = AdapterDefinition.newAdapterDefinition(entityClass);
+        if (adapterDefinition != null) {
+            Class<?> adapterClass = adapterDefinition.getAdapter();
+            if (adapterClass == DefaultContextAdapter.class) {
+                contextAdapter = new DefaultContextAdapter();
             } else {
                 ApplicationContext applicationContext = repository.getApplicationContext();
-                selector = (Selector) applicationContext.getBean(selectorClass);
+                contextAdapter = (ContextAdapter) applicationContext.getBean(adapterClass);
             }
-            if (selector instanceof DefaultSelector) {
-                DefaultSelector defaultSelector = (DefaultSelector) selector;
-                defaultSelector.setSelectorDefinition(selectorDefinition);
+            if (contextAdapter instanceof DefaultContextAdapter) {
+                DefaultContextAdapter defaultContextAdapter = (DefaultContextAdapter) contextAdapter;
+                defaultContextAdapter.setAdapterDefinition(adapterDefinition);
             }
         }
     }
 
-    public boolean isSelectable() {
-        return selector != null;
+    public boolean isAdaptive() {
+        return contextAdapter != null;
     }
 
 }

@@ -17,12 +17,12 @@
 package com.gitee.dorive.core.impl.executor;
 
 import com.gitee.dorive.core.api.Executor;
-import com.gitee.dorive.core.api.Selector;
+import com.gitee.dorive.core.api.ContextAdapter;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.impl.resolver.SelectorResolver;
+import com.gitee.dorive.core.impl.resolver.AdapterResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,12 +31,12 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class SelectableExecutor extends AbstractExecutor {
+public class AdaptiveExecutor extends AbstractExecutor {
 
     private AbstractContextRepository<?, ?> repository;
     private Executor executor;
 
-    public SelectableExecutor(AbstractContextRepository<?, ?> repository, Executor executor) {
+    public AdaptiveExecutor(AbstractContextRepository<?, ?> repository, Executor executor) {
         super(repository.getEntityElement());
         this.repository = repository;
         this.executor = executor;
@@ -49,17 +49,17 @@ public class SelectableExecutor extends AbstractExecutor {
 
     @Override
     public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
-        SelectorResolver selectorResolver = repository.getSelectorResolver();
-        Selector selector = selectorResolver.getSelector();
-        selector.rebuild(boundedContext, query);
+        AdapterResolver adapterResolver = repository.getAdapterResolver();
+        ContextAdapter contextAdapter = adapterResolver.getContextAdapter();
+        contextAdapter.adapt(boundedContext, query);
         return executor.executeQuery(boundedContext, query);
     }
 
     @Override
     public int execute(BoundedContext boundedContext, Operation operation) {
-        SelectorResolver selectorResolver = repository.getSelectorResolver();
-        Selector selector = selectorResolver.getSelector();
-        selector.rebuild(boundedContext, operation);
+        AdapterResolver adapterResolver = repository.getAdapterResolver();
+        ContextAdapter contextAdapter = adapterResolver.getContextAdapter();
+        contextAdapter.adapt(boundedContext, operation);
         return executor.execute(boundedContext, operation);
     }
 
