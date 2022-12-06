@@ -75,24 +75,26 @@ public class SQLExampleBuilder implements ExampleBuilder {
             ConfiguredRepository definedRepository = mergedRepository.getDefinedRepository();
             ConfiguredRepository configuredRepository = mergedRepository.getConfiguredRepository();
 
+            BinderResolver binderResolver = definedRepository.getBinderResolver();
+
             TableInfo tableInfo = getTableInfo(configuredRepository);
             String tableName = tableInfo.getTableName();
 
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
-            List<JoinSegment> joinSegments = newJoinSegments(sqlSegmentMap, definedRepository.getBinderResolver(), tableName, tableAlias);
             Example example = repositoryWrapper.newExampleByCoating(boundedContext, coatingObject);
             boolean dirtyQuery = example.isDirtyQuery();
             Set<String> joinTableNames = new HashSet<>(8);
 
             if ("/".equals(absoluteAccessPath)) {
                 String sql = String.format("SELECT %s.id FROM %s %s ", tableAlias, tableName, tableAlias);
-                rootSqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, example, true, dirtyQuery, joinTableNames);
+                rootSqlSegment = new SqlSegment(tableName, tableAlias, sql, Collections.emptyList(), example, true, dirtyQuery, joinTableNames);
                 sqlSegmentMap.put(tableName, rootSqlSegment);
 
             } else {
                 String sql = String.format("LEFT JOIN %s %s ON ", tableName, tableAlias);
+                List<JoinSegment> joinSegments = newJoinSegments(sqlSegmentMap, binderResolver, tableName, tableAlias);
                 SqlSegment sqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, example, false, dirtyQuery, joinTableNames);
                 sqlSegmentMap.put(tableName, sqlSegment);
             }
