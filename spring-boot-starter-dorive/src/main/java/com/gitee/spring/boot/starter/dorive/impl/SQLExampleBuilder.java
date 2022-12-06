@@ -110,9 +110,11 @@ public class SQLExampleBuilder implements ExampleBuilder {
             return example;
         }
 
+        StringBuilder sqlBuilder = new StringBuilder();
         List<Object> args = new ArrayList<>();
-        String sql = buildSQL(sqlSegmentMap, example, args);
-        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sql, args.toArray());
+        buildSQL(sqlBuilder, args, sqlSegmentMap, example);
+
+        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sqlBuilder.toString(), args.toArray());
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
         if (!primaryKeys.isEmpty()) {
             example.eq("id", primaryKeys);
@@ -168,8 +170,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
     }
 
-    private String buildSQL(Map<String, SqlSegment> sqlSegmentMap, Example example, List<Object> args) {
-        StringBuilder sqlBuilder = new StringBuilder();
+    private void buildSQL(StringBuilder sqlBuilder, List<Object> args, Map<String, SqlSegment> sqlSegmentMap, Example example) {
         List<String> sqlCriteria = new ArrayList<>(sqlSegmentMap.size());
 
         for (SqlSegment sqlSegment : sqlSegmentMap.values()) {
@@ -214,8 +215,6 @@ public class SQLExampleBuilder implements ExampleBuilder {
         if (page != null) {
             sqlBuilder.append(" ").append(page);
         }
-
-        return sqlBuilder.toString();
     }
 
 }
