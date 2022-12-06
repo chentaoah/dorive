@@ -64,8 +64,6 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         List<RepositoryWrapper> repositoryWrappers = coatingWrapper.getRepositoryWrappers();
         SpecificProperties specificProperties = coatingWrapper.getSpecificProperties();
-        OrderBy orderByInfo = specificProperties.getOrderBy(coatingObject);
-        Page<Object> pageInfo = specificProperties.getPage(coatingObject);
 
         Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>(repositoryWrappers.size() * 4 / 3 + 1);
         SqlSegment rootSqlSegment = null;
@@ -101,8 +99,8 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
 
         Example example = new Example();
-        example.setOrderBy(orderByInfo);
-        example.setPage(pageInfo);
+        example.setOrderBy(specificProperties.getOrderBy(coatingObject));
+        example.setPage(specificProperties.getPage(coatingObject));
 
         assert rootSqlSegment != null;
         markReachableAndDirty(sqlSegmentMap, rootSqlSegment);
