@@ -16,6 +16,7 @@
  */
 package com.gitee.spring.boot.starter.dorive.entity;
 
+import com.gitee.dorive.core.entity.executor.Example;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -30,7 +31,7 @@ public class SqlSegment {
     private String tableAlias;
     private String sql;
     private List<JoinSegment> joinSegments;
-    private String sqlCriteria;
+    private Example example;
     private boolean rootReachable;
     private boolean dirtyQuery;
     private Set<String> joinTableNames;

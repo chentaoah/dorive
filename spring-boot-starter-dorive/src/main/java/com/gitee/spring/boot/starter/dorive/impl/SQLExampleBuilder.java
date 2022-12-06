@@ -22,6 +22,8 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
+import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.spring.boot.starter.dorive.entity.ArgSegment;
 import com.gitee.spring.boot.starter.dorive.entity.JoinSegment;
 import com.gitee.spring.boot.starter.dorive.entity.Metadata;
 import com.gitee.spring.boot.starter.dorive.entity.SqlSegment;
@@ -82,21 +84,18 @@ public class SQLExampleBuilder implements ExampleBuilder {
             letter = (char) (letter + 1);
 
             List<JoinSegment> joinSegments = newJoinSegments(sqlSegmentMap, definedRepository.getBinderResolver(), tableName, tableAlias);
-
             Example example = repositoryWrapper.newExampleByCoating(boundedContext, coatingObject);
-            String sqlCriteria = null;
-            if (example.isDirtyQuery()) {
-                sqlCriteria = CollUtil.join(example.getCriteria(), " AND ", tableAlias + ".", null);
-            }
+            boolean dirtyQuery = example.isDirtyQuery();
+            Set<String> joinTableNames = new HashSet<>(8);
 
             if ("/".equals(absoluteAccessPath)) {
                 String sql = String.format("SELECT %s.id FROM %s %s ", tableAlias, tableName, tableAlias);
-                rootSqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, sqlCriteria, true, example.isDirtyQuery(), new HashSet<>(8));
+                rootSqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, example, true, dirtyQuery, joinTableNames);
                 sqlSegmentMap.put(tableName, rootSqlSegment);
 
             } else {
                 String sql = String.format("LEFT JOIN %s %s ON ", tableName, tableAlias);
-                SqlSegment sqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, sqlCriteria, false, example.isDirtyQuery(), new HashSet<>(8));
+                SqlSegment sqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, example, false, dirtyQuery, joinTableNames);
                 sqlSegmentMap.put(tableName, sqlSegment);
             }
         }
@@ -111,8 +110,9 @@ public class SQLExampleBuilder implements ExampleBuilder {
             return example;
         }
 
-        String sql = buildSQL(sqlSegmentMap, example);
-        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sql);
+        List<Object> args = new ArrayList<>();
+        String sql = buildSQL(sqlSegmentMap, example, args);
+        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sql, args.toArray());
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
         if (!primaryKeys.isEmpty()) {
             example.eq("id", primaryKeys);
@@ -168,7 +168,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
     }
 
-    private String buildSQL(Map<String, SqlSegment> sqlSegmentMap, Example example) {
+    private String buildSQL(Map<String, SqlSegment> sqlSegmentMap, Example example, List<Object> args) {
         StringBuilder sqlBuilder = new StringBuilder();
         List<String> sqlCriteria = new ArrayList<>(sqlSegmentMap.size());
 
@@ -186,8 +186,19 @@ public class SQLExampleBuilder implements ExampleBuilder {
                     sqlBuilder.append(StrUtil.join(" AND ", joinSegments)).append(" ");
                 }
 
-                if (sqlSegment.getSqlCriteria() != null) {
-                    sqlCriteria.add(sqlSegment.getSqlCriteria());
+                String tableAlias = sqlSegment.getTableAlias();
+                Example sqlExample = sqlSegment.getExample();
+                if (sqlExample != null && sqlExample.isDirtyQuery()) {
+                    List<Criterion> criteria = sqlExample.getCriteria();
+                    List<ArgSegment> argSegments = new ArrayList<>(criteria.size());
+                    for (Criterion criterion : criteria) {
+                        args.add(criterion.getFinalValue());
+                        int index = args.size() - 1;
+                        ArgSegment argSegment = new ArgSegment(criterion.getFinalProperty(), criterion.getFinalOperator(), index);
+                        argSegments.add(argSegment);
+                    }
+                    String sqlCriterion = CollUtil.join(argSegments, " AND ", tableAlias + ".", null);
+                    sqlCriteria.add(sqlCriterion);
                 }
             }
         }

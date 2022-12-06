@@ -34,9 +34,11 @@ public class Criterion {
     private String operator;
     private Object value;
 
-    @Override
-    public String toString() {
-        String property = StrUtil.toUnderlineCase(this.property);
+    public String getFinalProperty() {
+        return StrUtil.toUnderlineCase(this.property);
+    }
+
+    public String getFinalOperator() {
         String operator = this.operator;
         if (this.value instanceof Collection) {
             if (Operator.EQ.equals(operator)) {
@@ -46,8 +48,11 @@ public class Criterion {
                 operator = Operator.NOT_IN;
             }
         }
-        String value = convert(this.value);
-        return property + " " + operator + " " + value;
+        return operator;
+    }
+
+    public Object getFinalValue() {
+        return convert(this.value);
     }
 
     private String convert(Object value) {
@@ -79,6 +84,11 @@ public class Criterion {
             return "NULL";
         }
         return value.toString();
+    }
+
+    @Override
+    public String toString() {
+        return getFinalProperty() + " " + getFinalOperator() + " " + getFinalValue();
     }
 
 }
