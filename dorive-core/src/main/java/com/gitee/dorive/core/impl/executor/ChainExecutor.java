@@ -44,8 +44,6 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     private final AbstractContextRepository<?, ?> repository;
     private final EntityHandler entityHandler;
 
-    private final OperationTypeResolver operationTypeResolver = new OperationTypeResolver();
-
     public ChainExecutor(AbstractContextRepository<?, ?> repository, EntityHandler entityHandler) {
         super(repository.getEntityElement());
         this.repository = repository;
@@ -106,7 +104,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                 Object targetEntity = anchorPoint == null ? rootEntity : anchorPoint.getValue(rootEntity);
                 if (targetEntity != null) {
 
-                    int contextOperationType = operationTypeResolver.resolveOperationType(boundedContext, repository);
+                    int contextOperationType = OperationTypeResolver.resolveOperationType(boundedContext, repository);
 
                     Collection<?> collection;
                     Object boundIdEntity = null;
@@ -119,7 +117,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
                     for (Object entity : collection) {
                         Object primaryKey = repository.getPrimaryKey(entity);
-                        int operationType = operationTypeResolver.mergeOperationType(expectedOperationType, contextOperationType, primaryKey);
+                        int operationType = OperationTypeResolver.mergeOperationType(expectedOperationType, contextOperationType, primaryKey);
                         if ((operationType & Operation.INSERT) == Operation.INSERT) {
                             getBoundValueFromContext(boundedContext, rootEntity, repository, entity);
                         }

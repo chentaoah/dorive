@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class OperationTypeResolver {
 
-    public int resolveOperationType(BoundedContext boundedContext, ConfiguredRepository repository) {
+    public static int resolveOperationType(BoundedContext boundedContext, ConfiguredRepository repository) {
         EntityDefinition entityDefinition = repository.getEntityDefinition();
         String commandKey = entityDefinition.getCommandKey();
         if (StringUtils.isNotBlank(commandKey) && boundedContext.containsKey(commandKey)) {
@@ -40,7 +40,7 @@ public class OperationTypeResolver {
         return Operation.NONE;
     }
 
-    public int mergeOperationType(int expectedOperationType, int contextOperationType, Object primaryKey) {
+    public static int mergeOperationType(int expectedOperationType, int contextOperationType, Object primaryKey) {
         if (contextOperationType == Operation.FORCE_IGNORE) {
             return Operation.FORCE_IGNORE;
 
