@@ -14,7 +14,7 @@
         <module>dorive-core</module>
         <module>dorive-event</module>
         <module>dorive-coating</module>
-        <module>spring-boot-starter-dorive</module>
+        <module>dorive-spring-boot-starter</module>
     </modules>
 
     <properties>
