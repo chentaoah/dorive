@@ -66,10 +66,14 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     public Page<E> selectPageByCoating(BoundedContext boundedContext, Object coatingObject) {
         Example example = buildExample(boundedContext, coatingObject);
         Page<Object> page = example.getPage();
-        if (page != null && page.getTotal() != 0) {
-            List<E> records = selectByExample(boundedContext, example);
-            page.setRecords((List<Object>) records);
-            return (Page<E>) page;
+        if (page != null) {
+            long total = page.getTotal();
+            if (total != 0) {
+                List<E> records = selectByExample(boundedContext, example);
+                page.setTotal(total);
+                page.setRecords((List<Object>) records);
+                return (Page<E>) page;
+            }
         }
         return selectPageByExample(boundedContext, example);
     }
