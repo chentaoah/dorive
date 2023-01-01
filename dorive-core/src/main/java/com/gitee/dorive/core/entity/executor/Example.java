@@ -33,7 +33,6 @@ public class Example {
 
     private boolean emptyQuery = false;
     private boolean usedPage = false;
-
     private String[] selectColumns;
     private List<Criterion> criteria = new ArrayList<>(4);
     private OrderBy orderBy;
