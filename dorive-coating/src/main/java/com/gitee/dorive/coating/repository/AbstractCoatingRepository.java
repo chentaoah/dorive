@@ -62,8 +62,15 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Page<E> selectPageByCoating(BoundedContext boundedContext, Object coatingObject) {
         Example example = buildExample(boundedContext, coatingObject);
+        Page<Object> page = example.getPage();
+        if (page != null && page.getTotal() != 0) {
+            List<E> records = selectByExample(boundedContext, example);
+            page.setRecords((List<Object>) records);
+            return (Page<E>) page;
+        }
         return selectPageByExample(boundedContext, example);
     }
 

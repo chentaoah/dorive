@@ -22,26 +22,26 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
-import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.spring.boot.starter.dorive.entity.ArgSegment;
-import com.gitee.spring.boot.starter.dorive.entity.JoinSegment;
-import com.gitee.spring.boot.starter.dorive.entity.Metadata;
-import com.gitee.spring.boot.starter.dorive.entity.SqlSegment;
 import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.entity.CoatingWrapper;
-import com.gitee.dorive.coating.entity.RepositoryWrapper;
 import com.gitee.dorive.coating.entity.MergedRepository;
+import com.gitee.dorive.coating.entity.RepositoryWrapper;
 import com.gitee.dorive.coating.entity.SpecificProperties;
 import com.gitee.dorive.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.definition.BindingDefinition;
+import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.spring.boot.starter.dorive.entity.ArgSegment;
+import com.gitee.spring.boot.starter.dorive.entity.JoinSegment;
+import com.gitee.spring.boot.starter.dorive.entity.Metadata;
+import com.gitee.spring.boot.starter.dorive.entity.SqlSegment;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -112,8 +112,20 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         StringBuilder sqlBuilder = new StringBuilder();
         List<Object> args = new ArrayList<>();
-        buildSQL(sqlBuilder, args, sqlSegmentMap, example);
 
+        buildSQL(sqlBuilder, args, sqlSegmentMap);
+        Page<Object> page = example.getPage();
+        if (page != null) {
+            int count = SqlRunner.db().selectCount("SELECT COUNT(1) FROM (" + sqlBuilder + ") " + letter, args.toArray());
+            if (count == 0) {
+                example.setEmptyQuery(true);
+                return example;
+            } else {
+                page.setTotal(count);
+            }
+        }
+
+        buildSQL(sqlBuilder, example);
         List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sqlBuilder.toString(), args.toArray());
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
         if (!primaryKeys.isEmpty()) {
@@ -170,7 +182,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
     }
 
-    private void buildSQL(StringBuilder sqlBuilder, List<Object> args, Map<String, SqlSegment> sqlSegmentMap, Example example) {
+    private void buildSQL(StringBuilder sqlBuilder, List<Object> args, Map<String, SqlSegment> sqlSegmentMap) {
         List<String> sqlCriteria = new ArrayList<>(sqlSegmentMap.size());
 
         for (SqlSegment sqlSegment : sqlSegmentMap.values()) {
@@ -205,12 +217,13 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
 
         sqlBuilder.append("WHERE ").append(StrUtil.join(" AND ", sqlCriteria));
+    }
 
+    private void buildSQL(StringBuilder sqlBuilder, Example example) {
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
             sqlBuilder.append(" ").append(orderBy);
         }
-
         Page<Object> page = example.getPage();
         if (page != null) {
             sqlBuilder.append(" ").append(page);
