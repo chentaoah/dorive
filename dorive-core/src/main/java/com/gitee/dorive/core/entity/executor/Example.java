@@ -35,6 +35,7 @@ public class Example {
     private String[] selectColumns;
     private List<Criterion> criteria = new ArrayList<>(4);
     private OrderBy orderBy;
+    private boolean usedPage = false;
     private Page<Object> page;
 
     public boolean isDirtyQuery() {

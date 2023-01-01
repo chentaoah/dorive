@@ -61,9 +61,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         CoatingWrapper coatingWrapper = coatingWrapperMap.get(coatingObject.getClass());
         Assert.notNull(coatingWrapper, "No coating wrapper exists!");
-
         List<RepositoryWrapper> repositoryWrappers = coatingWrapper.getRepositoryWrappers();
-        SpecificProperties specificProperties = coatingWrapper.getSpecificProperties();
 
         Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>(repositoryWrappers.size() * 4 / 3 + 1);
         SqlSegment rootSqlSegment = null;
@@ -100,9 +98,14 @@ public class SQLExampleBuilder implements ExampleBuilder {
             }
         }
 
+        SpecificProperties properties = coatingWrapper.getSpecificProperties();
+        OrderBy orderBy = properties.getOrderBy(coatingObject);
+        Page<Object> page = properties.getPage(coatingObject);
+
         Example example = new Example();
-        example.setOrderBy(specificProperties.getOrderBy(coatingObject));
-        example.setPage(specificProperties.getPage(coatingObject));
+        example.setOrderBy(orderBy);
+        example.setUsedPage(page != null);
+        example.setPage(page);
 
         assert rootSqlSegment != null;
         markReachableAndDirty(sqlSegmentMap, rootSqlSegment);
@@ -114,7 +117,6 @@ public class SQLExampleBuilder implements ExampleBuilder {
         List<Object> args = new ArrayList<>();
 
         buildSQL(sqlBuilder, args, sqlSegmentMap);
-        Page<Object> page = example.getPage();
         if (page != null) {
             int count = SqlRunner.db().selectCount("SELECT COUNT(1) FROM (" + sqlBuilder + ") " + letter, args.toArray());
             if (count == 0) {
@@ -125,7 +127,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             }
         }
 
-        buildSQL(sqlBuilder, example);
+        buildSQL(sqlBuilder, orderBy, page);
         List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(sqlBuilder.toString(), args.toArray());
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
         if (!primaryKeys.isEmpty()) {
@@ -219,12 +221,10 @@ public class SQLExampleBuilder implements ExampleBuilder {
         sqlBuilder.append("WHERE ").append(StrUtil.join(" AND ", sqlCriteria));
     }
 
-    private void buildSQL(StringBuilder sqlBuilder, Example example) {
-        OrderBy orderBy = example.getOrderBy();
+    private void buildSQL(StringBuilder sqlBuilder, OrderBy orderBy, Page<Object> page) {
         if (orderBy != null) {
             sqlBuilder.append(" ").append(orderBy);
         }
-        Page<Object> page = example.getPage();
         if (page != null) {
             sqlBuilder.append(" ").append(page);
         }
