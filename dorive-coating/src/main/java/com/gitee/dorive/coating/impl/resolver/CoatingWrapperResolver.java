@@ -68,7 +68,7 @@ public class CoatingWrapperResolver {
                 }
 
                 Set<String> fieldNames = new LinkedHashSet<>();
-                Map<String, List<PropertyWrapper>> accessPathPropertyWrappersMap = new LinkedHashMap<>();
+                Map<String, List<PropertyWrapper>> belongToPropertyWrappersMap = new LinkedHashMap<>();
                 Map<String, PropertyWrapper> fieldPropertyWrapperMap = new LinkedHashMap<>();
                 SpecificProperties specificProperties = new SpecificProperties();
 
@@ -89,16 +89,16 @@ public class CoatingWrapperResolver {
 
                     fieldNames.add(fieldName);
 
-                    String accessPath = propertyDefinition.getAccessPath();
-                    if (StringUtils.isNotBlank(accessPath) && accessPath.startsWith("/")) {
-                        List<PropertyWrapper> existPropertyWrappers = accessPathPropertyWrappersMap.computeIfAbsent(accessPath, key -> new ArrayList<>());
+                    String belongTo = propertyDefinition.getBelongTo();
+                    if (StringUtils.isNotBlank(belongTo) && belongTo.startsWith("/")) {
+                        List<PropertyWrapper> existPropertyWrappers = belongToPropertyWrappersMap.computeIfAbsent(belongTo, key -> new ArrayList<>());
                         existPropertyWrappers.add(propertyWrapper);
                     } else {
                         fieldPropertyWrapperMap.put(fieldName, propertyWrapper);
                     }
                 });
 
-                List<RepositoryWrapper> repositoryWrappers = collectRepositoryWrappers(accessPathPropertyWrappersMap, fieldPropertyWrapperMap);
+                List<RepositoryWrapper> repositoryWrappers = collectRepositoryWrappers(belongToPropertyWrappersMap, fieldPropertyWrapperMap);
                 checkFieldNames(coatingClass, fieldNames, repositoryWrappers);
 
                 List<RepositoryWrapper> reversedRepositoryWrappers = new ArrayList<>(repositoryWrappers);
@@ -111,7 +111,7 @@ public class CoatingWrapperResolver {
         }
     }
 
-    private List<RepositoryWrapper> collectRepositoryWrappers(Map<String, List<PropertyWrapper>> accessPathPropertyWrappersMap,
+    private List<RepositoryWrapper> collectRepositoryWrappers(Map<String, List<PropertyWrapper>> belongToPropertyWrappersMap,
                                                               Map<String, PropertyWrapper> fieldPropertyWrapperMap) {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
@@ -125,9 +125,9 @@ public class CoatingWrapperResolver {
 
             List<PropertyWrapper> propertyWrappers = new ArrayList<>();
 
-            List<PropertyWrapper> accessPathPropertyWrappers = accessPathPropertyWrappersMap.get(absoluteAccessPath);
-            if (accessPathPropertyWrappers != null) {
-                propertyWrappers.addAll(accessPathPropertyWrappers);
+            List<PropertyWrapper> belongToPropertyWrappers = belongToPropertyWrappersMap.get(absoluteAccessPath);
+            if (belongToPropertyWrappers != null) {
+                propertyWrappers.addAll(belongToPropertyWrappers);
             }
 
             for (String fieldName : entityElement.getProperties()) {

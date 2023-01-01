@@ -32,7 +32,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class PropertyDefinition {
 
-    private String accessPath;
+    private String belongTo;
     private String alias;
     private String operator;
     private boolean ignore;

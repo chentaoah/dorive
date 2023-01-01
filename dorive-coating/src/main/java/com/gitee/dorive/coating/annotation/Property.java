@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Property {
 
-    String accessPath() default "";
+    String belongTo() default "";
 
     String alias() default "";
 
