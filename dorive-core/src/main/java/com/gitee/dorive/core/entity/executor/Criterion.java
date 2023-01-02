@@ -75,6 +75,12 @@ public class Criterion {
             return String.valueOf(value);
 
         } else if (value instanceof String) {
+            if (operator.endsWith(Operator.LIKE)) {
+                String string = (String) value;
+                if (!string.startsWith("%") && !string.endsWith("%")) {
+                    value = "%" + string + "%";
+                }
+            }
             return "'" + value + "'";
 
         } else if (value instanceof Date) {

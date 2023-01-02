@@ -47,12 +47,22 @@ public class AppenderContext {
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_IN, (abstractWrapper, property, value) -> abstractWrapper.notIn(property, (Collection<?>) value));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS, (abstractWrapper, property, value) -> abstractWrapper.isNull(property));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NOT, (abstractWrapper, property, value) -> abstractWrapper.isNotNull(property));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LIKE, Compare::like);
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_LIKE, Compare::notLike);
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LIKE, (abstractWrapper, property, value) -> abstractWrapper.like(property, convertLikeValue(value)));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_LIKE, (abstractWrapper, property, value) -> abstractWrapper.notLike(property, convertLikeValue(value)));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.GT, Compare::gt);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.GE, Compare::ge);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LT, Compare::lt);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LE, Compare::le);
+    }
+
+    public static Object convertLikeValue(Object value) {
+        if (value instanceof String) {
+            String string = (String) value;
+            if (!string.startsWith("%") && !string.endsWith("%")) {
+                return "%" + string + "%";
+            }
+        }
+        return value;
     }
 
 }
