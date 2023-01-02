@@ -78,7 +78,7 @@ public class BinderResolver {
 
             Processor processor = newProcessor(bindingDefinition);
 
-            if (StringUtils.isNotBlank(bindingDefinition.getBindProp())) {
+            if (bindingDefinition.getBindExp().startsWith("/")) {
                 PropertyBinder propertyBinder = newPropertyBinder(bindingDefinition, fieldPropertyChain, processor);
                 allBinders.add(propertyBinder);
                 propertyBinders.add(propertyBinder);
@@ -108,37 +108,33 @@ public class BinderResolver {
 
     private void renewBindingDefinition(String accessPath, BindingDefinition bindingDefinition) {
         String field = bindingDefinition.getField();
-        String bindProp = bindingDefinition.getBindProp();
+        String bindExp = bindingDefinition.getBindExp();
         String property = bindingDefinition.getProperty();
         Class<?> processor = bindingDefinition.getProcessor();
-        String bindCtx = bindingDefinition.getBindCtx();
         String alias = bindingDefinition.getAlias();
         String bindAlias = bindingDefinition.getBindAlias();
-
-        Assert.notBlank(bindProp + bindCtx, "The bindProp and bindCtx cannot be blank at the same time!");
 
         if (StringUtils.isBlank(alias)) {
             alias = field;
         }
+
         if (StringUtils.isBlank(bindAlias)) {
             bindAlias = property;
         }
 
-        if (StringUtils.isNotBlank(bindProp)) {
-            Assert.isTrue(bindProp.startsWith("/") || bindProp.startsWith("."), "The bindProp must be a path!");
-            if (bindProp.startsWith(".")) {
-                bindProp = PathUtils.getAbsolutePath(accessPath, bindProp);
+        if (bindExp.startsWith("/") || bindExp.startsWith(".")) {
+            if (bindExp.startsWith(".")) {
+                bindExp = PathUtils.getAbsolutePath(accessPath, bindExp);
             }
             if (StringUtils.isBlank(bindAlias)) {
-                bindAlias = PathUtils.getFieldName(bindProp);
+                bindAlias = PathUtils.getFieldName(bindExp);
             }
         }
 
         bindingDefinition.setField(field);
-        bindingDefinition.setBindProp(bindProp);
+        bindingDefinition.setBindExp(bindExp);
         bindingDefinition.setProperty(property);
         bindingDefinition.setProcessor(processor);
-        bindingDefinition.setBindCtx(bindCtx);
         bindingDefinition.setAlias(alias);
         bindingDefinition.setBindAlias(bindAlias);
     }
@@ -174,13 +170,13 @@ public class BinderResolver {
 
     private PropertyBinder newPropertyBinder(BindingDefinition bindingDefinition, PropertyChain fieldPropertyChain, Processor processor) {
         Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
-        String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), bindingDefinition.getBindProp());
+        String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), bindingDefinition.getBindExp());
         ConfiguredRepository belongRepository = allRepositoryMap.get(belongAccessPath);
         Assert.notNull(belongRepository, "The belong repository cannot be null!");
         belongRepository.setBoundEntity(true);
 
         Map<String, PropertyChain> allPropertyChainMap = repository.getPropertyResolver().getAllPropertyChainMap();
-        PropertyChain boundPropertyChain = allPropertyChainMap.get(bindingDefinition.getBindProp());
+        PropertyChain boundPropertyChain = allPropertyChainMap.get(bindingDefinition.getBindExp());
         Assert.notNull(boundPropertyChain, "The bound property chain cannot be null!");
         boundPropertyChain.initialize();
 

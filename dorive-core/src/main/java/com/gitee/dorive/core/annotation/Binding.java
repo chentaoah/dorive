@@ -35,13 +35,11 @@ public @interface Binding {
 
     String field();
 
-    String bindProp() default "";
+    String bindExp();
 
     String property() default "";
 
     Class<?> processor() default DefaultProcessor.class;
-
-    String bindCtx() default "";
 
     String alias() default "";
 

@@ -31,8 +31,8 @@ public class ContextBinder extends AbstractBinder {
 
     @Override
     public Object getBoundValue(BoundedContext boundedContext, Object rootEntity) {
-        String bindCtx = bindingDefinition.getBindCtx();
-        return boundedContext.get(bindCtx);
+        String bindExp = bindingDefinition.getBindExp();
+        return boundedContext.get(bindExp);
     }
 
     @Override

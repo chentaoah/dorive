@@ -32,10 +32,9 @@ import java.util.Map;
 public class BindingDefinition {
 
     private String field;
-    private String bindProp;
+    private String bindExp;
     private String property;
     private Class<?> processor;
-    private String bindCtx;
     private String alias;
     private String bindAlias;
 
