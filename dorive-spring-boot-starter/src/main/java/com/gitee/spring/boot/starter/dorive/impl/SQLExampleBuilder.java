@@ -38,6 +38,7 @@ import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.util.CriterionUtils;
 import com.gitee.spring.boot.starter.dorive.entity.ArgSegment;
 import com.gitee.spring.boot.starter.dorive.entity.JoinSegment;
 import com.gitee.spring.boot.starter.dorive.entity.Metadata;
@@ -207,10 +208,17 @@ public class SQLExampleBuilder implements ExampleBuilder {
                     List<Criterion> criteria = sqlExample.getCriteria();
                     List<ArgSegment> argSegments = new ArrayList<>(criteria.size());
                     for (Criterion criterion : criteria) {
-                        args.add(criterion.getFinalValue());
-                        int index = args.size() - 1;
-                        ArgSegment argSegment = new ArgSegment(criterion.getFinalProperty(), criterion.getFinalOperator(), index);
-                        argSegments.add(argSegment);
+                        String property = CriterionUtils.getProperty(criterion);
+                        String operator = CriterionUtils.getOperator(criterion);
+                        if (!operator.startsWith("IS")) {
+                            args.add(CriterionUtils.getValue(criterion));
+                            int index = args.size() - 1;
+                            ArgSegment argSegment = new ArgSegment(property, operator, index);
+                            argSegments.add(argSegment);
+                        } else {
+                            ArgSegment argSegment = new ArgSegment(property, operator, null);
+                            argSegments.add(argSegment);
+                        }
                     }
                     String sqlCriterion = CollUtil.join(argSegments, " AND ", tableAlias + ".", null);
                     sqlCriteria.add(sqlCriterion);

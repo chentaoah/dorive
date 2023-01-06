@@ -11,11 +11,15 @@ public class ArgSegment {
 
     private String property;
     private String operator;
-    private int index;
+    private Integer index;
 
     @Override
     public String toString() {
-        return property + " " + operator + " {" + index + "}";
+        if (index != null) {
+            return property + " " + operator + " {" + index + "}";
+        } else {
+            return property + " " + operator;
+        }
     }
 
 }

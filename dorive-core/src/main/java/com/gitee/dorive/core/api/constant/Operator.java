@@ -21,8 +21,8 @@ public interface Operator {
     String NE = "<>";
     String IN = "IN";
     String NOT_IN = "NOT IN";
-    String IS = "IS";
-    String IS_NOT = "IS NOT";
+    String IS_NULL = "IS NULL";
+    String IS_NOT_NULL = "IS NOT NULL";
     String LIKE = "LIKE";
     String NOT_LIKE = "NOT LIKE";
     String GT = ">";
