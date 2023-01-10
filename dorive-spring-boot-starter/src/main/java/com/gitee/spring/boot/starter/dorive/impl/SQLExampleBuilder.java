@@ -211,7 +211,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
                         String property = CriterionUtils.getProperty(criterion);
                         String operator = CriterionUtils.getOperator(criterion);
                         if (!operator.startsWith("IS")) {
-                            args.add(CriterionUtils.getValue(criterion));
+                            args.add(criterion.getValue());
                             int index = args.size() - 1;
                             ArgSegment argSegment = new ArgSegment(property, operator, index);
                             argSegments.add(argSegment);
