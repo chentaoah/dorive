@@ -26,6 +26,7 @@ import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.OperationTypeResolver;
+import com.gitee.dorive.core.impl.operable.FuncResult;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
@@ -106,12 +107,9 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                 if (targetEntity != null) {
 
                     if (targetEntity instanceof Operable) {
-                        List<?> listToDelete = ((Operable<?>) targetEntity).getListToDelete();
-                        for (Object entity : listToDelete) {
-                            Object primaryKey = repository.getPrimaryKey(entity);
-                            int operationType = OperationTypeResolver.mergeOperationType(Operation.DELETE, Operation.NONE, primaryKey);
-                            totalCount += doExecute(boundedContext, repository, entity, operationType);
-                        }
+                        FuncResult result = ((Operable) targetEntity).accept(repository, boundedContext, targetEntity);
+                        totalCount += result.getTotalCount();
+                        if (result.isSkip()) continue;
                     }
 
                     int contextOperationType = OperationTypeResolver.resolveOperationType(boundedContext, repository);
