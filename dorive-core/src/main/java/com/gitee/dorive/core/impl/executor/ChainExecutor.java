@@ -17,13 +17,14 @@
 package com.gitee.dorive.core.impl.executor;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.api.Binder;
+import com.gitee.dorive.core.api.Operable;
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.PropertyChain;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.OperationTypeResolver;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
@@ -104,12 +105,22 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                 Object targetEntity = anchorPoint == null ? rootEntity : anchorPoint.getValue(rootEntity);
                 if (targetEntity != null) {
 
+                    if (targetEntity instanceof Operable) {
+                        List<?> listToDelete = ((Operable<?>) targetEntity).getListToDelete();
+                        for (Object entity : listToDelete) {
+                            Object primaryKey = repository.getPrimaryKey(entity);
+                            int operationType = OperationTypeResolver.mergeOperationType(Operation.DELETE, Operation.NONE, primaryKey);
+                            totalCount += doExecute(boundedContext, repository, entity, operationType);
+                        }
+                    }
+
                     int contextOperationType = OperationTypeResolver.resolveOperationType(boundedContext, repository);
 
                     Collection<?> collection;
                     Object boundIdEntity = null;
                     if (targetEntity instanceof Collection) {
                         collection = (Collection<?>) targetEntity;
+
                     } else {
                         collection = Collections.singletonList(targetEntity);
                         boundIdEntity = targetEntity;
