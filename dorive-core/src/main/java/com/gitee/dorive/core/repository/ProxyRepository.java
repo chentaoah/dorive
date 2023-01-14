@@ -16,10 +16,12 @@
  */
 package com.gitee.dorive.core.repository;
 
+import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Query;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -65,11 +67,6 @@ public class ProxyRepository extends AbstractRepository<Object, Object> {
     }
 
     @Override
-    public Result<Object> selectResultByExample(BoundedContext boundedContext, Example example) {
-        return proxyRepository.selectResultByExample(boundedContext, example);
-    }
-
-    @Override
     public int insert(BoundedContext boundedContext, Object entity) {
         return proxyRepository.insert(boundedContext, entity);
     }
@@ -102,6 +99,16 @@ public class ProxyRepository extends AbstractRepository<Object, Object> {
     @Override
     public int deleteByExample(BoundedContext boundedContext, Example example) {
         return proxyRepository.deleteByExample(boundedContext, example);
+    }
+
+    @Override
+    public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
+        return proxyRepository.executeQuery(boundedContext, query);
+    }
+
+    @Override
+    public int execute(BoundedContext boundedContext, Operation operation) {
+        return proxyRepository.execute(boundedContext, operation);
     }
 
 }

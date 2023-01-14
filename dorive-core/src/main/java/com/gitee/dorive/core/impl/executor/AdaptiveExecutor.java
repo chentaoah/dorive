@@ -37,14 +37,8 @@ public class AdaptiveExecutor extends AbstractExecutor {
     private Executor executor;
 
     public AdaptiveExecutor(AbstractContextRepository<?, ?> repository, Executor executor) {
-        super(repository.getEntityElement());
         this.repository = repository;
         this.executor = executor;
-    }
-
-    @Override
-    public Operation buildInsertOrUpdate(BoundedContext boundedContext, Object entity) {
-        return new Operation(Operation.INSERT_OR_UPDATE, entity);
     }
 
     @Override

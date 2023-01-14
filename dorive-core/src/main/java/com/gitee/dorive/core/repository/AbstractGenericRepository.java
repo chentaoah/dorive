@@ -21,6 +21,7 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.api.ListableRepository;
 import com.gitee.dorive.core.api.MetadataHolder;
 import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.entity.operation.Operation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -42,6 +43,13 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
             }
         }
         return totalCount;
+    }
+
+    @Override
+    public int insertOrUpdate(BoundedContext boundedContext, E entity) {
+        Assert.notNull(entity, "The entity cannot be null!");
+        Operation operation = new Operation(Operation.INSERT_OR_UPDATE, entity);
+        return execute(boundedContext, operation);
     }
 
     @Override

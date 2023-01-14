@@ -16,10 +16,9 @@
  */
 package com.gitee.dorive.core.api;
 
+import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.BoundedContext;
 
 import java.util.List;
 
@@ -57,15 +56,6 @@ public interface Repository<E, PK> {
      * @return 分页
      */
     Page<E> selectPageByExample(BoundedContext boundedContext, Example example);
-
-    /**
-     * 根据条件查询结果集
-     *
-     * @param boundedContext 边界上下文
-     * @param example        条件
-     * @return 结果集
-     */
-    Result<E> selectResultByExample(BoundedContext boundedContext, Example example);
 
     /**
      * 插入一个实体

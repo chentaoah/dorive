@@ -67,6 +67,7 @@ import static com.gitee.spring.boot.starter.dorive.impl.AppenderContext.OPERATOR
 @ToString
 public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHolder {
 
+    private EntityElement entityElement;
     private EntityDefinition entityDefinition;
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;
@@ -77,7 +78,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                                BaseMapper<Object> baseMapper,
                                Class<Object> pojoClass,
                                EntityFactory entityFactory) {
-        super(entityElement);
+        this.entityElement = entityElement;
         this.entityDefinition = entityDefinition;
         this.baseMapper = baseMapper;
         this.pojoClass = pojoClass;

@@ -20,6 +20,7 @@ import com.gitee.dorive.core.entity.EntityElement;
 import com.gitee.dorive.core.entity.PropertyChain;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.impl.OperationBuilder;
 import com.gitee.dorive.core.impl.executor.ChainExecutor;
 import com.gitee.dorive.core.impl.executor.AdaptiveExecutor;
 import com.gitee.dorive.core.impl.handler.AdaptiveEntityHandler;
@@ -93,8 +94,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         setEntityElement(rootRepository.getEntityElement());
         setEntityDefinition(rootRepository.getEntityDefinition());
+        setOperationBuilder(rootRepository.getOperationBuilder());
 
-        EntityHandler entityHandler = new BatchEntityHandler(this);
+        EntityHandler entityHandler = new BatchEntityHandler(this, rootRepository.getOperationBuilder());
         if (delegateResolver.isDelegated()) {
             entityHandler = new AdaptiveEntityHandler(this, entityHandler);
         }
@@ -110,6 +112,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         EntityElement entityElement = EntityElement.newEntityElement(annotatedElement);
         EntityDefinition entityDefinition = EntityDefinition.newEntityDefinition(entityElement);
 
+        OperationBuilder operationBuilder = new OperationBuilder(entityElement);
+
         Class<?> repositoryClass = entityDefinition.getRepository();
         Object repository;
         if (repositoryClass == DefaultRepository.class) {
@@ -121,6 +125,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             DefaultRepository defaultRepository = (DefaultRepository) repository;
             defaultRepository.setEntityElement(entityElement);
             defaultRepository.setEntityDefinition(entityDefinition);
+            defaultRepository.setOperationBuilder(operationBuilder);
             defaultRepository.setExecutor(newExecutor(entityElement, entityDefinition));
         }
 
@@ -144,6 +149,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         ConfiguredRepository configuredRepository = new ConfiguredRepository();
         configuredRepository.setEntityElement(entityElement);
         configuredRepository.setEntityDefinition(entityDefinition);
+        configuredRepository.setOperationBuilder(operationBuilder);
         configuredRepository.setProxyRepository((AbstractRepository<Object, Object>) repository);
         configuredRepository.setAccessPath(accessPath);
         configuredRepository.setRoot(isRoot);

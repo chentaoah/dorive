@@ -17,35 +17,13 @@
 package com.gitee.dorive.core.api;
 
 import com.gitee.dorive.core.entity.BoundedContext;
-import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.operation.Delete;
-import com.gitee.dorive.core.entity.operation.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.entity.operation.Update;
 
 public interface Executor {
 
-    Query buildQueryByPK(BoundedContext boundedContext, Object primaryKey);
-
-    Query buildQuery(BoundedContext boundedContext, Example example);
-
     Result<Object> executeQuery(BoundedContext boundedContext, Query query);
-
-    Insert buildInsert(BoundedContext boundedContext, Object entity);
-
-    Update buildUpdate(BoundedContext boundedContext, Object entity);
-
-    Update buildUpdate(BoundedContext boundedContext, Object entity, Example example);
-
-    Operation buildInsertOrUpdate(BoundedContext boundedContext, Object entity);
-
-    Delete buildDelete(BoundedContext boundedContext, Object entity);
-
-    Delete buildDeleteByPK(BoundedContext boundedContext, Object primaryKey);
-
-    Delete buildDelete(BoundedContext boundedContext, Example example);
 
     int execute(BoundedContext boundedContext, Operation operation);
 

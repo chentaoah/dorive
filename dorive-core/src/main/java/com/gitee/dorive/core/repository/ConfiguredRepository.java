@@ -16,23 +16,23 @@
  */
 package com.gitee.dorive.core.repository;
 
+import com.gitee.dorive.core.api.MetadataHolder;
+import com.gitee.dorive.core.api.PropertyProxy;
+import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.PropertyChain;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.PropertyResolver;
-import com.gitee.dorive.core.api.MetadataHolder;
-import com.gitee.dorive.core.api.PropertyProxy;
-import com.gitee.dorive.core.entity.BoundedContext;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -50,41 +50,6 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
     protected boolean boundEntity;
 
     @Override
-    public List<Object> selectByExample(BoundedContext boundedContext, Example example) {
-        if (example.isEmptyQuery()) {
-            return Collections.emptyList();
-        }
-        if (example.getOrderBy() == null) {
-            example.setOrderBy(defaultOrderBy);
-        }
-        return super.selectByExample(boundedContext, example);
-    }
-
-    @Override
-    public Page<Object> selectPageByExample(BoundedContext boundedContext, Example example) {
-        if (example.isEmptyQuery()) {
-            Page<Object> page = example.getPage();
-            return page != null ? page : new Page<>();
-        }
-        if (example.getOrderBy() == null) {
-            example.setOrderBy(defaultOrderBy);
-        }
-        return super.selectPageByExample(boundedContext, example);
-    }
-
-    @Override
-    public Result<Object> selectResultByExample(BoundedContext boundedContext, Example example) {
-        if (example.isEmptyQuery()) {
-            Page<Object> page = example.getPage();
-            return page != null ? new Result<>(page) : new Result<>();
-        }
-        if (example.getOrderBy() == null) {
-            example.setOrderBy(defaultOrderBy);
-        }
-        return super.selectResultByExample(boundedContext, example);
-    }
-
-    @Override
     public int updateByExample(BoundedContext boundedContext, Object entity, Example example) {
         if (example.isEmptyQuery()) {
             return 0;
@@ -98,6 +63,21 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
             return 0;
         }
         return super.deleteByExample(boundedContext, example);
+    }
+
+    @Override
+    public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
+        Example example = query.getExample();
+        if (example != null) {
+            if (example.isEmptyQuery()) {
+                Page<Object> page = example.getPage();
+                return page != null ? new Result<>(page) : new Result<>();
+            }
+            if (example.getOrderBy() == null) {
+                example.setOrderBy(defaultOrderBy);
+            }
+        }
+        return super.executeQuery(boundedContext, query);
     }
 
     @Override

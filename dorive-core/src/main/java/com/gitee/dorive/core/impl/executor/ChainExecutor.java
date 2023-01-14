@@ -47,7 +47,6 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     private final EntityHandler entityHandler;
 
     public ChainExecutor(AbstractContextRepository<?, ?> repository, EntityHandler entityHandler) {
-        super(repository.getEntityElement());
         this.repository = repository;
         this.entityHandler = entityHandler;
     }
@@ -57,21 +56,12 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         Assert.isTrue(query.getPrimaryKey() != null || query.getExample() != null, "The query criteria cannot be null!");
         ConfiguredRepository rootRepository = repository.getRootRepository();
         if (rootRepository.isConformsScenes(boundedContext)) {
-            if (query.getPrimaryKey() != null) {
-                Object rootEntity = rootRepository.selectByPrimaryKey(boundedContext, query.getPrimaryKey());
-                if (rootEntity != null) {
-                    handleEntities(boundedContext, Collections.singletonList(rootEntity));
-                }
-                return new Result<>(rootEntity);
-
-            } else if (query.getExample() != null) {
-                Result<Object> result = rootRepository.selectResultByExample(boundedContext, query.getExample());
-                List<Object> rootEntities = result.getRecords();
-                if (!rootEntities.isEmpty()) {
-                    handleEntities(boundedContext, rootEntities);
-                }
-                return result;
+            Result<Object> result = rootRepository.executeQuery(boundedContext, query);
+            List<Object> rootEntities = result.getRecords();
+            if (!rootEntities.isEmpty()) {
+                handleEntities(boundedContext, rootEntities);
             }
+            return result;
         }
         return new Result<>();
     }
@@ -79,11 +69,6 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     @Override
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
         entityHandler.handleEntities(boundedContext, rootEntities);
-    }
-
-    @Override
-    public Operation buildInsertOrUpdate(BoundedContext boundedContext, Object entity) {
-        return new Operation(Operation.INSERT_OR_UPDATE, entity);
     }
 
     @Override
