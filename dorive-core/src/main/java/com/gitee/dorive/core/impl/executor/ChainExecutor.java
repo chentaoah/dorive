@@ -143,8 +143,8 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                     }
 
                 } else if (repository.isAggregated()) {
+                    int operationType = expectedOperationType | Operation.IGNORE_ROOT;
                     for (Object entity : collection) {
-                        int operationType = expectedOperationType | Operation.IGNORE_ROOT;
                         Operation newOperation = new Operation(operationType, entity);
                         totalCount += repository.execute(boundedContext, newOperation);
                     }
