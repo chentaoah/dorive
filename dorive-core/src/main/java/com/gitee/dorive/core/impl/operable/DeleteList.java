@@ -24,7 +24,7 @@ public class DeleteList implements Operable {
     }
 
     @Override
-    public FuncResult accept(ConfiguredRepository repository, BoundedContext boundedContext, Object entity) {
+    public OperationResult accept(ConfiguredRepository repository, BoundedContext boundedContext, Object entity) {
         int totalCount = 0;
         for (Object entityToDelete : listToDelete) {
             Object primaryKey = repository.getPrimaryKey(entityToDelete);
@@ -33,7 +33,7 @@ public class DeleteList implements Operable {
                 totalCount += repository.delete(boundedContext, entityToDelete);
             }
         }
-        return new FuncResult(false, totalCount);
+        return new OperationResult(Operation.INSERT_OR_UPDATE_OR_DELETE, totalCount);
     }
-
+    
 }

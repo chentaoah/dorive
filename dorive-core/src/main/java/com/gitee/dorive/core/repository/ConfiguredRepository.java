@@ -89,7 +89,7 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
         return null;
     }
 
-    public boolean isConformsScenes(BoundedContext boundedContext) {
+    public boolean isMatchScenes(BoundedContext boundedContext) {
         String[] scenes = entityDefinition.getScenes();
         if (scenes == null || scenes.length == 0) {
             return true;

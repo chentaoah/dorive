@@ -23,7 +23,7 @@ public class OperableList<E> extends ArrayList<E> implements Operable {
     }
 
     @Override
-    public FuncResult accept(ConfiguredRepository repository, BoundedContext boundedContext, Object entity) {
+    public OperationResult accept(ConfiguredRepository repository, BoundedContext boundedContext, Object entity) {
         return operable.accept(repository, boundedContext, entity);
     }
 

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FuncResult {
-    private boolean isSkip;
+public class OperationResult {
+    private int operationType;
     private int totalCount;
 }
