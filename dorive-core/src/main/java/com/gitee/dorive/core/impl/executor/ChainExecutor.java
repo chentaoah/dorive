@@ -76,6 +76,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         int expectedOperationType = operation.getType();
         boolean isInsertContext = (expectedOperationType & Operation.INSERT) == Operation.INSERT;
         boolean isIgnoreRoot = (expectedOperationType & Operation.IGNORE_ROOT) == Operation.IGNORE_ROOT;
+        int ignoreRootOperationType = expectedOperationType | Operation.IGNORE_ROOT;
 
         Object rootEntity = operation.getEntity();
         Assert.notNull(rootEntity, "The rootEntity cannot be null!");
@@ -128,7 +129,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                             if ((operationType & Operation.INSERT_OR_UPDATE_OR_DELETE) > 0) {
                                 operationType = expectedOperationType;
                             } else {
-                                operationType = expectedOperationType | Operation.IGNORE_ROOT;
+                                operationType = ignoreRootOperationType;
                             }
                             Operation newOperation = new Operation(operationType, entity);
                             totalCount += repository.execute(boundedContext, newOperation);
@@ -143,9 +144,8 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                     }
 
                 } else if (repository.isAggregated()) {
-                    int operationType = expectedOperationType | Operation.IGNORE_ROOT;
                     for (Object entity : collection) {
-                        Operation newOperation = new Operation(operationType, entity);
+                        Operation newOperation = new Operation(ignoreRootOperationType, entity);
                         totalCount += repository.execute(boundedContext, newOperation);
                     }
                 }
