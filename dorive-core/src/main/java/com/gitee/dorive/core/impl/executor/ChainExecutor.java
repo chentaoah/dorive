@@ -54,8 +54,11 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     @Override
     public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
         Assert.isTrue(query.getPrimaryKey() != null || query.getExample() != null, "The query criteria cannot be null!");
+
         ConfiguredRepository rootRepository = repository.getRootRepository();
-        if (rootRepository.isMatchScenes(boundedContext)) {
+        boolean isIncludeRoot = (query.getType() & Operation.INCLUDE_ROOT) == Operation.INCLUDE_ROOT;
+        
+        if (rootRepository.isMatchScenes(boundedContext) || isIncludeRoot) {
             Result<Object> result = rootRepository.executeQuery(boundedContext, query);
             List<Object> rootEntities = result.getRecords();
             if (!rootEntities.isEmpty()) {
@@ -63,6 +66,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
             }
             return result;
         }
+
         return new Result<>();
     }
 
@@ -74,9 +78,13 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     @Override
     public int execute(BoundedContext boundedContext, Operation operation) {
         int expectedOperationType = operation.getType();
+
         boolean isInsertContext = (expectedOperationType & Operation.INSERT) == Operation.INSERT;
         boolean isIgnoreRoot = (expectedOperationType & Operation.IGNORE_ROOT) == Operation.IGNORE_ROOT;
+        boolean isIncludeRoot = (expectedOperationType & Operation.INCLUDE_ROOT) == Operation.INCLUDE_ROOT;
+
         int ignoreRootOperationType = expectedOperationType | Operation.IGNORE_ROOT;
+        int includeRootOperationType = expectedOperationType | Operation.INCLUDE_ROOT;
 
         Object rootEntity = operation.getEntity();
         Assert.notNull(rootEntity, "The rootEntity cannot be null!");
@@ -95,6 +103,8 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                     continue;
                 }
 
+                boolean isForceInclude = isIncludeRoot && repository.isRoot();
+
                 int acceptOperationType = Operation.INSERT_OR_UPDATE_OR_DELETE;
                 if (targetEntity instanceof Operable) {
                     OperationResult result = ((Operable) targetEntity).accept(repository, boundedContext, targetEntity);
@@ -112,7 +122,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                     boundIdEntity = targetEntity;
                 }
 
-                if (repository.isMatchScenes(boundedContext)) {
+                if (repository.isMatchScenes(boundedContext) || isForceInclude) {
                     int contextOperationType = OperationTypeResolver.resolveOperationType(boundedContext, repository);
 
                     for (Object entity : collection) {
@@ -126,11 +136,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                         operationType = operationType & acceptOperationType;
 
                         if (repository.isAggregated()) {
-                            if ((operationType & Operation.INSERT_OR_UPDATE_OR_DELETE) > 0) {
-                                operationType = expectedOperationType;
-                            } else {
-                                operationType = ignoreRootOperationType;
-                            }
+                            operationType = (operationType & Operation.INSERT_OR_UPDATE_OR_DELETE) > 0 ? includeRootOperationType : ignoreRootOperationType;
                             Operation newOperation = new Operation(operationType, entity);
                             totalCount += repository.execute(boundedContext, newOperation);
 

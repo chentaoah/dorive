@@ -34,6 +34,7 @@ public class Operation {
     public static final int FORCE_IGNORE = 0x00000010;
     public static final int FORCE_INSERT = 0x00000010 | INSERT;
     public static final int IGNORE_ROOT = 0x00000020;
+    public static final int INCLUDE_ROOT = 0x00000040;
 
     protected int type;
     protected Object entity;
