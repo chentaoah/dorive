@@ -8,22 +8,27 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.impl.OperationBuilder;
 import com.gitee.dorive.core.impl.OperationTypeResolver;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
+import lombok.Data;
 
 import java.util.*;
 
+@Data
 public class DeleteList implements Operable {
 
-    private final String[] scenesToAdd;
-    private final List<?> listToDelete;
+    private List<?> listToDelete;
+    private String[] scenesToAdd;
 
-    public DeleteList(Object entity, String... scenesToAdd) {
-        this.scenesToAdd = scenesToAdd;
-        this.listToDelete = Collections.singletonList(entity);
+    public DeleteList(Object object) {
+        if (object instanceof Collection) {
+            this.listToDelete = new ArrayList<>((Collection<?>) object);
+        } else {
+            this.listToDelete = Collections.singletonList(object);
+        }
     }
 
-    public DeleteList(Collection<?> collection, String... scenesToAdd) {
+    public DeleteList(Object object, String... scenesToAdd) {
+        this(object);
         this.scenesToAdd = scenesToAdd;
-        this.listToDelete = new ArrayList<>(collection);
     }
 
     @Override
