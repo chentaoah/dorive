@@ -39,7 +39,7 @@ public class BoundedContext {
         this.scenes = CollUtil.set(false, scenes);
     }
 
-    public boolean isConformsScenes(String scene) {
+    public boolean isMatchScenes(String scene) {
         return scenes.contains(scene);
     }
 

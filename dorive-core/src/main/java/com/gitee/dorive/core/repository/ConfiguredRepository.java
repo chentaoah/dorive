@@ -95,7 +95,7 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
             return true;
         }
         for (String scene : scenes) {
-            if (boundedContext.isConformsScenes(scene)) {
+            if (boundedContext.isMatchScenes(scene)) {
                 return true;
             }
         }
