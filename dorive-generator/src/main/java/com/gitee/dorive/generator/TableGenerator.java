@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class TableGenerator {
 
-    public static void execute(String dirPath, String tablePrefix) {
+    public static void execute(String tablePrefix, String dirPath) {
         List<String> fileNames = FileUtil.listFileNames(dirPath);
         if (!fileNames.isEmpty()) {
             List<String> sources = new ArrayList<>();
