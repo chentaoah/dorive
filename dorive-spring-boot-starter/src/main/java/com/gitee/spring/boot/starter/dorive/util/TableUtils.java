@@ -65,18 +65,18 @@ public class TableUtils {
             }
         }
 
-        String tableCreation = "create table " + tableName + "(\n" +
+        String tableSql = "create table " + tableName + "(\n" +
                 CollUtil.join(properties, ",\n", "    ", null)
                 + "\n);";
 
-        return new TableInfo(tableName, tableCreation);
+        return new TableInfo(tableName, tableSql);
     }
 
     @lombok.Data
     @AllArgsConstructor
     public static class TableInfo {
         private String tableName;
-        private String tableCreation;
+        private String tableSql;
     }
 
 }
