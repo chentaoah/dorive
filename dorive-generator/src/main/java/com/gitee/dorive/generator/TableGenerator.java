@@ -30,8 +30,8 @@ public class TableGenerator {
             List<String> tableNames = tableInfos.stream().map(TableInfo::getTableName).collect(Collectors.toList());
             List<String> tableSqls = tableInfos.stream().map(TableInfo::getTableSql).collect(Collectors.toList());
 
-            System.out.println(StrUtil.join(", ", tableNames));
-            System.out.println(StrUtil.join("\n", tableSqls));
+            System.out.println(StrUtil.join(", ", tableNames) + "\n");
+            System.out.println(StrUtil.join("\n\n", tableSqls));
         }
     }
 

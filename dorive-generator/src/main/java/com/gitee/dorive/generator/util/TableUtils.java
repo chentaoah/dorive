@@ -25,6 +25,7 @@ public class TableUtils {
     public static TableInfo newTableInfo(String tablePrefix, ClassVO classVO) {
         String tableName = tablePrefix + "_" + StrUtil.toUnderlineCase(classVO.getName());
         List<String> properties = new ArrayList<>();
+        List<String> tableIndexes = new ArrayList<>();
 
         List<FieldVO> fieldVOs = classVO.getFieldVOs();
         for (FieldVO fieldVO : fieldVOs) {
@@ -34,6 +35,10 @@ public class TableUtils {
 
             String fieldName = fieldVO.getName();
             String column = StrUtil.toUnderlineCase(fieldName);
+
+            if (!fieldName.equals("id") && fieldName.endsWith("Id")) {
+                tableIndexes.add("create index idx_" + column + " on " + tableName + " (" + column + ");");
+            }
 
             switch (fieldName) {
                 case "id":
@@ -76,9 +81,13 @@ public class TableUtils {
 
         String comment = classVO.getComment();
         String suffix = StringUtils.isNotBlank(comment) ? " comment '" + comment + "';" : ";";
-        String tableSql = "create table " + tableName + "(\n" +
+        String tableSql = "create table " + tableName + " (\n" +
                 CollUtil.join(properties, ",\n", "    ", null)
                 + "\n)" + suffix;
+
+        if (!tableIndexes.isEmpty()) {
+            tableSql = tableSql + "\n" + StrUtil.join("\n", tableIndexes);
+        }
 
         return new TableInfo(tableName, tableSql);
     }
