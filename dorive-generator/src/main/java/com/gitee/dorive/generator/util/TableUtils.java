@@ -32,10 +32,10 @@ public class TableUtils {
                 continue;
             }
 
-            String name = fieldVO.getName();
-            String column = StrUtil.toUnderlineCase(name);
+            String fieldName = fieldVO.getName();
+            String column = StrUtil.toUnderlineCase(fieldName);
 
-            switch (name) {
+            switch (fieldName) {
                 case "id":
                     properties.add("id int unsigned auto_increment comment '主键' primary key");
                     break;
