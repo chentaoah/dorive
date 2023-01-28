@@ -39,7 +39,7 @@ public class TableUtils {
 
             switch (name) {
                 case "id":
-                    properties.add("id int auto_increment primary key");
+                    properties.add("id int unsigned auto_increment primary key");
                     break;
 
                 case "createTime":
