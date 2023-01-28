@@ -37,23 +37,31 @@ public class TableUtils {
             String name = field.getName();
             String column = StrUtil.toUnderlineCase(name);
 
-            if (name.equals("id")) {
-                properties.add("id int auto_increment primary key");
+            switch (name) {
+                case "id":
+                    properties.add("id int auto_increment primary key");
+                    break;
 
-            } else if (name.equals("createTime")) {
-                properties.add("create_time timestamp default CURRENT_TIMESTAMP null");
+                case "createTime":
+                    properties.add("create_time timestamp default CURRENT_TIMESTAMP null");
+                    break;
 
-            } else {
-                Class<?> type = field.getType();
-                if (type == Integer.class) {
-                    properties.add(column + " int null");
+                case "updateTime":
+                    properties.add("update_time timestamp null on update CURRENT_TIMESTAMP");
+                    break;
 
-                } else if (type == String.class) {
-                    properties.add(column + " varchar(255) null");
+                default:
+                    Class<?> type = field.getType();
+                    if (type == Integer.class) {
+                        properties.add(column + " int null");
 
-                } else if (type == Data.class) {
-                    properties.add(column + " timestamp null");
-                }
+                    } else if (type == String.class) {
+                        properties.add(column + " varchar(255) null");
+
+                    } else if (type == Data.class) {
+                        properties.add(column + " timestamp null");
+                    }
+                    break;
             }
         }
 
