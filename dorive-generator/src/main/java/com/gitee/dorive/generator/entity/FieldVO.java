@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class FieldVO {
+
     private String comment;
     private List<AnnotationVO> annotationVOs;
     private String type;
