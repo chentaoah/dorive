@@ -27,7 +27,7 @@ import com.gitee.dorive.core.entity.PropertyChain;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.impl.OperationBuilder;
+import com.gitee.dorive.core.impl.OperationFactory;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -37,11 +37,11 @@ import java.util.List;
 public class BatchEntityHandler implements EntityHandler {
 
     private final AbstractContextRepository<?, ?> repository;
-    private final OperationBuilder operationBuilder;
+    private final OperationFactory operationFactory;
 
-    public BatchEntityHandler(AbstractContextRepository<?, ?> repository, OperationBuilder operationBuilder) {
+    public BatchEntityHandler(AbstractContextRepository<?, ?> repository, OperationFactory operationFactory) {
         this.repository = repository;
-        this.operationBuilder = operationBuilder;
+        this.operationFactory = operationFactory;
     }
 
     @Override
@@ -50,7 +50,7 @@ public class BatchEntityHandler implements EntityHandler {
             if (repository.isMatchScenes(boundedContext)) {
                 UnionExample unionExample = newUnionExample(repository, boundedContext, rootEntities);
                 if (unionExample.isDirtyQuery()) {
-                    Query query = operationBuilder.buildQuery(boundedContext, unionExample);
+                    Query query = operationFactory.buildQuery(boundedContext, unionExample);
                     query.setType(query.getType() | Operation.INCLUDE_ROOT);
                     Result<Object> result = repository.executeQuery(boundedContext, query);
                     if (result instanceof EntityIndex) {

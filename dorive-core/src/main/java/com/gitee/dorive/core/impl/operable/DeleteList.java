@@ -5,7 +5,7 @@ import com.gitee.dorive.core.api.Operable;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.operation.Delete;
 import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.impl.OperationBuilder;
+import com.gitee.dorive.core.impl.OperationFactory;
 import com.gitee.dorive.core.impl.OperationTypeResolver;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
 import lombok.Data;
@@ -40,12 +40,12 @@ public class DeleteList implements Operable {
         }
 
         int totalCount = 0;
-        OperationBuilder operationBuilder = repository.getOperationBuilder();
+        OperationFactory operationFactory = repository.getOperationFactory();
         for (Object entityToDelete : listToDelete) {
             Object primaryKey = repository.getPrimaryKey(entityToDelete);
             int operationType = OperationTypeResolver.mergeOperationType(Operation.DELETE, Operation.NONE, primaryKey);
             if (operationType == Operation.DELETE) {
-                Delete delete = operationBuilder.buildDelete(boundedContext, entityToDelete);
+                Delete delete = operationFactory.buildDelete(boundedContext, entityToDelete);
                 delete.setType(delete.getType() | Operation.INCLUDE_ROOT);
                 totalCount += repository.execute(boundedContext, delete);
             }

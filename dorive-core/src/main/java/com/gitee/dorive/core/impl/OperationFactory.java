@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class OperationBuilder {
+public class OperationFactory {
 
     protected EntityElement entityElement;
 
