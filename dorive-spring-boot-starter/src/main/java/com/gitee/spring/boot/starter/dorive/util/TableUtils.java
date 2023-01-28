@@ -42,8 +42,16 @@ public class TableUtils {
                     properties.add("id int unsigned auto_increment comment '主键' primary key");
                     break;
 
+                case "createUser":
+                    properties.add("create_user varchar(255) null comment '创建者'");
+                    break;
+
                 case "createTime":
                     properties.add("create_time timestamp default CURRENT_TIMESTAMP null comment '创建时间'");
+                    break;
+                    
+                case "updateUser":
+                    properties.add("update_user varchar(255) null comment '更新者'");
                     break;
 
                 case "updateTime":
