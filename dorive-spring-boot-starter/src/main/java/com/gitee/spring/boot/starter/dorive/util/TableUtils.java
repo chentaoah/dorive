@@ -39,15 +39,15 @@ public class TableUtils {
 
             switch (name) {
                 case "id":
-                    properties.add("id int unsigned auto_increment primary key");
+                    properties.add("id int unsigned auto_increment comment '主键' primary key");
                     break;
 
                 case "createTime":
-                    properties.add("create_time timestamp default CURRENT_TIMESTAMP null");
+                    properties.add("create_time timestamp default CURRENT_TIMESTAMP null comment '创建时间'");
                     break;
 
                 case "updateTime":
-                    properties.add("update_time timestamp null on update CURRENT_TIMESTAMP");
+                    properties.add("update_time timestamp null on update CURRENT_TIMESTAMP comment '更新时间'");
                     break;
 
                 default:
