@@ -37,8 +37,9 @@ import java.util.regex.Pattern;
 @Data
 public class CoatingWrapperResolver {
 
-    private AbstractCoatingRepository<?, ?> repository;
+    private static Map<String, List<Class<?>>> scannedClasses = new ConcurrentHashMap<>();
 
+    private AbstractCoatingRepository<?, ?> repository;
     private Map<Class<?>, CoatingWrapper> coatingWrapperMap = new ConcurrentHashMap<>();
 
     public CoatingWrapperResolver(AbstractCoatingRepository<?, ?> repository) {
@@ -51,7 +52,12 @@ public class CoatingWrapperResolver {
         Pattern pattern = Pattern.compile(regex);
 
         for (String scanPackage : scanPackages) {
-            List<Class<?>> classes = ResourceUtils.resolveClasses(scanPackage);
+            List<Class<?>> classes = scannedClasses.get(scanPackage);
+            if (classes == null) {
+                classes = ResourceUtils.resolveClasses(scanPackage);
+                scannedClasses.put(scanPackage, classes);
+            }
+
             for (Class<?> coatingClass : classes) {
 
                 Coating coatingAnnotation = AnnotationUtils.getAnnotation(coatingClass, Coating.class);
