@@ -28,6 +28,7 @@ import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.event.repository.AbstractEventRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.util.List;
@@ -36,17 +37,29 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> implements ExampleBuilder, CoatingRepository<E, PK> {
 
-    protected MergedRepositoryResolver mergedRepositoryResolver = new MergedRepositoryResolver(this);
-    protected CoatingWrapperResolver coatingWrapperResolver = new CoatingWrapperResolver(this);
-    protected ExampleBuilder exampleBuilder = new DefaultExampleBuilder(this);
+    protected String[] scanPackages;
+    protected String regex;
+    protected MergedRepositoryResolver mergedRepositoryResolver;
+    protected CoatingWrapperResolver coatingWrapperResolver;
+    protected ExampleBuilder exampleBuilder;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
         CoatingScan coatingScan = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), CoatingScan.class);
         if (coatingScan != null) {
+            this.scanPackages = coatingScan.value();
+            this.regex = coatingScan.regex();
+            if (StringUtils.isBlank(regex)) {
+                regex = "^" + entityClass.getSimpleName() + ".*";
+            }
+
+            this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
+            this.coatingWrapperResolver = new CoatingWrapperResolver(this);
+            this.exampleBuilder = new DefaultExampleBuilder(this);
+
             mergedRepositoryResolver.resolveMergedRepositoryMap();
-            coatingWrapperResolver.resolveCoatingWrapperMap(coatingScan.value());
+            coatingWrapperResolver.resolveCoatingWrapperMap();
         }
     }
 

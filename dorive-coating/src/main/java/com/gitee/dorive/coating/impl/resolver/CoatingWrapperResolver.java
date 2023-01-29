@@ -17,14 +17,10 @@
 package com.gitee.dorive.coating.impl.resolver;
 
 import com.gitee.dorive.coating.annotation.Coating;
-import com.gitee.dorive.coating.entity.CoatingWrapper;
-import com.gitee.dorive.coating.entity.MergedRepository;
-import com.gitee.dorive.coating.entity.PropertyWrapper;
-import com.gitee.dorive.coating.entity.RepositoryWrapper;
-import com.gitee.dorive.coating.entity.SpecificProperties;
-import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
+import com.gitee.dorive.coating.entity.*;
 import com.gitee.dorive.coating.entity.definition.CoatingDefinition;
 import com.gitee.dorive.coating.entity.definition.PropertyDefinition;
+import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.coating.util.ResourceUtils;
 import com.gitee.dorive.core.entity.EntityElement;
 import com.gitee.dorive.core.entity.Property;
@@ -34,14 +30,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 @Data
 public class CoatingWrapperResolver {
@@ -54,7 +45,11 @@ public class CoatingWrapperResolver {
         this.repository = repository;
     }
 
-    public void resolveCoatingWrapperMap(String... scanPackages) throws Exception {
+    public void resolveCoatingWrapperMap() throws Exception {
+        String[] scanPackages = repository.getScanPackages();
+        String regex = repository.getRegex();
+        Pattern pattern = Pattern.compile(regex);
+
         for (String scanPackage : scanPackages) {
             List<Class<?>> classes = ResourceUtils.resolveClasses(scanPackage);
             for (Class<?> coatingClass : classes) {
@@ -63,7 +58,9 @@ public class CoatingWrapperResolver {
                 if (coatingAnnotation == null) {
                     continue;
                 }
-                if (coatingAnnotation.qualifier() != Object.class && coatingAnnotation.qualifier() != repository.getEntityClass()) {
+
+                String simpleName = coatingClass.getSimpleName();
+                if (!pattern.matcher(simpleName).matches()) {
                     continue;
                 }
 
