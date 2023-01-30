@@ -44,4 +44,6 @@
 | dorive-spring-boot-starter | 实现与mybatis-plus的集成         |
 | dorive-generator           | 实现根据实体生成数据库表结构     |
 
-### 
+### 📊框架设计
+
+![avatar](https://gitee.com/digital-engine/dorive/raw/master/doc/img/domain_model.png)
