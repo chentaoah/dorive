@@ -7,7 +7,6 @@
   <img src="https://img.shields.io/github/stars/chentaoah/dorive?color=%231890FF&style=flat-square" alt="stars">
 </p>
 <hr/>
-
 🔥🔥🔥dorive轻量级领域驱动框架，帮助开发者通过建模，快速构建具有可维护性、可拓展性的应用程序。
 
 ### ❓领域驱动
@@ -33,3 +32,16 @@
 | 实体变更持久化 | 实体变更自身属性后，间接同步到数据库。                       |
 | 表结构生成     | 根据实体，生成对应的建表语句。                               |
 
+### 📖项目结构
+
+| 模块                       | 描述                             |
+| -------------------------- | -------------------------------- |
+| dorive-injection           | 实现依赖注入校验                 |
+| dorive-proxy               | 实现动态代理，取代反射           |
+| dorive-core                | 实现实体解析、仓储CRUD的核心逻辑 |
+| dorive-event               | 实现仓储操作时的事件通知机制     |
+| dorive-coating             | 实现通过防腐层对象的查询机制     |
+| dorive-spring-boot-starter | 实现与mybatis-plus的集成         |
+| dorive-generator           | 实现根据实体生成数据库表结构     |
+
+### 
