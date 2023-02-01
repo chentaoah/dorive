@@ -40,14 +40,14 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
 
     @Override
     public ResObject<Page<E>> page(Q query) {
-        BoundedContext boundedContext = new BoundedContext();
+        BoundedContext boundedContext = newBoundedContext(query);
         Page<E> page = repository.selectPageByCoating(boundedContext, query);
         return ResObject.successData(page);
     }
 
     @Override
     public ResObject<List<E>> list(Q query) {
-        BoundedContext boundedContext = new BoundedContext();
+        BoundedContext boundedContext = newBoundedContext(query);
         List<E> entities = repository.selectByCoating(boundedContext, query);
         return ResObject.successData(entities);
     }
@@ -64,6 +64,10 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
         BoundedContext boundedContext = new BoundedContext();
         int count = repository.deleteByPrimaryKey(boundedContext, id);
         return count > 0 ? ResObject.success() : ResObject.failure();
+    }
+
+    protected BoundedContext newBoundedContext(Q query) {
+        return new BoundedContext();
     }
 
 }
