@@ -40,6 +40,7 @@ public class CoatingWrapperResolver {
     private static Map<String, List<Class<?>>> scannedClasses = new ConcurrentHashMap<>();
 
     private AbstractCoatingRepository<?, ?> repository;
+
     private Map<Class<?>, CoatingWrapper> coatingWrapperMap = new ConcurrentHashMap<>();
 
     public CoatingWrapperResolver(AbstractCoatingRepository<?, ?> repository) {
@@ -50,6 +51,8 @@ public class CoatingWrapperResolver {
         String[] scanPackages = repository.getScanPackages();
         String regex = repository.getRegex();
         Pattern pattern = Pattern.compile(regex);
+
+        List<Class<?>> coatingClasses = new ArrayList<>();
 
         for (String scanPackage : scanPackages) {
             List<Class<?>> classes = scannedClasses.get(scanPackage);
@@ -69,6 +72,8 @@ public class CoatingWrapperResolver {
                 if (!pattern.matcher(simpleName).matches()) {
                     continue;
                 }
+
+                coatingClasses.add(coatingClass);
 
                 Set<String> fieldNames = new LinkedHashSet<>();
                 Map<String, List<PropertyWrapper>> belongToPropertyWrappersMap = new LinkedHashMap<>();
@@ -111,6 +116,10 @@ public class CoatingWrapperResolver {
                 CoatingWrapper coatingWrapper = new CoatingWrapper(coatingDefinition, repositoryWrappers, reversedRepositoryWrappers, specificProperties);
                 coatingWrapperMap.put(coatingClass, coatingWrapper);
             }
+        }
+
+        if (coatingClasses.size() == 1 && repository.getDefCoatingClass() == null) {
+            repository.setDefCoatingClass(coatingClasses.get(0));
         }
     }
 

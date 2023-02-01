@@ -39,6 +39,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
     protected String[] scanPackages;
     protected String regex;
+    protected Class<?> defCoatingClass;
     protected MergedRepositoryResolver mergedRepositoryResolver;
     protected CoatingWrapperResolver coatingWrapperResolver;
     protected ExampleBuilder exampleBuilder;
@@ -50,8 +51,13 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
         if (coatingScan != null) {
             this.scanPackages = coatingScan.value();
             this.regex = coatingScan.regex();
+            this.defCoatingClass = coatingScan.def();
+
             if (StringUtils.isBlank(regex)) {
                 regex = "^" + entityClass.getSimpleName() + ".*";
+            }
+            if (defCoatingClass == Object.class) {
+                defCoatingClass = null;
             }
 
             this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
