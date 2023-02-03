@@ -164,6 +164,7 @@ public class TenantQuery {
 #### 新增数据
 
 ```java
+// 在上下文中，设置场景值，能够决定每次操作的范围
 BoundedContext boundedContext = new BoundedContext(Tenant.ALL);
 
 // 开发者无需设置实体之间的关联id
@@ -190,8 +191,8 @@ BoundedContext boundedContext = new BoundedContext(Tenant.ALL);
 TenantQuery tenantQuery = new TenantQuery();
 tenantQuery.setUserCode("000001");
 tenantQuery.setOrderByDesc("id");
-tenantQuery.setPageNum(1L);
-tenantQuery.setPageSize(10L);
+tenantQuery.setPageNum(1);
+tenantQuery.setPageSize(10);
 
 List<Tenant> tenants = tenantRepository.selectByCoating(boundedContext, tenantQuery);
 ```
