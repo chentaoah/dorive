@@ -40,12 +40,12 @@ public class TableGenerator {
         }
     }
 
-    public static void outputFile(String tablePrefix, String dirPath, String outputPath) {
+    public static void outputFile(String tablePrefix, String dirPath, String filePath) {
         List<TableInfo> tableInfos = execute(tablePrefix, dirPath);
         if (tableInfos != null) {
             List<String> tableSqls = tableInfos.stream().map(TableInfo::getTableSql).collect(Collectors.toList());
             String content = StrUtil.join("\n\n", tableSqls);
-            FileUtil.writeString(content, outputPath, StandardCharsets.UTF_8);
+            FileUtil.writeString(content, filePath, StandardCharsets.UTF_8);
         }
     }
 
