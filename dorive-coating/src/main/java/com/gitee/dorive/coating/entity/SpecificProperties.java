@@ -28,47 +28,42 @@ import lombok.Data;
 @Data
 public class SpecificProperties {
 
-    private PropertyWrapper orderByAscProperty;
-    private PropertyWrapper orderByDescProperty;
-    private PropertyWrapper pageNumProperty;
-    private PropertyWrapper pageSizeProperty;
+    private PropertyWrapper sortByProperty;
+    private PropertyWrapper orderProperty;
+    private PropertyWrapper pageProperty;
+    private PropertyWrapper limitProperty;
 
     public boolean addProperty(String fieldName, PropertyWrapper propertyWrapper) {
-        if ("orderByAsc".equals(fieldName)) {
-            orderByAscProperty = propertyWrapper;
+        if ("sortBy".equals(fieldName)) {
+            sortByProperty = propertyWrapper;
             return true;
 
-        } else if ("orderByDesc".equals(fieldName)) {
-            orderByDescProperty = propertyWrapper;
+        } else if ("order".equals(fieldName)) {
+            orderProperty = propertyWrapper;
             return true;
 
-        } else if ("pageNum".equals(fieldName)) {
-            pageNumProperty = propertyWrapper;
+        } else if ("page".equals(fieldName)) {
+            pageProperty = propertyWrapper;
             return true;
 
-        } else if ("pageSize".equals(fieldName)) {
-            pageSizeProperty = propertyWrapper;
+        } else if ("limit".equals(fieldName)) {
+            limitProperty = propertyWrapper;
             return true;
         }
         return false;
     }
 
     public OrderBy getOrderBy(Object coatingObject) {
-        if (orderByAscProperty != null) {
-            Object orderByAsc = orderByAscProperty.getProperty().getFieldValue(coatingObject);
-            if (orderByAsc != null) {
-                String[] columns = StringUtils.toStringArray(orderByAsc);
+        if (sortByProperty != null && orderProperty != null) {
+            Object sortBy = sortByProperty.getProperty().getFieldValue(coatingObject);
+            Object order = orderProperty.getProperty().getFieldValue(coatingObject);
+            if (sortBy != null && order instanceof String) {
+                String[] columns = StringUtils.toStringArray(sortBy);
                 if (columns != null && columns.length > 0) {
-                    return new OrderBy(columns, Order.ASC);
-                }
-            }
-        }
-        if (orderByDescProperty != null) {
-            Object orderByDesc = orderByDescProperty.getProperty().getFieldValue(coatingObject);
-            if (orderByDesc != null) {
-                String[] columns = StringUtils.toStringArray(orderByDesc);
-                if (columns != null && columns.length > 0) {
-                    return new OrderBy(columns, Order.DESC);
+                    String orderStr = ((String) order).toUpperCase();
+                    if (Order.ASC.equals(orderStr) || Order.DESC.equals(orderStr)) {
+                        return new OrderBy(columns, orderStr);
+                    }
                 }
             }
         }
@@ -76,11 +71,11 @@ public class SpecificProperties {
     }
 
     public Page<Object> getPage(Object coatingObject) {
-        if (pageNumProperty != null && pageSizeProperty != null) {
-            Object pageNum = pageNumProperty.getProperty().getFieldValue(coatingObject);
-            Object pageSize = pageSizeProperty.getProperty().getFieldValue(coatingObject);
-            if (pageNum != null && pageSize != null) {
-                return new Page<>(Convert.convert(Long.class, pageNum), Convert.convert(Long.class, pageSize));
+        if (pageProperty != null && limitProperty != null) {
+            Object page = pageProperty.getProperty().getFieldValue(coatingObject);
+            Object limit = limitProperty.getProperty().getFieldValue(coatingObject);
+            if (page != null && limit != null) {
+                return new Page<>(Convert.convert(Long.class, page), Convert.convert(Long.class, limit));
             }
         }
         return null;

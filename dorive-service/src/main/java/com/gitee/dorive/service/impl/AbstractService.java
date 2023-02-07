@@ -1,5 +1,6 @@
 package com.gitee.dorive.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -32,28 +33,31 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
     }
 
     @Override
-    public ResObject<Object> add(E entity) {
+    public ResObject<Object> post(E entity) {
         BoundedContext boundedContext = new BoundedContext();
         int count = repository.insert(boundedContext, entity);
         return count > 0 ? ResObject.success() : ResObject.failure();
     }
 
     @Override
-    public ResObject<Page<E>> page(Q query) {
+    public ResObject<List<E>> get(Q query) {
         BoundedContext boundedContext = newBoundedContext(query);
-        Page<E> page = repository.selectPageByCoating(boundedContext, query);
-        return ResObject.successData(page);
+        Number page = (Number) BeanUtil.getFieldValue(query, "page");
+        Number limit = (Number) BeanUtil.getFieldValue(query, "limit");
+        if (page != null && limit != null) {
+            Page<E> dataPage = repository.selectPageByCoating(boundedContext, query);
+            ResObject<List<E>> resObject = ResObject.successData(dataPage.getRecords());
+            resObject.setPageInfo(new ResObject.PageInfo(dataPage.getTotal(), dataPage.getCurrent(), dataPage.getSize()));
+            return resObject;
+
+        } else {
+            List<E> data = repository.selectByCoating(boundedContext, query);
+            return ResObject.successData(data);
+        }
     }
 
     @Override
-    public ResObject<List<E>> list(Q query) {
-        BoundedContext boundedContext = newBoundedContext(query);
-        List<E> entities = repository.selectByCoating(boundedContext, query);
-        return ResObject.successData(entities);
-    }
-
-    @Override
-    public ResObject<Object> update(E entity) {
+    public ResObject<Object> put(Integer id, E entity) {
         BoundedContext boundedContext = new BoundedContext();
         int count = repository.update(boundedContext, entity);
         return count > 0 ? ResObject.success() : ResObject.failure();
