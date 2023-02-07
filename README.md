@@ -74,9 +74,9 @@
 | dorive-core                | 实现实体解析、仓储CRUD的核心逻辑              |
 | dorive-event               | 实现仓储操作时的事件通知机制                  |
 | dorive-coating             | 实现通过防腐层对象的查询机制                  |
+| dorive-service             | 实现抽象的Service与Controller，供开发者继承。 |
 | dorive-spring-boot-starter | 实现与mybatis-plus的集成                      |
 | dorive-generator           | 实现根据实体生成数据库表结构                  |
-| dorive-service             | 实现抽象的Service与Controller，供开发者继承。 |
 
 ### 📊架构设计
 
@@ -216,5 +216,3 @@ BoundedContext boundedContext = new BoundedContext(Tenant.ALL);
 // 开发者通过聚合对象的id，即可删除所有数据
 int count = tenantRepository.deleteByPrimaryKey(boundedContext, 1);
 ```
-
-#### 
