@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.validation.Valid;
 import java.util.List;
 
 public abstract class AbstractController<S extends IService<E, Q>, E, Q>
@@ -37,19 +36,19 @@ public abstract class AbstractController<S extends IService<E, Q>, E, Q>
 
     @Override
     @PostMapping("/")
-    public ResObject<Object> post(@Valid @RequestBody E entity) {
+    public ResObject<Object> post(@RequestBody E entity) {
         return service.post(entity);
     }
 
     @Override
     @GetMapping("/")
-    public ResObject<List<E>> get(@Valid Q query) {
+    public ResObject<List<E>> get(Q query) {
         return service.get(query);
     }
 
     @Override
     @PutMapping("/{id}")
-    public ResObject<Object> put(@PathVariable Integer id, @Valid @RequestBody E entity) {
+    public ResObject<Object> put(@PathVariable Integer id, @RequestBody E entity) {
         return service.put(id, entity);
     }
 
