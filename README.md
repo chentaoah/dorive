@@ -156,9 +156,10 @@ package xxx.xxx.xxx.xxx.xxx.query;
 @Coating
 public class TenantQuery {
     private String userCode;
-    private String orderByDesc;
-    private Integer pageNum;
-    private Integer pageSize;
+    private String sortBy;
+    private String order;
+    private Integer page;
+    private Integer limit;
 }
 ```
 
@@ -191,9 +192,10 @@ BoundedContext boundedContext = new BoundedContext(Tenant.ALL);
 // 开发者无需编写复杂的查询SQL
 TenantQuery tenantQuery = new TenantQuery();
 tenantQuery.setUserCode("000001");
-tenantQuery.setOrderByDesc("id");
-tenantQuery.setPageNum(1);
-tenantQuery.setPageSize(10);
+tenantQuery.setSortBy("id");
+tenantQuery.setOrder("desc");
+tenantQuery.setPage(1);
+tenantQuery.setLimit(10);
 
 List<Tenant> tenants = tenantRepository.selectByCoating(boundedContext, tenantQuery);
 ```
