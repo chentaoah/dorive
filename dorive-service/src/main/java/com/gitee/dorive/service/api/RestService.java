@@ -4,7 +4,7 @@ import com.gitee.dorive.service.common.ResObject;
 
 import java.util.List;
 
-public interface IService<E, Q> {
+public interface RestService<E, Q> {
 
     ResObject<Object> post(E entity);
 

@@ -1,7 +1,7 @@
 package com.gitee.dorive.service.impl;
 
 import com.gitee.dorive.core.util.ReflectUtils;
-import com.gitee.dorive.service.api.IService;
+import com.gitee.dorive.service.api.RestService;
 import com.gitee.dorive.service.common.ResObject;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-public abstract class AbstractController<S extends IService<E, Q>, E, Q>
-        implements ApplicationContextAware, InitializingBean, IService<E, Q> {
+public abstract class AbstractController<S extends RestService<E, Q>, E, Q>
+        implements ApplicationContextAware, InitializingBean, RestService<E, Q> {
 
     protected ApplicationContext applicationContext;
     protected S service;

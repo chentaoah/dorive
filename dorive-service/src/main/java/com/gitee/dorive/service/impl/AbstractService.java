@@ -7,7 +7,7 @@ import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
 import com.gitee.dorive.core.util.ReflectUtils;
-import com.gitee.dorive.service.api.IService;
+import com.gitee.dorive.service.api.RestService;
 import com.gitee.dorive.service.common.ResObject;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,7 +17,7 @@ import org.springframework.context.ApplicationContextAware;
 import java.util.List;
 
 public abstract class AbstractService<R extends AbstractCoatingRepository<E, Integer>, E, Q>
-        implements ApplicationContextAware, InitializingBean, IService<E, Q> {
+        implements ApplicationContextAware, InitializingBean, RestService<E, Q> {
 
     protected ApplicationContext applicationContext;
     protected R repository;
