@@ -33,6 +33,4 @@ public @interface CoatingScan {
 
     String regex() default "";
 
-    Class<?> def() default Object.class;
-
 }

@@ -53,8 +53,6 @@ public class CoatingWrapperResolver {
         String regex = repository.getRegex();
         Pattern pattern = Pattern.compile(regex);
 
-        List<Class<?>> coatingClasses = new ArrayList<>();
-
         for (String scanPackage : scanPackages) {
             List<Class<?>> classes = scannedClasses.get(scanPackage);
             if (classes == null) {
@@ -63,7 +61,6 @@ public class CoatingWrapperResolver {
             }
 
             for (Class<?> coatingClass : classes) {
-
                 Coating coatingAnnotation = AnnotationUtils.getAnnotation(coatingClass, Coating.class);
                 if (coatingAnnotation == null) {
                     continue;
@@ -73,8 +70,6 @@ public class CoatingWrapperResolver {
                 if (!pattern.matcher(simpleName).matches()) {
                     continue;
                 }
-
-                coatingClasses.add(coatingClass);
 
                 Set<String> fieldNames = new LinkedHashSet<>();
                 Map<String, List<PropertyWrapper>> belongToPropertyWrappersMap = new LinkedHashMap<>();
@@ -118,10 +113,6 @@ public class CoatingWrapperResolver {
                 coatingWrapperMap.put(coatingClass, coatingWrapper);
                 nameCoatingWrapperMap.put(coatingClass.getName(), coatingWrapper);
             }
-        }
-
-        if (coatingClasses.size() == 1 && repository.getDefCoatingClass() == null) {
-            repository.setDefCoatingClass(coatingClasses.get(0));
         }
     }
 
