@@ -21,17 +21,18 @@ import com.gitee.dorive.core.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 public class OrderBy {
 
-    private String[] columns;
+    private List<String> columns;
     private String order;
 
     @Override
     public String toString() {
-        String[] columns = StringUtils.toUnderlineCase(this.columns);
-        return "ORDER BY " + StrUtil.join(", ", (Object) columns) + " " + order.toUpperCase();
+        return "ORDER BY " + StrUtil.join(", ", StringUtils.toUnderlineCase(columns)) + " " + order.toUpperCase();
     }
 
 }

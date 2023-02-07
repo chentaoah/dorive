@@ -18,17 +18,13 @@ package com.gitee.dorive.core.util;
 
 import cn.hutool.core.util.StrUtil;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class StringUtils {
-
-    public static String[] toUnderlineCase(String... columns) {
-        String[] newColumns = new String[columns.length];
-        for (int index = 0; index < columns.length; index++) {
-            newColumns[index] = StrUtil.toUnderlineCase(columns[index]);
-        }
-        return newColumns;
-    }
 
     public static String[] toStringArray(Object object) {
         if (object instanceof String) {
@@ -47,6 +43,38 @@ public class StringUtils {
             return stringArray;
         }
         return null;
+    }
+
+    public static List<String> toStringList(Object object) {
+        if (object instanceof String) {
+            List<String> list = new ArrayList<>(1);
+            list.add((String) object);
+            return list;
+
+        } else if (object instanceof String[]) {
+            return new ArrayList<>(Arrays.asList((String[]) object));
+
+        } else if (object instanceof Collection) {
+            Collection<?> collection = (Collection<?>) object;
+            List<String> list = new ArrayList<>(collection.size());
+            for (Object item : collection) {
+                list.add(item.toString());
+            }
+            return list;
+        }
+        return null;
+    }
+
+    public static String[] toUnderlineCase(String... strings) {
+        String[] newStrings = new String[strings.length];
+        for (int index = 0; index < strings.length; index++) {
+            newStrings[index] = StrUtil.toUnderlineCase(strings[index]);
+        }
+        return newStrings;
+    }
+
+    public static List<String> toUnderlineCase(List<String> strings) {
+        return strings.stream().map(StrUtil::toUnderlineCase).collect(Collectors.toList());
     }
 
 }

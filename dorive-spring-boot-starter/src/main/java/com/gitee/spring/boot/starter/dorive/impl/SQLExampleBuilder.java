@@ -119,7 +119,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         buildSQL(sqlBuilder, args, sqlSegmentMap);
         if (page != null) {
-            int count = SqlRunner.db().selectCount("SELECT COUNT(1) FROM (" + sqlBuilder + ") " + letter, args.toArray());
+            long count = SqlRunner.db().selectCount("SELECT COUNT(1) FROM (" + sqlBuilder + ") " + letter, args.toArray());
             if (count == 0) {
                 example.setEmptyQuery(true);
                 return example;

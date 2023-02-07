@@ -18,16 +18,17 @@ package com.gitee.dorive.core.entity.definition;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.annotation.Entity;
 import com.gitee.dorive.core.api.constant.Order;
 import com.gitee.dorive.core.entity.EntityElement;
+import com.gitee.dorive.core.entity.executor.OrderBy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -54,12 +55,12 @@ public class EntityDefinition {
     public OrderBy getDefaultOrderBy() {
         if (StringUtils.isNotBlank(this.orderByAsc)) {
             String orderByAsc = StrUtil.toUnderlineCase(this.orderByAsc);
-            String[] columns = StrUtil.splitTrim(orderByAsc, ",").toArray(new String[0]);
+            List<String> columns = StrUtil.splitTrim(orderByAsc, ",");
             return new OrderBy(columns, Order.ASC);
         }
         if (StringUtils.isNotBlank(this.orderByDesc)) {
             String orderByDesc = StrUtil.toUnderlineCase(this.orderByDesc);
-            String[] columns = StrUtil.splitTrim(orderByDesc, ",").toArray(new String[0]);
+            List<String> columns = StrUtil.splitTrim(orderByDesc, ",");
             return new OrderBy(columns, Order.DESC);
         }
         return null;

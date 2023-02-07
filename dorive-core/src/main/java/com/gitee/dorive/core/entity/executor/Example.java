@@ -16,7 +16,6 @@
  */
 package com.gitee.dorive.core.entity.executor;
 
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.core.api.constant.Operator;
 import com.gitee.dorive.core.api.constant.Order;
@@ -25,6 +24,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Data
@@ -33,7 +33,7 @@ public class Example {
 
     private boolean emptyQuery = false;
     private boolean usedPage = false;
-    private String[] selectColumns;
+    private List<String> selectColumns;
     private List<Criterion> criteria = new ArrayList<>(4);
     private OrderBy orderBy;
     private Page<Object> page;
@@ -47,7 +47,15 @@ public class Example {
     }
 
     public void selectColumns(String... columns) {
-        selectColumns = selectColumns == null ? columns : ArrayUtil.addAll(selectColumns, columns);
+        selectColumns(StringUtils.toStringList(columns));
+    }
+
+    public void selectColumns(List<String> columns) {
+        if (selectColumns == null) {
+            selectColumns = columns;
+        } else {
+            selectColumns.addAll(columns);
+        }
     }
 
     public void addCriterion(Criterion criterion) {
@@ -119,12 +127,12 @@ public class Example {
     }
 
     public Example orderByAsc(String... columns) {
-        orderBy = new OrderBy(StringUtils.toUnderlineCase(columns), Order.ASC);
+        orderBy = new OrderBy(StringUtils.toUnderlineCase(Arrays.asList(columns)), Order.ASC);
         return this;
     }
 
     public Example orderByDesc(String... columns) {
-        orderBy = new OrderBy(StringUtils.toUnderlineCase(columns), Order.DESC);
+        orderBy = new OrderBy(StringUtils.toUnderlineCase(Arrays.asList(columns)), Order.DESC);
         return this;
     }
 

@@ -25,6 +25,8 @@ import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.util.StringUtils;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class SpecificProperties {
 
@@ -58,8 +60,8 @@ public class SpecificProperties {
             Object sortBy = sortByProperty.getProperty().getFieldValue(coatingObject);
             Object order = orderProperty.getProperty().getFieldValue(coatingObject);
             if (sortBy != null && order instanceof String) {
-                String[] columns = StringUtils.toStringArray(sortBy);
-                if (columns != null && columns.length > 0) {
+                List<String> columns = StringUtils.toStringList(sortBy);
+                if (columns != null && !columns.isEmpty()) {
                     String orderStr = ((String) order).toUpperCase();
                     if (Order.ASC.equals(orderStr) || Order.DESC.equals(orderStr)) {
                         return new OrderBy(columns, orderStr);

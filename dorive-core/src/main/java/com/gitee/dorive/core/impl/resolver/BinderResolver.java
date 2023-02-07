@@ -45,7 +45,7 @@ public class BinderResolver {
 
     private List<Binder> allBinders;
     private List<PropertyBinder> propertyBinders;
-    private String[] boundColumns;
+    private List<String> boundColumns;
     private List<ContextBinder> contextBinders;
     private List<Binder> boundValueBinders;
     private PropertyBinder boundIdBinder;
@@ -62,7 +62,7 @@ public class BinderResolver {
 
         allBinders = new ArrayList<>(bindingDefinitions.size());
         propertyBinders = new ArrayList<>(bindingDefinitions.size());
-        Set<String> boundColumns = new LinkedHashSet<>(bindingDefinitions.size() * 4 / 3 + 1);
+        boundColumns = new ArrayList<>(bindingDefinitions.size());
         contextBinders = new ArrayList<>(bindingDefinitions.size());
         boundValueBinders = new ArrayList<>(bindingDefinitions.size());
         boundIdBinder = null;
@@ -102,8 +102,6 @@ public class BinderResolver {
                 boundValueBinders.add(contextBinder);
             }
         }
-
-        this.boundColumns = boundColumns.toArray(new String[0]);
     }
 
     private void renewBindingDefinition(String accessPath, BindingDefinition bindingDefinition) {
