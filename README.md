@@ -24,10 +24,11 @@
 
 **缺点：**
 
-- 应用开发，无法脱离数据库。
-- 没有对业务行为的提炼与复用，每次遇到相似的业务需求时，都必须重新开发。
-- 功能迭代有一定局限性，难以拓展与重构。
-- 面对复杂的功能，无所适从，只能做简单地修改，无法实现更加丰富的功能。
+- 业务变化快，应用程序快速无序膨胀，直到无法支撑业务而重构。
+- 需求分析不足，满足于原型，容易偏离业务核心。
+- 下层的改动，容易在上层被放大，导致开发成本高，系统内部僵化。
+- 应用程序开发，无法脱离数据库。
+- 难以使用统一有效的方式，构建复杂的应用程序。
 
 ### 👬领域驱动
 
@@ -35,23 +36,22 @@
 
 **优点：**
 
-- 领域模型是业务知识的高度概括，容易在产品、开发、测试人员之间进行传播。
-- 数据高度内聚，可维护性强、代码耦合低。
-- 面向对象编程，可复用性、可拓展性强。
+- 领域模型可以作为产品、开发、测试人员沟通时的统一语言。
+- 领域模型数据高度内聚，可维护性强、代码耦合低。
+- 领域模型的开发过程是面向对象编程，可复用性、可拓展性强。
+- 能最大程度，减少系统内部的僵化与系统间的腐化。
 - 不强依赖于数据库，容易与不同的存储引擎进行集成。
-- 能最大程度，减少系统的僵化与腐化。（僵化：内部设计不合理，导致维护成本高。腐化：外部逻辑侵入，导致业务核心混乱）
 - 在战略层面，能借用领域模型，进行业务架构的顶层设计。
 
 **缺点：**
 
-- 要求开发人员掌握一定的业务知识。
-- 要求开发人员能够与业务人员进行充分的交流。
-- 要求开发人员能够将业务知识融入到模型的开发当中。
-- 初期的领域模型，可能需要在后续迭代中，不断演进。
+- 对开发人员的要求高。（能够掌握一些常见的设计模式）
+- 相较于UI驱动，需要做前期的准备工作。（沟通与消化业务知识）
+- 一般以整个模块交付，不容易以较小的单元交付。
 
 ### 🤸面临的挑战
 
-- 业务知识的提炼和抽象
+- 业务知识的提炼与抽象
 - 面向对象编程 + 数据持久化
 
 ### 🕺功能点
@@ -67,15 +67,16 @@
 
 ### 📖项目结构
 
-| 模块                       | 描述                             |
-| -------------------------- | -------------------------------- |
-| dorive-injection           | 实现依赖注入校验                 |
-| dorive-proxy               | 实现动态代理，取代反射           |
-| dorive-core                | 实现实体解析、仓储CRUD的核心逻辑 |
-| dorive-event               | 实现仓储操作时的事件通知机制     |
-| dorive-coating             | 实现通过防腐层对象的查询机制     |
-| dorive-spring-boot-starter | 实现与mybatis-plus的集成         |
-| dorive-generator           | 实现根据实体生成数据库表结构     |
+| 模块                       | 描述                                          |
+| -------------------------- | --------------------------------------------- |
+| dorive-injection           | 实现依赖注入校验                              |
+| dorive-proxy               | 实现动态代理，取代反射                        |
+| dorive-core                | 实现实体解析、仓储CRUD的核心逻辑              |
+| dorive-event               | 实现仓储操作时的事件通知机制                  |
+| dorive-coating             | 实现通过防腐层对象的查询机制                  |
+| dorive-spring-boot-starter | 实现与mybatis-plus的集成                      |
+| dorive-generator           | 实现根据实体生成数据库表结构                  |
+| dorive-service             | 实现抽象的Service与Controller，供开发者继承。 |
 
 ### 📊架构设计
 
@@ -93,7 +94,7 @@
 
 ### 🧡代码示例
 
-以Saas化场景为例，对租户对象建模。
+以Saas化场景为例，为租户建模。
 
 #### 定义实体
 
@@ -164,6 +165,7 @@ public class TenantQuery {
 #### 新增数据
 
 ```java
+// 在上下文中，设置场景值，能够决定每次操作的范围
 BoundedContext boundedContext = new BoundedContext(Tenant.ALL);
 
 // 开发者无需设置实体之间的关联id
@@ -190,8 +192,8 @@ BoundedContext boundedContext = new BoundedContext(Tenant.ALL);
 TenantQuery tenantQuery = new TenantQuery();
 tenantQuery.setUserCode("000001");
 tenantQuery.setOrderByDesc("id");
-tenantQuery.setPageNum(1L);
-tenantQuery.setPageSize(10L);
+tenantQuery.setPageNum(1);
+tenantQuery.setPageSize(10);
 
 List<Tenant> tenants = tenantRepository.selectByCoating(boundedContext, tenantQuery);
 ```
