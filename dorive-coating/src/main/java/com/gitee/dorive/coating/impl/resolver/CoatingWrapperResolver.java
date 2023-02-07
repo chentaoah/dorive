@@ -42,6 +42,7 @@ public class CoatingWrapperResolver {
     private AbstractCoatingRepository<?, ?> repository;
 
     private Map<Class<?>, CoatingWrapper> coatingWrapperMap = new ConcurrentHashMap<>();
+    private Map<String, CoatingWrapper> nameCoatingWrapperMap = new ConcurrentHashMap<>();
 
     public CoatingWrapperResolver(AbstractCoatingRepository<?, ?> repository) {
         this.repository = repository;
@@ -115,6 +116,7 @@ public class CoatingWrapperResolver {
                 CoatingDefinition coatingDefinition = CoatingDefinition.newCoatingDefinition(coatingClass);
                 CoatingWrapper coatingWrapper = new CoatingWrapper(coatingDefinition, repositoryWrappers, reversedRepositoryWrappers, specificProperties);
                 coatingWrapperMap.put(coatingClass, coatingWrapper);
+                nameCoatingWrapperMap.put(coatingClass.getName(), coatingWrapper);
             }
         }
 

@@ -58,9 +58,9 @@ public class SQLExampleBuilder implements ExampleBuilder {
     @Override
     public Example buildExample(BoundedContext boundedContext, Object coatingObject) {
         CoatingWrapperResolver coatingWrapperResolver = repository.getCoatingWrapperResolver();
-        Map<Class<?>, CoatingWrapper> coatingWrapperMap = coatingWrapperResolver.getCoatingWrapperMap();
+        Map<String, CoatingWrapper> nameCoatingWrapperMap = coatingWrapperResolver.getNameCoatingWrapperMap();
 
-        CoatingWrapper coatingWrapper = coatingWrapperMap.get(coatingObject.getClass());
+        CoatingWrapper coatingWrapper = nameCoatingWrapperMap.get(coatingObject.getClass().getName());
         Assert.notNull(coatingWrapper, "No coating wrapper exists!");
         List<RepositoryWrapper> repositoryWrappers = coatingWrapper.getRepositoryWrappers();
 

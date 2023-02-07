@@ -35,13 +35,13 @@ public abstract class AbstractController<S extends IService<E, Q>, E, Q>
     }
 
     @Override
-    @PostMapping("/")
+    @PostMapping
     public ResObject<Object> post(@RequestBody E entity) {
         return service.post(entity);
     }
 
     @Override
-    @GetMapping("/")
+    @GetMapping
     public ResObject<List<E>> get(Q query) {
         return service.get(query);
     }
