@@ -3,7 +3,9 @@ package com.gitee.dorive.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.repository.ConfiguredRepository;
 import com.gitee.dorive.core.util.ReflectUtils;
 import com.gitee.dorive.service.api.IService;
 import com.gitee.dorive.service.common.ResObject;
@@ -34,14 +36,14 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
 
     @Override
     public ResObject<Object> post(E entity) {
-        BoundedContext boundedContext = new BoundedContext();
+        BoundedContext boundedContext = newBoundedContext(entity, null);
         int count = repository.insert(boundedContext, entity);
         return count > 0 ? ResObject.success() : ResObject.failure();
     }
 
     @Override
     public ResObject<List<E>> get(Q query) {
-        BoundedContext boundedContext = newBoundedContext(query);
+        BoundedContext boundedContext = newBoundedContext(null, query);
         Number page = (Number) BeanUtil.getFieldValue(query, "page");
         Number limit = (Number) BeanUtil.getFieldValue(query, "limit");
         if (page != null && limit != null) {
@@ -58,20 +60,23 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
 
     @Override
     public ResObject<Object> put(Integer id, E entity) {
-        BoundedContext boundedContext = new BoundedContext();
+        BoundedContext boundedContext = newBoundedContext(entity, null);
         int count = repository.update(boundedContext, entity);
         return count > 0 ? ResObject.success() : ResObject.failure();
     }
 
     @Override
     public ResObject<Object> delete(Integer id) {
-        BoundedContext boundedContext = new BoundedContext();
+        BoundedContext boundedContext = newBoundedContext(null, null);
         int count = repository.deleteByPrimaryKey(boundedContext, id);
         return count > 0 ? ResObject.success() : ResObject.failure();
     }
 
-    protected BoundedContext newBoundedContext(Q query) {
-        return new BoundedContext();
+    protected BoundedContext newBoundedContext(E entity, Q query) {
+        ConfiguredRepository rootRepository = repository.getRootRepository();
+        EntityDefinition entityDefinition = rootRepository.getEntityDefinition();
+        String[] scenes = entityDefinition.getScenes();
+        return new BoundedContext(scenes);
     }
 
 }
