@@ -48,6 +48,7 @@ public abstract class AbstractController<S extends RestService<E, Q>, E, Q>
     }
 
     @Override
+    @GetMapping("/page")
     public ResObject<Page<E>> page(Q query) {
         return service.page(query);
     }
