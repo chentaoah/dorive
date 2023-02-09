@@ -1,5 +1,6 @@
 package com.gitee.dorive.service.impl;
 
+import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.util.ReflectUtils;
 import com.gitee.dorive.service.api.RestService;
 import com.gitee.dorive.service.common.ResObject;
@@ -44,6 +45,11 @@ public abstract class AbstractController<S extends RestService<E, Q>, E, Q>
     @GetMapping
     public ResObject<List<E>> get(Q query) {
         return service.get(query);
+    }
+
+    @Override
+    public ResObject<Page<E>> page(Q query) {
+        return service.page(query);
     }
 
     @Override

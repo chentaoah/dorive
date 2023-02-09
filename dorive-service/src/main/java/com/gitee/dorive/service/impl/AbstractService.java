@@ -1,6 +1,5 @@
 package com.gitee.dorive.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
@@ -44,18 +43,15 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
     @Override
     public ResObject<List<E>> get(Q query) {
         BoundedContext boundedContext = newBoundedContext(null, query);
-        Number page = (Number) BeanUtil.getFieldValue(query, "page");
-        Number limit = (Number) BeanUtil.getFieldValue(query, "limit");
-        if (page != null && limit != null) {
-            Page<E> dataPage = repository.selectPageByCoating(boundedContext, query);
-            ResObject<List<E>> resObject = ResObject.successData(dataPage.getRecords());
-            resObject.setPageInfo(new ResObject.PageInfo(dataPage.getTotal(), dataPage.getCurrent(), dataPage.getSize()));
-            return resObject;
+        List<E> entities = repository.selectByCoating(boundedContext, query);
+        return ResObject.successData(entities);
+    }
 
-        } else {
-            List<E> data = repository.selectByCoating(boundedContext, query);
-            return ResObject.successData(data);
-        }
+    @Override
+    public ResObject<Page<E>> page(Q query) {
+        BoundedContext boundedContext = newBoundedContext(null, query);
+        Page<E> page = repository.selectPageByCoating(boundedContext, query);
+        return ResObject.successData(page);
     }
 
     @Override
