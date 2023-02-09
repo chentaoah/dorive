@@ -53,11 +53,12 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
     @Override
     public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
-        Assert.isTrue(query.getPrimaryKey() != null || query.getExample() != null, "The query criteria cannot be null!");
+        Assert.isTrue(query.getPrimaryKey() != null || query.getExample() != null,
+                "The query criteria cannot be null!");
 
         ConfiguredRepository rootRepository = repository.getRootRepository();
         boolean isIncludeRoot = (query.getType() & Operation.INCLUDE_ROOT) == Operation.INCLUDE_ROOT;
-        
+
         if (rootRepository.isMatchScenes(boundedContext) || isIncludeRoot) {
             Result<Object> result = rootRepository.executeQuery(boundedContext, query);
             List<Object> rootEntities = result.getRecords();
