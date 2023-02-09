@@ -80,7 +80,7 @@ public class BatchEntityHandler implements EntityHandler {
                 }
                 if (example.isDirtyQuery()) {
                     Object primaryKey = rootRepository.getPrimaryKey(rootEntity);
-                    example.selectColumns(primaryKey + " as $id");
+                    example.extraColumns(primaryKey + " as $id");
                     unionExample.addExample(example);
                 }
             }

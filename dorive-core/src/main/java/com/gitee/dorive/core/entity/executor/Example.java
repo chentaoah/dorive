@@ -34,6 +34,7 @@ public class Example {
     private boolean emptyQuery = false;
     private boolean usedPage = false;
     private List<String> selectColumns;
+    private List<String> extraColumns;
     private List<Criterion> criteria = new ArrayList<>(4);
     private OrderBy orderBy;
     private Page<Object> page;
@@ -51,10 +52,18 @@ public class Example {
     }
 
     public void selectColumns(List<String> columns) {
-        if (selectColumns == null) {
-            selectColumns = columns;
+        selectColumns = columns;
+    }
+
+    public void extraColumns(String... columns) {
+        extraColumns(StringUtils.toStringList(columns));
+    }
+
+    public void extraColumns(List<String> columns) {
+        if (extraColumns == null) {
+            extraColumns = columns;
         } else {
-            selectColumns.addAll(columns);
+            extraColumns.addAll(columns);
         }
     }
 

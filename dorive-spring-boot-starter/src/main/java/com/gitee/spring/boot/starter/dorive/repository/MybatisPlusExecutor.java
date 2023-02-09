@@ -159,8 +159,16 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
 
         List<String> selectColumns = example.getSelectColumns();
         if (selectColumns != null) {
-            String sqlSelect = queryWrapper.select(pojoClass, i -> true).getSqlSelect();
-            sqlSelect = sqlSelect + StringPool.COMMA + queryWrapper.select(selectColumns).getSqlSelect();
+            queryWrapper.select(selectColumns);
+        }
+
+        List<String> extraColumns = example.getExtraColumns();
+        if (extraColumns != null) {
+            String sqlSelect = queryWrapper.getSqlSelect();
+            if (StringUtils.isBlank(sqlSelect)) {
+                sqlSelect = queryWrapper.select(pojoClass, i -> true).getSqlSelect();
+            }
+            sqlSelect = sqlSelect + StringPool.COMMA + queryWrapper.select(extraColumns).getSqlSelect();
             queryWrapper.select(sqlSelect);
         }
 
