@@ -59,7 +59,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         ConfiguredRepository rootRepository = repository.getRootRepository();
         boolean isIncludeRoot = (query.getType() & Operation.INCLUDE_ROOT) == Operation.INCLUDE_ROOT;
 
-        if (rootRepository.isMatchScenes(boundedContext) || isIncludeRoot) {
+        if (boundedContext.isMatch(rootRepository) || isIncludeRoot) {
             Result<Object> result = rootRepository.executeQuery(boundedContext, query);
             List<Object> rootEntities = result.getRecords();
             if (!rootEntities.isEmpty()) {
@@ -123,7 +123,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                     boundIdEntity = targetEntity;
                 }
 
-                if (repository.isMatchScenes(boundedContext) || isForceInclude) {
+                if (boundedContext.isMatch(repository) || isForceInclude) {
                     int contextOperationType = OperationTypeResolver.resolveOperationType(boundedContext, repository);
 
                     for (Object entity : collection) {

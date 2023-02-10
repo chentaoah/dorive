@@ -36,6 +36,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class EntityDefinition {
 
+    private String name;
     private String[] scenes;
     private int order;
     private Class<?> mapper;
@@ -64,6 +65,13 @@ public class EntityDefinition {
             return new OrderBy(columns, Order.DESC);
         }
         return null;
+    }
+
+    public void merge(EntityDefinition entityDefinition) {
+        String name = entityDefinition.getName();
+        if (StringUtils.isBlank(this.name) && StringUtils.isNotBlank(name)) {
+            this.name = name;
+        }
     }
 
 }

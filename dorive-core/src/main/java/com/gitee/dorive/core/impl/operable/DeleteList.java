@@ -2,11 +2,13 @@ package com.gitee.dorive.core.impl.operable;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.core.api.Operable;
+import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.operation.Delete;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.impl.OperationFactory;
 import com.gitee.dorive.core.impl.OperationTypeResolver;
+import com.gitee.dorive.core.impl.selector.SceneSelector;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
 import lombok.Data;
 
@@ -35,8 +37,12 @@ public class DeleteList implements Operable {
     public OperationResult accept(ConfiguredRepository repository, BoundedContext boundedContext, Object entity) {
         if (scenesToAdd != null && scenesToAdd.length > 0) {
             Set<String> newScenes = CollUtil.set(false, scenesToAdd);
-            newScenes.addAll(boundedContext.getScenes());
-            boundedContext.setScenes(newScenes);
+            Selector selector = boundedContext.getSelector();
+            if (selector instanceof SceneSelector) {
+                SceneSelector sceneSelector = (SceneSelector) selector;
+                newScenes.addAll(sceneSelector.getScenes());
+                sceneSelector.setScenes(newScenes);
+            }
         }
 
         int totalCount = 0;

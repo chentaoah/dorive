@@ -67,6 +67,18 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
 
     @Override
     public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
+        List<String> columns = boundedContext.selectColumns(this);
+        if (columns != null && !columns.isEmpty()) {
+            if (query.getPrimaryKey() != null) {
+                Example example = new Example().eq("id", query.getPrimaryKey());
+                query.setPrimaryKey(null);
+                query.setExample(example);
+            }
+            Example example = query.getExample();
+            if (example != null) {
+                example.selectColumns(columns);
+            }
+        }
         Example example = query.getExample();
         if (example != null) {
             if (example.isEmptyQuery()) {
@@ -87,19 +99,6 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
             return ((MetadataHolder) proxyRepository).getMetadata();
         }
         return null;
-    }
-
-    public boolean isMatchScenes(BoundedContext boundedContext) {
-        String[] scenes = entityDefinition.getScenes();
-        if (scenes == null || scenes.length == 0) {
-            return true;
-        }
-        for (String scene : scenes) {
-            if (boundedContext.isMatchScenes(scene)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public Example newExampleByContext(BoundedContext boundedContext, Object rootEntity) {

@@ -18,29 +18,42 @@ package com.gitee.dorive.core.entity;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.core.api.ExampleBuilder;
+import com.gitee.dorive.core.api.Selector;
+import com.gitee.dorive.core.impl.selector.SceneSelector;
+import com.gitee.dorive.core.repository.ConfiguredRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class BoundedContext {
 
-    private Set<String> scenes = Collections.emptySet();
+    private Selector selector;
     private Map<String, Object> attachments = Collections.emptyMap();
 
-    public BoundedContext(String... scenes) {
-        this.scenes = CollUtil.set(false, scenes);
+    public BoundedContext() {
+        selector = new SceneSelector(Collections.emptySet());
     }
 
-    public boolean isMatchScenes(String scene) {
-        return scenes.contains(scene);
+    public BoundedContext(Selector selector) {
+        this.selector = selector;
+    }
+
+    public BoundedContext(String... scenes) {
+        this.selector = new SceneSelector(CollUtil.set(false, scenes));
+    }
+
+    public boolean isMatch(ConfiguredRepository repository) {
+        return selector.isMatch(this, repository);
+    }
+
+    public List<String> selectColumns(ConfiguredRepository repository) {
+        return selector.selectColumns(this, repository);
     }
 
     public Object put(String key, Object value) {
