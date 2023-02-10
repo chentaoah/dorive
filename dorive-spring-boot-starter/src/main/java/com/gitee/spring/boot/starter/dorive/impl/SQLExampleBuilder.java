@@ -29,6 +29,7 @@ import com.gitee.dorive.coating.entity.RepositoryWrapper;
 import com.gitee.dorive.coating.entity.SpecificProperties;
 import com.gitee.dorive.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
+import com.gitee.dorive.core.api.constant.Operator;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.definition.BindingDefinition;
 import com.gitee.dorive.core.entity.executor.Criterion;
@@ -39,12 +40,19 @@ import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
 import com.gitee.dorive.core.util.CriterionUtils;
+import com.gitee.dorive.core.util.SqlUtils;
 import com.gitee.spring.boot.starter.dorive.entity.ArgSegment;
 import com.gitee.spring.boot.starter.dorive.entity.JoinSegment;
 import com.gitee.spring.boot.starter.dorive.entity.Metadata;
 import com.gitee.spring.boot.starter.dorive.entity.SqlSegment;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SQLExampleBuilder implements ExampleBuilder {
@@ -210,8 +218,12 @@ public class SQLExampleBuilder implements ExampleBuilder {
                     for (Criterion criterion : criteria) {
                         String property = CriterionUtils.getProperty(criterion);
                         String operator = CriterionUtils.getOperator(criterion);
+                        Object value = criterion.getValue();
+                        if (operator.endsWith(Operator.LIKE)) {
+                            value = SqlUtils.toLike(value);
+                        }
                         if (!operator.startsWith("IS")) {
-                            args.add(criterion.getValue());
+                            args.add(value);
                             int index = args.size() - 1;
                             ArgSegment argSegment = new ArgSegment(property, operator, index);
                             argSegments.add(argSegment);

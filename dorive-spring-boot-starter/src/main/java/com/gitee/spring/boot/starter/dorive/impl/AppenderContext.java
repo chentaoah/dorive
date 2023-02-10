@@ -19,6 +19,7 @@ package com.gitee.spring.boot.starter.dorive.impl;
 import com.baomidou.mybatisplus.core.conditions.interfaces.Compare;
 import com.gitee.spring.boot.starter.dorive.api.CriterionAppender;
 import com.gitee.dorive.core.api.constant.Operator;
+import com.gitee.dorive.core.util.SqlUtils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -47,22 +48,12 @@ public class AppenderContext {
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_IN, (abstractWrapper, property, value) -> abstractWrapper.notIn(property, (Collection<?>) value));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNull(property));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NOT_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNotNull(property));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LIKE, (abstractWrapper, property, value) -> abstractWrapper.like(property, convertLikeValue(value)));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_LIKE, (abstractWrapper, property, value) -> abstractWrapper.notLike(property, convertLikeValue(value)));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LIKE, (abstractWrapper, property, value) -> abstractWrapper.like(property, SqlUtils.toLike(value)));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_LIKE, (abstractWrapper, property, value) -> abstractWrapper.notLike(property, SqlUtils.toLike(value)));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.GT, Compare::gt);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.GE, Compare::ge);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LT, Compare::lt);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LE, Compare::le);
-    }
-
-    public static Object convertLikeValue(Object value) {
-        if (value instanceof String) {
-            String string = (String) value;
-            if (!string.startsWith("%") && !string.endsWith("%")) {
-                return "%" + string + "%";
-            }
-        }
-        return value;
     }
 
 }

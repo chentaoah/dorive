@@ -60,10 +60,7 @@ public class CriterionUtils {
 
         } else if (value instanceof String) {
             if (operator.endsWith(Operator.LIKE)) {
-                String string = (String) value;
-                if (!string.startsWith("%") && !string.endsWith("%")) {
-                    value = "%" + string + "%";
-                }
+                value = SqlUtils.toLike(value);
             }
             return "'" + value + "'";
 
