@@ -111,6 +111,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     private ConfiguredRepository newRepository(String accessPath, AnnotatedElement annotatedElement) {
         EntityElement entityElement = EntityElement.newEntityElement(annotatedElement);
         EntityDefinition entityDefinition = EntityDefinition.newEntityDefinition(entityElement);
+
+        Class<?> genericEntityClass = entityElement.getGenericEntityClass();
+        EntityElement genericEntityElement = EntityElement.newEntityElement(genericEntityClass);
+        EntityDefinition genericEntityDefinition = EntityDefinition.newEntityDefinition(genericEntityElement);
+        entityDefinition.merge(genericEntityDefinition);
+
         OperationFactory operationFactory = new OperationFactory(entityElement);
 
         Class<?> repositoryClass = entityDefinition.getRepository();
@@ -130,12 +136,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         boolean isRoot = "/".equals(accessPath);
         boolean aggregated = !(repository instanceof DefaultRepository);
-
-        if (aggregated) {
-            AbstractRepository<Object, Object> aggRepository = (AbstractRepository<Object, Object>) repository;
-            EntityDefinition aggEntityDefinition = aggRepository.getEntityDefinition();
-            entityDefinition.merge(aggEntityDefinition);
-        }
 
         repository = postProcessRepository((AbstractRepository<Object, Object>) repository);
 

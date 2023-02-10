@@ -22,6 +22,7 @@ import com.gitee.dorive.core.annotation.Entity;
 import com.gitee.dorive.core.api.constant.Order;
 import com.gitee.dorive.core.entity.EntityElement;
 import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.impl.DefaultEntityFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -68,9 +69,17 @@ public class EntityDefinition {
     }
 
     public void merge(EntityDefinition entityDefinition) {
-        String name = entityDefinition.getName();
-        if (StringUtils.isBlank(this.name) && StringUtils.isNotBlank(name)) {
-            this.name = name;
+        if (StringUtils.isBlank(name)) {
+            name = entityDefinition.getName();
+        }
+        if (scenes == null || scenes.length == 0) {
+            scenes = entityDefinition.getScenes();
+        }
+        if (mapper == null || mapper == Object.class) {
+            mapper = entityDefinition.getMapper();
+        }
+        if (factory == null || factory == DefaultEntityFactory.class) {
+            factory = entityDefinition.getFactory();
         }
     }
 
