@@ -20,15 +20,15 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.core.annotation.Entity;
 import com.gitee.dorive.core.api.constant.Order;
-import com.gitee.dorive.core.entity.EntityElement;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.DefaultEntityFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
+import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.Map;
 
@@ -48,22 +48,10 @@ public class EntityDefinition {
     private String builderKey;
     private String commandKey;
 
-    public static EntityDefinition newEntityDefinition(EntityElement entityElement) {
-        Entity entityAnnotation = entityElement.getEntityAnnotation();
-        Map<String, Object> annotationAttributes = AnnotationUtils.getAnnotationAttributes(entityAnnotation);
-        return BeanUtil.copyProperties(annotationAttributes, EntityDefinition.class);
-    }
-
-    public OrderBy getDefaultOrderBy() {
-        if (StringUtils.isNotBlank(this.orderByAsc)) {
-            String orderByAsc = StrUtil.toUnderlineCase(this.orderByAsc);
-            List<String> columns = StrUtil.splitTrim(orderByAsc, ",");
-            return new OrderBy(columns, Order.ASC);
-        }
-        if (StringUtils.isNotBlank(this.orderByDesc)) {
-            String orderByDesc = StrUtil.toUnderlineCase(this.orderByDesc);
-            List<String> columns = StrUtil.splitTrim(orderByDesc, ",");
-            return new OrderBy(columns, Order.DESC);
+    public static EntityDefinition newEntityDefinition(AnnotatedElement annotatedElement) {
+        if (annotatedElement.isAnnotationPresent(Entity.class)) {
+            Map<String, Object> annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Entity.class);
+            return BeanUtil.copyProperties(annotationAttributes, EntityDefinition.class);
         }
         return null;
     }
@@ -81,6 +69,20 @@ public class EntityDefinition {
         if (factory == null || factory == DefaultEntityFactory.class) {
             factory = entityDefinition.getFactory();
         }
+    }
+
+    public OrderBy getDefaultOrderBy() {
+        if (StringUtils.isNotBlank(this.orderByAsc)) {
+            String orderByAsc = StrUtil.toUnderlineCase(this.orderByAsc);
+            List<String> columns = StrUtil.splitTrim(orderByAsc, ",");
+            return new OrderBy(columns, Order.ASC);
+        }
+        if (StringUtils.isNotBlank(this.orderByDesc)) {
+            String orderByDesc = StrUtil.toUnderlineCase(this.orderByDesc);
+            List<String> columns = StrUtil.splitTrim(orderByDesc, ",");
+            return new OrderBy(columns, Order.DESC);
+        }
+        return null;
     }
 
 }

@@ -16,11 +16,10 @@
  */
 package com.gitee.dorive.core.impl.resolver;
 
-import com.gitee.dorive.core.annotation.Entity;
-import com.gitee.dorive.core.entity.Property;
-import com.gitee.dorive.core.entity.PropertyChain;
+import com.gitee.dorive.core.entity.element.PropertyChain;
+import com.gitee.dorive.core.entity.definition.EntityDefinition;
+import com.gitee.dorive.core.repository.DefaultRepository;
 import lombok.Data;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.util.LinkedHashMap;
@@ -29,11 +28,11 @@ import java.util.Map;
 @Data
 public class PropertyResolver {
 
-    private boolean ignoreAnnotated;
+    private boolean ignoreEntity;
     private Map<String, PropertyChain> allPropertyChainMap = new LinkedHashMap<>();
 
-    public PropertyResolver(boolean ignoreAnnotated) {
-        this.ignoreAnnotated = ignoreAnnotated;
+    public PropertyResolver(boolean ignoreEntity) {
+        this.ignoreEntity = ignoreEntity;
     }
 
     public void resolveProperties(Class<?> entityClass) {
@@ -44,28 +43,22 @@ public class PropertyResolver {
         PropertyChain lastPropertyChain = allPropertyChainMap.get(lastAccessPath);
         ReflectionUtils.doWithLocalFields(entityClass, declaredField -> {
             String accessPath = lastAccessPath + "/" + declaredField.getName();
-            boolean isAnnotatedEntity = AnnotatedElementUtils.isAnnotated(declaredField, Entity.class);
-            Property property = new Property(declaredField);
 
-            PropertyChain propertyChain = new PropertyChain(
-                    lastPropertyChain,
-                    entityClass,
-                    accessPath,
-                    isAnnotatedEntity,
-                    property,
-                    null);
-
-            if (isAnnotatedEntity) {
-                propertyChain.initialize();
-            }
-
+            PropertyChain propertyChain = new PropertyChain(lastPropertyChain, entityClass, accessPath, declaredField);
             allPropertyChainMap.put(accessPath, propertyChain);
 
-            if (ignoreAnnotated && isAnnotatedEntity) {
-                return;
+            EntityDefinition entityDefinition = propertyChain.getEntityDefinition();
+            if (entityDefinition != null) {
+                if (ignoreEntity) {
+                    return;
+                }
+                Class<?> repository = entityDefinition.getRepository();
+                if (repository != null && repository != DefaultRepository.class) {
+                    return;
+                }
             }
 
-            Class<?> fieldClass = property.getFieldClass();
+            Class<?> fieldClass = propertyChain.getFieldClass();
             if (!filterEntityClass(fieldClass)) {
                 resolveProperties(accessPath, fieldClass);
             }

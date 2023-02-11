@@ -38,8 +38,8 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
         if (enableEvent && (repository instanceof DefaultRepository)) {
             DefaultRepository defaultRepository = (DefaultRepository) repository;
             EventRepository eventRepository = new EventRepository(applicationContext);
-            eventRepository.setEntityElement(defaultRepository.getEntityElement());
             eventRepository.setEntityDefinition(defaultRepository.getEntityDefinition());
+            eventRepository.setEntityElement(defaultRepository.getEntityElement());
             eventRepository.setProxyRepository(repository);
             return eventRepository;
         }

@@ -18,14 +18,16 @@ package com.gitee.dorive.core.entity.definition;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.core.annotation.Binding;
-import com.gitee.dorive.core.entity.EntityElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 
+import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -38,9 +40,10 @@ public class BindingDefinition {
     private String alias;
     private String bindAlias;
 
-    public static List<BindingDefinition> newBindingDefinitions(EntityElement entityElement) {
-        List<BindingDefinition> bindingDefinitions = new ArrayList<>();
-        for (Binding bindingAnnotation : entityElement.getBindingAnnotations()) {
+    public static List<BindingDefinition> newBindingDefinitions(AnnotatedElement annotatedElement) {
+        Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(annotatedElement, Binding.class);
+        List<BindingDefinition> bindingDefinitions = new ArrayList<>(bindingAnnotations.size());
+        for (Binding bindingAnnotation : bindingAnnotations) {
             Map<String, Object> annotationAttributes = AnnotationUtils.getAnnotationAttributes(bindingAnnotation);
             bindingDefinitions.add(BeanUtil.copyProperties(annotationAttributes, BindingDefinition.class));
         }

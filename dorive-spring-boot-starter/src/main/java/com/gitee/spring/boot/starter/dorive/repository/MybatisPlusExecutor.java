@@ -35,7 +35,7 @@ import com.gitee.dorive.core.api.PropertyProxy;
 import com.gitee.dorive.core.api.constant.Order;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.Command;
-import com.gitee.dorive.core.entity.EntityElement;
+import com.gitee.dorive.core.entity.element.EntityElement;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;

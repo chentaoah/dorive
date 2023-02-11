@@ -1,7 +1,7 @@
 package com.gitee.dorive.core.impl;
 
 import com.gitee.dorive.core.entity.BoundedContext;
-import com.gitee.dorive.core.entity.EntityElement;
+import com.gitee.dorive.core.entity.element.EntityElement;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.*;
 import lombok.AllArgsConstructor;

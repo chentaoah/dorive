@@ -21,7 +21,7 @@ import com.gitee.dorive.core.api.Binder;
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.api.Operable;
 import com.gitee.dorive.core.entity.BoundedContext;
-import com.gitee.dorive.core.entity.PropertyChain;
+import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;

@@ -14,33 +14,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.dorive.core.entity;
+package com.gitee.dorive.core.entity.element;
 
 import com.gitee.dorive.core.api.PropertyProxy;
+import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.impl.PropertyProxyFactory;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.lang.reflect.Field;
+
 @Data
-@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @ToString(exclude = "lastPropertyChain")
-public class PropertyChain implements PropertyProxy {
+public class PropertyChain extends Property implements PropertyProxy {
 
-    private PropertyChain lastPropertyChain;
-    private Class<?> entityClass;
-    private String accessPath;
-    private boolean annotatedEntity;
-    private Property property;
-    private PropertyProxy propertyProxy;
+    protected PropertyChain lastPropertyChain;
+    protected Class<?> entityClass;
+    protected String accessPath;
+    protected EntityDefinition entityDefinition;
+    protected PropertyProxy propertyProxy;
 
-    public void initialize() {
+    public PropertyChain(PropertyChain lastPropertyChain, Class<?> entityClass, String accessPath, Field declaredField) {
+        super(declaredField);
+        this.lastPropertyChain = lastPropertyChain;
+        this.entityClass = entityClass;
+        this.accessPath = accessPath;
+        this.entityDefinition = EntityDefinition.newEntityDefinition(declaredField);
+        if (entityDefinition != null) {
+            newPropertyProxy();
+        }
+    }
+
+    public void newPropertyProxy() {
         if (propertyProxy == null) {
-            propertyProxy = PropertyProxyFactory.newPropertyProxy(entityClass, property.getDeclaredField());
+            propertyProxy = PropertyProxyFactory.newPropertyProxy(entityClass, declaredField);
             if (lastPropertyChain != null) {
-                lastPropertyChain.initialize();
+                lastPropertyChain.newPropertyProxy();
             }
         }
+    }
+
+    public boolean isAnnotatedEntity() {
+        return entityDefinition != null;
     }
 
     @Override

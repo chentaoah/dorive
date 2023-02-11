@@ -19,7 +19,7 @@ package com.gitee.dorive.core.repository;
 import com.gitee.dorive.core.api.MetadataHolder;
 import com.gitee.dorive.core.api.PropertyProxy;
 import com.gitee.dorive.core.entity.BoundedContext;
-import com.gitee.dorive.core.entity.PropertyChain;
+import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;

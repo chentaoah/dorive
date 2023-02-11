@@ -16,8 +16,8 @@
  */
 package com.gitee.dorive.core.repository;
 
-import com.gitee.dorive.core.entity.EntityElement;
-import com.gitee.dorive.core.entity.PropertyChain;
+import com.gitee.dorive.core.entity.element.EntityElement;
+import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.OperationFactory;
@@ -40,6 +40,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.util.*;
 
 @Data
@@ -83,7 +84,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
         allPropertyChainMap.forEach((accessPath, propertyChain) -> {
             if (propertyChain.isAnnotatedEntity()) {
-                ConfiguredRepository subRepository = newRepository(accessPath, propertyChain.getProperty().getDeclaredField());
+                ConfiguredRepository subRepository = newRepository(accessPath, propertyChain.getDeclaredField());
                 allRepositoryMap.put(accessPath, subRepository);
                 subRepositories.add(subRepository);
                 orderedRepositories.add(subRepository);
@@ -92,8 +93,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityDefinition().getOrder()));
 
-        setEntityElement(rootRepository.getEntityElement());
         setEntityDefinition(rootRepository.getEntityDefinition());
+        setEntityElement(rootRepository.getEntityElement());
         setOperationFactory(rootRepository.getOperationFactory());
 
         EntityHandler entityHandler = new BatchEntityHandler(this, rootRepository.getOperationFactory());
@@ -109,13 +110,19 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @SuppressWarnings("unchecked")
     private ConfiguredRepository newRepository(String accessPath, AnnotatedElement annotatedElement) {
+        EntityDefinition entityDefinition = EntityDefinition.newEntityDefinition(annotatedElement);
+        if (entityDefinition == null) {
+            throw new RuntimeException("The Entity definition is null!");
+        }
         EntityElement entityElement = EntityElement.newEntityElement(annotatedElement);
-        EntityDefinition entityDefinition = EntityDefinition.newEntityDefinition(entityElement);
 
-        Class<?> genericEntityClass = entityElement.getGenericEntityClass();
-        EntityElement genericEntityElement = EntityElement.newEntityElement(genericEntityClass);
-        EntityDefinition genericEntityDefinition = EntityDefinition.newEntityDefinition(genericEntityElement);
-        entityDefinition.merge(genericEntityDefinition);
+        if (annotatedElement instanceof Field) {
+            Class<?> genericType = entityElement.getGenericType();
+            EntityDefinition genericEntityDefinition = EntityDefinition.newEntityDefinition(genericType);
+            if (genericEntityDefinition != null) {
+                entityDefinition.merge(genericEntityDefinition);
+            }
+        }
 
         OperationFactory operationFactory = new OperationFactory(entityElement);
 
@@ -128,8 +135,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
         if (repository instanceof DefaultRepository) {
             DefaultRepository defaultRepository = (DefaultRepository) repository;
-            defaultRepository.setEntityElement(entityElement);
             defaultRepository.setEntityDefinition(entityDefinition);
+            defaultRepository.setEntityElement(entityElement);
             defaultRepository.setOperationFactory(operationFactory);
             defaultRepository.setExecutor(newExecutor(entityElement, entityDefinition));
         }
@@ -144,7 +151,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         PropertyResolver propertyResolver = new PropertyResolver(true);
         String lastAccessPath = isRoot || entityElement.isCollection() ? "" : accessPath;
-        propertyResolver.resolveProperties(lastAccessPath, entityElement.getGenericEntityClass());
+        propertyResolver.resolveProperties(lastAccessPath, entityElement.getGenericType());
 
         OrderBy defaultOrderBy = entityDefinition.getDefaultOrderBy();
 
@@ -153,8 +160,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         binderResolver.resolveAllBinders(accessPath, entityElement, entityDefinition, fieldPrefix, propertyResolver);
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository();
-        configuredRepository.setEntityElement(entityElement);
         configuredRepository.setEntityDefinition(entityDefinition);
+        configuredRepository.setEntityElement(entityElement);
         configuredRepository.setOperationFactory(operationFactory);
         configuredRepository.setProxyRepository((AbstractRepository<Object, Object>) repository);
         configuredRepository.setAccessPath(accessPath);

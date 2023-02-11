@@ -23,7 +23,7 @@ import com.gitee.dorive.core.api.EntityIndex;
 import com.gitee.dorive.core.api.ExampleBuilder;
 import com.gitee.dorive.core.api.PropertyProxy;
 import com.gitee.dorive.core.entity.BoundedContext;
-import com.gitee.dorive.core.entity.PropertyChain;
+import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;

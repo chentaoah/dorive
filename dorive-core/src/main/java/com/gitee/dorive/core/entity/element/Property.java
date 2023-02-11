@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.dorive.core.entity;
+package com.gitee.dorive.core.entity.element;
 
 import cn.hutool.core.util.ReflectUtil;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -25,13 +26,14 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 
 @Data
+@NoArgsConstructor
 public class Property {
 
-    private Field declaredField;
-    private Class<?> fieldClass;
-    private boolean collection;
-    private Class<?> genericFieldClass;
-    private String fieldName;
+    protected Field declaredField;
+    protected Class<?> fieldClass;
+    protected boolean collection;
+    protected Class<?> genericFieldClass;
+    protected String fieldName;
 
     public Property(Field declaredField) {
         Class<?> fieldClass = declaredField.getType();

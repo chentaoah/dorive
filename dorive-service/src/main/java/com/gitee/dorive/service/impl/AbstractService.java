@@ -1,13 +1,17 @@
 package com.gitee.dorive.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
+import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.executor.Page;
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.impl.selector.NameSelector;
+import com.gitee.dorive.core.impl.selector.SceneSelector;
 import com.gitee.dorive.core.util.ReflectUtils;
 import com.gitee.dorive.service.api.RestService;
 import com.gitee.dorive.service.common.ResObject;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -20,6 +24,7 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
 
     protected ApplicationContext applicationContext;
     protected R repository;
+    protected Selector selector;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -31,6 +36,10 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
     public void afterPropertiesSet() {
         Class<?> repositoryType = ReflectUtils.getFirstArgumentType(this.getClass());
         this.repository = (R) applicationContext.getBean(repositoryType);
+        EntityDefinition entityDefinition = repository.getEntityDefinition();
+        String name = entityDefinition.getName();
+        String[] scenes = entityDefinition.getScenes();
+        this.selector = StringUtils.isNotBlank(name) ? new NameSelector(name) : new SceneSelector(CollUtil.set(false, scenes));
     }
 
     @Override
@@ -69,10 +78,7 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
     }
 
     protected BoundedContext newBoundedContext(E entity, Q query) {
-        ConfiguredRepository rootRepository = repository.getRootRepository();
-        EntityDefinition entityDefinition = rootRepository.getEntityDefinition();
-        String[] scenes = entityDefinition.getScenes();
-        return new BoundedContext(scenes);
+        return new BoundedContext(selector);
     }
 
 }
