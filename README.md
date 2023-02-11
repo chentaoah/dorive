@@ -110,7 +110,8 @@ public class Tenant {
     /**
      * 选取器，决定操作的范围
      */
-    public static Selector ALL = new NameSelector("tenant", "dept", "user");
+    public static final Selector ALL = new NameSelector("*");
+    public static final Selector ONLY_TENANT = new NameSelector("tenant");
     
     private Integer id;
     private String tenantCode;
@@ -200,7 +201,7 @@ List<Tenant> tenants = tenantRepository.selectByCoating(boundedContext, tenantQu
 #### 更新数据
 
 ```java
-BoundedContext boundedContext = new BoundedContext();
+BoundedContext boundedContext = new BoundedContext(Tenant.ONLY_TENANT);
 
 Tenant tenant = tenantRepository.selectByPrimaryKey(boundedContext, 1);
 tenant.setTenantCode("tenant1");
