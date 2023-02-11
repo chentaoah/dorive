@@ -101,7 +101,8 @@
 ```java
 /**
  * 租户聚合
- * mapper 数据源
+ * name 实体名称
+ * mapper 数据来源
  */
 @Data
 @Entity(name = "tenant", mapper = SysTenantMapper.class)
@@ -116,7 +117,7 @@ public class Tenant {
     
     /**
      * 部门实体
-     * field 实体字段
+     * field 字段名称
      * bindExp 绑定字段表达式
      */
     @Entity(mapper = SysDeptMapper.class)
@@ -125,7 +126,7 @@ public class Tenant {
     
     /**
      * 用户实体
-     * property 绑定字段的内部属性
+     * property 绑定对象内部属性
      */
     @Entity(mapper = SysUserMapper.class)
     @Binding(field = "deptId", bindExp = "./departments", property = "id")
