@@ -1,6 +1,5 @@
 package com.gitee.dorive.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.BoundedContext;
@@ -39,7 +38,7 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
         EntityDefinition entityDefinition = repository.getEntityDefinition();
         String name = entityDefinition.getName();
         String[] scenes = entityDefinition.getScenes();
-        this.selector = StringUtils.isNotBlank(name) ? new NameSelector(name) : new SceneSelector(CollUtil.set(false, scenes));
+        this.selector = StringUtils.isNotBlank(name) ? new NameSelector(name) : new SceneSelector(scenes);
     }
 
     @Override

@@ -16,7 +16,6 @@
  */
 package com.gitee.dorive.core.entity;
 
-import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.core.api.ExampleBuilder;
 import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.impl.selector.SceneSelector;
@@ -37,7 +36,7 @@ public class BoundedContext {
     private Map<String, Object> attachments = Collections.emptyMap();
 
     public BoundedContext() {
-        selector = new SceneSelector(Collections.emptySet());
+        selector = new SceneSelector();
     }
 
     public BoundedContext(Selector selector) {
@@ -45,7 +44,7 @@ public class BoundedContext {
     }
 
     public BoundedContext(String... scenes) {
-        this.selector = new SceneSelector(CollUtil.set(false, scenes));
+        this.selector = new SceneSelector(scenes);
     }
 
     public boolean isMatch(ConfiguredRepository repository) {
