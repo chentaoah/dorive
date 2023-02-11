@@ -88,7 +88,7 @@
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.0.0</version>
+    <version>3.1.3</version>
 </dependency>
 ```
 
@@ -100,30 +100,26 @@
 
 ```java
 /**
- * 租户实体，此处亦可视为租户聚合
+ * 租户聚合
  * mapper 数据源
  */
 @Data
-@Entity(mapper = SysTenantMapper.class)
+@Entity(name = "tenant", mapper = SysTenantMapper.class)
 public class Tenant {
     /**
-     * 场景值集合。
-     * 一般来说，在定义实体的同时，会定义触发的场景值。开发者可以指定场景值，来决定每次操作的范围。
-     * 定义常量ALL的作用是，将常用的场景值集合统一维护起来。
+     * 选取器，决定操作的范围
      */
-    public static final String[] ALL = new String[]{"depts", "users"};
+    public static Selector ALL = new NameSelector("tenant", "dept", "user");
     
     private Integer id;
     private String tenantCode;
     
     /**
      * 部门实体
-     * scenes 场景值
-     * mapper 数据源
      * field 实体字段
      * bindExp 绑定字段表达式
      */
-    @Entity(scenes = "depts", mapper = SysDeptMapper.class)
+    @Entity(mapper = SysDeptMapper.class)
     @Binding(field = "tenantId", bindExp = "./id")
     private List<Department> departments;
     
@@ -131,7 +127,7 @@ public class Tenant {
      * 用户实体
      * property 绑定字段的内部属性
      */
-    @Entity(scenes = "users", mapper = SysUserMapper.class)
+    @Entity(mapper = SysUserMapper.class)
     @Binding(field = "deptId", bindExp = "./departments", property = "id")
     private List<User> users;
 }
@@ -166,7 +162,7 @@ public class TenantQuery {
 #### 新增数据
 
 ```java
-// 在上下文中，设置场景值，能够决定每次操作的范围
+// 在上下文中，设置选取器
 BoundedContext boundedContext = new BoundedContext(Tenant.ALL);
 
 // 开发者无需设置实体之间的关联id
