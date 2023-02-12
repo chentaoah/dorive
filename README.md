@@ -121,7 +121,7 @@ public class Tenant {
      * field 字段名称
      * bindExp 绑定字段表达式
      */
-    @Entity(mapper = SysDeptMapper.class)
+    @Entity
     @Binding(field = "tenantId", bindExp = "./id")
     private List<Department> departments;
     
@@ -129,7 +129,7 @@ public class Tenant {
      * 用户实体
      * property 绑定对象内部属性
      */
-    @Entity(mapper = SysUserMapper.class)
+    @Entity
     @Binding(field = "deptId", bindExp = "./departments", property = "id")
     private List<User> users;
 }
