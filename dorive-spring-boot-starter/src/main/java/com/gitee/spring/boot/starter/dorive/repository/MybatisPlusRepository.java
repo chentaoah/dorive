@@ -38,7 +38,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractCoatingRepository<E, P
 
     @Override
     @SuppressWarnings("unchecked")
-    protected Executor newExecutor(EntityElement entityElement, EntityDefinition entityDefinition) {
+    protected Executor newExecutor(EntityDefinition entityDefinition, EntityElement entityElement) {
         Class<?> mapperClass = entityDefinition.getMapper();
         Object mapper = null;
         Class<?> pojoClass = null;
@@ -68,7 +68,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractCoatingRepository<E, P
             defaultEntityFactory.setPojoClass(pojoClass);
         }
 
-        return new MybatisPlusExecutor(entityElement, entityDefinition, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass, entityFactory);
+        return new MybatisPlusExecutor(entityDefinition, entityElement, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass, entityFactory);
     }
 
 }
