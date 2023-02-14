@@ -16,11 +16,10 @@
  */
 package com.gitee.spring.boot.starter.dorive.impl;
 
-import com.gitee.spring.boot.starter.dorive.util.NumberUtils;
 import com.gitee.dorive.core.api.EntityIndex;
-import com.gitee.dorive.core.api.PropertyProxy;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
+import com.gitee.spring.boot.starter.dorive.util.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,39 +29,32 @@ import java.util.Map;
 
 public class EntityIndexResult extends Result<Object> implements EntityIndex {
 
-    private final Map<Long, List<Long>> primaryKeyMapping;
-    private final Map<Long, Object> primaryKeyEntityMap;
+    private final Map<Integer, List<Integer>> romNumMapping;
 
-    public EntityIndexResult(UnionExample unionExample, List<Map<String, Object>> resultMaps, List<Object> entities, PropertyProxy primaryKeyProxy) {
+    public EntityIndexResult(UnionExample unionExample, List<Map<String, Object>> resultMaps, List<Object> entities) {
         super(entities);
 
         int rootSize = unionExample.getExamples().size();
-        int entitySize = entities.size();
-        primaryKeyMapping = new HashMap<>(rootSize * 4 / 3 + 1);
-        primaryKeyEntityMap = new HashMap<>(entitySize * 4 / 3 + 1);
-
         int averageSize = resultMaps.size() / rootSize + 1;
-        for (Map<String, Object> resultMap : resultMaps) {
-            Long rootPrimaryKey = NumberUtils.longValue(resultMap.get("$id"));
-            List<Long> existPrimaryKeys = primaryKeyMapping.computeIfAbsent(rootPrimaryKey, key -> new ArrayList<>(averageSize));
-            Long primaryKey = NumberUtils.longValue(resultMap.get("id"));
-            existPrimaryKeys.add(primaryKey);
-        }
 
-        for (Object entity : entities) {
-            Long primaryKey = NumberUtils.longValue(primaryKeyProxy.getValue(entity));
-            primaryKeyEntityMap.put(primaryKey, entity);
+        romNumMapping = new HashMap<>(rootSize * 4 / 3 + 1);
+
+        for (int index = 0; index < resultMaps.size(); index++) {
+            Map<String, Object> resultMap = resultMaps.get(index);
+            Integer rowNum = NumberUtils.intValue(resultMap.get("$row"));
+            List<Integer> existRowNums = romNumMapping.computeIfAbsent(rowNum, key -> new ArrayList<>(averageSize));
+            existRowNums.add(index + 1);
         }
     }
 
     @Override
-    public List<Object> selectList(Object rootEntity, Object primaryKey) {
-        Long rootPrimaryKey = NumberUtils.longValue(primaryKey);
-        List<Long> existPrimaryKeys = primaryKeyMapping.get(rootPrimaryKey);
-        if (existPrimaryKeys != null && !existPrimaryKeys.isEmpty()) {
-            List<Object> entities = new ArrayList<>(existPrimaryKeys.size());
-            for (Long existPrimaryKey : existPrimaryKeys) {
-                Object entity = primaryKeyEntityMap.get(existPrimaryKey);
+    public List<Object> selectList(Object rootEntity, Object key) {
+        Integer rowNum = NumberUtils.intValue(key);
+        List<Integer> existRowNums = romNumMapping.get(rowNum);
+        if (existRowNums != null && !existRowNums.isEmpty()) {
+            List<Object> entities = new ArrayList<>(existRowNums.size());
+            for (Integer existRowNum : existRowNums) {
+                Object entity = records.get(existRowNum - 1);
                 entities.add(entity);
             }
             return entities;

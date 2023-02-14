@@ -138,7 +138,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultRepository.setEntityDefinition(entityDefinition);
             defaultRepository.setEntityElement(entityElement);
             defaultRepository.setOperationFactory(operationFactory);
-            defaultRepository.setExecutor(newExecutor(entityElement, entityDefinition));
+            defaultRepository.setExecutor(newExecutor(entityDefinition, entityElement));
         }
 
         boolean isRoot = "/".equals(accessPath);
@@ -176,7 +176,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return configuredRepository;
     }
 
-    protected abstract Executor newExecutor(EntityElement entityElement, EntityDefinition entityDefinition);
+    protected abstract Executor newExecutor(EntityDefinition entityDefinition, EntityElement entityElement);
 
     protected abstract AbstractRepository<Object, Object> postProcessRepository(AbstractRepository<Object, Object> repository);
 

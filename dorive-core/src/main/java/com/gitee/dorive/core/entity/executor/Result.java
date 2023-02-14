@@ -26,9 +26,9 @@ import java.util.List;
 @NoArgsConstructor
 public class Result<E> {
 
-    private E record;
-    private List<E> records = Collections.emptyList();
-    private Page<E> page;
+    protected E record;
+    protected List<E> records = Collections.emptyList();
+    protected Page<E> page;
 
     public Result(E record) {
         this.record = record;

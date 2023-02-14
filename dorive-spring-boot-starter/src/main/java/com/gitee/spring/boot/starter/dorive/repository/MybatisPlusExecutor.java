@@ -26,17 +26,14 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gitee.spring.boot.starter.dorive.api.CriterionAppender;
-import com.gitee.spring.boot.starter.dorive.entity.Metadata;
-import com.gitee.spring.boot.starter.dorive.impl.EntityIndexResult;
 import com.gitee.dorive.core.api.EntityFactory;
 import com.gitee.dorive.core.api.MetadataHolder;
 import com.gitee.dorive.core.api.PropertyProxy;
 import com.gitee.dorive.core.api.constant.Order;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.Command;
-import com.gitee.dorive.core.entity.element.EntityElement;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
+import com.gitee.dorive.core.entity.element.EntityElement;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -48,6 +45,9 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
+import com.gitee.spring.boot.starter.dorive.api.CriterionAppender;
+import com.gitee.spring.boot.starter.dorive.entity.Metadata;
+import com.gitee.spring.boot.starter.dorive.impl.EntityIndexResult;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -55,7 +55,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,19 +66,19 @@ import static com.gitee.spring.boot.starter.dorive.impl.AppenderContext.OPERATOR
 @ToString
 public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHolder {
 
-    private EntityElement entityElement;
     private EntityDefinition entityDefinition;
+    private EntityElement entityElement;
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;
     private EntityFactory entityFactory;
 
-    public MybatisPlusExecutor(EntityElement entityElement,
-                               EntityDefinition entityDefinition,
+    public MybatisPlusExecutor(EntityDefinition entityDefinition,
+                               EntityElement entityElement,
                                BaseMapper<Object> baseMapper,
                                Class<Object> pojoClass,
                                EntityFactory entityFactory) {
-        this.entityElement = entityElement;
         this.entityDefinition = entityDefinition;
+        this.entityElement = entityElement;
         this.baseMapper = baseMapper;
         this.pojoClass = pojoClass;
         this.entityFactory = entityFactory;
@@ -106,17 +105,8 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                     UnionExample unionExample = (UnionExample) example;
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                    int resultSize = resultMaps.size();
-                    Set<Object> existIds = new HashSet<>(resultSize * 4 / 3 + 1);
-                    List<Object> entities = new ArrayList<>(resultSize);
-                    for (Map<String, Object> resultMap : resultMaps) {
-                        Object id = resultMap.get("id");
-                        if (existIds.add(id)) {
-                            Object entity = entityFactory.reconstitute(boundedContext, resultMap);
-                            entities.add(entity);
-                        }
-                    }
-                    return new EntityIndexResult(unionExample, resultMaps, entities, entityElement.getPrimaryKeyProxy());
+                    List<Object> entities = reconstitute(boundedContext, resultMaps);
+                    return new EntityIndexResult(unionExample, resultMaps, entities);
 
                 } else {
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);

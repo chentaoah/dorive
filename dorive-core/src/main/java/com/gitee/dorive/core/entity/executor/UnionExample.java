@@ -34,7 +34,16 @@ public class UnionExample extends Example {
     public boolean isDirtyQuery() {
         return !examples.isEmpty();
     }
-    
+
+    @Override
+    public void selectColumns(List<String> selectColumns) {
+        if (examples != null && !examples.isEmpty()) {
+            for (Example example : examples) {
+                example.selectColumns(selectColumns);
+            }
+        }
+    }
+
     public void addExample(Example example) {
         examples.add(example);
     }
