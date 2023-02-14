@@ -62,8 +62,6 @@ public class BatchEntityHandler implements EntityHandler {
     }
 
     private UnionExample newUnionExample(ConfiguredRepository repository, BoundedContext boundedContext, List<Object> rootEntities) {
-        ConfiguredRepository rootRepository = this.repository.getRootRepository();
-
         PropertyChain anchorPoint = repository.getAnchorPoint();
         PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
 
@@ -71,7 +69,8 @@ public class BatchEntityHandler implements EntityHandler {
         ExampleBuilder exampleBuilder = StringUtils.isNotBlank(builderKey) ? (ExampleBuilder) boundedContext.get(builderKey) : null;
 
         UnionExample unionExample = new UnionExample();
-        for (Object rootEntity : rootEntities) {
+        for (int index = 0; index < rootEntities.size(); index++) {
+            Object rootEntity = rootEntities.get(index);
             Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
             if (lastEntity != null) {
                 Example example = repository.newExampleByContext(boundedContext, rootEntity);
@@ -79,8 +78,7 @@ public class BatchEntityHandler implements EntityHandler {
                     example = exampleBuilder.buildExample(boundedContext, rootEntity, example);
                 }
                 if (example.isDirtyQuery()) {
-                    Object primaryKey = rootRepository.getPrimaryKey(rootEntity);
-                    example.extraColumns(primaryKey + " as $id");
+                    example.extraColumns((index + 1) + " as $row");
                     unionExample.addExample(example);
                 }
             }
@@ -89,17 +87,15 @@ public class BatchEntityHandler implements EntityHandler {
     }
 
     private void setValueForRootEntities(ConfiguredRepository repository, List<Object> rootEntities, EntityIndex entityIndex) {
-        ConfiguredRepository rootRepository = this.repository.getRootRepository();
-
         PropertyChain anchorPoint = repository.getAnchorPoint();
         PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
         PropertyProxy propertyProxy = anchorPoint.getPropertyProxy();
 
-        for (Object rootEntity : rootEntities) {
+        for (int index = 0; index < rootEntities.size(); index++) {
+            Object rootEntity = rootEntities.get(index);
             Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
             if (lastEntity != null) {
-                Object primaryKey = rootRepository.getPrimaryKey(rootEntity);
-                List<Object> entities = entityIndex.selectList(rootEntity, primaryKey);
+                List<Object> entities = entityIndex.selectList(rootEntity, index + 1);
                 Object entity = repository.convertManyToOne(entities);
                 if (entity != null) {
                     propertyProxy.setValue(lastEntity, entity);

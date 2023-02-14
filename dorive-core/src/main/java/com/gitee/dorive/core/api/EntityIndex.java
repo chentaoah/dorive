@@ -20,6 +20,6 @@ import java.util.List;
 
 public interface EntityIndex {
 
-    List<Object> selectList(Object rootEntity, Object primaryKey);
+    List<Object> selectList(Object rootEntity, Object key);
 
 }

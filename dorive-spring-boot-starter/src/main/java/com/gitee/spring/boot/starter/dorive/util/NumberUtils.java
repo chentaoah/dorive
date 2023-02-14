@@ -18,6 +18,13 @@ package com.gitee.spring.boot.starter.dorive.util;
 
 public class NumberUtils {
 
+    public static Integer intValue(Object object) {
+        if (object instanceof Number) {
+            return ((Number) object).intValue();
+        }
+        return null;
+    }
+
     public static Long longValue(Object object) {
         if (object instanceof Number) {
             return ((Number) object).longValue();
