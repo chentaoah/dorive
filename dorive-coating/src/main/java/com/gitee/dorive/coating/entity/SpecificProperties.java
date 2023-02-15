@@ -55,7 +55,7 @@ public class SpecificProperties {
         return false;
     }
 
-    public OrderBy getOrderBy(Object coatingObject) {
+    public OrderBy newOrderBy(Object coatingObject) {
         if (sortByProperty != null && orderProperty != null) {
             Object sortBy = sortByProperty.getProperty().getFieldValue(coatingObject);
             Object order = orderProperty.getProperty().getFieldValue(coatingObject);
@@ -72,7 +72,7 @@ public class SpecificProperties {
         return null;
     }
 
-    public Page<Object> getPage(Object coatingObject) {
+    public Page<Object> newPage(Object coatingObject) {
         if (pageProperty != null && limitProperty != null) {
             Object page = pageProperty.getProperty().getFieldValue(coatingObject);
             Object limit = limitProperty.getProperty().getFieldValue(coatingObject);
