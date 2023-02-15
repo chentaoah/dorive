@@ -34,7 +34,7 @@ public class SqlSegment {
     private Example example;
     private boolean rootReachable;
     private boolean dirtyQuery;
-    private Set<String> joinTableNames;
+    private Set<String> targetAccessPaths;
 
     @Override
     public String toString() {

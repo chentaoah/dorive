@@ -22,7 +22,8 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class JoinSegment {
-
+    
+    private String targetAccessPath;
     private String joinTableName;
     private String joinTableAlias;
     private String sql;
