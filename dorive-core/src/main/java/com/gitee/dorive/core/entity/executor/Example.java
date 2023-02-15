@@ -32,7 +32,7 @@ import java.util.List;
 public class Example {
 
     private boolean emptyQuery = false;
-    private boolean usedPage = false;
+    private boolean countQueried = false;
     private List<String> selectColumns;
     private List<String> extraColumns;
     private List<Criterion> criteria = new ArrayList<>(4);

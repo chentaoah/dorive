@@ -75,6 +75,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>(repositoryWrappers.size() * 4 / 3 + 1);
         SqlSegment rootSqlSegment = null;
         char letter = 'a';
+        boolean anyDirtyQuery = false;
 
         for (RepositoryWrapper repositoryWrapper : repositoryWrappers) {
             MergedRepository mergedRepository = repositoryWrapper.getMergedRepository();
@@ -91,7 +92,10 @@ public class SQLExampleBuilder implements ExampleBuilder {
             letter = (char) (letter + 1);
 
             Example example = repositoryWrapper.newExampleByCoating(boundedContext, coatingObject);
+
             boolean dirtyQuery = example.isDirtyQuery();
+            anyDirtyQuery = anyDirtyQuery || dirtyQuery;
+
             Set<String> joinTableNames = new HashSet<>(8);
 
             if ("/".equals(absoluteAccessPath)) {
@@ -108,15 +112,19 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
 
         SpecificProperties properties = coatingWrapper.getSpecificProperties();
-        OrderBy orderBy = properties.getOrderBy(coatingObject);
-        Page<Object> page = properties.getPage(coatingObject);
+        OrderBy orderBy = properties.newOrderBy(coatingObject);
+        Page<Object> page = properties.newPage(coatingObject);
 
         Example example = new Example();
         example.setOrderBy(orderBy);
-        example.setUsedPage(page != null);
         example.setPage(page);
 
-        assert rootSqlSegment != null;
+        if (rootSqlSegment == null) {
+            throw new RuntimeException("Unable to build SQL statement!");
+        }
+        if (!anyDirtyQuery) {
+            return example;
+        }
         markReachableAndDirty(sqlSegmentMap, rootSqlSegment);
         if (!rootSqlSegment.isDirtyQuery()) {
             return example;
@@ -128,11 +136,11 @@ public class SQLExampleBuilder implements ExampleBuilder {
         buildSQL(sqlBuilder, args, sqlSegmentMap);
         if (page != null) {
             long count = SqlRunner.db().selectCount("SELECT COUNT(1) FROM (" + sqlBuilder + ") " + letter, args.toArray());
+            page.setTotal(count);
+            example.setCountQueried(true);
             if (count == 0) {
                 example.setEmptyQuery(true);
                 return example;
-            } else {
-                page.setTotal(count);
             }
         }
 
