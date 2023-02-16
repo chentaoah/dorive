@@ -1,4 +1,4 @@
-package com.gitee.spring.boot.starter.dorive.config;
+package com.gitee.dorive.spring.boot.starter.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;

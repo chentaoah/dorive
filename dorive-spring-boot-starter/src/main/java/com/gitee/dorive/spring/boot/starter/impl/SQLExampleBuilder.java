@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.boot.starter.dorive.impl;
+package com.gitee.dorive.spring.boot.starter.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
@@ -42,10 +42,10 @@ import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
 import com.gitee.dorive.core.util.CriterionUtils;
 import com.gitee.dorive.core.util.SqlUtils;
-import com.gitee.spring.boot.starter.dorive.entity.ArgSegment;
-import com.gitee.spring.boot.starter.dorive.entity.JoinSegment;
-import com.gitee.spring.boot.starter.dorive.entity.Metadata;
-import com.gitee.spring.boot.starter.dorive.entity.SqlSegment;
+import com.gitee.dorive.spring.boot.starter.entity.ArgSegment;
+import com.gitee.dorive.spring.boot.starter.entity.JoinSegment;
+import com.gitee.dorive.spring.boot.starter.entity.Metadata;
+import com.gitee.dorive.spring.boot.starter.entity.SqlSegment;
 
 import java.util.ArrayList;
 import java.util.Collections;

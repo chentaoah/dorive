@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.boot.starter.dorive.impl;
+package com.gitee.dorive.spring.boot.starter.impl;
 
 import com.gitee.dorive.core.api.EntityIndex;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
-import com.gitee.spring.boot.starter.dorive.util.NumberUtils;
+import com.gitee.dorive.spring.boot.starter.util.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.boot.starter.dorive.annotation;
+package com.gitee.dorive.spring.boot.starter.annotation;
 
 import com.gitee.dorive.core.annotation.Repository;
 import com.gitee.dorive.injection.annotation.Root;

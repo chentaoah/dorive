@@ -14,12 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.boot.starter.dorive.api;
+package com.gitee.dorive.spring.boot.starter.entity;
 
-import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
+import com.gitee.dorive.core.entity.executor.Example;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-public interface CriterionAppender {
+import java.util.List;
+import java.util.Set;
 
-    void appendCriterion(AbstractWrapper<?, String, ?> abstractWrapper, String property, Object value);
+@Data
+@AllArgsConstructor
+public class SqlSegment {
+
+    private String tableName;
+    private String tableAlias;
+    private String sql;
+    private List<JoinSegment> joinSegments;
+    private Example example;
+    private boolean rootReachable;
+    private boolean dirtyQuery;
+    private Set<String> targetAccessPaths;
+
+    @Override
+    public String toString() {
+        return sql;
+    }
 
 }
