@@ -1,4 +1,4 @@
-package com.gitee.spring.boot.starter.dorive.entity;
+package com.gitee.dorive.spring.boot.starter.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

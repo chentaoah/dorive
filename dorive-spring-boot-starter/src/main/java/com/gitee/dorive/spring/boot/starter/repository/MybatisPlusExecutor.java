@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.boot.starter.dorive.repository;
+package com.gitee.dorive.spring.boot.starter.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
@@ -45,9 +45,9 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
-import com.gitee.spring.boot.starter.dorive.api.CriterionAppender;
-import com.gitee.spring.boot.starter.dorive.entity.Metadata;
-import com.gitee.spring.boot.starter.dorive.impl.EntityIndexResult;
+import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
+import com.gitee.dorive.spring.boot.starter.entity.Metadata;
+import com.gitee.dorive.spring.boot.starter.impl.EntityIndexResult;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -59,7 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.gitee.spring.boot.starter.dorive.impl.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
+import static com.gitee.dorive.spring.boot.starter.impl.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
 
 @Getter
 @Setter

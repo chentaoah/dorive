@@ -1,1 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.gitee.dorive.core.config.DomainCoreConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.gitee.dorive.core.config.DomainCoreConfiguration

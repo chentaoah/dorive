@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.boot.starter.dorive.repository;
+package com.gitee.dorive.spring.boot.starter.repository;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gitee.spring.boot.starter.dorive.impl.SQLExampleBuilder;
+import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.EntityFactory;
 import com.gitee.dorive.core.api.Executor;

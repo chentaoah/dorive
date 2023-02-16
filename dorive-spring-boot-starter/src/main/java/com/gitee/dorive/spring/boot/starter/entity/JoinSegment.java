@@ -14,22 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.boot.starter.dorive.util;
+package com.gitee.dorive.spring.boot.starter.entity;
 
-public class NumberUtils {
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-    public static Integer intValue(Object object) {
-        if (object instanceof Number) {
-            return ((Number) object).intValue();
-        }
-        return null;
-    }
+@Data
+@AllArgsConstructor
+public class JoinSegment {
+    
+    private String targetAccessPath;
+    private String joinTableName;
+    private String joinTableAlias;
+    private String sql;
 
-    public static Long longValue(Object object) {
-        if (object instanceof Number) {
-            return ((Number) object).longValue();
-        }
-        return null;
+    @Override
+    public String toString() {
+        return sql;
     }
 
 }

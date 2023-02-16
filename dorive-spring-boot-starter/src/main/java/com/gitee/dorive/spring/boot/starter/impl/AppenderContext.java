@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.spring.boot.starter.dorive.impl;
+package com.gitee.dorive.spring.boot.starter.impl;
 
 import com.baomidou.mybatisplus.core.conditions.interfaces.Compare;
-import com.gitee.spring.boot.starter.dorive.api.CriterionAppender;
+import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
 import com.gitee.dorive.core.api.constant.Operator;
 import com.gitee.dorive.core.util.SqlUtils;
 
