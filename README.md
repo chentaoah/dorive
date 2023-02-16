@@ -67,16 +67,16 @@
 
 ### 📖项目结构
 
-| 模块                       | 描述                                          |
-| -------------------------- | --------------------------------------------- |
-| dorive-injection           | 实现依赖注入校验                              |
-| dorive-proxy               | 实现动态代理，取代反射                        |
-| dorive-core                | 实现实体解析、仓储CRUD的核心逻辑              |
-| dorive-event               | 实现仓储操作时的事件通知机制                  |
-| dorive-coating             | 实现通过防腐层对象的查询机制                  |
-| dorive-service             | 实现抽象的Service与Controller，供开发者继承。 |
-| dorive-spring-boot-starter | 实现与mybatis-plus的集成                      |
-| dorive-generator           | 实现根据实体生成数据库表结构                  |
+| 模块                       | 描述                                        |
+| -------------------------- | ------------------------------------------- |
+| dorive-injection           | 实现依赖注入校验                            |
+| dorive-proxy               | 实现动态代理，取代反射                      |
+| dorive-core                | 实现实体解析、仓储CRUD的核心逻辑            |
+| dorive-event               | 实现仓储操作时的事件通知机制                |
+| dorive-coating             | 实现通过防腐层对象的查询机制                |
+| dorive-service             | 实现抽象的Service与Controller，供开发者继承 |
+| dorive-spring-boot-starter | 实现与mybatis-plus的集成                    |
+| dorive-generator           | 实现根据实体生成数据库表结构                |
 
 ### 📊架构设计
 
@@ -88,7 +88,7 @@
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.1.3</version>
+    <version>3.1.7</version>
 </dependency>
 ```
 
