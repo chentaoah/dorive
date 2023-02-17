@@ -18,7 +18,6 @@ package com.gitee.dorive.spring.boot.starter.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -47,6 +46,7 @@ import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
 import com.gitee.dorive.spring.boot.starter.entity.Metadata;
+import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.spring.boot.starter.impl.EntityIndexResult;
 import lombok.Getter;
 import lombok.Setter;
@@ -71,17 +71,20 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;
     private EntityFactory entityFactory;
+    private AliasConverter aliasConverter;
 
     public MybatisPlusExecutor(EntityDefinition entityDefinition,
                                EntityElement entityElement,
                                BaseMapper<Object> baseMapper,
                                Class<Object> pojoClass,
-                               EntityFactory entityFactory) {
+                               EntityFactory entityFactory,
+                               AliasConverter aliasConverter) {
         this.entityDefinition = entityDefinition;
         this.entityElement = entityElement;
         this.baseMapper = baseMapper;
         this.pojoClass = pojoClass;
         this.entityFactory = entityFactory;
+        this.aliasConverter = aliasConverter;
     }
 
     @Override
@@ -100,15 +103,18 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
 
         } else if (query.getExample() != null) {
             Example example = query.getExample();
+
             if (query.withoutPage()) {
                 if (example instanceof UnionExample) {
                     UnionExample unionExample = (UnionExample) example;
+                    aliasConverter.convert(unionExample);
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
                     List<Object> entities = reconstitute(boundedContext, resultMaps);
                     return new EntityIndexResult(unionExample, resultMaps, entities);
 
                 } else {
+                    aliasConverter.convert(example);
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
                     List<Object> entities = reconstitute(boundedContext, resultMaps);
@@ -116,6 +122,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                 }
 
             } else {
+                aliasConverter.convert(example);
                 com.gitee.dorive.core.entity.executor.Page<Object> page = example.getPage();
                 Page<Map<String, Object>> dataPage = new Page<>(page.getCurrent(), page.getSize());
                 QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
@@ -129,10 +136,8 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
 
                 return new Result<>(page);
             }
-
-        } else {
-            throw new RuntimeException("Unsupported query method!");
         }
+        throw new RuntimeException("Unsupported query method!");
     }
 
     private List<Object> reconstitute(BoundedContext boundedContext, List<Map<String, Object>> resultMaps) {
@@ -164,8 +169,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
 
         for (Criterion criterion : example.getCriteria()) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            String property = StrUtil.toUnderlineCase(criterion.getProperty());
-            criterionAppender.appendCriterion(queryWrapper, property, criterion.getValue());
+            criterionAppender.appendCriterion(queryWrapper, criterion.getProperty(), criterion.getValue());
         }
 
         OrderBy orderBy = example.getOrderBy();
@@ -240,6 +244,9 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
             Update update = (Update) operation;
             Object primaryKey = update.getPrimaryKey();
             Example example = update.getExample();
+            if (example != null) {
+                aliasConverter.convert(example);
+            }
 
             String commandKey = entityDefinition.getCommandKey();
             if (StringUtils.isNotBlank(commandKey) && boundedContext.containsKey(commandKey)) {
@@ -263,6 +270,9 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
             Delete delete = (Delete) operation;
             Object primaryKey = delete.getPrimaryKey();
             Example example = delete.getExample();
+            if (example != null) {
+                aliasConverter.convert(example);
+            }
             if (primaryKey != null) {
                 return baseMapper.deleteById((Serializable) primaryKey);
 
@@ -277,8 +287,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
         for (Criterion criterion : example.getCriteria()) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            String property = StrUtil.toUnderlineCase(criterion.getProperty());
-            criterionAppender.appendCriterion(updateWrapper, property, criterion.getValue());
+            criterionAppender.appendCriterion(updateWrapper, criterion.getProperty(), criterion.getValue());
         }
         return updateWrapper;
     }
@@ -295,8 +304,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         }
         for (Criterion criterion : example.getCriteria()) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            String property = StrUtil.toUnderlineCase(criterion.getProperty());
-            criterionAppender.appendCriterion(updateWrapper, property, criterion.getValue());
+            criterionAppender.appendCriterion(updateWrapper, criterion.getProperty(), criterion.getValue());
         }
         return updateWrapper;
     }

@@ -25,8 +25,9 @@ public class ContextBinder extends AbstractBinder {
 
     public ContextBinder(BindingDefinition bindingDefinition,
                          PropertyChain fieldPropertyChain,
-                         Processor processor) {
-        super(bindingDefinition, fieldPropertyChain, processor);
+                         Processor processor,
+                         String alias) {
+        super(bindingDefinition, fieldPropertyChain, processor, alias);
     }
 
     @Override

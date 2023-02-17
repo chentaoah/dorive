@@ -32,11 +32,11 @@ import com.gitee.dorive.coating.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.constant.Operator;
 import com.gitee.dorive.core.entity.BoundedContext;
-import com.gitee.dorive.core.entity.definition.BindingDefinition;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
@@ -85,6 +85,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             ConfiguredRepository configuredRepository = mergedRepository.getConfiguredRepository();
 
             BinderResolver binderResolver = definedRepository.getBinderResolver();
+            AliasConverter aliasConverter = configuredRepository.getAliasConverter();
 
             TableInfo tableInfo = getTableInfo(configuredRepository);
             String tableName = tableInfo.getTableName();
@@ -93,6 +94,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             letter = (char) (letter + 1);
 
             Example example = repositoryWrapper.newExampleByCoating(boundedContext, coatingObject);
+            aliasConverter.convert(example);
 
             boolean dirtyQuery = example.isDirtyQuery();
             anyDirtyQuery = anyDirtyQuery || dirtyQuery;
@@ -182,9 +184,8 @@ public class SQLExampleBuilder implements ExampleBuilder {
                 String joinTableName = sqlSegment.getTableName();
                 String joinTableAlias = sqlSegment.getTableAlias();
 
-                BindingDefinition bindingDefinition = propertyBinder.getBindingDefinition();
-                String alias = StrUtil.toUnderlineCase(bindingDefinition.getAlias());
-                String bindAlias = StrUtil.toUnderlineCase(bindingDefinition.getBindAlias());
+                String alias = propertyBinder.getAlias();
+                String bindAlias = propertyBinder.getBindAlias();
                 String sqlCriteria = tableAlias + "." + alias + " = " + joinTableAlias + "." + bindAlias;
 
                 JoinSegment joinSegment = new JoinSegment(globalAccessPath, joinTableName, joinTableAlias, sqlCriteria);
@@ -231,7 +232,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
                     List<Criterion> criteria = sqlExample.getCriteria();
                     List<ArgSegment> argSegments = new ArrayList<>(criteria.size());
                     for (Criterion criterion : criteria) {
-                        String property = CriterionUtils.getProperty(criterion);
+                        String property = criterion.getProperty();
                         String operator = CriterionUtils.getOperator(criterion);
                         Object value = criterion.getValue();
                         if (operator.endsWith(Operator.LIKE)) {

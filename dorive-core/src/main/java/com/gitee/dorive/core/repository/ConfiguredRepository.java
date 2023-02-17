@@ -25,6 +25,7 @@ import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
@@ -48,6 +49,7 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
     protected String fieldPrefix;
     protected BinderResolver binderResolver;
     protected boolean boundEntity;
+    protected AliasConverter aliasConverter;
 
     @Override
     public int updateByExample(BoundedContext boundedContext, Object entity, Example example) {
@@ -104,7 +106,7 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
     public Example newExampleByContext(BoundedContext boundedContext, Object rootEntity) {
         Example example = new Example();
         for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
-            String alias = propertyBinder.getBindingDefinition().getAlias();
+            String alias = propertyBinder.getAlias();
             Object boundValue = propertyBinder.getBoundValue(boundedContext, rootEntity);
             if (boundValue instanceof Collection) {
                 boundValue = !((Collection<?>) boundValue).isEmpty() ? boundValue : null;
@@ -119,7 +121,7 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
         }
         if (example.isDirtyQuery()) {
             for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
-                String alias = contextBinder.getBindingDefinition().getAlias();
+                String alias = contextBinder.getAlias();
                 Object boundValue = contextBinder.getBoundValue(boundedContext, rootEntity);
                 if (boundValue != null) {
                     example.eq(alias, boundValue);

@@ -19,7 +19,6 @@ package com.gitee.dorive.coating.entity;
 import com.gitee.dorive.coating.entity.definition.PropertyDefinition;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.element.Property;
-import com.gitee.dorive.core.entity.definition.BindingDefinition;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
@@ -44,9 +43,9 @@ public class RepositoryWrapper {
             Object fieldValue = property.getFieldValue(coatingObject);
             if (fieldValue != null) {
                 PropertyDefinition propertyDefinition = propertyWrapper.getPropertyDefinition();
-                String alias = propertyDefinition.getAlias();
+                String field = propertyDefinition.getField();
                 String operator = propertyDefinition.getOperator();
-                example.addCriterion(new Criterion(alias, operator, fieldValue));
+                example.addCriterion(new Criterion(field, operator, fieldValue));
             }
         }
         ConfiguredRepository definedRepository = mergedRepository.getDefinedRepository();
@@ -54,8 +53,7 @@ public class RepositoryWrapper {
         for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
             Object boundValue = contextBinder.getBoundValue(boundedContext, null);
             if (boundValue != null) {
-                BindingDefinition bindingDefinition = contextBinder.getBindingDefinition();
-                String alias = bindingDefinition.getAlias();
+                String alias = contextBinder.getAlias();
                 example.eq(alias, boundValue);
             }
         }

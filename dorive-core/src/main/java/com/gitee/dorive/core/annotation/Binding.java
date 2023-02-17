@@ -41,8 +41,4 @@ public @interface Binding {
 
     Class<?> processor() default DefaultProcessor.class;
 
-    String alias() default "";
-
-    String bindAlias() default "";
-
 }

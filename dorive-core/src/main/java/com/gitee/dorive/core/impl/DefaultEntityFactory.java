@@ -32,21 +32,21 @@ import java.util.Map;
 @AllArgsConstructor
 public class DefaultEntityFactory implements EntityFactory {
 
-    private EntityElement entityElement;
-    private Class<?> pojoClass;
+    protected EntityElement entityElement;
+    protected Class<?> pojoClass;
+    protected Map<String, String> aliasPropMapping;
+    protected Map<String, String> propPojoMapping;
 
     @Override
     public Object reconstitute(BoundedContext boundedContext, Object persistentObject) {
-        if (persistentObject instanceof Map) {
-            return BeanUtil.mapToBean((Map<?, ?>) persistentObject, entityElement.getGenericType(), true, CopyOptions.create().ignoreNullValue());
-        } else {
-            return BeanUtil.copyProperties(persistentObject, entityElement.getGenericType());
-        }
+        CopyOptions copyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(aliasPropMapping);
+        return BeanUtil.toBean(persistentObject, entityElement.getGenericType(), copyOptions);
     }
 
     @Override
     public Object deconstruct(BoundedContext boundedContext, Object entity) {
-        return BeanUtil.copyProperties(entity, pojoClass);
+        CopyOptions copyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(propPojoMapping);
+        return BeanUtil.toBean(entity, pojoClass, copyOptions);
     }
 
 }

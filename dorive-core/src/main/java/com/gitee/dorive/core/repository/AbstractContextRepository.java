@@ -20,6 +20,7 @@ import com.gitee.dorive.core.entity.element.EntityElement;
 import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.OperationFactory;
 import com.gitee.dorive.core.impl.executor.ChainExecutor;
 import com.gitee.dorive.core.impl.executor.AdaptiveExecutor;
@@ -153,11 +154,13 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         String lastAccessPath = isRoot || entityElement.isCollection() ? "" : accessPath;
         propertyResolver.resolveProperties(lastAccessPath, entityElement.getGenericType());
 
-        OrderBy defaultOrderBy = entityDefinition.getDefaultOrderBy();
+        OrderBy defaultOrderBy = entityElement.newDefaultOrderBy(entityDefinition);
 
         BinderResolver binderResolver = new BinderResolver(this);
         String fieldPrefix = lastAccessPath + "/";
         binderResolver.resolveAllBinders(accessPath, entityElement, entityDefinition, fieldPrefix, propertyResolver);
+
+        AliasConverter aliasConverter = new AliasConverter(entityElement);
 
         ConfiguredRepository configuredRepository = new ConfiguredRepository();
         configuredRepository.setEntityDefinition(entityDefinition);
@@ -173,6 +176,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         configuredRepository.setFieldPrefix(fieldPrefix);
         configuredRepository.setBinderResolver(binderResolver);
         configuredRepository.setBoundEntity(false);
+        configuredRepository.setAliasConverter(aliasConverter);
         return configuredRepository;
     }
 

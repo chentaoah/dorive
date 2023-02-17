@@ -17,17 +17,16 @@
 package com.gitee.dorive.core.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.core.api.Binder;
+import com.gitee.dorive.core.api.Processor;
 import com.gitee.dorive.core.entity.definition.BindingDefinition;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
+import com.gitee.dorive.core.entity.element.EntityElement;
+import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.processor.DefaultProcessor;
 import com.gitee.dorive.core.impl.processor.PropertyProcessor;
-import com.gitee.dorive.core.api.Binder;
-import com.gitee.dorive.core.api.Processor;
-import com.gitee.dorive.core.entity.element.EntityElement;
-import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
 import com.gitee.dorive.core.util.PathUtils;
@@ -36,7 +35,9 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Data
 public class BinderResolver {
@@ -45,7 +46,7 @@ public class BinderResolver {
 
     private List<Binder> allBinders;
     private List<PropertyBinder> propertyBinders;
-    private List<String> boundColumns;
+    private List<String> boundFields;
     private List<ContextBinder> contextBinders;
     private List<Binder> boundValueBinders;
     private PropertyBinder boundIdBinder;
@@ -57,12 +58,12 @@ public class BinderResolver {
     public void resolveAllBinders(String accessPath, EntityElement entityElement, EntityDefinition entityDefinition,
                                   String fieldPrefix, PropertyResolver propertyResolver) {
 
-        List<BindingDefinition> bindingDefinitions = BindingDefinition.newBindingDefinitions(entityElement.getElement());
+        List<BindingDefinition> bindingDefinitions = BindingDefinition.newBindingDefinitions(entityElement.getAnnotatedElement());
         Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
 
         allBinders = new ArrayList<>(bindingDefinitions.size());
         propertyBinders = new ArrayList<>(bindingDefinitions.size());
-        boundColumns = new ArrayList<>(bindingDefinitions.size());
+        boundFields = new ArrayList<>(bindingDefinitions.size());
         contextBinders = new ArrayList<>(bindingDefinitions.size());
         boundValueBinders = new ArrayList<>(bindingDefinitions.size());
         boundIdBinder = null;
@@ -71,18 +72,23 @@ public class BinderResolver {
             renewBindingDefinition(accessPath, bindingDefinition);
 
             String field = bindingDefinition.getField();
+            String alias = entityElement.toAlias(field);
+
             PropertyChain fieldPropertyChain = allPropertyChainMap.get(fieldPrefix + field);
-            Assert.notNull(fieldPropertyChain, "The field property chain cannot be null! entity: {}, field: {}",
-                    entityElement.getGenericType().getSimpleName(), field);
+            Assert.notNull(
+                    fieldPropertyChain,
+                    "The field property chain cannot be null! entity: {}, field: {}",
+                    entityElement.getGenericType().getSimpleName(),
+                    field);
             fieldPropertyChain.newPropertyProxy();
 
             Processor processor = newProcessor(bindingDefinition);
 
             if (bindingDefinition.getBindExp().startsWith("/")) {
-                PropertyBinder propertyBinder = newPropertyBinder(bindingDefinition, fieldPropertyChain, processor);
+                PropertyBinder propertyBinder = newPropertyBinder(bindingDefinition, fieldPropertyChain, processor, alias);
                 allBinders.add(propertyBinder);
                 propertyBinders.add(propertyBinder);
-                boundColumns.add(StrUtil.toUnderlineCase(bindingDefinition.getAlias()));
+                boundFields.add(bindingDefinition.getField());
 
                 if (propertyBinder.isSameType()) {
                     if (!"id".equals(field)) {
@@ -96,7 +102,7 @@ public class BinderResolver {
                 }
 
             } else {
-                ContextBinder contextBinder = new ContextBinder(bindingDefinition, fieldPropertyChain, processor);
+                ContextBinder contextBinder = new ContextBinder(bindingDefinition, fieldPropertyChain, processor, alias);
                 allBinders.add(contextBinder);
                 contextBinders.add(contextBinder);
                 boundValueBinders.add(contextBinder);
@@ -105,36 +111,13 @@ public class BinderResolver {
     }
 
     private void renewBindingDefinition(String accessPath, BindingDefinition bindingDefinition) {
-        String field = bindingDefinition.getField();
         String bindExp = bindingDefinition.getBindExp();
-        String property = bindingDefinition.getProperty();
-        Class<?> processor = bindingDefinition.getProcessor();
-        String alias = bindingDefinition.getAlias();
-        String bindAlias = bindingDefinition.getBindAlias();
-
-        if (StringUtils.isBlank(alias)) {
-            alias = field;
-        }
-
-        if (StringUtils.isBlank(bindAlias)) {
-            bindAlias = property;
-        }
-
         if (bindExp.startsWith("/") || bindExp.startsWith(".")) {
             if (bindExp.startsWith(".")) {
                 bindExp = PathUtils.getAbsolutePath(accessPath, bindExp);
             }
-            if (StringUtils.isBlank(bindAlias)) {
-                bindAlias = PathUtils.getFieldName(bindExp);
-            }
         }
-
-        bindingDefinition.setField(field);
         bindingDefinition.setBindExp(bindExp);
-        bindingDefinition.setProperty(property);
-        bindingDefinition.setProcessor(processor);
-        bindingDefinition.setAlias(alias);
-        bindingDefinition.setBindAlias(bindAlias);
     }
 
     private Processor newProcessor(BindingDefinition bindingDefinition) {
@@ -166,19 +149,27 @@ public class BinderResolver {
         return processor;
     }
 
-    private PropertyBinder newPropertyBinder(BindingDefinition bindingDefinition, PropertyChain fieldPropertyChain, Processor processor) {
+    private PropertyBinder newPropertyBinder(BindingDefinition bindingDefinition, PropertyChain fieldPropertyChain, Processor processor, String alias) {
+        String bindExp = bindingDefinition.getBindExp();
+        String property = bindingDefinition.getProperty();
+
         Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
-        String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), bindingDefinition.getBindExp());
+        String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), bindExp);
         ConfiguredRepository belongRepository = allRepositoryMap.get(belongAccessPath);
         Assert.notNull(belongRepository, "The belong repository cannot be null!");
         belongRepository.setBoundEntity(true);
 
         Map<String, PropertyChain> allPropertyChainMap = repository.getPropertyResolver().getAllPropertyChainMap();
-        PropertyChain boundPropertyChain = allPropertyChainMap.get(bindingDefinition.getBindExp());
+        PropertyChain boundPropertyChain = allPropertyChainMap.get(bindExp);
         Assert.notNull(boundPropertyChain, "The bound property chain cannot be null!");
         boundPropertyChain.newPropertyProxy();
 
-        return new PropertyBinder(bindingDefinition, fieldPropertyChain, processor, belongAccessPath, belongRepository, boundPropertyChain);
+        EntityElement entityElement = belongRepository.getEntityElement();
+        String fieldName = StringUtils.isNotBlank(property) ? property : PathUtils.getFieldName(bindExp);
+        String bindAlias = entityElement.toAlias(fieldName);
+
+        return new PropertyBinder(bindingDefinition, fieldPropertyChain, processor, alias,
+                belongAccessPath, belongRepository, boundPropertyChain, bindAlias);
     }
 
 }

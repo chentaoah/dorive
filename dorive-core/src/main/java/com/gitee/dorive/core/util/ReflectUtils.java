@@ -16,10 +16,11 @@
  */
 package com.gitee.dorive.core.util;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ReflectUtils {
 
@@ -45,14 +46,6 @@ public class ReflectUtils {
         }
         Collections.reverse(superclasses);
         return superclasses;
-    }
-
-    public static Set<String> getFieldNames(Class<?> type) {
-        Set<String> fieldNames = new LinkedHashSet<>();
-        for (Field field : type.getDeclaredFields()) {
-            fieldNames.add(field.getName());
-        }
-        return fieldNames;
     }
 
 }

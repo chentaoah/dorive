@@ -17,7 +17,6 @@
 package com.gitee.dorive.core.entity.executor;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.core.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -32,7 +31,7 @@ public class OrderBy {
 
     @Override
     public String toString() {
-        return "ORDER BY " + StrUtil.join(", ", StringUtils.toUnderlineCase(columns)) + " " + order.toUpperCase();
+        return "ORDER BY " + StrUtil.join(", ", columns) + " " + order.toUpperCase();
     }
 
 }

@@ -16,9 +16,9 @@
  */
 package com.gitee.dorive.core.impl.binder;
 
-import com.gitee.dorive.core.entity.definition.BindingDefinition;
 import com.gitee.dorive.core.api.Processor;
 import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.entity.definition.BindingDefinition;
 import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
 import lombok.Getter;
@@ -31,17 +31,21 @@ public class PropertyBinder extends AbstractBinder {
     protected String belongAccessPath;
     protected ConfiguredRepository belongRepository;
     protected PropertyChain boundPropertyChain;
+    protected String bindAlias;
 
     public PropertyBinder(BindingDefinition bindingDefinition,
                           PropertyChain fieldPropertyChain,
                           Processor processor,
+                          String alias,
                           String belongAccessPath,
                           ConfiguredRepository belongRepository,
-                          PropertyChain boundPropertyChain) {
-        super(bindingDefinition, fieldPropertyChain, processor);
+                          PropertyChain boundPropertyChain,
+                          String bindAlias) {
+        super(bindingDefinition, fieldPropertyChain, processor, alias);
         this.belongAccessPath = belongAccessPath;
         this.belongRepository = belongRepository;
         this.boundPropertyChain = boundPropertyChain;
+        this.bindAlias = bindAlias;
     }
 
     public boolean isSameType() {
