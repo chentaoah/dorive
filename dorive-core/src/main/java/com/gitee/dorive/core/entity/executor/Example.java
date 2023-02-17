@@ -48,7 +48,7 @@ public class Example {
     }
 
     public void selectColumns(String... columns) {
-        selectColumns(StringUtils.toStringList(columns));
+        selectColumns(StringUtils.toList(columns));
     }
 
     public void selectColumns(List<String> columns) {
@@ -56,7 +56,7 @@ public class Example {
     }
 
     public void extraColumns(String... columns) {
-        extraColumns(StringUtils.toStringList(columns));
+        extraColumns(StringUtils.toList(columns));
     }
 
     public void extraColumns(List<String> columns) {
@@ -136,12 +136,12 @@ public class Example {
     }
 
     public Example orderByAsc(String... columns) {
-        orderBy = new OrderBy(StringUtils.toUnderlineCase(Arrays.asList(columns)), Order.ASC);
+        orderBy = new OrderBy(Arrays.asList(columns), Order.ASC);
         return this;
     }
 
     public Example orderByDesc(String... columns) {
-        orderBy = new OrderBy(StringUtils.toUnderlineCase(Arrays.asList(columns)), Order.DESC);
+        orderBy = new OrderBy(Arrays.asList(columns), Order.DESC);
         return this;
     }
 

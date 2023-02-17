@@ -5,7 +5,6 @@ import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
-import com.gitee.dorive.core.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -30,7 +29,7 @@ public class NameSelector implements Selector {
                     if (name.contains("(") && name.contains(")")) {
                         String realName = name.substring(0, name.indexOf("("));
                         String propsText = name.substring(name.indexOf("(") + 1, name.indexOf(")"));
-                        List<String> columns = StringUtils.toUnderlineCase(StrUtil.splitTrim(propsText, ","));
+                        List<String> columns = StrUtil.splitTrim(propsText, ",");
                         nameDefMap.put(realName, new NameDef(realName, columns));
 
                     } else {

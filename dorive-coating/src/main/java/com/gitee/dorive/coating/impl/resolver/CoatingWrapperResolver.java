@@ -135,7 +135,8 @@ public class CoatingWrapperResolver {
                 propertyWrappers.addAll(belongToPropertyWrappers);
             }
 
-            for (String fieldName : entityElement.getProperties()) {
+            Map<String, EntityElement.PropertyDef> propertyDefMap = entityElement.getPropertyDefMap();
+            for (String fieldName : propertyDefMap.keySet()) {
                 PropertyWrapper propertyWrapper = fieldPropertyWrapperMap.get(fieldName);
                 if (propertyWrapper != null) {
                     propertyWrappers.add(propertyWrapper);

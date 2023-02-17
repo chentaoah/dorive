@@ -14,10 +14,6 @@ public class CriterionUtils {
 
     private static final SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public static String getProperty(Criterion criterion) {
-        return StrUtil.toUnderlineCase(criterion.getProperty());
-    }
-
     public static String getOperator(Criterion criterion) {
         String operator = criterion.getOperator();
         Object value = criterion.getValue();
@@ -74,12 +70,13 @@ public class CriterionUtils {
     }
 
     public static String toString(Criterion criterion) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(criterion.getProperty()).append(" ").append(getOperator(criterion));
         String operator = criterion.getOperator();
         if (!operator.startsWith("IS")) {
-            return getProperty(criterion) + " " + getOperator(criterion) + " " + getValue(criterion);
-        } else {
-            return getProperty(criterion) + " " + getOperator(criterion);
+            builder.append(" ").append(getValue(criterion));
         }
+        return builder.toString();
     }
 
 }

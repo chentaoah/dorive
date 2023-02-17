@@ -33,7 +33,7 @@ import java.util.Map;
 public class PropertyDefinition {
 
     private String belongTo;
-    private String alias;
+    private String field;
     private String operator;
     private boolean ignore;
 
@@ -46,8 +46,8 @@ public class PropertyDefinition {
     }
 
     public static void renewPropertyDefinition(String fieldName, PropertyDefinition propertyDefinition) {
-        if (StringUtils.isBlank(propertyDefinition.getAlias())) {
-            propertyDefinition.setAlias(fieldName);
+        if (StringUtils.isBlank(propertyDefinition.getField())) {
+            propertyDefinition.setField(fieldName);
         }
     }
 

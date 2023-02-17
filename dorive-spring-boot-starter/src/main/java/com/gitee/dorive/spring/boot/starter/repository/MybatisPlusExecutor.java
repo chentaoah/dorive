@@ -18,7 +18,6 @@ package com.gitee.dorive.spring.boot.starter.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -164,8 +163,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
 
         for (Criterion criterion : example.getCriteria()) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            String property = StrUtil.toUnderlineCase(criterion.getProperty());
-            criterionAppender.appendCriterion(queryWrapper, property, criterion.getValue());
+            criterionAppender.appendCriterion(queryWrapper, criterion.getProperty(), criterion.getValue());
         }
 
         OrderBy orderBy = example.getOrderBy();
@@ -277,8 +275,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
         for (Criterion criterion : example.getCriteria()) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            String property = StrUtil.toUnderlineCase(criterion.getProperty());
-            criterionAppender.appendCriterion(updateWrapper, property, criterion.getValue());
+            criterionAppender.appendCriterion(updateWrapper, criterion.getProperty(), criterion.getValue());
         }
         return updateWrapper;
     }
@@ -295,8 +292,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         }
         for (Criterion criterion : example.getCriteria()) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            String property = StrUtil.toUnderlineCase(criterion.getProperty());
-            criterionAppender.appendCriterion(updateWrapper, property, criterion.getValue());
+            criterionAppender.appendCriterion(updateWrapper, criterion.getProperty(), criterion.getValue());
         }
         return updateWrapper;
     }

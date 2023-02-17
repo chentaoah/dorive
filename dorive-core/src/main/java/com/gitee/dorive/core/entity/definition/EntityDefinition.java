@@ -17,10 +17,7 @@
 package com.gitee.dorive.core.entity.definition;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.core.annotation.Entity;
-import com.gitee.dorive.core.api.constant.Order;
-import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.DefaultEntityFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.AnnotatedElement;
-import java.util.List;
 import java.util.Map;
 
 @Data
@@ -69,20 +65,6 @@ public class EntityDefinition {
         if (factory == null || factory == DefaultEntityFactory.class) {
             factory = entityDefinition.getFactory();
         }
-    }
-
-    public OrderBy getDefaultOrderBy() {
-        if (StringUtils.isNotBlank(this.orderByAsc)) {
-            String orderByAsc = StrUtil.toUnderlineCase(this.orderByAsc);
-            List<String> columns = StrUtil.splitTrim(orderByAsc, ",");
-            return new OrderBy(columns, Order.ASC);
-        }
-        if (StringUtils.isNotBlank(this.orderByDesc)) {
-            String orderByDesc = StrUtil.toUnderlineCase(this.orderByDesc);
-            List<String> columns = StrUtil.splitTrim(orderByDesc, ",");
-            return new OrderBy(columns, Order.DESC);
-        }
-        return null;
     }
 
 }

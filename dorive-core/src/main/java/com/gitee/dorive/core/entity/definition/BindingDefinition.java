@@ -37,8 +37,6 @@ public class BindingDefinition {
     private String bindExp;
     private String property;
     private Class<?> processor;
-    private String alias;
-    private String bindAlias;
 
     public static List<BindingDefinition> newBindingDefinitions(AnnotatedElement annotatedElement) {
         Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(annotatedElement, Binding.class);

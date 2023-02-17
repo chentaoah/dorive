@@ -153,8 +153,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         String lastAccessPath = isRoot || entityElement.isCollection() ? "" : accessPath;
         propertyResolver.resolveProperties(lastAccessPath, entityElement.getGenericType());
 
-        OrderBy defaultOrderBy = entityDefinition.getDefaultOrderBy();
-
+        OrderBy defaultOrderBy = entityElement.newDefaultOrderBy(entityDefinition);
+        
         BinderResolver binderResolver = new BinderResolver(this);
         String fieldPrefix = lastAccessPath + "/";
         binderResolver.resolveAllBinders(accessPath, entityElement, entityDefinition, fieldPrefix, propertyResolver);

@@ -24,7 +24,6 @@ import com.gitee.dorive.coating.entity.RepositoryWrapper;
 import com.gitee.dorive.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.entity.BoundedContext;
-import com.gitee.dorive.core.entity.definition.BindingDefinition;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
@@ -32,7 +31,11 @@ import com.gitee.dorive.core.repository.ConfiguredRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DefaultExampleBuilder implements ExampleBuilder {
 
@@ -100,7 +103,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
             List<Object> entities = Collections.emptyList();
             if (!example.isEmptyQuery() && example.isDirtyQuery()) {
-                example.selectColumns(new ArrayList<>(binderResolver.getBoundColumns()));
+                example.selectColumns(new ArrayList<>(binderResolver.getBoundFields()));
                 entities = configuredRepository.selectByExample(boundedContext, example);
             }
 
@@ -120,8 +123,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                         continue;
                     }
 
-                    BindingDefinition bindingDefinition = propertyBinder.getBindingDefinition();
-                    String bindAlias = bindingDefinition.getBindAlias();
+                    String bindAlias = propertyBinder.getBindAlias();
                     Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
                     fieldValue = propertyBinder.output(boundedContext, fieldValue);
                     targetExample.eq(bindAlias, fieldValue);

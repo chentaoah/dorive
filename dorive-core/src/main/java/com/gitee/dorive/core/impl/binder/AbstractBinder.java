@@ -31,6 +31,7 @@ public abstract class AbstractBinder implements Binder, Processor {
     protected BindingDefinition bindingDefinition;
     protected PropertyChain fieldPropertyChain;
     protected Processor processor;
+    protected String alias;
 
     @Override
     public BindingDefinition getBindingDefinition() {

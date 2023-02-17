@@ -31,7 +31,7 @@ public @interface Property {
 
     String belongTo() default "";
 
-    String alias() default "";
+    String field() default "";
 
     String operator() default "=";
 
