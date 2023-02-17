@@ -17,8 +17,10 @@ public class AliasConverter {
 
     public void convert(Example example) {
         List<String> selectColumns = example.getSelectColumns();
-        selectColumns = entityElement.toAliases(selectColumns);
-        example.selectColumns(selectColumns);
+        if (selectColumns != null && !selectColumns.isEmpty()) {
+            selectColumns = entityElement.toAliases(selectColumns);
+            example.selectColumns(selectColumns);
+        }
 
         List<Criterion> criteria = example.getCriteria();
         if (criteria != null && !criteria.isEmpty()) {
