@@ -34,18 +34,18 @@ public class DefaultEntityFactory implements EntityFactory {
 
     protected EntityElement entityElement;
     protected Class<?> pojoClass;
-    protected Map<String, String> propAliasMapping;
     protected Map<String, String> aliasPropMapping;
+    protected Map<String, String> propPojoMapping;
 
     @Override
     public Object reconstitute(BoundedContext boundedContext, Object persistentObject) {
-        CopyOptions copyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(propAliasMapping);
+        CopyOptions copyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(aliasPropMapping);
         return BeanUtil.toBean(persistentObject, entityElement.getGenericType(), copyOptions);
     }
 
     @Override
     public Object deconstruct(BoundedContext boundedContext, Object entity) {
-        CopyOptions copyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(aliasPropMapping);
+        CopyOptions copyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(propPojoMapping);
         return BeanUtil.toBean(entity, pojoClass, copyOptions);
     }
 

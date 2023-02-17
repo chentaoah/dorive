@@ -123,14 +123,6 @@ public class EntityElement {
         return null;
     }
 
-    public Map<String, String> newPropAliasMapping() {
-        Map<String, String> mapping = new LinkedHashMap<>();
-        for (PropertyDef propertyDef : propertyDefMap.values()) {
-            mapping.put(propertyDef.getProperty(), propertyDef.getAlias());
-        }
-        return mapping;
-    }
-
     public Map<String, String> newAliasPropMapping() {
         Map<String, String> mapping = new LinkedHashMap<>();
         for (PropertyDef propertyDef : propertyDefMap.values()) {

@@ -17,6 +17,8 @@
 package com.gitee.dorive.spring.boot.starter.repository;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
@@ -28,6 +30,9 @@ import com.gitee.dorive.core.impl.DefaultEntityFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MybatisPlusRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
 
@@ -67,8 +72,21 @@ public class MybatisPlusRepository<E, PK> extends AbstractCoatingRepository<E, P
             DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
             defaultEntityFactory.setEntityElement(entityElement);
             defaultEntityFactory.setPojoClass(pojoClass);
-            defaultEntityFactory.setPropAliasMapping(entityElement.newPropAliasMapping());
             defaultEntityFactory.setAliasPropMapping(entityElement.newAliasPropMapping());
+            if (pojoClass != null) {
+                Map<String, String> aliasPropMapping = entityElement.newAliasPropMapping();
+                Map<String, String> propPojoMapping = new LinkedHashMap<>();
+                List<TableFieldInfo> fieldList = TableInfoHelper.getTableInfo(pojoClass).getFieldList();
+                for (TableFieldInfo tableFieldInfo : fieldList) {
+                    String property = tableFieldInfo.getProperty();
+                    String column = tableFieldInfo.getColumn();
+                    String prop = aliasPropMapping.get(column);
+                    if (prop != null) {
+                        propPojoMapping.put(prop, property);
+                    }
+                }
+                defaultEntityFactory.setPropPojoMapping(propPojoMapping);
+            }
         }
 
         AliasConverter aliasConverter = new AliasConverter(entityElement);
