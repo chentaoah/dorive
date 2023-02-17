@@ -17,6 +17,7 @@
 package com.gitee.dorive.spring.boot.starter.repository;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.EntityFactory;
@@ -70,7 +71,10 @@ public class MybatisPlusRepository<E, PK> extends AbstractCoatingRepository<E, P
             defaultEntityFactory.setAliasPropMapping(entityElement.newAliasPropMapping());
         }
 
-        return new MybatisPlusExecutor(entityDefinition, entityElement, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass, entityFactory);
+        AliasConverter aliasConverter = new AliasConverter(entityElement);
+
+        return new MybatisPlusExecutor(entityDefinition, entityElement, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass,
+                entityFactory, aliasConverter);
     }
 
 }

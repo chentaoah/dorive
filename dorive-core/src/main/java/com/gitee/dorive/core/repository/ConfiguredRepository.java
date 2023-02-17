@@ -20,15 +20,12 @@ import com.gitee.dorive.core.api.MetadataHolder;
 import com.gitee.dorive.core.api.PropertyProxy;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.element.PropertyChain;
-import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.operation.Delete;
-import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.entity.operation.Update;
+import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
@@ -52,6 +49,7 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
     protected String fieldPrefix;
     protected BinderResolver binderResolver;
     protected boolean boundEntity;
+    protected AliasConverter aliasConverter;
 
     @Override
     public int updateByExample(BoundedContext boundedContext, Object entity, Example example) {
@@ -92,48 +90,8 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
             if (example.getOrderBy() == null) {
                 example.setOrderBy(defaultOrderBy);
             }
-            toAliases(example);
         }
         return super.executeQuery(boundedContext, query);
-    }
-
-    @Override
-    public int execute(BoundedContext boundedContext, Operation operation) {
-        Example example = null;
-        if (operation instanceof Update) {
-            Update update = (Update) operation;
-            example = update.getExample();
-
-        } else if (operation instanceof Delete) {
-            Delete delete = (Delete) operation;
-            example = delete.getExample();
-        }
-        if (example != null) {
-            toAliases(example);
-        }
-        return super.execute(boundedContext, operation);
-    }
-
-    public void toAliases(Example example) {
-        List<String> selectColumns = example.getSelectColumns();
-        selectColumns = entityElement.toAliases(selectColumns);
-        example.selectColumns(selectColumns);
-
-        List<Criterion> criteria = example.getCriteria();
-        if (criteria != null && !criteria.isEmpty()) {
-            for (Criterion criterion : criteria) {
-                String property = criterion.getProperty();
-                property = entityElement.toAlias(property);
-                criterion.setProperty(property);
-            }
-        }
-
-        OrderBy orderBy = example.getOrderBy();
-        if (orderBy != null) {
-            List<String> orderByColumns = orderBy.getColumns();
-            orderByColumns = entityElement.toAliases(orderByColumns);
-            orderBy.setColumns(orderByColumns);
-        }
     }
 
     @Override

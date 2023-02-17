@@ -36,6 +36,7 @@ import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.ConfiguredRepository;
@@ -84,6 +85,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             ConfiguredRepository configuredRepository = mergedRepository.getConfiguredRepository();
 
             BinderResolver binderResolver = definedRepository.getBinderResolver();
+            AliasConverter aliasConverter = configuredRepository.getAliasConverter();
 
             TableInfo tableInfo = getTableInfo(configuredRepository);
             String tableName = tableInfo.getTableName();
@@ -92,7 +94,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             letter = (char) (letter + 1);
 
             Example example = repositoryWrapper.newExampleByCoating(boundedContext, coatingObject);
-            configuredRepository.toAliases(example);
+            aliasConverter.convert(example);
 
             boolean dirtyQuery = example.isDirtyQuery();
             anyDirtyQuery = anyDirtyQuery || dirtyQuery;

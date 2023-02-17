@@ -67,7 +67,7 @@ public class EntityElement {
         Class<?> genericType = entityElement.getGenericType();
         PropertyProxy primaryKeyProxy = newPrimaryKeyProxy(genericType);
 
-        Field[] fields = genericType.getFields();
+        Field[] fields = ReflectUtil.getFields(genericType);
         Map<String, PropertyDef> propertyDefMap = new LinkedHashMap<>(fields.length * 4 / 3 + 1);
         for (Field field : fields) {
             String property = field.getName();
