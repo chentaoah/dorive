@@ -4,6 +4,7 @@ import com.gitee.dorive.core.entity.element.EntityElement;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.UnionExample;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -36,6 +37,13 @@ public class AliasConverter {
             List<String> orderByColumns = orderBy.getColumns();
             orderByColumns = entityElement.toAliases(orderByColumns);
             orderBy.setColumns(orderByColumns);
+        }
+    }
+
+    public void convert(UnionExample unionExample) {
+        List<Example> examples = unionExample.getExamples();
+        for (Example example : examples) {
+            convert(example);
         }
     }
 

@@ -103,17 +103,18 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
 
         } else if (query.getExample() != null) {
             Example example = query.getExample();
-            aliasConverter.convert(example);
 
             if (query.withoutPage()) {
                 if (example instanceof UnionExample) {
                     UnionExample unionExample = (UnionExample) example;
+                    aliasConverter.convert(unionExample);
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
                     List<Object> entities = reconstitute(boundedContext, resultMaps);
                     return new EntityIndexResult(unionExample, resultMaps, entities);
 
                 } else {
+                    aliasConverter.convert(example);
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
                     List<Object> entities = reconstitute(boundedContext, resultMaps);
@@ -121,6 +122,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                 }
 
             } else {
+                aliasConverter.convert(example);
                 com.gitee.dorive.core.entity.executor.Page<Object> page = example.getPage();
                 Page<Map<String, Object>> dataPage = new Page<>(page.getCurrent(), page.getSize());
                 QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
