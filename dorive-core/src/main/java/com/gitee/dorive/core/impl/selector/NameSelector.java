@@ -17,6 +17,8 @@ import java.util.Map;
 @Data
 public class NameSelector implements Selector {
 
+    public static final NameSelector EMPTY_SELECTOR = new NameSelector();
+
     private boolean wildcard;
     private Map<String, NameDef> nameDefMap = Collections.emptyMap();
 

@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BoundedContext {
 
     private boolean observer = false;
-    private Selector selector;
+    private Selector selector = NameSelector.EMPTY_SELECTOR;
     private Map<String, Object> attachments = Collections.emptyMap();
 
     @Deprecated
@@ -49,7 +49,6 @@ public class BoundedContext {
 
     public BoundedContext(boolean observer) {
         this.observer = observer;
-        this.selector = new NameSelector();
     }
 
     public BoundedContext(Selector selector) {
