@@ -29,6 +29,7 @@ public @interface Entity {
 
     String name() default "";
 
+    @Deprecated
     String[] scenes() default {};
 
     int order() default 0;

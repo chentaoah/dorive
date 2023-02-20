@@ -96,18 +96,26 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
         int totalCount = 0;
         for (CommonRepository repository : delegateRepository.getOrderedRepositories()) {
+
+            if (isIgnoreRoot && repository.isRoot()) {
+                continue;
+            }
+
+            boolean isObserver = boundedContext.isObserver();
+            boolean isMatch = boundedContext.isMatch(repository);
+            boolean isForceInclude = isIncludeRoot && repository.isRoot();
+            boolean isAggregated = repository.isAggregated();
+
+            if (!isObserver && !isMatch && !isForceInclude && !isAggregated) {
+                continue;
+            }
+
             PropertyChain anchorPoint = repository.getAnchorPoint();
             Object targetEntity = anchorPoint == null ? rootEntity : anchorPoint.getValue(rootEntity);
             if (targetEntity != null) {
 
-                if (isIgnoreRoot && repository.isRoot()) {
-                    continue;
-                }
-
-                boolean isForceInclude = isIncludeRoot && repository.isRoot();
-
                 int observedOperationType = Operation.INSERT_OR_UPDATE_OR_DELETE;
-                if (boundedContext.isObserver()) {
+                if (isObserver) {
                     if (targetEntity instanceof Observed) {
                         ObservedResult result = ((Observed) targetEntity).accept(repository, boundedContext, targetEntity);
                         observedOperationType = result.getOperationType();
@@ -125,7 +133,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                     boundIdEntity = targetEntity;
                 }
 
-                if (boundedContext.isMatch(repository) || isForceInclude) {
+                if (isMatch || isForceInclude) {
                     int contextOperationType = OperationTypeResolver.resolveOperationType(boundedContext, repository);
 
                     for (Object entity : collection) {
@@ -138,7 +146,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
                         operationType = operationType & observedOperationType;
 
-                        if (repository.isAggregated()) {
+                        if (isAggregated) {
                             operationType = (operationType & Operation.INSERT_OR_UPDATE_OR_DELETE) > 0 ? includeRootOperationType : ignoreRootOperationType;
                             Operation newOperation = new Operation(operationType, entity);
                             totalCount += repository.execute(boundedContext, newOperation);
@@ -152,7 +160,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                         setBoundIdForBoundEntity(boundedContext, rootEntity, repository, boundIdEntity);
                     }
 
-                } else if (repository.isAggregated()) {
+                } else if (isAggregated) {
                     for (Object entity : collection) {
                         Operation newOperation = new Operation(ignoreRootOperationType, entity);
                         totalCount += repository.execute(boundedContext, newOperation);
