@@ -27,7 +27,7 @@ import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -80,8 +80,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
             MergedRepository mergedRepository = repositoryWrapper.getMergedRepository();
             String lastAccessPath = mergedRepository.getLastAccessPath();
-            ConfiguredRepository definedRepository = mergedRepository.getDefinedRepository();
-            ConfiguredRepository configuredRepository = mergedRepository.getConfiguredRepository();
+            CommonRepository definedRepository = mergedRepository.getDefinedRepository();
+            CommonRepository commonRepository = mergedRepository.getCommonRepository();
 
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 
@@ -104,7 +104,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             List<Object> entities = Collections.emptyList();
             if (!example.isEmptyQuery() && example.isDirtyQuery()) {
                 example.selectColumns(new ArrayList<>(binderResolver.getBoundFields()));
-                entities = configuredRepository.selectByExample(boundedContext, example);
+                entities = commonRepository.selectByExample(boundedContext, example);
             }
 
             for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {

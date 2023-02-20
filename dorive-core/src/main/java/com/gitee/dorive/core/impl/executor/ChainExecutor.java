@@ -19,17 +19,17 @@ package com.gitee.dorive.core.impl.executor;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.Binder;
 import com.gitee.dorive.core.api.EntityHandler;
-import com.gitee.dorive.core.api.Operable;
+import com.gitee.dorive.core.api.Observed;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.OperationTypeResolver;
-import com.gitee.dorive.core.impl.operable.OperationResult;
+import com.gitee.dorive.core.impl.observe.ObservedResult;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -56,7 +56,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         Assert.isTrue(query.getPrimaryKey() != null || query.getExample() != null,
                 "The query criteria cannot be null!");
 
-        ConfiguredRepository rootRepository = repository.getRootRepository();
+        CommonRepository rootRepository = repository.getRootRepository();
         boolean isIncludeRoot = (query.getType() & Operation.INCLUDE_ROOT) == Operation.INCLUDE_ROOT;
 
         if (boundedContext.isMatch(rootRepository) || isIncludeRoot) {
@@ -95,7 +95,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         delegateRepository = delegateRepository == null ? repository : delegateRepository;
 
         int totalCount = 0;
-        for (ConfiguredRepository repository : delegateRepository.getOrderedRepositories()) {
+        for (CommonRepository repository : delegateRepository.getOrderedRepositories()) {
             PropertyChain anchorPoint = repository.getAnchorPoint();
             Object targetEntity = anchorPoint == null ? rootEntity : anchorPoint.getValue(rootEntity);
             if (targetEntity != null) {
@@ -106,11 +106,13 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
                 boolean isForceInclude = isIncludeRoot && repository.isRoot();
 
-                int acceptOperationType = Operation.INSERT_OR_UPDATE_OR_DELETE;
-                if (targetEntity instanceof Operable) {
-                    OperationResult result = ((Operable) targetEntity).accept(repository, boundedContext, targetEntity);
-                    acceptOperationType = result.getOperationType();
-                    totalCount += result.getTotalCount();
+                int observedOperationType = Operation.INSERT_OR_UPDATE_OR_DELETE;
+                if (boundedContext.isObserver()) {
+                    if (targetEntity instanceof Observed) {
+                        ObservedResult result = ((Observed) targetEntity).accept(repository, boundedContext, targetEntity);
+                        observedOperationType = result.getOperationType();
+                        totalCount += result.getTotalCount();
+                    }
                 }
 
                 Collection<?> collection;
@@ -134,7 +136,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                             getBoundValueFromContext(boundedContext, rootEntity, repository, entity);
                         }
 
-                        operationType = operationType & acceptOperationType;
+                        operationType = operationType & observedOperationType;
 
                         if (repository.isAggregated()) {
                             operationType = (operationType & Operation.INSERT_OR_UPDATE_OR_DELETE) > 0 ? includeRootOperationType : ignoreRootOperationType;
@@ -161,7 +163,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         return totalCount;
     }
 
-    private int doExecute(BoundedContext boundedContext, ConfiguredRepository repository, Object entity, int operationType) {
+    private int doExecute(BoundedContext boundedContext, CommonRepository repository, Object entity, int operationType) {
         if (operationType == Operation.INSERT) {
             return repository.insert(boundedContext, entity);
 
@@ -177,7 +179,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         return 0;
     }
 
-    private void getBoundValueFromContext(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository repository, Object entity) {
+    private void getBoundValueFromContext(BoundedContext boundedContext, Object rootEntity, CommonRepository repository, Object entity) {
         for (Binder binder : repository.getBinderResolver().getBoundValueBinders()) {
             Object fieldValue = binder.getFieldValue(boundedContext, entity);
             if (fieldValue == null) {
@@ -189,7 +191,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         }
     }
 
-    private void setBoundIdForBoundEntity(BoundedContext boundedContext, Object rootEntity, ConfiguredRepository repository, Object entity) {
+    private void setBoundIdForBoundEntity(BoundedContext boundedContext, Object rootEntity, CommonRepository repository, Object entity) {
         Binder binder = repository.getBinderResolver().getBoundIdBinder();
         if (binder != null) {
             Object boundValue = binder.getBoundValue(boundedContext, rootEntity);

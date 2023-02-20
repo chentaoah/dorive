@@ -38,7 +38,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ConfiguredRepository extends ProxyRepository implements MetadataHolder {
+public class CommonRepository extends ProxyRepository implements MetadataHolder {
 
     protected String accessPath;
     protected boolean root;

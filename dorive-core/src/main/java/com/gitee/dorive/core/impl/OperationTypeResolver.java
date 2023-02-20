@@ -18,14 +18,14 @@ package com.gitee.dorive.core.impl;
 
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.Command;
 import org.apache.commons.lang3.StringUtils;
 
 public class OperationTypeResolver {
 
-    public static int resolveOperationType(BoundedContext boundedContext, ConfiguredRepository repository) {
+    public static int resolveOperationType(BoundedContext boundedContext, CommonRepository repository) {
         EntityDefinition entityDefinition = repository.getEntityDefinition();
         String commandKey = entityDefinition.getCommandKey();
         if (StringUtils.isNotBlank(commandKey) && boundedContext.containsKey(commandKey)) {

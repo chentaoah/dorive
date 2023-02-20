@@ -19,7 +19,7 @@ package com.gitee.dorive.core.entity;
 import com.gitee.dorive.core.api.ExampleBuilder;
 import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.impl.selector.SceneSelector;
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @EqualsAndHashCode(callSuper = false)
 public class BoundedContext {
 
+    private boolean observer;
     private Selector selector;
     private Map<String, Object> attachments = Collections.emptyMap();
 
@@ -47,11 +48,11 @@ public class BoundedContext {
         this.selector = new SceneSelector(scenes);
     }
 
-    public boolean isMatch(ConfiguredRepository repository) {
+    public boolean isMatch(CommonRepository repository) {
         return selector.isMatch(this, repository);
     }
 
-    public List<String> selectColumns(ConfiguredRepository repository) {
+    public List<String> selectColumns(CommonRepository repository) {
         return selector.selectColumns(this, repository);
     }
 

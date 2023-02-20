@@ -56,10 +56,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected AdapterResolver adapterResolver = new AdapterResolver(this);
     protected PropertyResolver propertyResolver = new PropertyResolver(false);
 
-    protected Map<String, ConfiguredRepository> allRepositoryMap = new LinkedHashMap<>();
-    protected ConfiguredRepository rootRepository;
-    protected List<ConfiguredRepository> subRepositories = new ArrayList<>();
-    protected List<ConfiguredRepository> orderedRepositories = new ArrayList<>();
+    protected Map<String, CommonRepository> allRepositoryMap = new LinkedHashMap<>();
+    protected CommonRepository rootRepository;
+    protected List<CommonRepository> subRepositories = new ArrayList<>();
+    protected List<CommonRepository> orderedRepositories = new ArrayList<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -77,7 +77,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         allClasses.add(entityClass);
         allClasses.forEach(clazz -> propertyResolver.resolveProperties(clazz));
 
-        ConfiguredRepository rootRepository = newRepository("/", entityClass);
+        CommonRepository rootRepository = newRepository("/", entityClass);
         allRepositoryMap.put("/", rootRepository);
         this.rootRepository = rootRepository;
         orderedRepositories.add(rootRepository);
@@ -85,7 +85,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
         allPropertyChainMap.forEach((accessPath, propertyChain) -> {
             if (propertyChain.isAnnotatedEntity()) {
-                ConfiguredRepository subRepository = newRepository(accessPath, propertyChain.getDeclaredField());
+                CommonRepository subRepository = newRepository(accessPath, propertyChain.getDeclaredField());
                 allRepositoryMap.put(accessPath, subRepository);
                 subRepositories.add(subRepository);
                 orderedRepositories.add(subRepository);
@@ -110,7 +110,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     @SuppressWarnings("unchecked")
-    private ConfiguredRepository newRepository(String accessPath, AnnotatedElement annotatedElement) {
+    private CommonRepository newRepository(String accessPath, AnnotatedElement annotatedElement) {
         EntityDefinition entityDefinition = EntityDefinition.newEntityDefinition(annotatedElement);
         if (entityDefinition == null) {
             throw new RuntimeException("The Entity definition is null!");
@@ -162,22 +162,22 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         AliasConverter aliasConverter = new AliasConverter(entityElement);
 
-        ConfiguredRepository configuredRepository = new ConfiguredRepository();
-        configuredRepository.setEntityDefinition(entityDefinition);
-        configuredRepository.setEntityElement(entityElement);
-        configuredRepository.setOperationFactory(operationFactory);
-        configuredRepository.setProxyRepository((AbstractRepository<Object, Object>) repository);
-        configuredRepository.setAccessPath(accessPath);
-        configuredRepository.setRoot(isRoot);
-        configuredRepository.setAggregated(aggregated);
-        configuredRepository.setAnchorPoint(anchorPoint);
-        configuredRepository.setPropertyResolver(propertyResolver);
-        configuredRepository.setDefaultOrderBy(defaultOrderBy);
-        configuredRepository.setFieldPrefix(fieldPrefix);
-        configuredRepository.setBinderResolver(binderResolver);
-        configuredRepository.setBoundEntity(false);
-        configuredRepository.setAliasConverter(aliasConverter);
-        return configuredRepository;
+        CommonRepository commonRepository = new CommonRepository();
+        commonRepository.setEntityDefinition(entityDefinition);
+        commonRepository.setEntityElement(entityElement);
+        commonRepository.setOperationFactory(operationFactory);
+        commonRepository.setProxyRepository((AbstractRepository<Object, Object>) repository);
+        commonRepository.setAccessPath(accessPath);
+        commonRepository.setRoot(isRoot);
+        commonRepository.setAggregated(aggregated);
+        commonRepository.setAnchorPoint(anchorPoint);
+        commonRepository.setPropertyResolver(propertyResolver);
+        commonRepository.setDefaultOrderBy(defaultOrderBy);
+        commonRepository.setFieldPrefix(fieldPrefix);
+        commonRepository.setBinderResolver(binderResolver);
+        commonRepository.setBoundEntity(false);
+        commonRepository.setAliasConverter(aliasConverter);
+        return commonRepository;
     }
 
     protected abstract Executor newExecutor(EntityDefinition entityDefinition, EntityElement entityElement);

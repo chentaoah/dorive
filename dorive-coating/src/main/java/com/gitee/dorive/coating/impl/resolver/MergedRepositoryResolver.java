@@ -20,7 +20,7 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.coating.entity.MergedRepository;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.AbstractRepository;
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -34,14 +34,14 @@ public class MergedRepositoryResolver {
     private AbstractContextRepository<?, ?> repository;
 
     private Map<String, MergedRepository> mergedRepositoryMap = new LinkedHashMap<>();
-    private Map<ConfiguredRepository, String> globalRepositoryPathMap = new LinkedHashMap<>();
+    private Map<CommonRepository, String> mergedRepositoryPathMap = new LinkedHashMap<>();
 
     public MergedRepositoryResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
     }
 
     public void resolveMergedRepositoryMap() {
-        ConfiguredRepository rootRepository = repository.getRootRepository();
+        CommonRepository rootRepository = repository.getRootRepository();
 
         MergedRepository rootMergedRepository = new MergedRepository("", "/", false, rootRepository, rootRepository);
         mergedRepositoryMap.put("/", rootMergedRepository);
@@ -50,22 +50,22 @@ public class MergedRepositoryResolver {
 
         for (MergedRepository mergedRepository : mergedRepositoryMap.values()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-            globalRepositoryPathMap.put(mergedRepository.getDefinedRepository(), absoluteAccessPath);
-            globalRepositoryPathMap.put(mergedRepository.getConfiguredRepository(), absoluteAccessPath);
+            mergedRepositoryPathMap.put(mergedRepository.getDefinedRepository(), absoluteAccessPath);
+            mergedRepositoryPathMap.put(mergedRepository.getCommonRepository(), absoluteAccessPath);
         }
     }
 
     private void resolveMergedRepositoryMap(List<String> multiAccessPath, AbstractContextRepository<?, ?> lastRepository) {
         String lastAccessPath = StrUtil.join("", multiAccessPath);
 
-        for (ConfiguredRepository repository : lastRepository.getSubRepositories()) {
+        for (CommonRepository repository : lastRepository.getSubRepositories()) {
             String accessPath = repository.getAccessPath();
             String absoluteAccessPath = lastAccessPath + accessPath;
             AbstractRepository<Object, Object> abstractRepository = repository.getProxyRepository();
 
             if (abstractRepository instanceof AbstractContextRepository) {
                 AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) abstractRepository;
-                ConfiguredRepository rootRepository = abstractContextRepository.getRootRepository();
+                CommonRepository rootRepository = abstractContextRepository.getRootRepository();
 
                 MergedRepository mergedRepository = new MergedRepository(
                         lastAccessPath,

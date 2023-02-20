@@ -24,7 +24,7 @@ import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.coating.util.ResourceUtils;
 import com.gitee.dorive.core.entity.element.EntityElement;
 import com.gitee.dorive.core.entity.element.Property;
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -125,7 +125,7 @@ public class CoatingWrapperResolver {
 
         for (MergedRepository mergedRepository : mergedRepositoryMap.values()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-            ConfiguredRepository repository = mergedRepository.getConfiguredRepository();
+            CommonRepository repository = mergedRepository.getCommonRepository();
             EntityElement entityElement = repository.getEntityElement();
 
             List<PropertyWrapper> propertyWrappers = new ArrayList<>();

@@ -1,24 +1,26 @@
-package com.gitee.dorive.core.impl.operable;
+package com.gitee.dorive.core.impl.observe;
 
-import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.core.api.Operable;
+import com.gitee.dorive.core.api.Observed;
 import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.operation.Delete;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.impl.OperationFactory;
 import com.gitee.dorive.core.impl.OperationTypeResolver;
-import com.gitee.dorive.core.impl.selector.SceneSelector;
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.impl.selector.NameSelector;
+import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @Data
-public class DeleteList implements Operable {
+public class DeleteList implements Observed {
 
     private List<?> listToDelete;
-    private String[] scenesToAdd;
+    private String[] namesToAdd;
 
     public DeleteList(Object object) {
         if (object instanceof Collection) {
@@ -28,20 +30,20 @@ public class DeleteList implements Operable {
         }
     }
 
-    public DeleteList(Object object, String... scenesToAdd) {
+    public DeleteList(Object object, String... namesToAdd) {
         this(object);
-        this.scenesToAdd = scenesToAdd;
+        this.namesToAdd = namesToAdd;
     }
 
     @Override
-    public OperationResult accept(ConfiguredRepository repository, BoundedContext boundedContext, Object entity) {
-        if (scenesToAdd != null && scenesToAdd.length > 0) {
-            Set<String> newScenes = CollUtil.set(false, scenesToAdd);
+    public ObservedResult accept(CommonRepository repository, BoundedContext boundedContext, Object entity) {
+        if (namesToAdd != null && namesToAdd.length > 0) {
             Selector selector = boundedContext.getSelector();
-            if (selector instanceof SceneSelector) {
-                SceneSelector sceneSelector = (SceneSelector) selector;
-                newScenes.addAll(sceneSelector.getScenes());
-                sceneSelector.setScenes(newScenes);
+            if (selector instanceof NameSelector) {
+                NameSelector nameSelector = new NameSelector();
+                for (String name : namesToAdd) {
+                    nameSelector.resolveName(name);
+                }
             }
         }
 
@@ -57,7 +59,7 @@ public class DeleteList implements Operable {
             }
         }
 
-        return new OperationResult(Operation.INSERT_OR_UPDATE_OR_DELETE, totalCount);
+        return new ObservedResult(Operation.INSERT_OR_UPDATE_OR_DELETE, totalCount);
     }
 
 }
