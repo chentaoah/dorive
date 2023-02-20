@@ -7,7 +7,7 @@ import com.gitee.dorive.core.entity.operation.Delete;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.impl.OperationFactory;
 import com.gitee.dorive.core.impl.OperationTypeResolver;
-import com.gitee.dorive.core.impl.selector.NameSelector;
+import com.gitee.dorive.core.impl.selector.ChainSelector;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
 
@@ -39,12 +39,8 @@ public class DeleteList implements Observed {
     public ObservedResult accept(CommonRepository repository, BoundedContext boundedContext, Object entity) {
         if (namesToAdd != null && namesToAdd.length > 0) {
             Selector selector = boundedContext.getSelector();
-            if (selector instanceof NameSelector) {
-                NameSelector nameSelector = new NameSelector();
-                for (String name : namesToAdd) {
-                    nameSelector.resolveName(name);
-                }
-            }
+            ChainSelector chainSelector = new ChainSelector(selector, namesToAdd);
+            boundedContext.setSelector(chainSelector);
         }
 
         int totalCount = 0;

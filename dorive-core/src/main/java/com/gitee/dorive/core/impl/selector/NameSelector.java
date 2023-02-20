@@ -27,21 +27,17 @@ public class NameSelector implements Selector {
                 if ("*".equals(name)) {
                     this.wildcard = true;
                 } else {
-                    resolveName(name);
+                    if (name.contains("(") && name.contains(")")) {
+                        String realName = name.substring(0, name.indexOf("("));
+                        String propertiesText = name.substring(name.indexOf("(") + 1, name.indexOf(")"));
+                        List<String> properties = StrUtil.splitTrim(propertiesText, ",");
+                        nameDefMap.put(realName, new NameDef(realName, properties));
+
+                    } else {
+                        nameDefMap.put(name, new NameDef(name, Collections.emptyList()));
+                    }
                 }
             }
-        }
-    }
-
-    public void resolveName(String name) {
-        if (name.contains("(") && name.contains(")")) {
-            String realName = name.substring(0, name.indexOf("("));
-            String propertiesText = name.substring(name.indexOf("(") + 1, name.indexOf(")"));
-            List<String> properties = StrUtil.splitTrim(propertiesText, ",");
-            nameDefMap.put(realName, new NameDef(realName, properties));
-
-        } else {
-            nameDefMap.put(name, new NameDef(name, Collections.emptyList()));
         }
     }
 

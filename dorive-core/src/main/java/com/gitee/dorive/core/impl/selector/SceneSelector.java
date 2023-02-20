@@ -21,7 +21,9 @@ public class SceneSelector implements Selector {
     private Set<String> scenes = Collections.emptySet();
 
     public SceneSelector(String... scenes) {
-        this.scenes = CollUtil.set(false, scenes);
+        if (scenes != null && scenes.length > 0) {
+            this.scenes = CollUtil.set(false, scenes);
+        }
     }
 
     @Override

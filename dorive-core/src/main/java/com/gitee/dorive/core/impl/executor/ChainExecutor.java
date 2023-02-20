@@ -120,6 +120,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                         ObservedResult result = ((Observed) targetEntity).accept(repository, boundedContext, targetEntity);
                         observedOperationType = result.getOperationType();
                         totalCount += result.getTotalCount();
+                        isMatch = boundedContext.isMatch(repository);
                     }
                 }
 
