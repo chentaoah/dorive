@@ -34,7 +34,6 @@ import java.util.Map;
 public class EntityDefinition {
 
     private String name;
-    @Deprecated
     private String[] scenes;
     private int order;
     private Class<?> mapper;
