@@ -17,8 +17,8 @@
 package com.gitee.dorive.core.entity;
 
 import com.gitee.dorive.core.api.ExampleBuilder;
-import com.gitee.dorive.core.api.Task;
 import com.gitee.dorive.core.api.Selector;
+import com.gitee.dorive.core.api.Task;
 import com.gitee.dorive.core.impl.selector.ChainSelector;
 import com.gitee.dorive.core.impl.selector.NameSelector;
 import com.gitee.dorive.core.impl.selector.SceneSelector;
@@ -89,12 +89,8 @@ public class BoundedContext {
         tasks.put(name, task);
     }
 
-    public void execute(String name, String... namesToAdd) {
-        Task task = tasks.get(name);
-        if (task != null) {
-            appendNames(namesToAdd);
-            task.execute();
-        }
+    public Ref ref(Object object) {
+        return new Ref(this, object);
     }
 
     public Object put(String key, Object value) {
