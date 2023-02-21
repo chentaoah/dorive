@@ -46,17 +46,27 @@ public class BatchEntityHandler implements EntityHandler {
 
     @Override
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
+        boolean isRelay = boundedContext.isRelay();
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (boundedContext.isMatch(repository)) {
-                UnionExample unionExample = newUnionExample(repository, boundedContext, rootEntities);
-                if (unionExample.isDirtyQuery()) {
-                    Query query = operationFactory.buildQuery(boundedContext, unionExample);
-                    query.setType(query.getType() | Operation.INCLUDE_ROOT);
-                    Result<Object> result = repository.executeQuery(boundedContext, query);
-                    if (result instanceof EntityIndex) {
-                        setValueForRootEntities(repository, rootEntities, (EntityIndex) result);
-                    }
+                if (isRelay && boundedContext.isRelay(repository)) {
+                    String name = repository.getEntityDefinition().getName();
+                    boundedContext.putTask(name, () -> executeQuery(repository, boundedContext, rootEntities));
+                } else {
+                    executeQuery(repository, boundedContext, rootEntities);
                 }
+            }
+        }
+    }
+
+    private void executeQuery(CommonRepository repository, BoundedContext boundedContext, List<Object> rootEntities) {
+        UnionExample unionExample = newUnionExample(repository, boundedContext, rootEntities);
+        if (unionExample.isDirtyQuery()) {
+            Query query = operationFactory.buildQuery(boundedContext, unionExample);
+            query.setType(query.getType() | Operation.INCLUDE_ROOT);
+            Result<Object> result = repository.executeQuery(boundedContext, query);
+            if (result instanceof EntityIndex) {
+                setValueForRootEntities(repository, rootEntities, (EntityIndex) result);
             }
         }
     }
