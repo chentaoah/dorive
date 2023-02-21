@@ -23,7 +23,7 @@ import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -48,7 +48,7 @@ public class RepositoryWrapper {
                 example.addCriterion(new Criterion(field, operator, fieldValue));
             }
         }
-        ConfiguredRepository definedRepository = mergedRepository.getDefinedRepository();
+        CommonRepository definedRepository = mergedRepository.getDefinedRepository();
         BinderResolver binderResolver = definedRepository.getBinderResolver();
         for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
             Object boundValue = contextBinder.getBoundValue(boundedContext, null);

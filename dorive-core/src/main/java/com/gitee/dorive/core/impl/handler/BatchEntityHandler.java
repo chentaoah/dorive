@@ -29,7 +29,7 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.OperationFactory;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.repository.CommonRepository;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class BatchEntityHandler implements EntityHandler {
 
     @Override
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
-        for (ConfiguredRepository repository : this.repository.getSubRepositories()) {
+        for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (boundedContext.isMatch(repository)) {
                 UnionExample unionExample = newUnionExample(repository, boundedContext, rootEntities);
                 if (unionExample.isDirtyQuery()) {
@@ -61,7 +61,7 @@ public class BatchEntityHandler implements EntityHandler {
         }
     }
 
-    private UnionExample newUnionExample(ConfiguredRepository repository, BoundedContext boundedContext, List<Object> rootEntities) {
+    private UnionExample newUnionExample(CommonRepository repository, BoundedContext boundedContext, List<Object> rootEntities) {
         PropertyChain anchorPoint = repository.getAnchorPoint();
         PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
 
@@ -86,7 +86,7 @@ public class BatchEntityHandler implements EntityHandler {
         return unionExample;
     }
 
-    private void setValueForRootEntities(ConfiguredRepository repository, List<Object> rootEntities, EntityIndex entityIndex) {
+    private void setValueForRootEntities(CommonRepository repository, List<Object> rootEntities, EntityIndex entityIndex) {
         PropertyChain anchorPoint = repository.getAnchorPoint();
         PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
         PropertyProxy propertyProxy = anchorPoint.getPropertyProxy();

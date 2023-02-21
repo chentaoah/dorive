@@ -16,7 +16,7 @@
  */
 package com.gitee.dorive.coating.entity;
 
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -26,6 +26,6 @@ public class MergedRepository {
     private String lastAccessPath;
     private String absoluteAccessPath;
     private boolean merged;
-    private ConfiguredRepository definedRepository;
-    private ConfiguredRepository configuredRepository;
+    private CommonRepository definedRepository;
+    private CommonRepository commonRepository;
 }

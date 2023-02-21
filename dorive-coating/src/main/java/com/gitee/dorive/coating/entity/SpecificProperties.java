@@ -60,11 +60,11 @@ public class SpecificProperties {
             Object sortBy = sortByProperty.getProperty().getFieldValue(coatingObject);
             Object order = orderProperty.getProperty().getFieldValue(coatingObject);
             if (sortBy != null && order instanceof String) {
-                List<String> columns = StringUtils.toList(sortBy);
-                if (columns != null && !columns.isEmpty()) {
+                List<String> properties = StringUtils.toList(sortBy);
+                if (properties != null && !properties.isEmpty()) {
                     String orderStr = ((String) order).toUpperCase();
                     if (Order.ASC.equals(orderStr) || Order.DESC.equals(orderStr)) {
-                        return new OrderBy(columns, orderStr);
+                        return new OrderBy(properties, orderStr);
                     }
                 }
             }

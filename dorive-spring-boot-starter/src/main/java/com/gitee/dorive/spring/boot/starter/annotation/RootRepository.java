@@ -38,4 +38,7 @@ public @interface RootRepository {
     @AliasFor(annotation = Repository.class)
     String value() default "";
 
+    @AliasFor(annotation = Repository.class)
+    String querier() default "SQL";
+
 }

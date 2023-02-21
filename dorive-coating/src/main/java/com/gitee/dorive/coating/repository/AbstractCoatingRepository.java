@@ -22,6 +22,7 @@ import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.dorive.coating.impl.DefaultExampleBuilder;
 import com.gitee.dorive.coating.impl.resolver.MergedRepositoryResolver;
+import com.gitee.dorive.core.annotation.Repository;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -37,6 +38,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> implements ExampleBuilder, CoatingRepository<E, PK> {
 
+    protected String querier;
     protected String[] scanPackages;
     protected String regex;
     protected MergedRepositoryResolver mergedRepositoryResolver;
@@ -46,18 +48,18 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
+        Repository repository = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), Repository.class);
         CoatingScan coatingScan = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), CoatingScan.class);
-        if (coatingScan != null) {
+        if (repository != null && coatingScan != null) {
+            this.querier = repository.querier();
             this.scanPackages = coatingScan.value();
-            this.regex = coatingScan.regex();
-
-            if (StringUtils.isBlank(regex)) {
-                regex = "^" + entityClass.getSimpleName() + ".*";
-            }
+            this.regex = StringUtils.isBlank(coatingScan.regex()) ? "^" + entityClass.getSimpleName() + ".*" : coatingScan.regex();
 
             this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
             this.coatingWrapperResolver = new CoatingWrapperResolver(this);
-            this.exampleBuilder = new DefaultExampleBuilder(this);
+            if ("default".equals(querier)) {
+                this.exampleBuilder = new DefaultExampleBuilder(this);
+            }
 
             mergedRepositoryResolver.resolveMergedRepositoryMap();
             coatingWrapperResolver.resolveCoatingWrapperMap();

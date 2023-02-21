@@ -39,7 +39,7 @@ import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.CriterionUtils;
 import com.gitee.dorive.core.util.SqlUtils;
 import com.gitee.dorive.spring.boot.starter.entity.ArgSegment;
@@ -81,13 +81,13 @@ public class SQLExampleBuilder implements ExampleBuilder {
         for (RepositoryWrapper repositoryWrapper : repositoryWrappers) {
             MergedRepository mergedRepository = repositoryWrapper.getMergedRepository();
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-            ConfiguredRepository definedRepository = mergedRepository.getDefinedRepository();
-            ConfiguredRepository configuredRepository = mergedRepository.getConfiguredRepository();
+            CommonRepository definedRepository = mergedRepository.getDefinedRepository();
+            CommonRepository commonRepository = mergedRepository.getCommonRepository();
 
             BinderResolver binderResolver = definedRepository.getBinderResolver();
-            AliasConverter aliasConverter = configuredRepository.getAliasConverter();
+            AliasConverter aliasConverter = commonRepository.getAliasConverter();
 
-            TableInfo tableInfo = getTableInfo(configuredRepository);
+            TableInfo tableInfo = getTableInfo(commonRepository);
             String tableName = tableInfo.getTableName();
 
             String tableAlias = String.valueOf(letter);
@@ -159,7 +159,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         return example;
     }
 
-    private TableInfo getTableInfo(ConfiguredRepository repository) {
+    private TableInfo getTableInfo(CommonRepository repository) {
         Metadata metadata = (Metadata) repository.getMetadata();
         Class<?> pojoClass = metadata.getPojoClass();
         return TableInfoHelper.getTableInfo(pojoClass);
@@ -167,14 +167,14 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
     private List<JoinSegment> newJoinSegments(Map<String, SqlSegment> sqlSegmentMap, String absoluteAccessPath, BinderResolver binderResolver, String tableAlias) {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
-        Map<ConfiguredRepository, String> globalRepositoryPathMap = mergedRepositoryResolver.getGlobalRepositoryPathMap();
+        Map<CommonRepository, String> mergedRepositoryPathMap = mergedRepositoryResolver.getMergedRepositoryPathMap();
 
         List<PropertyBinder> propertyBinders = binderResolver.getPropertyBinders();
         List<JoinSegment> joinSegments = new ArrayList<>(propertyBinders.size());
 
         for (PropertyBinder propertyBinder : propertyBinders) {
-            ConfiguredRepository belongRepository = propertyBinder.getBelongRepository();
-            String globalAccessPath = globalRepositoryPathMap.get(belongRepository);
+            CommonRepository belongRepository = propertyBinder.getBelongRepository();
+            String globalAccessPath = mergedRepositoryPathMap.get(belongRepository);
             SqlSegment sqlSegment = sqlSegmentMap.get(globalAccessPath);
 
             if (sqlSegment != null) {

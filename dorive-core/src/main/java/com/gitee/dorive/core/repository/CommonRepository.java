@@ -38,7 +38,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ConfiguredRepository extends ProxyRepository implements MetadataHolder {
+public class CommonRepository extends ProxyRepository implements MetadataHolder {
 
     protected String accessPath;
     protected boolean root;
@@ -69,8 +69,8 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
 
     @Override
     public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
-        List<String> columns = boundedContext.selectColumns(this);
-        if (columns != null && !columns.isEmpty()) {
+        List<String> properties = boundedContext.selectColumns(this);
+        if (properties != null && !properties.isEmpty()) {
             if (query.getPrimaryKey() != null) {
                 Example example = new Example().eq("id", query.getPrimaryKey());
                 query.setPrimaryKey(null);
@@ -78,7 +78,7 @@ public class ConfiguredRepository extends ProxyRepository implements MetadataHol
             }
             Example example = query.getExample();
             if (example != null) {
-                example.selectColumns(columns);
+                example.selectColumns(properties);
             }
         }
         Example example = query.getExample();

@@ -4,9 +4,10 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -16,21 +17,23 @@ import java.util.Map;
 @Data
 public class NameSelector implements Selector {
 
+    public static final NameSelector EMPTY_SELECTOR = new NameSelector();
+
     private boolean wildcard;
     private Map<String, NameDef> nameDefMap = Collections.emptyMap();
 
     public NameSelector(String... names) {
         if (names != null && names.length > 0) {
-            nameDefMap = new LinkedHashMap<>(names.length * 4 / 3 + 1);
+            this.nameDefMap = new LinkedHashMap<>(names.length * 4 / 3 + 1);
             for (String name : names) {
                 if ("*".equals(name)) {
-                    wildcard = true;
+                    this.wildcard = true;
                 } else {
                     if (name.contains("(") && name.contains(")")) {
                         String realName = name.substring(0, name.indexOf("("));
-                        String propsText = name.substring(name.indexOf("(") + 1, name.indexOf(")"));
-                        List<String> columns = StrUtil.splitTrim(propsText, ",");
-                        nameDefMap.put(realName, new NameDef(realName, columns));
+                        String propertiesText = name.substring(name.indexOf("(") + 1, name.indexOf(")"));
+                        List<String> properties = StrUtil.splitTrim(propertiesText, ",");
+                        nameDefMap.put(realName, new NameDef(realName, properties));
 
                     } else {
                         nameDefMap.put(name, new NameDef(name, Collections.emptyList()));
@@ -41,29 +44,28 @@ public class NameSelector implements Selector {
     }
 
     @Override
-    public boolean isMatch(BoundedContext boundedContext, ConfiguredRepository repository) {
+    public boolean isMatch(BoundedContext boundedContext, CommonRepository repository) {
         if (wildcard) {
             return true;
-        } else {
-            EntityDefinition entityDefinition = repository.getEntityDefinition();
-            String name = entityDefinition.getName();
-            return org.apache.commons.lang3.StringUtils.isBlank(name) || nameDefMap.containsKey(name);
         }
+        EntityDefinition entityDefinition = repository.getEntityDefinition();
+        String name = entityDefinition.getName();
+        return StringUtils.isBlank(name) || nameDefMap.containsKey(name);
     }
 
     @Override
-    public List<String> selectColumns(BoundedContext boundedContext, ConfiguredRepository repository) {
+    public List<String> selectColumns(BoundedContext boundedContext, CommonRepository repository) {
         EntityDefinition entityDefinition = repository.getEntityDefinition();
         String name = entityDefinition.getName();
         NameDef nameDef = nameDefMap.get(name);
-        return nameDef != null && !nameDef.getColumns().isEmpty() ? nameDef.getColumns() : null;
+        return nameDef != null && !nameDef.getProperties().isEmpty() ? nameDef.getProperties() : null;
     }
 
     @Data
     @AllArgsConstructor
     public static class NameDef {
         private String name;
-        private List<String> columns;
+        private List<String> properties;
     }
 
 }

@@ -28,7 +28,7 @@ import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.processor.DefaultProcessor;
 import com.gitee.dorive.core.impl.processor.PropertyProcessor;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.PathUtils;
 import com.gitee.dorive.core.util.ReflectUtils;
 import lombok.Data;
@@ -153,9 +153,9 @@ public class BinderResolver {
         String bindExp = bindingDefinition.getBindExp();
         String property = bindingDefinition.getProperty();
 
-        Map<String, ConfiguredRepository> allRepositoryMap = repository.getAllRepositoryMap();
+        Map<String, CommonRepository> allRepositoryMap = repository.getAllRepositoryMap();
         String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), bindExp);
-        ConfiguredRepository belongRepository = allRepositoryMap.get(belongAccessPath);
+        CommonRepository belongRepository = allRepositoryMap.get(belongAccessPath);
         Assert.notNull(belongRepository, "The belong repository cannot be null!");
         belongRepository.setBoundEntity(true);
 

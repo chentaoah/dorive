@@ -20,7 +20,7 @@ import com.gitee.dorive.core.api.Processor;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.definition.BindingDefinition;
 import com.gitee.dorive.core.entity.element.PropertyChain;
-import com.gitee.dorive.core.repository.ConfiguredRepository;
+import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,7 +29,7 @@ import lombok.Setter;
 public class PropertyBinder extends AbstractBinder {
 
     protected String belongAccessPath;
-    protected ConfiguredRepository belongRepository;
+    protected CommonRepository belongRepository;
     protected PropertyChain boundPropertyChain;
     protected String bindAlias;
 
@@ -38,7 +38,7 @@ public class PropertyBinder extends AbstractBinder {
                           Processor processor,
                           String alias,
                           String belongAccessPath,
-                          ConfiguredRepository belongRepository,
+                          CommonRepository belongRepository,
                           PropertyChain boundPropertyChain,
                           String bindAlias) {
         super(bindingDefinition, fieldPropertyChain, processor, alias);
