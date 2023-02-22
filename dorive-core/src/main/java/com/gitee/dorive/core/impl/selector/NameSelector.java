@@ -29,18 +29,14 @@ public class NameSelector implements Selector {
                 if ("*".equals(name)) {
                     this.wildcard = true;
                 } else {
-                    boolean isRelay = name.startsWith("$");
-                    if (isRelay) {
-                        name = name.substring(1);
-                    }
                     if (name.contains("(") && name.contains(")")) {
                         String realName = name.substring(0, name.indexOf("("));
                         String propertiesText = name.substring(name.indexOf("(") + 1, name.indexOf(")"));
                         List<String> properties = StrUtil.splitTrim(propertiesText, ",");
-                        nameDefMap.put(realName, new NameDef(isRelay, realName, properties));
+                        nameDefMap.put(realName, new NameDef(realName, properties));
 
                     } else {
-                        nameDefMap.put(name, new NameDef(isRelay, name, Collections.emptyList()));
+                        nameDefMap.put(name, new NameDef(name, Collections.emptyList()));
                     }
                 }
             }
@@ -58,14 +54,6 @@ public class NameSelector implements Selector {
     }
 
     @Override
-    public boolean isRelay(BoundedContext boundedContext, CommonRepository repository) {
-        EntityDefinition entityDefinition = repository.getEntityDefinition();
-        String name = entityDefinition.getName();
-        NameDef nameDef = nameDefMap.get(name);
-        return nameDef != null && nameDef.isRelay();
-    }
-
-    @Override
     public List<String> selectColumns(BoundedContext boundedContext, CommonRepository repository) {
         EntityDefinition entityDefinition = repository.getEntityDefinition();
         String name = entityDefinition.getName();
@@ -76,7 +64,6 @@ public class NameSelector implements Selector {
     @Data
     @AllArgsConstructor
     public static class NameDef {
-        private boolean relay;
         private String name;
         private List<String> properties;
     }

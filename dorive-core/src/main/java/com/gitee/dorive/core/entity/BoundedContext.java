@@ -17,7 +17,6 @@
 package com.gitee.dorive.core.entity;
 
 import com.gitee.dorive.core.api.ExampleBuilder;
-import com.gitee.dorive.core.api.Task;
 import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.impl.selector.ChainSelector;
 import com.gitee.dorive.core.impl.selector.NameSelector;
@@ -35,10 +34,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @EqualsAndHashCode(callSuper = false)
 public class BoundedContext {
 
-    private boolean relay = false;
+    private boolean ref = false;
     private boolean observer = false;
     private Selector selector = NameSelector.EMPTY_SELECTOR;
-    private Map<String, Task> tasks = Collections.emptyMap();
     private Map<String, Object> attachments = Collections.emptyMap();
 
     @Deprecated
@@ -59,17 +57,13 @@ public class BoundedContext {
         this.selector = selector;
     }
 
-    public BoundedContext(boolean relay, Selector selector) {
-        this.relay = relay;
+    public BoundedContext(boolean ref, Selector selector) {
+        this.ref = ref;
         this.selector = selector;
     }
 
     public boolean isMatch(CommonRepository repository) {
         return selector.isMatch(this, repository);
-    }
-
-    public boolean isRelay(CommonRepository repository) {
-        return selector.isRelay(this, repository);
     }
 
     public List<String> selectColumns(CommonRepository repository) {
@@ -79,21 +73,6 @@ public class BoundedContext {
     public void appendNames(String... namesToAdd) {
         if (namesToAdd != null && namesToAdd.length > 0) {
             selector = new ChainSelector(selector, namesToAdd);
-        }
-    }
-
-    public void putTask(String name, Task task) {
-        if (tasks == Collections.EMPTY_MAP) {
-            tasks = new ConcurrentHashMap<>();
-        }
-        tasks.put(name, task);
-    }
-
-    public void execute(String name, String... namesToAdd) {
-        Task task = tasks.get(name);
-        if (task != null) {
-            appendNames(namesToAdd);
-            task.execute();
         }
     }
 

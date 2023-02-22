@@ -26,6 +26,7 @@ import com.gitee.dorive.core.impl.executor.ChainExecutor;
 import com.gitee.dorive.core.impl.executor.AdaptiveExecutor;
 import com.gitee.dorive.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
+import com.gitee.dorive.core.impl.handler.RefEntityHandler;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import com.gitee.dorive.core.impl.resolver.PropertyResolver;
@@ -99,6 +100,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setOperationFactory(rootRepository.getOperationFactory());
 
         EntityHandler entityHandler = new BatchEntityHandler(this, rootRepository.getOperationFactory());
+        if (entityElement.getRefProxy() != null) {
+            entityHandler = new RefEntityHandler(this, entityHandler);
+        }
         if (delegateResolver.isDelegated()) {
             entityHandler = new AdaptiveEntityHandler(this, entityHandler);
         }

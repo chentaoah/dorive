@@ -46,15 +46,9 @@ public class BatchEntityHandler implements EntityHandler {
 
     @Override
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
-        boolean isRelay = boundedContext.isRelay();
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (boundedContext.isMatch(repository)) {
-                if (isRelay && boundedContext.isRelay(repository)) {
-                    String name = repository.getEntityDefinition().getName();
-                    boundedContext.putTask(name, () -> executeQuery(repository, boundedContext, rootEntities));
-                } else {
-                    executeQuery(repository, boundedContext, rootEntities);
-                }
+                executeQuery(repository, boundedContext, rootEntities);
             }
         }
     }

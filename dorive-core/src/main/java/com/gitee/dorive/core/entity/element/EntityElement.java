@@ -43,6 +43,7 @@ public class EntityElement {
     private AnnotatedElement annotatedElement;
     private boolean collection;
     private Class<?> genericType;
+    private PropertyProxy refProxy;
     private PropertyProxy primaryKeyProxy;
     private Map<String, PropertyDef> propertyDefMap;
 
@@ -59,12 +60,13 @@ public class EntityElement {
             entityClass = property.getGenericFieldClass();
         }
 
-        EntityElement entityElement = new EntityElement(annotatedElement, isCollection, entityClass, null, null);
+        EntityElement entityElement = new EntityElement(annotatedElement, isCollection, entityClass, null, null, null);
         return processEntityElement(entityElement);
     }
 
     private static EntityElement processEntityElement(EntityElement entityElement) {
         Class<?> genericType = entityElement.getGenericType();
+        PropertyProxy refProxy = newRefProxy(genericType);
         PropertyProxy primaryKeyProxy = newPrimaryKeyProxy(genericType);
 
         Field[] fields = ReflectUtil.getFields(genericType);
@@ -81,9 +83,15 @@ public class EntityElement {
             propertyDefMap.put(property, new PropertyDef(property, isAssign, alias));
         }
 
+        entityElement.setRefProxy(refProxy);
         entityElement.setPrimaryKeyProxy(primaryKeyProxy);
         entityElement.setPropertyDefMap(propertyDefMap);
         return entityElement;
+    }
+
+    private static PropertyProxy newRefProxy(Class<?> entityClass) {
+        Field field = ReflectUtil.getField(entityClass, "ref");
+        return field != null ? PropertyProxyFactory.newPropertyProxy(entityClass, "ref") : null;
     }
 
     private static PropertyProxy newPrimaryKeyProxy(Class<?> entityClass) {
