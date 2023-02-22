@@ -14,13 +14,13 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-@ToString(exclude = {"all", "self"})
+@ToString(exclude = {"rootEntities", "self"})
 public class DefaultRef implements Ref {
 
     private AbstractRepository<Object, Object> repository;
     private EntityHandler entityHandler;
     private BoundedContext boundedContext;
-    private List<Object> all;
+    private List<Object> rootEntities;
     private Object self;
 
     @Override
