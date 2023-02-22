@@ -45,15 +45,17 @@ public class BatchEntityHandler implements EntityHandler {
     }
 
     @Override
-    public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
+    public int handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
+        int totalCount = 0;
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (boundedContext.isMatch(repository)) {
-                executeQuery(repository, boundedContext, rootEntities);
+                totalCount += executeQuery(repository, boundedContext, rootEntities);
             }
         }
+        return totalCount;
     }
 
-    private void executeQuery(CommonRepository repository, BoundedContext boundedContext, List<Object> rootEntities) {
+    private int executeQuery(CommonRepository repository, BoundedContext boundedContext, List<Object> rootEntities) {
         UnionExample unionExample = newUnionExample(repository, boundedContext, rootEntities);
         if (unionExample.isDirtyQuery()) {
             Query query = operationFactory.buildQuery(boundedContext, unionExample);
@@ -62,7 +64,9 @@ public class BatchEntityHandler implements EntityHandler {
             if (result instanceof EntityIndex) {
                 setValueForRootEntities(repository, rootEntities, (EntityIndex) result);
             }
+            return result.getTotal();
         }
+        return 0;
     }
 
     private UnionExample newUnionExample(CommonRepository repository, BoundedContext boundedContext, List<Object> rootEntities) {

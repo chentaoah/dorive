@@ -32,9 +32,7 @@ import java.util.Map;
 public class MergedRepositoryResolver {
 
     private AbstractContextRepository<?, ?> repository;
-
     private Map<String, MergedRepository> mergedRepositoryMap = new LinkedHashMap<>();
-    private Map<CommonRepository, String> mergedRepositoryPathMap = new LinkedHashMap<>();
 
     public MergedRepositoryResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
@@ -47,12 +45,6 @@ public class MergedRepositoryResolver {
         mergedRepositoryMap.put("/", rootMergedRepository);
 
         resolveMergedRepositoryMap(new ArrayList<>(), repository);
-
-        for (MergedRepository mergedRepository : mergedRepositoryMap.values()) {
-            String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-            mergedRepositoryPathMap.put(mergedRepository.getDefinedRepository(), absoluteAccessPath);
-            mergedRepositoryPathMap.put(mergedRepository.getCommonRepository(), absoluteAccessPath);
-        }
     }
 
     private void resolveMergedRepositoryMap(List<String> multiAccessPath, AbstractContextRepository<?, ?> lastRepository) {

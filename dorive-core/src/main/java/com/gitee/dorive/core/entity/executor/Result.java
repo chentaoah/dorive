@@ -26,23 +26,22 @@ import java.util.List;
 @NoArgsConstructor
 public class Result<E> {
 
-    protected E record;
-    protected List<E> records = Collections.emptyList();
     protected Page<E> page;
-
-    public Result(E record) {
-        this.record = record;
-    }
-
-    public Result(List<E> records) {
-        this.records = records;
-        this.record = !records.isEmpty() ? records.get(0) : null;
-    }
+    protected List<E> records = Collections.emptyList();
+    protected E record;
+    protected int total = 0;
 
     public Result(Page<E> page) {
         this.page = page;
         this.records = page.getRecords();
         this.record = !records.isEmpty() ? records.get(0) : null;
+        this.total = this.records.size();
+    }
+
+    public Result(List<E> records) {
+        this.records = records;
+        this.record = !records.isEmpty() ? records.get(0) : null;
+        this.total = this.records.size();
     }
 
 }

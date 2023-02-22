@@ -4,8 +4,16 @@ import com.gitee.dorive.core.entity.BoundedContext;
 
 public interface Ref {
 
-    void relay(BoundedContext boundedContext);
+    int select(BoundedContext boundedContext);
 
-    void relay(Selector selector);
+    int select(Selector selector);
+
+    int insertOrUpdate(BoundedContext boundedContext);
+
+    int insertOrUpdate(Selector selector);
+
+    int delete(BoundedContext boundedContext);
+
+    int delete(Selector selector);
 
 }

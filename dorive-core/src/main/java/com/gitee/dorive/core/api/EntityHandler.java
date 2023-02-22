@@ -22,6 +22,6 @@ import java.util.List;
 
 public interface EntityHandler {
 
-    void handleEntities(BoundedContext boundedContext, List<Object> rootEntities);
+    int handleEntities(BoundedContext boundedContext, List<Object> rootEntities);
 
 }

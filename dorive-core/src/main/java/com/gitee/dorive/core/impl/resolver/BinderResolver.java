@@ -165,7 +165,7 @@ public class BinderResolver {
         boundPropertyChain.newPropertyProxy();
 
         EntityElement entityElement = belongRepository.getEntityElement();
-        String fieldName = StringUtils.isNotBlank(property) ? property : PathUtils.getFieldName(bindExp);
+        String fieldName = StringUtils.isNotBlank(property) ? property : PathUtils.getLastName(bindExp);
         String bindAlias = entityElement.toAlias(fieldName);
 
         return new PropertyBinder(bindingDefinition, fieldPropertyChain, processor, alias,
