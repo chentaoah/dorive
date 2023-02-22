@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @EqualsAndHashCode(callSuper = false)
 public class BoundedContext {
 
+    private boolean ref = false;
     private boolean observer = false;
     private Selector selector = NameSelector.EMPTY_SELECTOR;
     private Map<String, Object> attachments = Collections.emptyMap();
@@ -53,6 +54,11 @@ public class BoundedContext {
     }
 
     public BoundedContext(Selector selector) {
+        this.selector = selector;
+    }
+
+    public BoundedContext(boolean ref, Selector selector) {
+        this.ref = ref;
         this.selector = selector;
     }
 
