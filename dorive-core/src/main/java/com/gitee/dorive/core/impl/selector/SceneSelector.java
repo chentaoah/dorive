@@ -42,11 +42,6 @@ public class SceneSelector implements Selector {
     }
 
     @Override
-    public boolean isRelay(BoundedContext boundedContext, CommonRepository repository) {
-        return false;
-    }
-
-    @Override
     public List<String> selectColumns(BoundedContext boundedContext, CommonRepository repository) {
         return null;
     }

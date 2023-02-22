@@ -32,7 +32,6 @@ import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Collections;
 import java.util.List;
 
 public class BatchEntityHandler implements EntityHandler {
@@ -46,32 +45,15 @@ public class BatchEntityHandler implements EntityHandler {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
-        boolean isRelay = boundedContext.isRelay();
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (boundedContext.isMatch(repository)) {
-                if (isRelay && boundedContext.isRelay(repository)) {
-                    String name = repository.getEntityDefinition().getName();
-                    boundedContext.putTask(name, (object) -> {
-                        if (object == null) {
-                            return executeQuery(repository, boundedContext, rootEntities);
-
-                        } else if (object instanceof List) {
-                            return executeQuery(repository, boundedContext, (List<Object>) object);
-
-                        } else {
-                            return executeQuery(repository, boundedContext, Collections.singletonList(object));
-                        }
-                    });
-                } else {
-                    executeQuery(repository, boundedContext, rootEntities);
-                }
+                executeQuery(repository, boundedContext, rootEntities);
             }
         }
     }
 
-    private List<Object> executeQuery(CommonRepository repository, BoundedContext boundedContext, List<Object> rootEntities) {
+    private void executeQuery(CommonRepository repository, BoundedContext boundedContext, List<Object> rootEntities) {
         UnionExample unionExample = newUnionExample(repository, boundedContext, rootEntities);
         if (unionExample.isDirtyQuery()) {
             Query query = operationFactory.buildQuery(boundedContext, unionExample);
@@ -80,9 +62,7 @@ public class BatchEntityHandler implements EntityHandler {
             if (result instanceof EntityIndex) {
                 setValueForRootEntities(repository, rootEntities, (EntityIndex) result);
             }
-            return result.getRecords();
         }
-        return Collections.emptyList();
     }
 
     private UnionExample newUnionExample(CommonRepository repository, BoundedContext boundedContext, List<Object> rootEntities) {
