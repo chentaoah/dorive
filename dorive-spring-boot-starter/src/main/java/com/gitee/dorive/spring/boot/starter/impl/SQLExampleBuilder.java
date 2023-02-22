@@ -28,7 +28,6 @@ import com.gitee.dorive.coating.entity.MergedRepository;
 import com.gitee.dorive.coating.entity.RepositoryWrapper;
 import com.gitee.dorive.coating.entity.SpecificProperties;
 import com.gitee.dorive.coating.impl.resolver.CoatingWrapperResolver;
-import com.gitee.dorive.coating.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.constant.Operator;
 import com.gitee.dorive.core.entity.BoundedContext;
@@ -80,6 +79,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         for (RepositoryWrapper repositoryWrapper : repositoryWrappers) {
             MergedRepository mergedRepository = repositoryWrapper.getMergedRepository();
+            String lastAccessPath = mergedRepository.getLastAccessPath();
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             CommonRepository commonRepository = mergedRepository.getCommonRepository();
@@ -108,7 +108,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
             } else {
                 String sql = String.format("LEFT JOIN %s %s ON ", tableName, tableAlias);
-                List<JoinSegment> joinSegments = newJoinSegments(sqlSegmentMap, absoluteAccessPath, binderResolver, tableAlias);
+                List<JoinSegment> joinSegments = newJoinSegments(sqlSegmentMap, lastAccessPath, absoluteAccessPath, binderResolver, tableAlias);
                 SqlSegment sqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, example, false, dirtyQuery, joinTableNames);
                 sqlSegmentMap.put(absoluteAccessPath, sqlSegment);
             }
@@ -165,18 +165,15 @@ public class SQLExampleBuilder implements ExampleBuilder {
         return TableInfoHelper.getTableInfo(pojoClass);
     }
 
-    private List<JoinSegment> newJoinSegments(Map<String, SqlSegment> sqlSegmentMap, String absoluteAccessPath, BinderResolver binderResolver, String tableAlias) {
-        MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
-        Map<CommonRepository, String> mergedRepositoryPathMap = mergedRepositoryResolver.getMergedRepositoryPathMap();
-
+    private List<JoinSegment> newJoinSegments(Map<String, SqlSegment> sqlSegmentMap, String lastAccessPath, String absoluteAccessPath, BinderResolver binderResolver, String tableAlias) {
         List<PropertyBinder> propertyBinders = binderResolver.getPropertyBinders();
         List<JoinSegment> joinSegments = new ArrayList<>(propertyBinders.size());
 
         for (PropertyBinder propertyBinder : propertyBinders) {
-            CommonRepository belongRepository = propertyBinder.getBelongRepository();
-            String globalAccessPath = mergedRepositoryPathMap.get(belongRepository);
-            SqlSegment sqlSegment = sqlSegmentMap.get(globalAccessPath);
+            String belongAccessPath = propertyBinder.getBelongAccessPath();
+            String globalAccessPath = lastAccessPath + belongAccessPath;
 
+            SqlSegment sqlSegment = sqlSegmentMap.get(globalAccessPath);
             if (sqlSegment != null) {
                 Set<String> targetAccessPaths = sqlSegment.getTargetAccessPaths();
                 targetAccessPaths.add(absoluteAccessPath);
