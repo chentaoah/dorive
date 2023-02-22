@@ -19,14 +19,12 @@ package com.gitee.dorive.core.impl.executor;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.Binder;
 import com.gitee.dorive.core.api.EntityHandler;
-import com.gitee.dorive.core.api.Observed;
 import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.OperationTypeResolver;
-import com.gitee.dorive.core.impl.observe.ObservedResult;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -60,11 +58,17 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         boolean isIncludeRoot = (query.getType() & Operation.INCLUDE_ROOT) == Operation.INCLUDE_ROOT;
 
         if (boundedContext.isMatch(rootRepository) || isIncludeRoot) {
+            int totalCount = 0;
+
             Result<Object> result = rootRepository.executeQuery(boundedContext, query);
+            totalCount += result.getTotal();
+
             List<Object> rootEntities = result.getRecords();
             if (!rootEntities.isEmpty()) {
-                handleEntities(boundedContext, rootEntities);
+                totalCount += handleEntities(boundedContext, rootEntities);
             }
+
+            result.setTotal(totalCount);
             return result;
         }
 
@@ -72,8 +76,8 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     }
 
     @Override
-    public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
-        entityHandler.handleEntities(boundedContext, rootEntities);
+    public int handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
+        return entityHandler.handleEntities(boundedContext, rootEntities);
     }
 
     @Override
@@ -101,28 +105,17 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                 continue;
             }
 
-            boolean isObserver = boundedContext.isObserver();
             boolean isMatch = boundedContext.isMatch(repository);
             boolean isForceInclude = isIncludeRoot && repository.isRoot();
             boolean isAggregated = repository.isAggregated();
 
-            if (!isObserver && !isMatch && !isForceInclude && !isAggregated) {
+            if (!isMatch && !isForceInclude && !isAggregated) {
                 continue;
             }
 
             PropertyChain anchorPoint = repository.getAnchorPoint();
             Object targetEntity = anchorPoint == null ? rootEntity : anchorPoint.getValue(rootEntity);
             if (targetEntity != null) {
-
-                int observedOperationType = Operation.INSERT_OR_UPDATE_OR_DELETE;
-                if (isObserver) {
-                    if (targetEntity instanceof Observed) {
-                        ObservedResult result = ((Observed) targetEntity).accept(repository, boundedContext, targetEntity);
-                        observedOperationType = result.getOperationType();
-                        totalCount += result.getTotalCount();
-                        isMatch = boundedContext.isMatch(repository);
-                    }
-                }
 
                 Collection<?> collection;
                 Object boundIdEntity = null;
@@ -144,8 +137,6 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                         if ((operationType & Operation.INSERT) == Operation.INSERT) {
                             getBoundValueFromContext(boundedContext, rootEntity, repository, entity);
                         }
-
-                        operationType = operationType & observedOperationType;
 
                         if (isAggregated) {
                             operationType = (operationType & Operation.INSERT_OR_UPDATE_OR_DELETE) > 0 ? includeRootOperationType : ignoreRootOperationType;

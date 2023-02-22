@@ -32,7 +32,6 @@ import java.util.Map;
 public class MergedRepositoryResolver {
 
     private AbstractContextRepository<?, ?> repository;
-
     private Map<String, MergedRepository> mergedRepositoryMap = new LinkedHashMap<>();
 
     public MergedRepositoryResolver(AbstractContextRepository<?, ?> repository) {

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
 public class AdaptiveEntityHandler implements EntityHandler {
@@ -40,20 +41,28 @@ public class AdaptiveEntityHandler implements EntityHandler {
     }
 
     @Override
-    public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
+    public int handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
         List<Object> newRootEntities = new ArrayList<>(rootEntities.size());
+
         int delegateCount = repository.getDelegateResolver().getDelegateCount();
         Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>(delegateCount * 4 / 3 + 1);
+
         filterRootEntities(rootEntities, newRootEntities, repositoryEntitiesMap);
+
+        AtomicInteger totalCount = new AtomicInteger();
+
         if (!newRootEntities.isEmpty()) {
-            entityHandler.handleEntities(boundedContext, newRootEntities);
+            totalCount.addAndGet(entityHandler.handleEntities(boundedContext, newRootEntities));
         }
+
         repositoryEntitiesMap.forEach((repository, entities) -> {
             Executor executor = repository.getExecutor();
             if (executor instanceof EntityHandler) {
-                ((EntityHandler) executor).handleEntities(boundedContext, entities);
+                totalCount.addAndGet(((EntityHandler) executor).handleEntities(boundedContext, entities));
             }
         });
+
+        return totalCount.get();
     }
 
     private void filterRootEntities(List<Object> rootEntities, List<Object> newRootEntities,

@@ -171,9 +171,9 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         for (PropertyBinder propertyBinder : propertyBinders) {
             String belongAccessPath = propertyBinder.getBelongAccessPath();
-            String globalAccessPath = lastAccessPath + belongAccessPath;
+            String targetAccessPath = lastAccessPath + belongAccessPath;
 
-            SqlSegment sqlSegment = sqlSegmentMap.get(globalAccessPath);
+            SqlSegment sqlSegment = sqlSegmentMap.get(targetAccessPath);
             if (sqlSegment != null) {
                 Set<String> targetAccessPaths = sqlSegment.getTargetAccessPaths();
                 targetAccessPaths.add(absoluteAccessPath);
@@ -185,7 +185,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
                 String bindAlias = propertyBinder.getBindAlias();
                 String sqlCriteria = tableAlias + "." + alias + " = " + joinTableAlias + "." + bindAlias;
 
-                JoinSegment joinSegment = new JoinSegment(globalAccessPath, joinTableName, joinTableAlias, sqlCriteria);
+                JoinSegment joinSegment = new JoinSegment(targetAccessPath, joinTableName, joinTableAlias, sqlCriteria);
                 joinSegments.add(joinSegment);
             }
         }

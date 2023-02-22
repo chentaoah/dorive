@@ -23,6 +23,7 @@ import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.element.EntityElement;
 import com.gitee.dorive.core.impl.DefaultRef;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
+import com.gitee.dorive.core.repository.AbstractRepository;
 
 import java.util.List;
 
@@ -37,18 +38,19 @@ public class RefEntityHandler implements EntityHandler {
     }
 
     @Override
-    public void handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
+    @SuppressWarnings("unchecked")
+    public int handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
         if (boundedContext.isRef()) {
             EntityElement entityElement = repository.getEntityElement();
             PropertyProxy refProxy = entityElement.getRefProxy();
             if (refProxy != null) {
                 for (Object rootEntity : rootEntities) {
-                    Ref ref = new DefaultRef(entityHandler, rootEntities, rootEntity);
+                    Ref ref = new DefaultRef((AbstractRepository<Object, Object>) repository, entityHandler, boundedContext, rootEntities, rootEntity);
                     refProxy.setValue(rootEntity, ref);
                 }
             }
         }
-        entityHandler.handleEntities(boundedContext, rootEntities);
+        return entityHandler.handleEntities(boundedContext, rootEntities);
     }
 
 }
