@@ -16,23 +16,23 @@
  */
 package com.gitee.dorive.core.repository;
 
+import com.gitee.dorive.core.api.EntityHandler;
+import com.gitee.dorive.core.api.Executor;
+import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.element.EntityElement;
 import com.gitee.dorive.core.entity.element.PropertyChain;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.OperationFactory;
-import com.gitee.dorive.core.impl.executor.ChainExecutor;
 import com.gitee.dorive.core.impl.executor.AdaptiveExecutor;
+import com.gitee.dorive.core.impl.executor.ChainExecutor;
 import com.gitee.dorive.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
-import com.gitee.dorive.core.impl.handler.RefEntityHandler;
+import com.gitee.dorive.core.impl.ref.RefAssignor;
+import com.gitee.dorive.core.impl.resolver.AdapterResolver;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import com.gitee.dorive.core.impl.resolver.PropertyResolver;
-import com.gitee.dorive.core.api.EntityHandler;
-import com.gitee.dorive.core.api.Executor;
-import com.gitee.dorive.core.impl.resolver.AdapterResolver;
 import com.gitee.dorive.core.util.ReflectUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -43,7 +43,11 @@ import org.springframework.context.ApplicationContextAware;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -100,12 +104,14 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setOperationFactory(rootRepository.getOperationFactory());
 
         EntityHandler entityHandler = new BatchEntityHandler(this, rootRepository.getOperationFactory());
-        if (entityElement.getRefProxy() != null) {
-            entityHandler = new RefEntityHandler(this, entityHandler);
-        }
+
+        RefAssignor refAssignor = new RefAssignor(this, entityHandler, entityClass);
+        refAssignor.assign();
+
         if (delegateResolver.isDelegated()) {
             entityHandler = new AdaptiveEntityHandler(this, entityHandler);
         }
+
         Executor executor = new ChainExecutor(this, entityHandler);
         if (adapterResolver.isAdaptive()) {
             executor = new AdaptiveExecutor(this, executor);
