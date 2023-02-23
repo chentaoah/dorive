@@ -8,4 +8,12 @@ public interface Obj {
 
     int select(Selector selector);
 
+    int insertOrUpdate(BoundedContext boundedContext);
+
+    int insertOrUpdate(Selector selector);
+
+    int delete(BoundedContext boundedContext);
+
+    int delete(Selector selector);
+
 }
