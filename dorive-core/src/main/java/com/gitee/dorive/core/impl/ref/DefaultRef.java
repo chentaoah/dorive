@@ -70,7 +70,7 @@ public class DefaultRef implements Ref {
     }
 
     @Override
-    public Obj bind(Object object) {
+    public Obj forObj(Object object) {
         return new DefaultObj(this, object);
     }
 

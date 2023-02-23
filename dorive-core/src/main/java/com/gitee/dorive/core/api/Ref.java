@@ -2,6 +2,6 @@ package com.gitee.dorive.core.api;
 
 public interface Ref extends Repository<Object, Object> {
 
-    Obj bind(Object obj);
+    Obj forObj(Object obj);
 
 }
