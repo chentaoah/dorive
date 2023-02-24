@@ -20,8 +20,13 @@ public class RefInjector {
     private Class<?> entityClass;
 
     public Field getField() {
-        Field field = ReflectUtil.getField(entityClass, "ref");
-        return field != null && Modifier.isStatic(field.getModifiers()) ? field : null;
+        try {
+            Field field = entityClass.getDeclaredField("ref");
+            return Modifier.isStatic(field.getModifiers()) ? field : null;
+        } catch (Exception e) {
+            // ignore
+        }
+        return null;
     }
 
     @SuppressWarnings("unchecked")
