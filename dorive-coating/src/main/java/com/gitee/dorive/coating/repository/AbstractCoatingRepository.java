@@ -19,8 +19,8 @@ package com.gitee.dorive.coating.repository;
 import com.gitee.dorive.coating.annotation.CoatingScan;
 import com.gitee.dorive.coating.api.CoatingRepository;
 import com.gitee.dorive.coating.api.ExampleBuilder;
-import com.gitee.dorive.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.dorive.coating.impl.DefaultExampleBuilder;
+import com.gitee.dorive.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.dorive.coating.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.core.annotation.Repository;
 import com.gitee.dorive.core.entity.BoundedContext;
@@ -74,6 +74,9 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     @Override
     public List<E> selectByCoating(BoundedContext boundedContext, Object coatingObject) {
         Example example = buildExample(boundedContext, coatingObject);
+        if (example.isCountQueried()) {
+            example.setPage(null);
+        }
         return selectByExample(boundedContext, example);
     }
 

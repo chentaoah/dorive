@@ -1,8 +1,9 @@
-package com.gitee.dorive.core.api;
+package com.gitee.dorive.ref.api;
 
+import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.BoundedContext;
 
-public interface Obj {
+public interface RefObj {
 
     int select(BoundedContext boundedContext);
 

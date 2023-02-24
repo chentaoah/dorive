@@ -28,7 +28,6 @@ import com.gitee.dorive.core.impl.executor.AdaptiveExecutor;
 import com.gitee.dorive.core.impl.executor.ChainExecutor;
 import com.gitee.dorive.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
-import com.gitee.dorive.core.impl.ref.RefAssignor;
 import com.gitee.dorive.core.impl.resolver.AdapterResolver;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
@@ -103,20 +102,18 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setEntityElement(rootRepository.getEntityElement());
         setOperationFactory(rootRepository.getOperationFactory());
 
-        EntityHandler entityHandler = new BatchEntityHandler(this, rootRepository.getOperationFactory());
-
-        RefAssignor refAssignor = new RefAssignor(this, entityHandler, entityClass);
-        refAssignor.assign();
-
+        EntityHandler batchEntityHandler = new BatchEntityHandler(this, rootRepository.getOperationFactory());
+        EntityHandler entityHandler = batchEntityHandler;
         if (delegateResolver.isDelegated()) {
             entityHandler = new AdaptiveEntityHandler(this, entityHandler);
         }
-
         Executor executor = new ChainExecutor(this, entityHandler);
         if (adapterResolver.isAdaptive()) {
             executor = new AdaptiveExecutor(this, executor);
         }
         setExecutor(executor);
+
+        postProcessEntityClass(this, batchEntityHandler, entityClass);
     }
 
     @SuppressWarnings("unchecked")
@@ -193,5 +190,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected abstract Executor newExecutor(EntityDefinition entityDefinition, EntityElement entityElement);
 
     protected abstract AbstractRepository<Object, Object> postProcessRepository(AbstractRepository<Object, Object> repository);
+
+    protected abstract void postProcessEntityClass(AbstractContextRepository<?, ?> repository, EntityHandler entityHandler, Class<?> entityClass);
 
 }
