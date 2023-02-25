@@ -1,10 +1,10 @@
-package com.gitee.dorive.core.impl.ref;
+package com.gitee.dorive.ref.impl;
 
 import com.gitee.dorive.core.api.EntityHandler;
-import com.gitee.dorive.core.api.Obj;
-import com.gitee.dorive.core.api.Repository;
+import com.gitee.dorive.ref.api.RefObj;
 import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.repository.AbstractRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,9 +12,9 @@ import java.util.Collections;
 
 @Data
 @AllArgsConstructor
-public class DefaultObj implements Obj {
+public class RefObjImpl implements RefObj {
 
-    private DefaultRef ref;
+    private RefImpl ref;
     private Object object;
 
     @Override
@@ -30,7 +30,7 @@ public class DefaultObj implements Obj {
 
     @Override
     public int insertOrUpdate(BoundedContext boundedContext) {
-        Repository<Object, Object> repository = ref.getRepository();
+        AbstractRepository<Object, Object> repository = ref.getProxyRepository();
         return repository.insertOrUpdate(boundedContext, object);
     }
 
@@ -41,7 +41,7 @@ public class DefaultObj implements Obj {
 
     @Override
     public int delete(BoundedContext boundedContext) {
-        Repository<Object, Object> repository = ref.getRepository();
+        AbstractRepository<Object, Object> repository = ref.getProxyRepository();
         return repository.delete(boundedContext, object);
     }
 
