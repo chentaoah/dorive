@@ -15,7 +15,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class RefImpl extends ProxyRepository implements Ref {
+public class RefImpl extends ProxyRepository implements Ref<Object> {
 
     private EntityHandler entityHandler;
     private CoatingRepository<Object, Object> repository;
