@@ -30,7 +30,7 @@ public class RefInjector {
     }
 
     @SuppressWarnings("unchecked")
-    public Ref createRef() {
+    public Ref<Object> createRef() {
         RefImpl refImpl = new RefImpl((AbstractRepository<Object, Object>) repository, entityHandler);
         refImpl.setEntityDefinition(repository.getEntityDefinition());
         refImpl.setEntityElement(repository.getEntityElement());
@@ -39,7 +39,7 @@ public class RefInjector {
         return refImpl;
     }
 
-    public void inject(Field field, Ref ref) {
+    public void inject(Field field, Ref<Object> ref) {
         ReflectUtil.setFieldValue(null, field, ref);
     }
 
