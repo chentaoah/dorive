@@ -16,11 +16,9 @@
  */
 package com.gitee.dorive.core.api;
 
-import com.gitee.dorive.core.repository.CommonRepository;
-
-import java.util.List;
-
 public interface Context {
+
+    Selector getSelector();
 
     Object put(String key, Object value);
 
@@ -29,9 +27,5 @@ public interface Context {
     Object get(String key);
 
     Object remove(String key);
-
-    boolean matches(CommonRepository repository);
-
-    List<String> selectColumns(CommonRepository repository);
 
 }

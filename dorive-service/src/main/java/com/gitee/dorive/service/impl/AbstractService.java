@@ -3,6 +3,7 @@ package com.gitee.dorive.service.impl;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.selector.NameSelector;
@@ -77,7 +78,7 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
     }
 
     protected Context newContext(E entity, Q query) {
-        return selector;
+        return new BoundedContext(selector);
     }
-
+    
 }

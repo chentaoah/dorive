@@ -20,6 +20,7 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.Binder;
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
@@ -57,7 +58,9 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         CommonRepository rootRepository = repository.getRootRepository();
         boolean isIncludeRoot = (query.getType() & Operation.INCLUDE_ROOT) == Operation.INCLUDE_ROOT;
 
-        if (context.matches(rootRepository) || isIncludeRoot) {
+        Selector selector = context.getSelector();
+
+        if (selector.matches(context, rootRepository) || isIncludeRoot) {
             int totalCount = 0;
 
             Result<Object> result = rootRepository.executeQuery(context, query);
@@ -98,6 +101,8 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         AbstractContextRepository<?, ?> delegateRepository = delegateResolver.delegateRepository(rootEntity);
         delegateRepository = delegateRepository == null ? repository : delegateRepository;
 
+        Selector selector = context.getSelector();
+
         int totalCount = 0;
         for (CommonRepository repository : delegateRepository.getOrderedRepositories()) {
 
@@ -105,7 +110,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                 continue;
             }
 
-            boolean isMatch = context.matches(repository);
+            boolean isMatch = selector.matches(context, repository);
             boolean isForceInclude = isIncludeRoot && repository.isRoot();
             boolean isAggregated = repository.isAggregated();
 

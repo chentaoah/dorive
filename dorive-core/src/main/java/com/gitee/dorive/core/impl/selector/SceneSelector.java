@@ -1,6 +1,8 @@
 package com.gitee.dorive.core.impl.selector;
 
 import cn.hutool.core.collection.CollUtil;
+import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
@@ -16,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class SceneSelector extends AbstractSelector {
+public class SceneSelector implements Selector {
 
     private Set<String> scenes = Collections.emptySet();
 
@@ -27,7 +29,7 @@ public class SceneSelector extends AbstractSelector {
     }
 
     @Override
-    public boolean matches(CommonRepository repository) {
+    public boolean matches(Context context, CommonRepository repository) {
         EntityDefinition entityDefinition = repository.getEntityDefinition();
         String[] scenes = entityDefinition.getScenes();
         if (scenes == null || scenes.length == 0) {
@@ -42,7 +44,7 @@ public class SceneSelector extends AbstractSelector {
     }
 
     @Override
-    public List<String> selectColumns(CommonRepository repository) {
+    public List<String> selectColumns(Context context, CommonRepository repository) {
         return null;
     }
 

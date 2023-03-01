@@ -19,6 +19,7 @@ package com.gitee.dorive.core.repository;
 import com.gitee.dorive.core.api.MetadataHolder;
 import com.gitee.dorive.core.api.PropertyProxy;
 import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -69,7 +70,8 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
-        List<String> properties = context.selectColumns(this);
+        Selector selector = context.getSelector();
+        List<String> properties = selector.selectColumns(context, this);
         if (properties != null && !properties.isEmpty()) {
             if (query.getPrimaryKey() != null) {
                 Example example = new Example().eq("id", query.getPrimaryKey());

@@ -18,6 +18,7 @@ package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.api.ListableRepository;
 import com.gitee.dorive.core.api.MetadataHolder;
@@ -37,8 +38,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
         int totalCount = 0;
+        Selector selector = context.getSelector();
         for (CommonRepository repository : getOrderedRepositories()) {
-            if (context.matches(repository)) {
+            if (selector.matches(context, repository)) {
                 totalCount += repository.updateByExample(context, entity, example);
             }
         }
@@ -63,8 +65,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     public int deleteByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         int totalCount = 0;
+        Selector selector = context.getSelector();
         for (CommonRepository repository : getOrderedRepositories()) {
-            if (context.matches(repository)) {
+            if (selector.matches(context, repository)) {
                 totalCount += repository.deleteByExample(context, example);
             }
         }
