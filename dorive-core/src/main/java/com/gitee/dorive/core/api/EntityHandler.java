@@ -16,12 +16,10 @@
  */
 package com.gitee.dorive.core.api;
 
-import com.gitee.dorive.core.entity.BoundedContext;
-
 import java.util.List;
 
 public interface EntityHandler {
 
-    int handleEntities(BoundedContext boundedContext, List<Object> rootEntities);
+    int handleEntities(Context context, List<Object> rootEntities);
 
 }

@@ -17,7 +17,7 @@
 package com.gitee.dorive.core.impl.binder;
 
 import com.gitee.dorive.core.api.Processor;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.definition.BindingDefinition;
 import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -53,12 +53,12 @@ public class PropertyBinder extends AbstractBinder {
     }
 
     @Override
-    public Object getBoundValue(BoundedContext boundedContext, Object rootEntity) {
+    public Object getBoundValue(Context context, Object rootEntity) {
         return boundPropertyChain.getValue(rootEntity);
     }
 
     @Override
-    public void setBoundValue(BoundedContext boundedContext, Object rootEntity, Object property) {
+    public void setBoundValue(Context context, Object rootEntity, Object property) {
         boundPropertyChain.setValue(rootEntity, property);
     }
 

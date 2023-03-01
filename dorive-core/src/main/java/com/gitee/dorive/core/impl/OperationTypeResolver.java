@@ -16,20 +16,20 @@
  */
 package com.gitee.dorive.core.impl;
 
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.Command;
 import org.apache.commons.lang3.StringUtils;
 
 public class OperationTypeResolver {
 
-    public static int resolveOperationType(BoundedContext boundedContext, CommonRepository repository) {
+    public static int resolveOperationType(Context context, CommonRepository repository) {
         EntityDefinition entityDefinition = repository.getEntityDefinition();
         String commandKey = entityDefinition.getCommandKey();
-        if (StringUtils.isNotBlank(commandKey) && boundedContext.containsKey(commandKey)) {
-            Command command = (Command) boundedContext.get(commandKey);
+        if (StringUtils.isNotBlank(commandKey) && context.containsKey(commandKey)) {
+            Command command = (Command) context.get(commandKey);
             if (command.isForceIgnore()) {
                 return Operation.FORCE_IGNORE;
 

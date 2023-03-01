@@ -16,10 +16,10 @@
  */
 package com.gitee.dorive.core.impl.binder;
 
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.definition.BindingDefinition;
 import com.gitee.dorive.core.api.Binder;
 import com.gitee.dorive.core.api.Processor;
-import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.element.PropertyChain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,23 +39,23 @@ public abstract class AbstractBinder implements Binder, Processor {
     }
 
     @Override
-    public Object getFieldValue(BoundedContext boundedContext, Object entity) {
+    public Object getFieldValue(Context context, Object entity) {
         return fieldPropertyChain.getValue(entity);
     }
 
     @Override
-    public void setFieldValue(BoundedContext boundedContext, Object entity, Object property) {
+    public void setFieldValue(Context context, Object entity, Object property) {
         fieldPropertyChain.setValue(entity, property);
     }
 
     @Override
-    public Object input(BoundedContext boundedContext, Object valueObject) {
-        return processor.input(boundedContext, valueObject);
+    public Object input(Context context, Object valueObject) {
+        return processor.input(context, valueObject);
     }
 
     @Override
-    public Object output(BoundedContext boundedContext, Object valueObject) {
-        return processor.output(boundedContext, valueObject);
+    public Object output(Context context, Object valueObject) {
+        return processor.output(context, valueObject);
     }
 
 }

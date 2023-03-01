@@ -16,12 +16,10 @@
  */
 package com.gitee.dorive.core.api;
 
-import com.gitee.dorive.core.entity.BoundedContext;
-
 public interface Processor {
 
-    Object input(BoundedContext boundedContext, Object valueObject);
+    Object input(Context context, Object valueObject);
 
-    Object output(BoundedContext boundedContext, Object valueObject);
+    Object output(Context context, Object valueObject);
 
 }

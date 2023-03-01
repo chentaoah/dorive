@@ -16,11 +16,11 @@
  */
 package com.gitee.dorive.coating.api;
 
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 
 public interface ExampleBuilder {
 
-    Example buildExample(BoundedContext boundedContext, Object coatingObject);
+    Example buildExample(Context context, Object coatingObject);
 
 }

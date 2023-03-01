@@ -23,7 +23,7 @@ import com.gitee.dorive.coating.entity.MergedRepository;
 import com.gitee.dorive.coating.entity.RepositoryWrapper;
 import com.gitee.dorive.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
@@ -46,7 +46,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
     }
 
     @Override
-    public Example buildExample(BoundedContext boundedContext, Object coatingObject) {
+    public Example buildExample(Context context, Object coatingObject) {
         CoatingWrapperResolver coatingWrapperResolver = repository.getCoatingWrapperResolver();
         Map<Class<?>, CoatingWrapper> coatingWrapperMap = coatingWrapperResolver.getCoatingWrapperMap();
 
@@ -55,7 +55,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
         Map<String, RepoCriterion> repoCriterionMap = new LinkedHashMap<>();
         for (RepositoryWrapper repositoryWrapper : coatingWrapper.getReversedRepositoryWrappers()) {
-            Example example = repositoryWrapper.newExampleByCoating(boundedContext, coatingObject);
+            Example example = repositoryWrapper.newExampleByCoating(context, coatingObject);
             RepoCriterion repoCriterion = new RepoCriterion(repositoryWrapper, example);
 
             MergedRepository mergedRepository = repositoryWrapper.getMergedRepository();
@@ -64,14 +64,14 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             repoCriterionMap.put(relativeAccessPath, repoCriterion);
         }
 
-        executeChainQuery(boundedContext, repoCriterionMap);
+        executeChainQuery(context, repoCriterionMap);
 
         RepoCriterion repoCriterion = repoCriterionMap.get("/");
         Assert.notNull(repoCriterion, "The criterion cannot be null!");
         return repoCriterion.getExample();
     }
 
-    private void executeChainQuery(BoundedContext boundedContext, Map<String, RepoCriterion> repoCriterionMap) {
+    private void executeChainQuery(Context context, Map<String, RepoCriterion> repoCriterionMap) {
         repoCriterionMap.forEach((accessPath, repoCriterion) -> {
             if ("/".equals(accessPath)) return;
 
@@ -104,7 +104,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             List<Object> entities = Collections.emptyList();
             if (!example.isEmptyQuery() && example.isDirtyQuery()) {
                 example.selectColumns(new ArrayList<>(binderResolver.getBoundFields()));
-                entities = commonRepository.selectByExample(boundedContext, example);
+                entities = commonRepository.selectByExample(context, example);
             }
 
             for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
@@ -117,7 +117,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                         continue;
                     }
 
-                    List<Object> fieldValues = collectFieldValues(boundedContext, entities, propertyBinder);
+                    List<Object> fieldValues = collectFieldValues(context, entities, propertyBinder);
                     if (fieldValues.isEmpty()) {
                         targetExample.setEmptyQuery(true);
                         continue;
@@ -125,17 +125,17 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
                     String bindAlias = propertyBinder.getBindAlias();
                     Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
-                    fieldValue = propertyBinder.output(boundedContext, fieldValue);
+                    fieldValue = propertyBinder.output(context, fieldValue);
                     targetExample.eq(bindAlias, fieldValue);
                 }
             }
         });
     }
 
-    private List<Object> collectFieldValues(BoundedContext boundedContext, List<Object> entities, PropertyBinder propertyBinder) {
+    private List<Object> collectFieldValues(Context context, List<Object> entities, PropertyBinder propertyBinder) {
         List<Object> fieldValues = new ArrayList<>();
         for (Object entity : entities) {
-            Object fieldValue = propertyBinder.getFieldValue(boundedContext, entity);
+            Object fieldValue = propertyBinder.getFieldValue(context, entity);
             if (fieldValue != null) {
                 fieldValues.add(fieldValue);
             }

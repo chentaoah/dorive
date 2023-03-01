@@ -1,12 +1,11 @@
 package com.gitee.dorive.core.impl.selector;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.core.api.Selector;
-import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
@@ -15,7 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class NameSelector implements Selector {
+@EqualsAndHashCode(callSuper = false)
+public class NameSelector extends AbstractSelector {
 
     public static final NameSelector EMPTY_SELECTOR = new NameSelector();
 
@@ -44,7 +44,7 @@ public class NameSelector implements Selector {
     }
 
     @Override
-    public boolean isMatch(BoundedContext boundedContext, CommonRepository repository) {
+    public boolean matches(CommonRepository repository) {
         if (wildcard) {
             return true;
         }
@@ -54,7 +54,7 @@ public class NameSelector implements Selector {
     }
 
     @Override
-    public List<String> selectColumns(BoundedContext boundedContext, CommonRepository repository) {
+    public List<String> selectColumns(CommonRepository repository) {
         EntityDefinition entityDefinition = repository.getEntityDefinition();
         String name = entityDefinition.getName();
         NameDef nameDef = nameDefMap.get(name);

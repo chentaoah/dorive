@@ -16,15 +16,14 @@
  */
 package com.gitee.dorive.core.api;
 
-import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 
 public interface Executor {
 
-    Result<Object> executeQuery(BoundedContext boundedContext, Query query);
+    Result<Object> executeQuery(Context context, Query query);
 
-    int execute(BoundedContext boundedContext, Operation operation);
+    int execute(Context context, Operation operation);
 
 }

@@ -14,17 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.dorive.coating.api;
+package com.gitee.dorive.core.api;
 
-import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.repository.CommonRepository;
 
 import java.util.List;
 
-public interface CoatingRepository<E, PK> {
+public interface Context {
 
-    List<E> selectByCoating(Context context, Object coatingObject);
+    Object put(String key, Object value);
 
-    Page<E> selectPageByCoating(Context context, Object coatingObject);
+    boolean containsKey(String key);
+
+    Object get(String key);
+
+    Object remove(String key);
+
+    boolean matches(CommonRepository repository);
+
+    List<String> selectColumns(CommonRepository repository);
 
 }

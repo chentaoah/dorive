@@ -16,12 +16,10 @@
  */
 package com.gitee.dorive.core.api;
 
-import com.gitee.dorive.core.entity.BoundedContext;
-
 public interface EntityFactory {
 
-    Object reconstitute(BoundedContext boundedContext, Object persistentObject);
+    Object reconstitute(Context context, Object persistentObject);
 
-    Object deconstruct(BoundedContext boundedContext, Object entity);
+    Object deconstruct(Context context, Object entity);
 
 }

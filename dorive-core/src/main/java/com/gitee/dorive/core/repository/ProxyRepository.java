@@ -16,7 +16,7 @@
  */
 package com.gitee.dorive.core.repository;
 
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
@@ -52,63 +52,63 @@ public class ProxyRepository extends AbstractRepository<Object, Object> {
     }
 
     @Override
-    public Object selectByPrimaryKey(BoundedContext boundedContext, Object primaryKey) {
-        return proxyRepository.selectByPrimaryKey(boundedContext, primaryKey);
+    public Object selectByPrimaryKey(Context context, Object primaryKey) {
+        return proxyRepository.selectByPrimaryKey(context, primaryKey);
     }
 
     @Override
-    public List<Object> selectByExample(BoundedContext boundedContext, Example example) {
-        return proxyRepository.selectByExample(boundedContext, example);
+    public List<Object> selectByExample(Context context, Example example) {
+        return proxyRepository.selectByExample(context, example);
     }
 
     @Override
-    public Page<Object> selectPageByExample(BoundedContext boundedContext, Example example) {
-        return proxyRepository.selectPageByExample(boundedContext, example);
+    public Page<Object> selectPageByExample(Context context, Example example) {
+        return proxyRepository.selectPageByExample(context, example);
     }
 
     @Override
-    public int insert(BoundedContext boundedContext, Object entity) {
-        return proxyRepository.insert(boundedContext, entity);
+    public int insert(Context context, Object entity) {
+        return proxyRepository.insert(context, entity);
     }
 
     @Override
-    public int update(BoundedContext boundedContext, Object entity) {
-        return proxyRepository.update(boundedContext, entity);
+    public int update(Context context, Object entity) {
+        return proxyRepository.update(context, entity);
     }
 
     @Override
-    public int updateByExample(BoundedContext boundedContext, Object entity, Example example) {
-        return proxyRepository.updateByExample(boundedContext, entity, example);
+    public int updateByExample(Context context, Object entity, Example example) {
+        return proxyRepository.updateByExample(context, entity, example);
     }
 
     @Override
-    public int insertOrUpdate(BoundedContext boundedContext, Object entity) {
-        return proxyRepository.insertOrUpdate(boundedContext, entity);
+    public int insertOrUpdate(Context context, Object entity) {
+        return proxyRepository.insertOrUpdate(context, entity);
     }
 
     @Override
-    public int delete(BoundedContext boundedContext, Object entity) {
-        return proxyRepository.delete(boundedContext, entity);
+    public int delete(Context context, Object entity) {
+        return proxyRepository.delete(context, entity);
     }
 
     @Override
-    public int deleteByPrimaryKey(BoundedContext boundedContext, Object primaryKey) {
-        return proxyRepository.deleteByPrimaryKey(boundedContext, primaryKey);
+    public int deleteByPrimaryKey(Context context, Object primaryKey) {
+        return proxyRepository.deleteByPrimaryKey(context, primaryKey);
     }
 
     @Override
-    public int deleteByExample(BoundedContext boundedContext, Example example) {
-        return proxyRepository.deleteByExample(boundedContext, example);
+    public int deleteByExample(Context context, Example example) {
+        return proxyRepository.deleteByExample(context, example);
     }
 
     @Override
-    public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
-        return proxyRepository.executeQuery(boundedContext, query);
+    public Result<Object> executeQuery(Context context, Query query) {
+        return proxyRepository.executeQuery(context, query);
     }
 
     @Override
-    public int execute(BoundedContext boundedContext, Operation operation) {
-        return proxyRepository.execute(boundedContext, operation);
+    public int execute(Context context, Operation operation) {
+        return proxyRepository.execute(context, operation);
     }
 
 }

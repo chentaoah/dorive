@@ -19,7 +19,7 @@ package com.gitee.dorive.core.repository;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.Executor;
 import com.gitee.dorive.core.api.Repository;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.element.EntityElement;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -41,90 +41,90 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
 
     @Override
     @SuppressWarnings("unchecked")
-    public E selectByPrimaryKey(BoundedContext boundedContext, PK primaryKey) {
+    public E selectByPrimaryKey(Context context, PK primaryKey) {
         Assert.notNull(primaryKey, "The primaryKey cannot be null!");
-        Query query = operationFactory.buildQueryByPK(boundedContext, primaryKey);
-        Result<Object> result = executeQuery(boundedContext, query);
+        Query query = operationFactory.buildQueryByPK(context, primaryKey);
+        Result<Object> result = executeQuery(context, query);
         return (E) result.getRecord();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<E> selectByExample(BoundedContext boundedContext, Example example) {
+    public List<E> selectByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        Query query = operationFactory.buildQuery(boundedContext, example);
-        Result<Object> result = executeQuery(boundedContext, query);
+        Query query = operationFactory.buildQuery(context, example);
+        Result<Object> result = executeQuery(context, query);
         return (List<E>) result.getRecords();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Page<E> selectPageByExample(BoundedContext boundedContext, Example example) {
+    public Page<E> selectPageByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         Assert.notNull(example.getPage(), "The page cannot be null!");
-        Query query = operationFactory.buildQuery(boundedContext, example);
-        Result<Object> result = executeQuery(boundedContext, query);
+        Query query = operationFactory.buildQuery(context, example);
+        Result<Object> result = executeQuery(context, query);
         return (Page<E>) result.getPage();
     }
 
     @Override
-    public int insert(BoundedContext boundedContext, E entity) {
+    public int insert(Context context, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Insert insert = operationFactory.buildInsert(boundedContext, entity);
-        return execute(boundedContext, insert);
+        Insert insert = operationFactory.buildInsert(context, entity);
+        return execute(context, insert);
     }
 
     @Override
-    public int update(BoundedContext boundedContext, E entity) {
+    public int update(Context context, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Update update = operationFactory.buildUpdate(boundedContext, entity);
-        return execute(boundedContext, update);
+        Update update = operationFactory.buildUpdate(context, entity);
+        return execute(context, update);
     }
 
     @Override
-    public int updateByExample(BoundedContext boundedContext, Object entity, Example example) {
+    public int updateByExample(Context context, Object entity, Example example) {
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
-        Update update = operationFactory.buildUpdate(boundedContext, entity, example);
-        return execute(boundedContext, update);
+        Update update = operationFactory.buildUpdate(context, entity, example);
+        return execute(context, update);
     }
 
     @Override
-    public int insertOrUpdate(BoundedContext boundedContext, E entity) {
+    public int insertOrUpdate(Context context, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = operationFactory.buildInsertOrUpdate(boundedContext, entity);
-        return execute(boundedContext, operation);
+        Operation operation = operationFactory.buildInsertOrUpdate(context, entity);
+        return execute(context, operation);
     }
 
     @Override
-    public int delete(BoundedContext boundedContext, E entity) {
+    public int delete(Context context, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Delete delete = operationFactory.buildDelete(boundedContext, entity);
-        return execute(boundedContext, delete);
+        Delete delete = operationFactory.buildDelete(context, entity);
+        return execute(context, delete);
     }
 
     @Override
-    public int deleteByPrimaryKey(BoundedContext boundedContext, PK primaryKey) {
+    public int deleteByPrimaryKey(Context context, PK primaryKey) {
         Assert.notNull(primaryKey, "The primaryKey cannot be null!");
-        Delete delete = operationFactory.buildDeleteByPK(boundedContext, primaryKey);
-        return execute(boundedContext, delete);
+        Delete delete = operationFactory.buildDeleteByPK(context, primaryKey);
+        return execute(context, delete);
     }
 
     @Override
-    public int deleteByExample(BoundedContext boundedContext, Example example) {
+    public int deleteByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        Delete delete = operationFactory.buildDelete(boundedContext, example);
-        return execute(boundedContext, delete);
+        Delete delete = operationFactory.buildDelete(context, example);
+        return execute(context, delete);
     }
 
     @Override
-    public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
-        return executor.executeQuery(boundedContext, query);
+    public Result<Object> executeQuery(Context context, Query query) {
+        return executor.executeQuery(context, query);
     }
 
     @Override
-    public int execute(BoundedContext boundedContext, Operation operation) {
-        return executor.execute(boundedContext, operation);
+    public int execute(Context context, Operation operation) {
+        return executor.execute(context, operation);
     }
 
 }

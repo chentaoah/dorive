@@ -18,7 +18,7 @@ package com.gitee.dorive.core.repository;
 
 import com.gitee.dorive.core.api.MetadataHolder;
 import com.gitee.dorive.core.api.PropertyProxy;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -52,24 +52,24 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
     protected AliasConverter aliasConverter;
 
     @Override
-    public int updateByExample(BoundedContext boundedContext, Object entity, Example example) {
+    public int updateByExample(Context context, Object entity, Example example) {
         if (example.isEmptyQuery()) {
             return 0;
         }
-        return super.updateByExample(boundedContext, entity, example);
+        return super.updateByExample(context, entity, example);
     }
 
     @Override
-    public int deleteByExample(BoundedContext boundedContext, Example example) {
+    public int deleteByExample(Context context, Example example) {
         if (example.isEmptyQuery()) {
             return 0;
         }
-        return super.deleteByExample(boundedContext, example);
+        return super.deleteByExample(context, example);
     }
 
     @Override
-    public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
-        List<String> properties = boundedContext.selectColumns(this);
+    public Result<Object> executeQuery(Context context, Query query) {
+        List<String> properties = context.selectColumns(this);
         if (properties != null && !properties.isEmpty()) {
             if (query.getPrimaryKey() != null) {
                 Example example = new Example().eq("id", query.getPrimaryKey());
@@ -91,7 +91,7 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
                 example.setOrderBy(defaultOrderBy);
             }
         }
-        return super.executeQuery(boundedContext, query);
+        return super.executeQuery(context, query);
     }
 
     @Override
@@ -103,16 +103,16 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
         return null;
     }
 
-    public Example newExampleByContext(BoundedContext boundedContext, Object rootEntity) {
+    public Example newExampleByContext(Context context, Object rootEntity) {
         Example example = new Example();
         for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
             String alias = propertyBinder.getAlias();
-            Object boundValue = propertyBinder.getBoundValue(boundedContext, rootEntity);
+            Object boundValue = propertyBinder.getBoundValue(context, rootEntity);
             if (boundValue instanceof Collection) {
                 boundValue = !((Collection<?>) boundValue).isEmpty() ? boundValue : null;
             }
             if (boundValue != null) {
-                boundValue = propertyBinder.input(boundedContext, boundValue);
+                boundValue = propertyBinder.input(context, boundValue);
                 example.eq(alias, boundValue);
             } else {
                 example.getCriteria().clear();
@@ -122,7 +122,7 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
         if (example.isDirtyQuery()) {
             for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
                 String alias = contextBinder.getAlias();
-                Object boundValue = contextBinder.getBoundValue(boundedContext, rootEntity);
+                Object boundValue = contextBinder.getBoundValue(context, rootEntity);
                 if (boundValue != null) {
                     example.eq(alias, boundValue);
                 }

@@ -2,7 +2,7 @@ package com.gitee.dorive.service.impl;
 
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.Selector;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.selector.NameSelector;
@@ -43,41 +43,41 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
 
     @Override
     public ResObject<Object> post(E entity) {
-        BoundedContext boundedContext = newBoundedContext(entity, null);
-        int count = repository.insert(boundedContext, entity);
+        Context context = newContext(entity, null);
+        int count = repository.insert(context, entity);
         return count > 0 ? ResObject.success() : ResObject.failure();
     }
 
     @Override
     public ResObject<List<E>> get(Q query) {
-        BoundedContext boundedContext = newBoundedContext(null, query);
-        List<E> entities = repository.selectByCoating(boundedContext, query);
+        Context context = newContext(null, query);
+        List<E> entities = repository.selectByCoating(context, query);
         return ResObject.successData(entities);
     }
 
     @Override
     public ResObject<Page<E>> page(Q query) {
-        BoundedContext boundedContext = newBoundedContext(null, query);
-        Page<E> page = repository.selectPageByCoating(boundedContext, query);
+        Context context = newContext(null, query);
+        Page<E> page = repository.selectPageByCoating(context, query);
         return ResObject.successData(page);
     }
 
     @Override
     public ResObject<Object> put(Integer id, E entity) {
-        BoundedContext boundedContext = newBoundedContext(entity, null);
-        int count = repository.update(boundedContext, entity);
+        Context context = newContext(entity, null);
+        int count = repository.update(context, entity);
         return count > 0 ? ResObject.success() : ResObject.failure();
     }
 
     @Override
     public ResObject<Object> delete(Integer id) {
-        BoundedContext boundedContext = newBoundedContext(null, null);
-        int count = repository.deleteByPrimaryKey(boundedContext, id);
+        Context context = newContext(null, null);
+        int count = repository.deleteByPrimaryKey(context, id);
         return count > 0 ? ResObject.success() : ResObject.failure();
     }
 
-    protected BoundedContext newBoundedContext(E entity, Q query) {
-        return new BoundedContext(selector);
+    protected Context newContext(E entity, Q query) {
+        return selector;
     }
 
 }
