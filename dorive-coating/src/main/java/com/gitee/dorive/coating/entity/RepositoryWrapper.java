@@ -17,7 +17,7 @@
 package com.gitee.dorive.coating.entity;
 
 import com.gitee.dorive.coating.entity.definition.PropertyDefinition;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.element.Property;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -36,7 +36,7 @@ public class RepositoryWrapper {
     private MergedRepository mergedRepository;
     private List<PropertyWrapper> collectedPropertyWrappers;
 
-    public Example newExampleByCoating(BoundedContext boundedContext, Object coatingObject) {
+    public Example newExampleByCoating(Context context, Object coatingObject) {
         Example example = new Example();
         for (PropertyWrapper propertyWrapper : collectedPropertyWrappers) {
             Property property = propertyWrapper.getProperty();
@@ -51,7 +51,7 @@ public class RepositoryWrapper {
         CommonRepository definedRepository = mergedRepository.getDefinedRepository();
         BinderResolver binderResolver = definedRepository.getBinderResolver();
         for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
-            Object boundValue = contextBinder.getBoundValue(boundedContext, null);
+            Object boundValue = contextBinder.getBoundValue(context, null);
             if (boundValue != null) {
                 String alias = contextBinder.getAlias();
                 example.eq(alias, boundValue);

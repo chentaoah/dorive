@@ -16,7 +16,7 @@
  */
 package com.gitee.dorive.event.entity;
 
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.event.repository.EventRepository;
 import lombok.Getter;
@@ -28,7 +28,7 @@ import org.springframework.context.ApplicationEvent;
 public class RepositoryEvent extends ApplicationEvent {
 
     private String methodName;
-    private BoundedContext boundedContext;
+    private Context context;
     private Operation operation;
 
     public RepositoryEvent(EventRepository eventRepository) {

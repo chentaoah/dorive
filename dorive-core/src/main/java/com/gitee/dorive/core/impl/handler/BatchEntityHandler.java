@@ -22,7 +22,7 @@ import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.api.EntityIndex;
 import com.gitee.dorive.core.api.ExampleBuilder;
 import com.gitee.dorive.core.api.PropertyProxy;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.Operation;
@@ -45,22 +45,22 @@ public class BatchEntityHandler implements EntityHandler {
     }
 
     @Override
-    public int handleEntities(BoundedContext boundedContext, List<Object> rootEntities) {
+    public int handleEntities(Context context, List<Object> rootEntities) {
         int totalCount = 0;
         for (CommonRepository repository : this.repository.getSubRepositories()) {
-            if (boundedContext.isMatch(repository)) {
-                totalCount += executeQuery(repository, boundedContext, rootEntities);
+            if (context.matches(repository)) {
+                totalCount += executeQuery(repository, context, rootEntities);
             }
         }
         return totalCount;
     }
 
-    private int executeQuery(CommonRepository repository, BoundedContext boundedContext, List<Object> rootEntities) {
-        UnionExample unionExample = newUnionExample(repository, boundedContext, rootEntities);
+    private int executeQuery(CommonRepository repository, Context context, List<Object> rootEntities) {
+        UnionExample unionExample = newUnionExample(repository, context, rootEntities);
         if (unionExample.isDirtyQuery()) {
-            Query query = operationFactory.buildQuery(boundedContext, unionExample);
+            Query query = operationFactory.buildQuery(context, unionExample);
             query.setType(query.getType() | Operation.INCLUDE_ROOT);
-            Result<Object> result = repository.executeQuery(boundedContext, query);
+            Result<Object> result = repository.executeQuery(context, query);
             if (result instanceof EntityIndex) {
                 setValueForRootEntities(repository, rootEntities, (EntityIndex) result);
             }
@@ -69,21 +69,21 @@ public class BatchEntityHandler implements EntityHandler {
         return 0;
     }
 
-    private UnionExample newUnionExample(CommonRepository repository, BoundedContext boundedContext, List<Object> rootEntities) {
+    private UnionExample newUnionExample(CommonRepository repository, Context context, List<Object> rootEntities) {
         PropertyChain anchorPoint = repository.getAnchorPoint();
         PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
 
         String builderKey = repository.getEntityDefinition().getBuilderKey();
-        ExampleBuilder exampleBuilder = StringUtils.isNotBlank(builderKey) ? (ExampleBuilder) boundedContext.get(builderKey) : null;
+        ExampleBuilder exampleBuilder = StringUtils.isNotBlank(builderKey) ? (ExampleBuilder) context.get(builderKey) : null;
 
         UnionExample unionExample = new UnionExample();
         for (int index = 0; index < rootEntities.size(); index++) {
             Object rootEntity = rootEntities.get(index);
             Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
             if (lastEntity != null) {
-                Example example = repository.newExampleByContext(boundedContext, rootEntity);
+                Example example = repository.newExampleByContext(context, rootEntity);
                 if (exampleBuilder != null) {
-                    example = exampleBuilder.buildExample(boundedContext, rootEntity, example);
+                    example = exampleBuilder.buildExample(context, rootEntity, example);
                 }
                 if (example.isDirtyQuery()) {
                     example.extraColumns((index + 1) + " as $row");

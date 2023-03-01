@@ -30,7 +30,7 @@ import com.gitee.dorive.coating.entity.SpecificProperties;
 import com.gitee.dorive.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.constant.Operator;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -64,7 +64,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
     }
 
     @Override
-    public Example buildExample(BoundedContext boundedContext, Object coatingObject) {
+    public Example buildExample(Context context, Object coatingObject) {
         CoatingWrapperResolver coatingWrapperResolver = repository.getCoatingWrapperResolver();
         Map<String, CoatingWrapper> nameCoatingWrapperMap = coatingWrapperResolver.getNameCoatingWrapperMap();
 
@@ -93,7 +93,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
-            Example example = repositoryWrapper.newExampleByCoating(boundedContext, coatingObject);
+            Example example = repositoryWrapper.newExampleByCoating(context, coatingObject);
             aliasConverter.convert(example);
 
             boolean dirtyQuery = example.isDirtyQuery();

@@ -16,9 +16,9 @@
  */
 package com.gitee.dorive.core.impl.processor;
 
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.definition.BindingDefinition;
 import com.gitee.dorive.core.api.Processor;
-import com.gitee.dorive.core.entity.BoundedContext;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -29,12 +29,12 @@ public class DefaultProcessor implements Processor {
     protected BindingDefinition bindingDefinition;
 
     @Override
-    public Object input(BoundedContext boundedContext, Object valueObject) {
+    public Object input(Context context, Object valueObject) {
         return valueObject;
     }
 
     @Override
-    public Object output(BoundedContext boundedContext, Object valueObject) {
+    public Object output(Context context, Object valueObject) {
         return valueObject;
     }
 

@@ -23,7 +23,7 @@ import com.gitee.dorive.coating.impl.DefaultExampleBuilder;
 import com.gitee.dorive.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.dorive.coating.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.core.annotation.Repository;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.event.repository.AbstractEventRepository;
@@ -67,31 +67,31 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     }
 
     @Override
-    public Example buildExample(BoundedContext boundedContext, Object coatingObject) {
-        return exampleBuilder.buildExample(boundedContext, coatingObject);
+    public Example buildExample(Context context, Object coatingObject) {
+        return exampleBuilder.buildExample(context, coatingObject);
     }
 
     @Override
-    public List<E> selectByCoating(BoundedContext boundedContext, Object coatingObject) {
-        Example example = buildExample(boundedContext, coatingObject);
+    public List<E> selectByCoating(Context context, Object coatingObject) {
+        Example example = buildExample(context, coatingObject);
         if (example.isCountQueried()) {
             example.setPage(null);
         }
-        return selectByExample(boundedContext, example);
+        return selectByExample(context, example);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Page<E> selectPageByCoating(BoundedContext boundedContext, Object coatingObject) {
-        Example example = buildExample(boundedContext, coatingObject);
+    public Page<E> selectPageByCoating(Context context, Object coatingObject) {
+        Example example = buildExample(context, coatingObject);
         if (example.isCountQueried()) {
             Page<Object> page = example.getPage();
             example.setPage(null);
-            List<E> records = selectByExample(boundedContext, example);
+            List<E> records = selectByExample(context, example);
             page.setRecords((List<Object>) records);
             return (Page<E>) page;
         }
-        return selectPageByExample(boundedContext, example);
+        return selectPageByExample(context, example);
     }
 
 }

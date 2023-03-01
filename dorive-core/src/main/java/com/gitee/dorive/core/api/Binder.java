@@ -16,19 +16,18 @@
  */
 package com.gitee.dorive.core.api;
 
-import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.definition.BindingDefinition;
 
 public interface Binder {
 
     BindingDefinition getBindingDefinition();
 
-    Object getFieldValue(BoundedContext boundedContext, Object entity);
+    Object getFieldValue(Context context, Object entity);
 
-    void setFieldValue(BoundedContext boundedContext, Object entity, Object property);
+    void setFieldValue(Context context, Object entity, Object property);
 
-    Object getBoundValue(BoundedContext boundedContext, Object rootEntity);
+    Object getBoundValue(Context context, Object rootEntity);
 
-    void setBoundValue(BoundedContext boundedContext, Object rootEntity, Object property);
+    void setBoundValue(Context context, Object rootEntity, Object property);
 
 }

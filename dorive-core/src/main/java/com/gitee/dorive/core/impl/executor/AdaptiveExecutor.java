@@ -18,7 +18,7 @@ package com.gitee.dorive.core.impl.executor;
 
 import com.gitee.dorive.core.api.Executor;
 import com.gitee.dorive.core.api.ContextAdapter;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
@@ -42,19 +42,19 @@ public class AdaptiveExecutor extends AbstractExecutor {
     }
 
     @Override
-    public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
+    public Result<Object> executeQuery(Context context, Query query) {
         AdapterResolver adapterResolver = repository.getAdapterResolver();
         ContextAdapter contextAdapter = adapterResolver.getContextAdapter();
-        contextAdapter.adapt(boundedContext, query);
-        return executor.executeQuery(boundedContext, query);
+        contextAdapter.adapt(context, query);
+        return executor.executeQuery(context, query);
     }
 
     @Override
-    public int execute(BoundedContext boundedContext, Operation operation) {
+    public int execute(Context context, Operation operation) {
         AdapterResolver adapterResolver = repository.getAdapterResolver();
         ContextAdapter contextAdapter = adapterResolver.getContextAdapter();
-        contextAdapter.adapt(boundedContext, operation);
-        return executor.execute(boundedContext, operation);
+        contextAdapter.adapt(context, operation);
+        return executor.execute(context, operation);
     }
 
 }

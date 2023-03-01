@@ -2,7 +2,8 @@ package com.gitee.dorive.ref.impl;
 
 import com.gitee.dorive.coating.api.CoatingRepository;
 import com.gitee.dorive.core.api.EntityHandler;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.ListableRepository;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.core.repository.ProxyRepository;
@@ -18,25 +19,49 @@ import java.util.List;
 public class RefImpl extends ProxyRepository implements Ref<Object> {
 
     private EntityHandler entityHandler;
-    private CoatingRepository<Object, Object> repository;
+    private ListableRepository<Object, Object> listableRepository;
+    private CoatingRepository<Object, Object> coatingRepository;
 
     @SuppressWarnings("unchecked")
     public RefImpl(AbstractRepository<Object, Object> repository, EntityHandler entityHandler) {
         super(repository);
         this.entityHandler = entityHandler;
+        if (repository instanceof ListableRepository) {
+            this.listableRepository = (ListableRepository<Object, Object>) repository;
+        }
         if (repository instanceof CoatingRepository) {
-            this.repository = (CoatingRepository<Object, Object>) repository;
+            this.coatingRepository = (CoatingRepository<Object, Object>) repository;
         }
     }
 
     @Override
-    public List<Object> selectByCoating(BoundedContext boundedContext, Object coatingObject) {
-        return repository.selectByCoating(boundedContext, coatingObject);
+    public int insertList(Context context, List<Object> entities) {
+        return listableRepository.insertList(context, entities);
     }
 
     @Override
-    public Page<Object> selectPageByCoating(BoundedContext boundedContext, Object coatingObject) {
-        return repository.selectPageByCoating(boundedContext, coatingObject);
+    public int updateList(Context context, List<Object> entities) {
+        return listableRepository.updateList(context, entities);
+    }
+
+    @Override
+    public int insertOrUpdateList(Context context, List<Object> entities) {
+        return listableRepository.insertOrUpdateList(context, entities);
+    }
+
+    @Override
+    public int deleteList(Context context, List<Object> entities) {
+        return listableRepository.deleteList(context, entities);
+    }
+
+    @Override
+    public List<Object> selectByCoating(Context context, Object coatingObject) {
+        return coatingRepository.selectByCoating(context, coatingObject);
+    }
+
+    @Override
+    public Page<Object> selectPageByCoating(Context context, Object coatingObject) {
+        return coatingRepository.selectPageByCoating(context, coatingObject);
     }
 
     @Override

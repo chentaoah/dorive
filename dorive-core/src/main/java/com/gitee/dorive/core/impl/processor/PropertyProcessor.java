@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.processor;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -31,7 +31,7 @@ import java.util.Collection;
 public class PropertyProcessor extends DefaultProcessor {
 
     @Override
-    public Object input(BoundedContext boundedContext, Object valueObject) {
+    public Object input(Context context, Object valueObject) {
         String property = bindingDefinition.getProperty();
         if (valueObject instanceof Collection) {
             return CollUtil.map((Collection<?>) valueObject, item -> BeanUtil.getFieldValue(item, property), true);

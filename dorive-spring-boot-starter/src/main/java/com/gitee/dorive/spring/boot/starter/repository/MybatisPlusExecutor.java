@@ -29,7 +29,7 @@ import com.gitee.dorive.core.api.EntityFactory;
 import com.gitee.dorive.core.api.MetadataHolder;
 import com.gitee.dorive.core.api.PropertyProxy;
 import com.gitee.dorive.core.api.constant.Order;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.Command;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.element.EntityElement;
@@ -93,12 +93,12 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
     }
 
     @Override
-    public Result<Object> executeQuery(BoundedContext boundedContext, Query query) {
+    public Result<Object> executeQuery(Context context, Query query) {
         if (query.getPrimaryKey() != null) {
             QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("id", query.getPrimaryKey());
             List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-            List<Object> entities = reconstitute(boundedContext, resultMaps);
+            List<Object> entities = reconstitute(context, resultMaps);
             return new Result<>(entities);
 
         } else if (query.getExample() != null) {
@@ -110,14 +110,14 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                     aliasConverter.convert(unionExample);
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                    List<Object> entities = reconstitute(boundedContext, resultMaps);
+                    List<Object> entities = reconstitute(context, resultMaps);
                     return new EntityIndexResult(unionExample, resultMaps, entities);
 
                 } else {
                     aliasConverter.convert(example);
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                    List<Object> entities = reconstitute(boundedContext, resultMaps);
+                    List<Object> entities = reconstitute(context, resultMaps);
                     return new Result<>(entities);
                 }
 
@@ -131,7 +131,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                 page.setTotal(dataPage.getTotal());
 
                 List<Map<String, Object>> resultMaps = dataPage.getRecords();
-                List<Object> entities = reconstitute(boundedContext, resultMaps);
+                List<Object> entities = reconstitute(context, resultMaps);
                 page.setRecords(entities);
 
                 return new Result<>(page);
@@ -140,10 +140,10 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         throw new RuntimeException("Unsupported query method!");
     }
 
-    private List<Object> reconstitute(BoundedContext boundedContext, List<Map<String, Object>> resultMaps) {
+    private List<Object> reconstitute(Context context, List<Map<String, Object>> resultMaps) {
         List<Object> entities = new ArrayList<>(resultMaps.size());
         for (Map<String, Object> resultMap : resultMaps) {
-            Object entity = entityFactory.reconstitute(boundedContext, resultMap);
+            Object entity = entityFactory.reconstitute(context, resultMap);
             entities.add(entity);
         }
         return entities;
@@ -229,9 +229,9 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
     }
 
     @Override
-    public int execute(BoundedContext boundedContext, Operation operation) {
+    public int execute(Context context, Operation operation) {
         Object entity = operation.getEntity();
-        Object persistentObject = entity != null ? entityFactory.deconstruct(boundedContext, entity) : null;
+        Object persistentObject = entity != null ? entityFactory.deconstruct(context, entity) : null;
 
         if (operation instanceof Insert) {
             int count = baseMapper.insert(persistentObject);
@@ -249,8 +249,8 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
             }
 
             String commandKey = entityDefinition.getCommandKey();
-            if (StringUtils.isNotBlank(commandKey) && boundedContext.containsKey(commandKey)) {
-                Command command = (Command) boundedContext.get(commandKey);
+            if (StringUtils.isNotBlank(commandKey) && context.containsKey(commandKey)) {
+                Command command = (Command) context.get(commandKey);
                 Set<String> nullableProperties = command.getNullableProperties();
                 if (nullableProperties != null && !nullableProperties.isEmpty()) {
                     example = primaryKey != null ? new Example().eq("id", primaryKey) : example;

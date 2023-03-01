@@ -16,11 +16,10 @@
  */
 package com.gitee.dorive.core.api;
 
-import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.operation.Operation;
 
 public interface ContextAdapter {
 
-    void adapt(BoundedContext boundedContext, Operation operation);
+    void adapt(Context context, Operation operation);
 
 }

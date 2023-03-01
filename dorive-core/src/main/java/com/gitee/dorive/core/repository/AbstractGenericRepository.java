@@ -17,10 +17,10 @@
 package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.api.ListableRepository;
 import com.gitee.dorive.core.api.MetadataHolder;
-import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.operation.Operation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,62 +33,62 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         implements ListableRepository<E, PK>, MetadataHolder {
 
     @Override
-    public int updateByExample(BoundedContext boundedContext, Object entity, Example example) {
+    public int updateByExample(Context context, Object entity, Example example) {
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
         int totalCount = 0;
         for (CommonRepository repository : getOrderedRepositories()) {
-            if (boundedContext.isMatch(repository)) {
-                totalCount += repository.updateByExample(boundedContext, entity, example);
+            if (context.matches(repository)) {
+                totalCount += repository.updateByExample(context, entity, example);
             }
         }
         return totalCount;
     }
 
     @Override
-    public int insertOrUpdate(BoundedContext boundedContext, E entity) {
+    public int insertOrUpdate(Context context, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
         Operation operation = new Operation(Operation.INSERT_OR_UPDATE, entity);
-        return execute(boundedContext, operation);
+        return execute(context, operation);
     }
 
     @Override
-    public int deleteByPrimaryKey(BoundedContext boundedContext, PK primaryKey) {
+    public int deleteByPrimaryKey(Context context, PK primaryKey) {
         Assert.notNull(primaryKey, "The primaryKey cannot be null!");
-        E entity = selectByPrimaryKey(boundedContext, primaryKey);
-        return delete(boundedContext, entity);
+        E entity = selectByPrimaryKey(context, primaryKey);
+        return delete(context, entity);
     }
 
     @Override
-    public int deleteByExample(BoundedContext boundedContext, Example example) {
+    public int deleteByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         int totalCount = 0;
         for (CommonRepository repository : getOrderedRepositories()) {
-            if (boundedContext.isMatch(repository)) {
-                totalCount += repository.deleteByExample(boundedContext, example);
+            if (context.matches(repository)) {
+                totalCount += repository.deleteByExample(context, example);
             }
         }
         return totalCount;
     }
 
     @Override
-    public int insertList(BoundedContext boundedContext, List<E> entities) {
-        return entities.stream().mapToInt(entity -> insert(boundedContext, entity)).sum();
+    public int insertList(Context context, List<E> entities) {
+        return entities.stream().mapToInt(entity -> insert(context, entity)).sum();
     }
 
     @Override
-    public int updateList(BoundedContext boundedContext, List<E> entities) {
-        return entities.stream().mapToInt(entity -> update(boundedContext, entity)).sum();
+    public int updateList(Context context, List<E> entities) {
+        return entities.stream().mapToInt(entity -> update(context, entity)).sum();
     }
 
     @Override
-    public int insertOrUpdateList(BoundedContext boundedContext, List<E> entities) {
-        return entities.stream().mapToInt(entity -> insertOrUpdate(boundedContext, entity)).sum();
+    public int insertOrUpdateList(Context context, List<E> entities) {
+        return entities.stream().mapToInt(entity -> insertOrUpdate(context, entity)).sum();
     }
 
     @Override
-    public int deleteList(BoundedContext boundedContext, List<E> entities) {
-        return entities.stream().mapToInt(entity -> delete(boundedContext, entity)).sum();
+    public int deleteList(Context context, List<E> entities) {
+        return entities.stream().mapToInt(entity -> delete(context, entity)).sum();
     }
 
     @Override

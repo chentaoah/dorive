@@ -16,11 +16,10 @@
  */
 package com.gitee.dorive.core.api;
 
-import com.gitee.dorive.core.entity.BoundedContext;
 import com.gitee.dorive.core.entity.executor.Example;
 
 public interface ExampleBuilder {
 
-    Example buildExample(BoundedContext boundedContext, Object rootEntity, Example example);
+    Example buildExample(Context context, Object rootEntity, Example example);
 
 }

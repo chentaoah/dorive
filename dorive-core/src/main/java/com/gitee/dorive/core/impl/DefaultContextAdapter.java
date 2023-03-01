@@ -17,7 +17,7 @@
 package com.gitee.dorive.core.impl;
 
 import com.gitee.dorive.core.api.ContextAdapter;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.definition.AdapterDefinition;
 import com.gitee.dorive.core.entity.operation.Operation;
 import lombok.Data;
@@ -28,7 +28,7 @@ public class DefaultContextAdapter implements ContextAdapter {
     protected AdapterDefinition adapterDefinition;
 
     @Override
-    public void adapt(BoundedContext boundedContext, Operation operation) {
+    public void adapt(Context context, Operation operation) {
         // ignore
     }
 
