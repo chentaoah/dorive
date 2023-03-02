@@ -12,7 +12,7 @@ import com.gitee.dorive.ref.impl.RefInjector;
 import java.lang.reflect.Field;
 import java.util.List;
 
-public abstract class AbstractRefRepository<E, PK> extends AbstractCoatingRepository<E, PK> implements SimpleRepository<E, PK> {
+public abstract class AbstractSimpleRepository<E, PK> extends AbstractCoatingRepository<E, PK> implements SimpleRepository<E, PK> {
 
     @Override
     protected void postProcessEntityClass(AbstractContextRepository<?, ?> repository, EntityHandler entityHandler, Class<?> entityClass) {
