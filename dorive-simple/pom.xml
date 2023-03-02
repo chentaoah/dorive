@@ -8,7 +8,7 @@
         <artifactId>dorive</artifactId>
         <version>3.2.9</version>
     </parent>
-    <artifactId>dorive-ref</artifactId>
+    <artifactId>dorive-simple</artifactId>
     <dependencies>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>

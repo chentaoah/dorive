@@ -8,11 +8,11 @@
         <artifactId>dorive</artifactId>
         <version>3.2.9</version>
     </parent>
-    <artifactId>dorive-service</artifactId>
+    <artifactId>dorive-web</artifactId>
     <dependencies>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-ref</artifactId>
+            <artifactId>dorive-simple</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
