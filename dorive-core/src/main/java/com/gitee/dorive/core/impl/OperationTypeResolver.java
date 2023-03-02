@@ -23,13 +23,18 @@ import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.entity.Command;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Map;
+
 public class OperationTypeResolver {
 
     public static int resolveOperationType(Context context, CommonRepository repository) {
+        Map<String, Object> attachments = context.getAttachments();
+
         EntityDefinition entityDefinition = repository.getEntityDefinition();
         String commandKey = entityDefinition.getCommandKey();
-        if (StringUtils.isNotBlank(commandKey) && context.containsKey(commandKey)) {
-            Command command = (Command) context.get(commandKey);
+        
+        if (StringUtils.isNotBlank(commandKey) && attachments.containsKey(commandKey)) {
+            Command command = (Command) attachments.get(commandKey);
             if (command.isForceIgnore()) {
                 return Operation.FORCE_IGNORE;
 

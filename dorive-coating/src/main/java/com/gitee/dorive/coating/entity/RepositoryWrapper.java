@@ -36,11 +36,11 @@ public class RepositoryWrapper {
     private MergedRepository mergedRepository;
     private List<PropertyWrapper> collectedPropertyWrappers;
 
-    public Example newExampleByCoating(Context context, Object coatingObject) {
+    public Example newExampleByCoating(Context context, Object coating) {
         Example example = new Example();
         for (PropertyWrapper propertyWrapper : collectedPropertyWrappers) {
             Property property = propertyWrapper.getProperty();
-            Object fieldValue = property.getFieldValue(coatingObject);
+            Object fieldValue = property.getFieldValue(coating);
             if (fieldValue != null) {
                 PropertyDefinition propertyDefinition = propertyWrapper.getPropertyDefinition();
                 String field = propertyDefinition.getField();

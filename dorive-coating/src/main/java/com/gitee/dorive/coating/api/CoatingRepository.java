@@ -23,8 +23,8 @@ import java.util.List;
 
 public interface CoatingRepository<E, PK> {
 
-    List<E> selectByCoating(Context context, Object coatingObject);
+    List<E> selectByCoating(Context context, Object coating);
 
-    Page<E> selectPageByCoating(Context context, Object coatingObject);
+    Page<E> selectPageByCoating(Context context, Object coating);
 
 }

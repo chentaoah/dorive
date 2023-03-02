@@ -21,6 +21,8 @@ import com.gitee.dorive.core.api.Processor;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.element.PropertyChain;
 
+import java.util.Map;
+
 public class ContextBinder extends AbstractBinder {
 
     public ContextBinder(BindingDefinition bindingDefinition,
@@ -32,8 +34,9 @@ public class ContextBinder extends AbstractBinder {
 
     @Override
     public Object getBoundValue(Context context, Object rootEntity) {
+        Map<String, Object> attachments = context.getAttachments();
         String bindExp = bindingDefinition.getBindExp();
-        return context.get(bindExp);
+        return attachments.get(bindExp);
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.gitee.dorive.core.impl.selector;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
@@ -17,7 +16,7 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class NameSelector implements Selector {
+public class NameSelector extends AbstractSelector {
 
     public static final NameSelector EMPTY_SELECTOR = new NameSelector();
 

@@ -2,7 +2,6 @@ package com.gitee.dorive.core.impl.selector;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
@@ -18,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class SceneSelector implements Selector {
+public class SceneSelector extends AbstractSelector {
 
     private Set<String> scenes = Collections.emptySet();
 

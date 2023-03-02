@@ -38,9 +38,9 @@ public class DefaultEntityFactory implements EntityFactory {
     protected Map<String, String> propPojoMapping;
 
     @Override
-    public Object reconstitute(Context context, Object persistentObject) {
+    public Object reconstitute(Context context, Object persistent) {
         CopyOptions copyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(aliasPropMapping);
-        return BeanUtil.toBean(persistentObject, entityElement.getGenericType(), copyOptions);
+        return BeanUtil.toBean(persistent, entityElement.getGenericType(), copyOptions);
     }
 
     @Override

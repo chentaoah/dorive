@@ -46,16 +46,16 @@ public class DefaultExampleBuilder implements ExampleBuilder {
     }
 
     @Override
-    public Example buildExample(Context context, Object coatingObject) {
+    public Example buildExample(Context context, Object coating) {
         CoatingWrapperResolver coatingWrapperResolver = repository.getCoatingWrapperResolver();
         Map<Class<?>, CoatingWrapper> coatingWrapperMap = coatingWrapperResolver.getCoatingWrapperMap();
 
-        CoatingWrapper coatingWrapper = coatingWrapperMap.get(coatingObject.getClass());
+        CoatingWrapper coatingWrapper = coatingWrapperMap.get(coating.getClass());
         Assert.notNull(coatingWrapper, "No coating wrapper exists!");
 
         Map<String, RepoCriterion> repoCriterionMap = new LinkedHashMap<>();
         for (RepositoryWrapper repositoryWrapper : coatingWrapper.getReversedRepositoryWrappers()) {
-            Example example = repositoryWrapper.newExampleByCoating(context, coatingObject);
+            Example example = repositoryWrapper.newExampleByCoating(context, coating);
             RepoCriterion repoCriterion = new RepoCriterion(repositoryWrapper, example);
 
             MergedRepository mergedRepository = repositoryWrapper.getMergedRepository();

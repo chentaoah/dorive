@@ -64,11 +64,11 @@ public class SQLExampleBuilder implements ExampleBuilder {
     }
 
     @Override
-    public Example buildExample(Context context, Object coatingObject) {
+    public Example buildExample(Context context, Object coating) {
         CoatingWrapperResolver coatingWrapperResolver = repository.getCoatingWrapperResolver();
         Map<String, CoatingWrapper> nameCoatingWrapperMap = coatingWrapperResolver.getNameCoatingWrapperMap();
 
-        CoatingWrapper coatingWrapper = nameCoatingWrapperMap.get(coatingObject.getClass().getName());
+        CoatingWrapper coatingWrapper = nameCoatingWrapperMap.get(coating.getClass().getName());
         Assert.notNull(coatingWrapper, "No coating wrapper exists!");
         List<RepositoryWrapper> repositoryWrappers = coatingWrapper.getRepositoryWrappers();
 
@@ -93,7 +93,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
-            Example example = repositoryWrapper.newExampleByCoating(context, coatingObject);
+            Example example = repositoryWrapper.newExampleByCoating(context, coating);
             aliasConverter.convert(example);
 
             boolean dirtyQuery = example.isDirtyQuery();
@@ -115,8 +115,8 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
 
         SpecificProperties properties = coatingWrapper.getSpecificProperties();
-        OrderBy orderBy = properties.newOrderBy(coatingObject);
-        Page<Object> page = properties.newPage(coatingObject);
+        OrderBy orderBy = properties.newOrderBy(coating);
+        Page<Object> page = properties.newPage(coating);
 
         Example example = new Example();
         example.setOrderBy(orderBy);

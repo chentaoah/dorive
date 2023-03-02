@@ -231,11 +231,11 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
     @Override
     public int execute(Context context, Operation operation) {
         Object entity = operation.getEntity();
-        Object persistentObject = entity != null ? entityFactory.deconstruct(context, entity) : null;
+        Object persistent = entity != null ? entityFactory.deconstruct(context, entity) : null;
 
         if (operation instanceof Insert) {
-            int count = baseMapper.insert(persistentObject);
-            Object primaryKey = BeanUtil.getFieldValue(persistentObject, "id");
+            int count = baseMapper.insert(persistent);
+            Object primaryKey = BeanUtil.getFieldValue(persistent, "id");
             PropertyProxy primaryKeyProxy = entityElement.getPrimaryKeyProxy();
             primaryKeyProxy.setValue(entity, primaryKey);
             return count;
@@ -248,22 +248,23 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                 aliasConverter.convert(example);
             }
 
+            Map<String, Object> attachments = context.getAttachments();
             String commandKey = entityDefinition.getCommandKey();
-            if (StringUtils.isNotBlank(commandKey) && context.containsKey(commandKey)) {
-                Command command = (Command) context.get(commandKey);
+            if (StringUtils.isNotBlank(commandKey) && attachments.containsKey(commandKey)) {
+                Command command = (Command) attachments.get(commandKey);
                 Set<String> nullableProperties = command.getNullableProperties();
                 if (nullableProperties != null && !nullableProperties.isEmpty()) {
                     example = primaryKey != null ? new Example().eq("id", primaryKey) : example;
-                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistentObject, nullableProperties, example);
+                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableProperties, example);
                     return baseMapper.update(null, updateWrapper);
                 }
             }
 
             if (primaryKey != null) {
-                return baseMapper.updateById(persistentObject);
+                return baseMapper.updateById(persistent);
 
             } else if (example != null) {
-                return baseMapper.update(persistentObject, buildUpdateWrapper(example));
+                return baseMapper.update(persistent, buildUpdateWrapper(example));
             }
 
         } else if (operation instanceof Delete) {
@@ -292,12 +293,12 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         return updateWrapper;
     }
 
-    private UpdateWrapper<Object> buildUpdateWrapper(Object persistentObject, Set<String> nullableProperties, Example example) {
+    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableProperties, Example example) {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
         List<TableFieldInfo> fieldList = TableInfoHelper.getTableInfo(pojoClass).getFieldList();
         for (TableFieldInfo tableFieldInfo : fieldList) {
             String property = tableFieldInfo.getProperty();
-            Object value = BeanUtil.getFieldValue(persistentObject, property);
+            Object value = BeanUtil.getFieldValue(persistent, property);
             if (value != null || nullableProperties.contains(property)) {
                 updateWrapper.set(true, tableFieldInfo.getColumn(), value);
             }

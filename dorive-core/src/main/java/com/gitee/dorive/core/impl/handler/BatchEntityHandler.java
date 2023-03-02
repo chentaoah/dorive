@@ -34,6 +34,7 @@ import com.gitee.dorive.core.repository.CommonRepository;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 
 public class BatchEntityHandler implements EntityHandler {
 
@@ -75,8 +76,9 @@ public class BatchEntityHandler implements EntityHandler {
         PropertyChain anchorPoint = repository.getAnchorPoint();
         PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
 
+        Map<String, Object> attachments = context.getAttachments();
         String builderKey = repository.getEntityDefinition().getBuilderKey();
-        ExampleBuilder exampleBuilder = StringUtils.isNotBlank(builderKey) ? (ExampleBuilder) context.get(builderKey) : null;
+        ExampleBuilder exampleBuilder = StringUtils.isNotBlank(builderKey) ? (ExampleBuilder) attachments.get(builderKey) : null;
 
         UnionExample unionExample = new UnionExample();
         for (int index = 0; index < rootEntities.size(); index++) {

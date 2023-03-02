@@ -67,13 +67,13 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     }
 
     @Override
-    public Example buildExample(Context context, Object coatingObject) {
-        return exampleBuilder.buildExample(context, coatingObject);
+    public Example buildExample(Context context, Object coating) {
+        return exampleBuilder.buildExample(context, coating);
     }
 
     @Override
-    public List<E> selectByCoating(Context context, Object coatingObject) {
-        Example example = buildExample(context, coatingObject);
+    public List<E> selectByCoating(Context context, Object coating) {
+        Example example = buildExample(context, coating);
         if (example.isCountQueried()) {
             example.setPage(null);
         }
@@ -82,8 +82,8 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
     @Override
     @SuppressWarnings("unchecked")
-    public Page<E> selectPageByCoating(Context context, Object coatingObject) {
-        Example example = buildExample(context, coatingObject);
+    public Page<E> selectPageByCoating(Context context, Object coating) {
+        Example example = buildExample(context, coating);
         if (example.isCountQueried()) {
             Page<Object> page = example.getPage();
             example.setPage(null);

@@ -18,7 +18,7 @@ package com.gitee.dorive.core.api;
 
 public interface EntityFactory {
 
-    Object reconstitute(Context context, Object persistentObject);
+    Object reconstitute(Context context, Object persistent);
 
     Object deconstruct(Context context, Object entity);
 

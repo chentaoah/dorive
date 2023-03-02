@@ -55,10 +55,10 @@ public class SpecificProperties {
         return false;
     }
 
-    public OrderBy newOrderBy(Object coatingObject) {
+    public OrderBy newOrderBy(Object coating) {
         if (sortByProperty != null && orderProperty != null) {
-            Object sortBy = sortByProperty.getProperty().getFieldValue(coatingObject);
-            Object order = orderProperty.getProperty().getFieldValue(coatingObject);
+            Object sortBy = sortByProperty.getProperty().getFieldValue(coating);
+            Object order = orderProperty.getProperty().getFieldValue(coating);
             if (sortBy != null && order instanceof String) {
                 List<String> properties = StringUtils.toList(sortBy);
                 if (properties != null && !properties.isEmpty()) {
@@ -72,10 +72,10 @@ public class SpecificProperties {
         return null;
     }
 
-    public Page<Object> newPage(Object coatingObject) {
+    public Page<Object> newPage(Object coating) {
         if (pageProperty != null && limitProperty != null) {
-            Object page = pageProperty.getProperty().getFieldValue(coatingObject);
-            Object limit = limitProperty.getProperty().getFieldValue(coatingObject);
+            Object page = pageProperty.getProperty().getFieldValue(coating);
+            Object limit = limitProperty.getProperty().getFieldValue(coating);
             if (page != null && limit != null) {
                 return new Page<>(Convert.convert(Long.class, page), Convert.convert(Long.class, limit));
             }

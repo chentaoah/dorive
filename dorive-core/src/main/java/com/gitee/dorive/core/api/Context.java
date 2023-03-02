@@ -16,16 +16,12 @@
  */
 package com.gitee.dorive.core.api;
 
+import java.util.Map;
+
 public interface Context {
 
     Selector getSelector();
 
-    Object put(String key, Object value);
-
-    boolean containsKey(String key);
-
-    Object get(String key);
-
-    Object remove(String key);
+    Map<String, Object> getAttachments();
 
 }

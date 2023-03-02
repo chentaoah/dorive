@@ -21,6 +21,6 @@ import com.gitee.dorive.core.entity.executor.Example;
 
 public interface ExampleBuilder {
 
-    Example buildExample(Context context, Object coatingObject);
+    Example buildExample(Context context, Object coating);
 
 }
