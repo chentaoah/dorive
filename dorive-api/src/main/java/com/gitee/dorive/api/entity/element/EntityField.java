@@ -51,8 +51,8 @@ public class EntityField extends EntityEle {
         }
         this.bindingDefs = BindingDef.fromElement(field);
         this.aliasDef = AliasDef.fromElement(field);
-        if (!filter(this.genericType)) {
-            this.entityType = new EntityType(this.genericType);
+        if (!filter(this.type)) {
+            this.entityType = new EntityType(this.type);
         }
     }
 
