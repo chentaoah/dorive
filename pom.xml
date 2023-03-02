@@ -31,6 +31,7 @@
     <modules>
         <module>dorive-injection</module>
         <module>dorive-proxy</module>
+        <module>dorive-api</module>
         <module>dorive-core</module>
         <module>dorive-event</module>
         <module>dorive-coating</module>
