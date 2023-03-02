@@ -1,4 +1,4 @@
-package com.gitee.dorive.ref.impl;
+package com.gitee.dorive.simple.impl;
 
 import com.gitee.dorive.coating.api.CoatingRepository;
 import com.gitee.dorive.core.api.ContextBuilder;
@@ -9,9 +9,9 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.core.repository.ProxyRepository;
-import com.gitee.dorive.ref.api.Ref;
-import com.gitee.dorive.ref.api.RefObj;
-import com.gitee.dorive.ref.api.SimpleRepository;
+import com.gitee.dorive.simple.api.Ref;
+import com.gitee.dorive.simple.api.RefObj;
+import com.gitee.dorive.simple.api.SimpleRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

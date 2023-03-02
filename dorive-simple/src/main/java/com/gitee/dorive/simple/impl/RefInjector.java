@@ -1,8 +1,8 @@
-package com.gitee.dorive.ref.impl;
+package com.gitee.dorive.simple.impl;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.core.api.EntityHandler;
-import com.gitee.dorive.ref.api.Ref;
+import com.gitee.dorive.simple.api.Ref;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import lombok.AllArgsConstructor;

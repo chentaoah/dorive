@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.dorive.ref.api;
+package com.gitee.dorive.simple.api;
 
 import com.gitee.dorive.core.api.ContextBuilder;
 import com.gitee.dorive.core.entity.executor.Example;

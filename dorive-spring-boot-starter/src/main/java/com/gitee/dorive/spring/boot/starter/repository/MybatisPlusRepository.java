@@ -25,7 +25,7 @@ import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.element.EntityElement;
 import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.DefaultEntityFactory;
-import com.gitee.dorive.ref.repository.AbstractSimpleRepository;
+import com.gitee.dorive.simple.repository.AbstractSimpleRepository;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
 
 import java.lang.reflect.ParameterizedType;

@@ -1,4 +1,4 @@
-package com.gitee.dorive.ref.repository;
+package com.gitee.dorive.simple.repository;
 
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.ContextBuilder;
@@ -6,8 +6,8 @@ import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
-import com.gitee.dorive.ref.api.SimpleRepository;
-import com.gitee.dorive.ref.impl.RefInjector;
+import com.gitee.dorive.simple.api.SimpleRepository;
+import com.gitee.dorive.simple.impl.RefInjector;
 
 import java.lang.reflect.Field;
 import java.util.List;

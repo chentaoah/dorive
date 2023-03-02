@@ -1,4 +1,4 @@
-package com.gitee.dorive.service.common;
+package com.gitee.dorive.web.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;

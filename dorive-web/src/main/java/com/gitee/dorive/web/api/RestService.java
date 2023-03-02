@@ -1,7 +1,7 @@
-package com.gitee.dorive.service.api;
+package com.gitee.dorive.web.api;
 
 import com.gitee.dorive.core.entity.executor.Page;
-import com.gitee.dorive.service.common.ResObject;
+import com.gitee.dorive.web.common.ResObject;
 
 import java.util.List;
 
