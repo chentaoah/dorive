@@ -24,7 +24,7 @@ public class EntityType extends EntityEle {
 
     private Class<?> type;
     private AdapterDef adapterDef;
-    private Map<String, EntityField> entityFields;
+    private Map<String, EntityField> entityFields = new LinkedHashMap<>();
 
     public static EntityType getInstance(Class<?> type) {
         return CACHE.computeIfAbsent(type, key -> new EntityType(type));
@@ -38,7 +38,6 @@ public class EntityType extends EntityEle {
 
         this.type = type;
         this.adapterDef = AdapterDef.fromElement(type);
-        this.entityFields = new LinkedHashMap<>();
         for (Field field : ReflectUtil.getFields(type)) {
             EntityField entityField = new EntityField(field);
             entityField.initialize();
