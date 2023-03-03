@@ -15,10 +15,10 @@ public class EntityResolver {
     private EntityType entityType;
     private Map<String, EntityEle> entityEleMap = new LinkedHashMap<>();
 
-    public void resolve(Class<?> type) {
-        entityType = EntityType.getInstance(type);
-        entityEleMap.put("/", entityType);
-        resolve("", entityType.getEntityFields().values());
+    public EntityResolver(Class<?> type) {
+        this.entityType = EntityType.getInstance(type);
+        this.entityEleMap.put("/", this.entityType);
+        resolve("", this.entityType.getEntityFields().values());
     }
 
     private void resolve(String lastAccessPath, Collection<EntityField> entityFields) {

@@ -26,6 +26,11 @@ public class EntityField extends EntityEle {
     private AliasDef aliasDef;
     private EntityType entityType;
 
+    public static boolean filter(Class<?> type) {
+        String className = type.getName();
+        return !className.startsWith("java.lang.") && !className.startsWith("java.util.") && !type.isEnum();
+    }
+
     public EntityField(Field field) {
         super(field);
         this.field = field;
@@ -52,14 +57,9 @@ public class EntityField extends EntityEle {
         }
         bindingDefs = BindingDef.fromElement(field);
         aliasDef = AliasDef.fromElement(field);
-        if (!filter(genericType)) {
+        if (filter(genericType)) {
             entityType = EntityType.getInstance(genericType);
         }
-    }
-
-    private boolean filter(Class<?> type) {
-        String className = type.getName();
-        return className.startsWith("java.lang.") || className.startsWith("java.util.") || type.isEnum();
     }
 
     @Override

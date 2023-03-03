@@ -50,8 +50,18 @@ public class EntityType extends EntityEle {
     }
 
     @Override
+    protected boolean isCollection() {
+        return false;
+    }
+
+    @Override
     public Class<?> getGenericType() {
         return type;
+    }
+
+    @Override
+    protected EntityType getEntityType() {
+        return this;
     }
 
     @Override

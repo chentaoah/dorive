@@ -20,23 +20,25 @@ public abstract class EntityEle {
         this.entityDef = EntityDef.fromElement(element);
     }
 
+    public boolean isEntity() {
+        return entityDef != null;
+    }
+
     public boolean isAggregated() {
-        return entityDef.getRepository() != Object.class;
+        return entityDef != null && entityDef.getRepository() != Object.class;
     }
-
-    public boolean isCollection() {
-        return false;
-    }
-
-    public Class<?> getGenericType() {
-        return null;
-    }
-
+    
     public void initialize() {
         if (entityDef != null && pkProxy == null) {
             doInitialize();
         }
     }
+
+    protected abstract boolean isCollection();
+
+    protected abstract Class<?> getGenericType();
+
+    protected abstract EntityType getEntityType();
 
     protected abstract void doInitialize();
 
