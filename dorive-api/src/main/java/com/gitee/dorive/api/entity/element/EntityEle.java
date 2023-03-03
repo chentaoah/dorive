@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.lang.reflect.AnnotatedElement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -14,6 +17,7 @@ public abstract class EntityEle {
     private AnnotatedElement element;
     private EntityDef entityDef;
     private PropProxy pkProxy;
+    private Map<String, String> aliasMap;
 
     public EntityEle(AnnotatedElement element) {
         this.element = element;
@@ -32,6 +36,22 @@ public abstract class EntityEle {
         if (entityDef != null && pkProxy == null) {
             doInitialize();
         }
+    }
+
+    public String toAlias(String property) {
+        return aliasMap.get(property);
+    }
+
+    public List<String> toAliases(List<String> properties) {
+        if (properties != null && !properties.isEmpty()) {
+            List<String> columns = new ArrayList<>(properties.size());
+            for (String property : properties) {
+                String alias = toAlias(property);
+                columns.add(alias);
+            }
+            return columns;
+        }
+        return properties;
     }
 
     protected abstract void doInitialize();

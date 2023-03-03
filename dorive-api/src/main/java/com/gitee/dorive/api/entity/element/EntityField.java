@@ -66,6 +66,7 @@ public class EntityField extends EntityEle {
     protected void doInitialize() {
         if (entityType != null) {
             setPkProxy(entityType.getPkProxy());
+            setAliasMap(entityType.getAliasMap());
         }
     }
 

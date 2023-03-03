@@ -3,8 +3,10 @@ package com.gitee.dorive.api.entity.element;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.def.AdapterDef;
+import com.gitee.dorive.api.entity.def.AliasDef;
 import com.gitee.dorive.api.impl.factory.PropProxyFactory;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -62,6 +64,15 @@ public class EntityType extends EntityEle {
         Assert.isTrue(hasField, "The primary key not found! type: {}", genericType.getName());
         PropProxy pkProxy = PropProxyFactory.newPropProxy(genericType, "id");
         setPkProxy(pkProxy);
+
+        Map<String, String> aliasMap = new LinkedHashMap<>();
+        for (EntityField entityField : entityFields.values()) {
+            String name = entityField.getName();
+            AliasDef aliasDef = entityField.getAliasDef();
+            String alias = aliasDef != null ? aliasDef.getValue() : StrUtil.toUnderlineCase(name);
+            aliasMap.put(name, alias);
+        }
+        setAliasMap(aliasMap);
     }
 
     @Override
