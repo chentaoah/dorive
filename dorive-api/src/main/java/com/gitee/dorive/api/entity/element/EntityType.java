@@ -28,7 +28,12 @@ public class EntityType extends EntityEle {
     private Map<String, EntityField> entityFields = new LinkedHashMap<>();
 
     public static EntityType getInstance(Class<?> type) {
-        return CACHE.computeIfAbsent(type, key -> new EntityType(type));
+        EntityType entityType = CACHE.get(type);
+        if (entityType == null) {
+            entityType = new EntityType(type);
+            CACHE.put(type, entityType);
+        }
+        return entityType;
     }
 
     private EntityType(Class<?> type) {
