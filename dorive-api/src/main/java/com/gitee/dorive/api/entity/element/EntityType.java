@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -39,9 +40,11 @@ public class EntityType extends EntityEle {
         this.type = type;
         this.adapterDef = AdapterDef.fromElement(type);
         for (Field field : ReflectUtil.getFields(type)) {
-            EntityField entityField = new EntityField(field);
-            entityField.initialize();
-            entityFields.put(entityField.getName(), entityField);
+            if (!Modifier.isStatic(field.getModifiers())) {
+                EntityField entityField = new EntityField(field);
+                entityField.initialize();
+                entityFields.put(entityField.getName(), entityField);
+            }
         }
         initialize();
 
