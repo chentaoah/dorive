@@ -22,7 +22,7 @@ import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.api.EntityIndex;
 import com.gitee.dorive.core.api.ExampleBuilder;
-import com.gitee.dorive.core.api.PropertyProxy;
+import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.element.PropertyChain;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -101,7 +101,7 @@ public class BatchEntityHandler implements EntityHandler {
     private void setValueForRootEntities(CommonRepository repository, List<Object> rootEntities, EntityIndex entityIndex) {
         PropertyChain anchorPoint = repository.getAnchorPoint();
         PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
-        PropertyProxy propertyProxy = anchorPoint.getPropertyProxy();
+        PropProxy propProxy = anchorPoint.getPropProxy();
 
         for (int index = 0; index < rootEntities.size(); index++) {
             Object rootEntity = rootEntities.get(index);
@@ -110,7 +110,7 @@ public class BatchEntityHandler implements EntityHandler {
                 List<Object> entities = entityIndex.selectList(rootEntity, index + 1);
                 Object entity = repository.convertManyToOne(entities);
                 if (entity != null) {
-                    propertyProxy.setValue(lastEntity, entity);
+                    propProxy.setValue(lastEntity, entity);
                 }
             }
         }

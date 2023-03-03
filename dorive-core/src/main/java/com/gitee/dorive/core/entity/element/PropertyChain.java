@@ -16,9 +16,9 @@
  */
 package com.gitee.dorive.core.entity.element;
 
-import com.gitee.dorive.core.api.PropertyProxy;
+import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
-import com.gitee.dorive.core.impl.PropertyProxyFactory;
+import com.gitee.dorive.api.impl.factory.PropProxyFactory;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -28,13 +28,13 @@ import java.lang.reflect.Field;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @ToString(exclude = "lastPropertyChain")
-public class PropertyChain extends Property implements PropertyProxy {
+public class PropertyChain extends Property implements PropProxy {
 
     protected PropertyChain lastPropertyChain;
     protected Class<?> entityClass;
     protected String accessPath;
     protected EntityDefinition entityDefinition;
-    protected PropertyProxy propertyProxy;
+    protected PropProxy propProxy;
 
     public PropertyChain(PropertyChain lastPropertyChain, Class<?> entityClass, String accessPath, Field declaredField) {
         super(declaredField);
@@ -48,8 +48,8 @@ public class PropertyChain extends Property implements PropertyProxy {
     }
 
     public void newPropertyProxy() {
-        if (propertyProxy == null) {
-            propertyProxy = PropertyProxyFactory.newPropertyProxy(entityClass, declaredField);
+        if (propProxy == null) {
+            propProxy = PropProxyFactory.newPropProxy(entityClass, declaredField);
             if (lastPropertyChain != null) {
                 lastPropertyChain.newPropertyProxy();
             }
@@ -65,7 +65,7 @@ public class PropertyChain extends Property implements PropertyProxy {
         if (lastPropertyChain != null) {
             entity = lastPropertyChain.getValue(entity);
         }
-        return entity != null ? propertyProxy.getValue(entity) : null;
+        return entity != null ? propProxy.getValue(entity) : null;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class PropertyChain extends Property implements PropertyProxy {
             entity = lastPropertyChain.getValue(entity);
         }
         if (entity != null) {
-            propertyProxy.setValue(entity, value);
+            propProxy.setValue(entity, value);
         }
     }
 

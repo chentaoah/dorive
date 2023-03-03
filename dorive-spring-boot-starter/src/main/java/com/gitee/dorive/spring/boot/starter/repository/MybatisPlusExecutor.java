@@ -27,7 +27,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.dorive.core.api.EntityFactory;
 import com.gitee.dorive.core.api.MetadataHolder;
-import com.gitee.dorive.core.api.PropertyProxy;
+import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.core.api.constant.Order;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.Command;
@@ -236,7 +236,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         if (operation instanceof Insert) {
             int count = baseMapper.insert(persistent);
             Object primaryKey = BeanUtil.getFieldValue(persistent, "id");
-            PropertyProxy primaryKeyProxy = entityElement.getPrimaryKeyProxy();
+            PropProxy primaryKeyProxy = entityElement.getPrimaryKeyProxy();
             primaryKeyProxy.setValue(entity, primaryKey);
             return count;
 

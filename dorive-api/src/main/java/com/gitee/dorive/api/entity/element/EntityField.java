@@ -1,5 +1,6 @@
 package com.gitee.dorive.api.entity.element;
 
+import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.api.entity.def.AliasDef;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
@@ -38,27 +39,43 @@ public class EntityField extends EntityEle {
             Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
             this.genericType = (Class<?>) actualTypeArgument;
         }
-        resolveDef(field);
+        resolve(field);
     }
 
-    private void resolveDef(Field field) {
+    private void resolve(Field field) {
         EntityDef entityDef = getEntityDef();
         if (entityDef != null) {
-            EntityDef genericEntityDef = EntityDef.fromElement(this.genericType);
+            EntityDef genericEntityDef = EntityDef.fromElement(genericType);
             if (genericEntityDef != null) {
                 entityDef.merge(genericEntityDef);
             }
         }
-        this.bindingDefs = BindingDef.fromElement(field);
-        this.aliasDef = AliasDef.fromElement(field);
-        if (!filter(this.type)) {
-            this.entityType = new EntityType(this.type);
+        bindingDefs = BindingDef.fromElement(field);
+        aliasDef = AliasDef.fromElement(field);
+        if (!filter(genericType)) {
+            entityType = EntityType.getInstance(genericType);
         }
     }
 
     private boolean filter(Class<?> type) {
         String className = type.getName();
         return className.startsWith("java.lang.") || className.startsWith("java.util.") || type.isEnum();
+    }
+
+    @Override
+    protected void doInitialize() {
+        if (entityType != null) {
+            entityType.initialize();
+            setPkProxy(entityType.getPkProxy());
+        }
+    }
+
+    public boolean isSameType(EntityField entityField) {
+        return type == entityField.getType() && genericType == entityField.getGenericType();
+    }
+
+    public Object getFieldValue(Object object) {
+        return ReflectUtil.getFieldValue(object, field);
     }
 
 }

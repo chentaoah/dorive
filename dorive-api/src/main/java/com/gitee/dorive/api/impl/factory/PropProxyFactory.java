@@ -14,42 +14,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.dorive.core.impl;
+package com.gitee.dorive.api.impl.factory;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.core.api.PropertyProxy;
+import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.proxy.ProxyCompiler;
 import com.gitee.dorive.proxy.JavassistCompiler;
-import com.gitee.dorive.core.util.ReflectUtils;
+import com.gitee.dorive.api.util.ReflectUtils;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PropertyProxyFactory {
+public class PropProxyFactory {
 
     private static final AtomicInteger COUNT = new AtomicInteger(0);
     private static final ProxyCompiler PROXY_COMPILER = new JavassistCompiler();
-    private static final Map<String, PropertyProxy> GENERATED_PROXY_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, PropProxy> GENERATED_PROXY_CACHE = new ConcurrentHashMap<>();
 
-    public static PropertyProxy newPropertyProxy(Class<?> entityClass, Field declaredField) {
-        return newPropertyProxy(entityClass, declaredField.getType(), declaredField.getName());
+    public static PropProxy newPropProxy(Class<?> entityClass, Field declaredField) {
+        return newPropProxy(entityClass, declaredField.getType(), declaredField.getName());
     }
 
-    public static PropertyProxy newPropertyProxy(Class<?> entityClass, String fieldName) {
+    public static PropProxy newPropProxy(Class<?> entityClass, String fieldName) {
         try {
             Field field = ReflectUtil.getField(entityClass, fieldName);
             Class<?> fieldClass = field.getType();
-            return newPropertyProxy(entityClass, fieldClass, fieldName);
+            return newPropProxy(entityClass, fieldClass, fieldName);
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate class!", e);
         }
     }
 
-    public static PropertyProxy newPropertyProxy(Class<?> entityClass, Class<?> fieldClass, String fieldName) {
+    public static PropProxy newPropProxy(Class<?> entityClass, Class<?> fieldClass, String fieldName) {
         String cacheKey = entityClass.getTypeName() + ":" + fieldClass.getTypeName() + ":" + fieldName;
         if (!GENERATED_PROXY_CACHE.containsKey(cacheKey)) {
             synchronized (GENERATED_PROXY_CACHE) {
@@ -57,8 +57,8 @@ public class PropertyProxyFactory {
                     try {
                         String generatedCode = generateCode(entityClass, fieldClass, fieldName);
                         Class<?> generatedClass = PROXY_COMPILER.compile(generatedCode, null);
-                        PropertyProxy propertyProxy = (PropertyProxy) ReflectUtils.newInstance(generatedClass);
-                        GENERATED_PROXY_CACHE.put(cacheKey, propertyProxy);
+                        PropProxy propProxy = (PropProxy) ReflectUtils.newInstance(generatedClass);
+                        GENERATED_PROXY_CACHE.put(cacheKey, propProxy);
 
                     } catch (Exception e) {
                         throw new RuntimeException("Failed to generate class!", e);
@@ -70,7 +70,7 @@ public class PropertyProxyFactory {
     }
 
     private static String generateCode(Class<?> entityClass, Class<?> fieldClass, String fieldName) {
-        Class<?> interfaceClass = PropertyProxy.class;
+        Class<?> interfaceClass = PropProxy.class;
         StringBuilder builder = new StringBuilder();
         String simpleName = interfaceClass.getSimpleName() + "$Proxy" + COUNT.getAndIncrement();
         builder.append(String.format("package %s;\n", interfaceClass.getPackage().getName()));

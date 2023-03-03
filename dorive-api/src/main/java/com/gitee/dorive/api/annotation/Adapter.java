@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.dorive.core.annotation;
+package com.gitee.dorive.api.annotation;
 
-import com.gitee.dorive.core.impl.DefaultContextAdapter;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
@@ -33,10 +32,10 @@ import java.lang.annotation.Target;
 public @interface Adapter {
 
     @AliasFor("adapter")
-    Class<?> value() default DefaultContextAdapter.class;
+    Class<?> value() default Object.class;
 
     @AliasFor("value")
-    Class<?> adapter() default DefaultContextAdapter.class;
+    Class<?> adapter() default Object.class;
 
     String[] args() default {};
 

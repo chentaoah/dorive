@@ -20,11 +20,11 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.core.annotation.Alias;
-import com.gitee.dorive.core.api.PropertyProxy;
+import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.core.api.constant.Order;
 import com.gitee.dorive.core.entity.definition.EntityDefinition;
 import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.impl.PropertyProxyFactory;
+import com.gitee.dorive.api.impl.factory.PropProxyFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -43,7 +43,7 @@ public class EntityElement {
     private AnnotatedElement annotatedElement;
     private boolean collection;
     private Class<?> genericType;
-    private PropertyProxy primaryKeyProxy;
+    private PropProxy primaryKeyProxy;
     private Map<String, PropertyDef> propertyDefMap;
 
     public static EntityElement newEntityElement(AnnotatedElement annotatedElement) {
@@ -65,7 +65,7 @@ public class EntityElement {
 
     private static EntityElement processEntityElement(EntityElement entityElement) {
         Class<?> genericType = entityElement.getGenericType();
-        PropertyProxy primaryKeyProxy = newPrimaryKeyProxy(genericType);
+        PropProxy primaryKeyProxy = newPrimaryKeyProxy(genericType);
 
         Field[] fields = ReflectUtil.getFields(genericType);
         Map<String, PropertyDef> propertyDefMap = new LinkedHashMap<>(fields.length * 4 / 3 + 1);
@@ -86,10 +86,10 @@ public class EntityElement {
         return entityElement;
     }
 
-    private static PropertyProxy newPrimaryKeyProxy(Class<?> entityClass) {
+    private static PropProxy newPrimaryKeyProxy(Class<?> entityClass) {
         Field field = ReflectUtil.getField(entityClass, "id");
         Assert.notNull(field, "The primary key not found! type: {}", entityClass.getName());
-        return PropertyProxyFactory.newPropertyProxy(entityClass, "id");
+        return PropProxyFactory.newPropProxy(entityClass, "id");
     }
 
     public String toAlias(String property) {

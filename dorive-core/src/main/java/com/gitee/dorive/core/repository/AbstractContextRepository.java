@@ -32,7 +32,7 @@ import com.gitee.dorive.core.impl.resolver.AdapterResolver;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import com.gitee.dorive.core.impl.resolver.PropertyResolver;
-import com.gitee.dorive.core.util.ReflectUtils;
+import com.gitee.dorive.api.util.ReflectUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.BeansException;

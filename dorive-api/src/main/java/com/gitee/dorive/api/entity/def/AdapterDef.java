@@ -14,30 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.dorive.core.entity.definition;
+package com.gitee.dorive.api.entity.def;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.api.annotation.Adapter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.AnnotationUtils;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Map;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class AdapterDefinition {
+public class AdapterDef {
 
     private Class<?> adapter;
     private String[] args;
 
-    public static AdapterDefinition newAdapterDefinition(AnnotatedElement annotatedElement) {
-        Adapter adapterAnnotation = AnnotatedElementUtils.getMergedAnnotation(annotatedElement, Adapter.class);
-        if (adapterAnnotation != null) {
-            Map<String, Object> annotationAttributes = AnnotationUtils.getAnnotationAttributes(adapterAnnotation);
-            return BeanUtil.copyProperties(annotationAttributes, AdapterDefinition.class);
+    public static AdapterDef fromElement(AnnotatedElement element) {
+        if (element.isAnnotationPresent(Adapter.class)) {
+            Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Adapter.class);
+            return BeanUtil.copyProperties(attributes, AdapterDef.class);
         }
         return null;
     }

@@ -17,7 +17,7 @@
 package com.gitee.dorive.core.repository;
 
 import com.gitee.dorive.core.api.MetadataHolder;
-import com.gitee.dorive.core.api.PropertyProxy;
+import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.element.PropertyChain;
@@ -134,7 +134,7 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
     }
 
     public Object getPrimaryKey(Object entity) {
-        PropertyProxy primaryKeyProxy = entityElement.getPrimaryKeyProxy();
+        PropProxy primaryKeyProxy = entityElement.getPrimaryKeyProxy();
         return primaryKeyProxy.getValue(entity);
     }
 

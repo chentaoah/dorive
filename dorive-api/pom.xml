@@ -11,6 +11,11 @@
     <artifactId>dorive-api</artifactId>
     <dependencies>
         <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-proxy</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
@@ -21,10 +26,6 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
         </dependency>
     </dependencies>
 </project>
