@@ -47,7 +47,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK
     @Override
     @SuppressWarnings("unchecked")
     protected Executor newExecutor(EntityDefinition entityDefinition, EntityElement entityElement) {
-        Class<?> mapperClass = entityDefinition.getMapper();
+        Class<?> mapperClass = entityDefinition.getSource();
         Object mapper = null;
         Class<?> pojoClass = null;
         if (mapperClass != Object.class) {

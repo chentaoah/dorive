@@ -37,7 +37,7 @@ public class EntityDefinition {
     private String name;
     private String[] scenes;
     private int order;
-    private Class<?> mapper;
+    private Class<?> source;
     private Class<?> factory;
     private Class<?> repository;
     private String orderByAsc;
@@ -70,8 +70,8 @@ public class EntityDefinition {
         if (scenes == null || scenes.length == 0) {
             scenes = entityDefinition.getScenes();
         }
-        if (mapper == null || mapper == Object.class) {
-            mapper = entityDefinition.getMapper();
+        if (source == null || source == Object.class) {
+            source = entityDefinition.getSource();
         }
         if (factory == null || factory == DefaultEntityFactory.class) {
             factory = entityDefinition.getFactory();
