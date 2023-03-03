@@ -96,7 +96,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         });
 
-        orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityDefinition().getOrder()));
+        orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityDefinition().getPriority()));
 
         setEntityDefinition(rootRepository.getEntityDefinition());
         setEntityElement(rootRepository.getEntityElement());

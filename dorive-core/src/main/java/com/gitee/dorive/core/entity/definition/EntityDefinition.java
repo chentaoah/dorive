@@ -36,10 +36,10 @@ public class EntityDefinition {
 
     private String name;
     private String[] scenes;
-    private int order;
     private Class<?> source;
     private Class<?> factory;
     private Class<?> repository;
+    private int priority;
     private String orderByAsc;
     private String orderByDesc;
     private String builderKey;

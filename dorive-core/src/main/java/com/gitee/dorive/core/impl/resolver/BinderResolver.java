@@ -94,8 +94,8 @@ public class BinderResolver {
                     if (!"id".equals(field)) {
                         boundValueBinders.add(propertyBinder);
                     } else {
-                        if (entityDefinition.getOrder() == 0) {
-                            entityDefinition.setOrder(-1);
+                        if (entityDefinition.getPriority() == 0) {
+                            entityDefinition.setPriority(-1);
                         }
                         boundIdBinder = propertyBinder;
                     }
