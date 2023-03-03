@@ -17,7 +17,7 @@
 package com.gitee.dorive.core.entity.definition;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.core.annotation.Binding;
+import com.gitee.dorive.api.annotation.Binding;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.core.annotation.AnnotatedElementUtils;

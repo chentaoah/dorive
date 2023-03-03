@@ -17,7 +17,7 @@
 package com.gitee.dorive.core.entity.definition;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.core.annotation.Entity;
+import com.gitee.dorive.api.annotation.Entity;
 import com.gitee.dorive.core.impl.DefaultEntityFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
