@@ -18,6 +18,7 @@ package com.gitee.dorive.core.entity.definition;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.api.annotation.Binding;
+import com.gitee.dorive.core.impl.processor.DefaultProcessor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -43,6 +44,7 @@ public class BindingDefinition {
         List<BindingDefinition> bindingDefinitions = new ArrayList<>(bindingAnnotations.size());
         for (Binding bindingAnnotation : bindingAnnotations) {
             Map<String, Object> annotationAttributes = AnnotationUtils.getAnnotationAttributes(bindingAnnotation);
+            annotationAttributes.putIfAbsent("processor", DefaultProcessor.class);
             bindingDefinitions.add(BeanUtil.copyProperties(annotationAttributes, BindingDefinition.class));
         }
         return bindingDefinitions;

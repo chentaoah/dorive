@@ -19,6 +19,7 @@ package com.gitee.dorive.core.entity.definition;
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.api.annotation.Entity;
 import com.gitee.dorive.core.impl.DefaultEntityFactory;
+import com.gitee.dorive.core.repository.DefaultRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -47,6 +48,10 @@ public class EntityDefinition {
     public static EntityDefinition newEntityDefinition(AnnotatedElement annotatedElement) {
         if (annotatedElement.isAnnotationPresent(Entity.class)) {
             Map<String, Object> annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Entity.class);
+            if (annotationAttributes != null) {
+                annotationAttributes.putIfAbsent("factory", DefaultEntityFactory.class);
+                annotationAttributes.putIfAbsent("repository", DefaultRepository.class);
+            }
             return BeanUtil.copyProperties(annotationAttributes, EntityDefinition.class);
         }
         return null;
