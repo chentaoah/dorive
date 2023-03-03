@@ -39,8 +39,7 @@ public class EntityType extends EntityEle {
     private EntityType(Class<?> type) {
         super(type);
 
-        Assert.isTrue(!LOCK.contains(type), "Circular dependency!");
-        LOCK.add(type);
+        Assert.isTrue(LOCK.add(type), "Circular dependency!");
 
         this.type = type;
         this.adapterDef = AdapterDef.fromElement(type);
