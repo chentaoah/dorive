@@ -44,7 +44,10 @@ public class BindingDefinition {
         List<BindingDefinition> bindingDefinitions = new ArrayList<>(bindingAnnotations.size());
         for (Binding bindingAnnotation : bindingAnnotations) {
             Map<String, Object> annotationAttributes = AnnotationUtils.getAnnotationAttributes(bindingAnnotation);
-            annotationAttributes.putIfAbsent("processor", DefaultProcessor.class);
+            Object processor = annotationAttributes.get("processor");
+            if (processor == Object.class) {
+                annotationAttributes.put("processor", DefaultProcessor.class);
+            }
             bindingDefinitions.add(BeanUtil.copyProperties(annotationAttributes, BindingDefinition.class));
         }
         return bindingDefinitions;

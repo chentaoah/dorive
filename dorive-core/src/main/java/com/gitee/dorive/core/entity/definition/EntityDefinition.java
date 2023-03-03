@@ -49,8 +49,14 @@ public class EntityDefinition {
         if (annotatedElement.isAnnotationPresent(Entity.class)) {
             Map<String, Object> annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Entity.class);
             if (annotationAttributes != null) {
-                annotationAttributes.putIfAbsent("factory", DefaultEntityFactory.class);
-                annotationAttributes.putIfAbsent("repository", DefaultRepository.class);
+                Object factory = annotationAttributes.get("factory");
+                if (factory == Object.class) {
+                    annotationAttributes.put("factory", DefaultEntityFactory.class);
+                }
+                Object repository = annotationAttributes.get("repository");
+                if (repository == Object.class) {
+                    annotationAttributes.put("repository", DefaultRepository.class);
+                }
             }
             return BeanUtil.copyProperties(annotationAttributes, EntityDefinition.class);
         }
