@@ -56,7 +56,16 @@ public class EntityType extends EntityEle {
     }
 
     @Override
-    protected boolean isCollection() {
+    protected void doInitialize() {
+        Class<?> genericType = getGenericType();
+        boolean hasField = ReflectUtil.hasField(genericType, "id");
+        Assert.isTrue(hasField, "The primary key not found! type: {}", genericType.getName());
+        PropProxy pkProxy = PropProxyFactory.newPropProxy(genericType, "id");
+        setPkProxy(pkProxy);
+    }
+
+    @Override
+    public boolean isCollection() {
         return false;
     }
 
@@ -66,17 +75,8 @@ public class EntityType extends EntityEle {
     }
 
     @Override
-    protected EntityType getEntityType() {
+    public EntityType getEntityType() {
         return this;
-    }
-
-    @Override
-    protected void doInitialize() {
-        Class<?> genericType = getGenericType();
-        boolean hasField = ReflectUtil.hasField(genericType, "id");
-        Assert.isTrue(hasField, "The primary key not found! type: {}", genericType.getName());
-        PropProxy pkProxy = PropProxyFactory.newPropProxy(genericType, "id");
-        setPkProxy(pkProxy);
     }
 
 }

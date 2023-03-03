@@ -27,19 +27,19 @@ public abstract class EntityEle {
     public boolean isAggregated() {
         return entityDef != null && entityDef.getRepository() != Object.class;
     }
-    
+
     public void initialize() {
         if (entityDef != null && pkProxy == null) {
             doInitialize();
         }
     }
 
-    protected abstract boolean isCollection();
-
-    protected abstract Class<?> getGenericType();
-
-    protected abstract EntityType getEntityType();
-
     protected abstract void doInitialize();
+
+    public abstract boolean isCollection();
+
+    public abstract Class<?> getGenericType();
+
+    public abstract EntityType getEntityType();
 
 }

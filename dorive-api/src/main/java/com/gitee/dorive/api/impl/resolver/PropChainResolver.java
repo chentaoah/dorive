@@ -11,12 +11,14 @@ import java.util.Map;
 @Data
 public class PropChainResolver {
 
-    private EntityResolver entityResolver;
     private Map<String, PropChain> propChainMap = new LinkedHashMap<>();
 
-    public PropChainResolver(Class<?> type) {
-        this.entityResolver = new EntityResolver(type);
-        resolve("", entityResolver.getEntityType());
+    public PropChainResolver(EntityType entityType) {
+        resolve("", entityType);
+    }
+
+    public PropChainResolver(String lastAccessPath, EntityType entityType) {
+        resolve(lastAccessPath, entityType);
     }
 
     private void resolve(String lastAccessPath, EntityType entityType) {
