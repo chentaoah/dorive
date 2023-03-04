@@ -1,6 +1,7 @@
 package com.gitee.dorive.api.entity.element;
 
 import com.gitee.dorive.api.api.PropProxy;
+import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,12 +17,14 @@ public abstract class EntityEle {
 
     private AnnotatedElement element;
     private EntityDef entityDef;
+    private List<BindingDef> bindingDefs;
     private PropProxy pkProxy;
     private Map<String, String> aliasMap;
 
     public EntityEle(AnnotatedElement element) {
         this.element = element;
         this.entityDef = EntityDef.fromElement(element);
+        this.bindingDefs = BindingDef.fromElement(element);
     }
 
     public boolean isEntity() {

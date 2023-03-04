@@ -2,7 +2,6 @@ package com.gitee.dorive.api.entity.element;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.api.entity.def.AliasDef;
-import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,7 +10,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -22,7 +20,6 @@ public class EntityField extends EntityEle {
     private boolean collection;
     private Class<?> genericType;
     private String name;
-    private List<BindingDef> bindingDefs;
     private AliasDef aliasDef;
     private EntityType entityType;
 
@@ -55,7 +52,6 @@ public class EntityField extends EntityEle {
                 entityDef.merge(genericEntityDef);
             }
         }
-        bindingDefs = BindingDef.fromElement(field);
         aliasDef = AliasDef.fromElement(field);
         if (filter(genericType)) {
             entityType = EntityType.getInstance(genericType);
