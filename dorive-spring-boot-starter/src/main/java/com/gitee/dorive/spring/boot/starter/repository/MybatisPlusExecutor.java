@@ -25,28 +25,19 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gitee.dorive.api.api.PropProxy;
+import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.api.EntityFactory;
 import com.gitee.dorive.core.api.MetadataHolder;
-import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.core.api.constant.Order;
-import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.Command;
-import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.core.entity.element.EntityEle;
-import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.executor.UnionExample;
-import com.gitee.dorive.core.entity.operation.Delete;
-import com.gitee.dorive.core.entity.operation.Insert;
-import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.entity.operation.Update;
+import com.gitee.dorive.core.entity.executor.*;
+import com.gitee.dorive.core.entity.operation.*;
+import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
 import com.gitee.dorive.spring.boot.starter.entity.Metadata;
-import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.spring.boot.starter.impl.EntityIndexResult;
 import lombok.Getter;
 import lombok.Setter;
@@ -248,17 +239,17 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                 aliasConverter.convert(example);
             }
 
-            Map<String, Object> attachments = context.getAttachments();
-            String commandKey = entityDef.getCommandKey();
-            if (StringUtils.isNotBlank(commandKey) && attachments.containsKey(commandKey)) {
-                Command command = (Command) attachments.get(commandKey);
-                Set<String> nullableProperties = command.getNullableProperties();
-                if (nullableProperties != null && !nullableProperties.isEmpty()) {
-                    example = primaryKey != null ? new Example().eq("id", primaryKey) : example;
-                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableProperties, example);
-                    return baseMapper.update(null, updateWrapper);
-                }
-            }
+//            Map<String, Object> attachments = context.getAttachments();
+//            String commandKey = entityDef.getCommandKey();
+//            if (StringUtils.isNotBlank(commandKey) && attachments.containsKey(commandKey)) {
+//                Command command = (Command) attachments.get(commandKey);
+//                Set<String> nullableProperties = command.getNullableProperties();
+//                if (nullableProperties != null && !nullableProperties.isEmpty()) {
+//                    example = primaryKey != null ? new Example().eq("id", primaryKey) : example;
+//                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableProperties, example);
+//                    return baseMapper.update(null, updateWrapper);
+//                }
+//            }
 
             if (primaryKey != null) {
                 return baseMapper.updateById(persistent);

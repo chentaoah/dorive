@@ -21,7 +21,7 @@ import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.Binder;
 import com.gitee.dorive.core.api.Processor;
 import com.gitee.dorive.api.entity.def.BindingDef;
-import com.gitee.dorive.core.entity.definition.EntityDef;
+import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.core.entity.element.EntityEle;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
@@ -60,13 +60,6 @@ public class BinderResolver {
                                   String fieldPrefix, PropChainResolver propChainResolver) {
 
         List<BindingDef> bindingDefs = BindingDef.fromElement(entityEle.getAnnotatedElement());
-        for (BindingDef bindingDef : bindingDefs) {
-            Class<?> processor = bindingDef.getProcessor();
-            if (processor == Object.class) {
-                bindingDef.setProcessor(DefaultProcessor.class);
-            }
-        }
-
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
 
         allBinders = new ArrayList<>(bindingDefs.size());
@@ -127,7 +120,7 @@ public class BinderResolver {
     private Processor newProcessor(BindingDef bindingDef) {
         Class<?> processorClass = bindingDef.getProcessor();
         Processor processor = null;
-        if (processorClass == DefaultProcessor.class) {
+        if (processorClass == Object.class) {
             if (StringUtils.isBlank(bindingDef.getProperty())) {
                 processor = new DefaultProcessor();
             } else {

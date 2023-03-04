@@ -21,13 +21,11 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.annotation.Alias;
 import com.gitee.dorive.api.api.PropProxy;
+import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.impl.factory.PropProxyFactory;
-import com.gitee.dorive.core.api.constant.Order;
-import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -110,16 +108,16 @@ public class EntityEle {
     }
 
     public OrderBy newDefaultOrderBy(EntityDef entityDef) {
-        if (StringUtils.isNotBlank(entityDef.getOrderByAsc())) {
-            List<String> properties = StrUtil.splitTrim(entityDef.getOrderByAsc(), ",");
-            List<String> columns = toAliases(properties);
-            return new OrderBy(columns, Order.ASC);
-        }
-        if (StringUtils.isNotBlank(entityDef.getOrderByDesc())) {
-            List<String> properties = StrUtil.splitTrim(entityDef.getOrderByDesc(), ",");
-            List<String> columns = toAliases(properties);
-            return new OrderBy(columns, Order.DESC);
-        }
+//        if (StringUtils.isNotBlank(entityDef.getOrderByAsc())) {
+//            List<String> properties = StrUtil.splitTrim(entityDef.getOrderByAsc(), ",");
+//            List<String> columns = toAliases(properties);
+//            return new OrderBy(columns, Order.ASC);
+//        }
+//        if (StringUtils.isNotBlank(entityDef.getOrderByDesc())) {
+//            List<String> properties = StrUtil.splitTrim(entityDef.getOrderByDesc(), ",");
+//            List<String> columns = toAliases(properties);
+//            return new OrderBy(columns, Order.DESC);
+//        }
         return null;
     }
 

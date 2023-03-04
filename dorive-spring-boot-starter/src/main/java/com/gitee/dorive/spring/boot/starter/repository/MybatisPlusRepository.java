@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.core.api.EntityFactory;
 import com.gitee.dorive.core.api.Executor;
-import com.gitee.dorive.core.entity.definition.EntityDef;
+import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.core.entity.element.EntityEle;
 import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.DefaultEntityFactory;
@@ -65,7 +65,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK
 
         Class<?> factoryClass = entityDef.getFactory();
         EntityFactory entityFactory;
-        if (factoryClass == DefaultEntityFactory.class) {
+        if (factoryClass == Object.class) {
             entityFactory = new DefaultEntityFactory();
         } else {
             entityFactory = (EntityFactory) applicationContext.getBean(factoryClass);

@@ -17,31 +17,26 @@
 package com.gitee.dorive.core.impl;
 
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.core.entity.Command;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Map;
 
 public class OperationTypeResolver {
 
     public static int resolveOperationType(Context context, CommonRepository repository) {
-        Map<String, Object> attachments = context.getAttachments();
-
-        EntityDef entityDef = repository.getEntityDef();
-        String commandKey = entityDef.getCommandKey();
-        
-        if (StringUtils.isNotBlank(commandKey) && attachments.containsKey(commandKey)) {
-            Command command = (Command) attachments.get(commandKey);
-            if (command.isForceIgnore()) {
-                return Operation.FORCE_IGNORE;
-
-            } else if (command.isForceInsert()) {
-                return Operation.FORCE_INSERT;
-            }
-        }
+//        Map<String, Object> attachments = context.getAttachments();
+//
+//        EntityDef entityDef = repository.getEntityDef();
+//        String commandKey = entityDef.getCommandKey();
+//
+//        if (StringUtils.isNotBlank(commandKey) && attachments.containsKey(commandKey)) {
+//            Command command = (Command) attachments.get(commandKey);
+//            if (command.isForceIgnore()) {
+//                return Operation.FORCE_IGNORE;
+//
+//            } else if (command.isForceInsert()) {
+//                return Operation.FORCE_INSERT;
+//            }
+//        }
         return Operation.NONE;
     }
 

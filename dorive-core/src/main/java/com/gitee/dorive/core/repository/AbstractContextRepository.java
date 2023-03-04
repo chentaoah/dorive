@@ -22,7 +22,7 @@ import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.api.Executor;
-import com.gitee.dorive.core.entity.definition.EntityDef;
+import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.core.entity.element.EntityEle;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.AliasConverter;
@@ -114,7 +114,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @SuppressWarnings("unchecked")
     private CommonRepository newRepository(String accessPath, AnnotatedElement annotatedElement) {
-        EntityDef entityDef = EntityDef.newEntityDefinition(annotatedElement);
+        EntityDef entityDef = EntityDef.fromElement(annotatedElement);
         if (entityDef == null) {
             throw new RuntimeException("The Entity definition is null!");
         }
@@ -122,7 +122,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         if (annotatedElement instanceof Field) {
             Class<?> genericType = entityEle.getGenericType();
-            EntityDef genericEntityDef = EntityDef.newEntityDefinition(genericType);
+            EntityDef genericEntityDef = EntityDef.fromElement(genericType);
             if (genericEntityDef != null) {
                 entityDef.merge(genericEntityDef);
             }
@@ -132,7 +132,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         Class<?> repositoryClass = entityDef.getRepository();
         Object repository;
-        if (repositoryClass == DefaultRepository.class) {
+        if (repositoryClass == Object.class) {
             repository = new DefaultRepository();
         } else {
             repository = applicationContext.getBean(repositoryClass);

@@ -16,25 +16,22 @@
  */
 package com.gitee.dorive.core.impl.handler;
 
-import com.gitee.dorive.core.api.Selector;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.executor.UnionExample;
+import com.gitee.dorive.api.api.PropProxy;
+import com.gitee.dorive.api.entity.element.PropChain;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.api.EntityIndex;
-import com.gitee.dorive.core.api.ExampleBuilder;
-import com.gitee.dorive.api.api.PropProxy;
-import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.api.entity.element.PropChain;
+import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.OperationFactory;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
-import java.util.Map;
 
 public class BatchEntityHandler implements EntityHandler {
 
@@ -76,9 +73,9 @@ public class BatchEntityHandler implements EntityHandler {
         PropChain anchorPoint = repository.getAnchorPoint();
         PropChain lastPropChain = anchorPoint.getLastPropChain();
 
-        Map<String, Object> attachments = context.getAttachments();
-        String builderKey = repository.getEntityDef().getBuilderKey();
-        ExampleBuilder exampleBuilder = StringUtils.isNotBlank(builderKey) ? (ExampleBuilder) attachments.get(builderKey) : null;
+//        Map<String, Object> attachments = context.getAttachments();
+//        String builderKey = repository.getEntityDef().getBuilderKey();
+//        ExampleBuilder exampleBuilder = StringUtils.isNotBlank(builderKey) ? (ExampleBuilder) attachments.get(builderKey) : null;
 
         UnionExample unionExample = new UnionExample();
         for (int index = 0; index < rootEntities.size(); index++) {
@@ -86,9 +83,9 @@ public class BatchEntityHandler implements EntityHandler {
             Object lastEntity = lastPropChain == null ? rootEntity : lastPropChain.getValue(rootEntity);
             if (lastEntity != null) {
                 Example example = repository.newExampleByContext(context, rootEntity);
-                if (exampleBuilder != null) {
-                    example = exampleBuilder.buildExample(context, rootEntity, example);
-                }
+//                if (exampleBuilder != null) {
+//                    example = exampleBuilder.buildExample(context, rootEntity, example);
+//                }
                 if (example.isDirtyQuery()) {
                     example.extraColumns((index + 1) + " as $row");
                     unionExample.addExample(example);

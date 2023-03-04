@@ -1,17 +1,15 @@
 package com.gitee.dorive.web.impl;
 
+import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
-import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.BoundedContext;
-import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.selector.NameSelector;
-import com.gitee.dorive.core.impl.selector.SceneSelector;
-import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.web.api.RestService;
 import com.gitee.dorive.web.common.ResObject;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -38,8 +36,7 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
         this.repository = (R) applicationContext.getBean(repositoryType);
         EntityDef entityDef = repository.getEntityDef();
         String name = entityDef.getName();
-        String[] scenes = entityDef.getScenes();
-        this.selector = StringUtils.isNotBlank(name) ? new NameSelector(name) : new SceneSelector(scenes);
+        this.selector = new NameSelector(name);
     }
 
     @Override
@@ -80,5 +77,5 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
     protected Context newContext(E entity, Q query) {
         return new BoundedContext(selector);
     }
-    
+
 }
