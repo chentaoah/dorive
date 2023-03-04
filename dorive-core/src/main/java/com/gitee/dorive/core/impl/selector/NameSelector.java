@@ -2,7 +2,7 @@ package com.gitee.dorive.core.impl.selector;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
+import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -49,15 +49,15 @@ public class NameSelector extends AbstractSelector {
         if (wildcard) {
             return true;
         }
-        EntityDefinition entityDefinition = repository.getEntityDefinition();
-        String name = entityDefinition.getName();
+        EntityDef entityDef = repository.getEntityDef();
+        String name = entityDef.getName();
         return StringUtils.isBlank(name) || nameDefMap.containsKey(name);
     }
 
     @Override
     public List<String> selectColumns(Context context, CommonRepository repository) {
-        EntityDefinition entityDefinition = repository.getEntityDefinition();
-        String name = entityDefinition.getName();
+        EntityDef entityDef = repository.getEntityDef();
+        String name = entityDef.getName();
         NameDef nameDef = nameDefMap.get(name);
         return nameDef != null && !nameDef.getProperties().isEmpty() ? nameDef.getProperties() : null;
     }

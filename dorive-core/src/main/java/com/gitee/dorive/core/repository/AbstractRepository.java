@@ -20,8 +20,8 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.Executor;
 import com.gitee.dorive.core.api.Repository;
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.element.EntityElement;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
+import com.gitee.dorive.core.entity.element.EntityEle;
+import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
@@ -34,8 +34,8 @@ import java.util.List;
 @Data
 public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Executor {
     
-    protected EntityDefinition entityDefinition;
-    protected EntityElement entityElement;
+    protected EntityDef entityDef;
+    protected EntityEle entityEle;
     protected OperationFactory operationFactory;
     protected Executor executor;
 

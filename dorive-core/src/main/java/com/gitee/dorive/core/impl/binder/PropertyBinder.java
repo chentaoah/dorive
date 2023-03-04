@@ -18,8 +18,8 @@ package com.gitee.dorive.core.impl.binder;
 
 import com.gitee.dorive.core.api.Processor;
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.definition.BindingDefinition;
-import com.gitee.dorive.core.entity.element.PropertyChain;
+import com.gitee.dorive.core.entity.definition.BindingDef;
+import com.gitee.dorive.core.entity.element.PropChain;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,36 +30,36 @@ public class PropertyBinder extends AbstractBinder {
 
     protected String belongAccessPath;
     protected CommonRepository belongRepository;
-    protected PropertyChain boundPropertyChain;
+    protected PropChain boundPropChain;
     protected String bindAlias;
 
-    public PropertyBinder(BindingDefinition bindingDefinition,
-                          PropertyChain fieldPropertyChain,
+    public PropertyBinder(BindingDef bindingDef,
+                          PropChain fieldPropChain,
                           Processor processor,
                           String alias,
                           String belongAccessPath,
                           CommonRepository belongRepository,
-                          PropertyChain boundPropertyChain,
+                          PropChain boundPropChain,
                           String bindAlias) {
-        super(bindingDefinition, fieldPropertyChain, processor, alias);
+        super(bindingDef, fieldPropChain, processor, alias);
         this.belongAccessPath = belongAccessPath;
         this.belongRepository = belongRepository;
-        this.boundPropertyChain = boundPropertyChain;
+        this.boundPropChain = boundPropChain;
         this.bindAlias = bindAlias;
     }
 
     public boolean isSameType() {
-        return fieldPropertyChain.isSameType(boundPropertyChain);
+        return fieldPropChain.isSameType(boundPropChain);
     }
 
     @Override
     public Object getBoundValue(Context context, Object rootEntity) {
-        return boundPropertyChain.getValue(rootEntity);
+        return boundPropChain.getValue(rootEntity);
     }
 
     @Override
     public void setBoundValue(Context context, Object rootEntity, Object property) {
-        boundPropertyChain.setValue(rootEntity, property);
+        boundPropChain.setValue(rootEntity, property);
     }
 
 }

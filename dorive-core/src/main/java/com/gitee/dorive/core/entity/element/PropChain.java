@@ -17,7 +17,7 @@
 package com.gitee.dorive.core.entity.element;
 
 import com.gitee.dorive.api.api.PropProxy;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
+import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.api.impl.factory.PropProxyFactory;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,22 +27,22 @@ import java.lang.reflect.Field;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ToString(exclude = "lastPropertyChain")
-public class PropertyChain extends Property implements PropProxy {
+@ToString(exclude = "lastPropChain")
+public class PropChain extends Property implements PropProxy {
 
-    protected PropertyChain lastPropertyChain;
+    protected PropChain lastPropChain;
     protected Class<?> entityClass;
     protected String accessPath;
-    protected EntityDefinition entityDefinition;
+    protected EntityDef entityDef;
     protected PropProxy propProxy;
 
-    public PropertyChain(PropertyChain lastPropertyChain, Class<?> entityClass, String accessPath, Field declaredField) {
+    public PropChain(PropChain lastPropChain, Class<?> entityClass, String accessPath, Field declaredField) {
         super(declaredField);
-        this.lastPropertyChain = lastPropertyChain;
+        this.lastPropChain = lastPropChain;
         this.entityClass = entityClass;
         this.accessPath = accessPath;
-        this.entityDefinition = EntityDefinition.newEntityDefinition(declaredField);
-        if (entityDefinition != null) {
+        this.entityDef = EntityDef.newEntityDefinition(declaredField);
+        if (entityDef != null) {
             newPropertyProxy();
         }
     }
@@ -50,28 +50,28 @@ public class PropertyChain extends Property implements PropProxy {
     public void newPropertyProxy() {
         if (propProxy == null) {
             propProxy = PropProxyFactory.newPropProxy(entityClass, declaredField);
-            if (lastPropertyChain != null) {
-                lastPropertyChain.newPropertyProxy();
+            if (lastPropChain != null) {
+                lastPropChain.newPropertyProxy();
             }
         }
     }
 
     public boolean isAnnotatedEntity() {
-        return entityDefinition != null;
+        return entityDef != null;
     }
 
     @Override
     public Object getValue(Object entity) {
-        if (lastPropertyChain != null) {
-            entity = lastPropertyChain.getValue(entity);
+        if (lastPropChain != null) {
+            entity = lastPropChain.getValue(entity);
         }
         return entity != null ? propProxy.getValue(entity) : null;
     }
 
     @Override
     public void setValue(Object entity, Object value) {
-        if (lastPropertyChain != null) {
-            entity = lastPropertyChain.getValue(entity);
+        if (lastPropChain != null) {
+            entity = lastPropChain.getValue(entity);
         }
         if (entity != null) {
             propProxy.setValue(entity, value);

@@ -2,7 +2,7 @@ package com.gitee.dorive.core.impl.selector;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
+import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,8 +29,8 @@ public class SceneSelector extends AbstractSelector {
 
     @Override
     public boolean matches(Context context, CommonRepository repository) {
-        EntityDefinition entityDefinition = repository.getEntityDefinition();
-        String[] scenes = entityDefinition.getScenes();
+        EntityDef entityDef = repository.getEntityDef();
+        String[] scenes = entityDef.getScenes();
         if (scenes == null || scenes.length == 0) {
             return true;
         }

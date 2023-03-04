@@ -23,7 +23,7 @@ import com.gitee.dorive.api.annotation.Alias;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.impl.factory.PropProxyFactory;
 import com.gitee.dorive.core.api.constant.Order;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
+import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,7 +38,7 @@ import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class EntityElement {
+public class EntityEle {
 
     private AnnotatedElement annotatedElement;
     private boolean collection;
@@ -46,7 +46,7 @@ public class EntityElement {
     private PropProxy primaryKeyProxy;
     private Map<String, PropertyDef> propertyDefMap;
 
-    public static EntityElement newEntityElement(AnnotatedElement annotatedElement) {
+    public static EntityEle newEntityElement(AnnotatedElement annotatedElement) {
         boolean isCollection = false;
         Class<?> entityClass = null;
 
@@ -59,12 +59,12 @@ public class EntityElement {
             entityClass = property.getGenericFieldClass();
         }
 
-        EntityElement entityElement = new EntityElement(annotatedElement, isCollection, entityClass, null, null);
-        return processEntityElement(entityElement);
+        EntityEle entityEle = new EntityEle(annotatedElement, isCollection, entityClass, null, null);
+        return processEntityElement(entityEle);
     }
 
-    private static EntityElement processEntityElement(EntityElement entityElement) {
-        Class<?> genericType = entityElement.getGenericType();
+    private static EntityEle processEntityElement(EntityEle entityEle) {
+        Class<?> genericType = entityEle.getGenericType();
         PropProxy primaryKeyProxy = newPrimaryKeyProxy(genericType);
 
         Field[] fields = ReflectUtil.getFields(genericType);
@@ -81,9 +81,9 @@ public class EntityElement {
             propertyDefMap.put(property, new PropertyDef(property, isAssign, alias));
         }
 
-        entityElement.setPrimaryKeyProxy(primaryKeyProxy);
-        entityElement.setPropertyDefMap(propertyDefMap);
-        return entityElement;
+        entityEle.setPrimaryKeyProxy(primaryKeyProxy);
+        entityEle.setPropertyDefMap(propertyDefMap);
+        return entityEle;
     }
 
     private static PropProxy newPrimaryKeyProxy(Class<?> entityClass) {
@@ -109,14 +109,14 @@ public class EntityElement {
         return properties;
     }
 
-    public OrderBy newDefaultOrderBy(EntityDefinition entityDefinition) {
-        if (StringUtils.isNotBlank(entityDefinition.getOrderByAsc())) {
-            List<String> properties = StrUtil.splitTrim(entityDefinition.getOrderByAsc(), ",");
+    public OrderBy newDefaultOrderBy(EntityDef entityDef) {
+        if (StringUtils.isNotBlank(entityDef.getOrderByAsc())) {
+            List<String> properties = StrUtil.splitTrim(entityDef.getOrderByAsc(), ",");
             List<String> columns = toAliases(properties);
             return new OrderBy(columns, Order.ASC);
         }
-        if (StringUtils.isNotBlank(entityDefinition.getOrderByDesc())) {
-            List<String> properties = StrUtil.splitTrim(entityDefinition.getOrderByDesc(), ",");
+        if (StringUtils.isNotBlank(entityDef.getOrderByDesc())) {
+            List<String> properties = StrUtil.splitTrim(entityDef.getOrderByDesc(), ",");
             List<String> columns = toAliases(properties);
             return new OrderBy(columns, Order.DESC);
         }

@@ -21,8 +21,8 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.core.api.EntityFactory;
 import com.gitee.dorive.core.api.Executor;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
-import com.gitee.dorive.core.entity.element.EntityElement;
+import com.gitee.dorive.core.entity.definition.EntityDef;
+import com.gitee.dorive.core.entity.element.EntityEle;
 import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.DefaultEntityFactory;
 import com.gitee.dorive.simple.repository.AbstractSimpleRepository;
@@ -46,8 +46,8 @@ public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK
 
     @Override
     @SuppressWarnings("unchecked")
-    protected Executor newExecutor(EntityDefinition entityDefinition, EntityElement entityElement) {
-        Class<?> mapperClass = entityDefinition.getSource();
+    protected Executor newExecutor(EntityDef entityDef, EntityEle entityEle) {
+        Class<?> mapperClass = entityDef.getSource();
         Object mapper = null;
         Class<?> pojoClass = null;
         if (mapperClass != Object.class) {
@@ -63,7 +63,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK
             }
         }
 
-        Class<?> factoryClass = entityDefinition.getFactory();
+        Class<?> factoryClass = entityDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == DefaultEntityFactory.class) {
             entityFactory = new DefaultEntityFactory();
@@ -72,11 +72,11 @@ public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK
         }
         if (entityFactory instanceof DefaultEntityFactory) {
             DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
-            defaultEntityFactory.setEntityElement(entityElement);
+            defaultEntityFactory.setEntityEle(entityEle);
             defaultEntityFactory.setPojoClass(pojoClass);
-            defaultEntityFactory.setAliasPropMapping(entityElement.newAliasPropMapping());
+            defaultEntityFactory.setAliasPropMapping(entityEle.newAliasPropMapping());
             if (pojoClass != null) {
-                Map<String, String> aliasPropMapping = entityElement.newAliasPropMapping();
+                Map<String, String> aliasPropMapping = entityEle.newAliasPropMapping();
                 Map<String, String> propPojoMapping = new LinkedHashMap<>();
                 List<TableFieldInfo> fieldList = TableInfoHelper.getTableInfo(pojoClass).getFieldList();
                 for (TableFieldInfo tableFieldInfo : fieldList) {
@@ -91,9 +91,9 @@ public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK
             }
         }
 
-        AliasConverter aliasConverter = new AliasConverter(entityElement);
+        AliasConverter aliasConverter = new AliasConverter(entityEle);
 
-        return new MybatisPlusExecutor(entityDefinition, entityElement, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass,
+        return new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass,
                 entityFactory, aliasConverter);
     }
 

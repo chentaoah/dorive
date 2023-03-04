@@ -31,8 +31,8 @@ import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.core.api.constant.Order;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.Command;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
-import com.gitee.dorive.core.entity.element.EntityElement;
+import com.gitee.dorive.core.entity.definition.EntityDef;
+import com.gitee.dorive.core.entity.element.EntityEle;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -66,21 +66,21 @@ import static com.gitee.dorive.spring.boot.starter.impl.AppenderContext.OPERATOR
 @ToString
 public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHolder {
 
-    private EntityDefinition entityDefinition;
-    private EntityElement entityElement;
+    private EntityDef entityDef;
+    private EntityEle entityEle;
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;
     private EntityFactory entityFactory;
     private AliasConverter aliasConverter;
 
-    public MybatisPlusExecutor(EntityDefinition entityDefinition,
-                               EntityElement entityElement,
+    public MybatisPlusExecutor(EntityDef entityDef,
+                               EntityEle entityEle,
                                BaseMapper<Object> baseMapper,
                                Class<Object> pojoClass,
                                EntityFactory entityFactory,
                                AliasConverter aliasConverter) {
-        this.entityDefinition = entityDefinition;
-        this.entityElement = entityElement;
+        this.entityDef = entityDef;
+        this.entityEle = entityEle;
         this.baseMapper = baseMapper;
         this.pojoClass = pojoClass;
         this.entityFactory = entityFactory;
@@ -236,7 +236,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         if (operation instanceof Insert) {
             int count = baseMapper.insert(persistent);
             Object primaryKey = BeanUtil.getFieldValue(persistent, "id");
-            PropProxy primaryKeyProxy = entityElement.getPrimaryKeyProxy();
+            PropProxy primaryKeyProxy = entityEle.getPrimaryKeyProxy();
             primaryKeyProxy.setValue(entity, primaryKey);
             return count;
 
@@ -249,7 +249,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
             }
 
             Map<String, Object> attachments = context.getAttachments();
-            String commandKey = entityDefinition.getCommandKey();
+            String commandKey = entityDef.getCommandKey();
             if (StringUtils.isNotBlank(commandKey) && attachments.containsKey(commandKey)) {
                 Command command = (Command) attachments.get(commandKey);
                 Set<String> nullableProperties = command.getNullableProperties();

@@ -32,25 +32,25 @@ import java.util.Set;
 
 @Data
 @AllArgsConstructor
-public class BindingDefinition {
+public class BindingDef {
 
     private String field;
     private String bindExp;
     private String property;
     private Class<?> processor;
 
-    public static List<BindingDefinition> newBindingDefinitions(AnnotatedElement annotatedElement) {
+    public static List<BindingDef> newBindingDefinitions(AnnotatedElement annotatedElement) {
         Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(annotatedElement, Binding.class);
-        List<BindingDefinition> bindingDefinitions = new ArrayList<>(bindingAnnotations.size());
+        List<BindingDef> bindingDefs = new ArrayList<>(bindingAnnotations.size());
         for (Binding bindingAnnotation : bindingAnnotations) {
             Map<String, Object> annotationAttributes = AnnotationUtils.getAnnotationAttributes(bindingAnnotation);
             Object processor = annotationAttributes.get("processor");
             if (processor == Object.class) {
                 annotationAttributes.put("processor", DefaultProcessor.class);
             }
-            bindingDefinitions.add(BeanUtil.copyProperties(annotationAttributes, BindingDefinition.class));
+            bindingDefs.add(BeanUtil.copyProperties(annotationAttributes, BindingDef.class));
         }
-        return bindingDefinitions;
+        return bindingDefs;
     }
 
 }

@@ -4,7 +4,7 @@ import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.BoundedContext;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
+import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.selector.NameSelector;
 import com.gitee.dorive.core.impl.selector.SceneSelector;
@@ -36,9 +36,9 @@ public abstract class AbstractService<R extends AbstractCoatingRepository<E, Int
     public void afterPropertiesSet() {
         Class<?> repositoryType = ReflectUtils.getFirstArgumentType(this.getClass());
         this.repository = (R) applicationContext.getBean(repositoryType);
-        EntityDefinition entityDefinition = repository.getEntityDefinition();
-        String name = entityDefinition.getName();
-        String[] scenes = entityDefinition.getScenes();
+        EntityDef entityDef = repository.getEntityDef();
+        String name = entityDef.getName();
+        String[] scenes = entityDef.getScenes();
         this.selector = StringUtils.isNotBlank(name) ? new NameSelector(name) : new SceneSelector(scenes);
     }
 

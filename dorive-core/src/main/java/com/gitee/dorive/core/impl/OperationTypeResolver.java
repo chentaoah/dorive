@@ -17,7 +17,7 @@
 package com.gitee.dorive.core.impl;
 
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
+import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.entity.Command;
@@ -30,8 +30,8 @@ public class OperationTypeResolver {
     public static int resolveOperationType(Context context, CommonRepository repository) {
         Map<String, Object> attachments = context.getAttachments();
 
-        EntityDefinition entityDefinition = repository.getEntityDefinition();
-        String commandKey = entityDefinition.getCommandKey();
+        EntityDef entityDef = repository.getEntityDef();
+        String commandKey = entityDef.getCommandKey();
         
         if (StringUtils.isNotBlank(commandKey) && attachments.containsKey(commandKey)) {
             Command command = (Command) attachments.get(commandKey);

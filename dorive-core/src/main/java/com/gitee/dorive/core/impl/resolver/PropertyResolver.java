@@ -16,8 +16,8 @@
  */
 package com.gitee.dorive.core.impl.resolver;
 
-import com.gitee.dorive.core.entity.element.PropertyChain;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
+import com.gitee.dorive.core.entity.element.PropChain;
+import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.core.repository.DefaultRepository;
 import lombok.Data;
 import org.springframework.util.ReflectionUtils;
@@ -29,7 +29,7 @@ import java.util.Map;
 public class PropertyResolver {
 
     private boolean ignoreEntity;
-    private Map<String, PropertyChain> allPropertyChainMap = new LinkedHashMap<>();
+    private Map<String, PropChain> allPropertyChainMap = new LinkedHashMap<>();
 
     public PropertyResolver(boolean ignoreEntity) {
         this.ignoreEntity = ignoreEntity;
@@ -40,25 +40,25 @@ public class PropertyResolver {
     }
 
     public void resolveProperties(String lastAccessPath, Class<?> entityClass) {
-        PropertyChain lastPropertyChain = allPropertyChainMap.get(lastAccessPath);
+        PropChain lastPropChain = allPropertyChainMap.get(lastAccessPath);
         ReflectionUtils.doWithLocalFields(entityClass, declaredField -> {
             String accessPath = lastAccessPath + "/" + declaredField.getName();
 
-            PropertyChain propertyChain = new PropertyChain(lastPropertyChain, entityClass, accessPath, declaredField);
-            allPropertyChainMap.put(accessPath, propertyChain);
+            PropChain propChain = new PropChain(lastPropChain, entityClass, accessPath, declaredField);
+            allPropertyChainMap.put(accessPath, propChain);
 
-            EntityDefinition entityDefinition = propertyChain.getEntityDefinition();
-            if (entityDefinition != null) {
+            EntityDef entityDef = propChain.getEntityDef();
+            if (entityDef != null) {
                 if (ignoreEntity) {
                     return;
                 }
-                Class<?> repository = entityDefinition.getRepository();
+                Class<?> repository = entityDef.getRepository();
                 if (repository != null && repository != DefaultRepository.class) {
                     return;
                 }
             }
 
-            Class<?> fieldClass = propertyChain.getFieldClass();
+            Class<?> fieldClass = propChain.getFieldClass();
             if (!filterEntityClass(fieldClass)) {
                 resolveProperties(accessPath, fieldClass);
             }

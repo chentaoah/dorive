@@ -28,16 +28,16 @@ import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class AdapterDefinition {
+public class AdapterDef {
 
     private Class<?> adapter;
     private String[] args;
 
-    public static AdapterDefinition newAdapterDefinition(AnnotatedElement annotatedElement) {
+    public static AdapterDef newAdapterDefinition(AnnotatedElement annotatedElement) {
         Adapter adapterAnnotation = AnnotatedElementUtils.getMergedAnnotation(annotatedElement, Adapter.class);
         if (adapterAnnotation != null) {
             Map<String, Object> annotationAttributes = AnnotationUtils.getAnnotationAttributes(adapterAnnotation);
-            return BeanUtil.copyProperties(annotationAttributes, AdapterDefinition.class);
+            return BeanUtil.copyProperties(annotationAttributes, AdapterDef.class);
         }
         return null;
     }

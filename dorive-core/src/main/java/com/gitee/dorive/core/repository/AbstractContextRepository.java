@@ -18,9 +18,9 @@ package com.gitee.dorive.core.repository;
 
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.api.Executor;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
-import com.gitee.dorive.core.entity.element.EntityElement;
-import com.gitee.dorive.core.entity.element.PropertyChain;
+import com.gitee.dorive.core.entity.definition.EntityDef;
+import com.gitee.dorive.core.entity.element.EntityEle;
+import com.gitee.dorive.core.entity.element.PropChain;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.OperationFactory;
@@ -86,7 +86,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         this.rootRepository = rootRepository;
         orderedRepositories.add(rootRepository);
 
-        Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
+        Map<String, PropChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
         allPropertyChainMap.forEach((accessPath, propertyChain) -> {
             if (propertyChain.isAnnotatedEntity()) {
                 CommonRepository subRepository = newRepository(accessPath, propertyChain.getDeclaredField());
@@ -96,10 +96,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         });
 
-        orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityDefinition().getPriority()));
+        orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityDef().getPriority()));
 
-        setEntityDefinition(rootRepository.getEntityDefinition());
-        setEntityElement(rootRepository.getEntityElement());
+        setEntityDef(rootRepository.getEntityDef());
+        setEntityEle(rootRepository.getEntityEle());
         setOperationFactory(rootRepository.getOperationFactory());
 
         EntityHandler batchEntityHandler = new BatchEntityHandler(this, rootRepository.getOperationFactory());
@@ -118,23 +118,23 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @SuppressWarnings("unchecked")
     private CommonRepository newRepository(String accessPath, AnnotatedElement annotatedElement) {
-        EntityDefinition entityDefinition = EntityDefinition.newEntityDefinition(annotatedElement);
-        if (entityDefinition == null) {
+        EntityDef entityDef = EntityDef.newEntityDefinition(annotatedElement);
+        if (entityDef == null) {
             throw new RuntimeException("The Entity definition is null!");
         }
-        EntityElement entityElement = EntityElement.newEntityElement(annotatedElement);
+        EntityEle entityEle = EntityEle.newEntityElement(annotatedElement);
 
         if (annotatedElement instanceof Field) {
-            Class<?> genericType = entityElement.getGenericType();
-            EntityDefinition genericEntityDefinition = EntityDefinition.newEntityDefinition(genericType);
-            if (genericEntityDefinition != null) {
-                entityDefinition.merge(genericEntityDefinition);
+            Class<?> genericType = entityEle.getGenericType();
+            EntityDef genericEntityDef = EntityDef.newEntityDefinition(genericType);
+            if (genericEntityDef != null) {
+                entityDef.merge(genericEntityDef);
             }
         }
 
-        OperationFactory operationFactory = new OperationFactory(entityElement);
+        OperationFactory operationFactory = new OperationFactory(entityEle);
 
-        Class<?> repositoryClass = entityDefinition.getRepository();
+        Class<?> repositoryClass = entityDef.getRepository();
         Object repository;
         if (repositoryClass == DefaultRepository.class) {
             repository = new DefaultRepository();
@@ -143,10 +143,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
         if (repository instanceof DefaultRepository) {
             DefaultRepository defaultRepository = (DefaultRepository) repository;
-            defaultRepository.setEntityDefinition(entityDefinition);
-            defaultRepository.setEntityElement(entityElement);
+            defaultRepository.setEntityDef(entityDef);
+            defaultRepository.setEntityEle(entityEle);
             defaultRepository.setOperationFactory(operationFactory);
-            defaultRepository.setExecutor(newExecutor(entityDefinition, entityElement));
+            defaultRepository.setExecutor(newExecutor(entityDef, entityEle));
         }
 
         boolean isRoot = "/".equals(accessPath);
@@ -154,24 +154,24 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         repository = postProcessRepository((AbstractRepository<Object, Object>) repository);
 
-        Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
-        PropertyChain anchorPoint = allPropertyChainMap.get(accessPath);
+        Map<String, PropChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
+        PropChain anchorPoint = allPropertyChainMap.get(accessPath);
 
         PropertyResolver propertyResolver = new PropertyResolver(true);
-        String lastAccessPath = isRoot || entityElement.isCollection() ? "" : accessPath;
-        propertyResolver.resolveProperties(lastAccessPath, entityElement.getGenericType());
+        String lastAccessPath = isRoot || entityEle.isCollection() ? "" : accessPath;
+        propertyResolver.resolveProperties(lastAccessPath, entityEle.getGenericType());
 
-        OrderBy defaultOrderBy = entityElement.newDefaultOrderBy(entityDefinition);
+        OrderBy defaultOrderBy = entityEle.newDefaultOrderBy(entityDef);
 
         BinderResolver binderResolver = new BinderResolver(this);
         String fieldPrefix = lastAccessPath + "/";
-        binderResolver.resolveAllBinders(accessPath, entityElement, entityDefinition, fieldPrefix, propertyResolver);
+        binderResolver.resolveAllBinders(accessPath, entityEle, entityDef, fieldPrefix, propertyResolver);
 
-        AliasConverter aliasConverter = new AliasConverter(entityElement);
+        AliasConverter aliasConverter = new AliasConverter(entityEle);
 
         CommonRepository commonRepository = new CommonRepository();
-        commonRepository.setEntityDefinition(entityDefinition);
-        commonRepository.setEntityElement(entityElement);
+        commonRepository.setEntityDef(entityDef);
+        commonRepository.setEntityEle(entityEle);
         commonRepository.setOperationFactory(operationFactory);
         commonRepository.setProxyRepository((AbstractRepository<Object, Object>) repository);
         commonRepository.setAccessPath(accessPath);
@@ -187,7 +187,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return commonRepository;
     }
 
-    protected abstract Executor newExecutor(EntityDefinition entityDefinition, EntityElement entityElement);
+    protected abstract Executor newExecutor(EntityDef entityDef, EntityEle entityEle);
 
     protected abstract AbstractRepository<Object, Object> postProcessRepository(AbstractRepository<Object, Object> repository);
 

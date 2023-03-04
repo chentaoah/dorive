@@ -32,7 +32,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EntityDefinition {
+public class EntityDef {
 
     private String name;
     private String[] scenes;
@@ -45,7 +45,7 @@ public class EntityDefinition {
     private String builderKey;
     private String commandKey;
 
-    public static EntityDefinition newEntityDefinition(AnnotatedElement annotatedElement) {
+    public static EntityDef newEntityDefinition(AnnotatedElement annotatedElement) {
         if (annotatedElement.isAnnotationPresent(Entity.class)) {
             Map<String, Object> annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Entity.class);
             if (annotationAttributes != null) {
@@ -58,23 +58,23 @@ public class EntityDefinition {
                     annotationAttributes.put("repository", DefaultRepository.class);
                 }
             }
-            return BeanUtil.copyProperties(annotationAttributes, EntityDefinition.class);
+            return BeanUtil.copyProperties(annotationAttributes, EntityDef.class);
         }
         return null;
     }
 
-    public void merge(EntityDefinition entityDefinition) {
+    public void merge(EntityDef entityDef) {
         if (StringUtils.isBlank(name)) {
-            name = entityDefinition.getName();
+            name = entityDef.getName();
         }
         if (scenes == null || scenes.length == 0) {
-            scenes = entityDefinition.getScenes();
+            scenes = entityDef.getScenes();
         }
         if (source == null || source == Object.class) {
-            source = entityDefinition.getSource();
+            source = entityDef.getSource();
         }
         if (factory == null || factory == DefaultEntityFactory.class) {
-            factory = entityDefinition.getFactory();
+            factory = entityDef.getFactory();
         }
     }
 

@@ -17,7 +17,7 @@
 package com.gitee.dorive.core.impl.resolver;
 
 import com.gitee.dorive.core.api.ContextAdapter;
-import com.gitee.dorive.core.entity.definition.AdapterDefinition;
+import com.gitee.dorive.core.entity.definition.AdapterDef;
 import com.gitee.dorive.core.impl.DefaultContextAdapter;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import lombok.Data;
@@ -36,9 +36,9 @@ public class AdapterResolver {
 
     public void resolveAdapter() {
         Class<?> entityClass = repository.getEntityClass();
-        AdapterDefinition adapterDefinition = AdapterDefinition.newAdapterDefinition(entityClass);
-        if (adapterDefinition != null) {
-            Class<?> adapterClass = adapterDefinition.getAdapter();
+        AdapterDef adapterDef = AdapterDef.newAdapterDefinition(entityClass);
+        if (adapterDef != null) {
+            Class<?> adapterClass = adapterDef.getAdapter();
             if (adapterClass == DefaultContextAdapter.class) {
                 contextAdapter = new DefaultContextAdapter();
             } else {
@@ -47,7 +47,7 @@ public class AdapterResolver {
             }
             if (contextAdapter instanceof DefaultContextAdapter) {
                 DefaultContextAdapter defaultContextAdapter = (DefaultContextAdapter) contextAdapter;
-                defaultContextAdapter.setAdapterDefinition(adapterDefinition);
+                defaultContextAdapter.setAdapterDef(adapterDef);
             }
         }
     }

@@ -20,7 +20,7 @@ import com.gitee.dorive.core.api.MetadataHolder;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.api.Selector;
-import com.gitee.dorive.core.entity.element.PropertyChain;
+import com.gitee.dorive.core.entity.element.PropChain;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -44,7 +44,7 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
     protected String accessPath;
     protected boolean root;
     protected boolean aggregated;
-    protected PropertyChain anchorPoint;
+    protected PropChain anchorPoint;
     protected PropertyResolver propertyResolver;
     protected OrderBy defaultOrderBy;
     protected String fieldPrefix;
@@ -134,12 +134,12 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
     }
 
     public Object getPrimaryKey(Object entity) {
-        PropProxy primaryKeyProxy = entityElement.getPrimaryKeyProxy();
+        PropProxy primaryKeyProxy = entityEle.getPrimaryKeyProxy();
         return primaryKeyProxy.getValue(entity);
     }
 
     public Object convertManyToOne(List<?> entities) {
-        if (entityElement.isCollection()) {
+        if (entityEle.isCollection()) {
             return entities;
         } else if (!entities.isEmpty()) {
             return entities.get(0);
