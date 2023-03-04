@@ -16,11 +16,14 @@
  */
 package com.gitee.dorive.core.repository;
 
+import com.gitee.dorive.api.entity.element.EntityType;
+import com.gitee.dorive.api.entity.element.PropChain;
+import com.gitee.dorive.api.impl.resolver.PropChainResolver;
+import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.api.Executor;
 import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.core.entity.element.EntityEle;
-import com.gitee.dorive.core.entity.element.PropChain;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.OperationFactory;
@@ -31,8 +34,6 @@ import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
 import com.gitee.dorive.core.impl.resolver.AdapterResolver;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
-import com.gitee.dorive.core.impl.resolver.PropertyResolver;
-import com.gitee.dorive.api.util.ReflectUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.BeansException;
@@ -42,11 +43,7 @@ import org.springframework.context.ApplicationContextAware;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -55,10 +52,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected ApplicationContext applicationContext;
 
     protected Class<?> entityClass;
+    protected EntityType entityType;
+    protected PropChainResolver propChainResolver;
 
     protected DelegateResolver delegateResolver = new DelegateResolver(this);
     protected AdapterResolver adapterResolver = new AdapterResolver(this);
-    protected PropertyResolver propertyResolver = new PropertyResolver(false);
 
     protected Map<String, CommonRepository> allRepositoryMap = new LinkedHashMap<>();
     protected CommonRepository rootRepository;
@@ -73,21 +71,19 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     @Override
     public void afterPropertiesSet() throws Exception {
         entityClass = ReflectUtils.getFirstArgumentType(this.getClass());
+        entityType = EntityType.getInstance(entityClass);
+        propChainResolver = new PropChainResolver(entityType);
 
         delegateResolver.resolveDelegateRepositoryMap();
         adapterResolver.resolveAdapter();
-
-        List<Class<?>> allClasses = ReflectUtils.getAllSuperclasses(entityClass, Object.class);
-        allClasses.add(entityClass);
-        allClasses.forEach(clazz -> propertyResolver.resolveProperties(clazz));
 
         CommonRepository rootRepository = newRepository("/", entityClass);
         allRepositoryMap.put("/", rootRepository);
         this.rootRepository = rootRepository;
         orderedRepositories.add(rootRepository);
 
-        Map<String, PropChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
-        allPropertyChainMap.forEach((accessPath, propertyChain) -> {
+        Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
+        propChainMap.forEach((accessPath, propertyChain) -> {
             if (propertyChain.isAnnotatedEntity()) {
                 CommonRepository subRepository = newRepository(accessPath, propertyChain.getDeclaredField());
                 allRepositoryMap.put(accessPath, subRepository);
@@ -154,18 +150,18 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         repository = postProcessRepository((AbstractRepository<Object, Object>) repository);
 
-        Map<String, PropChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
-        PropChain anchorPoint = allPropertyChainMap.get(accessPath);
+        Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
+        PropChain anchorPoint = propChainMap.get(accessPath);
 
-        PropertyResolver propertyResolver = new PropertyResolver(true);
         String lastAccessPath = isRoot || entityEle.isCollection() ? "" : accessPath;
-        propertyResolver.resolveProperties(lastAccessPath, entityEle.getGenericType());
+        EntityType entityType = EntityType.getInstance(entityEle.getGenericType());
+        PropChainResolver propChainResolver = new PropChainResolver(lastAccessPath, entityType);
 
         OrderBy defaultOrderBy = entityEle.newDefaultOrderBy(entityDef);
 
         BinderResolver binderResolver = new BinderResolver(this);
         String fieldPrefix = lastAccessPath + "/";
-        binderResolver.resolveAllBinders(accessPath, entityEle, entityDef, fieldPrefix, propertyResolver);
+        binderResolver.resolveAllBinders(accessPath, entityEle, entityDef, fieldPrefix, propChainResolver);
 
         AliasConverter aliasConverter = new AliasConverter(entityEle);
 
@@ -178,7 +174,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         commonRepository.setRoot(isRoot);
         commonRepository.setAggregated(aggregated);
         commonRepository.setAnchorPoint(anchorPoint);
-        commonRepository.setPropertyResolver(propertyResolver);
+        commonRepository.setPropChainResolver(propChainResolver);
         commonRepository.setDefaultOrderBy(defaultOrderBy);
         commonRepository.setFieldPrefix(fieldPrefix);
         commonRepository.setBinderResolver(binderResolver);

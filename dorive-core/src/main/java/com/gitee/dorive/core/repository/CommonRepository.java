@@ -16,11 +16,12 @@
  */
 package com.gitee.dorive.core.repository;
 
-import com.gitee.dorive.core.api.MetadataHolder;
 import com.gitee.dorive.api.api.PropProxy;
+import com.gitee.dorive.api.entity.element.PropChain;
+import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.MetadataHolder;
 import com.gitee.dorive.core.api.Selector;
-import com.gitee.dorive.core.entity.element.PropChain;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -30,7 +31,6 @@ import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.impl.resolver.PropertyResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -45,7 +45,7 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
     protected boolean root;
     protected boolean aggregated;
     protected PropChain anchorPoint;
-    protected PropertyResolver propertyResolver;
+    protected PropChainResolver propChainResolver;
     protected OrderBy defaultOrderBy;
     protected String fieldPrefix;
     protected BinderResolver binderResolver;

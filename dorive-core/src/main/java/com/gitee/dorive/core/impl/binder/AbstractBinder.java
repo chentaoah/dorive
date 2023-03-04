@@ -20,7 +20,7 @@ import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.definition.BindingDef;
 import com.gitee.dorive.core.api.Binder;
 import com.gitee.dorive.core.api.Processor;
-import com.gitee.dorive.core.entity.element.PropChain;
+import com.gitee.dorive.api.entity.element.PropChain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

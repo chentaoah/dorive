@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.binder;
 import com.gitee.dorive.core.api.Processor;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.definition.BindingDef;
-import com.gitee.dorive.core.entity.element.PropChain;
+import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;

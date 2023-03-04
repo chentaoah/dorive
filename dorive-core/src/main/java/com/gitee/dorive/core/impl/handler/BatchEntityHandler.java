@@ -24,7 +24,7 @@ import com.gitee.dorive.core.api.EntityIndex;
 import com.gitee.dorive.core.api.ExampleBuilder;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.element.PropChain;
+import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;

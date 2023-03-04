@@ -17,12 +17,13 @@
 package com.gitee.dorive.core.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.Binder;
 import com.gitee.dorive.core.api.Processor;
 import com.gitee.dorive.core.entity.definition.BindingDef;
 import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.core.entity.element.EntityEle;
-import com.gitee.dorive.core.entity.element.PropChain;
+import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.processor.DefaultProcessor;
@@ -56,10 +57,10 @@ public class BinderResolver {
     }
 
     public void resolveAllBinders(String accessPath, EntityEle entityEle, EntityDef entityDef,
-                                  String fieldPrefix, PropertyResolver propertyResolver) {
+                                  String fieldPrefix, PropChainResolver propChainResolver) {
 
         List<BindingDef> bindingDefs = BindingDef.newBindingDefinitions(entityEle.getAnnotatedElement());
-        Map<String, PropChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
+        Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
 
         allBinders = new ArrayList<>(bindingDefs.size());
         propertyBinders = new ArrayList<>(bindingDefs.size());
@@ -74,13 +75,9 @@ public class BinderResolver {
             String field = bindingDef.getField();
             String alias = entityEle.toAlias(field);
 
-            PropChain fieldPropChain = allPropertyChainMap.get(fieldPrefix + field);
-            Assert.notNull(
-                    fieldPropChain,
-                    "The field property chain cannot be null! entity: {}, field: {}",
-                    entityEle.getGenericType().getSimpleName(),
-                    field);
-            fieldPropChain.newPropertyProxy();
+            PropChain fieldPropChain = propChainMap.get(fieldPrefix + field);
+            Assert.notNull(fieldPropChain, "The field property chain cannot be null! entity: {}, field: {}", entityEle.getGenericType().getSimpleName(), field);
+            fieldPropChain.newPropProxy();
 
             Processor processor = newProcessor(bindingDef);
 
@@ -159,10 +156,10 @@ public class BinderResolver {
         Assert.notNull(belongRepository, "The belong repository cannot be null!");
         belongRepository.setBoundEntity(true);
 
-        Map<String, PropChain> allPropertyChainMap = repository.getPropertyResolver().getAllPropertyChainMap();
-        PropChain boundPropChain = allPropertyChainMap.get(bindExp);
+        Map<String, PropChain> propChainMap = repository.getPropChainResolver().getPropChainMap();
+        PropChain boundPropChain = propChainMap.get(bindExp);
         Assert.notNull(boundPropChain, "The bound property chain cannot be null!");
-        boundPropChain.newPropertyProxy();
+        boundPropChain.newPropProxy();
 
         EntityEle entityEle = belongRepository.getEntityEle();
         String fieldName = StringUtils.isNotBlank(property) ? property : PathUtils.getLastName(bindExp);
