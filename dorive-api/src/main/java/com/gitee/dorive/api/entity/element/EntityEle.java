@@ -27,7 +27,7 @@ public abstract class EntityEle {
         this.bindingDefs = BindingDef.fromElement(element);
     }
 
-    public boolean isEntity() {
+    public boolean isAnnotatedEntity() {
         return entityDef != null;
     }
 
