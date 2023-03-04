@@ -20,7 +20,7 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.Binder;
 import com.gitee.dorive.core.api.Processor;
-import com.gitee.dorive.core.entity.definition.BindingDef;
+import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.core.entity.definition.EntityDef;
 import com.gitee.dorive.core.entity.element.EntityEle;
 import com.gitee.dorive.api.entity.element.PropChain;
@@ -59,7 +59,14 @@ public class BinderResolver {
     public void resolveAllBinders(String accessPath, EntityEle entityEle, EntityDef entityDef,
                                   String fieldPrefix, PropChainResolver propChainResolver) {
 
-        List<BindingDef> bindingDefs = BindingDef.newBindingDefinitions(entityEle.getAnnotatedElement());
+        List<BindingDef> bindingDefs = BindingDef.fromElement(entityEle.getAnnotatedElement());
+        for (BindingDef bindingDef : bindingDefs) {
+            Class<?> processor = bindingDef.getProcessor();
+            if (processor == Object.class) {
+                bindingDef.setProcessor(DefaultProcessor.class);
+            }
+        }
+
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
 
         allBinders = new ArrayList<>(bindingDefs.size());

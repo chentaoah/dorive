@@ -17,7 +17,7 @@
 package com.gitee.dorive.core.impl.processor;
 
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.definition.BindingDef;
+import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.core.api.Processor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
