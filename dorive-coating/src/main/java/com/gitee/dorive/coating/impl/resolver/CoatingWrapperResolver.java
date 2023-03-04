@@ -23,7 +23,7 @@ import com.gitee.dorive.coating.entity.definition.PropertyDefinition;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.coating.util.ResourceUtils;
 import com.gitee.dorive.core.entity.element.EntityEle;
-import com.gitee.dorive.core.entity.element.Property;
+import com.gitee.dorive.core.entity.Property;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;

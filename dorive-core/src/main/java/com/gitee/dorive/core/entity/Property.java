@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.dorive.core.entity.element;
+package com.gitee.dorive.core.entity;
 
 import cn.hutool.core.util.ReflectUtil;
 import lombok.Data;

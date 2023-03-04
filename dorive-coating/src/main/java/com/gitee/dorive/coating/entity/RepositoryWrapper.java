@@ -18,7 +18,7 @@ package com.gitee.dorive.coating.entity;
 
 import com.gitee.dorive.coating.entity.definition.PropertyDefinition;
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.element.Property;
+import com.gitee.dorive.core.entity.Property;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.ContextBinder;

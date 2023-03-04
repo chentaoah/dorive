@@ -23,6 +23,7 @@ import com.gitee.dorive.api.annotation.Alias;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.impl.factory.PropProxyFactory;
+import com.gitee.dorive.core.entity.Property;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
