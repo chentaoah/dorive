@@ -52,6 +52,10 @@ public class PropChain implements PropProxy {
         }
     }
 
+    public boolean isSameType(PropChain propChain) {
+        return this.entityField.isSameType(propChain.getEntityField());
+    }
+
     @Override
     public Object getValue(Object entity) {
         if (lastPropChain != null) {
