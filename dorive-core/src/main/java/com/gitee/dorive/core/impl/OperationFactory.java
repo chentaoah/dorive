@@ -1,7 +1,7 @@
 package com.gitee.dorive.core.impl;
 
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.*;
 import lombok.AllArgsConstructor;
@@ -31,7 +31,7 @@ public class OperationFactory {
 
     public Update buildUpdate(Context context, Object entity) {
         Update update = new Update(Operation.UPDATE, entity);
-        Object primaryKey = entityEle.getPrimaryKeyProxy().getValue(entity);
+        Object primaryKey = entityEle.getPkProxy().getValue(entity);
         update.setPrimaryKey(primaryKey);
         return update;
     }
@@ -43,7 +43,7 @@ public class OperationFactory {
     }
 
     public Operation buildInsertOrUpdate(Context context, Object entity) {
-        Object primaryKey = entityEle.getPrimaryKeyProxy().getValue(entity);
+        Object primaryKey = entityEle.getPkProxy().getValue(entity);
         if (primaryKey == null) {
             return new Insert(Operation.INSERT, entity);
         } else {
@@ -55,7 +55,7 @@ public class OperationFactory {
 
     public Delete buildDelete(Context context, Object entity) {
         Delete delete = new Delete(Operation.DELETE, entity);
-        Object primaryKey = entityEle.getPrimaryKeyProxy().getValue(entity);
+        Object primaryKey = entityEle.getPkProxy().getValue(entity);
         delete.setPrimaryKey(primaryKey);
         return delete;
     }

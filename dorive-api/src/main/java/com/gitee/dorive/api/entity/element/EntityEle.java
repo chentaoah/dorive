@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +22,16 @@ public abstract class EntityEle {
     private List<BindingDef> bindingDefs;
     private PropProxy pkProxy;
     private Map<String, String> aliasMap;
+
+    public static EntityEle fromElement(AnnotatedElement element) {
+        if (element instanceof Class) {
+            return EntityType.getInstance((Class<?>) element);
+
+        } else if (element instanceof Field) {
+            return new EntityField((Field) element);
+        }
+        throw new RuntimeException("Unsupported type!");
+    }
 
     public EntityEle(AnnotatedElement element) {
         this.element = element;
@@ -55,6 +67,12 @@ public abstract class EntityEle {
             return columns;
         }
         return properties;
+    }
+
+    public Map<String, String> newAliasPropMap() {
+        Map<String, String> map = new LinkedHashMap<>();
+        aliasMap.forEach((key, value) -> map.put(value, key));
+        return map;
     }
 
     protected abstract void doInitialize();

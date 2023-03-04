@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.core.api.EntityFactory;
 import com.gitee.dorive.core.api.Executor;
 import com.gitee.dorive.api.entity.def.EntityDef;
-import com.gitee.dorive.core.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.DefaultEntityFactory;
 import com.gitee.dorive.simple.repository.AbstractSimpleRepository;
@@ -74,9 +74,9 @@ public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK
             DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
             defaultEntityFactory.setEntityEle(entityEle);
             defaultEntityFactory.setPojoClass(pojoClass);
-            defaultEntityFactory.setAliasPropMapping(entityEle.newAliasPropMapping());
+            defaultEntityFactory.setAliasPropMapping(entityEle.newAliasPropMap());
             if (pojoClass != null) {
-                Map<String, String> aliasPropMapping = entityEle.newAliasPropMapping();
+                Map<String, String> aliasPropMapping = entityEle.newAliasPropMap();
                 Map<String, String> propPojoMapping = new LinkedHashMap<>();
                 List<TableFieldInfo> fieldList = TableInfoHelper.getTableInfo(pojoClass).getFieldList();
                 for (TableFieldInfo tableFieldInfo : fieldList) {

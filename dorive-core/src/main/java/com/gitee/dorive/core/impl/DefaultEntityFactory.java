@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.EntityFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;

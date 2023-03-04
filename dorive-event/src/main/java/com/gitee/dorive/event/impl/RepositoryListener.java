@@ -16,7 +16,7 @@
  */
 package com.gitee.dorive.event.impl;
 
-import com.gitee.dorive.core.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.event.annotation.Listener;
 import com.gitee.dorive.event.api.EntityListener;
 import com.gitee.dorive.event.entity.RepositoryEvent;

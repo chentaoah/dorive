@@ -16,14 +16,16 @@
  */
 package com.gitee.dorive.core.repository;
 
+import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.api.entity.element.EntityType;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.api.Executor;
-import com.gitee.dorive.api.entity.def.EntityDef;
-import com.gitee.dorive.core.entity.element.EntityEle;
+import com.gitee.dorive.core.api.constant.Order;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.OperationFactory;
@@ -36,6 +38,7 @@ import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -118,7 +121,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         if (entityDef == null) {
             throw new RuntimeException("The Entity definition is null!");
         }
-        EntityEle entityEle = EntityEle.newEntityElement(annotatedElement);
+        EntityEle entityEle = EntityEle.fromElement(annotatedElement);
 
         if (annotatedElement instanceof Field) {
             Class<?> genericType = entityEle.getGenericType();
@@ -157,7 +160,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         EntityType entityType = EntityType.getInstance(entityEle.getGenericType());
         PropChainResolver propChainResolver = new PropChainResolver(lastAccessPath, entityType);
 
-        OrderBy defaultOrderBy = entityEle.newDefaultOrderBy(entityDef);
+        OrderBy defaultOrderBy = newDefaultOrderBy(entityDef, entityEle);
 
         BinderResolver binderResolver = new BinderResolver(this);
         String fieldPrefix = lastAccessPath + "/";
@@ -181,6 +184,17 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         commonRepository.setBoundEntity(false);
         commonRepository.setAliasConverter(aliasConverter);
         return commonRepository;
+    }
+
+    private OrderBy newDefaultOrderBy(EntityDef entityDef, EntityEle entityEle) {
+        String sortBy = entityDef.getSortBy();
+        String order = entityDef.getOrder().toUpperCase();
+        if (StringUtils.isNotBlank(sortBy) && (Order.ASC.equals(order) || Order.DESC.equals(order))) {
+            List<String> properties = StrUtil.splitTrim(sortBy, ",");
+            List<String> columns = entityEle.toAliases(properties);
+            return new OrderBy(columns, order);
+        }
+        return null;
     }
 
     protected abstract Executor newExecutor(EntityDef entityDef, EntityEle entityEle);

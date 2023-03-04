@@ -22,7 +22,7 @@ import com.gitee.dorive.coating.entity.definition.CoatingDefinition;
 import com.gitee.dorive.coating.entity.definition.PropertyDefinition;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.coating.util.ResourceUtils;
-import com.gitee.dorive.core.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.entity.Property;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
@@ -135,7 +135,7 @@ public class CoatingWrapperResolver {
                 propertyWrappers.addAll(belongToPropertyWrappers);
             }
 
-            Map<String, EntityEle.PropertyDef> propertyDefMap = entityEle.getPropertyDefMap();
+            Map<String, String> propertyDefMap = entityEle.getAliasMap();
             for (String fieldName : propertyDefMap.keySet()) {
                 PropertyWrapper propertyWrapper = fieldPropertyWrapperMap.get(fieldName);
                 if (propertyWrapper != null) {

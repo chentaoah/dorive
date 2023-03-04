@@ -134,7 +134,7 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
     }
 
     public Object getPrimaryKey(Object entity) {
-        PropProxy primaryKeyProxy = entityEle.getPrimaryKeyProxy();
+        PropProxy primaryKeyProxy = entityEle.getPkProxy();
         return primaryKeyProxy.getValue(entity);
     }
 

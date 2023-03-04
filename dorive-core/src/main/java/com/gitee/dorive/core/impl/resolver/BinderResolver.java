@@ -22,7 +22,7 @@ import com.gitee.dorive.core.api.Binder;
 import com.gitee.dorive.core.api.Processor;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
-import com.gitee.dorive.core.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
@@ -59,7 +59,7 @@ public class BinderResolver {
     public void resolveAllBinders(String accessPath, EntityEle entityEle, EntityDef entityDef,
                                   String fieldPrefix, PropChainResolver propChainResolver) {
 
-        List<BindingDef> bindingDefs = BindingDef.fromElement(entityEle.getAnnotatedElement());
+        List<BindingDef> bindingDefs = BindingDef.fromElement(entityEle.getElement());
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
 
         allBinders = new ArrayList<>(bindingDefs.size());
