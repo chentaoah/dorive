@@ -30,7 +30,7 @@ import com.gitee.dorive.core.impl.processor.DefaultProcessor;
 import com.gitee.dorive.core.impl.processor.PropertyProcessor;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.api.util.PathUtils;
+import com.gitee.dorive.core.util.PathUtils;
 import com.gitee.dorive.api.util.ReflectUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
