@@ -122,6 +122,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             throw new RuntimeException("The Entity definition is null!");
         }
         EntityEle entityEle = EntityEle.fromElement(annotatedElement);
+        entityEle.initialize();
 
         if (annotatedElement instanceof Field) {
             Class<?> genericType = entityEle.getGenericType();

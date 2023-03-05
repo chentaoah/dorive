@@ -16,6 +16,7 @@
  */
 package com.gitee.dorive.coating.entity;
 
+import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.coating.entity.definition.PropertyDefinition;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.Property;
@@ -53,8 +54,9 @@ public class RepositoryWrapper {
         for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
             Object boundValue = contextBinder.getBoundValue(context, null);
             if (boundValue != null) {
-                String alias = contextBinder.getAlias();
-                example.eq(alias, boundValue);
+                BindingDef bindingDef = contextBinder.getBindingDef();
+                String field = bindingDef.getField();
+                example.eq(field, boundValue);
             }
         }
         return example;

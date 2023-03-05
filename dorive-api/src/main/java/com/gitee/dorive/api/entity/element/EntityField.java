@@ -61,6 +61,7 @@ public class EntityField extends EntityEle {
     @Override
     protected void doInitialize() {
         if (entityType != null) {
+            entityType.initialize();
             setPkProxy(entityType.getPkProxy());
             setAliasMap(entityType.getAliasMap());
         }

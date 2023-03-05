@@ -17,6 +17,7 @@
 package com.gitee.dorive.coating.impl;
 
 import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.entity.CoatingWrapper;
 import com.gitee.dorive.coating.entity.MergedRepository;
@@ -122,11 +123,12 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                         targetExample.setEmptyQuery(true);
                         continue;
                     }
-
-                    String bindAlias = propertyBinder.getBindAlias();
+                    
+                    PropChain boundPropChain = propertyBinder.getBoundPropChain();
+                    String field = boundPropChain.getEntityField().getName();
                     Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
                     fieldValue = propertyBinder.output(context, fieldValue);
-                    targetExample.eq(bindAlias, fieldValue);
+                    targetExample.eq(field, fieldValue);
                 }
             }
         });

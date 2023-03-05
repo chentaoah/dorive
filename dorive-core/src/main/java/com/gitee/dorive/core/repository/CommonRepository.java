@@ -17,6 +17,7 @@
 package com.gitee.dorive.core.repository;
 
 import com.gitee.dorive.api.api.PropProxy;
+import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.Context;
@@ -108,14 +109,15 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
     public Example newExampleByContext(Context context, Object rootEntity) {
         Example example = new Example();
         for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
-            String alias = propertyBinder.getAlias();
+            BindingDef bindingDef = propertyBinder.getBindingDef();
+            String field = bindingDef.getField();
             Object boundValue = propertyBinder.getBoundValue(context, rootEntity);
             if (boundValue instanceof Collection) {
                 boundValue = !((Collection<?>) boundValue).isEmpty() ? boundValue : null;
             }
             if (boundValue != null) {
                 boundValue = propertyBinder.input(context, boundValue);
-                example.eq(alias, boundValue);
+                example.eq(field, boundValue);
             } else {
                 example.getCriteria().clear();
                 break;
@@ -123,10 +125,11 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
         }
         if (example.isDirtyQuery()) {
             for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
-                String alias = contextBinder.getAlias();
+                BindingDef bindingDef = contextBinder.getBindingDef();
+                String field = bindingDef.getField();
                 Object boundValue = contextBinder.getBoundValue(context, rootEntity);
                 if (boundValue != null) {
-                    example.eq(alias, boundValue);
+                    example.eq(field, boundValue);
                 }
             }
         }
