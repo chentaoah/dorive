@@ -22,7 +22,7 @@ import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.impl.DefaultExampleBuilder;
 import com.gitee.dorive.coating.impl.resolver.CoatingWrapperResolver;
 import com.gitee.dorive.coating.impl.resolver.MergedRepositoryResolver;
-import com.gitee.dorive.core.annotation.Repository;
+import com.gitee.dorive.api.annotation.Repository;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
