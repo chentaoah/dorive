@@ -26,6 +26,7 @@ public class EntityType extends EntityEle {
     private static final Set<Class<?>> LOCK = new ConcurrentHashSet<>();
 
     private Class<?> type;
+    private String name;
     private AdapterDef adapterDef;
     private Map<String, EntityField> entityFields = new LinkedHashMap<>();
 
@@ -44,6 +45,7 @@ public class EntityType extends EntityEle {
         Assert.isTrue(LOCK.add(type), "Circular dependency!");
 
         this.type = type;
+        this.name = type.getName();
         this.adapterDef = AdapterDef.fromElement(type);
         for (Field field : ReflectUtil.getFields(type)) {
             if (!Modifier.isStatic(field.getModifiers())) {

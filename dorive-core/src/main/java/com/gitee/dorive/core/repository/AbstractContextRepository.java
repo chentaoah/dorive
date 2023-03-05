@@ -16,6 +16,7 @@
  */
 package com.gitee.dorive.core.repository;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
@@ -55,8 +56,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected EntityType entityType;
     protected PropChainResolver propChainResolver;
 
-    protected DelegateResolver delegateResolver = new DelegateResolver(this);
-    protected AdapterResolver adapterResolver = new AdapterResolver(this);
+    protected DelegateResolver delegateResolver;
+    protected AdapterResolver adapterResolver;
 
     protected Map<String, CommonRepository> repositoryMap = new LinkedHashMap<>();
     protected CommonRepository rootRepository;
@@ -76,10 +77,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     public void afterPropertiesSet() throws Exception {
         Class<?> entityClass = ReflectUtils.getFirstArgumentType(this.getClass());
         entityType = EntityType.getInstance(entityClass);
+        Assert.isTrue(entityType.isAnnotatedEntity(), "No @Entity annotation found! type: {}", entityType.getName());
         propChainResolver = new PropChainResolver(entityType);
 
-        delegateResolver.resolve();
-        adapterResolver.resolve();
+        delegateResolver = new DelegateResolver(this);
+        adapterResolver = new AdapterResolver(this);
 
         CommonRepository rootRepository = newRepository("/", entityType);
         repositoryMap.put("/", rootRepository);
@@ -148,7 +150,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         EntityType entityType = EntityType.getInstance(entityEle.getGenericType());
         PropChainResolver propChainResolver = new PropChainResolver(lastAccessPath, entityType);
         String fieldPrefix = lastAccessPath + "/";
-        binderResolver.resolveAllBinders(accessPath, entityEle, fieldPrefix, propChainResolver);
+        binderResolver.resolve(accessPath, entityEle, propChainResolver, fieldPrefix);
 
         AliasConverter aliasConverter = new AliasConverter(entityEle);
 

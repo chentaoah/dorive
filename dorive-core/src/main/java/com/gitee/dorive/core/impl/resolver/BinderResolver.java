@@ -16,6 +16,7 @@
  */
 package com.gitee.dorive.core.impl.resolver;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.Binder;
@@ -56,8 +57,8 @@ public class BinderResolver {
         this.repository = repository;
     }
 
-    public void resolveAllBinders(String accessPath, EntityEle entityEle, String fieldPrefix, PropChainResolver propChainResolver) {
-        List<BindingDef> bindingDefs = BindingDef.fromElement(entityEle.getElement());
+    public void resolve(String accessPath, EntityEle entityEle, PropChainResolver propChainResolver, String fieldPrefix) {
+        List<BindingDef> bindingDefs = entityEle.getBindingDefs();
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
 
         allBinders = new ArrayList<>(bindingDefs.size());
@@ -68,7 +69,7 @@ public class BinderResolver {
         boundIdBinder = null;
 
         for (BindingDef bindingDef : bindingDefs) {
-            renewBindingDefinition(accessPath, bindingDef);
+            bindingDef = renewBindingDef(accessPath, bindingDef);
 
             String field = bindingDef.getField();
             String alias = entityEle.toAlias(field);
@@ -106,14 +107,14 @@ public class BinderResolver {
         }
     }
 
-    private void renewBindingDefinition(String accessPath, BindingDef bindingDef) {
+    private BindingDef renewBindingDef(String accessPath, BindingDef bindingDef) {
+        bindingDef = BeanUtil.copyProperties(bindingDef, BindingDef.class);
         String bindExp = bindingDef.getBindExp();
-        if (bindExp.startsWith("/") || bindExp.startsWith(".")) {
-            if (bindExp.startsWith(".")) {
-                bindExp = PathUtils.getAbsolutePath(accessPath, bindExp);
-            }
+        if (bindExp.startsWith(".")) {
+            bindExp = PathUtils.getAbsolutePath(accessPath, bindExp);
+            bindingDef.setBindExp(bindExp);
         }
-        bindingDef.setBindExp(bindExp);
+        return bindingDef;
     }
 
     private Processor newProcessor(BindingDef bindingDef) {
@@ -149,9 +150,9 @@ public class BinderResolver {
         String bindExp = bindingDef.getBindExp();
         String property = bindingDef.getProperty();
 
-        Map<String, CommonRepository> allRepositoryMap = repository.getRepositoryMap();
-        String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), bindExp);
-        CommonRepository belongRepository = allRepositoryMap.get(belongAccessPath);
+        Map<String, CommonRepository> repositoryMap = repository.getRepositoryMap();
+        String belongAccessPath = PathUtils.getBelongPath(repositoryMap.keySet(), bindExp);
+        CommonRepository belongRepository = repositoryMap.get(belongAccessPath);
         Assert.notNull(belongRepository, "The belong repository cannot be null!");
         belongRepository.setBoundEntity(true);
 

@@ -27,7 +27,7 @@ public class PropChainResolver {
             String accessPath = lastAccessPath + "/" + entityField.getName();
             PropChain propChain = new PropChain(lastPropChain, entityType, accessPath, entityField);
             propChainMap.put(accessPath, propChain);
-            if (EntityField.filter(entityField.getType()) && !entityField.isAggregated()) {
+            if (EntityField.filter(entityField.getType()) && !entityField.isAnnotatedEntity()) {
                 resolve(accessPath, entityField.getEntityType());
             }
         }

@@ -16,6 +16,7 @@
  */
 package com.gitee.dorive.core.impl.resolver;
 
+import com.gitee.dorive.api.entity.element.EntityType;
 import com.gitee.dorive.core.api.ContextAdapter;
 import com.gitee.dorive.api.entity.def.AdapterDef;
 import com.gitee.dorive.core.impl.DefaultContextAdapter;
@@ -27,19 +28,19 @@ import org.springframework.context.ApplicationContext;
 public class AdapterResolver {
 
     private AbstractContextRepository<?, ?> repository;
-
     private ContextAdapter contextAdapter;
 
     public AdapterResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
+        resolve();
     }
 
     public void resolve() {
-        Class<?> entityClass = repository.getEntityClass();
-        AdapterDef adapterDef = AdapterDef.fromElement(entityClass);
+        EntityType entityType = repository.getEntityType();
+        AdapterDef adapterDef = entityType.getAdapterDef();
         if (adapterDef != null) {
             Class<?> adapterClass = adapterDef.getAdapter();
-            if (adapterClass == DefaultContextAdapter.class) {
+            if (adapterClass == Object.class) {
                 contextAdapter = new DefaultContextAdapter();
             } else {
                 ApplicationContext applicationContext = repository.getApplicationContext();
