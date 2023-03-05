@@ -29,7 +29,7 @@ public class EntityType extends EntityEle {
     private AdapterDef adapterDef;
     private Map<String, EntityField> entityFields = new LinkedHashMap<>();
 
-    public static EntityType getInstance(Class<?> type) {
+    public static synchronized EntityType getInstance(Class<?> type) {
         EntityType entityType = CACHE.get(type);
         if (entityType == null) {
             entityType = new EntityType(type);
@@ -48,7 +48,6 @@ public class EntityType extends EntityEle {
         for (Field field : ReflectUtil.getFields(type)) {
             if (!Modifier.isStatic(field.getModifiers())) {
                 EntityField entityField = new EntityField(field);
-                entityField.initialize();
                 entityFields.put(entityField.getName(), entityField);
             }
         }

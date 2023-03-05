@@ -42,6 +42,7 @@ public class EntityField extends EntityEle {
             this.genericType = (Class<?>) actualTypeArgument;
         }
         resolve(field);
+        initialize();
     }
 
     private void resolve(Field field) {
