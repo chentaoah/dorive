@@ -25,7 +25,7 @@ import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.api.Executor;
-import com.gitee.dorive.core.api.constant.Order;
+import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.OperationFactory;

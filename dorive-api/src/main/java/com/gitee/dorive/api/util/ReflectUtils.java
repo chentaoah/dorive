@@ -18,34 +18,18 @@ package com.gitee.dorive.api.util;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class ReflectUtils {
+
+    public static Object newInstance(Class<?> type) {
+        return org.springframework.cglib.core.ReflectUtils.newInstance(type);
+    }
 
     public static Class<?> getFirstArgumentType(Class<?> type) {
         Type genericSuperclass = type.getGenericSuperclass();
         ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
         return (Class<?>) actualTypeArgument;
-    }
-
-    public static Object newInstance(Class<?> type) {
-        return org.springframework.cglib.core.ReflectUtils.newInstance(type);
-    }
-
-    public static List<Class<?>> getAllSuperclasses(Class<?> type, Class<?> ignoredType) {
-        List<Class<?>> superclasses = new ArrayList<>();
-        Class<?> superclass = type.getSuperclass();
-        while (superclass != null) {
-            if (superclass != ignoredType) {
-                superclasses.add(superclass);
-            }
-            superclass = superclass.getSuperclass();
-        }
-        Collections.reverse(superclasses);
-        return superclasses;
     }
 
 }

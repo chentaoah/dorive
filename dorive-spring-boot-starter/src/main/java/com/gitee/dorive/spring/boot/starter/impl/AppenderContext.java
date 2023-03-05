@@ -18,7 +18,7 @@ package com.gitee.dorive.spring.boot.starter.impl;
 
 import com.baomidou.mybatisplus.core.conditions.interfaces.Compare;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
-import com.gitee.dorive.core.api.constant.Operator;
+import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.util.SqlUtils;
 
 import java.util.Collection;

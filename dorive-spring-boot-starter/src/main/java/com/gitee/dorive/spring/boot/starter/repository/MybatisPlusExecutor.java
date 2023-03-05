@@ -30,7 +30,7 @@ import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.api.EntityFactory;
 import com.gitee.dorive.core.api.MetadataHolder;
-import com.gitee.dorive.core.api.constant.Order;
+import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.core.entity.operation.*;

@@ -1,7 +1,7 @@
 package com.gitee.dorive.core.util;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.core.api.constant.Operator;
+import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.entity.executor.Criterion;
 
 import java.text.SimpleDateFormat;

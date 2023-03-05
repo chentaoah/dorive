@@ -17,8 +17,8 @@
 package com.gitee.dorive.core.entity.executor;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.core.api.constant.Operator;
-import com.gitee.dorive.core.api.constant.Order;
+import com.gitee.dorive.api.constant.Operator;
+import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.core.util.StringUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;

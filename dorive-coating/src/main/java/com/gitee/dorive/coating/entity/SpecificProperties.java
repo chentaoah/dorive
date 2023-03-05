@@ -19,7 +19,7 @@
 package com.gitee.dorive.coating.entity;
 
 import cn.hutool.core.convert.Convert;
-import com.gitee.dorive.core.api.constant.Order;
+import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.util.StringUtils;
