@@ -34,11 +34,10 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
     }
 
     @Override
-    protected AbstractRepository<Object, Object> postProcessRepository(AbstractRepository<Object, Object> repository) {
+    protected AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository) {
         if (enableEvent && (repository instanceof DefaultRepository)) {
             DefaultRepository defaultRepository = (DefaultRepository) repository;
             EventRepository eventRepository = new EventRepository(applicationContext);
-            eventRepository.setEntityDef(defaultRepository.getEntityDef());
             eventRepository.setEntityEle(defaultRepository.getEntityEle());
             eventRepository.setProxyRepository(repository);
             return eventRepository;

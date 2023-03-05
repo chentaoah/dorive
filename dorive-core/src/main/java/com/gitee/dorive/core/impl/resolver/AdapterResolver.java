@@ -34,7 +34,7 @@ public class AdapterResolver {
         this.repository = repository;
     }
 
-    public void resolveAdapter() {
+    public void resolve() {
         Class<?> entityClass = repository.getEntityClass();
         AdapterDef adapterDef = AdapterDef.fromElement(entityClass);
         if (adapterDef != null) {

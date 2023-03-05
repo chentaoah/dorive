@@ -53,7 +53,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
         if (repository != null && coatingScan != null) {
             this.querier = repository.querier();
             this.scanPackages = coatingScan.value();
-            this.regex = StringUtils.isBlank(coatingScan.regex()) ? "^" + entityClass.getSimpleName() + ".*" : coatingScan.regex();
+            this.regex = StringUtils.isBlank(coatingScan.regex()) ? "^" + getEntityClass().getSimpleName() + ".*" : coatingScan.regex();
 
             this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
             this.coatingWrapperResolver = new CoatingWrapperResolver(this);

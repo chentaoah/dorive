@@ -56,9 +56,7 @@ public class BinderResolver {
         this.repository = repository;
     }
 
-    public void resolveAllBinders(String accessPath, EntityEle entityEle, EntityDef entityDef,
-                                  String fieldPrefix, PropChainResolver propChainResolver) {
-
+    public void resolveAllBinders(String accessPath, EntityEle entityEle, String fieldPrefix, PropChainResolver propChainResolver) {
         List<BindingDef> bindingDefs = BindingDef.fromElement(entityEle.getElement());
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
 
@@ -91,6 +89,7 @@ public class BinderResolver {
                     if (!"id".equals(field)) {
                         boundValueBinders.add(propertyBinder);
                     } else {
+                        EntityDef entityDef = entityEle.getEntityDef();
                         if (entityDef.getPriority() == 0) {
                             entityDef.setPriority(-1);
                         }
@@ -150,7 +149,7 @@ public class BinderResolver {
         String bindExp = bindingDef.getBindExp();
         String property = bindingDef.getProperty();
 
-        Map<String, CommonRepository> allRepositoryMap = repository.getAllRepositoryMap();
+        Map<String, CommonRepository> allRepositoryMap = repository.getRepositoryMap();
         String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), bindExp);
         CommonRepository belongRepository = allRepositoryMap.get(belongAccessPath);
         Assert.notNull(belongRepository, "The belong repository cannot be null!");

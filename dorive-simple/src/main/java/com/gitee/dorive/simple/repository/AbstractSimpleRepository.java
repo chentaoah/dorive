@@ -5,7 +5,6 @@ import com.gitee.dorive.core.api.ContextBuilder;
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
-import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.simple.api.SimpleRepository;
 import com.gitee.dorive.simple.impl.RefInjector;
 
@@ -15,8 +14,8 @@ import java.util.List;
 public abstract class AbstractSimpleRepository<E, PK> extends AbstractCoatingRepository<E, PK> implements SimpleRepository<E, PK> {
 
     @Override
-    protected void postProcessEntityClass(AbstractContextRepository<?, ?> repository, EntityHandler entityHandler, Class<?> entityClass) {
-        RefInjector refInjector = new RefInjector(repository, entityHandler, entityClass);
+    protected void processEntityClass(EntityHandler entityHandler) {
+        RefInjector refInjector = new RefInjector(this, entityHandler, getEntityClass());
         Field field = refInjector.getField();
         if (field != null) {
             refInjector.inject(field, refInjector.createRef());

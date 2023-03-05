@@ -45,13 +45,17 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
     protected String accessPath;
     protected boolean root;
     protected boolean aggregated;
-    protected PropChain anchorPoint;
-    protected PropChainResolver propChainResolver;
+
     protected OrderBy defaultOrderBy;
-    protected String fieldPrefix;
+
+    protected PropChain anchorPoint;
     protected BinderResolver binderResolver;
-    protected boolean boundEntity;
+    protected PropChainResolver propChainResolver;
+    protected String fieldPrefix;
+    
     protected AliasConverter aliasConverter;
+
+    protected boolean boundEntity;
 
     @Override
     public int updateByExample(Context context, Object entity, Example example) {

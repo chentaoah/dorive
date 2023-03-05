@@ -35,7 +35,7 @@ public class DelegateResolver {
         this.repository = repository;
     }
 
-    public void resolveDelegateRepositoryMap() {
+    public void resolve() {
         ReflectionUtils.doWithLocalFields(repository.getClass(), declaredField -> {
             Class<?> fieldClass = declaredField.getType();
             if (AbstractContextRepository.class.isAssignableFrom(fieldClass)) {
