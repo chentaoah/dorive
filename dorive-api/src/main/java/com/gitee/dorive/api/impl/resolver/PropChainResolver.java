@@ -17,10 +17,6 @@ public class PropChainResolver {
         resolve("", entityType);
     }
 
-    public PropChainResolver(String lastAccessPath, EntityType entityType) {
-        resolve(lastAccessPath, entityType);
-    }
-
     private void resolve(String lastAccessPath, EntityType entityType) {
         PropChain lastPropChain = propChainMap.get(lastAccessPath);
         for (EntityField entityField : entityType.getEntityFields().values()) {

@@ -49,7 +49,6 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
     protected PropChain anchorPoint;
     protected BinderResolver binderResolver;
     protected PropChainResolver propChainResolver;
-    protected String fieldPrefix;
     protected AliasConverter aliasConverter;
     protected boolean boundEntity;
 

@@ -57,7 +57,7 @@ public class BinderResolver {
         this.repository = repository;
     }
 
-    public void resolve(String accessPath, EntityEle entityEle, PropChainResolver propChainResolver, String fieldPrefix) {
+    public void resolve(String accessPath, EntityEle entityEle, PropChainResolver propChainResolver) {
         List<BindingDef> bindingDefs = entityEle.getBindingDefs();
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
 
@@ -74,7 +74,7 @@ public class BinderResolver {
             String field = bindingDef.getField();
             String alias = entityEle.toAlias(field);
 
-            PropChain fieldPropChain = propChainMap.get(fieldPrefix + field);
+            PropChain fieldPropChain = propChainMap.get("/" + field);
             Assert.notNull(fieldPropChain, "The field property chain cannot be null! entity: {}, field: {}", entityEle.getGenericType().getSimpleName(), field);
             fieldPropChain.newPropProxy();
 

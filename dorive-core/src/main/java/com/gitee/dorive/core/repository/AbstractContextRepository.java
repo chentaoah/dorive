@@ -141,13 +141,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         PropChain anchorPoint = propChainMap.get(accessPath);
 
         BinderResolver binderResolver = new BinderResolver(this);
-
-        String lastAccessPath = isRoot || entityEle.isCollection() ? "" : accessPath;
         EntityType entityType = EntityType.getInstance(entityEle.getGenericType());
-        PropChainResolver propChainResolver = new PropChainResolver(lastAccessPath, entityType);
-
-        String fieldPrefix = lastAccessPath + "/";
-        binderResolver.resolve(accessPath, entityEle, propChainResolver, fieldPrefix);
+        PropChainResolver propChainResolver = new PropChainResolver(entityType);
+        binderResolver.resolve(accessPath, entityEle, propChainResolver);
 
         AliasConverter aliasConverter = new AliasConverter(entityEle);
 
@@ -162,7 +158,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         commonRepository.setAnchorPoint(anchorPoint);
         commonRepository.setBinderResolver(binderResolver);
         commonRepository.setPropChainResolver(propChainResolver);
-        commonRepository.setFieldPrefix(fieldPrefix);
         commonRepository.setAliasConverter(aliasConverter);
         commonRepository.setBoundEntity(false);
         return commonRepository;
