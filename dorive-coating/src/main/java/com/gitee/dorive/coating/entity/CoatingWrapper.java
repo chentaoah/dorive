@@ -16,7 +16,7 @@
  */
 package com.gitee.dorive.coating.entity;
 
-import com.gitee.dorive.coating.entity.definition.CoatingDefinition;
+import com.gitee.dorive.coating.entity.definition.CoatingDef;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -25,7 +25,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class CoatingWrapper {
-    private CoatingDefinition coatingDefinition;
+    private CoatingDef coatingDef;
     private List<RepositoryWrapper> repositoryWrappers;
     private List<RepositoryWrapper> reversedRepositoryWrappers;
     private SpecificProperties specificProperties;

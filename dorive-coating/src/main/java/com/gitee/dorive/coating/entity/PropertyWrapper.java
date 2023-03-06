@@ -16,7 +16,7 @@
  */
 package com.gitee.dorive.coating.entity;
 
-import com.gitee.dorive.coating.entity.definition.PropertyDefinition;
+import com.gitee.dorive.coating.entity.definition.PropertyDef;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -24,5 +24,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class PropertyWrapper {
     private Property property;
-    private PropertyDefinition propertyDefinition;
+    private PropertyDef propertyDef;
 }

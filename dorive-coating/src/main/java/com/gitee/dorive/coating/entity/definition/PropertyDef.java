@@ -30,24 +30,24 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PropertyDefinition {
+public class PropertyDef {
 
     private String belongTo;
     private String field;
     private String operator;
     private boolean ignore;
 
-    public static PropertyDefinition newPropertyDefinition(AnnotatedElement annotatedElement) {
+    public static PropertyDef fromElement(AnnotatedElement annotatedElement) {
         Map<String, Object> annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Property.class);
         if (annotationAttributes == null) {
-            return new PropertyDefinition("", "", "=", false);
+            return new PropertyDef("", "", "=", false);
         }
-        return BeanUtil.copyProperties(annotationAttributes, PropertyDefinition.class);
+        return BeanUtil.copyProperties(annotationAttributes, PropertyDef.class);
     }
 
-    public static void renewPropertyDefinition(String fieldName, PropertyDefinition propertyDefinition) {
-        if (StringUtils.isBlank(propertyDefinition.getField())) {
-            propertyDefinition.setField(fieldName);
+    public static void renew(String fieldName, PropertyDef propertyDef) {
+        if (StringUtils.isBlank(propertyDef.getField())) {
+            propertyDef.setField(fieldName);
         }
     }
 

@@ -18,8 +18,8 @@ package com.gitee.dorive.coating.impl.resolver;
 
 import com.gitee.dorive.coating.annotation.Coating;
 import com.gitee.dorive.coating.entity.*;
-import com.gitee.dorive.coating.entity.definition.CoatingDefinition;
-import com.gitee.dorive.coating.entity.definition.PropertyDefinition;
+import com.gitee.dorive.coating.entity.definition.CoatingDef;
+import com.gitee.dorive.coating.entity.definition.PropertyDef;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.coating.util.ResourceUtils;
 import com.gitee.dorive.api.entity.element.EntityEle;
@@ -80,20 +80,20 @@ public class CoatingWrapperResolver {
                     Property property = new Property(declaredField);
                     String fieldName = property.getName();
 
-                    PropertyDefinition propertyDefinition = PropertyDefinition.newPropertyDefinition(declaredField);
-                    PropertyDefinition.renewPropertyDefinition(fieldName, propertyDefinition);
-                    if (propertyDefinition.isIgnore()) {
+                    PropertyDef propertyDef = PropertyDef.fromElement(declaredField);
+                    PropertyDef.renew(fieldName, propertyDef);
+                    if (propertyDef.isIgnore()) {
                         return;
                     }
 
-                    PropertyWrapper propertyWrapper = new PropertyWrapper(property, propertyDefinition);
+                    PropertyWrapper propertyWrapper = new PropertyWrapper(property, propertyDef);
                     if (specificProperties.addProperty(fieldName, propertyWrapper)) {
                         return;
                     }
 
                     fieldNames.add(fieldName);
 
-                    String belongTo = propertyDefinition.getBelongTo();
+                    String belongTo = propertyDef.getBelongTo();
                     if (StringUtils.isNotBlank(belongTo) && belongTo.startsWith("/")) {
                         List<PropertyWrapper> existPropertyWrappers = belongToPropertyWrappersMap.computeIfAbsent(belongTo, key -> new ArrayList<>());
                         existPropertyWrappers.add(propertyWrapper);
@@ -108,8 +108,8 @@ public class CoatingWrapperResolver {
                 List<RepositoryWrapper> reversedRepositoryWrappers = new ArrayList<>(repositoryWrappers);
                 Collections.reverse(reversedRepositoryWrappers);
 
-                CoatingDefinition coatingDefinition = CoatingDefinition.newCoatingDefinition(coatingClass);
-                CoatingWrapper coatingWrapper = new CoatingWrapper(coatingDefinition, repositoryWrappers, reversedRepositoryWrappers, specificProperties);
+                CoatingDef coatingDef = CoatingDef.fromElement(coatingClass);
+                CoatingWrapper coatingWrapper = new CoatingWrapper(coatingDef, repositoryWrappers, reversedRepositoryWrappers, specificProperties);
                 coatingWrapperMap.put(coatingClass, coatingWrapper);
                 nameCoatingWrapperMap.put(coatingClass.getName(), coatingWrapper);
             }

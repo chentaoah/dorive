@@ -17,7 +17,7 @@
 package com.gitee.dorive.coating.entity;
 
 import com.gitee.dorive.api.entity.def.BindingDef;
-import com.gitee.dorive.coating.entity.definition.PropertyDefinition;
+import com.gitee.dorive.coating.entity.definition.PropertyDef;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -42,9 +42,9 @@ public class RepositoryWrapper {
             Property property = propertyWrapper.getProperty();
             Object fieldValue = property.getFieldValue(coating);
             if (fieldValue != null) {
-                PropertyDefinition propertyDefinition = propertyWrapper.getPropertyDefinition();
-                String field = propertyDefinition.getField();
-                String operator = propertyDefinition.getOperator();
+                PropertyDef propertyDef = propertyWrapper.getPropertyDef();
+                String field = propertyDef.getField();
+                String operator = propertyDef.getOperator();
                 example.addCriterion(new Criterion(field, operator, fieldValue));
             }
         }

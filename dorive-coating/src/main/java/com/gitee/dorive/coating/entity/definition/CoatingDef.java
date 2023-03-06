@@ -23,11 +23,11 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Map;
 
-public class CoatingDefinition {
+public class CoatingDef {
 
-    public static CoatingDefinition newCoatingDefinition(AnnotatedElement annotatedElement) {
+    public static CoatingDef fromElement(AnnotatedElement annotatedElement) {
         Map<String, Object> annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Coating.class);
-        return BeanUtil.copyProperties(annotationAttributes, CoatingDefinition.class);
+        return BeanUtil.copyProperties(annotationAttributes, CoatingDef.class);
     }
 
 }
