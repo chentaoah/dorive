@@ -18,7 +18,7 @@ package com.gitee.dorive.core.api;
 
 import com.gitee.dorive.core.entity.operation.Operation;
 
-public interface ContextAdapter {
+public interface Adapter {
 
     void adapt(Context context, Operation operation);
 
