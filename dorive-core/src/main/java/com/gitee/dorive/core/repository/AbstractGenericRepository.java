@@ -30,15 +30,14 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK>
-        implements ListableRepository<E, PK>, MetadataHolder {
+public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK> implements ListableRepository<E, PK>, MetadataHolder {
 
     @Override
     public int updateByExample(Context context, Object entity, Example example) {
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
-        int totalCount = 0;
         Selector selector = context.getSelector();
+        int totalCount = 0;
         for (CommonRepository repository : getOrderedRepositories()) {
             if (selector.matches(context, repository)) {
                 totalCount += repository.updateByExample(context, entity, example);
@@ -64,8 +63,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     @Override
     public int deleteByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        int totalCount = 0;
         Selector selector = context.getSelector();
+        int totalCount = 0;
         for (CommonRepository repository : getOrderedRepositories()) {
             if (selector.matches(context, repository)) {
                 totalCount += repository.deleteByExample(context, example);
