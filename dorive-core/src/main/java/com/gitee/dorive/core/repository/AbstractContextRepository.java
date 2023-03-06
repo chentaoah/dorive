@@ -155,20 +155,15 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         commonRepository.setEntityEle(entityEle);
         commonRepository.setOperationFactory(operationFactory);
         commonRepository.setProxyRepository((AbstractRepository<Object, Object>) repository);
-
         commonRepository.setAccessPath(accessPath);
         commonRepository.setRoot(isRoot);
         commonRepository.setAggregated(isAggregated);
-
         commonRepository.setDefaultOrderBy(defaultOrderBy);
-
         commonRepository.setAnchorPoint(anchorPoint);
         commonRepository.setBinderResolver(binderResolver);
         commonRepository.setPropChainResolver(propChainResolver);
         commonRepository.setFieldPrefix(fieldPrefix);
-
         commonRepository.setAliasConverter(aliasConverter);
-
         commonRepository.setBoundEntity(false);
         return commonRepository;
     }
