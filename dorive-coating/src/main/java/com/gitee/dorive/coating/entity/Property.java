@@ -54,6 +54,9 @@ public class Property {
 
     private void resolve(Field field) {
         propertyDef = PropertyDef.fromElement(field);
+        if (propertyDef != null) {
+            propertyDef.merge(name);
+        }
     }
 
     public boolean isSameType(Property property) {

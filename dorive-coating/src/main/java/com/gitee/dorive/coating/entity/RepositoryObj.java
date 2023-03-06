@@ -31,7 +31,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class RepositoryWrapper {
+public class RepositoryObj {
 
     private MergedRepository mergedRepository;
     private List<Property> collectedProperties;

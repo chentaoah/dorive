@@ -37,17 +37,17 @@ public class PropertyDef {
     private String operator;
     private boolean ignore;
 
-    public static PropertyDef fromElement(AnnotatedElement annotatedElement) {
-        Map<String, Object> annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Property.class);
-        if (annotationAttributes == null) {
-            return new PropertyDef("", "", "=", false);
+    public static PropertyDef fromElement(AnnotatedElement element) {
+        if (element.isAnnotationPresent(Property.class)) {
+            Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Property.class);
+            return BeanUtil.copyProperties(attributes, PropertyDef.class);
         }
-        return BeanUtil.copyProperties(annotationAttributes, PropertyDef.class);
+        return new PropertyDef("", "", "=", false);
     }
 
-    public static void renew(String fieldName, PropertyDef propertyDef) {
-        if (StringUtils.isBlank(propertyDef.getField())) {
-            propertyDef.setField(fieldName);
+    public void merge(String fieldName) {
+        if (StringUtils.isBlank(field)) {
+            field = fieldName;
         }
     }
 

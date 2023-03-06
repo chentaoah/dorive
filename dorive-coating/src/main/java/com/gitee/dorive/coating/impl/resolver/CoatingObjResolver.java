@@ -34,15 +34,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 @Data
-public class CoatingWrapperResolver {
+public class CoatingObjResolver {
 
     private static Map<String, List<Class<?>>> scannedClasses = new ConcurrentHashMap<>();
 
     private AbstractCoatingRepository<?, ?> repository;
-    private Map<Class<?>, CoatingWrapper> coatingWrapperMap = new ConcurrentHashMap<>();
-    private Map<String, CoatingWrapper> nameCoatingWrapperMap = new ConcurrentHashMap<>();
+    private Map<Class<?>, CoatingObj> coatingObjMap = new ConcurrentHashMap<>();
+    private Map<String, CoatingObj> nameCoatingObjMap = new ConcurrentHashMap<>();
 
-    public CoatingWrapperResolver(AbstractCoatingRepository<?, ?> repository) throws Exception {
+    public CoatingObjResolver(AbstractCoatingRepository<?, ?> repository) throws Exception {
         this.repository = repository;
         resolve();
     }
@@ -70,26 +70,23 @@ public class CoatingWrapperResolver {
                     continue;
                 }
 
+                SpecificProperties specificProperties = new SpecificProperties();
                 Set<String> fieldNames = new LinkedHashSet<>();
                 Map<String, List<Property>> belongToPropertyMap = new LinkedHashMap<>();
                 Map<String, Property> fieldPropertyMap = new LinkedHashMap<>();
-                SpecificProperties specificProperties = new SpecificProperties();
 
                 ReflectionUtils.doWithLocalFields(coatingClass, declaredField -> {
                     Property property = new Property(declaredField);
-                    String fieldName = property.getName();
 
                     PropertyDef propertyDef = property.getPropertyDef();
-                    PropertyDef.renew(fieldName, propertyDef);
-
                     if (propertyDef.isIgnore()) {
                         return;
                     }
 
+                    String fieldName = property.getName();
                     if (specificProperties.addProperty(fieldName, property)) {
                         return;
                     }
-
                     fieldNames.add(fieldName);
 
                     String belongTo = propertyDef.getBelongTo();
@@ -101,30 +98,29 @@ public class CoatingWrapperResolver {
                     }
                 });
 
-                List<RepositoryWrapper> repositoryWrappers = collectRepositoryWrappers(belongToPropertyMap, fieldPropertyMap);
-                checkFieldNames(coatingClass, fieldNames, repositoryWrappers);
+                List<RepositoryObj> repositoryObjs = collectRepositoryObjs(belongToPropertyMap, fieldPropertyMap);
+                checkFieldNames(coatingClass, fieldNames, repositoryObjs);
 
-                List<RepositoryWrapper> reversedRepositoryWrappers = new ArrayList<>(repositoryWrappers);
-                Collections.reverse(reversedRepositoryWrappers);
+                List<RepositoryObj> reversedRepositoryObjs = new ArrayList<>(repositoryObjs);
+                Collections.reverse(reversedRepositoryObjs);
 
                 CoatingDef coatingDef = CoatingDef.fromElement(coatingClass);
-                CoatingWrapper coatingWrapper = new CoatingWrapper(coatingDef, repositoryWrappers, reversedRepositoryWrappers, specificProperties);
-                coatingWrapperMap.put(coatingClass, coatingWrapper);
-                nameCoatingWrapperMap.put(coatingClass.getName(), coatingWrapper);
+                CoatingObj coatingObj = new CoatingObj(coatingDef, repositoryObjs, reversedRepositoryObjs, specificProperties);
+                coatingObjMap.put(coatingClass, coatingObj);
+                nameCoatingObjMap.put(coatingClass.getName(), coatingObj);
             }
         }
     }
 
-    private List<RepositoryWrapper> collectRepositoryWrappers(Map<String, List<Property>> belongToPropertyMap,
-                                                              Map<String, Property> fieldPropertyMap) {
+    private List<RepositoryObj> collectRepositoryObjs(Map<String, List<Property>> belongToPropertyMap, Map<String, Property> fieldPropertyMap) {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
 
-        List<RepositoryWrapper> repositoryWrappers = new ArrayList<>();
+        List<RepositoryObj> repositoryObjs = new ArrayList<>();
 
         for (MergedRepository mergedRepository : mergedRepositoryMap.values()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-            CommonRepository repository = mergedRepository.getCommonRepository();
+            CommonRepository repository = mergedRepository.getExecutedRepository();
             EntityEle entityEle = repository.getEntityEle();
 
             List<Property> properties = new ArrayList<>();
@@ -143,18 +139,18 @@ public class CoatingWrapperResolver {
             }
 
             if (!properties.isEmpty() || repository.isBoundEntity()) {
-                RepositoryWrapper repositoryWrapper = new RepositoryWrapper(mergedRepository, properties);
-                repositoryWrappers.add(repositoryWrapper);
+                RepositoryObj repositoryObj = new RepositoryObj(mergedRepository, properties);
+                repositoryObjs.add(repositoryObj);
             }
         }
 
-        return repositoryWrappers;
+        return repositoryObjs;
     }
 
-    private void checkFieldNames(Class<?> coatingClass, Set<String> fieldNames, List<RepositoryWrapper> repositoryWrappers) {
+    private void checkFieldNames(Class<?> coatingClass, Set<String> fieldNames, List<RepositoryObj> repositoryObjs) {
         Set<String> remainFieldNames = new LinkedHashSet<>(fieldNames);
-        for (RepositoryWrapper repositoryWrapper : repositoryWrappers) {
-            for (Property property : repositoryWrapper.getCollectedProperties()) {
+        for (RepositoryObj repositoryObj : repositoryObjs) {
+            for (Property property : repositoryObj.getCollectedProperties()) {
                 remainFieldNames.remove(property.getName());
             }
         }

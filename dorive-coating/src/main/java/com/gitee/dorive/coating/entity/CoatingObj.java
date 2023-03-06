@@ -24,9 +24,9 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class CoatingWrapper {
+public class CoatingObj {
     private CoatingDef coatingDef;
-    private List<RepositoryWrapper> repositoryWrappers;
-    private List<RepositoryWrapper> reversedRepositoryWrappers;
+    private List<RepositoryObj> repositoryObjs;
+    private List<RepositoryObj> reversedRepositoryObjs;
     private SpecificProperties specificProperties;
 }
