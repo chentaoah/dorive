@@ -16,7 +16,6 @@
  */
 package com.gitee.dorive.event.impl;
 
-import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.event.annotation.Listener;
 import com.gitee.dorive.event.api.EntityListener;
 import com.gitee.dorive.event.entity.RepositoryEvent;
@@ -63,9 +62,8 @@ public class RepositoryListener implements ApplicationListener<RepositoryEvent>,
 
     @Override
     public void onApplicationEvent(RepositoryEvent event) {
-        EventRepository eventRepository = (EventRepository) event.getSource();
-        EntityEle entityEle = eventRepository.getEntityEle();
-        Class<?> entityClass = entityEle.getGenericType();
+        EventRepository repository = (EventRepository) event.getSource();
+        Class<?> entityClass = repository.getEntityClass();
         List<EntityListener> entityListeners = classEventListenersMap.get(entityClass);
         if (entityListeners != null && !entityListeners.isEmpty()) {
             for (EntityListener entityListener : entityListeners) {
