@@ -18,8 +18,8 @@ package com.gitee.dorive.coating.impl.resolver;
 
 import com.gitee.dorive.coating.annotation.Coating;
 import com.gitee.dorive.coating.entity.*;
-import com.gitee.dorive.coating.entity.definition.CoatingDef;
-import com.gitee.dorive.coating.entity.definition.PropertyDef;
+import com.gitee.dorive.coating.entity.def.CoatingDef;
+import com.gitee.dorive.coating.entity.def.PropertyDef;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.coating.util.ResourceUtils;
 import com.gitee.dorive.api.entity.element.EntityEle;

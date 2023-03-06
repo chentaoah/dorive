@@ -17,7 +17,7 @@
 package com.gitee.dorive.coating.entity;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.coating.entity.definition.PropertyDef;
+import com.gitee.dorive.coating.entity.def.PropertyDef;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

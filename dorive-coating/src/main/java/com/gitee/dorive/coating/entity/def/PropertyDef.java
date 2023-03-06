@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.dorive.coating.entity.definition;
+package com.gitee.dorive.coating.entity.def;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.coating.annotation.Property;

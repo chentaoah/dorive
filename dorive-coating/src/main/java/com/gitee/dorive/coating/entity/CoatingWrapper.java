@@ -16,7 +16,7 @@
  */
 package com.gitee.dorive.coating.entity;
 
-import com.gitee.dorive.coating.entity.definition.CoatingDef;
+import com.gitee.dorive.coating.entity.def.CoatingDef;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
