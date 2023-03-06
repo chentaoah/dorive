@@ -17,6 +17,7 @@
 package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.api.entity.element.EntityType;
 import com.gitee.dorive.core.api.Executor;
 import com.gitee.dorive.core.api.Repository;
 import com.gitee.dorive.core.api.Context;
@@ -44,6 +45,10 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
 
     public Class<?> getEntityClass() {
         return entityEle.getGenericType();
+    }
+
+    public EntityType getEntityType() {
+        return entityEle.getEntityType();
     }
 
     @Override
