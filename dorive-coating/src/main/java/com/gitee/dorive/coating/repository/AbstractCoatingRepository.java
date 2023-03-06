@@ -60,9 +60,6 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
             if ("default".equals(querier)) {
                 this.exampleBuilder = new DefaultExampleBuilder(this);
             }
-
-            mergedRepositoryResolver.resolveMergedRepositoryMap();
-            coatingWrapperResolver.resolveCoatingWrapperMap();
         }
     }
 

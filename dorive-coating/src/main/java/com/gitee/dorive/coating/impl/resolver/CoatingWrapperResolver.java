@@ -44,11 +44,12 @@ public class CoatingWrapperResolver {
     private Map<Class<?>, CoatingWrapper> coatingWrapperMap = new ConcurrentHashMap<>();
     private Map<String, CoatingWrapper> nameCoatingWrapperMap = new ConcurrentHashMap<>();
 
-    public CoatingWrapperResolver(AbstractCoatingRepository<?, ?> repository) {
+    public CoatingWrapperResolver(AbstractCoatingRepository<?, ?> repository) throws Exception {
         this.repository = repository;
+        resolve();
     }
 
-    public void resolveCoatingWrapperMap() throws Exception {
+    public void resolve() throws Exception {
         String[] scanPackages = repository.getScanPackages();
         String regex = repository.getRegex();
         Pattern pattern = Pattern.compile(regex);
