@@ -165,8 +165,7 @@ public class BinderResolver {
         String fieldName = StringUtils.isNotBlank(property) ? property : PathUtils.getLastName(bindExp);
         String bindAlias = entityEle.toAlias(fieldName);
 
-        return new PropertyBinder(bindingDef, fieldPropChain, processor, alias,
-                belongAccessPath, belongRepository, boundPropChain, bindAlias);
+        return new PropertyBinder(bindingDef, fieldPropChain, processor, alias, belongAccessPath, belongRepository, boundPropChain, bindAlias);
     }
 
 }

@@ -53,9 +53,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     protected ApplicationContext applicationContext;
 
-    protected EntityType entityType;
     protected PropChainResolver propChainResolver;
-
     protected DelegateResolver delegateResolver;
     protected AdapterResolver adapterResolver;
 
@@ -69,19 +67,13 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         this.applicationContext = applicationContext;
     }
 
-    public Class<?> getEntityClass() {
-        return entityType.getType();
-    }
-
     @Override
     public void afterPropertiesSet() throws Exception {
         Class<?> entityClass = ReflectUtils.getFirstArgumentType(this.getClass());
-        entityType = EntityType.getInstance(entityClass);
+        EntityType entityType = EntityType.getInstance(entityClass);
         Assert.isTrue(entityType.isAnnotatedEntity(), "No @Entity annotation found! type: {}", entityType.getName());
-        propChainResolver = new PropChainResolver(entityType);
 
-        delegateResolver = new DelegateResolver(this);
-        adapterResolver = new AdapterResolver(this);
+        propChainResolver = new PropChainResolver(entityType);
 
         CommonRepository rootRepository = newRepository("/", entityType);
         repositoryMap.put("/", rootRepository);
@@ -102,6 +94,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         setEntityEle(rootRepository.getEntityEle());
         setOperationFactory(rootRepository.getOperationFactory());
+
+        delegateResolver = new DelegateResolver(this);
+        adapterResolver = new AdapterResolver(this);
 
         EntityHandler batchEntityHandler = new BatchEntityHandler(this, rootRepository.getOperationFactory());
         EntityHandler entityHandler = batchEntityHandler;
@@ -146,9 +141,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         PropChain anchorPoint = propChainMap.get(accessPath);
 
         BinderResolver binderResolver = new BinderResolver(this);
+
         String lastAccessPath = isRoot || entityEle.isCollection() ? "" : accessPath;
         EntityType entityType = EntityType.getInstance(entityEle.getGenericType());
         PropChainResolver propChainResolver = new PropChainResolver(lastAccessPath, entityType);
+
         String fieldPrefix = lastAccessPath + "/";
         binderResolver.resolve(accessPath, entityEle, propChainResolver, fieldPrefix);
 

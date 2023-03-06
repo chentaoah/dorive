@@ -42,6 +42,10 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
         return entityEle.getEntityDef();
     }
 
+    public Class<?> getEntityClass() {
+        return entityEle.getGenericType();
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public E selectByPrimaryKey(Context context, PK primaryKey) {
