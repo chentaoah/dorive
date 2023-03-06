@@ -25,7 +25,7 @@ import lombok.Data;
 @Data
 public class DefaultAdapter implements Adapter {
 
-    protected AdapterDef adapterDef;
+    private AdapterDef adapterDef;
 
     @Override
     public void adapt(Context context, Operation operation) {

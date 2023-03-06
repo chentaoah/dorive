@@ -53,7 +53,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK
         Object mapper = null;
         Class<?> pojoClass = null;
         if (mapperClass != Object.class) {
-            mapper = applicationContext.getBean(mapperClass);
+            mapper = getApplicationContext().getBean(mapperClass);
             Type[] genericInterfaces = mapperClass.getGenericInterfaces();
             if (genericInterfaces.length > 0) {
                 Type genericInterface = mapperClass.getGenericInterfaces()[0];
@@ -70,7 +70,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK
         if (factoryClass == Object.class) {
             entityFactory = new DefaultEntityFactory();
         } else {
-            entityFactory = (EntityFactory) applicationContext.getBean(factoryClass);
+            entityFactory = (EntityFactory) getApplicationContext().getBean(factoryClass);
         }
         if (entityFactory instanceof DefaultEntityFactory) {
             DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;

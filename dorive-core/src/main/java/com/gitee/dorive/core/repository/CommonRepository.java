@@ -16,7 +16,6 @@
  */
 package com.gitee.dorive.core.repository;
 
-import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.api.impl.resolver.PropChainResolver;
@@ -42,15 +41,15 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class CommonRepository extends ProxyRepository implements MetadataHolder {
 
-    protected String accessPath;
-    protected boolean root;
-    protected boolean aggregated;
-    protected OrderBy defaultOrderBy;
-    protected PropChain anchorPoint;
-    protected BinderResolver binderResolver;
-    protected PropChainResolver propChainResolver;
-    protected AliasConverter aliasConverter;
-    protected boolean boundEntity;
+    private String accessPath;
+    private boolean root;
+    private boolean aggregated;
+    private OrderBy defaultOrderBy;
+    private PropChain anchorPoint;
+    private BinderResolver binderResolver;
+    private PropChainResolver propChainResolver;
+    private AliasConverter aliasConverter;
+    private boolean boundEntity;
 
     @Override
     public int updateByExample(Context context, Object entity, Example example) {
@@ -136,12 +135,11 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
     }
 
     public Object getPrimaryKey(Object entity) {
-        PropProxy primaryKeyProxy = entityEle.getPkProxy();
-        return primaryKeyProxy.getValue(entity);
+        return getEntityEle().getPkProxy().getValue(entity);
     }
 
     public Object convertManyToOne(List<?> entities) {
-        if (entityEle.isCollection()) {
+        if (getEntityEle().isCollection()) {
             return entities;
         } else if (!entities.isEmpty()) {
             return entities.get(0);

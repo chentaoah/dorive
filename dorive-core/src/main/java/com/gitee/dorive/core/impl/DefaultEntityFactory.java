@@ -32,10 +32,10 @@ import java.util.Map;
 @AllArgsConstructor
 public class DefaultEntityFactory implements EntityFactory {
 
-    protected EntityEle entityEle;
-    protected Class<?> pojoClass;
-    protected Map<String, String> aliasPropMapping;
-    protected Map<String, String> propPojoMapping;
+    private EntityEle entityEle;
+    private Class<?> pojoClass;
+    private Map<String, String> aliasPropMapping;
+    private Map<String, String> propPojoMapping;
 
     @Override
     public Object reconstitute(Context context, Object persistent) {

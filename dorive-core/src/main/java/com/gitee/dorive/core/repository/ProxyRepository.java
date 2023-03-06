@@ -35,7 +35,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class ProxyRepository extends AbstractRepository<Object, Object> {
 
-    protected AbstractRepository<Object, Object> proxyRepository;
+    private AbstractRepository<Object, Object> proxyRepository;
 
     public AbstractRepository<Object, Object> getProxyRepository() {
         if (proxyRepository instanceof ProxyRepository) {

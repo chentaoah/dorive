@@ -28,10 +28,10 @@ import lombok.Data;
 @AllArgsConstructor
 public abstract class AbstractBinder implements Binder, Processor {
 
-    protected BindingDef bindingDef;
-    protected PropChain fieldPropChain;
-    protected Processor processor;
-    protected String alias;
+    private BindingDef bindingDef;
+    private PropChain fieldPropChain;
+    private Processor processor;
+    private String alias;
 
     public BindingDef getBindingDef() {
         return bindingDef;

@@ -10,6 +10,6 @@ import java.util.Map;
 
 @Data
 public abstract class AbstractContext implements Context {
-    protected Selector selector = NameSelector.EMPTY_SELECTOR;
-    protected Map<String, Object> attachments = Collections.emptyMap();
+    private Selector selector = NameSelector.EMPTY_SELECTOR;
+    private Map<String, Object> attachments = Collections.emptyMap();
 }

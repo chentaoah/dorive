@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DefaultProcessor implements Processor {
 
-    protected BindingDef bindingDef;
+    private BindingDef bindingDef;
 
     @Override
     public Object input(Context context, Object valueObject) {

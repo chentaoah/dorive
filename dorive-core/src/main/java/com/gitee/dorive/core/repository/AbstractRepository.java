@@ -35,9 +35,9 @@ import java.util.List;
 @Data
 public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Executor {
 
-    protected EntityEle entityEle;
-    protected OperationFactory operationFactory;
-    protected Executor executor;
+    private EntityEle entityEle;
+    private OperationFactory operationFactory;
+    private Executor executor;
 
     public EntityDef getEntityDef() {
         return entityEle.getEntityDef();

@@ -11,7 +11,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class OperationFactory {
 
-    protected EntityEle entityEle;
+    private EntityEle entityEle;
 
     public Query buildQueryByPK(Context context, Object primaryKey) {
         Query query = new Query(Operation.SELECT, null);

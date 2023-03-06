@@ -29,11 +29,11 @@ import java.util.Collection;
 @NoArgsConstructor
 public class Property {
 
-    protected Field declaredField;
-    protected Class<?> fieldClass;
-    protected boolean collection;
-    protected Class<?> genericFieldClass;
-    protected String fieldName;
+    private Field declaredField;
+    private Class<?> fieldClass;
+    private boolean collection;
+    private Class<?> genericFieldClass;
+    private String fieldName;
 
     public Property(Field declaredField) {
         Class<?> fieldClass = declaredField.getType();

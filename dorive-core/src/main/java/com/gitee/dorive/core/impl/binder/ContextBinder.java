@@ -35,7 +35,7 @@ public class ContextBinder extends AbstractBinder {
     @Override
     public Object getBoundValue(Context context, Object rootEntity) {
         Map<String, Object> attachments = context.getAttachments();
-        String bindExp = bindingDef.getBindExp();
+        String bindExp = getBindingDef().getBindExp();
         return attachments.get(bindExp);
     }
 

@@ -95,7 +95,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
 
     @Override
     public Object getMetadata() {
-        return rootRepository.getMetadata();
+        return getRootRepository().getMetadata();
     }
 
 }

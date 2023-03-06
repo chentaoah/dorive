@@ -28,10 +28,10 @@ import lombok.Setter;
 @Setter
 public class PropertyBinder extends AbstractBinder {
 
-    protected String belongAccessPath;
-    protected CommonRepository belongRepository;
-    protected PropChain boundPropChain;
-    protected String bindAlias;
+    private String belongAccessPath;
+    private CommonRepository belongRepository;
+    private PropChain boundPropChain;
+    private String bindAlias;
 
     public PropertyBinder(BindingDef bindingDef,
                           PropChain fieldPropChain,
@@ -49,7 +49,7 @@ public class PropertyBinder extends AbstractBinder {
     }
 
     public boolean isSameType() {
-        return fieldPropChain.isSameType(boundPropChain);
+        return getFieldPropChain().isSameType(boundPropChain);
     }
 
     @Override
