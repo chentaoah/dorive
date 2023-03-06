@@ -17,8 +17,9 @@
 package com.gitee.dorive.coating.entity;
 
 import cn.hutool.core.util.ReflectUtil;
+import com.gitee.dorive.coating.entity.definition.PropertyDef;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -26,7 +27,7 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 
 @Data
-@NoArgsConstructor
+@AllArgsConstructor
 public class Property {
 
     private Field field;
@@ -34,25 +35,25 @@ public class Property {
     private boolean collection;
     private Class<?> genericType;
     private String name;
+    private PropertyDef propertyDef;
 
-    public Property(Field Field) {
-        Class<?> fieldClass = Field.getType();
-        boolean isCollection = false;
-        Class<?> fieldGenericClass = fieldClass;
-        String fieldName = Field.getName();
-
-        if (Collection.class.isAssignableFrom(fieldClass)) {
-            isCollection = true;
-            ParameterizedType parameterizedType = (ParameterizedType) Field.getGenericType();
+    public Property(Field field) {
+        this.field = field;
+        this.type = field.getType();
+        this.collection = false;
+        this.genericType = field.getType();
+        this.name = field.getName();
+        if (Collection.class.isAssignableFrom(field.getType())) {
+            this.collection = true;
+            ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
             Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-            fieldGenericClass = (Class<?>) actualTypeArgument;
+            this.genericType = (Class<?>) actualTypeArgument;
         }
+        resolve(field);
+    }
 
-        this.field = Field;
-        this.type = fieldClass;
-        this.collection = isCollection;
-        this.genericType = fieldGenericClass;
-        this.name = fieldName;
+    private void resolve(Field field) {
+        propertyDef = PropertyDef.fromElement(field);
     }
 
     public boolean isSameType(Property property) {

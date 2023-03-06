@@ -30,26 +30,26 @@ import java.util.List;
 @Data
 public class SpecificProperties {
 
-    private PropertyWrapper sortByProperty;
-    private PropertyWrapper orderProperty;
-    private PropertyWrapper pageProperty;
-    private PropertyWrapper limitProperty;
+    private Property sortByProperty;
+    private Property orderProperty;
+    private Property pageProperty;
+    private Property limitProperty;
 
-    public boolean addProperty(String fieldName, PropertyWrapper propertyWrapper) {
+    public boolean addProperty(String fieldName, Property property) {
         if ("sortBy".equals(fieldName)) {
-            sortByProperty = propertyWrapper;
+            sortByProperty = property;
             return true;
 
         } else if ("order".equals(fieldName)) {
-            orderProperty = propertyWrapper;
+            orderProperty = property;
             return true;
 
         } else if ("page".equals(fieldName)) {
-            pageProperty = propertyWrapper;
+            pageProperty = property;
             return true;
 
         } else if ("limit".equals(fieldName)) {
-            limitProperty = propertyWrapper;
+            limitProperty = property;
             return true;
         }
         return false;
@@ -57,8 +57,8 @@ public class SpecificProperties {
 
     public OrderBy newOrderBy(Object coating) {
         if (sortByProperty != null && orderProperty != null) {
-            Object sortBy = sortByProperty.getProperty().getFieldValue(coating);
-            Object order = orderProperty.getProperty().getFieldValue(coating);
+            Object sortBy = sortByProperty.getFieldValue(coating);
+            Object order = orderProperty.getFieldValue(coating);
             if (sortBy != null && order instanceof String) {
                 List<String> properties = StringUtils.toList(sortBy);
                 if (properties != null && !properties.isEmpty()) {
@@ -74,8 +74,8 @@ public class SpecificProperties {
 
     public Page<Object> newPage(Object coating) {
         if (pageProperty != null && limitProperty != null) {
-            Object page = pageProperty.getProperty().getFieldValue(coating);
-            Object limit = limitProperty.getProperty().getFieldValue(coating);
+            Object page = pageProperty.getFieldValue(coating);
+            Object limit = limitProperty.getFieldValue(coating);
             if (page != null && limit != null) {
                 return new Page<>(Convert.convert(Long.class, page), Convert.convert(Long.class, limit));
             }

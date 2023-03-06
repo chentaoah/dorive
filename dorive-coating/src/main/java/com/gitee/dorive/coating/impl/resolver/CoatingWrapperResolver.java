@@ -23,7 +23,6 @@ import com.gitee.dorive.coating.entity.definition.PropertyDef;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.coating.util.ResourceUtils;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.coating.entity.Property;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -72,22 +71,22 @@ public class CoatingWrapperResolver {
                 }
 
                 Set<String> fieldNames = new LinkedHashSet<>();
-                Map<String, List<PropertyWrapper>> belongToPropertyWrappersMap = new LinkedHashMap<>();
-                Map<String, PropertyWrapper> fieldPropertyWrapperMap = new LinkedHashMap<>();
+                Map<String, List<Property>> belongToPropertyMap = new LinkedHashMap<>();
+                Map<String, Property> fieldPropertyMap = new LinkedHashMap<>();
                 SpecificProperties specificProperties = new SpecificProperties();
 
                 ReflectionUtils.doWithLocalFields(coatingClass, declaredField -> {
                     Property property = new Property(declaredField);
                     String fieldName = property.getName();
 
-                    PropertyDef propertyDef = PropertyDef.fromElement(declaredField);
+                    PropertyDef propertyDef = property.getPropertyDef();
                     PropertyDef.renew(fieldName, propertyDef);
+
                     if (propertyDef.isIgnore()) {
                         return;
                     }
 
-                    PropertyWrapper propertyWrapper = new PropertyWrapper(property, propertyDef);
-                    if (specificProperties.addProperty(fieldName, propertyWrapper)) {
+                    if (specificProperties.addProperty(fieldName, property)) {
                         return;
                     }
 
@@ -95,14 +94,14 @@ public class CoatingWrapperResolver {
 
                     String belongTo = propertyDef.getBelongTo();
                     if (StringUtils.isNotBlank(belongTo) && belongTo.startsWith("/")) {
-                        List<PropertyWrapper> existPropertyWrappers = belongToPropertyWrappersMap.computeIfAbsent(belongTo, key -> new ArrayList<>());
-                        existPropertyWrappers.add(propertyWrapper);
+                        List<Property> existProperties = belongToPropertyMap.computeIfAbsent(belongTo, key -> new ArrayList<>());
+                        existProperties.add(property);
                     } else {
-                        fieldPropertyWrapperMap.put(fieldName, propertyWrapper);
+                        fieldPropertyMap.put(fieldName, property);
                     }
                 });
 
-                List<RepositoryWrapper> repositoryWrappers = collectRepositoryWrappers(belongToPropertyWrappersMap, fieldPropertyWrapperMap);
+                List<RepositoryWrapper> repositoryWrappers = collectRepositoryWrappers(belongToPropertyMap, fieldPropertyMap);
                 checkFieldNames(coatingClass, fieldNames, repositoryWrappers);
 
                 List<RepositoryWrapper> reversedRepositoryWrappers = new ArrayList<>(repositoryWrappers);
@@ -116,8 +115,8 @@ public class CoatingWrapperResolver {
         }
     }
 
-    private List<RepositoryWrapper> collectRepositoryWrappers(Map<String, List<PropertyWrapper>> belongToPropertyWrappersMap,
-                                                              Map<String, PropertyWrapper> fieldPropertyWrapperMap) {
+    private List<RepositoryWrapper> collectRepositoryWrappers(Map<String, List<Property>> belongToPropertyMap,
+                                                              Map<String, Property> fieldPropertyMap) {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
 
@@ -128,23 +127,23 @@ public class CoatingWrapperResolver {
             CommonRepository repository = mergedRepository.getCommonRepository();
             EntityEle entityEle = repository.getEntityEle();
 
-            List<PropertyWrapper> propertyWrappers = new ArrayList<>();
+            List<Property> properties = new ArrayList<>();
 
-            List<PropertyWrapper> belongToPropertyWrappers = belongToPropertyWrappersMap.get(absoluteAccessPath);
-            if (belongToPropertyWrappers != null) {
-                propertyWrappers.addAll(belongToPropertyWrappers);
+            List<Property> belongToProperties = belongToPropertyMap.get(absoluteAccessPath);
+            if (belongToProperties != null) {
+                properties.addAll(belongToProperties);
             }
 
-            Map<String, String> propertyDefMap = entityEle.getAliasMap();
-            for (String fieldName : propertyDefMap.keySet()) {
-                PropertyWrapper propertyWrapper = fieldPropertyWrapperMap.get(fieldName);
-                if (propertyWrapper != null) {
-                    propertyWrappers.add(propertyWrapper);
+            Map<String, String> aliasMap = entityEle.getAliasMap();
+            for (String fieldName : aliasMap.keySet()) {
+                Property property = fieldPropertyMap.get(fieldName);
+                if (property != null) {
+                    properties.add(property);
                 }
             }
 
-            if (!propertyWrappers.isEmpty() || repository.isBoundEntity()) {
-                RepositoryWrapper repositoryWrapper = new RepositoryWrapper(mergedRepository, propertyWrappers);
+            if (!properties.isEmpty() || repository.isBoundEntity()) {
+                RepositoryWrapper repositoryWrapper = new RepositoryWrapper(mergedRepository, properties);
                 repositoryWrappers.add(repositoryWrapper);
             }
         }
@@ -155,8 +154,8 @@ public class CoatingWrapperResolver {
     private void checkFieldNames(Class<?> coatingClass, Set<String> fieldNames, List<RepositoryWrapper> repositoryWrappers) {
         Set<String> remainFieldNames = new LinkedHashSet<>(fieldNames);
         for (RepositoryWrapper repositoryWrapper : repositoryWrappers) {
-            for (PropertyWrapper propertyWrapper : repositoryWrapper.getCollectedPropertyWrappers()) {
-                remainFieldNames.remove(propertyWrapper.getProperty().getName());
+            for (Property property : repositoryWrapper.getCollectedProperties()) {
+                remainFieldNames.remove(property.getName());
             }
         }
         if (!remainFieldNames.isEmpty()) {

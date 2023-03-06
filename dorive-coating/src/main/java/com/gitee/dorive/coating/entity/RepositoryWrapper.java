@@ -34,15 +34,14 @@ import java.util.List;
 public class RepositoryWrapper {
 
     private MergedRepository mergedRepository;
-    private List<PropertyWrapper> collectedPropertyWrappers;
+    private List<Property> collectedProperties;
 
     public Example newExampleByCoating(Context context, Object coating) {
         Example example = new Example();
-        for (PropertyWrapper propertyWrapper : collectedPropertyWrappers) {
-            Property property = propertyWrapper.getProperty();
+        for (Property property : collectedProperties) {
             Object fieldValue = property.getFieldValue(coating);
             if (fieldValue != null) {
-                PropertyDef propertyDef = propertyWrapper.getPropertyDef();
+                PropertyDef propertyDef = property.getPropertyDef();
                 String field = propertyDef.getField();
                 String operator = propertyDef.getOperator();
                 example.addCriterion(new Criterion(field, operator, fieldValue));
