@@ -38,12 +38,12 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> implements ExampleBuilder, CoatingRepository<E, PK> {
 
-    protected String querier;
-    protected String[] scanPackages;
-    protected String regex;
-    protected MergedRepositoryResolver mergedRepositoryResolver;
-    protected CoatingWrapperResolver coatingWrapperResolver;
-    protected ExampleBuilder exampleBuilder;
+    private String querier;
+    private String[] scanPackages;
+    private String regex;
+    private MergedRepositoryResolver mergedRepositoryResolver;
+    private CoatingWrapperResolver coatingWrapperResolver;
+    private ExampleBuilder exampleBuilder;
 
     @Override
     public void afterPropertiesSet() throws Exception {

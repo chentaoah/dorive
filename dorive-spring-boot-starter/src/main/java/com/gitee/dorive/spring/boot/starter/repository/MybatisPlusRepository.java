@@ -39,8 +39,8 @@ public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        if ("SQL".equals(querier)) {
-            this.exampleBuilder = new SQLExampleBuilder(this);
+        if ("SQL".equals(getQuerier())) {
+            setExampleBuilder(new SQLExampleBuilder(this));
         }
     }
 

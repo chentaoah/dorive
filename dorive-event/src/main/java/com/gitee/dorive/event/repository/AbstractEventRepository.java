@@ -24,7 +24,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 
 public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepository<E, PK> {
 
-    protected boolean enableEvent;
+    private boolean enableEvent;
 
     @Override
     public void afterPropertiesSet() throws Exception {
