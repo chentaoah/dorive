@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.dorive.core.entity;
+package com.gitee.dorive.coating.entity;
 
 import cn.hutool.core.util.ReflectUtil;
 import lombok.Data;
@@ -29,38 +29,38 @@ import java.util.Collection;
 @NoArgsConstructor
 public class Property {
 
-    private Field declaredField;
-    private Class<?> fieldClass;
+    private Field field;
+    private Class<?> type;
     private boolean collection;
-    private Class<?> genericFieldClass;
-    private String fieldName;
+    private Class<?> genericType;
+    private String name;
 
-    public Property(Field declaredField) {
-        Class<?> fieldClass = declaredField.getType();
+    public Property(Field Field) {
+        Class<?> fieldClass = Field.getType();
         boolean isCollection = false;
         Class<?> fieldGenericClass = fieldClass;
-        String fieldName = declaredField.getName();
+        String fieldName = Field.getName();
 
         if (Collection.class.isAssignableFrom(fieldClass)) {
             isCollection = true;
-            ParameterizedType parameterizedType = (ParameterizedType) declaredField.getGenericType();
+            ParameterizedType parameterizedType = (ParameterizedType) Field.getGenericType();
             Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
             fieldGenericClass = (Class<?>) actualTypeArgument;
         }
 
-        this.declaredField = declaredField;
-        this.fieldClass = fieldClass;
+        this.field = Field;
+        this.type = fieldClass;
         this.collection = isCollection;
-        this.genericFieldClass = fieldGenericClass;
-        this.fieldName = fieldName;
+        this.genericType = fieldGenericClass;
+        this.name = fieldName;
     }
 
     public boolean isSameType(Property property) {
-        return fieldClass == property.getFieldClass() && genericFieldClass == property.getGenericFieldClass();
+        return type == property.getType() && genericType == property.getGenericType();
     }
 
     public Object getFieldValue(Object object) {
-        return ReflectUtil.getFieldValue(object, declaredField);
+        return ReflectUtil.getFieldValue(object, field);
     }
 
 }

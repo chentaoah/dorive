@@ -23,7 +23,7 @@ import com.gitee.dorive.coating.entity.definition.PropertyDefinition;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.coating.util.ResourceUtils;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.core.entity.Property;
+import com.gitee.dorive.coating.entity.Property;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +40,6 @@ public class CoatingWrapperResolver {
     private static Map<String, List<Class<?>>> scannedClasses = new ConcurrentHashMap<>();
 
     private AbstractCoatingRepository<?, ?> repository;
-
     private Map<Class<?>, CoatingWrapper> coatingWrapperMap = new ConcurrentHashMap<>();
     private Map<String, CoatingWrapper> nameCoatingWrapperMap = new ConcurrentHashMap<>();
 
@@ -79,7 +78,7 @@ public class CoatingWrapperResolver {
 
                 ReflectionUtils.doWithLocalFields(coatingClass, declaredField -> {
                     Property property = new Property(declaredField);
-                    String fieldName = property.getFieldName();
+                    String fieldName = property.getName();
 
                     PropertyDefinition propertyDefinition = PropertyDefinition.newPropertyDefinition(declaredField);
                     PropertyDefinition.renewPropertyDefinition(fieldName, propertyDefinition);
@@ -157,7 +156,7 @@ public class CoatingWrapperResolver {
         Set<String> remainFieldNames = new LinkedHashSet<>(fieldNames);
         for (RepositoryWrapper repositoryWrapper : repositoryWrappers) {
             for (PropertyWrapper propertyWrapper : repositoryWrapper.getCollectedPropertyWrappers()) {
-                remainFieldNames.remove(propertyWrapper.getProperty().getFieldName());
+                remainFieldNames.remove(propertyWrapper.getProperty().getName());
             }
         }
         if (!remainFieldNames.isEmpty()) {
