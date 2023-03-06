@@ -45,8 +45,8 @@ public class BatchEntityHandler implements EntityHandler {
 
     @Override
     public int handleEntities(Context context, List<Object> rootEntities) {
-        int totalCount = 0;
         Selector selector = context.getSelector();
+        int totalCount = 0;
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (selector.matches(context, repository)) {
                 totalCount += executeQuery(repository, context, rootEntities);
