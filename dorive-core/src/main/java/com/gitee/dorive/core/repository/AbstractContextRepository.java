@@ -137,14 +137,14 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultRepository.setEntityDef(entityDef);
             defaultRepository.setEntityEle(entityEle);
             defaultRepository.setOperationFactory(operationFactory);
-            defaultRepository.setExecutor(newExecutor(entityEle));
+            defaultRepository.setExecutor(newExecutor(entityDef, entityEle));
         }
         repository = processRepository((AbstractRepository<Object, Object>) repository);
 
         boolean isRoot = "/".equals(accessPath);
         boolean isAggregated = entityEle.isAggregated();
 
-        OrderBy defaultOrderBy = newDefaultOrderBy(entityEle);
+        OrderBy defaultOrderBy = newDefaultOrderBy(entityDef, entityEle);
 
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
         PropChain anchorPoint = propChainMap.get(accessPath);
@@ -152,7 +152,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         BinderResolver binderResolver = new BinderResolver(this);
         EntityType entityType = EntityType.getInstance(entityEle.getGenericType());
         PropChainResolver propChainResolver = new PropChainResolver(entityType);
-        binderResolver.resolve(accessPath, entityEle, propChainResolver);
+        binderResolver.resolve(accessPath, entityDef, entityEle, propChainResolver);
 
         AliasConverter aliasConverter = new AliasConverter(entityEle);
 
@@ -186,8 +186,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return entityDef;
     }
 
-    private OrderBy newDefaultOrderBy(EntityEle entityEle) {
-        EntityDef entityDef = entityEle.getEntityDef();
+    private OrderBy newDefaultOrderBy(EntityDef entityDef, EntityEle entityEle) {
         String sortBy = entityDef.getSortBy();
         String order = entityDef.getOrder().toUpperCase();
         if (StringUtils.isNotBlank(sortBy) && (Order.ASC.equals(order) || Order.DESC.equals(order))) {
@@ -198,7 +197,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return null;
     }
 
-    protected abstract Executor newExecutor(EntityEle entityEle);
+    protected abstract Executor newExecutor(EntityDef entityDef, EntityEle entityEle);
 
     protected abstract AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository);
 

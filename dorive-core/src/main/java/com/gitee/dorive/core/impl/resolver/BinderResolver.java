@@ -57,7 +57,7 @@ public class BinderResolver {
         this.repository = repository;
     }
 
-    public void resolve(String accessPath, EntityEle entityEle, PropChainResolver propChainResolver) {
+    public void resolve(String accessPath, EntityDef entityDef, EntityEle entityEle, PropChainResolver propChainResolver) {
         List<BindingDef> bindingDefs = entityEle.getBindingDefs();
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
 
@@ -90,7 +90,6 @@ public class BinderResolver {
                     if (!"id".equals(field)) {
                         boundValueBinders.add(propertyBinder);
                     } else {
-                        EntityDef entityDef = entityEle.getEntityDef();
                         if (entityDef.getPriority() == 0) {
                             entityDef.setPriority(-1);
                         }
