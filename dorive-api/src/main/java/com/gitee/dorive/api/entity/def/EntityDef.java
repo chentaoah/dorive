@@ -60,4 +60,8 @@ public class EntityDef {
         }
     }
 
+    public boolean isAggregated() {
+        return repository != Object.class;
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.gitee.dorive.api.entity.element;
 
+import com.gitee.dorive.api.annotation.Aggregate;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
@@ -19,6 +20,7 @@ public abstract class EntityEle {
 
     private AnnotatedElement element;
     private EntityDef entityDef;
+    private boolean aggregated;
     private List<BindingDef> bindingDefs;
     private PropProxy pkProxy;
     private Map<String, String> aliasMap;
@@ -36,6 +38,7 @@ public abstract class EntityEle {
     public EntityEle(AnnotatedElement element) {
         this.element = element;
         this.entityDef = EntityDef.fromElement(element);
+        this.aggregated = (entityDef != null && entityDef.isAggregated()) || element.isAnnotationPresent(Aggregate.class);
         this.bindingDefs = BindingDef.fromElement(element);
     }
 
@@ -44,7 +47,7 @@ public abstract class EntityEle {
     }
 
     public boolean isAggregated() {
-        return entityDef != null && entityDef.getRepository() != Object.class;
+        return aggregated;
     }
 
     public void initialize() {
