@@ -24,6 +24,11 @@ import org.springframework.core.annotation.Order;
 @Configuration
 public class DoriveCoreConfiguration {
 
+    @Bean("repositoryDefinitionV3")
+    public RepositoryDefinition repositoryDefinition() {
+        return new RepositoryDefinition();
+    }
+
     @Bean("repositoryContextV3")
     public RepositoryContext repositoryContext() {
         return new RepositoryContext();

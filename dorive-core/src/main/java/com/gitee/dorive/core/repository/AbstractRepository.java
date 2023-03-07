@@ -35,13 +35,10 @@ import java.util.List;
 @Data
 public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Executor {
 
+    private EntityDef entityDef;
     private EntityEle entityEle;
     private OperationFactory operationFactory;
     private Executor executor;
-
-    public EntityDef getEntityDef() {
-        return entityEle.getEntityDef();
-    }
 
     public Class<?> getEntityClass() {
         return entityEle.getGenericType();

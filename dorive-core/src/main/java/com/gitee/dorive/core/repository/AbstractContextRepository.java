@@ -16,6 +16,7 @@
  */
 package com.gitee.dorive.core.repository;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.constant.Order;
@@ -27,6 +28,7 @@ import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.api.Executor;
+import com.gitee.dorive.core.config.RepositoryDefinition;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.OperationFactory;
@@ -45,7 +47,11 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -92,6 +98,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityDef().getPriority()));
 
+        setEntityDef(rootRepository.getEntityDef());
         setEntityEle(rootRepository.getEntityEle());
         setOperationFactory(rootRepository.getOperationFactory());
 
@@ -114,9 +121,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @SuppressWarnings("unchecked")
     private CommonRepository newRepository(String accessPath, EntityEle entityEle) {
+        EntityDef entityDef = renewEntityDef(entityEle);
+
         OperationFactory operationFactory = new OperationFactory(entityEle);
 
-        EntityDef entityDef = entityEle.getEntityDef();
         Class<?> repositoryClass = entityDef.getRepository();
         Object repository;
         if (repositoryClass == Object.class) {
@@ -126,6 +134,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
         if (repository instanceof DefaultRepository) {
             DefaultRepository defaultRepository = (DefaultRepository) repository;
+            defaultRepository.setEntityDef(entityDef);
             defaultRepository.setEntityEle(entityEle);
             defaultRepository.setOperationFactory(operationFactory);
             defaultRepository.setExecutor(newExecutor(entityEle));
@@ -148,6 +157,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         AliasConverter aliasConverter = new AliasConverter(entityEle);
 
         CommonRepository commonRepository = new CommonRepository();
+        commonRepository.setEntityDef(entityDef);
         commonRepository.setEntityEle(entityEle);
         commonRepository.setOperationFactory(operationFactory);
         commonRepository.setProxyRepository((AbstractRepository<Object, Object>) repository);
@@ -161,6 +171,18 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         commonRepository.setAliasConverter(aliasConverter);
         commonRepository.setBoundEntity(false);
         return commonRepository;
+    }
+
+    private EntityDef renewEntityDef(EntityEle entityEle) {
+        EntityDef entityDef = entityEle.getEntityDef();
+        if (!entityDef.isAggregated() && entityEle.isAggregated()) {
+            EntityDef newEntityDef = BeanUtil.copyProperties(entityDef, EntityDef.class);
+            Class<?> genericType = entityEle.getGenericType();
+            Class<?> repositoryType = RepositoryDefinition.findType(genericType);
+            newEntityDef.setRepository(repositoryType);
+            return newEntityDef;
+        }
+        return entityDef;
     }
 
     private OrderBy newDefaultOrderBy(EntityEle entityEle) {
