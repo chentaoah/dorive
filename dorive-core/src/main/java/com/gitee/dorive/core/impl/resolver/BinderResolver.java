@@ -75,7 +75,7 @@ public class BinderResolver {
             String alias = entityEle.toAlias(field);
 
             PropChain fieldPropChain = propChainMap.get("/" + field);
-            Assert.notNull(fieldPropChain, "The field property chain cannot be null! entity: {}, field: {}", entityEle.getGenericType().getSimpleName(), field);
+            Assert.notNull(fieldPropChain, "The field of @Binding may be wrong! type: {}, field: {}", entityEle.getGenericType().getName(), field);
             fieldPropChain.newPropProxy();
 
             Processor processor = newProcessor(bindingDef);
