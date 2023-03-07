@@ -41,11 +41,8 @@ public class EntityDef {
     private String order;
 
     public static EntityDef fromElement(AnnotatedElement element) {
-        if (element.isAnnotationPresent(Entity.class)) {
-            Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Entity.class);
-            return BeanUtil.copyProperties(attributes, EntityDef.class);
-        }
-        return null;
+        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Entity.class);
+        return attributes != null ? BeanUtil.copyProperties(attributes, EntityDef.class) : null;
     }
 
     public void merge(EntityDef entityDef) {
