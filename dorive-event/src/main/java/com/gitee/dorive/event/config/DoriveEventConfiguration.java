@@ -23,7 +23,7 @@ import org.springframework.core.annotation.Order;
 
 @Order(-100)
 @Configuration
-public class DomainEventConfiguration {
+public class DoriveEventConfiguration {
 
     @Bean("repositoryListenerV3")
     public RepositoryListener repositoryListener() {

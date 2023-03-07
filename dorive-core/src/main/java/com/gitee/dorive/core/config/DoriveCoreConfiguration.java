@@ -22,7 +22,7 @@ import org.springframework.core.annotation.Order;
 
 @Order(-100)
 @Configuration
-public class DomainCoreConfiguration {
+public class DoriveCoreConfiguration {
 
     @Bean("repositoryContextV3")
     public RepositoryContext repositoryContext() {

@@ -41,7 +41,7 @@ import java.util.List;
 @Order(-100)
 @Configuration
 @ConditionalOnProperty(prefix = "dorive", name = "enable", havingValue = "true")
-public class DomainInjectionConfiguration implements BeanFactoryPostProcessor {
+public class DoriveInjectionConfiguration implements BeanFactoryPostProcessor {
 
     public static final String SCAN_KEY = "dorive.scan";
     public static final String DOMAINS_KEY = "dorive.domains";
