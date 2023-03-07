@@ -54,7 +54,7 @@ public class EntityIndexResult extends Result<Object> implements EntityIndex {
         if (existRowNums != null && !existRowNums.isEmpty()) {
             List<Object> entities = new ArrayList<>(existRowNums.size());
             for (Integer existRowNum : existRowNums) {
-                Object entity = records.get(existRowNum - 1);
+                Object entity = getRecords().get(existRowNum - 1);
                 entities.add(entity);
             }
             return entities;

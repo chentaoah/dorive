@@ -26,10 +26,10 @@ import java.util.List;
 @NoArgsConstructor
 public class Result<E> {
 
-    protected Page<E> page;
-    protected List<E> records = Collections.emptyList();
-    protected E record;
-    protected int total = 0;
+    private Page<E> page;
+    private List<E> records = Collections.emptyList();
+    private E record;
+    private int total = 0;
 
     public Result(Page<E> page) {
         this.page = page;

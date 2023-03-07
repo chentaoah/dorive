@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.gitee.dorive.event.config.DomainEventConfiguration
+  com.gitee.dorive.event.config.DoriveEventConfiguration

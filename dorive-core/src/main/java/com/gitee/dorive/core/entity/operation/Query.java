@@ -23,7 +23,7 @@ public class Query extends Condition {
     }
 
     public boolean withoutPage() {
-        return example.getPage() == null;
+        return getExample().getPage() == null;
     }
 
 }

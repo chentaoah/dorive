@@ -23,13 +23,13 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.dorive.coating.api.ExampleBuilder;
-import com.gitee.dorive.coating.entity.CoatingWrapper;
+import com.gitee.dorive.coating.entity.CoatingObj;
 import com.gitee.dorive.coating.entity.MergedRepository;
-import com.gitee.dorive.coating.entity.RepositoryWrapper;
+import com.gitee.dorive.coating.entity.RepositoryObj;
 import com.gitee.dorive.coating.entity.SpecificProperties;
-import com.gitee.dorive.coating.impl.resolver.CoatingWrapperResolver;
+import com.gitee.dorive.coating.impl.resolver.CoatingObjResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
-import com.gitee.dorive.core.api.constant.Operator;
+import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -64,36 +64,36 @@ public class SQLExampleBuilder implements ExampleBuilder {
     }
 
     @Override
-    public Example buildExample(Context context, Object coatingObject) {
-        CoatingWrapperResolver coatingWrapperResolver = repository.getCoatingWrapperResolver();
-        Map<String, CoatingWrapper> nameCoatingWrapperMap = coatingWrapperResolver.getNameCoatingWrapperMap();
+    public Example buildExample(Context context, Object coating) {
+        CoatingObjResolver coatingObjResolver = repository.getCoatingObjResolver();
+        Map<String, CoatingObj> nameCoatingObjMap = coatingObjResolver.getNameCoatingObjMap();
 
-        CoatingWrapper coatingWrapper = nameCoatingWrapperMap.get(coatingObject.getClass().getName());
-        Assert.notNull(coatingWrapper, "No coating wrapper exists!");
-        List<RepositoryWrapper> repositoryWrappers = coatingWrapper.getRepositoryWrappers();
+        CoatingObj coatingObj = nameCoatingObjMap.get(coating.getClass().getName());
+        Assert.notNull(coatingObj, "No coating object exists!");
+        List<RepositoryObj> repositoryObjs = coatingObj.getRepositoryObjs();
 
-        Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>(repositoryWrappers.size() * 4 / 3 + 1);
+        Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>(repositoryObjs.size() * 4 / 3 + 1);
         SqlSegment rootSqlSegment = null;
         char letter = 'a';
         boolean anyDirtyQuery = false;
 
-        for (RepositoryWrapper repositoryWrapper : repositoryWrappers) {
-            MergedRepository mergedRepository = repositoryWrapper.getMergedRepository();
+        for (RepositoryObj repositoryObj : repositoryObjs) {
+            MergedRepository mergedRepository = repositoryObj.getMergedRepository();
             String lastAccessPath = mergedRepository.getLastAccessPath();
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
-            CommonRepository commonRepository = mergedRepository.getCommonRepository();
+            CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
             BinderResolver binderResolver = definedRepository.getBinderResolver();
-            AliasConverter aliasConverter = commonRepository.getAliasConverter();
+            AliasConverter aliasConverter = executedRepository.getAliasConverter();
 
-            TableInfo tableInfo = getTableInfo(commonRepository);
+            TableInfo tableInfo = getTableInfo(executedRepository);
             String tableName = tableInfo.getTableName();
 
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
-            Example example = repositoryWrapper.newExampleByCoating(context, coatingObject);
+            Example example = repositoryObj.newExampleByCoating(context, coating);
             aliasConverter.convert(example);
 
             boolean dirtyQuery = example.isDirtyQuery();
@@ -114,9 +114,9 @@ public class SQLExampleBuilder implements ExampleBuilder {
             }
         }
 
-        SpecificProperties properties = coatingWrapper.getSpecificProperties();
-        OrderBy orderBy = properties.newOrderBy(coatingObject);
-        Page<Object> page = properties.newPage(coatingObject);
+        SpecificProperties properties = coatingObj.getSpecificProperties();
+        OrderBy orderBy = properties.newOrderBy(coating);
+        Page<Object> page = properties.newPage(coating);
 
         Example example = new Example();
         example.setOrderBy(orderBy);

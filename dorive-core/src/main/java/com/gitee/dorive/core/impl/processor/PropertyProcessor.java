@@ -32,7 +32,7 @@ public class PropertyProcessor extends DefaultProcessor {
 
     @Override
     public Object input(Context context, Object valueObject) {
-        String property = bindingDefinition.getProperty();
+        String property = getBindingDef().getProperty();
         if (valueObject instanceof Collection) {
             return CollUtil.map((Collection<?>) valueObject, item -> BeanUtil.getFieldValue(item, property), true);
         } else {

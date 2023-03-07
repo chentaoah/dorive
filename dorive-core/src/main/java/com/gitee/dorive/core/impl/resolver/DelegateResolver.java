@@ -28,14 +28,14 @@ import java.util.Map;
 public class DelegateResolver {
 
     private AbstractContextRepository<?, ?> repository;
-
     private Map<Class<?>, AbstractContextRepository<?, ?>> delegateRepositoryMap = new LinkedHashMap<>(3 * 4 / 3 + 1);
 
     public DelegateResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
+        resolve();
     }
 
-    public void resolveDelegateRepositoryMap() {
+    public void resolve() {
         ReflectionUtils.doWithLocalFields(repository.getClass(), declaredField -> {
             Class<?> fieldClass = declaredField.getType();
             if (AbstractContextRepository.class.isAssignableFrom(fieldClass)) {

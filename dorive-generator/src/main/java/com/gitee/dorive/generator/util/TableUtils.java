@@ -2,7 +2,7 @@ package com.gitee.dorive.generator.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.core.annotation.Entity;
+import com.gitee.dorive.api.annotation.Entity;
 import com.gitee.dorive.generator.entity.ClassVO;
 import com.gitee.dorive.generator.entity.FieldVO;
 import com.gitee.dorive.generator.entity.TableInfo;

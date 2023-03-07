@@ -18,6 +18,7 @@ package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.api.ListableRepository;
 import com.gitee.dorive.core.api.MetadataHolder;
@@ -29,16 +30,16 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK>
-        implements ListableRepository<E, PK>, MetadataHolder {
+public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK> implements ListableRepository<E, PK>, MetadataHolder {
 
     @Override
     public int updateByExample(Context context, Object entity, Example example) {
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
+        Selector selector = context.getSelector();
         int totalCount = 0;
         for (CommonRepository repository : getOrderedRepositories()) {
-            if (context.matches(repository)) {
+            if (selector.matches(context, repository)) {
                 totalCount += repository.updateByExample(context, entity, example);
             }
         }
@@ -62,9 +63,10 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     @Override
     public int deleteByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
+        Selector selector = context.getSelector();
         int totalCount = 0;
         for (CommonRepository repository : getOrderedRepositories()) {
-            if (context.matches(repository)) {
+            if (selector.matches(context, repository)) {
                 totalCount += repository.deleteByExample(context, example);
             }
         }
@@ -93,7 +95,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
 
     @Override
     public Object getMetadata() {
-        return rootRepository.getMetadata();
+        return getRootRepository().getMetadata();
     }
 
 }

@@ -36,18 +36,19 @@ public class MergedRepositoryResolver {
 
     public MergedRepositoryResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
+        resolve();
     }
 
-    public void resolveMergedRepositoryMap() {
+    public void resolve() {
         CommonRepository rootRepository = repository.getRootRepository();
 
         MergedRepository rootMergedRepository = new MergedRepository("", "/", false, rootRepository, rootRepository);
         mergedRepositoryMap.put("/", rootMergedRepository);
 
-        resolveMergedRepositoryMap(new ArrayList<>(), repository);
+        resolve(new ArrayList<>(), repository);
     }
 
-    private void resolveMergedRepositoryMap(List<String> multiAccessPath, AbstractContextRepository<?, ?> lastRepository) {
+    private void resolve(List<String> multiAccessPath, AbstractContextRepository<?, ?> lastRepository) {
         String lastAccessPath = StrUtil.join("", multiAccessPath);
 
         for (CommonRepository repository : lastRepository.getSubRepositories()) {
@@ -69,7 +70,7 @@ public class MergedRepositoryResolver {
 
                 List<String> newMultiAccessPath = new ArrayList<>(multiAccessPath);
                 newMultiAccessPath.add(accessPath);
-                resolveMergedRepositoryMap(newMultiAccessPath, abstractContextRepository);
+                resolve(newMultiAccessPath, abstractContextRepository);
 
             } else {
                 MergedRepository mergedRepository = new MergedRepository(

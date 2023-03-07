@@ -25,28 +25,19 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gitee.dorive.api.api.PropProxy;
+import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.api.EntityFactory;
 import com.gitee.dorive.core.api.MetadataHolder;
-import com.gitee.dorive.core.api.PropertyProxy;
-import com.gitee.dorive.core.api.constant.Order;
-import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.Command;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
-import com.gitee.dorive.core.entity.element.EntityElement;
-import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.executor.UnionExample;
-import com.gitee.dorive.core.entity.operation.Delete;
-import com.gitee.dorive.core.entity.operation.Insert;
-import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.entity.operation.Update;
+import com.gitee.dorive.api.constant.Order;
+import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.core.entity.executor.*;
+import com.gitee.dorive.core.entity.operation.*;
+import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
 import com.gitee.dorive.spring.boot.starter.entity.Metadata;
-import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.spring.boot.starter.impl.EntityIndexResult;
 import lombok.Getter;
 import lombok.Setter;
@@ -66,21 +57,21 @@ import static com.gitee.dorive.spring.boot.starter.impl.AppenderContext.OPERATOR
 @ToString
 public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHolder {
 
-    private EntityDefinition entityDefinition;
-    private EntityElement entityElement;
+    private EntityDef entityDef;
+    private EntityEle entityEle;
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;
     private EntityFactory entityFactory;
     private AliasConverter aliasConverter;
 
-    public MybatisPlusExecutor(EntityDefinition entityDefinition,
-                               EntityElement entityElement,
+    public MybatisPlusExecutor(EntityDef entityDef,
+                               EntityEle entityEle,
                                BaseMapper<Object> baseMapper,
                                Class<Object> pojoClass,
                                EntityFactory entityFactory,
                                AliasConverter aliasConverter) {
-        this.entityDefinition = entityDefinition;
-        this.entityElement = entityElement;
+        this.entityDef = entityDef;
+        this.entityEle = entityEle;
         this.baseMapper = baseMapper;
         this.pojoClass = pojoClass;
         this.entityFactory = entityFactory;
@@ -231,12 +222,12 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
     @Override
     public int execute(Context context, Operation operation) {
         Object entity = operation.getEntity();
-        Object persistentObject = entity != null ? entityFactory.deconstruct(context, entity) : null;
+        Object persistent = entity != null ? entityFactory.deconstruct(context, entity) : null;
 
         if (operation instanceof Insert) {
-            int count = baseMapper.insert(persistentObject);
-            Object primaryKey = BeanUtil.getFieldValue(persistentObject, "id");
-            PropertyProxy primaryKeyProxy = entityElement.getPrimaryKeyProxy();
+            int count = baseMapper.insert(persistent);
+            Object primaryKey = BeanUtil.getFieldValue(persistent, "id");
+            PropProxy primaryKeyProxy = entityEle.getPkProxy();
             primaryKeyProxy.setValue(entity, primaryKey);
             return count;
 
@@ -248,22 +239,23 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                 aliasConverter.convert(example);
             }
 
-            String commandKey = entityDefinition.getCommandKey();
-            if (StringUtils.isNotBlank(commandKey) && context.containsKey(commandKey)) {
-                Command command = (Command) context.get(commandKey);
-                Set<String> nullableProperties = command.getNullableProperties();
-                if (nullableProperties != null && !nullableProperties.isEmpty()) {
-                    example = primaryKey != null ? new Example().eq("id", primaryKey) : example;
-                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistentObject, nullableProperties, example);
-                    return baseMapper.update(null, updateWrapper);
-                }
-            }
+//            Map<String, Object> attachments = context.getAttachments();
+//            String commandKey = entityDef.getCommandKey();
+//            if (StringUtils.isNotBlank(commandKey) && attachments.containsKey(commandKey)) {
+//                Command command = (Command) attachments.get(commandKey);
+//                Set<String> nullableProperties = command.getNullableProperties();
+//                if (nullableProperties != null && !nullableProperties.isEmpty()) {
+//                    example = primaryKey != null ? new Example().eq("id", primaryKey) : example;
+//                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableProperties, example);
+//                    return baseMapper.update(null, updateWrapper);
+//                }
+//            }
 
             if (primaryKey != null) {
-                return baseMapper.updateById(persistentObject);
+                return baseMapper.updateById(persistent);
 
             } else if (example != null) {
-                return baseMapper.update(persistentObject, buildUpdateWrapper(example));
+                return baseMapper.update(persistent, buildUpdateWrapper(example));
             }
 
         } else if (operation instanceof Delete) {
@@ -292,12 +284,12 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         return updateWrapper;
     }
 
-    private UpdateWrapper<Object> buildUpdateWrapper(Object persistentObject, Set<String> nullableProperties, Example example) {
+    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableProperties, Example example) {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
         List<TableFieldInfo> fieldList = TableInfoHelper.getTableInfo(pojoClass).getFieldList();
         for (TableFieldInfo tableFieldInfo : fieldList) {
             String property = tableFieldInfo.getProperty();
-            Object value = BeanUtil.getFieldValue(persistentObject, property);
+            Object value = BeanUtil.getFieldValue(persistent, property);
             if (value != null || nullableProperties.contains(property)) {
                 updateWrapper.set(true, tableFieldInfo.getColumn(), value);
             }

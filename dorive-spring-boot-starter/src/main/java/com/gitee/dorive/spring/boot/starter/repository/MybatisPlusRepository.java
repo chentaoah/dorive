@@ -21,11 +21,11 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.core.api.EntityFactory;
 import com.gitee.dorive.core.api.Executor;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
-import com.gitee.dorive.core.entity.element.EntityElement;
+import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.DefaultEntityFactory;
-import com.gitee.dorive.ref.repository.AbstractRefRepository;
+import com.gitee.dorive.simple.repository.AbstractSimpleRepository;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
 
 import java.lang.reflect.ParameterizedType;
@@ -34,24 +34,26 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
+public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK> {
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        if ("SQL".equals(querier)) {
-            this.exampleBuilder = new SQLExampleBuilder(this);
+        if ("SQL".equals(getQuerier())) {
+            setExampleBuilder(new SQLExampleBuilder(this));
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    protected Executor newExecutor(EntityDefinition entityDefinition, EntityElement entityElement) {
-        Class<?> mapperClass = entityDefinition.getMapper();
+    protected Executor newExecutor(EntityEle entityEle) {
+        EntityDef entityDef = entityEle.getEntityDef();
+
+        Class<?> mapperClass = entityDef.getSource();
         Object mapper = null;
         Class<?> pojoClass = null;
         if (mapperClass != Object.class) {
-            mapper = applicationContext.getBean(mapperClass);
+            mapper = getApplicationContext().getBean(mapperClass);
             Type[] genericInterfaces = mapperClass.getGenericInterfaces();
             if (genericInterfaces.length > 0) {
                 Type genericInterface = mapperClass.getGenericInterfaces()[0];
@@ -63,20 +65,20 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
             }
         }
 
-        Class<?> factoryClass = entityDefinition.getFactory();
+        Class<?> factoryClass = entityDef.getFactory();
         EntityFactory entityFactory;
-        if (factoryClass == DefaultEntityFactory.class) {
+        if (factoryClass == Object.class) {
             entityFactory = new DefaultEntityFactory();
         } else {
-            entityFactory = (EntityFactory) applicationContext.getBean(factoryClass);
+            entityFactory = (EntityFactory) getApplicationContext().getBean(factoryClass);
         }
         if (entityFactory instanceof DefaultEntityFactory) {
             DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
-            defaultEntityFactory.setEntityElement(entityElement);
+            defaultEntityFactory.setEntityEle(entityEle);
             defaultEntityFactory.setPojoClass(pojoClass);
-            defaultEntityFactory.setAliasPropMapping(entityElement.newAliasPropMapping());
+            defaultEntityFactory.setAliasPropMapping(entityEle.newAliasPropMap());
             if (pojoClass != null) {
-                Map<String, String> aliasPropMapping = entityElement.newAliasPropMapping();
+                Map<String, String> aliasPropMapping = entityEle.newAliasPropMap();
                 Map<String, String> propPojoMapping = new LinkedHashMap<>();
                 List<TableFieldInfo> fieldList = TableInfoHelper.getTableInfo(pojoClass).getFieldList();
                 for (TableFieldInfo tableFieldInfo : fieldList) {
@@ -91,9 +93,9 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
             }
         }
 
-        AliasConverter aliasConverter = new AliasConverter(entityElement);
+        AliasConverter aliasConverter = new AliasConverter(entityEle);
 
-        return new MybatisPlusExecutor(entityDefinition, entityElement, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass,
+        return new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass,
                 entityFactory, aliasConverter);
     }
 

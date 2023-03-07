@@ -16,22 +16,12 @@
  */
 package com.gitee.dorive.core.api;
 
-import com.gitee.dorive.core.repository.CommonRepository;
-
-import java.util.List;
+import java.util.Map;
 
 public interface Context {
 
-    Object put(String key, Object value);
+    Selector getSelector();
 
-    boolean containsKey(String key);
-
-    Object get(String key);
-
-    Object remove(String key);
-
-    boolean matches(CommonRepository repository);
-
-    List<String> selectColumns(CommonRepository repository);
+    Map<String, Object> getAttachments();
 
 }

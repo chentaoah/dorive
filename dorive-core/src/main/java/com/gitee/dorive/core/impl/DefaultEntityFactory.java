@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.element.EntityElement;
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.EntityFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,15 +32,15 @@ import java.util.Map;
 @AllArgsConstructor
 public class DefaultEntityFactory implements EntityFactory {
 
-    protected EntityElement entityElement;
-    protected Class<?> pojoClass;
-    protected Map<String, String> aliasPropMapping;
-    protected Map<String, String> propPojoMapping;
+    private EntityEle entityEle;
+    private Class<?> pojoClass;
+    private Map<String, String> aliasPropMapping;
+    private Map<String, String> propPojoMapping;
 
     @Override
-    public Object reconstitute(Context context, Object persistentObject) {
+    public Object reconstitute(Context context, Object persistent) {
         CopyOptions copyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(aliasPropMapping);
-        return BeanUtil.toBean(persistentObject, entityElement.getGenericType(), copyOptions);
+        return BeanUtil.toBean(persistent, entityEle.getGenericType(), copyOptions);
     }
 
     @Override

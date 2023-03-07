@@ -16,9 +16,10 @@
  */
 package com.gitee.dorive.core.impl.resolver;
 
-import com.gitee.dorive.core.api.ContextAdapter;
-import com.gitee.dorive.core.entity.definition.AdapterDefinition;
-import com.gitee.dorive.core.impl.DefaultContextAdapter;
+import com.gitee.dorive.api.entity.def.AdapterDef;
+import com.gitee.dorive.api.entity.element.EntityType;
+import com.gitee.dorive.core.api.Adapter;
+import com.gitee.dorive.core.impl.DefaultAdapter;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
@@ -27,33 +28,33 @@ import org.springframework.context.ApplicationContext;
 public class AdapterResolver {
 
     private AbstractContextRepository<?, ?> repository;
-
-    private ContextAdapter contextAdapter;
+    private Adapter adapter;
 
     public AdapterResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
+        resolve();
     }
 
-    public void resolveAdapter() {
-        Class<?> entityClass = repository.getEntityClass();
-        AdapterDefinition adapterDefinition = AdapterDefinition.newAdapterDefinition(entityClass);
-        if (adapterDefinition != null) {
-            Class<?> adapterClass = adapterDefinition.getAdapter();
-            if (adapterClass == DefaultContextAdapter.class) {
-                contextAdapter = new DefaultContextAdapter();
+    public void resolve() {
+        EntityType entityType = repository.getEntityType();
+        AdapterDef adapterDef = entityType.getAdapterDef();
+        if (adapterDef != null) {
+            Class<?> adapterClass = adapterDef.getAdapter();
+            if (adapterClass == Object.class) {
+                adapter = new DefaultAdapter();
             } else {
                 ApplicationContext applicationContext = repository.getApplicationContext();
-                contextAdapter = (ContextAdapter) applicationContext.getBean(adapterClass);
+                adapter = (Adapter) applicationContext.getBean(adapterClass);
             }
-            if (contextAdapter instanceof DefaultContextAdapter) {
-                DefaultContextAdapter defaultContextAdapter = (DefaultContextAdapter) contextAdapter;
-                defaultContextAdapter.setAdapterDefinition(adapterDefinition);
+            if (adapter instanceof DefaultAdapter) {
+                DefaultAdapter defaultAdapter = (DefaultAdapter) adapter;
+                defaultAdapter.setAdapterDef(adapterDef);
             }
         }
     }
 
     public boolean isAdaptive() {
-        return contextAdapter != null;
+        return adapter != null;
     }
 
 }

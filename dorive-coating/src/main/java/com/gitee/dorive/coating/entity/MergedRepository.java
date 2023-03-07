@@ -27,5 +27,5 @@ public class MergedRepository {
     private String absoluteAccessPath;
     private boolean merged;
     private CommonRepository definedRepository;
-    private CommonRepository commonRepository;
+    private CommonRepository executedRepository;
 }

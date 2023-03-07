@@ -1,27 +1,14 @@
 package com.gitee.dorive.core.impl.selector;
 
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.api.Selector;
+import com.gitee.dorive.core.entity.BoundedContext;
 
 public abstract class AbstractSelector implements Selector {
 
     @Override
-    public Object put(String key, Object value) {
-        return null;
-    }
-
-    @Override
-    public boolean containsKey(String key) {
-        return false;
-    }
-
-    @Override
-    public Object get(String key) {
-        return null;
-    }
-
-    @Override
-    public Object remove(String key) {
-        return null;
+    public Context build() {
+        return new BoundedContext(this);
     }
 
 }

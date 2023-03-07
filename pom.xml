@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive</artifactId>
-    <version>3.2.7</version>
+    <version>3.3.1</version>
     <packaging>pom</packaging>
 
     <licenses>
@@ -31,11 +31,12 @@
     <modules>
         <module>dorive-injection</module>
         <module>dorive-proxy</module>
+        <module>dorive-api</module>
         <module>dorive-core</module>
         <module>dorive-event</module>
         <module>dorive-coating</module>
-        <module>dorive-ref</module>
-        <module>dorive-service</module>
+        <module>dorive-simple</module>
+        <module>dorive-web</module>
         <module>dorive-spring-boot-starter</module>
         <module>dorive-generator</module>
     </modules>

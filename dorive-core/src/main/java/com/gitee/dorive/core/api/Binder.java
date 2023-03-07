@@ -16,11 +16,11 @@
  */
 package com.gitee.dorive.core.api;
 
-import com.gitee.dorive.core.entity.definition.BindingDefinition;
+import com.gitee.dorive.api.entity.def.BindingDef;
 
 public interface Binder {
 
-    BindingDefinition getBindingDefinition();
+    BindingDef getBindingDef();
 
     Object getFieldValue(Context context, Object entity);
 

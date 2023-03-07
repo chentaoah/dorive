@@ -17,11 +17,12 @@
 package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.api.entity.element.EntityType;
 import com.gitee.dorive.core.api.Executor;
 import com.gitee.dorive.core.api.Repository;
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.element.EntityElement;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
+import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
@@ -33,11 +34,19 @@ import java.util.List;
 
 @Data
 public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Executor {
-    
-    protected EntityDefinition entityDefinition;
-    protected EntityElement entityElement;
-    protected OperationFactory operationFactory;
-    protected Executor executor;
+
+    private EntityDef entityDef;
+    private EntityEle entityEle;
+    private OperationFactory operationFactory;
+    private Executor executor;
+
+    public Class<?> getEntityClass() {
+        return entityEle.getGenericType();
+    }
+
+    public EntityType getEntityType() {
+        return entityEle.getEntityType();
+    }
 
     @Override
     @SuppressWarnings("unchecked")

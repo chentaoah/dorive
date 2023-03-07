@@ -20,9 +20,9 @@ import com.gitee.dorive.coating.annotation.CoatingScan;
 import com.gitee.dorive.coating.api.CoatingRepository;
 import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.impl.DefaultExampleBuilder;
-import com.gitee.dorive.coating.impl.resolver.CoatingWrapperResolver;
+import com.gitee.dorive.coating.impl.resolver.CoatingObjResolver;
 import com.gitee.dorive.coating.impl.resolver.MergedRepositoryResolver;
-import com.gitee.dorive.core.annotation.Repository;
+import com.gitee.dorive.api.annotation.Repository;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -38,12 +38,12 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> implements ExampleBuilder, CoatingRepository<E, PK> {
 
-    protected String querier;
-    protected String[] scanPackages;
-    protected String regex;
-    protected MergedRepositoryResolver mergedRepositoryResolver;
-    protected CoatingWrapperResolver coatingWrapperResolver;
-    protected ExampleBuilder exampleBuilder;
+    private String querier;
+    private String[] scanPackages;
+    private String regex;
+    private MergedRepositoryResolver mergedRepositoryResolver;
+    private CoatingObjResolver coatingObjResolver;
+    private ExampleBuilder exampleBuilder;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -53,27 +53,24 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
         if (repository != null && coatingScan != null) {
             this.querier = repository.querier();
             this.scanPackages = coatingScan.value();
-            this.regex = StringUtils.isBlank(coatingScan.regex()) ? "^" + entityClass.getSimpleName() + ".*" : coatingScan.regex();
+            this.regex = StringUtils.isBlank(coatingScan.regex()) ? "^" + getEntityClass().getSimpleName() + ".*" : coatingScan.regex();
 
             this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
-            this.coatingWrapperResolver = new CoatingWrapperResolver(this);
+            this.coatingObjResolver = new CoatingObjResolver(this);
             if ("default".equals(querier)) {
                 this.exampleBuilder = new DefaultExampleBuilder(this);
             }
-
-            mergedRepositoryResolver.resolveMergedRepositoryMap();
-            coatingWrapperResolver.resolveCoatingWrapperMap();
         }
     }
 
     @Override
-    public Example buildExample(Context context, Object coatingObject) {
-        return exampleBuilder.buildExample(context, coatingObject);
+    public Example buildExample(Context context, Object coating) {
+        return exampleBuilder.buildExample(context, coating);
     }
 
     @Override
-    public List<E> selectByCoating(Context context, Object coatingObject) {
-        Example example = buildExample(context, coatingObject);
+    public List<E> selectByCoating(Context context, Object coating) {
+        Example example = buildExample(context, coating);
         if (example.isCountQueried()) {
             example.setPage(null);
         }
@@ -82,8 +79,8 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
     @Override
     @SuppressWarnings("unchecked")
-    public Page<E> selectPageByCoating(Context context, Object coatingObject) {
-        Example example = buildExample(context, coatingObject);
+    public Page<E> selectPageByCoating(Context context, Object coating) {
+        Example example = buildExample(context, coating);
         if (example.isCountQueried()) {
             Page<Object> page = example.getPage();
             example.setPage(null);

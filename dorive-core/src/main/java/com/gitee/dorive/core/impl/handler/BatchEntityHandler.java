@@ -16,21 +16,20 @@
  */
 package com.gitee.dorive.core.impl.handler;
 
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.executor.UnionExample;
+import com.gitee.dorive.api.api.PropProxy;
+import com.gitee.dorive.api.entity.element.PropChain;
+import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.api.EntityHandler;
 import com.gitee.dorive.core.api.EntityIndex;
-import com.gitee.dorive.core.api.ExampleBuilder;
-import com.gitee.dorive.core.api.PropertyProxy;
-import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.element.PropertyChain;
+import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.OperationFactory;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -46,9 +45,10 @@ public class BatchEntityHandler implements EntityHandler {
 
     @Override
     public int handleEntities(Context context, List<Object> rootEntities) {
+        Selector selector = context.getSelector();
         int totalCount = 0;
         for (CommonRepository repository : this.repository.getSubRepositories()) {
-            if (context.matches(repository)) {
+            if (selector.matches(context, repository)) {
                 totalCount += executeQuery(repository, context, rootEntities);
             }
         }
@@ -70,21 +70,22 @@ public class BatchEntityHandler implements EntityHandler {
     }
 
     private UnionExample newUnionExample(CommonRepository repository, Context context, List<Object> rootEntities) {
-        PropertyChain anchorPoint = repository.getAnchorPoint();
-        PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
+        PropChain anchorPoint = repository.getAnchorPoint();
+        PropChain lastPropChain = anchorPoint.getLastPropChain();
 
-        String builderKey = repository.getEntityDefinition().getBuilderKey();
-        ExampleBuilder exampleBuilder = StringUtils.isNotBlank(builderKey) ? (ExampleBuilder) context.get(builderKey) : null;
+//        Map<String, Object> attachments = context.getAttachments();
+//        String builderKey = repository.getEntityDef().getBuilderKey();
+//        ExampleBuilder exampleBuilder = StringUtils.isNotBlank(builderKey) ? (ExampleBuilder) attachments.get(builderKey) : null;
 
         UnionExample unionExample = new UnionExample();
         for (int index = 0; index < rootEntities.size(); index++) {
             Object rootEntity = rootEntities.get(index);
-            Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
+            Object lastEntity = lastPropChain == null ? rootEntity : lastPropChain.getValue(rootEntity);
             if (lastEntity != null) {
                 Example example = repository.newExampleByContext(context, rootEntity);
-                if (exampleBuilder != null) {
-                    example = exampleBuilder.buildExample(context, rootEntity, example);
-                }
+//                if (exampleBuilder != null) {
+//                    example = exampleBuilder.buildExample(context, rootEntity, example);
+//                }
                 if (example.isDirtyQuery()) {
                     example.extraColumns((index + 1) + " as $row");
                     unionExample.addExample(example);
@@ -95,18 +96,18 @@ public class BatchEntityHandler implements EntityHandler {
     }
 
     private void setValueForRootEntities(CommonRepository repository, List<Object> rootEntities, EntityIndex entityIndex) {
-        PropertyChain anchorPoint = repository.getAnchorPoint();
-        PropertyChain lastPropertyChain = anchorPoint.getLastPropertyChain();
-        PropertyProxy propertyProxy = anchorPoint.getPropertyProxy();
+        PropChain anchorPoint = repository.getAnchorPoint();
+        PropChain lastPropChain = anchorPoint.getLastPropChain();
+        PropProxy propProxy = anchorPoint.getPropProxy();
 
         for (int index = 0; index < rootEntities.size(); index++) {
             Object rootEntity = rootEntities.get(index);
-            Object lastEntity = lastPropertyChain == null ? rootEntity : lastPropertyChain.getValue(rootEntity);
+            Object lastEntity = lastPropChain == null ? rootEntity : lastPropChain.getValue(rootEntity);
             if (lastEntity != null) {
                 List<Object> entities = entityIndex.selectList(rootEntity, index + 1);
                 Object entity = repository.convertManyToOne(entities);
                 if (entity != null) {
-                    propertyProxy.setValue(lastEntity, entity);
+                    propProxy.setValue(lastEntity, entity);
                 }
             }
         }

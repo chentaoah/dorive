@@ -16,10 +16,12 @@
  */
 package com.gitee.dorive.core.repository;
 
-import com.gitee.dorive.core.api.MetadataHolder;
-import com.gitee.dorive.core.api.PropertyProxy;
+import com.gitee.dorive.api.entity.def.BindingDef;
+import com.gitee.dorive.api.entity.element.PropChain;
+import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.entity.element.PropertyChain;
+import com.gitee.dorive.core.api.MetadataHolder;
+import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -29,7 +31,6 @@ import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.impl.resolver.PropertyResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -40,16 +41,15 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class CommonRepository extends ProxyRepository implements MetadataHolder {
 
-    protected String accessPath;
-    protected boolean root;
-    protected boolean aggregated;
-    protected PropertyChain anchorPoint;
-    protected PropertyResolver propertyResolver;
-    protected OrderBy defaultOrderBy;
-    protected String fieldPrefix;
-    protected BinderResolver binderResolver;
-    protected boolean boundEntity;
-    protected AliasConverter aliasConverter;
+    private String accessPath;
+    private boolean root;
+    private boolean aggregated;
+    private OrderBy defaultOrderBy;
+    private PropChain anchorPoint;
+    private BinderResolver binderResolver;
+    private PropChainResolver propChainResolver;
+    private AliasConverter aliasConverter;
+    private boolean boundEntity;
 
     @Override
     public int updateByExample(Context context, Object entity, Example example) {
@@ -69,7 +69,8 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
-        List<String> properties = context.selectColumns(this);
+        Selector selector = context.getSelector();
+        List<String> properties = selector.selectColumns(context, this);
         if (properties != null && !properties.isEmpty()) {
             if (query.getPrimaryKey() != null) {
                 Example example = new Example().eq("id", query.getPrimaryKey());
@@ -106,14 +107,15 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
     public Example newExampleByContext(Context context, Object rootEntity) {
         Example example = new Example();
         for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
-            String alias = propertyBinder.getAlias();
+            BindingDef bindingDef = propertyBinder.getBindingDef();
+            String field = bindingDef.getField();
             Object boundValue = propertyBinder.getBoundValue(context, rootEntity);
             if (boundValue instanceof Collection) {
                 boundValue = !((Collection<?>) boundValue).isEmpty() ? boundValue : null;
             }
             if (boundValue != null) {
                 boundValue = propertyBinder.input(context, boundValue);
-                example.eq(alias, boundValue);
+                example.eq(field, boundValue);
             } else {
                 example.getCriteria().clear();
                 break;
@@ -121,10 +123,11 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
         }
         if (example.isDirtyQuery()) {
             for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
-                String alias = contextBinder.getAlias();
+                BindingDef bindingDef = contextBinder.getBindingDef();
+                String field = bindingDef.getField();
                 Object boundValue = contextBinder.getBoundValue(context, rootEntity);
                 if (boundValue != null) {
-                    example.eq(alias, boundValue);
+                    example.eq(field, boundValue);
                 }
             }
         }
@@ -132,12 +135,11 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
     }
 
     public Object getPrimaryKey(Object entity) {
-        PropertyProxy primaryKeyProxy = entityElement.getPrimaryKeyProxy();
-        return primaryKeyProxy.getValue(entity);
+        return getEntityEle().getPkProxy().getValue(entity);
     }
 
     public Object convertManyToOne(List<?> entities) {
-        if (entityElement.isCollection()) {
+        if (getEntityEle().isCollection()) {
             return entities;
         } else if (!entities.isEmpty()) {
             return entities.get(0);

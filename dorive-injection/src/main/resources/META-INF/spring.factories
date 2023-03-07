@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.gitee.dorive.injection.config.DomainInjectionConfiguration
+  com.gitee.dorive.injection.config.DoriveInjectionConfiguration

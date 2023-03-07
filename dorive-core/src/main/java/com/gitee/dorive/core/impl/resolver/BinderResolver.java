@@ -16,13 +16,15 @@
  */
 package com.gitee.dorive.core.impl.resolver;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.Binder;
 import com.gitee.dorive.core.api.Processor;
-import com.gitee.dorive.core.entity.definition.BindingDefinition;
-import com.gitee.dorive.core.entity.definition.EntityDefinition;
-import com.gitee.dorive.core.entity.element.EntityElement;
-import com.gitee.dorive.core.entity.element.PropertyChain;
+import com.gitee.dorive.api.entity.def.BindingDef;
+import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.processor.DefaultProcessor;
@@ -30,7 +32,7 @@ import com.gitee.dorive.core.impl.processor.PropertyProcessor;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.PathUtils;
-import com.gitee.dorive.core.util.ReflectUtils;
+import com.gitee.dorive.api.util.ReflectUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
@@ -55,54 +57,49 @@ public class BinderResolver {
         this.repository = repository;
     }
 
-    public void resolveAllBinders(String accessPath, EntityElement entityElement, EntityDefinition entityDefinition,
-                                  String fieldPrefix, PropertyResolver propertyResolver) {
+    public void resolve(String accessPath, EntityEle entityEle, PropChainResolver propChainResolver) {
+        List<BindingDef> bindingDefs = entityEle.getBindingDefs();
+        Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
 
-        List<BindingDefinition> bindingDefinitions = BindingDefinition.newBindingDefinitions(entityElement.getAnnotatedElement());
-        Map<String, PropertyChain> allPropertyChainMap = propertyResolver.getAllPropertyChainMap();
-
-        allBinders = new ArrayList<>(bindingDefinitions.size());
-        propertyBinders = new ArrayList<>(bindingDefinitions.size());
-        boundFields = new ArrayList<>(bindingDefinitions.size());
-        contextBinders = new ArrayList<>(bindingDefinitions.size());
-        boundValueBinders = new ArrayList<>(bindingDefinitions.size());
+        allBinders = new ArrayList<>(bindingDefs.size());
+        propertyBinders = new ArrayList<>(bindingDefs.size());
+        boundFields = new ArrayList<>(bindingDefs.size());
+        contextBinders = new ArrayList<>(bindingDefs.size());
+        boundValueBinders = new ArrayList<>(bindingDefs.size());
         boundIdBinder = null;
 
-        for (BindingDefinition bindingDefinition : bindingDefinitions) {
-            renewBindingDefinition(accessPath, bindingDefinition);
+        for (BindingDef bindingDef : bindingDefs) {
+            bindingDef = renewBindingDef(accessPath, bindingDef);
 
-            String field = bindingDefinition.getField();
-            String alias = entityElement.toAlias(field);
+            String field = bindingDef.getField();
+            String alias = entityEle.toAlias(field);
 
-            PropertyChain fieldPropertyChain = allPropertyChainMap.get(fieldPrefix + field);
-            Assert.notNull(
-                    fieldPropertyChain,
-                    "The field property chain cannot be null! entity: {}, field: {}",
-                    entityElement.getGenericType().getSimpleName(),
-                    field);
-            fieldPropertyChain.newPropertyProxy();
+            PropChain fieldPropChain = propChainMap.get("/" + field);
+            Assert.notNull(fieldPropChain, "The field property chain cannot be null! entity: {}, field: {}", entityEle.getGenericType().getSimpleName(), field);
+            fieldPropChain.newPropProxy();
 
-            Processor processor = newProcessor(bindingDefinition);
+            Processor processor = newProcessor(bindingDef);
 
-            if (bindingDefinition.getBindExp().startsWith("/")) {
-                PropertyBinder propertyBinder = newPropertyBinder(bindingDefinition, fieldPropertyChain, processor, alias);
+            if (bindingDef.getBindExp().startsWith("/")) {
+                PropertyBinder propertyBinder = newPropertyBinder(bindingDef, fieldPropChain, processor, alias);
                 allBinders.add(propertyBinder);
                 propertyBinders.add(propertyBinder);
-                boundFields.add(bindingDefinition.getField());
+                boundFields.add(bindingDef.getField());
 
                 if (propertyBinder.isSameType()) {
                     if (!"id".equals(field)) {
                         boundValueBinders.add(propertyBinder);
                     } else {
-                        if (entityDefinition.getOrder() == 0) {
-                            entityDefinition.setOrder(-1);
+                        EntityDef entityDef = entityEle.getEntityDef();
+                        if (entityDef.getPriority() == 0) {
+                            entityDef.setPriority(-1);
                         }
                         boundIdBinder = propertyBinder;
                     }
                 }
 
             } else {
-                ContextBinder contextBinder = new ContextBinder(bindingDefinition, fieldPropertyChain, processor, alias);
+                ContextBinder contextBinder = new ContextBinder(bindingDef, fieldPropChain, processor, alias);
                 allBinders.add(contextBinder);
                 contextBinders.add(contextBinder);
                 boundValueBinders.add(contextBinder);
@@ -110,21 +107,21 @@ public class BinderResolver {
         }
     }
 
-    private void renewBindingDefinition(String accessPath, BindingDefinition bindingDefinition) {
-        String bindExp = bindingDefinition.getBindExp();
-        if (bindExp.startsWith("/") || bindExp.startsWith(".")) {
-            if (bindExp.startsWith(".")) {
-                bindExp = PathUtils.getAbsolutePath(accessPath, bindExp);
-            }
+    private BindingDef renewBindingDef(String accessPath, BindingDef bindingDef) {
+        bindingDef = BeanUtil.copyProperties(bindingDef, BindingDef.class);
+        String bindExp = bindingDef.getBindExp();
+        if (bindExp.startsWith(".")) {
+            bindExp = PathUtils.getAbsolutePath(accessPath, bindExp);
+            bindingDef.setBindExp(bindExp);
         }
-        bindingDefinition.setBindExp(bindExp);
+        return bindingDef;
     }
 
-    private Processor newProcessor(BindingDefinition bindingDefinition) {
-        Class<?> processorClass = bindingDefinition.getProcessor();
+    private Processor newProcessor(BindingDef bindingDef) {
+        Class<?> processorClass = bindingDef.getProcessor();
         Processor processor = null;
-        if (processorClass == DefaultProcessor.class) {
-            if (StringUtils.isBlank(bindingDefinition.getProperty())) {
+        if (processorClass == Object.class) {
+            if (StringUtils.isBlank(bindingDef.getProperty())) {
                 processor = new DefaultProcessor();
             } else {
                 processor = new PropertyProcessor();
@@ -141,35 +138,34 @@ public class BinderResolver {
         }
         if (processor instanceof DefaultProcessor) {
             DefaultProcessor defaultProcessor = (DefaultProcessor) processor;
-            defaultProcessor.setBindingDefinition(bindingDefinition);
+            defaultProcessor.setBindingDef(bindingDef);
         }
         if (processor instanceof PropertyProcessor) {
-            Assert.notBlank(bindingDefinition.getProperty(), "The property of PropertyProcessor cannot be blank!");
+            Assert.notBlank(bindingDef.getProperty(), "The property of PropertyProcessor cannot be blank!");
         }
         return processor;
     }
 
-    private PropertyBinder newPropertyBinder(BindingDefinition bindingDefinition, PropertyChain fieldPropertyChain, Processor processor, String alias) {
-        String bindExp = bindingDefinition.getBindExp();
-        String property = bindingDefinition.getProperty();
+    private PropertyBinder newPropertyBinder(BindingDef bindingDef, PropChain fieldPropChain, Processor processor, String alias) {
+        String bindExp = bindingDef.getBindExp();
+        String property = bindingDef.getProperty();
 
-        Map<String, CommonRepository> allRepositoryMap = repository.getAllRepositoryMap();
-        String belongAccessPath = PathUtils.getBelongPath(allRepositoryMap.keySet(), bindExp);
-        CommonRepository belongRepository = allRepositoryMap.get(belongAccessPath);
+        Map<String, CommonRepository> repositoryMap = repository.getRepositoryMap();
+        String belongAccessPath = PathUtils.getBelongPath(repositoryMap.keySet(), bindExp);
+        CommonRepository belongRepository = repositoryMap.get(belongAccessPath);
         Assert.notNull(belongRepository, "The belong repository cannot be null!");
         belongRepository.setBoundEntity(true);
 
-        Map<String, PropertyChain> allPropertyChainMap = repository.getPropertyResolver().getAllPropertyChainMap();
-        PropertyChain boundPropertyChain = allPropertyChainMap.get(bindExp);
-        Assert.notNull(boundPropertyChain, "The bound property chain cannot be null!");
-        boundPropertyChain.newPropertyProxy();
+        Map<String, PropChain> propChainMap = repository.getPropChainResolver().getPropChainMap();
+        PropChain boundPropChain = propChainMap.get(bindExp);
+        Assert.notNull(boundPropChain, "The bound property chain cannot be null!");
+        boundPropChain.newPropProxy();
 
-        EntityElement entityElement = belongRepository.getEntityElement();
+        EntityEle entityEle = belongRepository.getEntityEle();
         String fieldName = StringUtils.isNotBlank(property) ? property : PathUtils.getLastName(bindExp);
-        String bindAlias = entityElement.toAlias(fieldName);
+        String bindAlias = entityEle.toAlias(fieldName);
 
-        return new PropertyBinder(bindingDefinition, fieldPropertyChain, processor, alias,
-                belongAccessPath, belongRepository, boundPropertyChain, bindAlias);
+        return new PropertyBinder(bindingDef, fieldPropChain, processor, alias, belongAccessPath, belongRepository, boundPropChain, bindAlias);
     }
 
 }

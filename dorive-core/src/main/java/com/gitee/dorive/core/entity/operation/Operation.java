@@ -36,7 +36,7 @@ public class Operation {
     public static final int IGNORE_ROOT = 0x00000020;
     public static final int INCLUDE_ROOT = 0x00000040;
 
-    protected int type;
-    protected Object entity;
+    private int type;
+    private Object entity;
 
 }

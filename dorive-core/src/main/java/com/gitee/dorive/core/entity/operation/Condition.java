@@ -24,8 +24,8 @@ import lombok.Setter;
 @Setter
 public class Condition extends Operation {
 
-    protected Object primaryKey;
-    protected Example example;
+    private Object primaryKey;
+    private Example example;
 
     public Condition(int type, Object entity) {
         super(type, entity);

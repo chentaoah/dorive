@@ -34,7 +34,7 @@ import org.springframework.context.ApplicationContext;
 @EqualsAndHashCode(callSuper = false)
 public class EventRepository extends ProxyRepository {
 
-    protected ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
 
     @Override
     public int insert(Context context, Object entity) {

@@ -1,6 +1,6 @@
 package com.gitee.dorive.core.impl;
 
-import com.gitee.dorive.core.entity.element.EntityElement;
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -14,12 +14,12 @@ import java.util.List;
 @AllArgsConstructor
 public class AliasConverter {
 
-    private EntityElement entityElement;
+    private EntityEle entityEle;
 
     public void convert(Example example) {
         List<String> selectColumns = example.getSelectColumns();
         if (selectColumns != null && !selectColumns.isEmpty()) {
-            selectColumns = entityElement.toAliases(selectColumns);
+            selectColumns = entityEle.toAliases(selectColumns);
             example.selectColumns(selectColumns);
         }
 
@@ -27,7 +27,7 @@ public class AliasConverter {
         if (criteria != null && !criteria.isEmpty()) {
             for (Criterion criterion : criteria) {
                 String property = criterion.getProperty();
-                property = entityElement.toAlias(property);
+                property = entityEle.toAlias(property);
                 criterion.setProperty(property);
             }
         }
@@ -35,7 +35,7 @@ public class AliasConverter {
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
             List<String> orderByColumns = orderBy.getColumns();
-            orderByColumns = entityElement.toAliases(orderByColumns);
+            orderByColumns = entityEle.toAliases(orderByColumns);
             orderBy.setColumns(orderByColumns);
         }
     }
