@@ -54,33 +54,9 @@
 - 业务知识的提炼与抽象
 - 面向对象编程 + 数据持久化
 
-### 🕺功能点
-
-| 功能点         | 描述                                                         |
-| -------------- | ------------------------------------------------------------ |
-| 依赖注入校验   | 依赖注入时，校验Bean所属的领域是否一致。如果不一致，会给出警告。 |
-| 模型声明       | 启动时，将带有@Entity注解的Java类，解析为一个实体。多个实体嵌套，视为一个聚合。<br />通过仓储，可以对聚合，进行级联增、删、改、查操作。 |
-| 事件通知       | 当仓储操作一个聚合时，会向外发送增、删、改事件。             |
-| 实体动态构造   | 通过自定义工厂，可以实现动态构造实体对象。从而，实现方法重写、以及动态级联查询。 |
-| 实体变更持久化 | 实体变更自身属性后，间接同步到数据库。                       |
-| 表结构生成     | 根据实体，生成对应的建表语句。                               |
-
-### 📖项目结构
-
-| 模块                       | 描述                                        |
-| -------------------------- | ------------------------------------------- |
-| dorive-injection           | 实现依赖注入校验                            |
-| dorive-proxy               | 实现动态代理，取代反射                      |
-| dorive-core                | 实现实体解析、仓储CRUD的核心逻辑            |
-| dorive-event               | 实现仓储操作时的事件通知机制                |
-| dorive-coating             | 实现通过防腐层对象的查询机制                |
-| dorive-service             | 实现抽象的Service与Controller，供开发者继承 |
-| dorive-spring-boot-starter | 实现与mybatis-plus的集成                    |
-| dorive-generator           | 实现根据实体生成数据库表结构                |
-
 ### 📊架构设计
 
-![avatar](https://gitee.com/digital-engine/dorive/raw/master/doc/img/domain_model.png)
+![avatar](https://gitee.com/digital-engine/dorive/raw/master/doc/img/framework.png)
 
 ### 🏄快速开始
 
@@ -88,7 +64,7 @@
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.1.7</version>
+    <version>3.3.1</version>
 </dependency>
 ```
 
@@ -102,13 +78,13 @@
 /**
  * 租户聚合
  * name 实体名称
- * mapper 数据来源
+ * source 数据来源
  */
 @Data
-@Entity(name = "tenant", mapper = SysTenantMapper.class)
+@Entity(name = "tenant", source = SysTenantMapper.class)
 public class Tenant {
     /**
-     * 选取器，决定操作的范围
+     * 选取器，决定每次操作的范围
      */
     public static final Selector ALL = new NameSelector("*");
     public static final Selector ONLY_TENANT = new NameSelector("tenant");
@@ -164,9 +140,6 @@ public class TenantQuery {
 #### 新增数据
 
 ```java
-// 在上下文中，设置选取器
-BoundedContext boundedContext = new BoundedContext(Tenant.ALL);
-
 // 开发者无需设置实体之间的关联id
 Tenant tenant = new Tenant();
 tenant.setTenantCode("tenant");
@@ -179,14 +152,12 @@ User user = new User();
 user.setUserCode("user");
 tenant.setUser(Collections.singletonList(user));
 
-int count = tenantRepository.insert(boundedContext, tenant);
+int count = tenantRepository.insert(Tenant.ALL, tenant);
 ```
 
 #### 查询数据
 
 ```java
-BoundedContext boundedContext = new BoundedContext(Tenant.ALL);
-
 // 开发者无需编写复杂的查询SQL
 TenantQuery tenantQuery = new TenantQuery();
 tenantQuery.setUserCode("000001");
@@ -195,24 +166,21 @@ tenantQuery.setOrder("desc");
 tenantQuery.setPage(1);
 tenantQuery.setLimit(10);
 
-List<Tenant> tenants = tenantRepository.selectByCoating(boundedContext, tenantQuery);
+List<Tenant> tenants = tenantRepository.selectByCoating(Tenant.ALL, tenantQuery);
 ```
 
 #### 更新数据
 
 ```java
-BoundedContext boundedContext = new BoundedContext(Tenant.ONLY_TENANT);
-
-Tenant tenant = tenantRepository.selectByPrimaryKey(boundedContext, 1);
+Tenant tenant = tenantRepository.selectByPrimaryKey(Tenant.ONLY_TENANT, 1);
 tenant.setTenantCode("tenant1");
 
-int count = tenantRepository.update(boundedContext, tenant);
+int count = tenantRepository.update(Tenant.ONLY_TENANT, tenant);
 ```
 
 #### 删除数据
 
 ```java
-BoundedContext boundedContext = new BoundedContext(Tenant.ALL);
 // 开发者通过聚合对象的id，即可删除所有数据
-int count = tenantRepository.deleteByPrimaryKey(boundedContext, 1);
+int count = tenantRepository.deleteByPrimaryKey(Tenant.ALL, 1);
 ```
