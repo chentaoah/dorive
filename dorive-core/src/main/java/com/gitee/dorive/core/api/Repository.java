@@ -30,7 +30,7 @@ import java.util.List;
 public interface Repository<E, PK> {
 
     /**
-     * 根据主键查询实体
+     * 根据主键，查询实体
      *
      * @param context    上下文
      * @param primaryKey 主键
@@ -39,7 +39,7 @@ public interface Repository<E, PK> {
     E selectByPrimaryKey(Context context, PK primaryKey);
 
     /**
-     * 根据条件查询实体
+     * 根据条件，查询实体
      *
      * @param context 上下文
      * @param example 条件
@@ -48,7 +48,7 @@ public interface Repository<E, PK> {
     List<E> selectByExample(Context context, Example example);
 
     /**
-     * 根据条件查询分页
+     * 根据条件，查询分页
      *
      * @param context 上下文
      * @param example 条件
@@ -86,7 +86,7 @@ public interface Repository<E, PK> {
 
     /**
      * 根据实体的主键，插入或者修改一个实体。
-     * 主键为空则插入，主键不为空则修改。
+     * 主键为空则插入，主键非空则修改。
      *
      * @param context 上下文
      * @param entity  实体

@@ -17,15 +17,14 @@
 package com.gitee.dorive.core.impl.executor;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.core.api.Binder;
-import com.gitee.dorive.core.api.EntityHandler;
-import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.api.entity.element.PropChain;
+import com.gitee.dorive.core.api.Binder;
+import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.EntityHandler;
+import com.gitee.dorive.core.api.Selector;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.impl.OperationTypeResolver;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -85,14 +84,14 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
     @Override
     public int execute(Context context, Operation operation) {
-        int expectedOperationType = operation.getType();
+        int expectedOperation = operation.getType();
 
-        boolean isInsertContext = (expectedOperationType & Operation.INSERT) == Operation.INSERT;
-        boolean isIgnoreRoot = (expectedOperationType & Operation.IGNORE_ROOT) == Operation.IGNORE_ROOT;
-        boolean isIncludeRoot = (expectedOperationType & Operation.INCLUDE_ROOT) == Operation.INCLUDE_ROOT;
+        boolean isInsertContext = (expectedOperation & Operation.INSERT) == Operation.INSERT;
+        boolean isIgnoreRoot = (expectedOperation & Operation.IGNORE_ROOT) == Operation.IGNORE_ROOT;
+        boolean isIncludeRoot = (expectedOperation & Operation.INCLUDE_ROOT) == Operation.INCLUDE_ROOT;
 
-        int ignoreRootOperationType = expectedOperationType | Operation.IGNORE_ROOT;
-        int includeRootOperationType = expectedOperationType | Operation.INCLUDE_ROOT;
+        int expectedIgnoreRoot = expectedOperation | Operation.IGNORE_ROOT;
+        int expectedIncludeRoot = expectedOperation | Operation.INCLUDE_ROOT;
 
         Object rootEntity = operation.getEntity();
         Assert.notNull(rootEntity, "The rootEntity cannot be null!");
@@ -133,23 +132,20 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                 }
 
                 if (isMatch || isForceInclude) {
-                    int contextOperationType = OperationTypeResolver.resolveOperationType(context, repository);
-
                     for (Object entity : collection) {
-                        Object primaryKey = repository.getPrimaryKey(entity);
-                        int operationType = OperationTypeResolver.mergeOperationType(expectedOperationType, contextOperationType, primaryKey);
+                        int finalOperation = mergeOperationType(expectedOperation, repository, entity);
 
-                        if ((operationType & Operation.INSERT) == Operation.INSERT) {
+                        if ((finalOperation & Operation.INSERT) == Operation.INSERT) {
                             getBoundValueFromContext(context, rootEntity, repository, entity);
                         }
 
                         if (isAggregated) {
-                            operationType = (operationType & Operation.INSERT_OR_UPDATE_OR_DELETE) > 0 ? includeRootOperationType : ignoreRootOperationType;
-                            Operation newOperation = new Operation(operationType, entity);
+                            finalOperation = (finalOperation & Operation.INSERT_OR_UPDATE_OR_DELETE) > 0 ? expectedIncludeRoot : expectedIgnoreRoot;
+                            Operation newOperation = new Operation(finalOperation, entity);
                             totalCount += repository.execute(context, newOperation);
 
                         } else {
-                            totalCount += doExecute(context, repository, entity, operationType);
+                            totalCount += doExecute(context, repository, entity, finalOperation);
                         }
                     }
 
@@ -159,13 +155,27 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
                 } else if (isAggregated) {
                     for (Object entity : collection) {
-                        Operation newOperation = new Operation(ignoreRootOperationType, entity);
+                        Operation newOperation = new Operation(expectedIgnoreRoot, entity);
                         totalCount += repository.execute(context, newOperation);
                     }
                 }
             }
         }
         return totalCount;
+    }
+
+    private int mergeOperationType(int expectedOperation, CommonRepository repository, Object entity) {
+        if (expectedOperation == Operation.FORCE_INSERT) {
+            return Operation.INSERT;
+
+        } else if (expectedOperation == Operation.INSERT_OR_UPDATE) {
+            return Operation.INSERT_OR_UPDATE;
+
+        } else {
+            Object primaryKey = repository.getPrimaryKey(entity);
+            int operationType = primaryKey == null ? Operation.INSERT : Operation.UPDATE_OR_DELETE;
+            return expectedOperation & operationType;
+        }
     }
 
     private int doExecute(Context context, CommonRepository repository, Object entity, int operationType) {
