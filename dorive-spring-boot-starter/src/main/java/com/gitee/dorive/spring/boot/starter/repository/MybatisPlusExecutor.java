@@ -42,7 +42,7 @@ import com.gitee.dorive.core.entity.operation.NullableUpdate;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.operation.Update;
-import com.gitee.dorive.core.impl.AliasConverter;
+import com.gitee.dorive.core.impl.adapter.AliasConverter;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
 import com.gitee.dorive.spring.boot.starter.entity.Metadata;

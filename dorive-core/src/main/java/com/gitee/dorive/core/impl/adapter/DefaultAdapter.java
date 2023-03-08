@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gitee.dorive.core.impl;
+package com.gitee.dorive.core.impl.adapter;
 
 import com.gitee.dorive.core.api.Adapter;
 import com.gitee.dorive.core.api.Context;

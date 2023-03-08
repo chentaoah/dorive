@@ -27,7 +27,7 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.*;
-import com.gitee.dorive.core.impl.OperationFactory;
+import com.gitee.dorive.core.impl.factory.OperationFactory;
 import lombok.Data;
 
 import java.util.List;

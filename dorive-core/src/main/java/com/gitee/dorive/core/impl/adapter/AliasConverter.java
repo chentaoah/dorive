@@ -1,4 +1,4 @@
-package com.gitee.dorive.core.impl;
+package com.gitee.dorive.core.impl.adapter;
 
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.entity.executor.Criterion;
