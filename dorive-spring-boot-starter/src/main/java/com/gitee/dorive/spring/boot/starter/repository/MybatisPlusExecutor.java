@@ -25,15 +25,23 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gitee.dorive.api.api.PropProxy;
+import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.api.EntityFactory;
 import com.gitee.dorive.core.api.MetadataHolder;
-import com.gitee.dorive.api.constant.Order;
-import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.core.entity.executor.*;
-import com.gitee.dorive.core.entity.operation.*;
+import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.executor.UnionExample;
+import com.gitee.dorive.core.entity.operation.Delete;
+import com.gitee.dorive.core.entity.operation.Insert;
+import com.gitee.dorive.core.entity.operation.NullableUpdate;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.AliasConverter;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
@@ -227,8 +235,7 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         if (operation instanceof Insert) {
             int count = baseMapper.insert(persistent);
             Object primaryKey = BeanUtil.getFieldValue(persistent, "id");
-            PropProxy primaryKeyProxy = entityEle.getPkProxy();
-            primaryKeyProxy.setValue(entity, primaryKey);
+            entityEle.getPkProxy().setValue(entity, primaryKey);
             return count;
 
         } else if (operation instanceof Update) {
@@ -239,17 +246,15 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
                 aliasConverter.convert(example);
             }
 
-//            Map<String, Object> attachments = context.getAttachments();
-//            String commandKey = entityDef.getCommandKey();
-//            if (StringUtils.isNotBlank(commandKey) && attachments.containsKey(commandKey)) {
-//                Command command = (Command) attachments.get(commandKey);
-//                Set<String> nullableProperties = command.getNullableProperties();
-//                if (nullableProperties != null && !nullableProperties.isEmpty()) {
-//                    example = primaryKey != null ? new Example().eq("id", primaryKey) : example;
-//                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableProperties, example);
-//                    return baseMapper.update(null, updateWrapper);
-//                }
-//            }
+            if (update instanceof NullableUpdate) {
+                NullableUpdate nullableUpdate = (NullableUpdate) update;
+                Set<String> nullableSet = nullableUpdate.getNullableSet();
+                if (nullableSet != null && !nullableSet.isEmpty()) {
+                    example = primaryKey != null ? new Example().eq("id", primaryKey) : example;
+                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableSet, example);
+                    return baseMapper.update(null, updateWrapper);
+                }
+            }
 
             if (primaryKey != null) {
                 return baseMapper.updateById(persistent);
@@ -284,13 +289,13 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         return updateWrapper;
     }
 
-    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableProperties, Example example) {
+    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableSet, Example example) {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
         List<TableFieldInfo> fieldList = TableInfoHelper.getTableInfo(pojoClass).getFieldList();
         for (TableFieldInfo tableFieldInfo : fieldList) {
             String property = tableFieldInfo.getProperty();
             Object value = BeanUtil.getFieldValue(persistent, property);
-            if (value != null || nullableProperties.contains(property)) {
+            if (value != null || nullableSet.contains(property)) {
                 updateWrapper.set(true, tableFieldInfo.getColumn(), value);
             }
         }
