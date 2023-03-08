@@ -93,8 +93,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK
 
         AliasConverter aliasConverter = new AliasConverter(entityEle);
 
-        return new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass,
-                entityFactory, aliasConverter);
+        return new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass, entityFactory, aliasConverter);
     }
 
 }
