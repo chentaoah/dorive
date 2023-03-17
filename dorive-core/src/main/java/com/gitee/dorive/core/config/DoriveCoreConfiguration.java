@@ -25,7 +25,7 @@ import org.springframework.core.annotation.Order;
 public class DoriveCoreConfiguration {
 
     @Bean("repositoryDefinitionV3")
-    public RepositoryDefinition repositoryDefinition() {
+    public static RepositoryDefinition repositoryDefinition() {
         return new RepositoryDefinition();
     }
 
