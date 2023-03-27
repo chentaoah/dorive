@@ -19,13 +19,14 @@ package com.gitee.dorive.core.impl.resolver;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.api.impl.resolver.PropChainResolver;
-import com.gitee.dorive.core.api.Binder;
-import com.gitee.dorive.core.api.Processor;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.api.entity.element.PropChain;
+import com.gitee.dorive.api.impl.resolver.PropChainResolver;
+import com.gitee.dorive.api.util.ReflectUtils;
+import com.gitee.dorive.core.api.Binder;
+import com.gitee.dorive.core.api.Processor;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.processor.DefaultProcessor;
@@ -33,7 +34,6 @@ import com.gitee.dorive.core.impl.processor.PropertyProcessor;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.PathUtils;
-import com.gitee.dorive.api.util.ReflectUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
@@ -46,6 +46,7 @@ import java.util.Map;
 public class BinderResolver {
 
     private AbstractContextRepository<?, ?> repository;
+    private PropChainResolver propChainResolver;
 
     private List<Binder> allBinders;
     private List<PropertyBinder> propertyBinders;
@@ -54,11 +55,12 @@ public class BinderResolver {
     private List<Binder> boundValueBinders;
     private PropertyBinder boundIdBinder;
 
-    public BinderResolver(AbstractContextRepository<?, ?> repository) {
+    public BinderResolver(AbstractContextRepository<?, ?> repository, EntityEle entityEle) {
         this.repository = repository;
+        this.propChainResolver = new PropChainResolver(entityEle.getEntityType());
     }
 
-    public void resolve(String accessPath, EntityDef entityDef, EntityEle entityEle, PropChainResolver propChainResolver) {
+    public void resolve(String accessPath, EntityDef entityDef, EntityEle entityEle) {
         List<BindingDef> bindingDefs = entityEle.getBindingDefs();
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
 

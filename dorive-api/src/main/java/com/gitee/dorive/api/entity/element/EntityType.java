@@ -108,4 +108,8 @@ public class EntityType extends EntityEle {
         return this;
     }
 
+    public void check() {
+        Assert.isTrue(isAnnotatedEntity(), "No @Entity annotation found! type: {}", name);
+    }
+
 }

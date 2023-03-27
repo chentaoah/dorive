@@ -19,7 +19,6 @@ package com.gitee.dorive.core.repository;
 
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.element.PropChain;
-import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.api.MetadataHolder;
 import com.gitee.dorive.core.api.Selector;
@@ -48,7 +47,6 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
     private OrderBy defaultOrderBy;
     private PropChain anchorPoint;
     private BinderResolver binderResolver;
-    private PropChainResolver propChainResolver;
     private AliasConverter aliasConverter;
     private boolean boundEntity;
 

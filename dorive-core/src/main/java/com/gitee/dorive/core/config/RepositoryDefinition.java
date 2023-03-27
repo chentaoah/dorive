@@ -50,7 +50,7 @@ public class RepositoryDefinition implements BeanFactoryPostProcessor {
         }
     }
 
-    public static Class<?> findType(Class<?> entityClass) {
+    public static Class<?> findRepositoryType(Class<?> entityClass) {
         return ENTITY_REPOSITORY_MAP.get(entityClass);
     }
 

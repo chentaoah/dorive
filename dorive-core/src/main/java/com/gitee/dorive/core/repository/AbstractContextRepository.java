@@ -78,7 +78,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     public void afterPropertiesSet() throws Exception {
         Class<?> entityClass = ReflectUtils.getFirstArgumentType(this.getClass());
         EntityType entityType = EntityType.getInstance(entityClass);
-        Assert.isTrue(entityType.isAnnotatedEntity(), "No @Entity annotation found! type: {}", entityType.getName());
+        entityType.check();
 
         propChainResolver = new PropChainResolver(entityType);
 
@@ -123,9 +123,54 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     @SuppressWarnings("unchecked")
     private CommonRepository newRepository(String accessPath, EntityEle entityEle) {
         EntityDef entityDef = renewEntityDef(entityEle);
-
         OperationFactory operationFactory = new OperationFactory(entityEle);
+        Object innerRepository = newRepository(entityDef, entityEle, operationFactory);
 
+        boolean isRoot = "/".equals(accessPath);
+        boolean isAggregated = entityEle.isAggregated();
+        OrderBy defaultOrderBy = newDefaultOrderBy(entityDef, entityEle);
+
+        Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
+        PropChain anchorPoint = propChainMap.get(accessPath);
+
+        BinderResolver binderResolver = new BinderResolver(this, entityEle);
+        binderResolver.resolve(accessPath, entityDef, entityEle);
+
+        AliasConverter aliasConverter = new AliasConverter(entityEle);
+
+        CommonRepository repository = new CommonRepository();
+        repository.setEntityDef(entityDef);
+        repository.setEntityEle(entityEle);
+        repository.setOperationFactory(operationFactory);
+        repository.setProxyRepository((AbstractRepository<Object, Object>) innerRepository);
+
+        repository.setAccessPath(accessPath);
+        repository.setRoot(isRoot);
+        repository.setAggregated(isAggregated);
+        repository.setDefaultOrderBy(defaultOrderBy);
+
+        repository.setAnchorPoint(anchorPoint);
+        repository.setBinderResolver(binderResolver);
+        repository.setAliasConverter(aliasConverter);
+
+        repository.setBoundEntity(false);
+        return repository;
+    }
+
+    private EntityDef renewEntityDef(EntityEle entityEle) {
+        EntityDef entityDef = entityEle.getEntityDef();
+        entityDef = BeanUtil.copyProperties(entityDef, EntityDef.class);
+        if (!entityDef.isAggregated() && entityEle.isAggregated()) {
+            Class<?> entityClass = entityEle.getGenericType();
+            Class<?> repositoryClass = RepositoryDefinition.findRepositoryType(entityClass);
+            Assert.notNull(repositoryClass, "No type of repository found! type: {}", entityClass.getName());
+            entityDef.setRepository(repositoryClass);
+        }
+        return entityDef;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Object newRepository(EntityDef entityDef, EntityEle entityEle, OperationFactory operationFactory) {
         Class<?> repositoryClass = entityDef.getRepository();
         Object repository;
         if (repositoryClass == Object.class) {
@@ -140,50 +185,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultRepository.setOperationFactory(operationFactory);
             defaultRepository.setExecutor(newExecutor(entityDef, entityEle));
         }
-        repository = processRepository((AbstractRepository<Object, Object>) repository);
-
-        boolean isRoot = "/".equals(accessPath);
-        boolean isAggregated = entityEle.isAggregated();
-
-        OrderBy defaultOrderBy = newDefaultOrderBy(entityDef, entityEle);
-
-        Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
-        PropChain anchorPoint = propChainMap.get(accessPath);
-
-        BinderResolver binderResolver = new BinderResolver(this);
-        EntityType entityType = EntityType.getInstance(entityEle.getGenericType());
-        PropChainResolver propChainResolver = new PropChainResolver(entityType);
-        binderResolver.resolve(accessPath, entityDef, entityEle, propChainResolver);
-
-        AliasConverter aliasConverter = new AliasConverter(entityEle);
-
-        CommonRepository commonRepository = new CommonRepository();
-        commonRepository.setEntityDef(entityDef);
-        commonRepository.setEntityEle(entityEle);
-        commonRepository.setOperationFactory(operationFactory);
-        commonRepository.setProxyRepository((AbstractRepository<Object, Object>) repository);
-        commonRepository.setAccessPath(accessPath);
-        commonRepository.setRoot(isRoot);
-        commonRepository.setAggregated(isAggregated);
-        commonRepository.setDefaultOrderBy(defaultOrderBy);
-        commonRepository.setAnchorPoint(anchorPoint);
-        commonRepository.setBinderResolver(binderResolver);
-        commonRepository.setPropChainResolver(propChainResolver);
-        commonRepository.setAliasConverter(aliasConverter);
-        commonRepository.setBoundEntity(false);
-        return commonRepository;
-    }
-
-    private EntityDef renewEntityDef(EntityEle entityEle) {
-        EntityDef entityDef = entityEle.getEntityDef();
-        entityDef = BeanUtil.copyProperties(entityDef, EntityDef.class);
-        if (!entityDef.isAggregated() && entityEle.isAggregated()) {
-            Class<?> entityClass = entityEle.getGenericType();
-            Class<?> repositoryClass = RepositoryDefinition.findType(entityClass);
-            Assert.notNull(repositoryClass, "No repository of type found! type: {}", entityClass.getName());
-            entityDef.setRepository(repositoryClass);
-        }
-        return entityDef;
+        return processRepository((AbstractRepository<Object, Object>) repository);
     }
 
     private OrderBy newDefaultOrderBy(EntityDef entityDef, EntityEle entityEle) {
