@@ -73,20 +73,12 @@ public class BatchEntityHandler implements EntityHandler {
     private UnionExample newUnionExample(CommonRepository repository, Context context, List<Object> rootEntities) {
         PropChain anchorPoint = repository.getAnchorPoint();
         PropChain lastPropChain = anchorPoint.getLastPropChain();
-
-//        Map<String, Object> attachments = context.getAttachments();
-//        String builderKey = repository.getEntityDef().getBuilderKey();
-//        ExampleBuilder exampleBuilder = StringUtils.isNotBlank(builderKey) ? (ExampleBuilder) attachments.get(builderKey) : null;
-
         UnionExample unionExample = new UnionExample();
         for (int index = 0; index < rootEntities.size(); index++) {
             Object rootEntity = rootEntities.get(index);
             Object lastEntity = lastPropChain == null ? rootEntity : lastPropChain.getValue(rootEntity);
             if (lastEntity != null) {
                 Example example = repository.newExampleByContext(context, rootEntity);
-//                if (exampleBuilder != null) {
-//                    example = exampleBuilder.buildExample(context, rootEntity, example);
-//                }
                 if (example.isDirtyQuery()) {
                     example.extraColumns((index + 1) + " as $row");
                     unionExample.addExample(example);
@@ -100,7 +92,6 @@ public class BatchEntityHandler implements EntityHandler {
         PropChain anchorPoint = repository.getAnchorPoint();
         PropChain lastPropChain = anchorPoint.getLastPropChain();
         PropProxy propProxy = anchorPoint.getPropProxy();
-
         for (int index = 0; index < rootEntities.size(); index++) {
             Object rootEntity = rootEntities.get(index);
             Object lastEntity = lastPropChain == null ? rootEntity : lastPropChain.getValue(rootEntity);
