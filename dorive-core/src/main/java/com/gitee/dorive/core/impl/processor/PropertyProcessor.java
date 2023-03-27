@@ -19,6 +19,7 @@ package com.gitee.dorive.core.impl.processor;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.Context;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,6 +38,12 @@ public class PropertyProcessor extends DefaultProcessor {
         } else {
             return BeanUtil.getFieldValue(valueObject, property);
         }
+    }
+
+    @Override
+    public void check() {
+        super.check();
+        Assert.notBlank(getBindingDef().getProperty(), "The property of PropertyProcessor cannot be blank!");
     }
 
 }

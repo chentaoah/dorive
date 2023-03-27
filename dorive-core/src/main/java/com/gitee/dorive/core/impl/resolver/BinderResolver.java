@@ -61,8 +61,8 @@ public class BinderResolver {
     }
 
     public void resolve(String accessPath, EntityDef entityDef, EntityEle entityEle) {
-        List<BindingDef> bindingDefs = entityEle.getBindingDefs();
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
+        List<BindingDef> bindingDefs = entityEle.getBindingDefs();
 
         allBinders = new ArrayList<>(bindingDefs.size());
         propertyBinders = new ArrayList<>(bindingDefs.size());
@@ -141,9 +141,7 @@ public class BinderResolver {
         if (processor instanceof DefaultProcessor) {
             DefaultProcessor defaultProcessor = (DefaultProcessor) processor;
             defaultProcessor.setBindingDef(bindingDef);
-        }
-        if (processor instanceof PropertyProcessor) {
-            Assert.notBlank(bindingDef.getProperty(), "The property of PropertyProcessor cannot be blank!");
+            defaultProcessor.check();
         }
         return processor;
     }

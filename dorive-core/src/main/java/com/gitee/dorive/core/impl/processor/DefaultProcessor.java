@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.core.impl.processor;
 
+import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.core.api.Processor;
@@ -37,6 +38,10 @@ public class DefaultProcessor implements Processor {
     @Override
     public Object output(Context context, Object valueObject) {
         return valueObject;
+    }
+
+    public void check() {
+        Assert.notNull(bindingDef, "The bindingDef cannot be null!");
     }
 
 }
