@@ -15,15 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity;
+package com.gitee.dorive.core.entity.context;
 
+import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.Selector;
+import com.gitee.dorive.core.impl.selector.NameSelector;
 import lombok.Data;
 
-import java.util.Set;
+import java.util.Collections;
+import java.util.Map;
 
 @Data
-public class Command {
-    private boolean forceIgnore;
-    private boolean forceInsert;
-    private Set<String> nullableProperties;
+public abstract class AbstractContext implements Context {
+    private Selector selector = NameSelector.EMPTY_SELECTOR;
+    private Map<String, Object> attachments = Collections.emptyMap();
 }

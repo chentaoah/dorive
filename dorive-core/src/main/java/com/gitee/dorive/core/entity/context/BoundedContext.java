@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity;
+package com.gitee.dorive.core.entity.context;
 
 import com.gitee.dorive.core.api.Selector;
 import lombok.Data;

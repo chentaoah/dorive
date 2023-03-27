@@ -22,7 +22,7 @@ import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.Context;
 import com.gitee.dorive.core.api.Selector;
-import com.gitee.dorive.core.entity.BoundedContext;
+import com.gitee.dorive.core.entity.context.BoundedContext;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.selector.NameSelector;
 import com.gitee.dorive.web.api.RestService;
