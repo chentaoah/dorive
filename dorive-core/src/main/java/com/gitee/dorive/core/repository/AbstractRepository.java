@@ -18,16 +18,19 @@
 package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.api.entity.element.EntityType;
+import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.repository.Repository;
-import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.operation.*;
+import com.gitee.dorive.core.entity.operation.Delete;
+import com.gitee.dorive.core.entity.operation.Insert;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import lombok.Data;
 
@@ -43,10 +46,6 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
 
     public Class<?> getEntityClass() {
         return entityEle.getGenericType();
-    }
-
-    public EntityType getEntityType() {
-        return entityEle.getEntityType();
     }
 
     @Override

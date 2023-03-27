@@ -18,6 +18,7 @@
 package com.gitee.dorive.core.impl.resolver;
 
 import com.gitee.dorive.api.entity.def.AdapterDef;
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.api.entity.element.EntityType;
 import com.gitee.dorive.core.api.common.Adapter;
 import com.gitee.dorive.core.impl.adapter.DefaultAdapter;
@@ -37,7 +38,8 @@ public class AdapterResolver {
     }
 
     public void resolve() {
-        EntityType entityType = repository.getEntityType();
+        EntityEle entityEle = repository.getEntityEle();
+        EntityType entityType = entityEle.getEntityType();
         AdapterDef adapterDef = entityType.getAdapterDef();
         if (adapterDef != null) {
             Class<?> adapterClass = adapterDef.getAdapter();
