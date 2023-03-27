@@ -84,7 +84,7 @@ public class BinderResolver {
             Processor processor = newProcessor(bindingDef);
 
             if (bindingDef.getBindExp().startsWith("/")) {
-                PropertyBinder propertyBinder = newPropertyBinder(bindingDef, fieldPropChain, processor, alias);
+                PropertyBinder propertyBinder = newPropertyBinder(bindingDef, alias, fieldPropChain, processor);
                 allBinders.add(propertyBinder);
                 propertyBinders.add(propertyBinder);
                 boundFields.add(bindingDef.getField());
@@ -101,7 +101,7 @@ public class BinderResolver {
                 }
 
             } else {
-                ContextBinder contextBinder = new ContextBinder(bindingDef, fieldPropChain, processor, alias);
+                ContextBinder contextBinder = new ContextBinder(bindingDef, alias, fieldPropChain, processor);
                 allBinders.add(contextBinder);
                 contextBinders.add(contextBinder);
                 boundValueBinders.add(contextBinder);
@@ -146,26 +146,27 @@ public class BinderResolver {
         return processor;
     }
 
-    private PropertyBinder newPropertyBinder(BindingDef bindingDef, PropChain fieldPropChain, Processor processor, String alias) {
+    private PropertyBinder newPropertyBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor) {
         String bindExp = bindingDef.getBindExp();
         String property = bindingDef.getProperty();
 
         Map<String, CommonRepository> repositoryMap = repository.getRepositoryMap();
         String belongAccessPath = PathUtils.getBelongPath(repositoryMap.keySet(), bindExp);
         CommonRepository belongRepository = repositoryMap.get(belongAccessPath);
-        Assert.notNull(belongRepository, "The belong repository cannot be null!");
+        Assert.notNull(belongRepository, "The belong repository cannot be null! bindExp: {}", bindExp);
         belongRepository.setBoundEntity(true);
 
         Map<String, PropChain> propChainMap = repository.getPropChainResolver().getPropChainMap();
         PropChain boundPropChain = propChainMap.get(bindExp);
-        Assert.notNull(boundPropChain, "The bound property chain cannot be null!");
+        Assert.notNull(boundPropChain, "The bound property chain cannot be null! bindExp: {}", bindExp);
         boundPropChain.newPropProxy();
 
         EntityEle entityEle = belongRepository.getEntityEle();
-        String fieldName = StringUtils.isNotBlank(property) ? property : PathUtils.getLastName(bindExp);
+        String fieldName = StringUtils.isBlank(property) ? PathUtils.getLastName(bindExp) : property;
         String bindAlias = entityEle.toAlias(fieldName);
 
-        return new PropertyBinder(bindingDef, fieldPropChain, processor, alias, belongAccessPath, belongRepository, boundPropChain, bindAlias);
+        return new PropertyBinder(bindingDef, alias, fieldPropChain, processor,
+                belongAccessPath, belongRepository, boundPropChain, bindAlias);
     }
 
 }

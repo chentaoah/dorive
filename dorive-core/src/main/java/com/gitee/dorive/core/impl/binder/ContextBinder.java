@@ -26,11 +26,8 @@ import java.util.Map;
 
 public class ContextBinder extends AbstractBinder {
 
-    public ContextBinder(BindingDef bindingDef,
-                         PropChain fieldPropChain,
-                         Processor processor,
-                         String alias) {
-        super(bindingDef, fieldPropChain, processor, alias);
+    public ContextBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor) {
+        super(bindingDef, alias, fieldPropChain, processor);
     }
 
     @Override

@@ -35,14 +35,14 @@ public class PropertyBinder extends AbstractBinder {
     private String bindAlias;
 
     public PropertyBinder(BindingDef bindingDef,
+                          String alias,
                           PropChain fieldPropChain,
                           Processor processor,
-                          String alias,
                           String belongAccessPath,
                           CommonRepository belongRepository,
                           PropChain boundPropChain,
                           String bindAlias) {
-        super(bindingDef, fieldPropChain, processor, alias);
+        super(bindingDef, alias, fieldPropChain, processor);
         this.belongAccessPath = belongAccessPath;
         this.belongRepository = belongRepository;
         this.boundPropChain = boundPropChain;

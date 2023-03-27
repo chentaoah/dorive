@@ -23,8 +23,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.lang.reflect.Field;
-
 @Data
 @ToString(exclude = "lastPropChain")
 @EqualsAndHashCode(callSuper = false)
@@ -57,10 +55,6 @@ public class PropChain implements PropProxy {
 
     public boolean isAnnotatedEntity() {
         return entityField.isAnnotatedEntity();
-    }
-
-    public Field getDeclaredField() {
-        return entityField.getField();
     }
 
     public boolean isSameType(PropChain propChain) {

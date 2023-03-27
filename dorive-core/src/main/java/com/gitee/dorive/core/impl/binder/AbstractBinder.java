@@ -30,13 +30,9 @@ import lombok.Data;
 public abstract class AbstractBinder implements Binder, Processor {
 
     private BindingDef bindingDef;
+    private String alias;
     private PropChain fieldPropChain;
     private Processor processor;
-    private String alias;
-
-    public BindingDef getBindingDef() {
-        return bindingDef;
-    }
 
     @Override
     public Object getFieldValue(Context context, Object entity) {
