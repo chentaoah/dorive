@@ -31,19 +31,19 @@ import java.util.Collection;
 public class PropertyProcessor extends DefaultProcessor {
 
     @Override
-    public Object input(Context context, Object valueObject) {
-        String property = getBindingDef().getProperty();
-        if (valueObject instanceof Collection) {
-            return CollUtil.map((Collection<?>) valueObject, item -> BeanUtil.getFieldValue(item, property), true);
-        } else {
-            return BeanUtil.getFieldValue(valueObject, property);
-        }
-    }
-
-    @Override
     public void check() {
         super.check();
         Assert.notBlank(getBindingDef().getProperty(), "The property of PropertyProcessor cannot be blank!");
+    }
+
+    @Override
+    public Object input(Context context, Object value) {
+        String property = getBindingDef().getProperty();
+        if (value instanceof Collection) {
+            return CollUtil.map((Collection<?>) value, item -> BeanUtil.getFieldValue(item, property), true);
+        } else {
+            return BeanUtil.getFieldValue(value, property);
+        }
     }
 
 }

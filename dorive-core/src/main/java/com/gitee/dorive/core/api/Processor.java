@@ -19,8 +19,8 @@ package com.gitee.dorive.core.api;
 
 public interface Processor {
 
-    Object input(Context context, Object valueObject);
+    Object input(Context context, Object value);
 
-    Object output(Context context, Object valueObject);
+    Object output(Context context, Object value);
 
 }

@@ -30,18 +30,18 @@ public class DefaultProcessor implements Processor {
 
     private BindingDef bindingDef;
 
-    @Override
-    public Object input(Context context, Object valueObject) {
-        return valueObject;
-    }
-
-    @Override
-    public Object output(Context context, Object valueObject) {
-        return valueObject;
-    }
-
     public void check() {
         Assert.notNull(bindingDef, "The bindingDef cannot be null!");
+    }
+
+    @Override
+    public Object input(Context context, Object value) {
+        return value;
+    }
+
+    @Override
+    public Object output(Context context, Object value) {
+        return value;
     }
 
 }
