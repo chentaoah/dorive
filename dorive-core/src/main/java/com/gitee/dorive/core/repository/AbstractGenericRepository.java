@@ -22,7 +22,6 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.api.repository.ListableRepository;
-import com.gitee.dorive.core.api.common.MetadataHolder;
 import com.gitee.dorive.core.entity.operation.Operation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,7 +30,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK> implements ListableRepository<E, PK>, MetadataHolder {
+public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK> implements ListableRepository<E, PK> {
 
     @Override
     public int updateByExample(Context context, Object entity, Example example) {
@@ -92,11 +91,6 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     @Override
     public int deleteList(Context context, List<E> entities) {
         return entities.stream().mapToInt(entity -> delete(context, entity)).sum();
-    }
-
-    @Override
-    public Object getMetadata() {
-        return getRootRepository().getMetadata();
     }
 
 }

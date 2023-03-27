@@ -20,14 +20,12 @@ package com.gitee.dorive.core.repository;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.common.MetadataHolder;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.impl.adapter.AliasConverter;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
@@ -36,10 +34,11 @@ import lombok.EqualsAndHashCode;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class CommonRepository extends ProxyRepository implements MetadataHolder {
+public class CommonRepository extends ProxyRepository {
 
     private String accessPath;
     private boolean root;
@@ -47,8 +46,8 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
     private OrderBy defaultOrderBy;
     private PropChain anchorPoint;
     private BinderResolver binderResolver;
-    private AliasConverter aliasConverter;
     private boolean boundEntity;
+    private Map<String, Object> attachments;
 
     @Override
     public int updateByExample(Context context, Object entity, Example example) {
@@ -92,15 +91,6 @@ public class CommonRepository extends ProxyRepository implements MetadataHolder 
             }
         }
         return super.executeQuery(context, query);
-    }
-
-    @Override
-    public Object getMetadata() {
-        AbstractRepository<Object, Object> proxyRepository = getProxyRepository();
-        if (proxyRepository instanceof MetadataHolder) {
-            return ((MetadataHolder) proxyRepository).getMetadata();
-        }
-        return null;
     }
 
     public Example newExampleByContext(Context context, Object rootEntity) {

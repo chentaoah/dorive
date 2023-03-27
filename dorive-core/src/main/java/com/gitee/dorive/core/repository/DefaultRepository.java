@@ -17,22 +17,10 @@
 
 package com.gitee.dorive.core.repository;
 
-import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.api.common.MetadataHolder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class DefaultRepository extends AbstractRepository<Object, Object> implements MetadataHolder {
-
-    @Override
-    public Object getMetadata() {
-        Executor executor = getExecutor();
-        if (executor instanceof MetadataHolder) {
-            return ((MetadataHolder) executor).getMetadata();
-        }
-        return null;
-    }
-
+public class DefaultRepository extends AbstractRepository<Object, Object> {
 }

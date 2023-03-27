@@ -29,9 +29,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.common.EntityFactory;
-import com.gitee.dorive.core.api.common.MetadataHolder;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -46,7 +45,6 @@ import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.adapter.AliasConverter;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
-import com.gitee.dorive.spring.boot.starter.entity.Metadata;
 import com.gitee.dorive.spring.boot.starter.impl.EntityIndexResult;
 import lombok.Getter;
 import lombok.Setter;
@@ -64,7 +62,7 @@ import static com.gitee.dorive.spring.boot.starter.impl.AppenderContext.OPERATOR
 @Getter
 @Setter
 @ToString
-public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHolder {
+public class MybatisPlusExecutor extends AbstractExecutor {
 
     private EntityDef entityDef;
     private EntityEle entityEle;
@@ -85,11 +83,6 @@ public class MybatisPlusExecutor extends AbstractExecutor implements MetadataHol
         this.pojoClass = pojoClass;
         this.entityFactory = entityFactory;
         this.aliasConverter = aliasConverter;
-    }
-
-    @Override
-    public Object getMetadata() {
-        return new Metadata(pojoClass);
     }
 
     @Override

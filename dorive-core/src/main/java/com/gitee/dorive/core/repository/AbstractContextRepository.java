@@ -31,10 +31,9 @@ import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.config.RepositoryDefinition;
 import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.impl.adapter.AliasConverter;
-import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.executor.AdaptiveExecutor;
 import com.gitee.dorive.core.impl.executor.ChainExecutor;
+import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
 import com.gitee.dorive.core.impl.resolver.AdapterResolver;
@@ -49,6 +48,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -126,6 +126,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         OperationFactory operationFactory = new OperationFactory(entityEle);
         Object innerRepository = newRepository(entityDef, entityEle, operationFactory);
 
+        innerRepository = processRepository((AbstractRepository<Object, Object>) innerRepository);
+
         boolean isRoot = "/".equals(accessPath);
         boolean isAggregated = entityEle.isAggregated();
         OrderBy defaultOrderBy = newDefaultOrderBy(entityDef, entityEle);
@@ -135,8 +137,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         BinderResolver binderResolver = new BinderResolver(this, entityEle);
         binderResolver.resolve(accessPath, entityDef, entityEle);
-
-        AliasConverter aliasConverter = new AliasConverter(entityEle);
 
         CommonRepository repository = new CommonRepository();
         repository.setEntityDef(entityDef);
@@ -151,9 +151,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         repository.setAnchorPoint(anchorPoint);
         repository.setBinderResolver(binderResolver);
-        repository.setAliasConverter(aliasConverter);
-
         repository.setBoundEntity(false);
+        repository.setAttachments(Collections.emptyMap());
+
         return repository;
     }
 
@@ -169,7 +169,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return entityDef;
     }
 
-    @SuppressWarnings("unchecked")
     private Object newRepository(EntityDef entityDef, EntityEle entityEle, OperationFactory operationFactory) {
         Class<?> repositoryClass = entityDef.getRepository();
         Object repository;
@@ -185,7 +184,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultRepository.setOperationFactory(operationFactory);
             defaultRepository.setExecutor(newExecutor(entityDef, entityEle));
         }
-        return processRepository((AbstractRepository<Object, Object>) repository);
+        return repository;
     }
 
     private OrderBy newDefaultOrderBy(EntityDef entityDef, EntityEle entityEle) {

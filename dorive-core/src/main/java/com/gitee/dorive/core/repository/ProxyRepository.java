@@ -45,11 +45,11 @@ public class ProxyRepository extends AbstractRepository<Object, Object> {
         return proxyRepository;
     }
 
-    public void setProxyRepository(AbstractRepository<Object, Object> proxyRepository) {
-        if (this.proxyRepository instanceof ProxyRepository) {
-            ((ProxyRepository) this.proxyRepository).setProxyRepository(proxyRepository);
+    public void setProxyRepository(AbstractRepository<Object, Object> repository) {
+        if (proxyRepository instanceof ProxyRepository) {
+            ((ProxyRepository) proxyRepository).setProxyRepository(repository);
         }
-        this.proxyRepository = proxyRepository;
+        proxyRepository = repository;
     }
 
     @Override
