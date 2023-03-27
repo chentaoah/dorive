@@ -17,9 +17,9 @@
 
 package com.gitee.dorive.core.impl.executor;
 
-import com.gitee.dorive.core.api.Executor;
-import com.gitee.dorive.core.api.Adapter;
-import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.api.common.Adapter;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;

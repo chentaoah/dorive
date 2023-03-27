@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.resolver;
 
 import com.gitee.dorive.api.entity.def.AdapterDef;
 import com.gitee.dorive.api.entity.element.EntityType;
-import com.gitee.dorive.core.api.Adapter;
+import com.gitee.dorive.core.api.common.Adapter;
 import com.gitee.dorive.core.impl.adapter.DefaultAdapter;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import lombok.Data;

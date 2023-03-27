@@ -15,12 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api;
+package com.gitee.dorive.core.api.executor;
 
-import java.util.List;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Query;
 
-public interface EntityIndex {
+public interface Executor {
 
-    List<Object> selectList(Object rootEntity, Object key);
+    Result<Object> executeQuery(Context context, Query query);
+
+    int execute(Context context, Operation operation);
 
 }

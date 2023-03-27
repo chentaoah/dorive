@@ -15,12 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api;
+package com.gitee.dorive.core.api.common;
 
-public interface Processor {
+import com.gitee.dorive.core.api.context.Context;
 
-    Object input(Context context, Object value);
+public interface EntityFactory {
 
-    Object output(Context context, Object value);
+    Object reconstitute(Context context, Object persistent);
+
+    Object deconstruct(Context context, Object entity);
 
 }

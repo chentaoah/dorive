@@ -15,16 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api;
+package com.gitee.dorive.core.api.common;
 
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.api.context.Context;
 
-public interface Executor {
+public interface Processor {
 
-    Result<Object> executeQuery(Context context, Query query);
+    Object input(Context context, Object value);
 
-    int execute(Context context, Operation operation);
+    Object output(Context context, Object value);
 
 }

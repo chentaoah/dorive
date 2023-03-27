@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.impl.executor;
 
-import com.gitee.dorive.core.api.Executor;
+import com.gitee.dorive.core.api.executor.Executor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

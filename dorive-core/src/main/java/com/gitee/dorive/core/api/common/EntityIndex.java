@@ -15,16 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api;
-
-import com.gitee.dorive.core.repository.CommonRepository;
+package com.gitee.dorive.core.api.common;
 
 import java.util.List;
 
-public interface Selector extends ContextBuilder {
+public interface EntityIndex {
 
-    boolean matches(Context context, CommonRepository repository);
-
-    List<String> selectColumns(Context context, CommonRepository repository);
+    List<Object> select(Object rootEntity, Object key);
 
 }

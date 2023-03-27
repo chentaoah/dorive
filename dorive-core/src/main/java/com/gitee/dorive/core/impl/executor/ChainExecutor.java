@@ -19,10 +19,10 @@ package com.gitee.dorive.core.impl.executor;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.entity.element.PropChain;
-import com.gitee.dorive.core.api.Binder;
-import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.api.EntityHandler;
-import com.gitee.dorive.core.api.Selector;
+import com.gitee.dorive.core.api.common.Binder;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
@@ -68,7 +68,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
             List<Object> rootEntities = result.getRecords();
             if (!rootEntities.isEmpty()) {
-                totalCount += handleEntities(context, rootEntities);
+                totalCount += handle(context, rootEntities);
             }
 
             result.setTotal(totalCount);
@@ -79,8 +79,8 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     }
 
     @Override
-    public int handleEntities(Context context, List<Object> rootEntities) {
-        return entityHandler.handleEntities(context, rootEntities);
+    public int handle(Context context, List<Object> entities) {
+        return entityHandler.handle(context, entities);
     }
 
     @Override

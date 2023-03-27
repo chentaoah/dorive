@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.core.impl.adapter;
 
-import com.gitee.dorive.core.api.Adapter;
-import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.common.Adapter;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.api.entity.def.AdapterDef;
 import com.gitee.dorive.core.entity.operation.Operation;
 import lombok.Data;

@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.processor;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.context.Context;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

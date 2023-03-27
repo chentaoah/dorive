@@ -18,9 +18,9 @@
 package com.gitee.dorive.core.impl.processor;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.api.entity.def.BindingDef;
-import com.gitee.dorive.core.api.Processor;
+import com.gitee.dorive.core.api.common.Processor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.core.impl.selector;
 
-import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.api.Selector;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.context.BoundedContext;
 
 public abstract class AbstractSelector implements Selector {

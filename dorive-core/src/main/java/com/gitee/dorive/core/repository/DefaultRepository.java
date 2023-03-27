@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.core.repository;
 
-import com.gitee.dorive.core.api.Executor;
-import com.gitee.dorive.core.api.MetadataHolder;
+import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.api.common.MetadataHolder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

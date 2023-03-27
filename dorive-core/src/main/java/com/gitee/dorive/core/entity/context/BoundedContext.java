@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.entity.context;
 
-import com.gitee.dorive.core.api.Selector;
+import com.gitee.dorive.core.api.context.Selector;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

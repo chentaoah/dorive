@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.selector;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;

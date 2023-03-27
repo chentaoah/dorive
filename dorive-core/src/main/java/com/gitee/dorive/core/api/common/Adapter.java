@@ -15,18 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api;
+package com.gitee.dorive.core.api.common;
 
-import java.util.List;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.operation.Operation;
 
-public interface ListableRepository<E, PK> extends Repository<E, PK> {
+public interface Adapter {
 
-    int insertList(Context context, List<E> entities);
-
-    int updateList(Context context, List<E> entities);
-
-    int insertOrUpdateList(Context context, List<E> entities);
-
-    int deleteList(Context context, List<E> entities);
+    void adapt(Context context, Operation operation);
 
 }

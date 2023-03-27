@@ -17,9 +17,9 @@
 
 package com.gitee.dorive.simple.impl;
 
-import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.api.ContextBuilder;
-import com.gitee.dorive.core.api.EntityHandler;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.ContextBuilder;
+import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.simple.api.RefObj;
 import lombok.AllArgsConstructor;
@@ -37,7 +37,7 @@ public class RefObjImpl implements RefObj {
     @Override
     public int select(Context context) {
         EntityHandler entityHandler = ref.getEntityHandler();
-        return entityHandler.handleEntities(context, Collections.singletonList(object));
+        return entityHandler.handle(context, Collections.singletonList(object));
     }
 
     @Override

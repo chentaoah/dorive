@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.simple.api;
 
-import com.gitee.dorive.core.api.ContextBuilder;
+import com.gitee.dorive.core.api.context.ContextBuilder;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 

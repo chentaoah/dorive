@@ -19,9 +19,9 @@ package com.gitee.dorive.core.repository;
 
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.element.PropChain;
-import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.api.MetadataHolder;
-import com.gitee.dorive.core.api.Selector;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.common.MetadataHolder;
+import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;

@@ -25,7 +25,7 @@ import com.gitee.dorive.coating.entity.MergedRepository;
 import com.gitee.dorive.coating.entity.RepositoryObj;
 import com.gitee.dorive.coating.impl.resolver.CoatingObjResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
-import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;

@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.spring.boot.starter.impl;
 
-import com.gitee.dorive.core.api.EntityIndex;
+import com.gitee.dorive.core.api.common.EntityIndex;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.spring.boot.starter.util.NumberUtils;
@@ -49,7 +49,7 @@ public class EntityIndexResult extends Result<Object> implements EntityIndex {
     }
 
     @Override
-    public List<Object> selectList(Object rootEntity, Object key) {
+    public List<Object> select(Object rootEntity, Object key) {
         Integer rowNum = NumberUtils.intValue(key);
         List<Integer> existRowNums = romNumMapping.get(rowNum);
         if (existRowNums != null && !existRowNums.isEmpty()) {

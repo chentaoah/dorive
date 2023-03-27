@@ -19,10 +19,10 @@ package com.gitee.dorive.core.impl.handler;
 
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.element.PropChain;
-import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.api.EntityHandler;
-import com.gitee.dorive.core.api.EntityIndex;
-import com.gitee.dorive.core.api.Selector;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.core.api.common.EntityIndex;
+import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
@@ -45,12 +45,12 @@ public class BatchEntityHandler implements EntityHandler {
     }
 
     @Override
-    public int handleEntities(Context context, List<Object> rootEntities) {
+    public int handle(Context context, List<Object> entities) {
         Selector selector = context.getSelector();
         int totalCount = 0;
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (selector.matches(context, repository)) {
-                totalCount += executeQuery(repository, context, rootEntities);
+                totalCount += executeQuery(repository, context, entities);
             }
         }
         return totalCount;
@@ -105,7 +105,7 @@ public class BatchEntityHandler implements EntityHandler {
             Object rootEntity = rootEntities.get(index);
             Object lastEntity = lastPropChain == null ? rootEntity : lastPropChain.getValue(rootEntity);
             if (lastEntity != null) {
-                List<Object> entities = entityIndex.selectList(rootEntity, index + 1);
+                List<Object> entities = entityIndex.select(rootEntity, index + 1);
                 Object entity = repository.convertManyToOne(entities);
                 if (entity != null) {
                     propProxy.setValue(lastEntity, entity);

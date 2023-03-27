@@ -18,10 +18,10 @@
 package com.gitee.dorive.simple.impl;
 
 import com.gitee.dorive.coating.api.CoatingRepository;
-import com.gitee.dorive.core.api.ContextBuilder;
-import com.gitee.dorive.core.api.EntityHandler;
-import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.api.ListableRepository;
+import com.gitee.dorive.core.api.context.ContextBuilder;
+import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.repository.ListableRepository;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.repository.AbstractRepository;

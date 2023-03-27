@@ -18,8 +18,8 @@
 package com.gitee.dorive.simple.repository;
 
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
-import com.gitee.dorive.core.api.ContextBuilder;
-import com.gitee.dorive.core.api.EntityHandler;
+import com.gitee.dorive.core.api.context.ContextBuilder;
+import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.simple.api.SimpleRepository;

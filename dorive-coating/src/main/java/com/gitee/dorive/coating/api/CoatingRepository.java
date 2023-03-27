@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.coating.api;
 
-import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Page;
 
 import java.util.List;

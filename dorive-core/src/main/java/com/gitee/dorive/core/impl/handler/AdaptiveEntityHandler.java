@@ -17,9 +17,9 @@
 
 package com.gitee.dorive.core.impl.handler;
 
-import com.gitee.dorive.core.api.EntityHandler;
-import com.gitee.dorive.core.api.Executor;
-import com.gitee.dorive.core.api.Context;
+import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import lombok.Data;
@@ -42,7 +42,7 @@ public class AdaptiveEntityHandler implements EntityHandler {
     }
 
     @Override
-    public int handleEntities(Context context, List<Object> rootEntities) {
+    public int handle(Context context, List<Object> rootEntities) {
         List<Object> newRootEntities = new ArrayList<>(rootEntities.size());
 
         int delegateCount = repository.getDelegateResolver().getDelegateCount();
@@ -53,13 +53,13 @@ public class AdaptiveEntityHandler implements EntityHandler {
         AtomicInteger totalCount = new AtomicInteger();
 
         if (!newRootEntities.isEmpty()) {
-            totalCount.addAndGet(entityHandler.handleEntities(context, newRootEntities));
+            totalCount.addAndGet(entityHandler.handle(context, newRootEntities));
         }
 
         repositoryEntitiesMap.forEach((repository, entities) -> {
             Executor executor = repository.getExecutor();
             if (executor instanceof EntityHandler) {
-                totalCount.addAndGet(((EntityHandler) executor).handleEntities(context, entities));
+                totalCount.addAndGet(((EntityHandler) executor).handle(context, entities));
             }
         });
 

@@ -15,20 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api;
+package com.gitee.dorive.core.api.context;
 
-import com.gitee.dorive.api.entity.def.BindingDef;
+import com.gitee.dorive.core.repository.CommonRepository;
 
-public interface Binder {
+import java.util.List;
 
-    BindingDef getBindingDef();
+public interface Selector extends ContextBuilder {
 
-    Object getFieldValue(Context context, Object entity);
+    boolean matches(Context context, CommonRepository repository);
 
-    void setFieldValue(Context context, Object entity, Object property);
-
-    Object getBoundValue(Context context, Object rootEntity);
-
-    void setBoundValue(Context context, Object rootEntity, Object property);
+    List<String> selectColumns(Context context, CommonRepository repository);
 
 }

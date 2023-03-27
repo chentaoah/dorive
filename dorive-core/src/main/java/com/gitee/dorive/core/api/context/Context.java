@@ -15,10 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api;
+package com.gitee.dorive.core.api.context;
 
-public interface MetadataHolder {
+import java.util.Map;
 
-    Object getMetadata();
+public interface Context {
+
+    Selector getSelector();
+
+    Map<String, Object> getAttachments();
 
 }

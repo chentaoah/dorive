@@ -18,11 +18,11 @@
 package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.core.api.Context;
-import com.gitee.dorive.core.api.Selector;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.api.ListableRepository;
-import com.gitee.dorive.core.api.MetadataHolder;
+import com.gitee.dorive.core.api.repository.ListableRepository;
+import com.gitee.dorive.core.api.common.MetadataHolder;
 import com.gitee.dorive.core.entity.operation.Operation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

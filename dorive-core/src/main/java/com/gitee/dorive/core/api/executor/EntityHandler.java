@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api;
+package com.gitee.dorive.core.api.executor;
 
-import java.util.Map;
+import com.gitee.dorive.core.api.context.Context;
 
-public interface Context {
+import java.util.List;
 
-    Selector getSelector();
+public interface EntityHandler {
 
-    Map<String, Object> getAttachments();
+    int handle(Context context, List<Object> entities);
 
 }

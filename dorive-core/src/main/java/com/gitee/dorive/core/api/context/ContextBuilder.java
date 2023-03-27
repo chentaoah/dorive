@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api;
+package com.gitee.dorive.core.api.context;
 
-public interface EntityFactory {
+public interface ContextBuilder {
 
-    Object reconstitute(Context context, Object persistent);
-
-    Object deconstruct(Context context, Object entity);
-
+    Context build();
+    
 }

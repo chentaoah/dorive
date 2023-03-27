@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api;
+package com.gitee.dorive.core.api.common;
 
-import com.gitee.dorive.core.entity.operation.Operation;
+public interface MetadataHolder {
 
-public interface Adapter {
-
-    void adapt(Context context, Operation operation);
+    Object getMetadata();
 
 }
