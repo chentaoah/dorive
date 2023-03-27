@@ -51,7 +51,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     @Override
     @SuppressWarnings("unchecked")
     public E selectByPrimaryKey(Context context, PK primaryKey) {
-        Assert.notNull(primaryKey, "The primaryKey cannot be null!");
+        Assert.notNull(primaryKey, "The primary key cannot be null!");
         Query query = operationFactory.buildQueryByPK(context, primaryKey);
         Result<Object> result = executeQuery(context, query);
         return (E) result.getRecord();
@@ -114,7 +114,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
 
     @Override
     public int deleteByPrimaryKey(Context context, PK primaryKey) {
-        Assert.notNull(primaryKey, "The primaryKey cannot be null!");
+        Assert.notNull(primaryKey, "The primary key cannot be null!");
         Delete delete = operationFactory.buildDeleteByPK(context, primaryKey);
         return execute(context, delete);
     }
