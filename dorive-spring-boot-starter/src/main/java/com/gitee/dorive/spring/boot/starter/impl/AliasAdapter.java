@@ -15,13 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.adapter;
+package com.gitee.dorive.spring.boot.starter.impl;
 
 import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.core.api.common.Adapter;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.UnionExample;
+import com.gitee.dorive.core.entity.operation.Condition;
+import com.gitee.dorive.core.entity.operation.Operation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -29,11 +33,33 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class AliasConverter {
+public class AliasAdapter implements Adapter {
 
     private EntityEle entityEle;
 
-    public void convert(Example example) {
+    @Override
+    public void adapt(Context context, Operation operation) {
+        if (operation instanceof Condition) {
+            Condition condition = (Condition) operation;
+            Example example = condition.getExample();
+            if (example != null) {
+                if (example instanceof UnionExample) {
+                    adapt((UnionExample) example);
+                } else {
+                    adapt(example);
+                }
+            }
+        }
+    }
+
+    public void adapt(UnionExample unionExample) {
+        List<Example> examples = unionExample.getExamples();
+        for (Example example : examples) {
+            adapt(example);
+        }
+    }
+
+    public void adapt(Example example) {
         List<String> selectColumns = example.getSelectColumns();
         if (selectColumns != null && !selectColumns.isEmpty()) {
             selectColumns = entityEle.toAliases(selectColumns);
@@ -54,13 +80,6 @@ public class AliasConverter {
             List<String> orderByColumns = orderBy.getColumns();
             orderByColumns = entityEle.toAliases(orderByColumns);
             orderBy.setColumns(orderByColumns);
-        }
-    }
-
-    public void convert(UnionExample unionExample) {
-        List<Example> examples = unionExample.getExamples();
-        for (Example example : examples) {
-            convert(example);
         }
     }
 

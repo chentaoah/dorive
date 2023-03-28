@@ -24,6 +24,8 @@ import com.gitee.dorive.core.repository.ProxyRepository;
 import com.gitee.dorive.event.annotation.EnableEvent;
 import org.springframework.core.annotation.AnnotationUtils;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepository<E, PK> {
 
     private boolean enableEvent;
@@ -38,16 +40,18 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
     @Override
     protected AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository) {
         if (enableEvent) {
-            AbstractRepository<Object, Object> proxyRepository = repository;
+            AbstractRepository<Object, Object> innerRepository = repository;
             if (repository instanceof ProxyRepository) {
-                repository = ((ProxyRepository) repository).getProxyRepository();
+                innerRepository = ((ProxyRepository) repository).getProxyRepository();
             }
-            if (repository instanceof DefaultRepository) {
-                DefaultRepository defaultRepository = (DefaultRepository) repository;
+            if (innerRepository instanceof DefaultRepository) {
+                DefaultRepository defaultRepository = (DefaultRepository) innerRepository;
                 EventRepository eventRepository = new EventRepository(getApplicationContext());
                 eventRepository.setEntityDef(defaultRepository.getEntityDef());
                 eventRepository.setEntityEle(defaultRepository.getEntityEle());
-                eventRepository.setProxyRepository(proxyRepository);
+                eventRepository.setOperationFactory(defaultRepository.getOperationFactory());
+                eventRepository.setProxyRepository(repository);
+                eventRepository.setAttachments(new ConcurrentHashMap<>(defaultRepository.getAttachments()));
                 return eventRepository;
             }
         }

@@ -42,7 +42,6 @@ import com.gitee.dorive.core.entity.operation.NullableUpdate;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.operation.Update;
-import com.gitee.dorive.core.impl.adapter.AliasConverter;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
 import com.gitee.dorive.spring.boot.starter.impl.EntityIndexResult;
@@ -69,20 +68,17 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;
     private EntityFactory entityFactory;
-    private AliasConverter aliasConverter;
 
     public MybatisPlusExecutor(EntityDef entityDef,
                                EntityEle entityEle,
                                BaseMapper<Object> baseMapper,
                                Class<Object> pojoClass,
-                               EntityFactory entityFactory,
-                               AliasConverter aliasConverter) {
+                               EntityFactory entityFactory) {
         this.entityDef = entityDef;
         this.entityEle = entityEle;
         this.baseMapper = baseMapper;
         this.pojoClass = pojoClass;
         this.entityFactory = entityFactory;
-        this.aliasConverter = aliasConverter;
     }
 
     @Override
@@ -100,14 +96,12 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             if (query.withoutPage()) {
                 if (example instanceof UnionExample) {
                     UnionExample unionExample = (UnionExample) example;
-                    aliasConverter.convert(unionExample);
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
                     List<Object> entities = reconstitute(context, resultMaps);
                     return new EntityIndexResult(unionExample, resultMaps, entities);
 
                 } else {
-                    aliasConverter.convert(example);
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
                     List<Object> entities = reconstitute(context, resultMaps);
@@ -115,7 +109,6 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                 }
 
             } else {
-                aliasConverter.convert(example);
                 com.gitee.dorive.core.entity.executor.Page<Object> page = example.getPage();
                 Page<Map<String, Object>> dataPage = new Page<>(page.getCurrent(), page.getSize());
                 QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
@@ -236,9 +229,6 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             Update update = (Update) operation;
             Object primaryKey = update.getPrimaryKey();
             Example example = update.getExample();
-            if (example != null) {
-                aliasConverter.convert(example);
-            }
 
             if (update instanceof NullableUpdate) {
                 NullableUpdate nullableUpdate = (NullableUpdate) update;
@@ -261,9 +251,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             Delete delete = (Delete) operation;
             Object primaryKey = delete.getPrimaryKey();
             Example example = delete.getExample();
-            if (example != null) {
-                aliasConverter.convert(example);
-            }
+
             if (primaryKey != null) {
                 return baseMapper.deleteById((Serializable) primaryKey);
 

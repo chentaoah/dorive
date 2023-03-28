@@ -53,6 +53,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -102,31 +103,16 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setEntityDef(rootRepository.getEntityDef());
         setEntityEle(rootRepository.getEntityEle());
         setOperationFactory(rootRepository.getOperationFactory());
-
-        delegateResolver = new DelegateResolver(this);
-        adapterResolver = new AdapterResolver(this);
-
-        EntityHandler batchEntityHandler = new BatchEntityHandler(this, rootRepository.getOperationFactory());
-        EntityHandler entityHandler = batchEntityHandler;
-        if (delegateResolver.isDelegated()) {
-            entityHandler = new AdaptiveEntityHandler(this, entityHandler);
-        }
-        Executor executor = new ChainExecutor(this, entityHandler);
-        if (adapterResolver.isAdaptive()) {
-            executor = new AdaptiveExecutor(this, executor);
-        }
-        setExecutor(executor);
-
-        processEntityClass(batchEntityHandler);
+        setExecutor(newExecutor(rootRepository));
+        setAttachments(new ConcurrentHashMap<>(rootRepository.getAttachments()));
     }
 
-    @SuppressWarnings("unchecked")
     private CommonRepository newRepository(String accessPath, EntityEle entityEle) {
         EntityDef entityDef = renewEntityDef(entityEle);
         OperationFactory operationFactory = new OperationFactory(entityEle);
-        Object innerRepository = newRepository(entityDef, entityEle, operationFactory);
 
-        innerRepository = processRepository((AbstractRepository<Object, Object>) innerRepository);
+        AbstractRepository<Object, Object> innerRepository = doNewRepository(entityDef, entityEle, operationFactory);
+        AbstractRepository<Object, Object> proxyRepository = processRepository(innerRepository);
 
         boolean isRoot = "/".equals(accessPath);
         boolean isAggregated = entityEle.isAggregated();
@@ -142,7 +128,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         repository.setEntityDef(entityDef);
         repository.setEntityEle(entityEle);
         repository.setOperationFactory(operationFactory);
-        repository.setProxyRepository((AbstractRepository<Object, Object>) innerRepository);
+        repository.setProxyRepository(proxyRepository);
+        repository.setAttachments(new ConcurrentHashMap<>(innerRepository.getAttachments()));
 
         repository.setAccessPath(accessPath);
         repository.setRoot(isRoot);
@@ -152,7 +139,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         repository.setAnchorPoint(anchorPoint);
         repository.setBinderResolver(binderResolver);
         repository.setBoundEntity(false);
-        repository.setAttachments(Collections.emptyMap());
 
         return repository;
     }
@@ -169,7 +155,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return entityDef;
     }
 
-    private Object newRepository(EntityDef entityDef, EntityEle entityEle, OperationFactory operationFactory) {
+    @SuppressWarnings("unchecked")
+    protected AbstractRepository<Object, Object> doNewRepository(EntityDef entityDef, EntityEle entityEle, OperationFactory operationFactory) {
         Class<?> repositoryClass = entityDef.getRepository();
         Object repository;
         if (repositoryClass == Object.class) {
@@ -183,8 +170,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultRepository.setEntityEle(entityEle);
             defaultRepository.setOperationFactory(operationFactory);
             defaultRepository.setExecutor(newExecutor(entityDef, entityEle));
+            defaultRepository.setAttachments(Collections.emptyMap());
         }
-        return repository;
+        return (AbstractRepository<Object, Object>) repository;
     }
 
     private OrderBy newDefaultOrderBy(EntityDef entityDef, EntityEle entityEle) {
@@ -196,6 +184,24 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             return new OrderBy(columns, order);
         }
         return null;
+    }
+
+    private Executor newExecutor(CommonRepository rootRepository) {
+        delegateResolver = new DelegateResolver(this);
+        adapterResolver = new AdapterResolver(this);
+
+        EntityHandler entityHandler = new BatchEntityHandler(this, rootRepository.getOperationFactory());
+        processEntityClass(entityHandler);
+
+        if (delegateResolver.isDelegated()) {
+            entityHandler = new AdaptiveEntityHandler(this, entityHandler);
+        }
+
+        Executor executor = new ChainExecutor(this, entityHandler);
+        if (adapterResolver.isAdaptive()) {
+            executor = new AdaptiveExecutor(this, executor);
+        }
+        return executor;
     }
 
     protected abstract Executor newExecutor(EntityDef entityDef, EntityEle entityEle);

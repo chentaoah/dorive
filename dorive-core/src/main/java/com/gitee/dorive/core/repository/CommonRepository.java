@@ -34,7 +34,6 @@ import lombok.EqualsAndHashCode;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -47,7 +46,6 @@ public class CommonRepository extends ProxyRepository {
     private PropChain anchorPoint;
     private BinderResolver binderResolver;
     private boolean boundEntity;
-    private Map<String, Object> attachments;
 
     @Override
     public int updateByExample(Context context, Object entity, Example example) {
