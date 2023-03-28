@@ -19,14 +19,19 @@ package com.gitee.dorive.spring.boot.starter.repository;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.gitee.dorive.core.api.common.EntityFactory;
-import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.core.impl.adapter.AliasConverter;
+import com.gitee.dorive.core.api.common.EntityFactory;
+import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
+import com.gitee.dorive.core.impl.factory.OperationFactory;
+import com.gitee.dorive.core.repository.AbstractRepository;
+import com.gitee.dorive.core.repository.DefaultRepository;
 import com.gitee.dorive.simple.repository.AbstractSimpleRepository;
+import com.gitee.dorive.spring.boot.starter.api.Keys;
+import com.gitee.dorive.spring.boot.starter.impl.AliasAdapter;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
 
 import java.lang.reflect.ParameterizedType;
@@ -34,6 +39,7 @@ import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK> {
 
@@ -43,6 +49,30 @@ public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK
         if ("SQL".equals(getQuerier())) {
             setExampleBuilder(new SQLExampleBuilder(this));
         }
+    }
+
+    @Override
+    protected AbstractRepository<Object, Object> doNewRepository(EntityDef entityDef, EntityEle entityEle, OperationFactory operationFactory) {
+        AbstractRepository<Object, Object> repository = super.doNewRepository(entityDef, entityEle, operationFactory);
+        if (repository instanceof DefaultRepository) {
+            DefaultRepository defaultRepository = (DefaultRepository) repository;
+            Executor executor = defaultRepository.getExecutor();
+            if (executor instanceof MybatisPlusExecutor) {
+                Map<String, Object> attachments = new ConcurrentHashMap<>();
+
+                AliasAdapter aliasAdapter = new AliasAdapter(entityEle);
+                attachments.put(Keys.ALIAS_ADAPTER, aliasAdapter);
+
+                MybatisPlusExecutor mybatisPlusExecutor = (MybatisPlusExecutor) executor;
+                Class<Object> pojoClass = mybatisPlusExecutor.getPojoClass();
+                TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
+                attachments.put(Keys.TABLE_INFO, tableInfo);
+
+                defaultRepository.setAttachments(attachments);
+                defaultRepository.setAdapter(aliasAdapter);
+            }
+        }
+        return repository;
     }
 
     @Override
@@ -92,9 +122,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK
             }
         }
 
-        AliasConverter aliasConverter = new AliasConverter(entityEle);
-
-        return new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass, entityFactory, aliasConverter);
+        return new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass, entityFactory);
     }
 
 }

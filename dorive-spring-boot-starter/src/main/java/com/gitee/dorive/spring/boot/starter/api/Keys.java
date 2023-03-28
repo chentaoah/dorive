@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.common;
+package com.gitee.dorive.spring.boot.starter.api;
 
-public interface MetadataHolder {
-
-    Object getMetadata();
-
+public interface Keys {
+    String TABLE_INFO = "TABLE_INFO";
+    String ALIAS_ADAPTER = "ALIAS_ADAPTER";
 }

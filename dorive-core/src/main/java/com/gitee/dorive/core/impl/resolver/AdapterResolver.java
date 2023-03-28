@@ -43,9 +43,7 @@ public class AdapterResolver {
         AdapterDef adapterDef = entityType.getAdapterDef();
         if (adapterDef != null) {
             Class<?> adapterClass = adapterDef.getAdapter();
-            if (adapterClass == Object.class) {
-                adapter = new DefaultAdapter();
-            } else {
+            if (adapterClass != Object.class) {
                 ApplicationContext applicationContext = repository.getApplicationContext();
                 adapter = (Adapter) applicationContext.getBean(adapterClass);
             }

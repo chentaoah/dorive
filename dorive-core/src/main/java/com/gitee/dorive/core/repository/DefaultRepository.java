@@ -17,22 +17,38 @@
 
 package com.gitee.dorive.core.repository;
 
-import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.api.common.MetadataHolder;
+import com.gitee.dorive.core.api.common.Adapter;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Query;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class DefaultRepository extends AbstractRepository<Object, Object> implements MetadataHolder {
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class DefaultRepository extends AbstractRepository<Object, Object> {
+
+    private Adapter adapter;
 
     @Override
-    public Object getMetadata() {
-        Executor executor = getExecutor();
-        if (executor instanceof MetadataHolder) {
-            return ((MetadataHolder) executor).getMetadata();
+    public Result<Object> executeQuery(Context context, Query query) {
+        if (adapter != null) {
+            adapter.adapt(context, query);
         }
-        return null;
+        return super.executeQuery(context, query);
+    }
+
+    @Override
+    public int execute(Context context, Operation operation) {
+        if (adapter != null) {
+            adapter.adapt(context, operation);
+        }
+        return super.execute(context, operation);
     }
 
 }

@@ -21,8 +21,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
+import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.entity.CoatingObj;
 import com.gitee.dorive.coating.entity.MergedRepository;
@@ -30,21 +30,19 @@ import com.gitee.dorive.coating.entity.RepositoryObj;
 import com.gitee.dorive.coating.entity.SpecificProperties;
 import com.gitee.dorive.coating.impl.resolver.CoatingObjResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
-import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
-import com.gitee.dorive.core.impl.adapter.AliasConverter;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.CriterionUtils;
 import com.gitee.dorive.core.util.SqlUtils;
+import com.gitee.dorive.spring.boot.starter.api.Keys;
 import com.gitee.dorive.spring.boot.starter.entity.ArgSegment;
 import com.gitee.dorive.spring.boot.starter.entity.JoinSegment;
-import com.gitee.dorive.spring.boot.starter.entity.Metadata;
 import com.gitee.dorive.spring.boot.starter.entity.SqlSegment;
 
 import java.util.ArrayList;
@@ -86,16 +84,17 @@ public class SQLExampleBuilder implements ExampleBuilder {
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
             BinderResolver binderResolver = definedRepository.getBinderResolver();
-            AliasConverter aliasConverter = executedRepository.getAliasConverter();
 
-            TableInfo tableInfo = getTableInfo(executedRepository);
+            Map<String, Object> attachments = executedRepository.getAttachments();
+            AliasAdapter aliasAdapter = (AliasAdapter) attachments.get(Keys.ALIAS_ADAPTER);
+            TableInfo tableInfo = (TableInfo) attachments.get(Keys.TABLE_INFO);
+
             String tableName = tableInfo.getTableName();
-
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
             Example example = repositoryObj.newExampleByCoating(context, coating);
-            aliasConverter.convert(example);
+            aliasAdapter.adapt(example);
 
             boolean dirtyQuery = example.isDirtyQuery();
             anyDirtyQuery = anyDirtyQuery || dirtyQuery;
@@ -158,12 +157,6 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
 
         return example;
-    }
-
-    private TableInfo getTableInfo(CommonRepository repository) {
-        Metadata metadata = (Metadata) repository.getMetadata();
-        Class<?> pojoClass = metadata.getPojoClass();
-        return TableInfoHelper.getTableInfo(pojoClass);
     }
 
     private List<JoinSegment> newJoinSegments(Map<String, SqlSegment> sqlSegmentMap, String lastAccessPath, String absoluteAccessPath, BinderResolver binderResolver, String tableAlias) {
