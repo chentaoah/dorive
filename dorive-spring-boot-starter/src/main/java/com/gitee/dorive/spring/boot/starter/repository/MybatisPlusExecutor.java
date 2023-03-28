@@ -130,7 +130,9 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         List<Object> entities = new ArrayList<>(resultMaps.size());
         for (Map<String, Object> resultMap : resultMaps) {
             Object entity = entityFactory.reconstitute(context, resultMap);
-            entities.add(entity);
+            if (entity != null) {
+                entities.add(entity);
+            }
         }
         return entities;
     }
@@ -217,7 +219,13 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     @Override
     public int execute(Context context, Operation operation) {
         Object entity = operation.getEntity();
-        Object persistent = entity != null ? entityFactory.deconstruct(context, entity) : null;
+        Object persistent = null;
+        if (entity != null) {
+            persistent = entityFactory.deconstruct(context, entity);
+            if (persistent == null) {
+                return 0;
+            }
+        }
 
         if (operation instanceof Insert) {
             int count = baseMapper.insert(persistent);
