@@ -19,7 +19,12 @@ package com.gitee.dorive.generator.entity;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class AnnotationVO {
+public class ClassVo {
+    private String comment;
     private String type;
+    private String name;
+    private List<FieldVo> fieldVos;
 }

@@ -23,15 +23,15 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class FieldVO {
+public class FieldVo {
 
     private String comment;
-    private List<AnnotationVO> annotationVOs;
+    private List<AnnotationVo> annotationVos;
     private String type;
     private String name;
 
     public boolean isAnnotationPresent(Class<?> annotationClass) {
-        return CollUtil.findOne(annotationVOs, annotationVO -> annotationVO.getType().equals(annotationClass.getName())) != null;
+        return CollUtil.findOne(annotationVos, annotationVo -> annotationVo.getType().equals(annotationClass.getName())) != null;
     }
 
 }

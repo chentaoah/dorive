@@ -18,9 +18,9 @@
 package com.gitee.dorive.generator.impl;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.generator.entity.AnnotationVO;
-import com.gitee.dorive.generator.entity.ClassVO;
-import com.gitee.dorive.generator.entity.FieldVO;
+import com.gitee.dorive.generator.entity.AnnotationVo;
+import com.gitee.dorive.generator.entity.ClassVo;
+import com.gitee.dorive.generator.entity.FieldVo;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.FieldDoc;
@@ -44,7 +44,7 @@ public class Doclet {
         this.sources = sources;
     }
 
-    public List<ClassVO> execute() {
+    public List<ClassVo> execute() {
         List<String> arguments = new ArrayList<>();
         arguments.add("-doclet");
         arguments.add(Doclet.class.getName());
@@ -60,53 +60,50 @@ public class Doclet {
             throw new RuntimeException("No classes information found!");
         }
 
-        List<ClassVO> classVOs = new ArrayList<>();
-
+        List<ClassVo> classVos = new ArrayList<>();
         for (ClassDoc classDoc : classDocs) {
-            ClassVO classVO = new ClassVO();
-
+            ClassVo classVo = new ClassVo();
             Object document = ReflectUtil.getFieldValue(classDoc, "documentation");
             if (document != null) {
                 String commentText = document.toString();
                 for (String message : commentText.split("\n")) {
                     message = message.trim();
                     if (!message.startsWith("@") && message.length() > 0) {
-                        classVO.setComment(message);
+                        classVo.setComment(message);
                         break;
                     }
                 }
             }
-            classVO.setType(classDoc.qualifiedName());
-            classVO.setName(classDoc.simpleTypeName());
+            classVo.setType(classDoc.qualifiedName());
+            classVo.setName(classDoc.simpleTypeName());
 
-            List<FieldVO> fieldVOs = new ArrayList<>();
-
+            List<FieldVo> fieldVos = new ArrayList<>();
             FieldDoc[] fieldDocs = classDoc.fields(false);
             for (FieldDoc fieldDoc : fieldDocs) {
                 if (!fieldDoc.isStatic()) {
-                    FieldVO fieldVO = new FieldVO();
-                    fieldVO.setComment(fieldDoc.commentText());
+                    FieldVo fieldVo = new FieldVo();
+                    fieldVo.setComment(fieldDoc.commentText());
 
-                    List<AnnotationVO> annotationVOs = new ArrayList<>();
+                    List<AnnotationVo> annotationVos = new ArrayList<>();
                     AnnotationDesc[] annotationDescs = fieldDoc.annotations();
                     for (AnnotationDesc annotationDesc : annotationDescs) {
-                        AnnotationVO annotationVO = new AnnotationVO();
-                        annotationVO.setType(annotationDesc.annotationType().qualifiedTypeName());
-                        annotationVOs.add(annotationVO);
+                        AnnotationVo annotationVo = new AnnotationVo();
+                        annotationVo.setType(annotationDesc.annotationType().qualifiedTypeName());
+                        annotationVos.add(annotationVo);
                     }
-                    fieldVO.setAnnotationVOs(annotationVOs);
+                    fieldVo.setAnnotationVos(annotationVos);
 
-                    fieldVO.setType(fieldDoc.type().qualifiedTypeName());
-                    fieldVO.setName(fieldDoc.name());
-                    fieldVOs.add(fieldVO);
+                    fieldVo.setType(fieldDoc.type().qualifiedTypeName());
+                    fieldVo.setName(fieldDoc.name());
+                    fieldVos.add(fieldVo);
                 }
             }
 
-            classVO.setFieldVOs(fieldVOs);
-            classVOs.add(classVO);
+            classVo.setFieldVos(fieldVos);
+            classVos.add(classVo);
         }
 
-        return classVOs;
+        return classVos;
     }
 
 }

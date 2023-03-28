@@ -20,8 +20,8 @@ package com.gitee.dorive.generator.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.annotation.Entity;
-import com.gitee.dorive.generator.entity.ClassVO;
-import com.gitee.dorive.generator.entity.FieldVO;
+import com.gitee.dorive.generator.entity.ClassVo;
+import com.gitee.dorive.generator.entity.FieldVo;
 import com.gitee.dorive.generator.entity.TableInfo;
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,35 +31,42 @@ import java.util.List;
 
 public class TableUtils {
 
-    public static List<TableInfo> getTableInfos(String tablePrefix, List<ClassVO> classVOs) {
+    public static List<TableInfo> getTableInfos(String tablePrefix, List<ClassVo> classVos) {
         List<TableInfo> tableInfos = new ArrayList<>();
-        for (ClassVO classVO : classVOs) {
-            tableInfos.add(newTableInfo(tablePrefix, classVO));
+        for (ClassVo classVo : classVos) {
+            tableInfos.add(newTableInfo(tablePrefix, classVo));
         }
         return tableInfos;
     }
 
-    public static TableInfo newTableInfo(String tablePrefix, ClassVO classVO) {
-        String tableName = tablePrefix + "_" + StrUtil.toUnderlineCase(classVO.getName());
+    public static TableInfo newTableInfo(String tablePrefix, ClassVo classVo) {
+        String tableName = tablePrefix + "_" + StrUtil.toUnderlineCase(classVo.getName());
         List<String> properties = new ArrayList<>();
         List<String> tableIndexes = new ArrayList<>();
 
-        List<FieldVO> fieldVOs = classVO.getFieldVOs();
-        for (FieldVO fieldVO : fieldVOs) {
-            if (fieldVO.isAnnotationPresent(Entity.class)) {
+        List<FieldVo> fieldVos = classVo.getFieldVos();
+        for (FieldVo fieldVo : fieldVos) {
+            if (fieldVo.isAnnotationPresent(Entity.class)) {
                 continue;
             }
 
-            String fieldName = fieldVO.getName();
-            String column = StrUtil.toUnderlineCase(fieldName);
+            String comment = fieldVo.getComment();
+            String type = fieldVo.getType();
+            String name = fieldVo.getName();
+            String column = StrUtil.toUnderlineCase(name);
 
-            if (!fieldName.equals("id") && fieldName.endsWith("Id")) {
+            if (!name.equals("id") && name.endsWith("Id")) {
                 tableIndexes.add("create index idx_" + column + " on " + tableName + " (" + column + ");");
             }
 
-            switch (fieldName) {
+            switch (name) {
                 case "id":
-                    properties.add("id int unsigned auto_increment comment '主键' primary key");
+                    if (Integer.class.getTypeName().equals(type)) {
+                        properties.add("id int unsigned auto_increment comment '主键' primary key");
+
+                    } else if (Long.class.getTypeName().equals(type)) {
+                        properties.add("id bigint unsigned auto_increment comment '主键' primary key");
+                    }
                     break;
 
                 case "createUser":
@@ -79,12 +86,12 @@ public class TableUtils {
                     break;
 
                 default:
-                    String comment = fieldVO.getComment();
-                    String type = fieldVO.getType();
                     String suffix = StringUtils.isNotBlank(comment) ? " comment '" + comment + "'" : "";
-
                     if (Integer.class.getTypeName().equals(type)) {
                         properties.add(column + " int null" + suffix);
+
+                    } else if (Long.class.getTypeName().equals(type)) {
+                        properties.add(column + " bigint null" + suffix);
 
                     } else if (String.class.getTypeName().equals(type)) {
                         properties.add(column + " varchar(255) null" + suffix);
@@ -96,7 +103,7 @@ public class TableUtils {
             }
         }
 
-        String comment = classVO.getComment();
+        String comment = classVo.getComment();
         String suffix = StringUtils.isNotBlank(comment) ? " comment '" + comment + "';" : ";";
         String tableSql = "create table " + tableName + " (\n" +
                 CollUtil.join(properties, ",\n", "    ", null)

@@ -19,7 +19,7 @@ package com.gitee.dorive.generator;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.generator.entity.ClassVO;
+import com.gitee.dorive.generator.entity.ClassVo;
 import com.gitee.dorive.generator.entity.TableInfo;
 import com.gitee.dorive.generator.impl.Doclet;
 import com.gitee.dorive.generator.util.TableUtils;
@@ -41,8 +41,8 @@ public class TableGenerator {
                 sources.add(file.getAbsolutePath());
             }
             Doclet doclet = new Doclet(sources);
-            List<ClassVO> classVOs = doclet.execute();
-            return TableUtils.getTableInfos(tablePrefix, classVOs);
+            List<ClassVo> classVos = doclet.execute();
+            return TableUtils.getTableInfos(tablePrefix, classVos);
         }
         return null;
     }
@@ -60,9 +60,10 @@ public class TableGenerator {
     public static void outputFile(String tablePrefix, String dirPath, String filePath) {
         List<TableInfo> tableInfos = execute(tablePrefix, dirPath);
         if (tableInfos != null) {
+            List<String> tableNames = tableInfos.stream().map(TableInfo::getTableName).collect(Collectors.toList());
             List<String> tableSqls = tableInfos.stream().map(TableInfo::getTableSql).collect(Collectors.toList());
-            String content = StrUtil.join("\n\n", tableSqls);
-            FileUtil.writeString(content, filePath, StandardCharsets.UTF_8);
+            System.out.println(StrUtil.join(", ", tableNames) + "\n");
+            FileUtil.writeString(StrUtil.join("\n\n", tableSqls), filePath, StandardCharsets.UTF_8);
         }
     }
 
