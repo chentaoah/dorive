@@ -29,7 +29,7 @@ import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.core.repository.DefaultRepository;
-import com.gitee.dorive.simple.repository.AbstractSimpleRepository;
+import com.gitee.dorive.simple.repository.AbstractRefRepository;
 import com.gitee.dorive.spring.boot.starter.api.Keys;
 import com.gitee.dorive.spring.boot.starter.impl.AliasAdapter;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MybatisPlusRepository<E, PK> extends AbstractSimpleRepository<E, PK> {
+public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
     @Override
     public void afterPropertiesSet() throws Exception {

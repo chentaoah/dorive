@@ -15,10 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.context;
+package com.gitee.dorive.core.entity.context;
 
-public interface ContextBuilder {
+import com.gitee.dorive.core.api.context.Selector;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-    Context build();
-    
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class InnerContext extends AbstractContext {
+
+    public InnerContext(Selector selector) {
+        super(selector);
+    }
+
 }

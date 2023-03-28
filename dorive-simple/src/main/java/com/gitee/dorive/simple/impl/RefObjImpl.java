@@ -18,8 +18,9 @@
 package com.gitee.dorive.simple.impl;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.ContextBuilder;
+import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.core.entity.context.InnerContext;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.simple.api.RefObj;
 import lombok.AllArgsConstructor;
@@ -36,13 +37,11 @@ public class RefObjImpl implements RefObj {
 
     @Override
     public int select(Context context) {
+        if (context instanceof Selector) {
+            context = new InnerContext((Selector) context);
+        }
         EntityHandler entityHandler = ref.getEntityHandler();
         return entityHandler.handle(context, Collections.singletonList(object));
-    }
-
-    @Override
-    public int select(ContextBuilder builder) {
-        return select(builder.build());
     }
 
     @Override
@@ -52,19 +51,9 @@ public class RefObjImpl implements RefObj {
     }
 
     @Override
-    public int insertOrUpdate(ContextBuilder builder) {
-        return insertOrUpdate(builder.build());
-    }
-
-    @Override
     public int delete(Context context) {
         AbstractRepository<Object, Object> repository = ref.getProxyRepository();
         return repository.delete(context, object);
-    }
-
-    @Override
-    public int delete(ContextBuilder builder) {
-        return delete(builder.build());
     }
 
 }

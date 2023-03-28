@@ -20,9 +20,12 @@ package com.gitee.dorive.core.repository;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Selector;
+import com.gitee.dorive.core.entity.context.InnerContext;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.api.repository.ListableRepository;
+import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Query;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -91,6 +94,22 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     @Override
     public int deleteList(Context context, List<E> entities) {
         return entities.stream().mapToInt(entity -> delete(context, entity)).sum();
+    }
+
+    @Override
+    public Result<Object> executeQuery(Context context, Query query) {
+        if (context instanceof Selector) {
+            context = new InnerContext((Selector) context);
+        }
+        return super.executeQuery(context, query);
+    }
+
+    @Override
+    public int execute(Context context, Operation operation) {
+        if (context instanceof Selector) {
+            context = new InnerContext((Selector) context);
+        }
+        return super.execute(context, operation);
     }
 
 }

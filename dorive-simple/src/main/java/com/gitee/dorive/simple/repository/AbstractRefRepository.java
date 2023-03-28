@@ -15,22 +15,23 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.selector;
+package com.gitee.dorive.simple.repository;
 
-import com.gitee.dorive.core.api.context.Selector;
+import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
+import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.simple.impl.RefInjector;
 
-import java.util.Map;
+import java.lang.reflect.Field;
 
-public abstract class AbstractSelector implements Selector {
-
-    @Override
-    public Selector getSelector() {
-        throw new RuntimeException("The method is not supported!");
-    }
+public abstract class AbstractRefRepository<E, PK> extends AbstractCoatingRepository<E, PK> {
 
     @Override
-    public Map<String, Object> getAttachments() {
-        throw new RuntimeException("The method is not supported!");
+    protected void processEntityClass(EntityHandler entityHandler) {
+        RefInjector refInjector = new RefInjector(this, entityHandler, getEntityClass());
+        Field field = refInjector.getField();
+        if (field != null) {
+            refInjector.inject(field, refInjector.createRef());
+        }
     }
 
 }

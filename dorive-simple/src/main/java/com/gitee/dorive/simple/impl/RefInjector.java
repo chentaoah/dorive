@@ -19,8 +19,8 @@ package com.gitee.dorive.simple.impl;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.simple.api.Ref;
+import com.gitee.dorive.simple.repository.AbstractRefRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -31,7 +31,7 @@ import java.lang.reflect.Modifier;
 @AllArgsConstructor
 public class RefInjector {
 
-    private AbstractRepository<?, ?> repository;
+    private AbstractRefRepository<?, ?> repository;
     private EntityHandler entityHandler;
     private Class<?> entityClass;
 
@@ -44,14 +44,15 @@ public class RefInjector {
         }
         return null;
     }
-
+    
     @SuppressWarnings("unchecked")
     public Ref<Object> createRef() {
-        RefImpl refImpl = new RefImpl((AbstractRepository<Object, Object>) repository, entityHandler);
+        RefImpl refImpl = new RefImpl((AbstractRefRepository<Object, Object>) repository, entityHandler);
         refImpl.setEntityDef(repository.getEntityDef());
         refImpl.setEntityEle(repository.getEntityEle());
         refImpl.setOperationFactory(repository.getOperationFactory());
         refImpl.setExecutor(repository.getExecutor());
+        refImpl.setAttachments(repository.getAttachments());
         return refImpl;
     }
 
