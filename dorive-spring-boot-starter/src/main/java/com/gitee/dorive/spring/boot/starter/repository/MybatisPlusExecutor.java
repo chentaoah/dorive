@@ -29,7 +29,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.core.api.common.EntityFactory;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -44,14 +43,14 @@ import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
-import com.gitee.dorive.spring.boot.starter.impl.EntityIndexResult;
+import com.gitee.dorive.spring.boot.starter.entity.QueryResult;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,18 +66,15 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     private EntityEle entityEle;
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;
-    private EntityFactory entityFactory;
 
     public MybatisPlusExecutor(EntityDef entityDef,
                                EntityEle entityEle,
                                BaseMapper<Object> baseMapper,
-                               Class<Object> pojoClass,
-                               EntityFactory entityFactory) {
+                               Class<Object> pojoClass) {
         this.entityDef = entityDef;
         this.entityEle = entityEle;
         this.baseMapper = baseMapper;
         this.pojoClass = pojoClass;
-        this.entityFactory = entityFactory;
     }
 
     @Override
@@ -87,54 +83,32 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("id", query.getPrimaryKey());
             List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-            List<Object> entities = reconstitute(context, resultMaps);
-            return new Result<>(entities);
+            return new Result<>(new QueryResult(resultMaps));
 
         } else if (query.getExample() != null) {
             Example example = query.getExample();
-
             if (query.withoutPage()) {
                 if (example instanceof UnionExample) {
                     UnionExample unionExample = (UnionExample) example;
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                    List<Object> entities = reconstitute(context, resultMaps);
-                    return new EntityIndexResult(unionExample, resultMaps, entities);
+                    return new Result<>(new QueryResult(resultMaps));
 
                 } else {
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                    List<Object> entities = reconstitute(context, resultMaps);
-                    return new Result<>(entities);
+                    return new Result<>(new QueryResult(resultMaps));
                 }
 
             } else {
                 com.gitee.dorive.core.entity.executor.Page<Object> page = example.getPage();
                 Page<Map<String, Object>> dataPage = new Page<>(page.getCurrent(), page.getSize());
                 QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
-
                 dataPage = baseMapper.selectMapsPage(dataPage, queryWrapper);
-                page.setTotal(dataPage.getTotal());
-
-                List<Map<String, Object>> resultMaps = dataPage.getRecords();
-                List<Object> entities = reconstitute(context, resultMaps);
-                page.setRecords(entities);
-
-                return new Result<>(page);
+                return new Result<>(new QueryResult(dataPage));
             }
         }
-        throw new RuntimeException("Unsupported query method!");
-    }
-
-    private List<Object> reconstitute(Context context, List<Map<String, Object>> resultMaps) {
-        List<Object> entities = new ArrayList<>(resultMaps.size());
-        for (Map<String, Object> resultMap : resultMaps) {
-            Object entity = entityFactory.reconstitute(context, resultMap);
-            if (entity != null) {
-                entities.add(entity);
-            }
-        }
-        return entities;
+        return new Result<>(new QueryResult(Collections.emptyList()));
     }
 
     private QueryWrapper<Object> buildQueryWrapper(Example example) {
@@ -218,20 +192,10 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
     @Override
     public int execute(Context context, Operation operation) {
-        Object entity = operation.getEntity();
-        Object persistent = null;
-        if (entity != null) {
-            persistent = entityFactory.deconstruct(context, entity);
-            if (persistent == null) {
-                return 0;
-            }
-        }
+        Object persistent = operation.getEntity();
 
         if (operation instanceof Insert) {
-            int count = baseMapper.insert(persistent);
-            Object primaryKey = BeanUtil.getFieldValue(persistent, "id");
-            entityEle.getPkProxy().setValue(entity, primaryKey);
-            return count;
+            return baseMapper.insert(persistent);
 
         } else if (operation instanceof Update) {
             Update update = (Update) operation;

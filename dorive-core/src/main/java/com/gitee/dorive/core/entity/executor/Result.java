@@ -45,4 +45,9 @@ public class Result<E> {
         this.total = this.records.size();
     }
 
+    public Result(E record) {
+        this.record = record;
+        this.total = 1;
+    }
+
 }

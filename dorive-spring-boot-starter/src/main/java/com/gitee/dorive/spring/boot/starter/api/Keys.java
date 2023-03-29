@@ -19,5 +19,5 @@ package com.gitee.dorive.spring.boot.starter.api;
 
 public interface Keys {
     String TABLE_INFO = "TABLE_INFO";
-    String ALIAS_ADAPTER = "ALIAS_ADAPTER";
+    String ALIAS_EXECUTOR = "ALIAS_EXECUTOR";
 }

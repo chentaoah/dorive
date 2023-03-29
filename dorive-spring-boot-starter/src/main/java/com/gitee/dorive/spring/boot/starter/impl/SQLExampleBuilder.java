@@ -44,6 +44,7 @@ import com.gitee.dorive.spring.boot.starter.api.Keys;
 import com.gitee.dorive.spring.boot.starter.entity.ArgSegment;
 import com.gitee.dorive.spring.boot.starter.entity.JoinSegment;
 import com.gitee.dorive.spring.boot.starter.entity.SqlSegment;
+import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,7 +87,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 
             Map<String, Object> attachments = executedRepository.getAttachments();
-            AliasAdapter aliasAdapter = (AliasAdapter) attachments.get(Keys.ALIAS_ADAPTER);
+            AliasExecutor aliasExecutor = (AliasExecutor) attachments.get(Keys.ALIAS_EXECUTOR);
             TableInfo tableInfo = (TableInfo) attachments.get(Keys.TABLE_INFO);
 
             String tableName = tableInfo.getTableName();
@@ -94,7 +95,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             letter = (char) (letter + 1);
 
             Example example = repositoryObj.newExampleByCoating(context, coating);
-            aliasAdapter.adapt(example);
+            aliasExecutor.convert(example);
 
             boolean dirtyQuery = example.isDirtyQuery();
             anyDirtyQuery = anyDirtyQuery || dirtyQuery;

@@ -31,12 +31,10 @@ import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.config.RepositoryDefinition;
 import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.impl.executor.AdaptiveExecutor;
 import com.gitee.dorive.core.impl.executor.ChainExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
-import com.gitee.dorive.core.impl.resolver.AdapterResolver;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import lombok.Data;
@@ -48,7 +46,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -63,7 +60,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     private PropChainResolver propChainResolver;
     private DelegateResolver delegateResolver;
-    private AdapterResolver adapterResolver;
 
     private Map<String, CommonRepository> repositoryMap = new LinkedHashMap<>();
     private CommonRepository rootRepository;
@@ -156,7 +152,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     @SuppressWarnings("unchecked")
-    protected AbstractRepository<Object, Object> doNewRepository(EntityDef entityDef, EntityEle entityEle, OperationFactory operationFactory) {
+    private AbstractRepository<Object, Object> doNewRepository(EntityDef entityDef, EntityEle entityEle, OperationFactory operationFactory) {
         Class<?> repositoryClass = entityDef.getRepository();
         Object repository;
         if (repositoryClass == Object.class) {
@@ -166,11 +162,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
         if (repository instanceof DefaultRepository) {
             DefaultRepository defaultRepository = (DefaultRepository) repository;
+            Map<String, Object> attachments = new ConcurrentHashMap<>(8);
             defaultRepository.setEntityDef(entityDef);
             defaultRepository.setEntityEle(entityEle);
             defaultRepository.setOperationFactory(operationFactory);
-            defaultRepository.setExecutor(newExecutor(entityDef, entityEle));
-            defaultRepository.setAttachments(Collections.emptyMap());
+            defaultRepository.setExecutor(newExecutor(entityDef, entityEle, attachments));
+            defaultRepository.setAttachments(attachments);
         }
         return (AbstractRepository<Object, Object>) repository;
     }
@@ -188,7 +185,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     private Executor newExecutor(CommonRepository rootRepository) {
         delegateResolver = new DelegateResolver(this);
-        adapterResolver = new AdapterResolver(this);
 
         EntityHandler entityHandler = new BatchEntityHandler(this, rootRepository.getOperationFactory());
         processEntityClass(entityHandler);
@@ -197,14 +193,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             entityHandler = new AdaptiveEntityHandler(this, entityHandler);
         }
 
-        Executor executor = new ChainExecutor(this, entityHandler);
-        if (adapterResolver.isAdaptive()) {
-            executor = new AdaptiveExecutor(this, executor);
-        }
-        return executor;
+        return new ChainExecutor(this, entityHandler);
     }
 
-    protected abstract Executor newExecutor(EntityDef entityDef, EntityEle entityEle);
+    protected abstract Executor newExecutor(EntityDef entityDef, EntityEle entityEle, Map<String, Object> attachments);
 
     protected abstract AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository);
 

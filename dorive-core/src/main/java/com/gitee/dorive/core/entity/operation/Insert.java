@@ -17,6 +17,11 @@
 
 package com.gitee.dorive.core.entity.operation;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Insert extends Operation {
 
     public Insert(int type, Object entity) {

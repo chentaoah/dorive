@@ -15,51 +15,67 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.impl;
+package com.gitee.dorive.spring.boot.starter.impl.executor;
 
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.core.api.common.Adapter;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class AliasAdapter implements Adapter {
+@EqualsAndHashCode(callSuper = true)
+public class AliasExecutor extends AbstractExecutor {
 
     private EntityEle entityEle;
+    private Executor executor;
 
     @Override
-    public void adapt(Context context, Operation operation) {
+    public Result<Object> executeQuery(Context context, Query query) {
+        Example example = query.getExample();
+        if (example != null) {
+            if (example instanceof UnionExample) {
+                convert((UnionExample) example);
+            } else {
+                convert(example);
+            }
+        }
+        return executor.executeQuery(context, query);
+    }
+
+    @Override
+    public int execute(Context context, Operation operation) {
         if (operation instanceof Condition) {
             Condition condition = (Condition) operation;
             Example example = condition.getExample();
             if (example != null) {
-                if (example instanceof UnionExample) {
-                    adapt((UnionExample) example);
-                } else {
-                    adapt(example);
-                }
+                convert(example);
             }
         }
+        return executor.execute(context, operation);
     }
 
-    public void adapt(UnionExample unionExample) {
+    public void convert(UnionExample unionExample) {
         List<Example> examples = unionExample.getExamples();
         for (Example example : examples) {
-            adapt(example);
+            convert(example);
         }
     }
 
-    public void adapt(Example example) {
+    public void convert(Example example) {
         List<String> selectColumns = example.getSelectColumns();
         if (selectColumns != null && !selectColumns.isEmpty()) {
             selectColumns = entityEle.toAliases(selectColumns);

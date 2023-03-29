@@ -15,22 +15,26 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.adapter;
+package com.gitee.dorive.spring.boot.starter.entity;
 
-import com.gitee.dorive.core.api.common.Adapter;
-import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.api.entity.def.AdapterDef;
-import com.gitee.dorive.core.entity.operation.Operation;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.Data;
 
+import java.util.List;
+import java.util.Map;
+
 @Data
-public class DefaultAdapter implements Adapter {
+public class QueryResult {
 
-    private AdapterDef adapterDef;
+    private Page<Map<String, Object>> page;
+    private List<Map<String, Object>> resultMaps;
 
-    @Override
-    public void adapt(Context context, Operation operation) {
-        // ignore
+    public QueryResult(Page<Map<String, Object>> page) {
+        this.page = page;
+    }
+
+    public QueryResult(List<Map<String, Object>> resultMaps) {
+        this.resultMaps = resultMaps;
     }
 
 }
