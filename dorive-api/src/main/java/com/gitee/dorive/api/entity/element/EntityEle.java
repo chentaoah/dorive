@@ -74,7 +74,7 @@ public abstract class EntityEle {
     }
 
     public String toAlias(String property) {
-        return aliasMap.get(property);
+        return aliasMap.getOrDefault(property, property);
     }
 
     public List<String> toAliases(List<String> properties) {
