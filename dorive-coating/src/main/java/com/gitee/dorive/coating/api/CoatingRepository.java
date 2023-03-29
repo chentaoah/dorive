@@ -18,11 +18,12 @@
 package com.gitee.dorive.coating.api;
 
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.repository.ListableRepository;
 import com.gitee.dorive.core.entity.executor.Page;
 
 import java.util.List;
 
-public interface CoatingRepository<E, PK> {
+public interface CoatingRepository<E, PK> extends ListableRepository<E, PK> {
 
     List<E> selectByCoating(Context context, Object coating);
 
