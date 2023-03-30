@@ -17,14 +17,10 @@
 
 package com.gitee.dorive.coating.entity;
 
-import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.coating.entity.def.PropertyDef;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.impl.binder.ContextBinder;
-import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -46,16 +42,6 @@ public class RepositoryObj {
                 String field = propertyDef.getField();
                 String operator = propertyDef.getOperator();
                 example.addCriterion(new Criterion(field, operator, fieldValue));
-            }
-        }
-        CommonRepository definedRepository = mergedRepository.getDefinedRepository();
-        BinderResolver binderResolver = definedRepository.getBinderResolver();
-        for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
-            Object boundValue = contextBinder.getBoundValue(context, null);
-            if (boundValue != null) {
-                BindingDef bindingDef = contextBinder.getBindingDef();
-                String field = bindingDef.getField();
-                example.eq(field, boundValue);
             }
         }
         return example;
