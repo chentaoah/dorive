@@ -25,4 +25,5 @@ import lombok.Data;
 public class TableInfo {
     private String tableName;
     private String tableSql;
+    private String alterSql;
 }

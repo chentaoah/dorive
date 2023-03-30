@@ -52,8 +52,10 @@ public class TableGenerator {
         if (tableInfos != null) {
             List<String> tableNames = tableInfos.stream().map(TableInfo::getTableName).collect(Collectors.toList());
             List<String> tableSqls = tableInfos.stream().map(TableInfo::getTableSql).collect(Collectors.toList());
+            List<String> alterSqls = tableInfos.stream().map(TableInfo::getAlterSql).collect(Collectors.toList());
             System.out.println(StrUtil.join(", ", tableNames) + "\n");
             System.out.println(StrUtil.join("\n\n", tableSqls));
+            System.out.println(StrUtil.join("\n\n", alterSqls));
         }
     }
 
@@ -62,8 +64,10 @@ public class TableGenerator {
         if (tableInfos != null) {
             List<String> tableNames = tableInfos.stream().map(TableInfo::getTableName).collect(Collectors.toList());
             List<String> tableSqls = tableInfos.stream().map(TableInfo::getTableSql).collect(Collectors.toList());
+            List<String> alterSqls = tableInfos.stream().map(TableInfo::getAlterSql).collect(Collectors.toList());
             System.out.println(StrUtil.join(", ", tableNames) + "\n");
             FileUtil.writeString(StrUtil.join("\n\n", tableSqls), filePath, StandardCharsets.UTF_8);
+            System.out.println(StrUtil.join("\n\n", alterSqls));
         }
     }
 

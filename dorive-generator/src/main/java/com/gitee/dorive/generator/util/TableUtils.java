@@ -42,9 +42,11 @@ public class TableUtils {
     public static TableInfo newTableInfo(String tablePrefix, ClassVo classVo) {
         String tableName = tablePrefix + "_" + StrUtil.toUnderlineCase(classVo.getName());
         List<String> properties = new ArrayList<>();
+        List<String> alterProperties = new ArrayList<>();
         List<String> tableIndexes = new ArrayList<>();
 
         List<FieldVo> fieldVos = classVo.getFieldVos();
+        String lastColumn = null;
         for (FieldVo fieldVo : fieldVos) {
             if (fieldVo.isAnnotationPresent(Entity.class)) {
                 continue;
@@ -55,51 +57,59 @@ public class TableUtils {
             String name = fieldVo.getName();
             String column = StrUtil.toUnderlineCase(name);
 
-            if (!name.equals("id") && name.endsWith("Id")) {
-                tableIndexes.add("create index idx_" + column + " on " + tableName + " (" + column + ");");
+            if ("id".equals(name)) {
+                if (Integer.class.getTypeName().equals(type)) {
+                    properties.add("id int unsigned auto_increment comment '主键' primary key");
+
+                } else if (Long.class.getTypeName().equals(type)) {
+                    properties.add("id bigint unsigned auto_increment comment '主键' primary key");
+                }
             }
 
+            String property = null;
             switch (name) {
-                case "id":
-                    if (Integer.class.getTypeName().equals(type)) {
-                        properties.add("id int unsigned auto_increment comment '主键' primary key");
-
-                    } else if (Long.class.getTypeName().equals(type)) {
-                        properties.add("id bigint unsigned auto_increment comment '主键' primary key");
-                    }
-                    break;
-
                 case "createUser":
-                    properties.add("create_user varchar(255) null comment '创建者'");
+                    property = "create_user varchar(255) null comment '创建者'";
                     break;
 
                 case "createTime":
-                    properties.add("create_time timestamp default CURRENT_TIMESTAMP null comment '创建时间'");
+                    property = "create_time timestamp default CURRENT_TIMESTAMP null comment '创建时间'";
                     break;
 
                 case "updateUser":
-                    properties.add("update_user varchar(255) null comment '更新者'");
+                    property = "update_user varchar(255) null comment '更新者'";
                     break;
 
                 case "updateTime":
-                    properties.add("update_time timestamp null on update CURRENT_TIMESTAMP comment '更新时间'");
+                    property = "update_time timestamp null on update CURRENT_TIMESTAMP comment '更新时间'";
                     break;
 
                 default:
                     String suffix = StringUtils.isNotBlank(comment) ? " comment '" + comment + "'" : "";
                     if (Integer.class.getTypeName().equals(type)) {
-                        properties.add(column + " int null" + suffix);
+                        property = column + " int null" + suffix;
 
                     } else if (Long.class.getTypeName().equals(type)) {
-                        properties.add(column + " bigint null" + suffix);
+                        property = column + " bigint null" + suffix;
 
                     } else if (String.class.getTypeName().equals(type)) {
-                        properties.add(column + " varchar(255) null" + suffix);
+                        property = column + " varchar(255) null" + suffix;
 
                     } else if (Date.class.getTypeName().equals(type)) {
-                        properties.add(column + " timestamp null" + suffix);
+                        property = column + " timestamp null" + suffix;
                     }
                     break;
+            }
+
+            if (property != null) {
+                properties.add(property);
+                alterProperties.add("alter table " + tableName + " add " + property + (lastColumn != null ? " after " + lastColumn : "") + ";");
+            }
+
+            lastColumn = column;
+
+            if (!name.equals("id") && name.endsWith("Id")) {
+                tableIndexes.add("create index idx_" + column + " on " + tableName + " (" + column + ");");
             }
         }
 
@@ -113,7 +123,9 @@ public class TableUtils {
             tableSql = tableSql + "\n" + StrUtil.join("\n", tableIndexes);
         }
 
-        return new TableInfo(tableName, tableSql);
+        String alterSql = StrUtil.join("\n", alterProperties);
+
+        return new TableInfo(tableName, tableSql, alterSql);
     }
 
 }
