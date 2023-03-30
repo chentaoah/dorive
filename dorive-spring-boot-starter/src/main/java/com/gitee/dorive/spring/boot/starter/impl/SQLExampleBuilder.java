@@ -84,6 +84,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
+            String relativeAccessPath = mergedRepository.isMerged() ? absoluteAccessPath + "/" : absoluteAccessPath;
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 
             Map<String, Object> attachments = executedRepository.getAttachments();
@@ -102,16 +103,16 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
             Set<String> joinTableNames = new HashSet<>(8);
 
-            if ("/".equals(absoluteAccessPath)) {
+            if ("/".equals(relativeAccessPath)) {
                 String sql = String.format("SELECT %s.id FROM %s %s ", tableAlias, tableName, tableAlias);
                 rootSqlSegment = new SqlSegment(tableName, tableAlias, sql, Collections.emptyList(), example, true, dirtyQuery, joinTableNames);
-                sqlSegmentMap.put(absoluteAccessPath, rootSqlSegment);
+                sqlSegmentMap.put(relativeAccessPath, rootSqlSegment);
 
             } else {
                 String sql = String.format("LEFT JOIN %s %s ON ", tableName, tableAlias);
-                List<JoinSegment> joinSegments = newJoinSegments(sqlSegmentMap, lastAccessPath, absoluteAccessPath, binderResolver, tableAlias);
+                List<JoinSegment> joinSegments = newJoinSegments(sqlSegmentMap, lastAccessPath, relativeAccessPath, binderResolver, tableAlias);
                 SqlSegment sqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, example, false, dirtyQuery, joinTableNames);
-                sqlSegmentMap.put(absoluteAccessPath, sqlSegment);
+                sqlSegmentMap.put(relativeAccessPath, sqlSegment);
             }
         }
 
@@ -160,7 +161,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         return example;
     }
 
-    private List<JoinSegment> newJoinSegments(Map<String, SqlSegment> sqlSegmentMap, String lastAccessPath, String absoluteAccessPath, BinderResolver binderResolver, String tableAlias) {
+    private List<JoinSegment> newJoinSegments(Map<String, SqlSegment> sqlSegmentMap, String lastAccessPath, String relativeAccessPath, BinderResolver binderResolver, String tableAlias) {
         List<PropertyBinder> propertyBinders = binderResolver.getPropertyBinders();
         List<JoinSegment> joinSegments = new ArrayList<>(propertyBinders.size());
 
@@ -171,7 +172,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             SqlSegment sqlSegment = sqlSegmentMap.get(targetAccessPath);
             if (sqlSegment != null) {
                 Set<String> targetAccessPaths = sqlSegment.getTargetAccessPaths();
-                targetAccessPaths.add(absoluteAccessPath);
+                targetAccessPaths.add(relativeAccessPath);
 
                 String joinTableName = sqlSegment.getTableName();
                 String joinTableAlias = sqlSegment.getTableAlias();
