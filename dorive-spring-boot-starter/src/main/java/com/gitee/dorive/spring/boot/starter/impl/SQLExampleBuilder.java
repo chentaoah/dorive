@@ -104,7 +104,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             Set<String> joinTableNames = new HashSet<>(8);
 
             if ("/".equals(relativeAccessPath)) {
-                String sql = String.format("SELECT %s.id FROM %s %s ", tableAlias, tableName, tableAlias);
+                String sql = String.format("SELECT DISTINCT %s.id FROM %s %s ", tableAlias, tableName, tableAlias);
                 rootSqlSegment = new SqlSegment(tableName, tableAlias, sql, Collections.emptyList(), example, true, dirtyQuery, joinTableNames);
                 sqlSegmentMap.put(relativeAccessPath, rootSqlSegment);
 
