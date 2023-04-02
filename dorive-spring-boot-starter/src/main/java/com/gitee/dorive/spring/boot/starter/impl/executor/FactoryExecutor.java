@@ -102,6 +102,7 @@ public class FactoryExecutor extends AbstractExecutor {
             Object primaryKey = BeanUtil.getFieldValue(persistent, "id");
             entityEle.getPkProxy().setValue(entity, primaryKey);
         }
+        operation.setEntity(entity);
         return totalCount;
     }
 

@@ -19,21 +19,20 @@ package com.gitee.dorive.event.entity;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.event.repository.EventRepository;
+import com.gitee.dorive.event.impl.EventExecutor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
 
 @Getter
 @Setter
-public class RepositoryEvent extends ApplicationEvent {
+public class ExecutorEvent extends ApplicationEvent {
 
-    private String methodName;
     private Context context;
     private Operation operation;
 
-    public RepositoryEvent(EventRepository eventRepository) {
-        super(eventRepository);
+    public ExecutorEvent(EventExecutor eventExecutor) {
+        super(eventExecutor);
     }
 
 }

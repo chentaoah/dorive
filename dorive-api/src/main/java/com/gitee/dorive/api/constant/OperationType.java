@@ -15,22 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.operation;
+package com.gitee.dorive.api.constant;
 
-import com.gitee.dorive.api.constant.OperationType;
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class Insert extends Operation {
-
-    public Insert(int type, Object entity) {
-        super(type, entity);
-    }
-
-    public Insert(Object entity) {
-        super(OperationType.INSERT, entity);
-    }
-
+public interface OperationType {
+    int NONE = 0x00000000;
+    int SELECT = 0x00000001;
+    int INSERT = 0x00000002;
+    int UPDATE = 0x00000004;
+    int INSERT_OR_UPDATE = INSERT | UPDATE;
+    int DELETE = 0x00000008;
+    int UPDATE_OR_DELETE = UPDATE | DELETE;
+    int INSERT_OR_UPDATE_OR_DELETE = INSERT | UPDATE | DELETE;
+    int FORCE_IGNORE = 0x00000010;
+    int FORCE_INSERT = 0x00000010 | INSERT;
+    int IGNORE_ROOT = 0x00000020;
+    int INCLUDE_ROOT = 0x00000040;
 }

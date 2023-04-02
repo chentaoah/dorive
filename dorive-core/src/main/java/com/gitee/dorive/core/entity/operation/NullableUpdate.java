@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.core.entity.operation;
 
+import com.gitee.dorive.api.constant.OperationType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,6 +31,10 @@ public class NullableUpdate extends Update {
 
     public NullableUpdate(int type, Object entity) {
         super(type, entity);
+    }
+
+    public NullableUpdate(Object entity) {
+        super(OperationType.UPDATE, entity);
     }
 
 }

@@ -17,10 +17,20 @@
 
 package com.gitee.dorive.core.entity.operation;
 
+import com.gitee.dorive.api.constant.OperationType;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Query extends Condition {
 
     public Query(int type, Object entity) {
         super(type, entity);
+    }
+
+    public Query(Object entity) {
+        super(OperationType.SELECT, entity);
     }
 
     public boolean withoutPage() {

@@ -18,6 +18,7 @@
 package com.gitee.dorive.core.impl.handler;
 
 import com.gitee.dorive.api.api.PropProxy;
+import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
@@ -26,7 +27,6 @@ import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
-import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
@@ -60,7 +60,7 @@ public class BatchEntityHandler implements EntityHandler {
         UnionExample unionExample = newUnionExample(repository, context, rootEntities);
         if (unionExample.isDirtyQuery()) {
             Query query = operationFactory.buildQuery(context, unionExample);
-            query.setType(query.getType() | Operation.INCLUDE_ROOT);
+            query.setType(query.getType() | OperationType.INCLUDE_ROOT);
             Result<Object> result = repository.executeQuery(context, query);
             if (result instanceof EntityIndex) {
                 setValueForRootEntities(repository, rootEntities, (EntityIndex) result);
