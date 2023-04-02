@@ -17,14 +17,15 @@
 
 package com.gitee.dorive.event.repository;
 
+import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.repository.AbstractGenericRepository;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.core.repository.DefaultRepository;
 import com.gitee.dorive.core.repository.ProxyRepository;
 import com.gitee.dorive.event.annotation.EnableEvent;
+import com.gitee.dorive.event.impl.EventExecutor;
 import org.springframework.core.annotation.AnnotationUtils;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepository<E, PK> {
 
@@ -46,13 +47,10 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
             }
             if (innerRepository instanceof DefaultRepository) {
                 DefaultRepository defaultRepository = (DefaultRepository) innerRepository;
-                EventRepository eventRepository = new EventRepository(getApplicationContext());
-                eventRepository.setEntityDef(defaultRepository.getEntityDef());
-                eventRepository.setEntityEle(defaultRepository.getEntityEle());
-                eventRepository.setOperationFactory(defaultRepository.getOperationFactory());
-                eventRepository.setProxyRepository(repository);
-                eventRepository.setAttachments(new ConcurrentHashMap<>(defaultRepository.getAttachments()));
-                return eventRepository;
+                EntityEle entityEle = defaultRepository.getEntityEle();
+                Executor executor = defaultRepository.getExecutor();
+                executor = new EventExecutor(getApplicationContext(), entityEle, executor);
+                defaultRepository.setExecutor(executor);
             }
         }
         return repository;

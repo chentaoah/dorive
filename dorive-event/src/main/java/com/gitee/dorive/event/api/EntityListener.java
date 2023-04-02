@@ -17,10 +17,10 @@
 
 package com.gitee.dorive.event.api;
 
-import com.gitee.dorive.event.entity.RepositoryEvent;
+import com.gitee.dorive.event.entity.ExecutorEvent;
 
 public interface EntityListener {
 
-    void onApplicationEvent(RepositoryEvent repositoryEvent);
+    void onApplicationEvent(ExecutorEvent executorEvent);
 
 }

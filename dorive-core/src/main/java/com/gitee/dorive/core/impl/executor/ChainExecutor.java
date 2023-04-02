@@ -18,14 +18,16 @@
 package com.gitee.dorive.core.impl.executor;
 
 import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.common.Binder;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.context.Selector;
+import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -56,7 +58,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
         Selector selector = context.getSelector();
         CommonRepository rootRepository = repository.getRootRepository();
-        boolean isIncludeRoot = (query.getType() & Operation.INCLUDE_ROOT) == Operation.INCLUDE_ROOT;
+        boolean isIncludeRoot = (query.getType() & OperationType.INCLUDE_ROOT) == OperationType.INCLUDE_ROOT;
 
         if (selector.matches(context, rootRepository) || isIncludeRoot) {
             int totalCount = 0;
@@ -83,14 +85,15 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
     @Override
     public int execute(Context context, Operation operation) {
-        int expectedOperation = operation.getType();
+        int expectedType = operation.getType();
 
-        boolean isInsertContext = (expectedOperation & Operation.INSERT) == Operation.INSERT;
-        boolean isIgnoreRoot = (expectedOperation & Operation.IGNORE_ROOT) == Operation.IGNORE_ROOT;
-        boolean isIncludeRoot = (expectedOperation & Operation.INCLUDE_ROOT) == Operation.INCLUDE_ROOT;
+        int realExpectedType = expectedType & OperationType.INSERT_OR_UPDATE_OR_DELETE;
+        int expectedIgnoreRoot = expectedType | OperationType.IGNORE_ROOT;
+        int expectedIncludeRoot = expectedType | OperationType.INCLUDE_ROOT;
 
-        int expectedIgnoreRoot = expectedOperation | Operation.IGNORE_ROOT;
-        int expectedIncludeRoot = expectedOperation | Operation.INCLUDE_ROOT;
+        boolean isInsertContext = (expectedType & OperationType.INSERT) == OperationType.INSERT;
+        boolean isIgnoreRoot = (expectedType & OperationType.IGNORE_ROOT) == OperationType.IGNORE_ROOT;
+        boolean isIncludeRoot = (expectedType & OperationType.INCLUDE_ROOT) == OperationType.INCLUDE_ROOT;
 
         Object rootEntity = operation.getEntity();
         Assert.notNull(rootEntity, "The rootEntity cannot be null!");
@@ -109,6 +112,9 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
             boolean isMatch = selector.matches(context, repository) || (isIncludeRoot && root);
             boolean isAggregated = repository.isAggregated();
+            if (!isMatch && !isAggregated) {
+                continue;
+            }
 
             PropChain anchorPoint = repository.getAnchorPoint();
             Object targetEntity = root ? rootEntity : anchorPoint.getValue(rootEntity);
@@ -120,59 +126,77 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                     collection = Collections.singletonList(targetEntity);
                 }
                 for (Object entity : collection) {
-                    int operationType = Operation.NONE;
+                    int operationType = OperationType.NONE;
                     boolean operable = false;
                     if (isMatch) {
-                        operationType = mergeOperationType(expectedOperation, repository, entity);
-                        operable = (operationType & Operation.INSERT_OR_UPDATE_OR_DELETE) > 0;
-                        if ((operationType & Operation.INSERT) == Operation.INSERT) {
-                            getBoundValue(context, rootEntity, repository, entity);
+                        operationType = mergeOperationType(realExpectedType, repository, entity);
+                        operable = (operationType & OperationType.INSERT_OR_UPDATE_OR_DELETE) > 0;
+                        if ((operationType & OperationType.INSERT) == OperationType.INSERT) {
+                            getBoundValue(repository, context, rootEntity, entity);
                         }
                     }
                     if (isAggregated) {
-                        Operation newOperation = new Operation(operable ? expectedIncludeRoot : expectedIgnoreRoot, entity);
+                        Operation newOperation = newOperation(realExpectedType, repository, context, entity);
+                        newOperation.setType(operable ? expectedIncludeRoot : expectedIgnoreRoot);
                         totalCount += repository.execute(context, newOperation);
 
                     } else if (operable) {
-                        if (root && expectedOperation == operationType) {
+                        if (root && realExpectedType == operationType) {
                             totalCount += repository.execute(context, operation);
                         } else {
-                            totalCount += doExecute(context, repository, entity, operationType);
+                            totalCount += doExecute(operationType, repository, context, entity);
                         }
                     }
                 }
                 if (isInsertContext && collection.size() == 1) {
-                    setBoundId(context, rootEntity, repository, targetEntity);
+                    setBoundId(repository, context, rootEntity, targetEntity);
                 }
             }
         }
         return totalCount;
     }
 
-    private int mergeOperationType(int expectedOperation, CommonRepository repository, Object entity) {
-        if (expectedOperation == Operation.FORCE_INSERT) {
-            return Operation.INSERT;
+    private int mergeOperationType(int realExpectedType, CommonRepository repository, Object entity) {
+        if (realExpectedType == OperationType.FORCE_INSERT) {
+            return OperationType.INSERT;
         } else {
             Object primaryKey = repository.getPrimaryKey(entity);
-            int operationType = primaryKey == null ? Operation.INSERT : Operation.UPDATE_OR_DELETE;
-            return expectedOperation & operationType;
+            int operationType = primaryKey == null ? OperationType.INSERT : OperationType.UPDATE_OR_DELETE;
+            return realExpectedType & operationType;
         }
     }
 
-    private int doExecute(Context context, CommonRepository repository, Object entity, int operationType) {
-        if (operationType == Operation.INSERT) {
+    private Operation newOperation(int realExpectedType, CommonRepository repository, Context context, Object entity) {
+        OperationFactory operationFactory = repository.getOperationFactory();
+        if (realExpectedType == OperationType.INSERT) {
+            return operationFactory.buildInsert(context, entity);
+
+        } else if (realExpectedType == OperationType.UPDATE) {
+            return operationFactory.buildUpdate(context, entity);
+
+        } else if (realExpectedType == OperationType.INSERT_OR_UPDATE) {
+            return new Operation(OperationType.INSERT_OR_UPDATE, entity);
+
+        } else if (realExpectedType == OperationType.DELETE) {
+            return operationFactory.buildDelete(context, entity);
+        }
+        throw new RuntimeException("Unsupported type!");
+    }
+
+    private int doExecute(int operationType, CommonRepository repository, Context context, Object entity) {
+        if (operationType == OperationType.INSERT) {
             return repository.insert(context, entity);
 
-        } else if (operationType == Operation.UPDATE) {
+        } else if (operationType == OperationType.UPDATE) {
             return repository.update(context, entity);
 
-        } else if (operationType == Operation.DELETE) {
+        } else if (operationType == OperationType.DELETE) {
             return repository.delete(context, entity);
         }
         return 0;
     }
 
-    private void getBoundValue(Context context, Object rootEntity, CommonRepository repository, Object entity) {
+    private void getBoundValue(CommonRepository repository, Context context, Object rootEntity, Object entity) {
         for (Binder binder : repository.getBinderResolver().getBoundValueBinders()) {
             Object fieldValue = binder.getFieldValue(context, entity);
             if (fieldValue == null) {
@@ -184,7 +208,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         }
     }
 
-    private void setBoundId(Context context, Object rootEntity, CommonRepository repository, Object entity) {
+    private void setBoundId(CommonRepository repository, Context context, Object rootEntity, Object entity) {
         Binder binder = repository.getBinderResolver().getBoundIdBinder();
         if (binder != null) {
             Object boundValue = binder.getBoundValue(context, rootEntity);

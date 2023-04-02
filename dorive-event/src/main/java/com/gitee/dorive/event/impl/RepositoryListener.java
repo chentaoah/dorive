@@ -17,10 +17,10 @@
 
 package com.gitee.dorive.event.impl;
 
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.event.annotation.Listener;
 import com.gitee.dorive.event.api.EntityListener;
-import com.gitee.dorive.event.entity.RepositoryEvent;
-import com.gitee.dorive.event.repository.EventRepository;
+import com.gitee.dorive.event.entity.ExecutorEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public class RepositoryListener implements ApplicationListener<RepositoryEvent>, ApplicationContextAware, InitializingBean {
+public class RepositoryListener implements ApplicationListener<ExecutorEvent>, ApplicationContextAware, InitializingBean {
 
     private ApplicationContext applicationContext;
     private final Map<Class<?>, List<EntityListener>> classEventListenersMap = new LinkedHashMap<>();
@@ -62,9 +62,10 @@ public class RepositoryListener implements ApplicationListener<RepositoryEvent>,
     }
 
     @Override
-    public void onApplicationEvent(RepositoryEvent event) {
-        EventRepository repository = (EventRepository) event.getSource();
-        Class<?> entityClass = repository.getEntityClass();
+    public void onApplicationEvent(ExecutorEvent event) {
+        EventExecutor executor = (EventExecutor) event.getSource();
+        EntityEle entityEle = executor.getEntityEle();
+        Class<?> entityClass = entityEle.getGenericType();
         List<EntityListener> entityListeners = classEventListenersMap.get(entityClass);
         if (entityListeners != null && !entityListeners.isEmpty()) {
             for (EntityListener entityListener : entityListeners) {
