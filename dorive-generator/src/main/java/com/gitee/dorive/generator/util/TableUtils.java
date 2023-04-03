@@ -56,18 +56,18 @@ public class TableUtils {
             String type = fieldVo.getType();
             String name = fieldVo.getName();
             String column = StrUtil.toUnderlineCase(name);
-
-            if ("id".equals(name)) {
-                if (Integer.class.getTypeName().equals(type)) {
-                    properties.add("id int unsigned auto_increment comment '主键' primary key");
-
-                } else if (Long.class.getTypeName().equals(type)) {
-                    properties.add("id bigint unsigned auto_increment comment '主键' primary key");
-                }
-            }
-
+            
             String property = null;
             switch (name) {
+                case "id":
+                    if (Integer.class.getTypeName().equals(type)) {
+                        properties.add("id int unsigned auto_increment comment '主键' primary key");
+
+                    } else if (Long.class.getTypeName().equals(type)) {
+                        properties.add("id bigint unsigned auto_increment comment '主键' primary key");
+                    }
+                    break;
+
                 case "createUser":
                     property = "create_user varchar(255) null comment '创建者'";
                     break;
