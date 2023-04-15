@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.core.entity.operation;
 
-import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.entity.executor.Example;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,10 +30,6 @@ public class Condition extends Operation {
 
     public Condition(int type, Object entity) {
         super(type, entity);
-    }
-
-    public void check() {
-        Assert.isTrue(primaryKey != null || example != null, "The condition cannot be null!");
     }
 
 }
