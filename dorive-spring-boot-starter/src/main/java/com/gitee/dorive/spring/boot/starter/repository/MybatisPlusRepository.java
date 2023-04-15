@@ -102,11 +102,9 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
                 }
             }
             for (TableFieldInfo tableFieldInfo : fieldList) {
-                String property = tableFieldInfo.getProperty();
-                String column = tableFieldInfo.getColumn();
-                String field = aliasFieldMapping.get(column);
+                String field = aliasFieldMapping.get(tableFieldInfo.getColumn());
                 if (field != null) {
-                    fieldPropMapping.put(field, property);
+                    fieldPropMapping.put(field, tableFieldInfo.getProperty());
                 }
             }
             defaultEntityFactory.setFieldPropMapping(fieldPropMapping);
