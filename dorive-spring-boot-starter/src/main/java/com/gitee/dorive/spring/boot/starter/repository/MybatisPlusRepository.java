@@ -32,6 +32,7 @@ import com.gitee.dorive.spring.boot.starter.api.Keys;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
 import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;
 import com.gitee.dorive.spring.boot.starter.impl.executor.FactoryExecutor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -78,19 +79,27 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
             entityFactory = (EntityFactory) getApplicationContext().getBean(factoryClass);
         }
         if (entityFactory instanceof DefaultEntityFactory) {
+            DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
+            defaultEntityFactory.setEntityEle(entityEle);
+            defaultEntityFactory.setPojoClass(pojoClass);
+
+            Map<String, String> aliasFieldMapping = entityEle.newAliasFieldMapping();
+            defaultEntityFactory.setAliasFieldMapping(aliasFieldMapping);
+
             TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
             assert tableInfo != null;
             attachments.put(Keys.TABLE_INFO, tableInfo);
 
-            Map<String, String> aliasFieldMapping = entityEle.newAliasFieldMapping();
-
-            DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
-            defaultEntityFactory.setEntityEle(entityEle);
-            defaultEntityFactory.setPojoClass(pojoClass);
-            defaultEntityFactory.setAliasFieldMapping(aliasFieldMapping);
-
             Map<String, String> fieldPropMapping = new LinkedHashMap<>();
 
+            String keyColumn = tableInfo.getKeyColumn();
+            String keyProperty = tableInfo.getKeyProperty();
+            if (StringUtils.isNotBlank(keyColumn) && StringUtils.isNotBlank(keyProperty)) {
+                String field = aliasFieldMapping.get(keyColumn);
+                if (field != null) {
+                    fieldPropMapping.put(field, keyProperty);
+                }
+            }
             List<TableFieldInfo> fieldList = tableInfo.getFieldList();
             for (TableFieldInfo tableFieldInfo : fieldList) {
                 String property = tableFieldInfo.getProperty();
