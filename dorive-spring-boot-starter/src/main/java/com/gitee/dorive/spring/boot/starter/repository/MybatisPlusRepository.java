@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.spring.boot.starter.repository;
 
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
@@ -67,6 +68,8 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
             }
         }
 
+        Assert.notNull(pojoClass, "The class of pojo cannot be null! source: {}", mapperClass);
+
         Class<?> factoryClass = entityDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
@@ -75,35 +78,35 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
             entityFactory = (EntityFactory) getApplicationContext().getBean(factoryClass);
         }
         if (entityFactory instanceof DefaultEntityFactory) {
+            TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
+            assert tableInfo != null;
+            attachments.put(Keys.TABLE_INFO, tableInfo);
+
+            Map<String, String> aliasFieldMapping = entityEle.newAliasFieldMapping();
+
             DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
             defaultEntityFactory.setEntityEle(entityEle);
             defaultEntityFactory.setPojoClass(pojoClass);
-            defaultEntityFactory.setAliasPropMapping(entityEle.newAliasPropMap());
-            if (pojoClass != null) {
-                Map<String, String> aliasPropMapping = entityEle.newAliasPropMap();
-                Map<String, String> propPojoMapping = new LinkedHashMap<>();
-                List<TableFieldInfo> fieldList = TableInfoHelper.getTableInfo(pojoClass).getFieldList();
-                for (TableFieldInfo tableFieldInfo : fieldList) {
-                    String property = tableFieldInfo.getProperty();
-                    String column = tableFieldInfo.getColumn();
-                    String prop = aliasPropMapping.get(column);
-                    if (prop != null) {
-                        propPojoMapping.put(prop, property);
-                    }
-                }
-                defaultEntityFactory.setPropPojoMapping(propPojoMapping);
-            }
-        }
+            defaultEntityFactory.setAliasFieldMapping(aliasFieldMapping);
 
-        TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
-        attachments.put(Keys.TABLE_INFO, tableInfo);
+            Map<String, String> fieldPropMapping = new LinkedHashMap<>();
+
+            List<TableFieldInfo> fieldList = tableInfo.getFieldList();
+            for (TableFieldInfo tableFieldInfo : fieldList) {
+                String property = tableFieldInfo.getProperty();
+                String column = tableFieldInfo.getColumn();
+                String field = aliasFieldMapping.get(column);
+                if (field != null) {
+                    fieldPropMapping.put(field, property);
+                }
+            }
+            defaultEntityFactory.setFieldPropMapping(fieldPropMapping);
+        }
 
         Executor executor = new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass);
         executor = new FactoryExecutor(entityEle, entityFactory, executor);
-
         executor = new AliasExecutor(entityEle, executor);
         attachments.put(Keys.ALIAS_EXECUTOR, executor);
-
         return executor;
     }
 

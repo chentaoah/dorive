@@ -22,7 +22,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.api.PropProxy;
-import com.gitee.dorive.api.entity.def.AdapterDef;
 import com.gitee.dorive.api.entity.def.AliasDef;
 import com.gitee.dorive.api.impl.factory.PropProxyFactory;
 import lombok.Data;
@@ -44,7 +43,6 @@ public class EntityType extends EntityEle {
 
     private Class<?> type;
     private String name;
-    private AdapterDef adapterDef;
     private Map<String, EntityField> entityFields = new LinkedHashMap<>();
 
     public static synchronized EntityType getInstance(Class<?> type) {
@@ -63,7 +61,6 @@ public class EntityType extends EntityEle {
 
         this.type = type;
         this.name = type.getName();
-        this.adapterDef = AdapterDef.fromElement(type);
         for (Field field : ReflectUtil.getFields(type)) {
             if (!Modifier.isStatic(field.getModifiers())) {
                 EntityField entityField = new EntityField(field);
