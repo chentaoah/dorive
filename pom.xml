@@ -36,7 +36,6 @@
         <module>dorive-event</module>
         <module>dorive-coating</module>
         <module>dorive-ref</module>
-        <module>dorive-web</module>
         <module>dorive-spring-boot-starter</module>
     </modules>
 
@@ -51,7 +50,7 @@
         <dependencies>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
+                <artifactId>spring-boot-starter</artifactId>
                 <version>2.7.8</version>
             </dependency>
             <dependency>
