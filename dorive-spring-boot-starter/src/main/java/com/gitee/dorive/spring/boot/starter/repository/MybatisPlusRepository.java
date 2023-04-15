@@ -71,6 +71,10 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
         Assert.notNull(pojoClass, "The class of pojo cannot be null! source: {}", mapperClass);
 
+        TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
+        assert tableInfo != null;
+        attachments.put(Keys.TABLE_INFO, tableInfo);
+
         Class<?> factoryClass = entityDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
@@ -86,12 +90,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
             Map<String, String> aliasFieldMapping = entityEle.newAliasFieldMapping();
             defaultEntityFactory.setAliasFieldMapping(aliasFieldMapping);
 
-            TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
-            assert tableInfo != null;
-            attachments.put(Keys.TABLE_INFO, tableInfo);
-
             Map<String, String> fieldPropMapping = new LinkedHashMap<>();
-
             String keyColumn = tableInfo.getKeyColumn();
             String keyProperty = tableInfo.getKeyProperty();
             if (StringUtils.isNotBlank(keyColumn) && StringUtils.isNotBlank(keyProperty)) {
