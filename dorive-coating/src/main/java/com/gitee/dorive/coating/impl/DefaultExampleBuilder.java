@@ -20,10 +20,10 @@ package com.gitee.dorive.coating.impl;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.coating.api.ExampleBuilder;
-import com.gitee.dorive.coating.entity.CoatingObj;
+import com.gitee.dorive.coating.entity.CoatingRepositories;
 import com.gitee.dorive.coating.entity.MergedRepository;
-import com.gitee.dorive.coating.entity.RepositoryObj;
-import com.gitee.dorive.coating.impl.resolver.CoatingObjResolver;
+import com.gitee.dorive.coating.entity.PropertyRepository;
+import com.gitee.dorive.coating.impl.resolver.CoatingRepositoriesResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -49,18 +49,18 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
     @Override
     public Example buildExample(Context context, Object coating) {
-        CoatingObjResolver coatingObjResolver = repository.getCoatingObjResolver();
-        Map<Class<?>, CoatingObj> coatingObjMap = coatingObjResolver.getCoatingObjMap();
+        CoatingRepositoriesResolver coatingRepositoriesResolver = repository.getCoatingRepositoriesResolver();
+        Map<String, CoatingRepositories> nameCoatingRepositoriesMap = coatingRepositoriesResolver.getNameCoatingRepositoriesMap();
 
-        CoatingObj coatingObj = coatingObjMap.get(coating.getClass());
-        Assert.notNull(coatingObj, "No coating object exists!");
+        CoatingRepositories coatingRepositories = nameCoatingRepositoriesMap.get(coating.getClass().getName());
+        Assert.notNull(coatingRepositories, "No coating object exists!");
 
         Map<String, RepoCriterion> repoCriterionMap = new LinkedHashMap<>();
-        for (RepositoryObj repositoryObj : coatingObj.getReversedRepositoryObjs()) {
-            Example example = repositoryObj.newExampleByCoating(context, coating);
-            RepoCriterion repoCriterion = new RepoCriterion(repositoryObj, example);
+        for (PropertyRepository propertyRepository : coatingRepositories.getReversedPropertyRepositories()) {
+            Example example = propertyRepository.newExampleByCoating(coating);
+            RepoCriterion repoCriterion = new RepoCriterion(propertyRepository, example);
 
-            MergedRepository mergedRepository = repositoryObj.getMergedRepository();
+            MergedRepository mergedRepository = propertyRepository.getMergedRepository();
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             String relativeAccessPath = mergedRepository.isMerged() ? absoluteAccessPath + "/" : absoluteAccessPath;
             repoCriterionMap.put(relativeAccessPath, repoCriterion);
@@ -77,10 +77,10 @@ public class DefaultExampleBuilder implements ExampleBuilder {
         repoCriterionMap.forEach((accessPath, repoCriterion) -> {
             if ("/".equals(accessPath)) return;
 
-            RepositoryObj repositoryObj = repoCriterion.getRepositoryObj();
+            PropertyRepository propertyRepository = repoCriterion.getPropertyRepository();
             Example example = repoCriterion.getExample();
 
-            MergedRepository mergedRepository = repositoryObj.getMergedRepository();
+            MergedRepository mergedRepository = propertyRepository.getMergedRepository();
             String lastAccessPath = mergedRepository.getLastAccessPath();
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
@@ -149,7 +149,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
     @Data
     @AllArgsConstructor
     public static class RepoCriterion {
-        private RepositoryObj repositoryObj;
+        private PropertyRepository propertyRepository;
         private Example example;
     }
 

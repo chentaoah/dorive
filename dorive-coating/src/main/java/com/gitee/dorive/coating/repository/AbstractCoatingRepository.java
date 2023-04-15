@@ -21,7 +21,7 @@ import com.gitee.dorive.coating.annotation.CoatingScan;
 import com.gitee.dorive.coating.api.CoatingRepository;
 import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.impl.DefaultExampleBuilder;
-import com.gitee.dorive.coating.impl.resolver.CoatingObjResolver;
+import com.gitee.dorive.coating.impl.resolver.CoatingRepositoriesResolver;
 import com.gitee.dorive.coating.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.api.annotation.Repository;
 import com.gitee.dorive.core.api.context.Context;
@@ -45,7 +45,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     private String[] scanPackages;
     private String regex;
     private MergedRepositoryResolver mergedRepositoryResolver;
-    private CoatingObjResolver coatingObjResolver;
+    private CoatingRepositoriesResolver coatingRepositoriesResolver;
     private ExampleBuilder exampleBuilder;
 
     @Override
@@ -59,7 +59,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
             this.regex = StringUtils.isBlank(coatingScan.regex()) ? "^" + getEntityClass().getSimpleName() + ".*" : coatingScan.regex();
 
             this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
-            this.coatingObjResolver = new CoatingObjResolver(this);
+            this.coatingRepositoriesResolver = new CoatingRepositoriesResolver(this);
             if ("default".equals(querier)) {
                 this.exampleBuilder = new DefaultExampleBuilder(this);
             }

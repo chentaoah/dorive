@@ -35,15 +35,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 @Data
-public class CoatingObjResolver {
+public class CoatingRepositoriesResolver {
 
     private static Map<String, List<Class<?>>> scannedClasses = new ConcurrentHashMap<>();
 
     private AbstractCoatingRepository<?, ?> repository;
-    private Map<Class<?>, CoatingObj> coatingObjMap = new ConcurrentHashMap<>();
-    private Map<String, CoatingObj> nameCoatingObjMap = new ConcurrentHashMap<>();
+    private Map<Class<?>, CoatingRepositories> classCoatingRepositoriesMap = new ConcurrentHashMap<>();
+    private Map<String, CoatingRepositories> nameCoatingRepositoriesMap = new ConcurrentHashMap<>();
 
-    public CoatingObjResolver(AbstractCoatingRepository<?, ?> repository) throws Exception {
+    public CoatingRepositoriesResolver(AbstractCoatingRepository<?, ?> repository) throws Exception {
         this.repository = repository;
         resolve();
     }
@@ -99,25 +99,25 @@ public class CoatingObjResolver {
                     }
                 });
 
-                List<RepositoryObj> repositoryObjs = collectRepositoryObjs(belongToPropertyMap, fieldPropertyMap);
-                checkFieldNames(coatingClass, fieldNames, repositoryObjs);
+                List<PropertyRepository> propertyRepositories = collectRepositories(belongToPropertyMap, fieldPropertyMap);
+                checkFieldNames(coatingClass, fieldNames, propertyRepositories);
 
-                List<RepositoryObj> reversedRepositoryObjs = new ArrayList<>(repositoryObjs);
-                Collections.reverse(reversedRepositoryObjs);
+                List<PropertyRepository> reversedPropertyRepositories = new ArrayList<>(propertyRepositories);
+                Collections.reverse(reversedPropertyRepositories);
 
                 CoatingDef coatingDef = CoatingDef.fromElement(coatingClass);
-                CoatingObj coatingObj = new CoatingObj(coatingDef, repositoryObjs, reversedRepositoryObjs, specificProperties);
-                coatingObjMap.put(coatingClass, coatingObj);
-                nameCoatingObjMap.put(coatingClass.getName(), coatingObj);
+                CoatingRepositories coatingRepositories = new CoatingRepositories(coatingDef, propertyRepositories, reversedPropertyRepositories, specificProperties);
+                classCoatingRepositoriesMap.put(coatingClass, coatingRepositories);
+                nameCoatingRepositoriesMap.put(coatingClass.getName(), coatingRepositories);
             }
         }
     }
 
-    private List<RepositoryObj> collectRepositoryObjs(Map<String, List<Property>> belongToPropertyMap, Map<String, Property> fieldPropertyMap) {
+    private List<PropertyRepository> collectRepositories(Map<String, List<Property>> belongToPropertyMap, Map<String, Property> fieldPropertyMap) {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
 
-        List<RepositoryObj> repositoryObjs = new ArrayList<>();
+        List<PropertyRepository> propertyRepositories = new ArrayList<>();
 
         for (MergedRepository mergedRepository : mergedRepositoryMap.values()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
@@ -140,18 +140,18 @@ public class CoatingObjResolver {
             }
 
             if (!properties.isEmpty() || repository.isBoundEntity()) {
-                RepositoryObj repositoryObj = new RepositoryObj(mergedRepository, properties);
-                repositoryObjs.add(repositoryObj);
+                PropertyRepository propertyRepository = new PropertyRepository(mergedRepository, properties);
+                propertyRepositories.add(propertyRepository);
             }
         }
 
-        return repositoryObjs;
+        return propertyRepositories;
     }
 
-    private void checkFieldNames(Class<?> coatingClass, Set<String> fieldNames, List<RepositoryObj> repositoryObjs) {
+    private void checkFieldNames(Class<?> coatingClass, Set<String> fieldNames, List<PropertyRepository> propertyRepositories) {
         Set<String> remainFieldNames = new LinkedHashSet<>(fieldNames);
-        for (RepositoryObj repositoryObj : repositoryObjs) {
-            for (Property property : repositoryObj.getCollectedProperties()) {
+        for (PropertyRepository propertyRepository : propertyRepositories) {
+            for (Property property : propertyRepository.getCollectedProperties()) {
                 remainFieldNames.remove(property.getName());
             }
         }

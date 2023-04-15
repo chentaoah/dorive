@@ -18,7 +18,6 @@
 package com.gitee.dorive.coating.entity;
 
 import com.gitee.dorive.coating.entity.def.PropertyDef;
-import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import lombok.AllArgsConstructor;
@@ -28,20 +27,20 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class RepositoryObj {
+public class PropertyRepository {
 
     private MergedRepository mergedRepository;
     private List<Property> collectedProperties;
 
-    public Example newExampleByCoating(Context context, Object coating) {
+    public Example newExampleByCoating(Object coating) {
         Example example = new Example();
         for (Property property : collectedProperties) {
             Object fieldValue = property.getFieldValue(coating);
             if (fieldValue != null) {
                 PropertyDef propertyDef = property.getPropertyDef();
-                String field = propertyDef.getField();
+                String fieldName = propertyDef.getField();
                 String operator = propertyDef.getOperator();
-                example.addCriterion(new Criterion(field, operator, fieldValue));
+                example.addCriterion(new Criterion(fieldName, operator, fieldValue));
             }
         }
         return example;

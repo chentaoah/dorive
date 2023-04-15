@@ -24,11 +24,11 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.coating.api.ExampleBuilder;
-import com.gitee.dorive.coating.entity.CoatingObj;
+import com.gitee.dorive.coating.entity.CoatingRepositories;
 import com.gitee.dorive.coating.entity.MergedRepository;
-import com.gitee.dorive.coating.entity.RepositoryObj;
+import com.gitee.dorive.coating.entity.PropertyRepository;
 import com.gitee.dorive.coating.entity.SpecificProperties;
-import com.gitee.dorive.coating.impl.resolver.CoatingObjResolver;
+import com.gitee.dorive.coating.impl.resolver.CoatingRepositoriesResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
@@ -65,20 +65,20 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
     @Override
     public Example buildExample(Context context, Object coating) {
-        CoatingObjResolver coatingObjResolver = repository.getCoatingObjResolver();
-        Map<String, CoatingObj> nameCoatingObjMap = coatingObjResolver.getNameCoatingObjMap();
+        CoatingRepositoriesResolver coatingRepositoriesResolver = repository.getCoatingRepositoriesResolver();
+        Map<String, CoatingRepositories> nameCoatingRepositoriesMap = coatingRepositoriesResolver.getNameCoatingRepositoriesMap();
 
-        CoatingObj coatingObj = nameCoatingObjMap.get(coating.getClass().getName());
-        Assert.notNull(coatingObj, "No coating object exists!");
-        List<RepositoryObj> repositoryObjs = coatingObj.getRepositoryObjs();
+        CoatingRepositories coatingRepositories = nameCoatingRepositoriesMap.get(coating.getClass().getName());
+        Assert.notNull(coatingRepositories, "No coating object exists!");
+        List<PropertyRepository> propertyRepositories = coatingRepositories.getPropertyRepositories();
 
-        Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>(repositoryObjs.size() * 4 / 3 + 1);
+        Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>(propertyRepositories.size() * 4 / 3 + 1);
         SqlSegment rootSqlSegment = null;
         char letter = 'a';
         boolean anyDirtyQuery = false;
 
-        for (RepositoryObj repositoryObj : repositoryObjs) {
-            MergedRepository mergedRepository = repositoryObj.getMergedRepository();
+        for (PropertyRepository propertyRepository : propertyRepositories) {
+            MergedRepository mergedRepository = propertyRepository.getMergedRepository();
             String lastAccessPath = mergedRepository.getLastAccessPath();
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
@@ -88,14 +88,14 @@ public class SQLExampleBuilder implements ExampleBuilder {
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 
             Map<String, Object> attachments = executedRepository.getAttachments();
-            AliasExecutor aliasExecutor = (AliasExecutor) attachments.get(Keys.ALIAS_EXECUTOR);
             TableInfo tableInfo = (TableInfo) attachments.get(Keys.TABLE_INFO);
+            AliasExecutor aliasExecutor = (AliasExecutor) attachments.get(Keys.ALIAS_EXECUTOR);
 
             String tableName = tableInfo.getTableName();
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
-            Example example = repositoryObj.newExampleByCoating(context, coating);
+            Example example = propertyRepository.newExampleByCoating(coating);
             aliasExecutor.convert(example);
 
             boolean dirtyQuery = example.isDirtyQuery();
@@ -116,7 +116,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             }
         }
 
-        SpecificProperties properties = coatingObj.getSpecificProperties();
+        SpecificProperties properties = coatingRepositories.getSpecificProperties();
         OrderBy orderBy = properties.newOrderBy(coating);
         Page<Object> page = properties.newPage(coating);
 

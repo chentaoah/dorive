@@ -89,7 +89,7 @@ public abstract class EntityEle {
         return properties;
     }
 
-    public Map<String, String> newAliasPropMap() {
+    public Map<String, String> newAliasFieldMapping() {
         Map<String, String> map = new LinkedHashMap<>();
         aliasMap.forEach((key, value) -> map.put(value, key));
         return map;
