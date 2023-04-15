@@ -86,36 +86,6 @@ public class Example {
         return this;
     }
 
-    public Example in(String property, Object value) {
-        criteria.add(new Criterion(property, Operator.IN, value));
-        return this;
-    }
-
-    public Example notIn(String property, Object value) {
-        criteria.add(new Criterion(property, Operator.NOT_IN, value));
-        return this;
-    }
-
-    public Example isNull(String property) {
-        criteria.add(new Criterion(property, Operator.IS_NULL, null));
-        return this;
-    }
-
-    public Example isNotNull(String property) {
-        criteria.add(new Criterion(property, Operator.IS_NOT_NULL, null));
-        return this;
-    }
-
-    public Example like(String property, Object value) {
-        criteria.add(new Criterion(property, Operator.LIKE, value));
-        return this;
-    }
-
-    public Example notLike(String property, Object value) {
-        criteria.add(new Criterion(property, Operator.NOT_LIKE, value));
-        return this;
-    }
-
     public Example gt(String property, Object value) {
         criteria.add(new Criterion(property, Operator.GT, value));
         return this;
@@ -133,6 +103,36 @@ public class Example {
 
     public Example le(String property, Object value) {
         criteria.add(new Criterion(property, Operator.LE, value));
+        return this;
+    }
+
+    public Example in(String property, Object value) {
+        criteria.add(new Criterion(property, Operator.IN, value));
+        return this;
+    }
+
+    public Example notIn(String property, Object value) {
+        criteria.add(new Criterion(property, Operator.NOT_IN, value));
+        return this;
+    }
+
+    public Example like(String property, Object value) {
+        criteria.add(new Criterion(property, Operator.LIKE, value));
+        return this;
+    }
+
+    public Example notLike(String property, Object value) {
+        criteria.add(new Criterion(property, Operator.NOT_LIKE, value));
+        return this;
+    }
+
+    public Example isNull(String property) {
+        criteria.add(new Criterion(property, Operator.IS_NULL, null));
+        return this;
+    }
+
+    public Example isNotNull(String property) {
+        criteria.add(new Criterion(property, Operator.IS_NOT_NULL, null));
         return this;
     }
 

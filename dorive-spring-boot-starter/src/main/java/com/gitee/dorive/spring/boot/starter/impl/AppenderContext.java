@@ -45,16 +45,26 @@ public class AppenderContext {
                 abstractWrapper.ne(property, value);
             }
         });
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IN, (abstractWrapper, property, value) -> abstractWrapper.in(property, (Collection<?>) value));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_IN, (abstractWrapper, property, value) -> abstractWrapper.notIn(property, (Collection<?>) value));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNull(property));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NOT_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNotNull(property));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LIKE, (abstractWrapper, property, value) -> abstractWrapper.like(property, SqlUtils.toLike(value)));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_LIKE, (abstractWrapper, property, value) -> abstractWrapper.notLike(property, SqlUtils.toLike(value)));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.GT, Compare::gt);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.GE, Compare::ge);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LT, Compare::lt);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LE, Compare::le);
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IN, (abstractWrapper, property, value) -> abstractWrapper.in(property, (Collection<?>) value));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_IN, (abstractWrapper, property, value) -> abstractWrapper.notIn(property, (Collection<?>) value));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LIKE, (abstractWrapper, property, value) -> abstractWrapper.like(property, SqlUtils.toLike(value)));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_LIKE, (abstractWrapper, property, value) -> abstractWrapper.notLike(property, SqlUtils.toLike(value)));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNull(property));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NOT_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNotNull(property));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NULLABLE, (abstractWrapper, property, value) -> {
+            if (value instanceof Boolean) {
+                Boolean flag = (Boolean) value;
+                if (flag) {
+                    abstractWrapper.isNull(property);
+                } else {
+                    abstractWrapper.isNotNull(property);
+                }
+            }
+        });
     }
 
 }
