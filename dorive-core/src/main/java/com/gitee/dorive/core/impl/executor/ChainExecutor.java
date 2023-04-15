@@ -56,8 +56,9 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     public Result<Object> executeQuery(Context context, Query query) {
         Assert.isTrue(query.getPrimaryKey() != null || query.getExample() != null, "The condition cannot be null!");
 
-        Selector selector = context.getSelector();
         CommonRepository rootRepository = repository.getRootRepository();
+
+        Selector selector = context.getSelector();
         boolean isIncludeRoot = (query.getType() & OperationType.INCLUDE_ROOT) == OperationType.INCLUDE_ROOT;
 
         if (selector.matches(context, rootRepository) || isIncludeRoot) {
