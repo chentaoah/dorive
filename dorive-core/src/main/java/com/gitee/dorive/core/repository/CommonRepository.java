@@ -125,13 +125,4 @@ public class CommonRepository extends ProxyRepository {
         return getEntityEle().getPkProxy().getValue(entity);
     }
 
-    public Object convertManyToOne(List<?> entities) {
-        if (getEntityEle().isCollection()) {
-            return entities;
-        } else if (!entities.isEmpty()) {
-            return entities.get(0);
-        }
-        return null;
-    }
-
 }

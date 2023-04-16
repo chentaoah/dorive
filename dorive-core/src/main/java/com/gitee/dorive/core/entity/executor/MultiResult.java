@@ -15,12 +15,23 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.common;
+package com.gitee.dorive.core.entity.executor;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
+import java.util.Map;
 
-public interface EntityIndex {
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class MultiResult extends Result<Object> {
 
-    List<Object> select(Object rootEntity, Object key);
+    private List<Map<String, Object>> resultMaps;
+
+    public MultiResult(List<Map<String, Object>> resultMaps, List<Object> entities) {
+        super(entities);
+        this.resultMaps = resultMaps;
+    }
 
 }
