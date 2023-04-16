@@ -69,7 +69,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         Map<String, CoatingRepositories> nameCoatingRepositoriesMap = coatingRepositoriesResolver.getNameCoatingRepositoriesMap();
 
         CoatingRepositories coatingRepositories = nameCoatingRepositoriesMap.get(coating.getClass().getName());
-        Assert.notNull(coatingRepositories, "No coating object exists!");
+        Assert.notNull(coatingRepositories, "No coating info exists!");
         List<PropertyRepository> propertyRepositories = coatingRepositories.getPropertyRepositories();
 
         Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>(propertyRepositories.size() * 4 / 3 + 1);
