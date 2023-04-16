@@ -24,6 +24,7 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.def.AliasDef;
 import com.gitee.dorive.api.impl.factory.PropProxyFactory;
+import com.gitee.dorive.api.util.ReflectUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -56,19 +57,16 @@ public class EntityType extends EntityEle {
 
     private EntityType(Class<?> type) {
         super(type);
-
         Assert.isTrue(LOCK.add(type), "Circular dependency!");
-
         this.type = type;
         this.name = type.getName();
-        for (Field field : ReflectUtil.getFields(type)) {
+        for (Field field : ReflectUtils.getAllFields(type)) {
             if (!Modifier.isStatic(field.getModifiers())) {
                 EntityField entityField = new EntityField(field);
                 entityFields.put(entityField.getName(), entityField);
             }
         }
         initialize();
-
         LOCK.remove(type);
     }
 

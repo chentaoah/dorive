@@ -92,8 +92,8 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
             String keyColumn = tableInfo.getKeyColumn();
             String keyProperty = tableInfo.getKeyProperty();
-            List<TableFieldInfo> fieldList = tableInfo.getFieldList();
-            
+            List<TableFieldInfo> tableFieldInfos = tableInfo.getFieldList();
+
             Map<String, String> fieldPropMapping = new LinkedHashMap<>();
             if (StringUtils.isNotBlank(keyColumn) && StringUtils.isNotBlank(keyProperty)) {
                 String field = aliasFieldMapping.get(keyColumn);
@@ -101,7 +101,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
                     fieldPropMapping.put(field, keyProperty);
                 }
             }
-            for (TableFieldInfo tableFieldInfo : fieldList) {
+            for (TableFieldInfo tableFieldInfo : tableFieldInfos) {
                 String field = aliasFieldMapping.get(tableFieldInfo.getColumn());
                 if (field != null) {
                     fieldPropMapping.put(field, tableFieldInfo.getProperty());

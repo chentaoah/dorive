@@ -31,7 +31,7 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.entity.QueryResult;
-import com.gitee.dorive.spring.boot.starter.impl.EntityIndexResult;
+import com.gitee.dorive.core.entity.executor.MultiResult;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -60,7 +60,7 @@ public class FactoryExecutor extends AbstractExecutor {
         if (resultMaps != null) {
             List<Object> entities = reconstitute(context, resultMaps);
             if (example instanceof UnionExample) {
-                return new EntityIndexResult((UnionExample) example, resultMaps, entities);
+                return new MultiResult(resultMaps, entities);
             } else {
                 return new Result<>(entities);
             }
