@@ -53,7 +53,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
         Map<String, CoatingRepositories> nameCoatingRepositoriesMap = coatingRepositoriesResolver.getNameCoatingRepositoriesMap();
 
         CoatingRepositories coatingRepositories = nameCoatingRepositoriesMap.get(coating.getClass().getName());
-        Assert.notNull(coatingRepositories, "No coating object exists!");
+        Assert.notNull(coatingRepositories, "No coating definition found!");
 
         Map<String, RepoCriterion> repoCriterionMap = new LinkedHashMap<>();
         for (PropertyRepository propertyRepository : coatingRepositories.getReversedPropertyRepositories()) {
