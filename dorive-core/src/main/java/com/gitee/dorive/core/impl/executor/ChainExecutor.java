@@ -88,13 +88,13 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     public int execute(Context context, Operation operation) {
         int expectedType = operation.getType();
 
-        int realExpectedType = expectedType & OperationType.INSERT_OR_UPDATE_OR_DELETE;
-        int expectedIgnoreRoot = expectedType | OperationType.IGNORE_ROOT;
-        int expectedIncludeRoot = expectedType | OperationType.INCLUDE_ROOT;
-
-        boolean isInsertContext = (expectedType & OperationType.INSERT) == OperationType.INSERT;
-        boolean isIgnoreRoot = (expectedType & OperationType.IGNORE_ROOT) == OperationType.IGNORE_ROOT;
         boolean isIncludeRoot = (expectedType & OperationType.INCLUDE_ROOT) == OperationType.INCLUDE_ROOT;
+        boolean isIgnoreRoot = (expectedType & OperationType.IGNORE_ROOT) == OperationType.IGNORE_ROOT;
+        int realExpectedType = expectedType & OperationType.INSERT_OR_UPDATE_OR_DELETE;
+
+        boolean isInsertContext = (realExpectedType & OperationType.INSERT) == OperationType.INSERT;
+        int expectedIncludeRoot = realExpectedType | OperationType.INCLUDE_ROOT;
+        int expectedIgnoreRoot = realExpectedType | OperationType.IGNORE_ROOT;
 
         Object rootEntity = operation.getEntity();
         Assert.notNull(rootEntity, "The rootEntity cannot be null!");
@@ -106,19 +106,19 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         Selector selector = context.getSelector();
         int totalCount = 0;
         for (CommonRepository repository : delegateRepository.getOrderedRepositories()) {
-            boolean root = repository.isRoot();
-            if (isIgnoreRoot && root) {
+            boolean isRoot = repository.isRoot();
+            if (isIgnoreRoot && isRoot) {
                 continue;
             }
 
-            boolean isMatch = selector.matches(context, repository) || (isIncludeRoot && root);
+            boolean isMatch = selector.matches(context, repository) || (isIncludeRoot && isRoot);
             boolean isAggregated = repository.isAggregated();
             if (!isMatch && !isAggregated) {
                 continue;
             }
 
             PropChain anchorPoint = repository.getAnchorPoint();
-            Object targetEntity = root ? rootEntity : anchorPoint.getValue(rootEntity);
+            Object targetEntity = isRoot ? rootEntity : anchorPoint.getValue(rootEntity);
             if (targetEntity != null) {
                 Collection<?> collection;
                 if (targetEntity instanceof Collection) {
@@ -142,7 +142,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
                         totalCount += repository.execute(context, newOperation);
 
                     } else if (operable) {
-                        if (root && realExpectedType == operationType) {
+                        if (isRoot && realExpectedType == operationType) {
                             totalCount += repository.execute(context, operation);
                         } else {
                             totalCount += doExecute(operationType, repository, context, entity);
