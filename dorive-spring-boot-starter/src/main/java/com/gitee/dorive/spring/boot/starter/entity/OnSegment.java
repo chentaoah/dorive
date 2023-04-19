@@ -20,12 +20,11 @@ package com.gitee.dorive.spring.boot.starter.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class JoinSegment extends Segment {
-    private String tableName;
+public class OnSegment extends Segment {
     private String tableAlias;
-    private List<OnSegment> onSegments;
+    private String column;
+    private String joinTableAlias;
+    private String joinColumn;
 }

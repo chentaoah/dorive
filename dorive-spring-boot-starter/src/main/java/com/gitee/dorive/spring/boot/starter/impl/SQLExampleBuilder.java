@@ -17,6 +17,10 @@
 
 package com.gitee.dorive.spring.boot.starter.impl;
 
+import java.util.HashSet;
+
+import com.gitee.dorive.spring.boot.starter.entity.OnSegment;
+
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
@@ -41,18 +45,13 @@ import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.CriterionUtils;
 import com.gitee.dorive.core.util.SqlUtils;
 import com.gitee.dorive.spring.boot.starter.api.Keys;
-import com.gitee.dorive.spring.boot.starter.entity.ArgSegment;
+import com.gitee.dorive.spring.boot.starter.entity.Argument;
 import com.gitee.dorive.spring.boot.starter.entity.JoinSegment;
-import com.gitee.dorive.spring.boot.starter.entity.SqlSegment;
+import com.gitee.dorive.spring.boot.starter.entity.Segment;
+import com.gitee.dorive.spring.boot.starter.entity.SelectSegment;
 import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SQLExampleBuilder implements ExampleBuilder {
@@ -72,8 +71,8 @@ public class SQLExampleBuilder implements ExampleBuilder {
         Assert.notNull(coatingRepositories, "No coating definition found!");
         List<PropertyRepository> propertyRepositories = coatingRepositories.getPropertyRepositories();
 
-        Map<String, SqlSegment> sqlSegmentMap = new LinkedHashMap<>(propertyRepositories.size() * 4 / 3 + 1);
-        SqlSegment rootSqlSegment = null;
+        Map<String, Segment> segmentMap = new LinkedHashMap<>(propertyRepositories.size() * 4 / 3 + 1);
+        SelectSegment selectSegment = null;
         char letter = 'a';
         boolean anyDirtyQuery = false;
 
@@ -101,18 +100,39 @@ public class SQLExampleBuilder implements ExampleBuilder {
             boolean dirtyQuery = example.isDirtyQuery();
             anyDirtyQuery = anyDirtyQuery || dirtyQuery;
 
-            Set<String> joinTableNames = new HashSet<>(8);
 
             if ("/".equals(relativeAccessPath)) {
-                String sql = String.format("SELECT DISTINCT %s.id FROM %s %s ", tableAlias, tableName, tableAlias);
-                rootSqlSegment = new SqlSegment(tableName, tableAlias, sql, Collections.emptyList(), example, true, dirtyQuery, joinTableNames);
-                sqlSegmentMap.put(relativeAccessPath, rootSqlSegment);
+                selectSegment = new SelectSegment();
+                selectSegment.setReachable(true);
+                selectSegment.setDirtyQuery(false);
+                selectSegment.setDirectJoinPaths(new LinkedHashSet<>(8));
+                selectSegment.setDistinct(true);
+                selectSegment.setColumns(Collections.singletonList(tableAlias + ".id"));
+                selectSegment.setTableName(tableName);
+                selectSegment.setTableAlias(tableAlias);
+                segmentMap.put(relativeAccessPath, selectSegment);
 
             } else {
-                String sql = String.format("LEFT JOIN %s %s ON ", tableName, tableAlias);
-                List<JoinSegment> joinSegments = newJoinSegments(sqlSegmentMap, lastAccessPath, relativeAccessPath, binderResolver, tableAlias);
-                SqlSegment sqlSegment = new SqlSegment(tableName, tableAlias, sql, joinSegments, example, false, dirtyQuery, joinTableNames);
-                sqlSegmentMap.put(relativeAccessPath, sqlSegment);
+                JoinSegment joinSegment = new JoinSegment();
+                joinSegment.setReachable(false);
+                joinSegment.setDirtyQuery(false);
+                joinSegment.setDirectJoinPaths(new LinkedHashSet<>(8));
+                joinSegment.setTableName(tableName);
+                joinSegment.setTableAlias(tableAlias);
+
+                List<OnSegment> onSegments = newOnSegments(segmentMap, lastAccessPath, relativeAccessPath, binderResolver, tableAlias);
+                joinSegment.setOnSegments(onSegments);
+
+                if (selectSegment != null) {
+                    List<JoinSegment> joinSegments = selectSegment.getJoinSegments();
+                    if (joinSegments == null) {
+                        joinSegments = new ArrayList<>();
+                        selectSegment.setJoinSegments(joinSegments);
+                    }
+                    joinSegments.add(joinSegment);
+                }
+
+                segmentMap.put(relativeAccessPath, joinSegment);
             }
         }
 
@@ -130,7 +150,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         if (!anyDirtyQuery) {
             return example;
         }
-        markReachableAndDirty(sqlSegmentMap, rootSqlSegment);
+        markReachableAndDirty(segmentMap, rootSqlSegment);
         if (!rootSqlSegment.isDirtyQuery()) {
             return example;
         }
@@ -138,7 +158,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         StringBuilder sqlBuilder = new StringBuilder();
         List<Object> args = new ArrayList<>();
 
-        buildSQL(sqlBuilder, args, sqlSegmentMap);
+        buildSQL(sqlBuilder, args, segmentMap);
         if (page != null) {
             long count = SqlRunner.db().selectCount("SELECT COUNT(1) FROM (" + sqlBuilder + ") " + letter, args.toArray());
             page.setTotal(count);
@@ -161,57 +181,62 @@ public class SQLExampleBuilder implements ExampleBuilder {
         return example;
     }
 
-    private List<JoinSegment> newJoinSegments(Map<String, SqlSegment> sqlSegmentMap, String lastAccessPath, String relativeAccessPath, BinderResolver binderResolver, String tableAlias) {
+    private List<OnSegment> newOnSegments(Map<String, Segment> segmentMap,
+                                          String lastAccessPath,
+                                          String relativeAccessPath,
+                                          BinderResolver binderResolver,
+                                          String tableAlias) {
         List<PropertyBinder> propertyBinders = binderResolver.getPropertyBinders();
-        List<JoinSegment> joinSegments = new ArrayList<>(propertyBinders.size());
+        List<OnSegment> onSegments = new ArrayList<>(propertyBinders.size());
 
         for (PropertyBinder propertyBinder : propertyBinders) {
             String belongAccessPath = propertyBinder.getBelongAccessPath();
             String targetAccessPath = lastAccessPath + belongAccessPath;
 
-            SqlSegment sqlSegment = sqlSegmentMap.get(targetAccessPath);
-            if (sqlSegment != null) {
-                Set<String> joinAccessPaths = sqlSegment.getJoinAccessPaths();
-                joinAccessPaths.add(relativeAccessPath);
-
-                String joinTableName = sqlSegment.getTableName();
-                String joinTableAlias = sqlSegment.getTableAlias();
+            Segment segment = segmentMap.get(targetAccessPath);
+            if (segment != null) {
+                Set<String> directJoinPaths = segment.getDirectJoinPaths();
+                directJoinPaths.add(relativeAccessPath);
 
                 String alias = propertyBinder.getAlias();
+                String joinTableAlias = segment.getTableAlias();
                 String bindAlias = propertyBinder.getBindAlias();
-                String sqlCriteria = tableAlias + "." + alias + " = " + joinTableAlias + "." + bindAlias;
 
-                JoinSegment joinSegment = new JoinSegment(targetAccessPath, joinTableName, joinTableAlias, sqlCriteria);
-                joinSegments.add(joinSegment);
+                OnSegment onSegment = new OnSegment();
+                onSegment.setTableAlias(tableAlias);
+                onSegment.setColumn(alias);
+                onSegment.setJoinTableAlias(joinTableAlias);
+                onSegment.setJoinColumn(bindAlias);
+                onSegments.add(onSegment);
             }
         }
-        return joinSegments;
+        return onSegments;
     }
 
-    private void markReachableAndDirty(Map<String, SqlSegment> sqlSegmentMap, SqlSegment lastSqlSegment) {
-        Set<String> joinAccessPaths = lastSqlSegment.getJoinAccessPaths();
-        for (String joinAccessPath : joinAccessPaths) {
-            SqlSegment joinSqlSegment = sqlSegmentMap.get(joinAccessPath);
-            if (joinSqlSegment != null) {
-                joinSqlSegment.setRootReachable(true);
-                markReachableAndDirty(sqlSegmentMap, joinSqlSegment);
-                if (joinSqlSegment.isDirtyQuery()) {
-                    lastSqlSegment.setDirtyQuery(true);
+    private void markReachableAndDirty(Map<String, Segment> segmentMap, Segment lastSegment) {
+        Set<String> directJoinPaths = lastSegment.getDirectJoinPaths();
+        for (String directJoinPath : directJoinPaths) {
+            Segment joinSegment = segmentMap.get(directJoinPath);
+            if (joinSegment != null) {
+                joinSegment.setReachable(true);
+                markReachableAndDirty(segmentMap, joinSegment);
+                if (joinSegment.isDirtyQuery()) {
+                    lastSegment.setDirtyQuery(true);
                 }
             }
         }
     }
 
-    private void buildSQL(StringBuilder sqlBuilder, List<Object> args, Map<String, SqlSegment> sqlSegmentMap) {
+    private void buildSQL(StringBuilder sqlBuilder, List<Object> args, Map<String, SelectSegment> sqlSegmentMap) {
         List<String> sqlCriteria = new ArrayList<>(sqlSegmentMap.size());
 
-        for (SqlSegment sqlSegment : sqlSegmentMap.values()) {
+        for (SelectSegment sqlSegment : sqlSegmentMap.values()) {
             if (sqlSegment.isRootReachable() && sqlSegment.isDirtyQuery()) {
                 sqlBuilder.append(sqlSegment);
 
                 List<JoinSegment> joinSegments = sqlSegment.getJoinSegments();
                 joinSegments = joinSegments.stream().filter(joinSegment -> {
-                    SqlSegment joinSqlSegment = sqlSegmentMap.get(joinSegment.getTargetAccessPath());
+                    SelectSegment joinSqlSegment = sqlSegmentMap.get(joinSegment.getTargetAccessPath());
                     return joinSqlSegment.isRootReachable() && joinSqlSegment.isDirtyQuery();
                 }).collect(Collectors.toList());
 
@@ -223,7 +248,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
                 Example sqlExample = sqlSegment.getExample();
                 if (sqlExample != null && sqlExample.isDirtyQuery()) {
                     List<Criterion> criteria = sqlExample.getCriteria();
-                    List<ArgSegment> argSegments = new ArrayList<>(criteria.size());
+                    List<Argument> arguments = new ArrayList<>(criteria.size());
                     for (Criterion criterion : criteria) {
                         String property = criterion.getProperty();
                         String operator = CriterionUtils.getOperator(criterion);
@@ -234,14 +259,14 @@ public class SQLExampleBuilder implements ExampleBuilder {
                         if (!operator.startsWith("IS")) {
                             args.add(value);
                             int index = args.size() - 1;
-                            ArgSegment argSegment = new ArgSegment(property, operator, index);
-                            argSegments.add(argSegment);
+                            Argument argument = new Argument(property, operator, index);
+                            arguments.add(argument);
                         } else {
-                            ArgSegment argSegment = new ArgSegment(property, operator, null);
-                            argSegments.add(argSegment);
+                            Argument argument = new Argument(property, operator, null);
+                            arguments.add(argument);
                         }
                     }
-                    String sqlCriterion = CollUtil.join(argSegments, " AND ", tableAlias + ".", null);
+                    String sqlCriterion = CollUtil.join(arguments, " AND ", tableAlias + ".", null);
                     sqlCriteria.add(sqlCriterion);
                 }
             }

@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ArgSegment {
+public class Argument {
 
     private String property;
     private String operator;

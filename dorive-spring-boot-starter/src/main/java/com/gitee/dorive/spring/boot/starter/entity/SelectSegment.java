@@ -17,29 +17,32 @@
 
 package com.gitee.dorive.spring.boot.starter.entity;
 
-import com.gitee.dorive.core.entity.executor.Example;
-import lombok.AllArgsConstructor;
+import cn.hutool.db.sql.SqlBuilder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
-import java.util.Set;
 
 @Data
-@AllArgsConstructor
-public class SqlSegment {
+@EqualsAndHashCode(callSuper = true)
+public class SelectSegment extends Segment {
 
+    private boolean distinct;
+    private List<String> columns;
     private String tableName;
     private String tableAlias;
-    private String sql;
     private List<JoinSegment> joinSegments;
-    private Example example;
-    private boolean rootReachable;
-    private boolean dirtyQuery;
-    private Set<String> joinAccessPaths;
+    private List<Argument> arguments;
+    private String groupBy;
+    private String orderBy;
+    private String limit;
 
     @Override
     public String toString() {
-        return sql;
+        SqlBuilder sqlBuilder = SqlBuilder.create();
+        sqlBuilder.select(distinct, columns);
+        sqlBuilder.from(tableName + " " + tableAlias);
+        return sqlBuilder.toString();
     }
 
 }
