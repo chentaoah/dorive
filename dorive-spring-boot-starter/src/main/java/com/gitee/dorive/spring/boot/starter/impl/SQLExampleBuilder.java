@@ -171,8 +171,8 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
             SqlSegment sqlSegment = sqlSegmentMap.get(targetAccessPath);
             if (sqlSegment != null) {
-                Set<String> targetAccessPaths = sqlSegment.getTargetAccessPaths();
-                targetAccessPaths.add(relativeAccessPath);
+                Set<String> joinAccessPaths = sqlSegment.getJoinAccessPaths();
+                joinAccessPaths.add(relativeAccessPath);
 
                 String joinTableName = sqlSegment.getTableName();
                 String joinTableAlias = sqlSegment.getTableAlias();
@@ -189,9 +189,9 @@ public class SQLExampleBuilder implements ExampleBuilder {
     }
 
     private void markReachableAndDirty(Map<String, SqlSegment> sqlSegmentMap, SqlSegment lastSqlSegment) {
-        Set<String> targetAccessPaths = lastSqlSegment.getTargetAccessPaths();
-        for (String targetAccessPath : targetAccessPaths) {
-            SqlSegment joinSqlSegment = sqlSegmentMap.get(targetAccessPath);
+        Set<String> joinAccessPaths = lastSqlSegment.getJoinAccessPaths();
+        for (String joinAccessPath : joinAccessPaths) {
+            SqlSegment joinSqlSegment = sqlSegmentMap.get(joinAccessPath);
             if (joinSqlSegment != null) {
                 joinSqlSegment.setRootReachable(true);
                 markReachableAndDirty(sqlSegmentMap, joinSqlSegment);
