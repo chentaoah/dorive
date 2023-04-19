@@ -32,6 +32,7 @@ import com.gitee.dorive.spring.boot.starter.api.Keys;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
 import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;
 import com.gitee.dorive.spring.boot.starter.impl.executor.FactoryExecutor;
+import com.gitee.dorive.spring.boot.starter.impl.executor.MybatisPlusExecutor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;

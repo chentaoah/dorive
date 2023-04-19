@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.repository;
+package com.gitee.dorive.spring.boot.starter.impl.executor;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
@@ -100,6 +100,16 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             }
         }
         return new Result<>(new QueryResult(Collections.emptyList()));
+    }
+
+    @Override
+    public long executeCountQuery(Context context, Query query) {
+        Example example = query.getExample();
+        if (example != null) {
+            QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
+            return baseMapper.selectCount(queryWrapper);
+        }
+        return 0L;
     }
 
     private QueryWrapper<Object> buildQueryWrapper(Example example) {

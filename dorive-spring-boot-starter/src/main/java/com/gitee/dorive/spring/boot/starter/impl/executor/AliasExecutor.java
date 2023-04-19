@@ -57,6 +57,15 @@ public class AliasExecutor extends AbstractExecutor {
     }
 
     @Override
+    public long executeCountQuery(Context context, Query query) {
+        Example example = query.getExample();
+        if (example != null) {
+            convert(example);
+        }
+        return executor.executeCountQuery(context, query);
+    }
+
+    @Override
     public int execute(Context context, Operation operation) {
         if (operation instanceof Condition) {
             Condition condition = (Condition) operation;
