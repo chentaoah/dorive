@@ -46,12 +46,18 @@ public class RefObjImpl implements RefObj {
 
     @Override
     public int insertOrUpdate(Context context) {
+        if (context instanceof Selector) {
+            context = new InnerContext((Selector) context);
+        }
         AbstractRepository<Object, Object> repository = ref.getProxyRepository();
         return repository.insertOrUpdate(context, object);
     }
 
     @Override
     public int delete(Context context) {
+        if (context instanceof Selector) {
+            context = new InnerContext((Selector) context);
+        }
         AbstractRepository<Object, Object> repository = ref.getProxyRepository();
         return repository.delete(context, object);
     }
