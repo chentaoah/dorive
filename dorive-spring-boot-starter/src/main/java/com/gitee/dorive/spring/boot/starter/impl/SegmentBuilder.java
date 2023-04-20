@@ -99,7 +99,7 @@ public class SegmentBuilder {
                 selectSegment.setReachable(true);
                 selectSegment.setDirtyQuery(example.isDirtyQuery());
                 selectSegment.setDirectedSegments(new ArrayList<>(8));
-                selectSegment.setDistinct(true);
+                selectSegment.setDistinct(false);
                 selectSegment.setColumns(Collections.emptyList());
                 selectSegment.setTableName(tableName);
                 selectSegment.setTableAlias(tableAlias);

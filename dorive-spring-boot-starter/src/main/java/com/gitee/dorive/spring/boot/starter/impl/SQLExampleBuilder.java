@@ -67,10 +67,9 @@ public class SQLExampleBuilder implements ExampleBuilder {
         if (!selectSegment.isDirtyQuery()) {
             return example;
         }
-
-        String column = selectSegment.getTableAlias() + ".id";
-        selectSegment.setColumns(Collections.singletonList(column));
-
+        
+        selectSegment.setDistinct(true);
+        selectSegment.setColumns(Collections.singletonList(selectSegment.getTableAlias() + ".id"));
         SqlBuilder builder = selectSegment.createBuilder();
 
         if (page != null) {
