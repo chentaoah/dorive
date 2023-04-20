@@ -56,7 +56,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
         if ("SQL".equals(getQuerier())) {
             setExampleBuilder(new SQLExampleBuilder(this));
         }
-        countQuerier = new CountQuerier(this);
+        this.countQuerier = new CountQuerier(this);
     }
 
     @Override
