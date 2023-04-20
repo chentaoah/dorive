@@ -23,8 +23,15 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class OnSegment extends Segment {
+
     private String tableAlias;
     private String column;
     private String joinTableAlias;
     private String joinColumn;
+
+    @Override
+    public String toString() {
+        return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
+    }
+
 }

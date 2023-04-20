@@ -17,11 +17,13 @@
 
 package com.gitee.dorive.spring.boot.starter.entity;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlBuilder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -32,17 +34,41 @@ public class SelectSegment extends Segment {
     private String tableName;
     private String tableAlias;
     private List<JoinSegment> joinSegments;
-    private List<Argument> arguments;
+    private List<ArgSegment> argSegments;
     private String groupBy;
     private String orderBy;
     private String limit;
 
-    @Override
-    public String toString() {
+    public SqlBuilder createBuilder() {
         SqlBuilder sqlBuilder = SqlBuilder.create();
         sqlBuilder.select(distinct, columns);
         sqlBuilder.from(tableName + " " + tableAlias);
-        return sqlBuilder.toString();
+        for (JoinSegment joinSegment : joinSegments) {
+            if (joinSegment.isAvailable()) {
+                sqlBuilder.join(joinSegment.getTableName() + " " + joinSegment.getTableAlias(), SqlBuilder.Join.LEFT);
+
+                List<OnSegment> onSegments = joinSegment.getOnSegments().stream()
+                        .filter(onSegment -> onSegment.getDirectedSegments().get(0).isAvailable())
+                        .collect(Collectors.toList());
+                sqlBuilder.on(StrUtil.join(" AND ", onSegments));
+            }
+        }
+        sqlBuilder.where(StrUtil.join(" AND ", argSegments));
+        if (groupBy != null) {
+            sqlBuilder.append(" ").append(groupBy);
+        }
+        if (orderBy != null) {
+            sqlBuilder.append(" ").append(orderBy);
+        }
+        if (limit != null) {
+            sqlBuilder.append(" ").append(limit);
+        }
+        return sqlBuilder;
+    }
+
+    @Override
+    public String toString() {
+        return createBuilder().toString();
     }
 
 }
