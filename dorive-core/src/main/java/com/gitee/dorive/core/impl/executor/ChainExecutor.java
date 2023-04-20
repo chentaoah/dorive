@@ -65,14 +65,14 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
             int totalCount = 0;
 
             Result<Object> result = rootRepository.executeQuery(context, query);
-            totalCount += result.getTotal();
+            totalCount += result.getCount();
 
             List<Object> rootEntities = result.getRecords();
             if (!rootEntities.isEmpty()) {
                 totalCount += handle(context, rootEntities);
             }
 
-            result.setTotal(totalCount);
+            result.setCount(totalCount);
             return result;
         }
 
@@ -82,6 +82,11 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     @Override
     public int handle(Context context, List<Object> entities) {
         return entityHandler.handle(context, entities);
+    }
+
+    @Override
+    public long executeCountQuery(Context context, Query query) {
+        throw new RuntimeException("This method does not support!");
     }
 
     @Override
@@ -170,16 +175,16 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     private Operation newOperation(int realExpectedType, CommonRepository repository, Context context, Object entity) {
         OperationFactory operationFactory = repository.getOperationFactory();
         if (realExpectedType == OperationType.INSERT) {
-            return operationFactory.buildInsert(context, entity);
+            return operationFactory.buildInsert(entity);
 
         } else if (realExpectedType == OperationType.UPDATE) {
-            return operationFactory.buildUpdate(context, entity);
+            return operationFactory.buildUpdate(entity);
 
         } else if (realExpectedType == OperationType.INSERT_OR_UPDATE) {
             return new Operation(OperationType.INSERT_OR_UPDATE, entity);
 
         } else if (realExpectedType == OperationType.DELETE) {
-            return operationFactory.buildDelete(context, entity);
+            return operationFactory.buildDeleteByEntity(entity);
         }
         throw new RuntimeException("Unsupported type!");
     }

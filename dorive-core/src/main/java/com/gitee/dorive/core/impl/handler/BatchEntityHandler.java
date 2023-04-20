@@ -60,16 +60,16 @@ public class BatchEntityHandler implements EntityHandler {
         return totalCount;
     }
 
-    private int executeQuery(CommonRepository repository, Context context, List<Object> rootEntities) {
+    private long executeQuery(CommonRepository repository, Context context, List<Object> rootEntities) {
         UnionExample unionExample = newUnionExample(repository, context, rootEntities);
         if (unionExample.isDirtyQuery()) {
-            Query query = operationFactory.buildQuery(context, unionExample);
+            Query query = operationFactory.buildQuery(unionExample);
             query.setType(query.getType() | OperationType.INCLUDE_ROOT);
             Result<Object> result = repository.executeQuery(context, query);
             if (result instanceof MultiResult) {
                 setValueForRootEntities(repository, rootEntities, (MultiResult) result);
             }
-            return result.getTotal();
+            return result.getCount();
         }
         return 0;
     }

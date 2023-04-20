@@ -28,12 +28,12 @@ public class ArgSegment {
 
     private String property;
     private String operator;
-    private Integer index;
+    private String expr;
 
     @Override
     public String toString() {
-        if (index != null) {
-            return property + " " + operator + " {" + index + "}";
+        if (expr != null) {
+            return property + " " + operator + " " + expr;
         } else {
             return property + " " + operator;
         }

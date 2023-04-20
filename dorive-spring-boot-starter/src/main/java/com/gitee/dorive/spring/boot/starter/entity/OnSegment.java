@@ -17,29 +17,21 @@
 
 package com.gitee.dorive.spring.boot.starter.entity;
 
-import com.gitee.dorive.core.entity.executor.Example;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.List;
-import java.util.Set;
+import lombok.EqualsAndHashCode;
 
 @Data
-@AllArgsConstructor
-public class SqlSegment {
+@EqualsAndHashCode(callSuper = true)
+public class OnSegment extends Segment {
 
-    private String tableName;
     private String tableAlias;
-    private String sql;
-    private List<JoinSegment> joinSegments;
-    private Example example;
-    private boolean rootReachable;
-    private boolean dirtyQuery;
-    private Set<String> targetAccessPaths;
+    private String column;
+    private String joinTableAlias;
+    private String joinColumn;
 
     @Override
     public String toString() {
-        return sql;
+        return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
     }
 
 }

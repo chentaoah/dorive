@@ -18,14 +18,26 @@
 package com.gitee.dorive.spring.boot.starter.entity;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class JoinSegment extends Segment {
-    private String tableName;
-    private String tableAlias;
-    private List<OnSegment> onSegments;
+public class Segment {
+
+    private boolean reachable;
+    private boolean dirtyQuery;
+    private List<Segment> directedSegments;
+
+    public boolean isAvailable() {
+        return reachable && dirtyQuery;
+    }
+
+    public String getTableName() {
+        return null;
+    }
+
+    public String getTableAlias() {
+        return null;
+    }
+
 }

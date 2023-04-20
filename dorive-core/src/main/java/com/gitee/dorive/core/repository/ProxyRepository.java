@@ -68,6 +68,11 @@ public class ProxyRepository extends AbstractRepository<Object, Object> {
     }
 
     @Override
+    public long selectCountByExample(Context context, Example example) {
+        return proxyRepository.selectCountByExample(context, example);
+    }
+
+    @Override
     public int insert(Context context, Object entity) {
         return proxyRepository.insert(context, entity);
     }

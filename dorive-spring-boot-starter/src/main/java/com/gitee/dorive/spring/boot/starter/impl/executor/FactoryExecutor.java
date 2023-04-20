@@ -90,6 +90,11 @@ public class FactoryExecutor extends AbstractExecutor {
     }
 
     @Override
+    public long executeCountQuery(Context context, Query query) {
+        return executor.executeCountQuery(context, query);
+    }
+
+    @Override
     public int execute(Context context, Operation operation) {
         Object entity = operation.getEntity();
         if (entity != null) {

@@ -30,24 +30,28 @@ public class Result<E> {
     private Page<E> page;
     private List<E> records = Collections.emptyList();
     private E record;
-    private int total = 0;
+    private long count = 0L;
 
     public Result(Page<E> page) {
         this.page = page;
         this.records = page.getRecords();
         this.record = !records.isEmpty() ? records.get(0) : null;
-        this.total = this.records.size();
+        this.count = this.records.size();
     }
 
     public Result(List<E> records) {
         this.records = records;
         this.record = !records.isEmpty() ? records.get(0) : null;
-        this.total = this.records.size();
+        this.count = this.records.size();
     }
 
     public Result(E record) {
         this.record = record;
-        this.total = 1;
+        this.count = 1L;
+    }
+
+    public Result(long count) {
+        this.count = count;
     }
 
 }

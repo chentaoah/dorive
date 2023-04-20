@@ -54,7 +54,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     @SuppressWarnings("unchecked")
     public E selectByPrimaryKey(Context context, PK primaryKey) {
         Assert.notNull(primaryKey, "The primary key cannot be null!");
-        Query query = operationFactory.buildQueryByPK(context, primaryKey);
+        Query query = operationFactory.buildQueryByPK(primaryKey);
         Result<Object> result = executeQuery(context, query);
         return (E) result.getRecord();
     }
@@ -63,7 +63,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     @SuppressWarnings("unchecked")
     public List<E> selectByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        Query query = operationFactory.buildQuery(context, example);
+        Query query = operationFactory.buildQuery(example);
         Result<Object> result = executeQuery(context, query);
         return (List<E>) result.getRecords();
     }
@@ -73,22 +73,29 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     public Page<E> selectPageByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         Assert.notNull(example.getPage(), "The page cannot be null!");
-        Query query = operationFactory.buildQuery(context, example);
+        Query query = operationFactory.buildQuery(example);
         Result<Object> result = executeQuery(context, query);
         return (Page<E>) result.getPage();
     }
 
     @Override
+    public long selectCountByExample(Context context, Example example) {
+        Assert.notNull(example, "The example cannot be null!");
+        Query query = operationFactory.buildQuery(example);
+        return executeCountQuery(context, query);
+    }
+
+    @Override
     public int insert(Context context, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Insert insert = operationFactory.buildInsert(context, entity);
+        Insert insert = operationFactory.buildInsert(entity);
         return execute(context, insert);
     }
 
     @Override
     public int update(Context context, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Update update = operationFactory.buildUpdate(context, entity);
+        Update update = operationFactory.buildUpdate(entity);
         return execute(context, update);
     }
 
@@ -96,41 +103,46 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     public int updateByExample(Context context, Object entity, Example example) {
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
-        Update update = operationFactory.buildUpdate(context, entity, example);
+        Update update = operationFactory.buildUpdate(entity, example);
         return execute(context, update);
     }
 
     @Override
     public int insertOrUpdate(Context context, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = operationFactory.buildInsertOrUpdate(context, entity);
+        Operation operation = operationFactory.buildInsertOrUpdate(entity);
         return execute(context, operation);
     }
 
     @Override
     public int delete(Context context, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Delete delete = operationFactory.buildDelete(context, entity);
+        Delete delete = operationFactory.buildDeleteByEntity(entity);
         return execute(context, delete);
     }
 
     @Override
     public int deleteByPrimaryKey(Context context, PK primaryKey) {
         Assert.notNull(primaryKey, "The primary key cannot be null!");
-        Delete delete = operationFactory.buildDeleteByPK(context, primaryKey);
+        Delete delete = operationFactory.buildDeleteByPK(primaryKey);
         return execute(context, delete);
     }
 
     @Override
     public int deleteByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        Delete delete = operationFactory.buildDelete(context, example);
+        Delete delete = operationFactory.buildDelete(example);
         return execute(context, delete);
     }
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         return executor.executeQuery(context, query);
+    }
+
+    @Override
+    public long executeCountQuery(Context context, Query query) {
+        return executor.executeCountQuery(context, query);
     }
 
     @Override

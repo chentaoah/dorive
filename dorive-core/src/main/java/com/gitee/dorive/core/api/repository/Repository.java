@@ -59,6 +59,15 @@ public interface Repository<E, PK> {
     Page<E> selectPageByExample(Context context, Example example);
 
     /**
+     * 根据条件，查询计数
+     *
+     * @param context 上下文
+     * @param example 条件
+     * @return 计数
+     */
+    long selectCountByExample(Context context, Example example);
+
+    /**
      * 插入一个实体
      *
      * @param context 上下文
