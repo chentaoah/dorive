@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.simple.api;
+package com.gitee.dorive.ref.api;
 
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.coating.api.CoatingRepository;
+import com.gitee.dorive.core.api.repository.ListableRepository;
+import com.gitee.dorive.ref.repository.AbstractRefRepository;
 
-public interface RefObj {
+public interface Ref<E> extends ListableRepository<E, Object>, CoatingRepository<E, Object> {
 
-    int select(Context context);
+    <R extends AbstractRefRepository<?, ?>> R get();
 
-    int insertOrUpdate(Context context);
-
-    int delete(Context context);
+    RefObj forObj(E obj);
 
 }

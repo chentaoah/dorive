@@ -27,7 +27,7 @@ import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.common.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
-import com.gitee.dorive.simple.repository.AbstractRefRepository;
+import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.spring.boot.starter.api.Keys;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
 import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;

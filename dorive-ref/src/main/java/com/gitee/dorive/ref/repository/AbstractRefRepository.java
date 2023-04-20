@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.simple.repository;
+package com.gitee.dorive.ref.repository;
 
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.context.Context;
@@ -24,7 +24,7 @@ import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.context.InnerContext;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
-import com.gitee.dorive.simple.impl.RefInjector;
+import com.gitee.dorive.ref.impl.RefInjector;
 
 import java.lang.reflect.Field;
 import java.util.List;
