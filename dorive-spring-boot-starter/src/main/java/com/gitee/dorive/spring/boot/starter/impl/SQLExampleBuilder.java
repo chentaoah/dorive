@@ -72,9 +72,8 @@ public class SQLExampleBuilder implements ExampleBuilder {
         List<PropertyRepository> propertyRepositories = coatingRepositories.getPropertyRepositories();
 
         Map<String, Segment> segmentMap = new LinkedHashMap<>(propertyRepositories.size() * 4 / 3 + 1);
-        SelectSegment selectSegment = null;
         char letter = 'a';
-        boolean anyDirtyQuery = false;
+        SelectSegment selectSegment = null;
         List<ArgSegment> argSegments = new ArrayList<>();
         List<Object> args = new ArrayList<>();
 
@@ -99,15 +98,12 @@ public class SQLExampleBuilder implements ExampleBuilder {
             Example example = propertyRepository.newExampleByCoating(coating);
             aliasExecutor.convert(example);
 
-            boolean dirtyQuery = example.isDirtyQuery();
-            anyDirtyQuery = anyDirtyQuery || dirtyQuery;
-
             appendArguments(argSegments, args, tableAlias, example);
 
             if ("/".equals(relativeAccessPath)) {
                 selectSegment = new SelectSegment();
                 selectSegment.setReachable(true);
-                selectSegment.setDirtyQuery(dirtyQuery);
+                selectSegment.setDirtyQuery(example.isDirtyQuery());
                 selectSegment.setDirectedSegments(new ArrayList<>(8));
                 selectSegment.setDistinct(true);
                 selectSegment.setColumns(Collections.singletonList(tableAlias + ".id"));
@@ -120,7 +116,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             } else {
                 JoinSegment joinSegment = new JoinSegment();
                 joinSegment.setReachable(false);
-                joinSegment.setDirtyQuery(dirtyQuery);
+                joinSegment.setDirtyQuery(example.isDirtyQuery());
                 joinSegment.setDirectedSegments(new ArrayList<>(4));
                 joinSegment.setTableName(tableName);
                 joinSegment.setTableAlias(tableAlias);
@@ -149,7 +145,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             throw new RuntimeException("Unable to build SQL statement!");
         }
 
-        if (!anyDirtyQuery) {
+        if (argSegments.isEmpty()) {
             return example;
         }
 
@@ -235,9 +231,11 @@ public class SQLExampleBuilder implements ExampleBuilder {
                 onSegment.setJoinTableAlias(joinTableAlias);
                 onSegment.setJoinColumn(bindAlias);
                 onSegments.add(onSegment);
-
+                
                 List<Segment> directedSegments = segment.getDirectedSegments();
-                directedSegments.add(joinSegment);
+                if (!directedSegments.contains(joinSegment)) {
+                    directedSegments.add(joinSegment);
+                }
             }
         }
         return onSegments;
