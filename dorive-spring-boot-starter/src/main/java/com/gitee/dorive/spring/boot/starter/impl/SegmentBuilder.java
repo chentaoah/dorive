@@ -17,12 +17,15 @@
 
 package com.gitee.dorive.spring.boot.starter.impl;
 
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.coating.entity.CoatingRepositories;
 import com.gitee.dorive.coating.entity.MergedRepository;
 import com.gitee.dorive.coating.entity.PropertyRepository;
 import com.gitee.dorive.coating.entity.SpecificProperties;
+import com.gitee.dorive.coating.impl.resolver.CoatingRepositoriesResolver;
+import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -40,6 +43,7 @@ import com.gitee.dorive.spring.boot.starter.entity.Segment;
 import com.gitee.dorive.spring.boot.starter.entity.SegmentResult;
 import com.gitee.dorive.spring.boot.starter.entity.SelectSegment;
 import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -49,9 +53,17 @@ import java.util.List;
 import java.util.Map;
 
 @Data
+@AllArgsConstructor
 public class SegmentBuilder {
 
-    public SegmentResult buildSegment(CoatingRepositories coatingRepositories, Object coating) {
+    private final AbstractCoatingRepository<?, ?> repository;
+
+    public SegmentResult buildSegment(Object coating) {
+        CoatingRepositoriesResolver resolver = repository.getCoatingRepositoriesResolver();
+        Map<String, CoatingRepositories> coatingRepositoriesMap = resolver.getNameCoatingRepositoriesMap();
+        CoatingRepositories coatingRepositories = coatingRepositoriesMap.get(coating.getClass().getName());
+        Assert.notNull(coatingRepositories, "No coating definition found!");
+
         List<PropertyRepository> propertyRepositories = coatingRepositories.getPropertyRepositories();
         Map<String, Segment> segmentMap = new LinkedHashMap<>(propertyRepositories.size() * 4 / 3 + 1);
         char letter = 'a';
@@ -87,8 +99,8 @@ public class SegmentBuilder {
                 selectSegment.setReachable(true);
                 selectSegment.setDirtyQuery(example.isDirtyQuery());
                 selectSegment.setDirectedSegments(new ArrayList<>(8));
-                selectSegment.setDistinct(true);
-                selectSegment.setColumns(Collections.singletonList(tableAlias + ".id"));
+                selectSegment.setDistinct(false);
+                selectSegment.setColumns(Collections.emptyList());
                 selectSegment.setTableName(tableName);
                 selectSegment.setTableAlias(tableAlias);
                 selectSegment.setJoinSegments(new ArrayList<>());

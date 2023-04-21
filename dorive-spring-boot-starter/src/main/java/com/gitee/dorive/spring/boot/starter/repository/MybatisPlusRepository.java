@@ -27,12 +27,15 @@ import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.common.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
-import com.gitee.dorive.simple.repository.AbstractRefRepository;
+import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.spring.boot.starter.api.Keys;
+import com.gitee.dorive.spring.boot.starter.impl.CountQuerier;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
 import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;
 import com.gitee.dorive.spring.boot.starter.impl.executor.FactoryExecutor;
 import com.gitee.dorive.spring.boot.starter.impl.executor.MybatisPlusExecutor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
@@ -41,7 +44,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
+
+    private CountQuerier countQuerier;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -49,6 +56,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
         if ("SQL".equals(getQuerier())) {
             setExampleBuilder(new SQLExampleBuilder(this));
         }
+        this.countQuerier = new CountQuerier(this);
     }
 
     @Override

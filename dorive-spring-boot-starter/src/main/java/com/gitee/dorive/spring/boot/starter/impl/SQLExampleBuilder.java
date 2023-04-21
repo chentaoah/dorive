@@ -18,12 +18,9 @@
 package com.gitee.dorive.spring.boot.starter.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
 import cn.hutool.db.sql.SqlBuilder;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.dorive.coating.api.ExampleBuilder;
-import com.gitee.dorive.coating.entity.CoatingRepositories;
-import com.gitee.dorive.coating.impl.resolver.CoatingRepositoriesResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -33,6 +30,7 @@ import com.gitee.dorive.spring.boot.starter.entity.SegmentResult;
 import com.gitee.dorive.spring.boot.starter.entity.SelectSegment;
 import lombok.Data;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -44,18 +42,12 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
     public SQLExampleBuilder(AbstractCoatingRepository<?, ?> repository) {
         this.repository = repository;
-        this.segmentBuilder = new SegmentBuilder();
+        this.segmentBuilder = new SegmentBuilder(repository);
     }
 
     @Override
     public Example buildExample(Context context, Object coating) {
-        CoatingRepositoriesResolver coatingRepositoriesResolver = repository.getCoatingRepositoriesResolver();
-        Map<String, CoatingRepositories> nameCoatingRepositoriesMap = coatingRepositoriesResolver.getNameCoatingRepositoriesMap();
-
-        CoatingRepositories coatingRepositories = nameCoatingRepositoriesMap.get(coating.getClass().getName());
-        Assert.notNull(coatingRepositories, "No coating definition found!");
-
-        SegmentResult segmentResult = segmentBuilder.buildSegment(coatingRepositories, coating);
+        SegmentResult segmentResult = segmentBuilder.buildSegment(coating);
         char letter = segmentResult.getLetter();
         SelectSegment selectSegment = segmentResult.getSelectSegment();
         List<Object> args = segmentResult.getArgs();
@@ -75,7 +67,9 @@ public class SQLExampleBuilder implements ExampleBuilder {
         if (!selectSegment.isDirtyQuery()) {
             return example;
         }
-
+        
+        selectSegment.setDistinct(true);
+        selectSegment.setColumns(Collections.singletonList(selectSegment.getTableAlias() + ".id"));
         SqlBuilder builder = selectSegment.createBuilder();
 
         if (page != null) {

@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.simple.impl;
+package com.gitee.dorive.ref.impl;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.repository.ProxyRepository;
-import com.gitee.dorive.simple.api.Ref;
-import com.gitee.dorive.simple.api.RefObj;
-import com.gitee.dorive.simple.repository.AbstractRefRepository;
+import com.gitee.dorive.ref.api.Ref;
+import com.gitee.dorive.ref.api.RefObj;
+import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
