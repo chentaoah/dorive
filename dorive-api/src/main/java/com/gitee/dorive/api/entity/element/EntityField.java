@@ -71,7 +71,7 @@ public class EntityField extends EntityEle {
             }
         }
         aliasDef = AliasDef.fromElement(field);
-        if (entityDef != null && filter(genericType)) {
+        if (filter(genericType)) {
             entityType = EntityType.getInstance(genericType);
         }
     }

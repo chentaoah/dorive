@@ -41,7 +41,10 @@ public class PropChainResolver {
             PropChain propChain = new PropChain(lastPropChain, entityType, accessPath, entityField);
             propChainMap.put(accessPath, propChain);
             if (EntityField.filter(entityField.getType()) && !entityField.isAnnotatedEntity()) {
-                resolve(accessPath, entityField.getEntityType());
+                EntityType fieldEntityType = entityField.getEntityType();
+                if (fieldEntityType != null) {
+                    resolve(accessPath, fieldEntityType);
+                }
             }
         }
     }

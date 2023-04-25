@@ -49,10 +49,11 @@ public class EntityType extends EntityEle {
     public static synchronized EntityType getInstance(Class<?> type) {
         EntityType entityType = CACHE.get(type);
         if (entityType == null) {
-            Assert.isTrue(LOCK.add(type), "Circular dependency!");
-            entityType = new EntityType(type);
-            LOCK.remove(type);
-            CACHE.put(type, entityType);
+            if (LOCK.add(type)) {
+                entityType = new EntityType(type);
+                LOCK.remove(type);
+                CACHE.put(type, entityType);
+            }
         }
         return entityType;
     }
