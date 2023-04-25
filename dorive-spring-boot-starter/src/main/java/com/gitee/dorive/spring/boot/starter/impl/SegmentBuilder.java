@@ -147,13 +147,22 @@ public class SegmentBuilder {
             if (operator.endsWith(Operator.LIKE)) {
                 value = SqlUtils.toLike(value);
             }
-            if (!operator.startsWith("IS")) {
+            ArgSegment argSegment = null;
+            if (Operator.NULL_SWITCH.equals(operator)) {
+                if (value instanceof Boolean) {
+                    Boolean flag = (Boolean) value;
+                    argSegment = new ArgSegment(tableAlias + "." + property, flag ? Operator.IS_NULL : Operator.IS_NOT_NULL, null);
+                }
+
+            } else if (operator.startsWith("IS")) {
+                argSegment = new ArgSegment(tableAlias + "." + property, operator, null);
+
+            } else {
                 args.add(value);
                 int index = args.size() - 1;
-                ArgSegment argSegment = new ArgSegment(tableAlias + "." + property, operator, "{" + index + "}");
-                argSegments.add(argSegment);
-            } else {
-                ArgSegment argSegment = new ArgSegment(tableAlias + "." + property, operator, null);
+                argSegment = new ArgSegment(tableAlias + "." + property, operator, "{" + index + "}");
+            }
+            if (argSegment != null) {
                 argSegments.add(argSegment);
             }
         }
