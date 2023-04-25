@@ -49,7 +49,9 @@ public class EntityType extends EntityEle {
     public static synchronized EntityType getInstance(Class<?> type) {
         EntityType entityType = CACHE.get(type);
         if (entityType == null) {
+            Assert.isTrue(LOCK.add(type), "Circular dependency!");
             entityType = new EntityType(type);
+            LOCK.remove(type);
             CACHE.put(type, entityType);
         }
         return entityType;
@@ -57,7 +59,6 @@ public class EntityType extends EntityEle {
 
     private EntityType(Class<?> type) {
         super(type);
-        Assert.isTrue(LOCK.add(type), "Circular dependency!");
         this.type = type;
         this.name = type.getName();
         for (Field field : ReflectUtils.getAllFields(type)) {
@@ -67,7 +68,6 @@ public class EntityType extends EntityEle {
             }
         }
         initialize();
-        LOCK.remove(type);
     }
 
     @Override
