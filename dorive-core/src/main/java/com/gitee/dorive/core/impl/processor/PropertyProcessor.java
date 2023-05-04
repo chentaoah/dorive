@@ -19,7 +19,6 @@ package com.gitee.dorive.core.impl.processor;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.context.Context;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,12 +28,6 @@ import java.util.Collection;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class PropertyProcessor extends DefaultProcessor {
-
-    @Override
-    public void check() {
-        super.check();
-        Assert.notBlank(getBindingDef().getProperty(), "The property of PropertyProcessor cannot be blank!");
-    }
 
     @Override
     public Object input(Context context, Object value) {

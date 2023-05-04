@@ -17,10 +17,9 @@
 
 package com.gitee.dorive.core.impl.processor;
 
-import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.core.api.common.Processor;
+import com.gitee.dorive.core.api.context.Context;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -29,10 +28,6 @@ import lombok.NoArgsConstructor;
 public class DefaultProcessor implements Processor {
 
     private BindingDef bindingDef;
-
-    public void check() {
-        Assert.notNull(bindingDef, "The bindingDef cannot be null!");
-    }
 
     @Override
     public Object input(Context context, Object value) {
