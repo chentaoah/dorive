@@ -40,7 +40,7 @@ public class CountQuerier {
         this.segmentBuilder = new SegmentBuilder(repository);
     }
 
-    public Map<String, Long> selectCount(String groupField, String countField, Object coating) {
+    public Map<String, Long> selectCount(String groupField, boolean distinct, String countField, Object coating) {
         SegmentResult segmentResult = segmentBuilder.buildSegment(coating);
         SelectSegment selectSegment = segmentResult.getSelectSegment();
         List<Object> args = segmentResult.getArgs();
@@ -55,7 +55,11 @@ public class CountQuerier {
 
         List<String> columns = new ArrayList<>(2);
         columns.add(groupByColumn + " AS recordId");
-        columns.add("count(DISTINCT " + countColumn + ") AS totalCount");
+        if (distinct) {
+            columns.add("count(DISTINCT " + countColumn + ") AS totalCount");
+        } else {
+            columns.add("count(" + countColumn + ") AS totalCount");
+        }
         selectSegment.setColumns(columns);
         selectSegment.setGroupBy("GROUP BY " + groupByColumn);
 
@@ -63,6 +67,10 @@ public class CountQuerier {
         Map<String, Long> countMap = new LinkedHashMap<>(resultMaps.size() * 4 / 3 + 1);
         resultMaps.forEach(resultMap -> countMap.put(resultMap.get("recordId").toString(), (Long) resultMap.get("totalCount")));
         return countMap;
+    }
+
+    public Map<String, Long> selectCount(String groupField, String countField, Object coating) {
+        return selectCount(groupField, true, countField, coating);
     }
 
 }
