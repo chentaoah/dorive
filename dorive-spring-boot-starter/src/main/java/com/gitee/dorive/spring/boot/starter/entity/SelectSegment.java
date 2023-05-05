@@ -39,14 +39,18 @@ public class SelectSegment extends Segment {
     private String orderBy;
     private String limit;
 
-    public SqlBuilder createBuilder() {
+    public String selectSql() {
         SqlBuilder sqlBuilder = SqlBuilder.create();
         sqlBuilder.select(distinct, columns);
+        return sqlBuilder.toString();
+    }
+
+    public String fromWhereSql() {
+        SqlBuilder sqlBuilder = SqlBuilder.create();
         sqlBuilder.from(tableName + " " + tableAlias);
         for (JoinSegment joinSegment : joinSegments) {
             if (joinSegment.isAvailable()) {
                 sqlBuilder.join(joinSegment.getTableName() + " " + joinSegment.getTableAlias(), SqlBuilder.Join.LEFT);
-
                 List<OnSegment> onSegments = joinSegment.getOnSegments().stream()
                         .filter(onSegment -> onSegment.getDirectedSegments().get(0).isAvailable())
                         .collect(Collectors.toList());
@@ -54,6 +58,11 @@ public class SelectSegment extends Segment {
             }
         }
         sqlBuilder.where(StrUtil.join(" AND ", argSegments));
+        return sqlBuilder.toString();
+    }
+
+    public String lastSql() {
+        SqlBuilder sqlBuilder = SqlBuilder.create();
         if (groupBy != null) {
             sqlBuilder.append(" ").append(groupBy);
         }
@@ -63,12 +72,12 @@ public class SelectSegment extends Segment {
         if (limit != null) {
             sqlBuilder.append(" ").append(limit);
         }
-        return sqlBuilder;
+        return sqlBuilder.toString();
     }
 
     @Override
     public String toString() {
-        return createBuilder().toString();
+        return selectSql() + fromWhereSql() + lastSql();
     }
 
 }

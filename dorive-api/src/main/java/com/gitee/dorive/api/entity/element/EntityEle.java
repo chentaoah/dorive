@@ -79,12 +79,12 @@ public abstract class EntityEle {
 
     public List<String> toAliases(List<String> properties) {
         if (properties != null && !properties.isEmpty()) {
-            List<String> columns = new ArrayList<>(properties.size());
+            List<String> aliases = new ArrayList<>(properties.size());
             for (String property : properties) {
                 String alias = toAlias(property);
-                columns.add(alias);
+                aliases.add(alias);
             }
-            return columns;
+            return aliases;
         }
         return properties;
     }

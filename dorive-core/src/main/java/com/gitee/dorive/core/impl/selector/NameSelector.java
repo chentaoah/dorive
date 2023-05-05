@@ -72,7 +72,7 @@ public class NameSelector extends AbstractSelector {
     }
 
     @Override
-    public List<String> selectColumns(Context context, CommonRepository repository) {
+    public List<String> select(Context context, CommonRepository repository) {
         EntityDef entityDef = repository.getEntityDef();
         String name = entityDef.getName();
         NameDef nameDef = nameDefMap.get(name);

@@ -115,18 +115,18 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     private QueryWrapper<Object> buildQueryWrapper(Example example) {
         QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
 
-        List<String> selectColumns = example.getSelectColumns();
-        if (selectColumns != null && !selectColumns.isEmpty()) {
-            queryWrapper.select(selectColumns);
+        List<String> selectProps = example.getSelectProps();
+        if (selectProps != null && !selectProps.isEmpty()) {
+            queryWrapper.select(selectProps);
         }
 
-        List<String> extraColumns = example.getExtraColumns();
-        if (extraColumns != null && !extraColumns.isEmpty()) {
+        List<String> extraProps = example.getExtraProps();
+        if (extraProps != null && !extraProps.isEmpty()) {
             String sqlSelect = queryWrapper.getSqlSelect();
             if (StringUtils.isBlank(sqlSelect)) {
                 sqlSelect = queryWrapper.select(pojoClass, i -> true).getSqlSelect();
             }
-            sqlSelect = sqlSelect + StringPool.COMMA + queryWrapper.select(extraColumns).getSqlSelect();
+            sqlSelect = sqlSelect + StringPool.COMMA + queryWrapper.select(extraProps).getSqlSelect();
             queryWrapper.select(sqlSelect);
         }
 
@@ -139,10 +139,10 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         if (orderBy != null) {
             String order = orderBy.getOrder();
             if (Order.ASC.equals(order)) {
-                queryWrapper.orderByAsc(orderBy.getColumns());
+                queryWrapper.orderByAsc(orderBy.getProperties());
 
             } else if (Order.DESC.equals(order)) {
-                queryWrapper.orderByDesc(orderBy.getColumns());
+                queryWrapper.orderByDesc(orderBy.getProperties());
             }
         }
 

@@ -85,13 +85,20 @@ public class AliasExecutor extends AbstractExecutor {
     }
 
     public void convert(Example example) {
-        List<String> selectColumns = example.getSelectColumns();
-        if (selectColumns != null && !selectColumns.isEmpty()) {
-            selectColumns = entityEle.toAliases(selectColumns);
-            example.selectColumns(selectColumns);
-        }
+        convertSelect(example);
+        convertCriteria(example.getCriteria());
+        convertOrderBy(example.getOrderBy());
+    }
 
-        List<Criterion> criteria = example.getCriteria();
+    public void convertSelect(Example example) {
+        List<String> properties = example.getSelectProps();
+        if (properties != null && !properties.isEmpty()) {
+            properties = entityEle.toAliases(properties);
+            example.select(properties);
+        }
+    }
+
+    public void convertCriteria(List<Criterion> criteria) {
         if (criteria != null && !criteria.isEmpty()) {
             for (Criterion criterion : criteria) {
                 String property = criterion.getProperty();
@@ -99,12 +106,13 @@ public class AliasExecutor extends AbstractExecutor {
                 criterion.setProperty(property);
             }
         }
+    }
 
-        OrderBy orderBy = example.getOrderBy();
+    public void convertOrderBy(OrderBy orderBy) {
         if (orderBy != null) {
-            List<String> orderByColumns = orderBy.getColumns();
-            orderByColumns = entityEle.toAliases(orderByColumns);
-            orderBy.setColumns(orderByColumns);
+            List<String> properties = orderBy.getProperties();
+            properties = entityEle.toAliases(properties);
+            orderBy.setProperties(properties);
         }
     }
 

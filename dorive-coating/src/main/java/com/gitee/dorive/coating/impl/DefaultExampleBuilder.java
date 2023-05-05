@@ -105,7 +105,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
             List<Object> entities = Collections.emptyList();
             if (!example.isEmptyQuery() && example.isDirtyQuery()) {
-                example.selectColumns(new ArrayList<>(binderResolver.getBoundFields()));
+                example.select(new ArrayList<>(binderResolver.getBoundFields()));
                 entities = executedRepository.selectByExample(context, example);
             }
 

@@ -66,7 +66,7 @@ public class CommonRepository extends ProxyRepository {
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Selector selector = context.getSelector();
-        List<String> properties = selector.selectColumns(context, this);
+        List<String> properties = selector.select(context, this);
         if (properties != null && !properties.isEmpty()) {
             if (query.getPrimaryKey() != null) {
                 Example example = new Example().eq("id", query.getPrimaryKey());
@@ -75,7 +75,7 @@ public class CommonRepository extends ProxyRepository {
             }
             Example example = query.getExample();
             if (example != null) {
-                example.selectColumns(properties);
+                example.select(properties);
             }
         }
         Example example = query.getExample();
@@ -84,8 +84,9 @@ public class CommonRepository extends ProxyRepository {
                 Page<Object> page = example.getPage();
                 return page != null ? new Result<>(page) : new Result<>();
             }
-            if (example.getOrderBy() == null) {
-                example.setOrderBy(defaultOrderBy);
+            if (example.getOrderBy() == null && defaultOrderBy != null) {
+                OrderBy orderBy = new OrderBy(defaultOrderBy.getProperties(), defaultOrderBy.getOrder());
+                example.setOrderBy(orderBy);
             }
         }
         return super.executeQuery(context, query);

@@ -25,6 +25,6 @@ public interface Selector extends Context {
 
     boolean matches(Context context, CommonRepository repository);
 
-    List<String> selectColumns(Context context, CommonRepository repository);
+    List<String> select(Context context, CommonRepository repository);
 
 }

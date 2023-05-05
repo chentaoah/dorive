@@ -18,7 +18,6 @@
 package com.gitee.dorive.spring.boot.starter.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.db.sql.SqlBuilder;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
@@ -30,7 +29,7 @@ import com.gitee.dorive.spring.boot.starter.entity.SegmentResult;
 import com.gitee.dorive.spring.boot.starter.entity.SelectSegment;
 import lombok.Data;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -67,13 +66,19 @@ public class SQLExampleBuilder implements ExampleBuilder {
         if (!selectSegment.isDirtyQuery()) {
             return example;
         }
-        
+
         selectSegment.setDistinct(true);
-        selectSegment.setColumns(Collections.singletonList(selectSegment.getTableAlias() + ".id"));
-        SqlBuilder builder = selectSegment.createBuilder();
+
+        List<String> selectColumns = new ArrayList<>(2);
+        String tableAlias = selectSegment.getTableAlias();
+        selectColumns.add(tableAlias + ".id");
+        selectSegment.setColumns(selectColumns);
+
+        String fromWhereSql = selectSegment.fromWhereSql();
 
         if (page != null) {
-            long count = SqlRunner.db().selectCount("SELECT COUNT(1) FROM (" + builder + ") " + letter, args.toArray());
+            String countSql = selectSegment.selectSql() + fromWhereSql;
+            long count = SqlRunner.db().selectCount("SELECT COUNT(1) FROM (" + countSql + ") " + letter, args.toArray());
             page.setTotal(count);
             example.setCountQueried(true);
             if (count == 0) {
@@ -83,13 +88,19 @@ public class SQLExampleBuilder implements ExampleBuilder {
         }
 
         if (orderBy != null) {
-            builder.append(" ").append(orderBy.toString());
+            for (String property : orderBy.getProperties()) {
+                if (!"id".equals(property)) {
+                    selectColumns.add(tableAlias + "." + property);
+                }
+            }
+            selectSegment.setOrderBy(orderBy.toString());
         }
         if (page != null) {
-            builder.append(" ").append(page.toString());
+            selectSegment.setLimit(page.toString());
         }
 
-        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(builder.toString(), args.toArray());
+        String selectSql = selectSegment.selectSql() + fromWhereSql + selectSegment.lastSql();
+        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(selectSql, args.toArray());
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
         if (!primaryKeys.isEmpty()) {
             example.eq("id", primaryKeys);

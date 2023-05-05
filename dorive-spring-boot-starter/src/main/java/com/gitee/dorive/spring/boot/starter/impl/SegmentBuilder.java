@@ -71,6 +71,10 @@ public class SegmentBuilder {
         List<ArgSegment> argSegments = new ArrayList<>();
         List<Object> args = new ArrayList<>();
 
+        SpecificProperties properties = coatingRepositories.getSpecificProperties();
+        OrderBy orderBy = properties.newOrderBy(coating);
+        Page<Object> page = properties.newPage(coating);
+
         for (PropertyRepository propertyRepository : propertyRepositories) {
             MergedRepository mergedRepository = propertyRepository.getMergedRepository();
             String lastAccessPath = mergedRepository.getLastAccessPath();
@@ -107,6 +111,8 @@ public class SegmentBuilder {
                 selectSegment.setArgSegments(argSegments);
                 segmentMap.put(relativeAccessPath, selectSegment);
 
+                aliasExecutor.convertOrderBy(orderBy);
+
             } else {
                 JoinSegment joinSegment = new JoinSegment();
                 joinSegment.setReachable(false);
@@ -130,10 +136,6 @@ public class SegmentBuilder {
         if (selectSegment != null) {
             markReachableAndDirty(selectSegment);
         }
-
-        SpecificProperties properties = coatingRepositories.getSpecificProperties();
-        OrderBy orderBy = properties.newOrderBy(coating);
-        Page<Object> page = properties.newPage(coating);
 
         return new SegmentResult(letter, selectSegment, args, orderBy, page);
     }

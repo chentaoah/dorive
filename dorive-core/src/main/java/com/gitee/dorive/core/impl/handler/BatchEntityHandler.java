@@ -84,7 +84,7 @@ public class BatchEntityHandler implements EntityHandler {
             if (lastEntity != null) {
                 Example example = repository.newExampleByContext(context, rootEntity);
                 if (example.isDirtyQuery()) {
-                    example.extraColumns((index + 1) + " as $row");
+                    example.selectExtra((index + 1) + " as $row");
                     unionExample.addExample(example);
                 }
             }
