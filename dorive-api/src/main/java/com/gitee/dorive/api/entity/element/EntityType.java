@@ -23,10 +23,12 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.def.AliasDef;
+import com.gitee.dorive.api.exception.CircularDependencyException;
 import com.gitee.dorive.api.impl.factory.PropProxyFactory;
 import com.gitee.dorive.api.util.ReflectUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -36,6 +38,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Data
+@Slf4j
 @EqualsAndHashCode(callSuper = true)
 public class EntityType extends EntityEle {
 
@@ -49,25 +52,33 @@ public class EntityType extends EntityEle {
     public static synchronized EntityType getInstance(Class<?> type) {
         EntityType entityType = CACHE.get(type);
         if (entityType == null) {
-            entityType = new EntityType(type);
-            CACHE.put(type, entityType);
+            if (LOCK.add(type)) {
+                entityType = new EntityType(type);
+                LOCK.remove(type);
+                CACHE.put(type, entityType);
+            } else {
+                throw new CircularDependencyException("Circular Dependency! type: " + type.getName());
+            }
         }
         return entityType;
     }
 
     private EntityType(Class<?> type) {
         super(type);
-        Assert.isTrue(LOCK.add(type), "Circular dependency!");
         this.type = type;
         this.name = type.getName();
         for (Field field : ReflectUtils.getAllFields(type)) {
             if (!Modifier.isStatic(field.getModifiers())) {
-                EntityField entityField = new EntityField(field);
-                entityFields.put(entityField.getName(), entityField);
+                try {
+                    EntityField entityField = new EntityField(field);
+                    entityFields.put(entityField.getName(), entityField);
+
+                } catch (CircularDependencyException e) {
+                    log.warn(e.getMessage());
+                }
             }
         }
         initialize();
-        LOCK.remove(type);
     }
 
     @Override
@@ -101,10 +112,6 @@ public class EntityType extends EntityEle {
     @Override
     public EntityType getEntityType() {
         return this;
-    }
-
-    public void check() {
-        Assert.isTrue(isAnnotatedEntity(), "No @Entity annotation found! type: {}", name);
     }
 
 }

@@ -120,6 +120,7 @@ public class BinderResolver {
     }
 
     private Processor newProcessor(BindingDef bindingDef) {
+        Assert.notNull(bindingDef, "The bindingDef cannot be null!");
         Class<?> processorClass = bindingDef.getProcessor();
         Processor processor = null;
         if (processorClass == Object.class) {
@@ -141,7 +142,9 @@ public class BinderResolver {
         if (processor instanceof DefaultProcessor) {
             DefaultProcessor defaultProcessor = (DefaultProcessor) processor;
             defaultProcessor.setBindingDef(bindingDef);
-            defaultProcessor.check();
+        }
+        if (processor instanceof PropertyProcessor) {
+            Assert.notBlank(bindingDef.getProperty(), "The property of PropertyProcessor cannot be blank!");
         }
         return processor;
     }
