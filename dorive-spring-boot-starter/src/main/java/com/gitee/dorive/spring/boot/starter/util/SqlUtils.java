@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.util;
+package com.gitee.dorive.spring.boot.starter.util;
 
 public class SqlUtils {
 
