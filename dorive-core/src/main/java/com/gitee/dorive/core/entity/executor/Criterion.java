@@ -17,21 +17,13 @@
 
 package com.gitee.dorive.core.entity.executor;
 
-import com.gitee.dorive.core.util.CriterionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
 public class Criterion {
-
     private String property;
     private String operator;
     private Object value;
-
-    @Override
-    public String toString() {
-        return CriterionUtils.toString(this);
-    }
-
 }

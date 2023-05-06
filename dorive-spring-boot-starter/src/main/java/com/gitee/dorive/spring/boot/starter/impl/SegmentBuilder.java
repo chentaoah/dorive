@@ -33,7 +33,7 @@ import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.core.util.CriterionUtils;
+import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
 import com.gitee.dorive.core.util.SqlUtils;
 import com.gitee.dorive.spring.boot.starter.api.Keys;
 import com.gitee.dorive.spring.boot.starter.entity.ArgSegment;

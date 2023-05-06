@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.util;
+package com.gitee.dorive.spring.boot.starter.util;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.core.util.SqlUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

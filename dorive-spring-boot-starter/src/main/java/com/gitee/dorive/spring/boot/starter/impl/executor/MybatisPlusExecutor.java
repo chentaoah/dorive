@@ -18,6 +18,7 @@
 package com.gitee.dorive.spring.boot.starter.impl.executor;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -35,6 +36,7 @@ import com.gitee.dorive.core.entity.operation.*;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
 import com.gitee.dorive.spring.boot.starter.entity.QueryResult;
+import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -167,7 +169,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
             String sqlSelect = nextQueryWrapper.getSqlSelect();
             String tableName = TableInfoHelper.getTableInfo(pojoClass).getTableName();
-            String criteria = nextExample.buildCriteria();
+            String criteria = CollUtil.join(nextExample.getCriteria(), " AND ", CriterionUtils::toString);
 
             String sql = "";
             if (nextExample.getOrderBy() == null && nextExample.getPage() == null) {

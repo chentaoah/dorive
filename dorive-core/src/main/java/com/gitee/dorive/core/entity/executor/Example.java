@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.core.entity.executor;
 
-import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.core.util.StringUtils;
@@ -70,10 +69,6 @@ public class Example {
 
     public void addCriterion(Criterion criterion) {
         criteria.add(criterion);
-    }
-
-    public String buildCriteria() {
-        return StrUtil.join(" AND ", criteria);
     }
 
     public Example eq(String property, Object value) {
