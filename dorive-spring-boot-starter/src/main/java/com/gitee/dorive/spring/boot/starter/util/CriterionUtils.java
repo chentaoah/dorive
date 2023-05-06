@@ -24,7 +24,6 @@ import com.gitee.dorive.core.entity.executor.Criterion;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.stream.Collectors;
 
 public class CriterionUtils {
 
@@ -55,21 +54,20 @@ public class CriterionUtils {
     public static Object getValue(Criterion criterion) {
         String operator = criterion.getOperator();
         Object value = criterion.getValue();
-        if (value instanceof Collection) {
-            Collection<?> collection = (Collection<?>) value;
-            return collection.stream().map(item -> sqlParam(operator, item)).collect(Collectors.joining(", ", "(", ")"));
-        }
-        return sqlParam(operator, value);
+        return StringUtils.sqlParam(format(operator, value));
     }
 
-    public static String sqlParam(String operator, Object value) {
+    public static Object format(String operator, Object value) {
+        if (value instanceof Collection) {
+            return value;
+        }
         if (value instanceof Date) {
             value = DateUtil.formatDateTime((Date) value);
         }
         if (Operator.LIKE.equals(operator) || Operator.NOT_LIKE.equals(operator)) {
             value = SqlUtils.toLike(value);
         }
-        return StringUtils.quotaMark(value);
+        return value;
     }
 
     public static String toString(Criterion criterion) {

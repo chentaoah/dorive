@@ -33,24 +33,14 @@ import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
-import com.gitee.dorive.spring.boot.starter.util.SqlUtils;
 import com.gitee.dorive.spring.boot.starter.api.Keys;
-import com.gitee.dorive.spring.boot.starter.entity.ArgSegment;
-import com.gitee.dorive.spring.boot.starter.entity.JoinSegment;
-import com.gitee.dorive.spring.boot.starter.entity.OnSegment;
-import com.gitee.dorive.spring.boot.starter.entity.Segment;
-import com.gitee.dorive.spring.boot.starter.entity.SegmentResult;
-import com.gitee.dorive.spring.boot.starter.entity.SelectSegment;
+import com.gitee.dorive.spring.boot.starter.entity.*;
 import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;
+import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -143,28 +133,17 @@ public class SegmentBuilder {
     private void appendArguments(List<ArgSegment> argSegments, List<Object> args, String tableAlias, Example example) {
         List<Criterion> criteria = example.getCriteria();
         for (Criterion criterion : criteria) {
-            String property = criterion.getProperty();
+            String property = tableAlias + "." + criterion.getProperty();
             String operator = CriterionUtils.getOperator(criterion);
-            Object value = criterion.getValue();
-            if (operator.endsWith(Operator.LIKE)) {
-                value = SqlUtils.toLike(value);
-            }
-            ArgSegment argSegment = null;
-            if (Operator.NULL_SWITCH.equals(operator)) {
-                if (value instanceof Boolean) {
-                    Boolean flag = (Boolean) value;
-                    argSegment = new ArgSegment(tableAlias + "." + property, flag ? Operator.IS_NULL : Operator.IS_NOT_NULL, null);
-                }
-
-            } else if (operator.startsWith("IS")) {
-                argSegment = new ArgSegment(tableAlias + "." + property, operator, null);
+            if (Operator.IS_NULL.equals(operator) || Operator.IS_NOT_NULL.equals(operator)) {
+                ArgSegment argSegment = new ArgSegment(property, operator, null);
+                argSegments.add(argSegment);
 
             } else {
-                args.add(value);
+                Object value = criterion.getValue();
+                args.add(CriterionUtils.format(operator, value));
                 int index = args.size() - 1;
-                argSegment = new ArgSegment(tableAlias + "." + property, operator, "{" + index + "}");
-            }
-            if (argSegment != null) {
+                ArgSegment argSegment = new ArgSegment(property, operator, "{" + index + "}");
                 argSegments.add(argSegment);
             }
         }
