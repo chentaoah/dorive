@@ -88,7 +88,6 @@ public class SegmentBuilder {
             List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> Collections.emptyList());
             aliasExecutor.convertCriteria(criteria);
             Example example = new Example(criteria);
-
             appendArguments(argSegments, args, tableAlias, example);
 
             if ("/".equals(relativeAccessPath)) {
