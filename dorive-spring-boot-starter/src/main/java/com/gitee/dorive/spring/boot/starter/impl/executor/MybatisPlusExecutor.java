@@ -47,6 +47,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.gitee.dorive.spring.boot.starter.impl.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
 
@@ -137,6 +138,10 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             criterionAppender.appendCriterion(queryWrapper, criterion.getProperty(), criterion.getValue());
         }
 
+        if (example instanceof MultiColInExample) {
+            appendCriteria(queryWrapper, (MultiColInExample) example);
+        }
+
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
             String order = orderBy.getOrder();
@@ -149,6 +154,27 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         }
 
         return queryWrapper;
+    }
+
+    private void appendCriteria(QueryWrapper<Object> queryWrapper, MultiColInExample example) {
+        List<String> properties = example.getProperties();
+        List<List<Object>> valuesColl = example.getValuesColl();
+        String propStr = properties.stream()
+                .collect(Collectors.joining(",", "(", ")"));
+        String valuesStr = valuesColl.stream()
+                .map(this::buildValuesStr)
+                .collect(Collectors.joining(",", "(", ")"));
+        if (queryWrapper.isEmptyOfWhere()) {
+            queryWrapper.last(" WHERE " + propStr + " IN " + valuesStr);
+        } else {
+            queryWrapper.last(propStr + " IN " + valuesStr);
+        }
+    }
+
+    private String buildValuesStr(List<Object> values) {
+        return values.stream()
+                .map(com.baomidou.mybatisplus.core.toolkit.StringUtils::sqlParam)
+                .collect(Collectors.joining(",", "(", ")"));
     }
 
     private QueryWrapper<Object> buildQueryWrapper(UnionExample unionExample) {

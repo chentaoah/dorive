@@ -17,22 +17,16 @@
 
 package com.gitee.dorive.core.entity.executor;
 
-import cn.hutool.core.util.StrUtil;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-public class OrderBy {
-
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class MultiColInExample extends Example {
     private List<String> properties;
-    private String order;
-
-    @Override
-    public String toString() {
-        return "ORDER BY " + StrUtil.join(",", properties) + " " + order.toUpperCase();
-    }
-
+    private List<List<Object>> valuesColl;
 }

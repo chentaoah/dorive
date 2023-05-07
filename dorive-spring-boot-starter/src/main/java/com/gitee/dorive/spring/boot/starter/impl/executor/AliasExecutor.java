@@ -20,11 +20,7 @@ package com.gitee.dorive.spring.boot.starter.impl.executor;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.executor.UnionExample;
+import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
@@ -87,6 +83,7 @@ public class AliasExecutor extends AbstractExecutor {
     public void convert(Example example) {
         convertSelect(example);
         convertCriteria(example.getCriteria());
+        covertMultiColIn(example);
         convertOrderBy(example.getOrderBy());
     }
 
@@ -94,7 +91,7 @@ public class AliasExecutor extends AbstractExecutor {
         List<String> properties = example.getSelectProps();
         if (properties != null && !properties.isEmpty()) {
             properties = entityEle.toAliases(properties);
-            example.select(properties);
+            example.setSelectProps(properties);
         }
     }
 
@@ -104,6 +101,17 @@ public class AliasExecutor extends AbstractExecutor {
                 String property = criterion.getProperty();
                 property = entityEle.toAlias(property);
                 criterion.setProperty(property);
+            }
+        }
+    }
+
+    private void covertMultiColIn(Example example) {
+        if (example instanceof MultiColInExample) {
+            MultiColInExample multiColInExample = (MultiColInExample) example;
+            List<String> properties = multiColInExample.getProperties();
+            if (properties != null && !properties.isEmpty()) {
+                properties = entityEle.toAliases(properties);
+                multiColInExample.setProperties(properties);
             }
         }
     }
