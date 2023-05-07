@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
-import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.util.Map;
 
 @Data
@@ -38,18 +38,16 @@ public class PropertyDef {
     private String operator;
     private boolean ignore;
 
-    public static PropertyDef fromElement(AnnotatedElement element) {
-        if (element.isAnnotationPresent(Property.class)) {
-            Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Property.class);
-            return BeanUtil.copyProperties(attributes, PropertyDef.class);
+    public static PropertyDef fromElement(Field field) {
+        if (field.isAnnotationPresent(Property.class)) {
+            Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(field, Property.class);
+            PropertyDef propertyDef = BeanUtil.copyProperties(attributes, PropertyDef.class);
+            if (StringUtils.isBlank(propertyDef.getField())) {
+                propertyDef.setField(field.getName());
+            }
+            return propertyDef;
         }
-        return new PropertyDef("", "", "=", false);
-    }
-
-    public void merge(String fieldName) {
-        if (StringUtils.isBlank(field)) {
-            field = fieldName;
-        }
+        return new PropertyDef("/", field.getName(), "=", false);
     }
 
 }

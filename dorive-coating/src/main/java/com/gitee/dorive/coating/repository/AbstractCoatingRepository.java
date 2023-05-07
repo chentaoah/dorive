@@ -17,12 +17,14 @@
 
 package com.gitee.dorive.coating.repository;
 
+import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.annotation.Repository;
 import com.gitee.dorive.coating.annotation.CoatingScan;
 import com.gitee.dorive.coating.api.CoatingRepository;
 import com.gitee.dorive.coating.api.ExampleBuilder;
+import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.impl.DefaultExampleBuilder;
-import com.gitee.dorive.coating.impl.resolver.CoatingRepositoriesResolver;
+import com.gitee.dorive.coating.impl.resolver.CoatingTypeResolver;
 import com.gitee.dorive.coating.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -34,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -43,7 +46,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     private String[] scanPackages;
     private String regex;
     private MergedRepositoryResolver mergedRepositoryResolver;
-    private CoatingRepositoriesResolver coatingRepositoriesResolver;
+    private CoatingTypeResolver coatingTypeResolver;
     private ExampleBuilder exampleBuilder;
 
     @Override
@@ -55,13 +58,19 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
             this.querier = repository.querier();
             this.scanPackages = coatingScan.value();
             this.regex = StringUtils.isBlank(coatingScan.regex()) ? "^" + getEntityClass().getSimpleName() + ".*" : coatingScan.regex();
-
             this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
-            this.coatingRepositoriesResolver = new CoatingRepositoriesResolver(this);
+            this.coatingTypeResolver = new CoatingTypeResolver(this);
             if ("default".equals(querier)) {
                 this.exampleBuilder = new DefaultExampleBuilder(this);
             }
         }
+    }
+
+    public CoatingType getCoatingType(Object coating) {
+        Map<String, CoatingType> nameCoatingTypeMap = coatingTypeResolver.getNameCoatingTypeMap();
+        CoatingType coatingType = nameCoatingTypeMap.get(coating.getClass().getName());
+        Assert.notNull(coatingType, "No coating type found!");
+        return coatingType;
     }
 
     @Override

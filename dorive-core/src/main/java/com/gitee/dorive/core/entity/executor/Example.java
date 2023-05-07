@@ -39,6 +39,10 @@ public class Example {
     private OrderBy orderBy;
     private Page<Object> page;
 
+    public Example(List<Criterion> criteria) {
+        this.criteria = criteria;
+    }
+
     public boolean isDirtyQuery() {
         return !criteria.isEmpty();
     }
@@ -65,10 +69,6 @@ public class Example {
         } else {
             extraProps.addAll(properties);
         }
-    }
-
-    public void addCriterion(Criterion criterion) {
-        criteria.add(criterion);
     }
 
     public Example eq(String property, Object value) {

@@ -17,14 +17,11 @@
 
 package com.gitee.dorive.spring.boot.starter.impl;
 
-import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.gitee.dorive.api.constant.Operator;
-import com.gitee.dorive.coating.entity.CoatingRepositories;
+import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.entity.MergedRepository;
-import com.gitee.dorive.coating.entity.PropertyRepository;
-import com.gitee.dorive.coating.entity.SpecificProperties;
-import com.gitee.dorive.coating.impl.resolver.CoatingRepositoriesResolver;
+import com.gitee.dorive.coating.entity.SpecificFields;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -34,13 +31,22 @@ import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.spring.boot.starter.api.Keys;
-import com.gitee.dorive.spring.boot.starter.entity.*;
+import com.gitee.dorive.spring.boot.starter.entity.ArgSegment;
+import com.gitee.dorive.spring.boot.starter.entity.JoinSegment;
+import com.gitee.dorive.spring.boot.starter.entity.OnSegment;
+import com.gitee.dorive.spring.boot.starter.entity.Segment;
+import com.gitee.dorive.spring.boot.starter.entity.SegmentResult;
+import com.gitee.dorive.spring.boot.starter.entity.SelectSegment;
 import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;
 import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -49,24 +55,20 @@ public class SegmentBuilder {
     private final AbstractCoatingRepository<?, ?> repository;
 
     public SegmentResult buildSegment(Object coating) {
-        CoatingRepositoriesResolver resolver = repository.getCoatingRepositoriesResolver();
-        Map<String, CoatingRepositories> coatingRepositoriesMap = resolver.getNameCoatingRepositoriesMap();
-        CoatingRepositories coatingRepositories = coatingRepositoriesMap.get(coating.getClass().getName());
-        Assert.notNull(coatingRepositories, "No coating definition found!");
+        CoatingType coatingType = repository.getCoatingType(coating);
+        Map<String, List<Criterion>> criteriaMap = coatingType.newCriteriaMap(coating);
+        SpecificFields properties = coatingType.getSpecificFields();
+        OrderBy orderBy = properties.newOrderBy(coating);
+        Page<Object> page = properties.newPage(coating);
 
-        List<PropertyRepository> propertyRepositories = coatingRepositories.getPropertyRepositories();
-        Map<String, Segment> segmentMap = new LinkedHashMap<>(propertyRepositories.size() * 4 / 3 + 1);
+        List<MergedRepository> mergedRepositories = coatingType.getMergedRepositories();
+        Map<String, Segment> segmentMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);
         char letter = 'a';
         SelectSegment selectSegment = null;
         List<ArgSegment> argSegments = new ArrayList<>();
         List<Object> args = new ArrayList<>();
 
-        SpecificProperties properties = coatingRepositories.getSpecificProperties();
-        OrderBy orderBy = properties.newOrderBy(coating);
-        Page<Object> page = properties.newPage(coating);
-
-        for (PropertyRepository propertyRepository : propertyRepositories) {
-            MergedRepository mergedRepository = propertyRepository.getMergedRepository();
+        for (MergedRepository mergedRepository : mergedRepositories) {
             String lastAccessPath = mergedRepository.getLastAccessPath();
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
@@ -83,8 +85,9 @@ public class SegmentBuilder {
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
-            Example example = propertyRepository.newExampleByCoating(coating);
-            aliasExecutor.convert(example);
+            List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> Collections.emptyList());
+            aliasExecutor.convertCriteria(criteria);
+            Example example = new Example(criteria);
 
             appendArguments(argSegments, args, tableAlias, example);
 

@@ -29,4 +29,5 @@ public class MergedRepository {
     private boolean merged;
     private CommonRepository definedRepository;
     private CommonRepository executedRepository;
+    private Integer sequence;
 }

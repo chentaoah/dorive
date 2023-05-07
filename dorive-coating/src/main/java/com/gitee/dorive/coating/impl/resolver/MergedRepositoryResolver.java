@@ -41,11 +41,13 @@ public class MergedRepositoryResolver {
     }
 
     public void resolve() {
-        CommonRepository rootRepository = repository.getRootRepository();
-
-        MergedRepository rootMergedRepository = new MergedRepository("", "/", false, rootRepository, rootRepository);
-        mergedRepositoryMap.put("/", rootMergedRepository);
-
+        mergedRepositoryMap.put("/", new MergedRepository(
+                "",
+                "/",
+                false,
+                repository.getRootRepository(),
+                repository.getRootRepository(),
+                1));
         resolve(new ArrayList<>(), repository);
     }
 
@@ -66,7 +68,8 @@ public class MergedRepositoryResolver {
                         absoluteAccessPath,
                         true,
                         repository,
-                        rootRepository);
+                        rootRepository,
+                        mergedRepositoryMap.size() + 1);
                 mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
 
                 List<String> newMultiAccessPath = new ArrayList<>(multiAccessPath);
@@ -79,7 +82,7 @@ public class MergedRepositoryResolver {
                         absoluteAccessPath,
                         false,
                         repository,
-                        repository);
+                        repository, mergedRepositoryMap.size() + 1);
                 mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
             }
         }

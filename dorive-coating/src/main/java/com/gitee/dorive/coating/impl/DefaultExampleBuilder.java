@@ -20,12 +20,11 @@ package com.gitee.dorive.coating.impl;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.coating.api.ExampleBuilder;
-import com.gitee.dorive.coating.entity.CoatingRepositories;
+import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.entity.MergedRepository;
-import com.gitee.dorive.coating.entity.PropertyRepository;
-import com.gitee.dorive.coating.impl.resolver.CoatingRepositoriesResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
@@ -49,38 +48,32 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
     @Override
     public Example buildExample(Context context, Object coating) {
-        CoatingRepositoriesResolver coatingRepositoriesResolver = repository.getCoatingRepositoriesResolver();
-        Map<String, CoatingRepositories> nameCoatingRepositoriesMap = coatingRepositoriesResolver.getNameCoatingRepositoriesMap();
+        CoatingType coatingType = repository.getCoatingType(coating);
+        Map<String, List<Criterion>> criteriaMap = coatingType.newCriteriaMap(coating);
 
-        CoatingRepositories coatingRepositories = nameCoatingRepositoriesMap.get(coating.getClass().getName());
-        Assert.notNull(coatingRepositories, "No coating definition found!");
-
-        Map<String, RepoCriterion> repoCriterionMap = new LinkedHashMap<>();
-        for (PropertyRepository propertyRepository : coatingRepositories.getReversedPropertyRepositories()) {
-            Example example = propertyRepository.newExampleByCoating(coating);
-            RepoCriterion repoCriterion = new RepoCriterion(propertyRepository, example);
-
-            MergedRepository mergedRepository = propertyRepository.getMergedRepository();
+        Map<String, RepoExample> repoExampleMap = new LinkedHashMap<>();
+        for (MergedRepository mergedRepository : coatingType.getReversedMergedRepositories()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             String relativeAccessPath = mergedRepository.isMerged() ? absoluteAccessPath + "/" : absoluteAccessPath;
-            repoCriterionMap.put(relativeAccessPath, repoCriterion);
+            List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> new ArrayList<>(2));
+            Example example = new Example(criteria);
+            repoExampleMap.put(relativeAccessPath, new RepoExample(mergedRepository, example));
         }
 
-        executeChainQuery(context, repoCriterionMap);
+        executeQuery(context, repoExampleMap);
 
-        RepoCriterion repoCriterion = repoCriterionMap.get("/");
-        Assert.notNull(repoCriterion, "The criterion cannot be null!");
-        return repoCriterion.getExample();
+        RepoExample repoExample = repoExampleMap.get("/");
+        Assert.notNull(repoExample, "The criterion cannot be null!");
+        return repoExample.getExample();
     }
 
-    private void executeChainQuery(Context context, Map<String, RepoCriterion> repoCriterionMap) {
-        repoCriterionMap.forEach((accessPath, repoCriterion) -> {
+    private void executeQuery(Context context, Map<String, RepoExample> repoExampleMap) {
+        repoExampleMap.forEach((accessPath, repoExample) -> {
             if ("/".equals(accessPath)) return;
 
-            PropertyRepository propertyRepository = repoCriterion.getPropertyRepository();
-            Example example = repoCriterion.getExample();
+            MergedRepository mergedRepository = repoExample.getMergedRepository();
+            Example example = repoExample.getExample();
 
-            MergedRepository mergedRepository = propertyRepository.getMergedRepository();
             String lastAccessPath = mergedRepository.getLastAccessPath();
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
@@ -89,9 +82,9 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
             for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
                 String absoluteAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
-                RepoCriterion targetRepoCriterion = repoCriterionMap.get(absoluteAccessPath);
-                if (targetRepoCriterion != null) {
-                    Example targetExample = targetRepoCriterion.getExample();
+                RepoExample targetRepoExample = repoExampleMap.get(absoluteAccessPath);
+                if (targetRepoExample != null) {
+                    Example targetExample = targetRepoExample.getExample();
                     if (targetExample.isEmptyQuery()) {
                         example.setEmptyQuery(true);
                         break;
@@ -111,9 +104,9 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
             for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
                 String absoluteAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
-                RepoCriterion targetRepoCriterion = repoCriterionMap.get(absoluteAccessPath);
-                if (targetRepoCriterion != null) {
-                    Example targetExample = targetRepoCriterion.getExample();
+                RepoExample targetRepoExample = repoExampleMap.get(absoluteAccessPath);
+                if (targetRepoExample != null) {
+                    Example targetExample = targetRepoExample.getExample();
                     if (entities.isEmpty()) {
                         targetExample.setEmptyQuery(true);
                         continue;
@@ -148,8 +141,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
     @Data
     @AllArgsConstructor
-    public static class RepoCriterion {
-        private PropertyRepository propertyRepository;
+    public static class RepoExample {
+        private MergedRepository mergedRepository;
         private Example example;
     }
 

@@ -29,7 +29,7 @@ import java.util.Collection;
 
 @Data
 @AllArgsConstructor
-public class Property {
+public class CoatingField {
 
     private Field field;
     private Class<?> type;
@@ -38,7 +38,7 @@ public class Property {
     private String name;
     private PropertyDef propertyDef;
 
-    public Property(Field field) {
+    public CoatingField(Field field) {
         this.field = field;
         this.type = field.getType();
         this.collection = false;
@@ -50,18 +50,11 @@ public class Property {
             Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
             this.genericType = (Class<?>) actualTypeArgument;
         }
-        resolve(field);
-    }
-
-    private void resolve(Field field) {
         propertyDef = PropertyDef.fromElement(field);
-        if (propertyDef != null) {
-            propertyDef.merge(name);
-        }
     }
 
-    public boolean isSameType(Property property) {
-        return type == property.getType() && genericType == property.getGenericType();
+    public boolean isIgnore() {
+        return propertyDef.isIgnore();
     }
 
     public Object getFieldValue(Object object) {

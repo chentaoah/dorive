@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.coating.annotation;
 
+import org.springframework.core.annotation.AliasFor;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -30,6 +32,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Property {
 
+    @AliasFor("belongTo")
+    String value() default "";
+    
+    @AliasFor("value")
     String belongTo() default "";
 
     String field() default "";

@@ -17,33 +17,41 @@
 
 package com.gitee.dorive.coating.entity;
 
+import com.gitee.dorive.coating.entity.def.CoatingDef;
 import com.gitee.dorive.coating.entity.def.PropertyDef;
 import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.Example;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class PropertyRepository {
+public class CoatingType {
 
-    private MergedRepository mergedRepository;
-    private List<Property> collectedProperties;
+    private CoatingDef coatingDef;
+    private List<CoatingField> fields;
+    private SpecificFields specificFields;
+    private List<MergedRepository> mergedRepositories;
+    private List<MergedRepository> reversedMergedRepositories;
 
-    public Example newExampleByCoating(Object coating) {
-        Example example = new Example();
-        for (Property property : collectedProperties) {
-            Object fieldValue = property.getFieldValue(coating);
+    public Map<String, List<Criterion>> newCriteriaMap(Object coating) {
+        Map<String, List<Criterion>> criteriaMap = new LinkedHashMap<>(8);
+        for (CoatingField field : fields) {
+            Object fieldValue = field.getFieldValue(coating);
             if (fieldValue != null) {
-                PropertyDef propertyDef = property.getPropertyDef();
+                PropertyDef propertyDef = field.getPropertyDef();
+                String belongTo = propertyDef.getBelongTo();
                 String fieldName = propertyDef.getField();
                 String operator = propertyDef.getOperator();
-                example.addCriterion(new Criterion(fieldName, operator, fieldValue));
+                List<Criterion> criteria = criteriaMap.computeIfAbsent(belongTo, key -> new ArrayList<>(4));
+                criteria.add(new Criterion(fieldName, operator, fieldValue));
             }
         }
-        return example;
+        return criteriaMap;
     }
 
 }
