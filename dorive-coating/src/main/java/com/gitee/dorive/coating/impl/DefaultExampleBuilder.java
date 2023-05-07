@@ -81,8 +81,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 
             for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
-                String absoluteAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
-                RepoExample targetRepoExample = repoExampleMap.get(absoluteAccessPath);
+                String relativeAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
+                RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
                 if (targetRepoExample != null) {
                     Example targetExample = targetRepoExample.getExample();
                     if (targetExample.isEmptyQuery()) {
@@ -103,8 +103,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             }
 
             for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
-                String absoluteAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
-                RepoExample targetRepoExample = repoExampleMap.get(absoluteAccessPath);
+                String relativeAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
+                RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
                 if (targetRepoExample != null) {
                     Example targetExample = targetRepoExample.getExample();
                     if (entities.isEmpty()) {

@@ -160,10 +160,8 @@ public class SegmentBuilder {
         List<OnSegment> onSegments = new ArrayList<>(propertyBinders.size());
 
         for (PropertyBinder propertyBinder : propertyBinders) {
-            String belongAccessPath = propertyBinder.getBelongAccessPath();
-            String targetAccessPath = lastAccessPath + belongAccessPath;
-
-            Segment segment = segmentMap.get(targetAccessPath);
+            String relativeAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
+            Segment segment = segmentMap.get(relativeAccessPath);
             if (segment != null) {
                 String alias = propertyBinder.getAlias();
                 String joinTableAlias = segment.getTableAlias();
