@@ -24,7 +24,6 @@ import com.gitee.dorive.coating.entity.MergedRepository;
 import com.gitee.dorive.coating.entity.SpecificFields;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
@@ -87,13 +86,12 @@ public class SegmentBuilder {
 
             List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> Collections.emptyList());
             aliasExecutor.convertCriteria(criteria);
-            Example example = new Example(criteria);
-            appendArguments(argSegments, args, tableAlias, example);
+            appendArguments(argSegments, args, tableAlias, criteria);
 
             if ("/".equals(relativeAccessPath)) {
                 selectSegment = new SelectSegment();
                 selectSegment.setReachable(true);
-                selectSegment.setDirtyQuery(example.isDirtyQuery());
+                selectSegment.setDirtyQuery(!criteria.isEmpty());
                 selectSegment.setDirectedSegments(new ArrayList<>(8));
                 selectSegment.setDistinct(false);
                 selectSegment.setColumns(Collections.emptyList());
@@ -108,7 +106,7 @@ public class SegmentBuilder {
             } else {
                 JoinSegment joinSegment = new JoinSegment();
                 joinSegment.setReachable(false);
-                joinSegment.setDirtyQuery(example.isDirtyQuery());
+                joinSegment.setDirtyQuery(!criteria.isEmpty());
                 joinSegment.setDirectedSegments(new ArrayList<>(4));
                 joinSegment.setTableName(tableName);
                 joinSegment.setTableAlias(tableAlias);
@@ -132,8 +130,10 @@ public class SegmentBuilder {
         return new SegmentResult(letter, selectSegment, args, orderBy, page);
     }
 
-    private void appendArguments(List<ArgSegment> argSegments, List<Object> args, String tableAlias, Example example) {
-        List<Criterion> criteria = example.getCriteria();
+    private void appendArguments(List<ArgSegment> argSegments,
+                                 List<Object> args,
+                                 String tableAlias,
+                                 List<Criterion> criteria) {
         for (Criterion criterion : criteria) {
             String property = tableAlias + "." + criterion.getProperty();
             String operator = CriterionUtils.getOperator(criterion);
