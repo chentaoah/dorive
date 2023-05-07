@@ -57,14 +57,14 @@ public class AppenderContext {
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NOT_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNotNull(property));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NULL_SWITCH, (abstractWrapper, property, value) -> {
             if (value instanceof Boolean) {
-                Boolean flag = (Boolean) value;
-                if (flag) {
+                if ((Boolean) value) {
                     abstractWrapper.isNull(property);
                 } else {
                     abstractWrapper.isNotNull(property);
                 }
             }
         });
+
     }
 
 }
