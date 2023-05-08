@@ -22,10 +22,14 @@ import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.entity.MergedRepository;
+import com.gitee.dorive.coating.entity.SpecificFields;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.MultiInBuilder;
+import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -37,6 +41,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DefaultExampleBuilder implements ExampleBuilder {
 
@@ -50,6 +55,9 @@ public class DefaultExampleBuilder implements ExampleBuilder {
     public Example buildExample(Context context, Object coating) {
         CoatingType coatingType = repository.getCoatingType(coating);
         Map<String, List<Criterion>> criteriaMap = coatingType.newCriteriaMap(coating);
+        SpecificFields properties = coatingType.getSpecificFields();
+        OrderBy orderBy = properties.newOrderBy(coating);
+        Page<Object> page = properties.newPage(coating);
 
         Map<String, RepoExample> repoExampleMap = new LinkedHashMap<>();
         for (MergedRepository mergedRepository : coatingType.getReversedMergedRepositories()) {
@@ -64,7 +72,11 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
         RepoExample repoExample = repoExampleMap.get("/");
         Assert.notNull(repoExample, "The criterion cannot be null!");
-        return repoExample.getExample();
+
+        Example example = repoExample.getExample();
+        example.setOrderBy(orderBy);
+        example.setPage(page);
+        return example;
     }
 
     private void executeQuery(Context context, Map<String, RepoExample> repoExampleMap) {
@@ -74,14 +86,13 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             MergedRepository mergedRepository = repoExample.getMergedRepository();
             Example example = repoExample.getExample();
 
-            String lastAccessPath = mergedRepository.getLastAccessPath();
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
+            Map<String, List<PropertyBinder>> mergedBindersMap = mergedRepository.getMergedBindersMap();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 
-            for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
-                String relativeAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
+            for (String relativeAccessPath : mergedBindersMap.keySet()) {
                 RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
                 if (targetRepoExample != null) {
                     Example targetExample = targetRepoExample.getExample();
@@ -102,34 +113,43 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                 entities = executedRepository.selectByExample(context, example);
             }
 
-            for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
-                String relativeAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
+            List<Object> finalEntities = entities;
+            mergedBindersMap.forEach((relativeAccessPath, binders) -> {
                 RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
                 if (targetRepoExample != null) {
                     Example targetExample = targetRepoExample.getExample();
-                    if (entities.isEmpty()) {
+                    if (finalEntities.isEmpty()) {
                         targetExample.setEmptyQuery(true);
-                        continue;
+                        return;
                     }
+                    if (binders.size() == 1) {
+                        PropertyBinder propertyBinder = binders.get(0);
+                        List<Object> fieldValues = collectFieldValues(context, finalEntities, propertyBinder);
+                        if (fieldValues.isEmpty()) {
+                            targetExample.setEmptyQuery(true);
+                            return;
+                        }
+                        PropChain boundPropChain = propertyBinder.getBoundPropChain();
+                        String field = boundPropChain.getEntityField().getName();
+                        Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
+                        fieldValue = propertyBinder.output(context, fieldValue);
+                        targetExample.eq(field, fieldValue);
 
-                    List<Object> fieldValues = collectFieldValues(context, entities, propertyBinder);
-                    if (fieldValues.isEmpty()) {
-                        targetExample.setEmptyQuery(true);
-                        continue;
+                    } else {
+                        List<String> properties = binders.stream()
+                                .map(binder -> binder.getBoundPropChain().getEntityField().getName())
+                                .collect(Collectors.toList());
+                        MultiInBuilder multiInBuilder = new MultiInBuilder(finalEntities.size(), properties);
+                        appendFieldValues(context, finalEntities, binders, multiInBuilder);
+                        targetExample.getCriteria().add(multiInBuilder.build());
                     }
-
-                    PropChain boundPropChain = propertyBinder.getBoundPropChain();
-                    String field = boundPropChain.getEntityField().getName();
-                    Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
-                    fieldValue = propertyBinder.output(context, fieldValue);
-                    targetExample.eq(field, fieldValue);
                 }
-            }
+            });
         });
     }
 
     private List<Object> collectFieldValues(Context context, List<Object> entities, PropertyBinder propertyBinder) {
-        List<Object> fieldValues = new ArrayList<>();
+        List<Object> fieldValues = new ArrayList<>(entities.size());
         for (Object entity : entities) {
             Object fieldValue = propertyBinder.getFieldValue(context, entity);
             if (fieldValue != null) {
@@ -137,6 +157,20 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             }
         }
         return fieldValues;
+    }
+
+    private void appendFieldValues(Context context, List<Object> entities, List<PropertyBinder> binders, MultiInBuilder builder) {
+        for (Object entity : entities) {
+            for (PropertyBinder binder : binders) {
+                Object fieldValue = binder.getFieldValue(context, entity);
+                if (fieldValue != null) {
+                    builder.append(fieldValue);
+                } else {
+                    builder.clear();
+                    break;
+                }
+            }
+        }
     }
 
     @Data

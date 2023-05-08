@@ -31,4 +31,5 @@ public interface Operator {
     String IS_NULL = "IS NULL";
     String IS_NOT_NULL = "IS NOT NULL";
     String NULL_SWITCH = "NULL_SWITCH";
+    String MULTI_IN = "MULTI_IN";
 }

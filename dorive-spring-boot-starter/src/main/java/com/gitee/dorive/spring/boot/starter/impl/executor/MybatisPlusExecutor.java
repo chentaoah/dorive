@@ -31,8 +31,17 @@ import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.*;
-import com.gitee.dorive.core.entity.operation.*;
+import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.executor.UnionExample;
+import com.gitee.dorive.core.entity.operation.Delete;
+import com.gitee.dorive.core.entity.operation.Insert;
+import com.gitee.dorive.core.entity.operation.NullableUpdate;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
 import com.gitee.dorive.spring.boot.starter.entity.QueryResult;
@@ -47,7 +56,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.gitee.dorive.spring.boot.starter.impl.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
 
@@ -138,10 +146,6 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             criterionAppender.appendCriterion(queryWrapper, criterion.getProperty(), criterion.getValue());
         }
 
-        if (example instanceof MultiColInExample) {
-            appendCriteria(queryWrapper, (MultiColInExample) example);
-        }
-
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
             String order = orderBy.getOrder();
@@ -154,32 +158,6 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         }
 
         return queryWrapper;
-    }
-
-    private void appendCriteria(QueryWrapper<Object> queryWrapper, MultiColInExample example) {
-        List<String> properties = example.getProperties();
-        String propStr = properties.stream().collect(Collectors.joining(",", "(", ")"));
-
-        StringBuilder valuesStr = new StringBuilder();
-        for (int page = 1; page <= example.page(); page++) {
-            List<Object> values = example.get(page);
-            valuesStr.append(buildValuesStr(values));
-        }
-        if (valuesStr.length() > 0) {
-            valuesStr.deleteCharAt(valuesStr.length() - 1);
-        }
-
-        if (queryWrapper.isEmptyOfWhere()) {
-            queryWrapper.last(" WHERE " + propStr + " IN (" + valuesStr + ")");
-        } else {
-            queryWrapper.last(" AND " + propStr + " IN (" + valuesStr + ")");
-        }
-    }
-
-    private String buildValuesStr(List<Object> values) {
-        return values.stream()
-                .map(com.baomidou.mybatisplus.core.toolkit.StringUtils::sqlParam)
-                .collect(Collectors.joining(",", "(", "),"));
     }
 
     private QueryWrapper<Object> buildQueryWrapper(UnionExample unionExample) {

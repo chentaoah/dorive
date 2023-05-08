@@ -19,6 +19,8 @@ package com.gitee.dorive.coating.impl.resolver;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.coating.entity.MergedRepository;
+import com.gitee.dorive.core.impl.binder.PropertyBinder;
+import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -41,12 +43,14 @@ public class MergedRepositoryResolver {
     }
 
     public void resolve() {
+        CommonRepository rootRepository = repository.getRootRepository();
         mergedRepositoryMap.put("/", new MergedRepository(
                 "",
                 "/",
                 false,
-                repository.getRootRepository(),
-                repository.getRootRepository(),
+                rootRepository,
+                getMergedBindersMap("", rootRepository),
+                rootRepository,
                 1));
         resolve(new ArrayList<>(), repository);
     }
@@ -68,6 +72,7 @@ public class MergedRepositoryResolver {
                         absoluteAccessPath,
                         true,
                         repository,
+                        getMergedBindersMap(lastAccessPath, repository),
                         rootRepository,
                         mergedRepositoryMap.size() + 1);
                 mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
@@ -82,10 +87,24 @@ public class MergedRepositoryResolver {
                         absoluteAccessPath,
                         false,
                         repository,
-                        repository, mergedRepositoryMap.size() + 1);
+                        getMergedBindersMap(lastAccessPath, repository),
+                        repository,
+                        mergedRepositoryMap.size() + 1);
                 mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
             }
         }
+    }
+
+    private Map<String, List<PropertyBinder>> getMergedBindersMap(String lastAccessPath, CommonRepository repository) {
+        BinderResolver binderResolver = repository.getBinderResolver();
+        List<PropertyBinder> propertyBinders = binderResolver.getPropertyBinders();
+        Map<String, List<PropertyBinder>> mergedBindersMap = new LinkedHashMap<>();
+        for (PropertyBinder propertyBinder : propertyBinders) {
+            String relativeAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
+            List<PropertyBinder> existPropertyBinders = mergedBindersMap.computeIfAbsent(relativeAccessPath, key -> new ArrayList<>());
+            existPropertyBinders.add(propertyBinder);
+        }
+        return mergedBindersMap;
     }
 
 }

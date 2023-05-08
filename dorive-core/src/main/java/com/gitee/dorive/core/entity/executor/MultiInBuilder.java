@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.core.entity.executor;
 
+import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.api.constant.Operator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -25,7 +27,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class MultiColInExample extends Example {
+public class MultiInBuilder {
 
     private int size;
     private List<String> properties;
@@ -33,7 +35,7 @@ public class MultiColInExample extends Example {
     private List<Object> values;
     private int cursor;
 
-    public MultiColInExample(int size, List<String> properties) {
+    public MultiInBuilder(int size, List<String> properties) {
         this.size = size;
         this.properties = properties;
         this.step = properties.size();
@@ -41,7 +43,7 @@ public class MultiColInExample extends Example {
         this.cursor = 0;
     }
 
-    public void add(Object value) {
+    public void append(Object value) {
         if (values.size() - cursor >= step) {
             cursor += step;
         }
@@ -60,6 +62,11 @@ public class MultiColInExample extends Example {
         int fromIndex = (page - 1) * step;
         int toIndex = fromIndex + step;
         return values.subList(fromIndex, toIndex);
+    }
+
+    public Criterion build() {
+        String propStr = StrUtil.join(",", properties);
+        return new Criterion(propStr, Operator.MULTI_IN, this);
     }
 
 }

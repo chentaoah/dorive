@@ -17,9 +17,13 @@
 
 package com.gitee.dorive.coating.entity;
 
+import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -28,6 +32,7 @@ public class MergedRepository {
     private String absoluteAccessPath;
     private boolean merged;
     private CommonRepository definedRepository;
+    private Map<String, List<PropertyBinder>> mergedBindersMap;
     private CommonRepository executedRepository;
     private Integer sequence;
 }

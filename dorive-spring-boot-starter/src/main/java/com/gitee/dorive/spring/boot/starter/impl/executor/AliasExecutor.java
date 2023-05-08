@@ -83,7 +83,6 @@ public class AliasExecutor extends AbstractExecutor {
     public void convert(Example example) {
         convertSelect(example);
         convertCriteria(example.getCriteria());
-        covertMultiColIn(example);
         convertOrderBy(example.getOrderBy());
     }
 
@@ -101,17 +100,6 @@ public class AliasExecutor extends AbstractExecutor {
                 String property = criterion.getProperty();
                 property = entityEle.toAlias(property);
                 criterion.setProperty(property);
-            }
-        }
-    }
-
-    private void covertMultiColIn(Example example) {
-        if (example instanceof MultiColInExample) {
-            MultiColInExample multiColInExample = (MultiColInExample) example;
-            List<String> properties = multiColInExample.getProperties();
-            if (properties != null && !properties.isEmpty()) {
-                properties = entityEle.toAliases(properties);
-                multiColInExample.setProperties(properties);
             }
         }
     }
