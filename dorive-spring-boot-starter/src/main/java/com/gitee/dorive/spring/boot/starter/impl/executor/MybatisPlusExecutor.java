@@ -158,23 +158,28 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
     private void appendCriteria(QueryWrapper<Object> queryWrapper, MultiColInExample example) {
         List<String> properties = example.getProperties();
-        List<List<Object>> valuesColl = example.getValuesColl();
-        String propStr = properties.stream()
-                .collect(Collectors.joining(",", "(", ")"));
-        String valuesStr = valuesColl.stream()
-                .map(this::buildValuesStr)
-                .collect(Collectors.joining(",", "(", ")"));
+        String propStr = properties.stream().collect(Collectors.joining(",", "(", ")"));
+
+        StringBuilder valuesStr = new StringBuilder();
+        for (int page = 1; page <= example.page(); page++) {
+            List<Object> values = example.get(page);
+            valuesStr.append(buildValuesStr(values));
+        }
+        if (valuesStr.length() > 0) {
+            valuesStr.deleteCharAt(valuesStr.length() - 1);
+        }
+
         if (queryWrapper.isEmptyOfWhere()) {
-            queryWrapper.last(" WHERE " + propStr + " IN " + valuesStr);
+            queryWrapper.last(" WHERE " + propStr + " IN (" + valuesStr + ")");
         } else {
-            queryWrapper.last(propStr + " IN " + valuesStr);
+            queryWrapper.last(" AND " + propStr + " IN (" + valuesStr + ")");
         }
     }
 
     private String buildValuesStr(List<Object> values) {
         return values.stream()
                 .map(com.baomidou.mybatisplus.core.toolkit.StringUtils::sqlParam)
-                .collect(Collectors.joining(",", "(", ")"));
+                .collect(Collectors.joining(",", "(", "),"));
     }
 
     private QueryWrapper<Object> buildQueryWrapper(UnionExample unionExample) {

@@ -19,14 +19,47 @@ package com.gitee.dorive.core.entity.executor;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class MultiColInExample extends Example {
+
+    private int size;
     private List<String> properties;
-    private List<List<Object>> valuesColl;
+    private int step;
+    private List<Object> values;
+    private int cursor;
+
+    public MultiColInExample(int size, List<String> properties) {
+        this.size = size;
+        this.properties = properties;
+        this.step = properties.size();
+        this.values = new ArrayList<>(size * step);
+        this.cursor = 0;
+    }
+
+    public void add(Object value) {
+        if (values.size() - cursor >= step) {
+            cursor += step;
+        }
+        values.add(value);
+    }
+
+    public void clear() {
+        values.subList(cursor, values.size()).clear();
+    }
+
+    public int page() {
+        return values.size() / step;
+    }
+
+    public List<Object> get(int page) {
+        int fromIndex = (page - 1) * step;
+        int toIndex = fromIndex + step;
+        return values.subList(fromIndex, toIndex);
+    }
+
 }
