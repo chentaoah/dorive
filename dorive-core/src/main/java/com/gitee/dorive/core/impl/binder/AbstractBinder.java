@@ -25,6 +25,9 @@ import com.gitee.dorive.api.entity.element.PropChain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 public abstract class AbstractBinder implements Binder, Processor {
@@ -52,6 +55,17 @@ public abstract class AbstractBinder implements Binder, Processor {
     @Override
     public Object output(Context context, Object value) {
         return processor.output(context, value);
+    }
+
+    public List<Object> collectFieldValues(Context context, List<Object> entities) {
+        List<Object> fieldValues = new ArrayList<>(entities.size());
+        for (Object entity : entities) {
+            Object fieldValue = getFieldValue(context, entity);
+            if (fieldValue != null) {
+                fieldValues.add(fieldValue);
+            }
+        }
+        return fieldValues;
     }
 
 }

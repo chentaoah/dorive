@@ -25,6 +25,9 @@ import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 public class PropertyBinder extends AbstractBinder {
@@ -61,6 +64,17 @@ public class PropertyBinder extends AbstractBinder {
     @Override
     public void setBoundValue(Context context, Object rootEntity, Object property) {
         boundPropChain.setValue(rootEntity, property);
+    }
+
+    public List<Object> collectBoundValues(Context context, List<Object> entities) {
+        List<Object> fieldValues = new ArrayList<>(entities.size());
+        for (Object entity : entities) {
+            Object fieldValue = getBoundValue(context, entity);
+            if (fieldValue != null) {
+                fieldValues.add(fieldValue);
+            }
+        }
+        return fieldValues;
     }
 
 }

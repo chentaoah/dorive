@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +51,7 @@ public class BinderResolver {
 
     private List<Binder> allBinders;
     private List<PropertyBinder> propertyBinders;
+    private Map<String, List<PropertyBinder>> mergedBindersMap;
     private List<String> boundFields;
     private List<ContextBinder> contextBinders;
     private List<Binder> boundValueBinders;
@@ -66,6 +68,7 @@ public class BinderResolver {
 
         allBinders = new ArrayList<>(bindingDefs.size());
         propertyBinders = new ArrayList<>(bindingDefs.size());
+        mergedBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
         boundFields = new ArrayList<>(bindingDefs.size());
         contextBinders = new ArrayList<>(bindingDefs.size());
         boundValueBinders = new ArrayList<>(bindingDefs.size());
@@ -87,6 +90,11 @@ public class BinderResolver {
                 PropertyBinder propertyBinder = newPropertyBinder(bindingDef, alias, fieldPropChain, processor);
                 allBinders.add(propertyBinder);
                 propertyBinders.add(propertyBinder);
+
+                String belongAccessPath = propertyBinder.getBelongAccessPath();
+                List<PropertyBinder> propertyBinders = mergedBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
+                propertyBinders.add(propertyBinder);
+                
                 boundFields.add(bindingDef.getField());
 
                 if (propertyBinder.isSameType()) {

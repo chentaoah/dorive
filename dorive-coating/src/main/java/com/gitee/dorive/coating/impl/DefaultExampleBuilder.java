@@ -59,7 +59,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             Example example = new Example(criteria);
             repoExampleMap.put(relativeAccessPath, new RepoExample(mergedRepository, example));
         }
-        
+
         executeQuery(context, repoExampleMap);
 
         RepoExample repoExample = repoExampleMap.get("/");
@@ -116,7 +116,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                     }
                     if (binders.size() == 1) {
                         PropertyBinder propertyBinder = binders.get(0);
-                        List<Object> fieldValues = collectFieldValues(context, finalEntities, propertyBinder);
+                        List<Object> fieldValues = propertyBinder.collectFieldValues(context, finalEntities);
                         if (fieldValues.isEmpty()) {
                             targetExample.setEmptyQuery(true);
                             return;
@@ -138,17 +138,6 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                 }
             });
         });
-    }
-
-    private List<Object> collectFieldValues(Context context, List<Object> entities, PropertyBinder propertyBinder) {
-        List<Object> fieldValues = new ArrayList<>(entities.size());
-        for (Object entity : entities) {
-            Object fieldValue = propertyBinder.getFieldValue(context, entity);
-            if (fieldValue != null) {
-                fieldValues.add(fieldValue);
-            }
-        }
-        return fieldValues;
     }
 
     private void appendFieldValues(Context context, List<Object> entities, List<PropertyBinder> binders, MultiInBuilder builder) {
