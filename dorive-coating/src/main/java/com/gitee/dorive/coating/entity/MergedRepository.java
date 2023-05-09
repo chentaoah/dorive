@@ -31,6 +31,7 @@ public class MergedRepository {
     private String lastAccessPath;
     private String absoluteAccessPath;
     private boolean merged;
+    private String relativeAccessPath;
     private CommonRepository definedRepository;
     private Map<String, List<PropertyBinder>> mergedBindersMap;
     private CommonRepository executedRepository;

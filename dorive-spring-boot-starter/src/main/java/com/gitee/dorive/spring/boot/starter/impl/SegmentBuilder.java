@@ -61,10 +61,10 @@ public class SegmentBuilder {
         for (MergedRepository mergedRepository : mergedRepositories) {
             String lastAccessPath = mergedRepository.getLastAccessPath();
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
+            String relativeAccessPath = mergedRepository.getRelativeAccessPath();
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
-            String relativeAccessPath = mergedRepository.isMerged() ? absoluteAccessPath + "/" : absoluteAccessPath;
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 
             Map<String, Object> attachments = executedRepository.getAttachments();

@@ -54,12 +54,12 @@ public class DefaultExampleBuilder implements ExampleBuilder {
         Map<String, RepoExample> repoExampleMap = new LinkedHashMap<>();
         for (MergedRepository mergedRepository : coatingType.getReversedMergedRepositories()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-            String relativeAccessPath = mergedRepository.isMerged() ? absoluteAccessPath + "/" : absoluteAccessPath;
+            String relativeAccessPath = mergedRepository.getRelativeAccessPath();
             List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> new ArrayList<>(2));
             Example example = new Example(criteria);
             repoExampleMap.put(relativeAccessPath, new RepoExample(mergedRepository, example));
         }
-
+        
         executeQuery(context, repoExampleMap);
 
         RepoExample repoExample = repoExampleMap.get("/");
