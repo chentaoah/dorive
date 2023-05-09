@@ -33,10 +33,10 @@ import java.lang.annotation.Target;
 public @interface Property {
 
     @AliasFor("belongTo")
-    String value() default "";
+    String value() default "/";
     
     @AliasFor("value")
-    String belongTo() default "";
+    String belongTo() default "/";
 
     String field() default "";
 

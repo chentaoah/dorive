@@ -42,9 +42,6 @@ public class PropertyDef {
         if (field.isAnnotationPresent(Property.class)) {
             Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(field, Property.class);
             PropertyDef propertyDef = BeanUtil.copyProperties(attributes, PropertyDef.class);
-            if (StringUtils.isBlank(propertyDef.getBelongTo())) {
-                propertyDef.setBelongTo("/");
-            }
             if (StringUtils.isBlank(propertyDef.getField())) {
                 propertyDef.setField(field.getName());
             }
