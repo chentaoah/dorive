@@ -25,6 +25,7 @@ import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -36,6 +37,7 @@ public class MergedRepositoryResolver {
 
     private AbstractContextRepository<?, ?> repository;
     private Map<String, MergedRepository> mergedRepositoryMap = new LinkedHashMap<>();
+    private Map<String, MergedRepository> nameMergedRepositoryMap = new LinkedHashMap<>();
 
     public MergedRepositoryResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
@@ -44,7 +46,7 @@ public class MergedRepositoryResolver {
 
     public void resolve() {
         CommonRepository rootRepository = repository.getRootRepository();
-        mergedRepositoryMap.put("/", new MergedRepository(
+        MergedRepository mergedRepository = new MergedRepository(
                 "",
                 "/",
                 false,
@@ -52,7 +54,15 @@ public class MergedRepositoryResolver {
                 rootRepository,
                 getMergedBindersMap("", rootRepository),
                 rootRepository,
-                1));
+                1);
+
+        mergedRepositoryMap.put("/", mergedRepository);
+
+        String name = mergedRepository.getName();
+        if (StringUtils.isNotBlank(name)) {
+            nameMergedRepositoryMap.putIfAbsent(name, mergedRepository);
+        }
+
         resolve(new ArrayList<>(), repository);
     }
 
@@ -77,7 +87,13 @@ public class MergedRepositoryResolver {
                         getMergedBindersMap(lastAccessPath, repository),
                         rootRepository,
                         mergedRepositoryMap.size() + 1);
+
                 mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
+
+                String name = mergedRepository.getName();
+                if (StringUtils.isNotBlank(name)) {
+                    nameMergedRepositoryMap.putIfAbsent(name, mergedRepository);
+                }
 
                 List<String> newMultiAccessPath = new ArrayList<>(multiAccessPath);
                 newMultiAccessPath.add(accessPath);
@@ -93,7 +109,13 @@ public class MergedRepositoryResolver {
                         getMergedBindersMap(lastAccessPath, repository),
                         repository,
                         mergedRepositoryMap.size() + 1);
+
                 mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
+
+                String name = mergedRepository.getName();
+                if (StringUtils.isNotBlank(name)) {
+                    nameMergedRepositoryMap.putIfAbsent(name, mergedRepository);
+                }
             }
         }
     }

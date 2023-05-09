@@ -108,15 +108,23 @@ public class CoatingTypeResolver {
     private List<MergedRepository> collectRepositories(List<CoatingField> fields) {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
+        Map<String, MergedRepository> nameMergedRepositoryMap = mergedRepositoryResolver.getNameMergedRepositoryMap();
 
         Set<MergedRepository> mergedRepositorySet = new LinkedHashSet<>();
 
         for (CoatingField field : fields) {
             PropertyDef propertyDef = field.getPropertyDef();
             String belongTo = propertyDef.getBelongTo();
+
+            if (!belongTo.startsWith("/")) {
+                MergedRepository mergedRepository = nameMergedRepositoryMap.get(belongTo);
+                Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
+                belongTo = mergedRepository.getAbsoluteAccessPath();
+            }
+
             MergedRepository mergedRepository = mergedRepositoryMap.get(belongTo);
             Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
-            
+
             String fieldName = propertyDef.getField();
             CommonRepository repository = mergedRepository.getExecutedRepository();
             EntityEle entityEle = repository.getEntityEle();

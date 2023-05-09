@@ -28,6 +28,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 public class MergedRepository {
+
     private String lastAccessPath;
     private String absoluteAccessPath;
     private boolean merged;
@@ -36,4 +37,9 @@ public class MergedRepository {
     private Map<String, List<PropertyBinder>> mergedBindersMap;
     private CommonRepository executedRepository;
     private Integer sequence;
+
+    public String getName() {
+        return definedRepository.getEntityDef().getName();
+    }
+
 }
