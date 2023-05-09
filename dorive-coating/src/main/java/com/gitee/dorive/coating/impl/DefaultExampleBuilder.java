@@ -20,27 +20,21 @@ package com.gitee.dorive.coating.impl;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.coating.api.ExampleBuilder;
+import com.gitee.dorive.coating.entity.CoatingCriteria;
 import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.entity.MergedRepository;
-import com.gitee.dorive.coating.entity.SpecificFields;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.MultiInBuilder;
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DefaultExampleBuilder implements ExampleBuilder {
@@ -54,10 +48,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
     @Override
     public Example buildExample(Context context, Object coating) {
         CoatingType coatingType = repository.getCoatingType(coating);
-        Map<String, List<Criterion>> criteriaMap = coatingType.newCriteriaMap(coating);
-        SpecificFields properties = coatingType.getSpecificFields();
-        OrderBy orderBy = properties.newOrderBy(coating);
-        Page<Object> page = properties.newPage(coating);
+        CoatingCriteria coatingCriteria = coatingType.newCriteria(coating);
+        Map<String, List<Criterion>> criteriaMap = coatingCriteria.getCriteriaMap();
 
         Map<String, RepoExample> repoExampleMap = new LinkedHashMap<>();
         for (MergedRepository mergedRepository : coatingType.getReversedMergedRepositories()) {
@@ -74,8 +66,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
         Assert.notNull(repoExample, "The criterion cannot be null!");
 
         Example example = repoExample.getExample();
-        example.setOrderBy(orderBy);
-        example.setPage(page);
+        example.setOrderBy(coatingCriteria.getOrderBy());
+        example.setPage(coatingCriteria.getPage());
         return example;
     }
 

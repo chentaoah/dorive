@@ -19,9 +19,9 @@ package com.gitee.dorive.spring.boot.starter.impl;
 
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.gitee.dorive.api.constant.Operator;
+import com.gitee.dorive.coating.entity.CoatingCriteria;
 import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.entity.MergedRepository;
-import com.gitee.dorive.coating.entity.SpecificFields;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -30,22 +30,13 @@ import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.spring.boot.starter.api.Keys;
-import com.gitee.dorive.spring.boot.starter.entity.ArgSegment;
-import com.gitee.dorive.spring.boot.starter.entity.JoinSegment;
-import com.gitee.dorive.spring.boot.starter.entity.OnSegment;
-import com.gitee.dorive.spring.boot.starter.entity.Segment;
-import com.gitee.dorive.spring.boot.starter.entity.SegmentResult;
-import com.gitee.dorive.spring.boot.starter.entity.SelectSegment;
+import com.gitee.dorive.spring.boot.starter.entity.*;
 import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;
 import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -55,10 +46,10 @@ public class SegmentBuilder {
 
     public SegmentResult buildSegment(Object coating) {
         CoatingType coatingType = repository.getCoatingType(coating);
-        Map<String, List<Criterion>> criteriaMap = coatingType.newCriteriaMap(coating);
-        SpecificFields properties = coatingType.getSpecificFields();
-        OrderBy orderBy = properties.newOrderBy(coating);
-        Page<Object> page = properties.newPage(coating);
+        CoatingCriteria coatingCriteria = coatingType.newCriteria(coating);
+        Map<String, List<Criterion>> criteriaMap = coatingCriteria.getCriteriaMap();
+        OrderBy orderBy = coatingCriteria.getOrderBy();
+        Page<Object> page = coatingCriteria.getPage();
 
         List<MergedRepository> mergedRepositories = coatingType.getMergedRepositories();
         Map<String, Segment> segmentMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);

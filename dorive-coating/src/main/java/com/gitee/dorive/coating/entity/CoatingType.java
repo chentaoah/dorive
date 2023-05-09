@@ -20,6 +20,8 @@ package com.gitee.dorive.coating.entity;
 import com.gitee.dorive.coating.entity.def.CoatingDef;
 import com.gitee.dorive.coating.entity.def.PropertyDef;
 import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.Page;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -37,6 +39,13 @@ public class CoatingType {
     private SpecificFields specificFields;
     private List<MergedRepository> mergedRepositories;
     private List<MergedRepository> reversedMergedRepositories;
+
+    public CoatingCriteria newCriteria(Object coating) {
+        Map<String, List<Criterion>> criteriaMap = newCriteriaMap(coating);
+        OrderBy orderBy = specificFields.newOrderBy(coating);
+        Page<Object> page = specificFields.newPage(coating);
+        return new CoatingCriteria(criteriaMap, orderBy, page);
+    }
 
     public Map<String, List<Criterion>> newCriteriaMap(Object coating) {
         Map<String, List<Criterion>> criteriaMap = new LinkedHashMap<>(8);
