@@ -54,6 +54,10 @@ public class MultiInBuilder {
         values.subList(cursor, values.size()).clear();
     }
 
+    public boolean isEmpty() {
+        return values.isEmpty();
+    }
+
     public int page() {
         return values.size() / step;
     }

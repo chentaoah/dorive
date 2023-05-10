@@ -18,7 +18,6 @@
 package com.gitee.dorive.coating.impl;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.entity.CoatingCriteria;
 import com.gitee.dorive.coating.entity.CoatingType;
@@ -34,7 +33,11 @@ import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DefaultExampleBuilder implements ExampleBuilder {
@@ -117,23 +120,26 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                     if (binders.size() == 1) {
                         PropertyBinder propertyBinder = binders.get(0);
                         List<Object> fieldValues = propertyBinder.collectFieldValues(context, finalEntities);
-                        if (fieldValues.isEmpty()) {
+                        if (!fieldValues.isEmpty()) {
+                            String fieldName = propertyBinder.getBoundName();
+                            if (fieldValues.size() == 1) {
+                                targetExample.eq(fieldName, fieldValues.get(0));
+                            } else {
+                                targetExample.in(fieldName, fieldValues);
+                            }
+                        } else {
                             targetExample.setEmptyQuery(true);
-                            return;
                         }
-                        PropChain boundPropChain = propertyBinder.getBoundPropChain();
-                        String field = boundPropChain.getEntityField().getName();
-                        Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
-                        fieldValue = propertyBinder.output(context, fieldValue);
-                        targetExample.eq(field, fieldValue);
 
                     } else {
-                        List<String> properties = binders.stream()
-                                .map(binder -> binder.getBoundPropChain().getEntityField().getName())
-                                .collect(Collectors.toList());
-                        MultiInBuilder multiInBuilder = new MultiInBuilder(finalEntities.size(), properties);
-                        appendFieldValues(context, finalEntities, binders, multiInBuilder);
-                        targetExample.getCriteria().add(multiInBuilder.build());
+                        List<String> properties = binders.stream().map(PropertyBinder::getBoundName).collect(Collectors.toList());
+                        MultiInBuilder builder = new MultiInBuilder(finalEntities.size(), properties);
+                        appendFieldValues(context, finalEntities, binders, builder);
+                        if (!builder.isEmpty()) {
+                            targetExample.getCriteria().add(builder.build());
+                        } else {
+                            targetExample.setEmptyQuery(true);
+                        }
                     }
                 }
             });
@@ -145,6 +151,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             for (PropertyBinder binder : binders) {
                 Object fieldValue = binder.getFieldValue(context, entity);
                 if (fieldValue != null) {
+                    fieldValue = binder.output(context, fieldValue);
                     builder.append(fieldValue);
                 } else {
                     builder.clear();

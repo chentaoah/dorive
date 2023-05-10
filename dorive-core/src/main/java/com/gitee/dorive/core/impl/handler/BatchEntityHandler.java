@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.core.impl.handler;
 
-import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
@@ -95,7 +94,6 @@ public class BatchEntityHandler implements EntityHandler {
     private void setValueForRootEntities(CommonRepository repository, List<Object> rootEntities, MultiResult multiResult) {
         boolean isCollection = repository.getEntityEle().isCollection();
         PropChain anchorPoint = repository.getAnchorPoint();
-        PropProxy propProxy = anchorPoint.getPropProxy();
 
         List<Map<String, Object>> resultMaps = multiResult.getResultMaps();
         List<Object> entities = multiResult.getRecords();
@@ -117,11 +115,11 @@ public class BatchEntityHandler implements EntityHandler {
                 Object rootEntity = rootEntities.get(rowNum - 1);
                 if (isCollection) {
                     Collection<Object> collection = new ArrayList<>(averageSize);
-                    propProxy.setValue(rootEntity, collection);
+                    anchorPoint.setValue(rootEntity, collection);
                     collection.add(entity);
                     lastCollection = collection;
                 } else {
-                    propProxy.setValue(rootEntity, entity);
+                    anchorPoint.setValue(rootEntity, entity);
                 }
             }
 

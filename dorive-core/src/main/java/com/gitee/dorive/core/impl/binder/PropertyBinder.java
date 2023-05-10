@@ -17,16 +17,13 @@
 
 package com.gitee.dorive.core.impl.binder;
 
-import com.gitee.dorive.core.api.common.Processor;
-import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.element.PropChain;
+import com.gitee.dorive.core.api.common.Processor;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
@@ -56,6 +53,10 @@ public class PropertyBinder extends AbstractBinder {
         return getFieldPropChain().isSameType(boundPropChain);
     }
 
+    public String getBoundName() {
+        return boundPropChain.getEntityField().getName();
+    }
+
     @Override
     public Object getBoundValue(Context context, Object rootEntity) {
         return boundPropChain.getValue(rootEntity);
@@ -64,17 +65,6 @@ public class PropertyBinder extends AbstractBinder {
     @Override
     public void setBoundValue(Context context, Object rootEntity, Object property) {
         boundPropChain.setValue(rootEntity, property);
-    }
-
-    public List<Object> collectBoundValues(Context context, List<Object> entities) {
-        List<Object> fieldValues = new ArrayList<>(entities.size());
-        for (Object entity : entities) {
-            Object fieldValue = getBoundValue(context, entity);
-            if (fieldValue != null) {
-                fieldValues.add(fieldValue);
-            }
-        }
-        return fieldValues;
     }
 
 }

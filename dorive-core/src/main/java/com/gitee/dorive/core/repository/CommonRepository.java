@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.core.repository;
 
-import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Selector;
@@ -94,28 +93,26 @@ public class CommonRepository extends ProxyRepository {
 
     public Example newExampleByContext(Context context, Object rootEntity) {
         Example example = new Example();
-        for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
-            BindingDef bindingDef = propertyBinder.getBindingDef();
-            String field = bindingDef.getField();
-            Object boundValue = propertyBinder.getBoundValue(context, rootEntity);
+        for (PropertyBinder binder : binderResolver.getPropertyBinders()) {
+            String fieldName = binder.getFieldName();
+            Object boundValue = binder.getBoundValue(context, rootEntity);
             if (boundValue instanceof Collection) {
                 boundValue = !((Collection<?>) boundValue).isEmpty() ? boundValue : null;
             }
             if (boundValue != null) {
-                boundValue = propertyBinder.input(context, boundValue);
-                example.eq(field, boundValue);
+                boundValue = binder.input(context, boundValue);
+                example.eq(fieldName, boundValue);
             } else {
                 example.getCriteria().clear();
                 break;
             }
         }
         if (example.isDirtyQuery()) {
-            for (ContextBinder contextBinder : binderResolver.getContextBinders()) {
-                BindingDef bindingDef = contextBinder.getBindingDef();
-                String field = bindingDef.getField();
-                Object boundValue = contextBinder.getBoundValue(context, rootEntity);
+            for (ContextBinder binder : binderResolver.getContextBinders()) {
+                String fieldName = binder.getFieldName();
+                Object boundValue = binder.getBoundValue(context, rootEntity);
                 if (boundValue != null) {
-                    example.eq(field, boundValue);
+                    example.eq(fieldName, boundValue);
                 }
             }
         }
