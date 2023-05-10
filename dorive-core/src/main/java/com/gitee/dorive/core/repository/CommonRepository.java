@@ -25,13 +25,10 @@ import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.impl.binder.ContextBinder;
-import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Collection;
 import java.util.List;
 
 @Data
@@ -89,34 +86,6 @@ public class CommonRepository extends ProxyRepository {
             }
         }
         return super.executeQuery(context, query);
-    }
-
-    public Example newExampleByContext(Context context, Object rootEntity) {
-        Example example = new Example();
-        for (PropertyBinder binder : binderResolver.getPropertyBinders()) {
-            String fieldName = binder.getFieldName();
-            Object boundValue = binder.getBoundValue(context, rootEntity);
-            if (boundValue instanceof Collection) {
-                boundValue = !((Collection<?>) boundValue).isEmpty() ? boundValue : null;
-            }
-            if (boundValue != null) {
-                boundValue = binder.input(context, boundValue);
-                example.eq(fieldName, boundValue);
-            } else {
-                example.getCriteria().clear();
-                break;
-            }
-        }
-        if (example.isDirtyQuery()) {
-            for (ContextBinder binder : binderResolver.getContextBinders()) {
-                String fieldName = binder.getFieldName();
-                Object boundValue = binder.getBoundValue(context, rootEntity);
-                if (boundValue != null) {
-                    example.eq(fieldName, boundValue);
-                }
-            }
-        }
-        return example;
     }
 
     public Object getPrimaryKey(Object entity) {

@@ -99,7 +99,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setEntityDef(rootRepository.getEntityDef());
         setEntityEle(rootRepository.getEntityEle());
         setOperationFactory(rootRepository.getOperationFactory());
-        setExecutor(newExecutor(rootRepository));
+        setExecutor(newExecutor());
         setAttachments(new ConcurrentHashMap<>(rootRepository.getAttachments()));
     }
 
@@ -182,10 +182,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return null;
     }
 
-    private Executor newExecutor(CommonRepository rootRepository) {
+    private Executor newExecutor() {
         delegateResolver = new DelegateResolver(this);
 
-        EntityHandler entityHandler = new BatchEntityHandler(this, rootRepository.getOperationFactory());
+        EntityHandler entityHandler = new BatchEntityHandler(this);
         processEntityClass(entityHandler);
 
         if (delegateResolver.isDelegated()) {

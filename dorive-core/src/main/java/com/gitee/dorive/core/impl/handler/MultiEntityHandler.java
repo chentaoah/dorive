@@ -3,6 +3,7 @@ package com.gitee.dorive.core.impl.handler;
 import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.MultiInBuilder;
 import com.gitee.dorive.core.entity.executor.MultiResult;
@@ -14,6 +15,8 @@ import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,30 +25,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class MultiQuerier {
+@Data
+@AllArgsConstructor
+public class MultiEntityHandler implements EntityHandler {
 
-    private final OperationFactory operationFactory;
+    private final CommonRepository repository;
 
-    public MultiQuerier(OperationFactory operationFactory) {
-        this.operationFactory = operationFactory;
-    }
-
-    public long executeQuery(Context context, List<Object> rootEntities, CommonRepository repository) {
-        Map<String, Object> entityIndex = new LinkedHashMap<>(rootEntities.size() * 4 / 3 + 1);
-        Example example = newExample(context, rootEntities, repository, entityIndex);
+    @Override
+    public int handle(Context context, List<Object> entities) {
+        Map<String, Object> entityIndex = new LinkedHashMap<>(entities.size() * 4 / 3 + 1);
+        Example example = newExample(context, entities, entityIndex);
         if (example.isDirtyQuery()) {
+            OperationFactory operationFactory = repository.getOperationFactory();
             Query query = operationFactory.buildQuery(example);
             query.setType(query.getType() | OperationType.INCLUDE_ROOT);
             Result<Object> result = repository.executeQuery(context, query);
             if (result instanceof MultiResult) {
-                setValueForRootEntities(context, rootEntities, repository, entityIndex, (MultiResult) result);
+                setValueForRootEntities(context, entities, entityIndex, (MultiResult) result);
             }
-            return result.getCount();
+            return (int) result.getCount();
         }
         return 0;
     }
 
-    private Example newExample(Context context, List<Object> rootEntities, CommonRepository repository, Map<String, Object> entityIndex) {
+    private Example newExample(Context context, List<Object> entities, Map<String, Object> entityIndex) {
         BinderResolver binderResolver = repository.getBinderResolver();
         Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
         List<PropertyBinder> binders = mergedBindersMap.get("/");
@@ -54,7 +57,7 @@ public class MultiQuerier {
         if (binders.size() == 1) {
             PropertyBinder binder = binders.get(0);
             String fieldName = binder.getFieldName();
-            List<Object> boundValues = collectBoundValues(context, rootEntities, entityIndex, binder);
+            List<Object> boundValues = collectBoundValues(context, entities, entityIndex, binder);
             if (!boundValues.isEmpty()) {
                 if (boundValues.size() == 1) {
                     example.eq(fieldName, boundValues.get(0));
@@ -65,8 +68,8 @@ public class MultiQuerier {
 
         } else {
             List<String> properties = binders.stream().map(AbstractBinder::getFieldName).collect(Collectors.toList());
-            MultiInBuilder builder = new MultiInBuilder(rootEntities.size(), properties);
-            collectBoundValues(context, rootEntities, entityIndex, binders, builder);
+            MultiInBuilder builder = new MultiInBuilder(entities.size(), properties);
+            collectBoundValues(context, entities, entityIndex, binders, builder);
             if (!builder.isEmpty()) {
                 example.getCriteria().add(builder.build());
             }
@@ -85,26 +88,25 @@ public class MultiQuerier {
         return example;
     }
 
-    public List<Object> collectBoundValues(Context context, List<Object> rootEntities, Map<String, Object> entityIndex,
-                                           PropertyBinder binder) {
-        List<Object> fieldValues = new ArrayList<>(rootEntities.size());
-        for (Object rootEntity : rootEntities) {
-            Object fieldValue = binder.getBoundValue(context, rootEntity);
+    public List<Object> collectBoundValues(Context context, List<Object> entities, Map<String, Object> entityIndex, PropertyBinder binder) {
+        List<Object> fieldValues = new ArrayList<>(entities.size());
+        for (Object entity : entities) {
+            Object fieldValue = binder.getBoundValue(context, entity);
             if (fieldValue != null) {
                 fieldValue = binder.input(context, fieldValue);
                 fieldValues.add(fieldValue);
-                entityIndex.put(String.valueOf(fieldValue), rootEntity);
+                entityIndex.put(String.valueOf(fieldValue), entity);
             }
         }
         return fieldValues;
     }
 
-    private void collectBoundValues(Context context, List<Object> rootEntities, Map<String, Object> entityIndex,
-                                    List<PropertyBinder> binders, MultiInBuilder multiInBuilder) {
-        for (Object rootEntity : rootEntities) {
+    private void collectBoundValues(Context context, List<Object> entities, Map<String, Object> entityIndex, List<PropertyBinder> binders,
+                                    MultiInBuilder multiInBuilder) {
+        for (Object entity : entities) {
             StringBuilder strBuilder = new StringBuilder();
             for (PropertyBinder binder : binders) {
-                Object fieldValue = binder.getBoundValue(context, rootEntity);
+                Object fieldValue = binder.getBoundValue(context, entity);
                 if (fieldValue != null) {
                     fieldValue = binder.input(context, fieldValue);
                     multiInBuilder.append(fieldValue);
@@ -119,14 +121,13 @@ public class MultiQuerier {
                 if (strBuilder.length() > 0) {
                     strBuilder.deleteCharAt(strBuilder.length() - 1);
                 }
-                entityIndex.put(strBuilder.toString(), rootEntity);
+                entityIndex.put(strBuilder.toString(), entity);
             }
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void setValueForRootEntities(Context context, List<Object> rootEntities, CommonRepository repository,
-                                         Map<String, Object> entityIndex, MultiResult multiResult) {
+    private void setValueForRootEntities(Context context, List<Object> rootEntities, Map<String, Object> entityIndex, MultiResult multiResult) {
         boolean isCollection = repository.getEntityEle().isCollection();
         PropChain anchorPoint = repository.getAnchorPoint();
 
