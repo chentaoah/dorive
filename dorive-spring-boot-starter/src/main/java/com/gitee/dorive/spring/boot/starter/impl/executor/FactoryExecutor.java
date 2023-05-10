@@ -43,7 +43,7 @@ import java.util.Map;
 
 @Data
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class FactoryExecutor extends AbstractExecutor {
 
     private EntityEle entityEle;

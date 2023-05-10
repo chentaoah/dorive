@@ -33,7 +33,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class AliasExecutor extends AbstractExecutor {
 
     private EntityEle entityEle;
