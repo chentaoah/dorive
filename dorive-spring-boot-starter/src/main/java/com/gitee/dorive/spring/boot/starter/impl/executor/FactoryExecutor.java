@@ -24,14 +24,13 @@ import com.gitee.dorive.core.api.common.EntityFactory;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.MultiResult;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.entity.QueryResult;
-import com.gitee.dorive.core.entity.executor.MultiResult;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -59,11 +58,7 @@ public class FactoryExecutor extends AbstractExecutor {
         List<Map<String, Object>> resultMaps = queryResult.getResultMaps();
         if (resultMaps != null) {
             List<Object> entities = reconstitute(context, resultMaps);
-            if (example instanceof UnionExample) {
-                return new MultiResult(resultMaps, entities);
-            } else {
-                return new Result<>(entities);
-            }
+            return new MultiResult(resultMaps, entities);
         }
 
         Page<Map<String, Object>> queryPage = queryResult.getPage();
