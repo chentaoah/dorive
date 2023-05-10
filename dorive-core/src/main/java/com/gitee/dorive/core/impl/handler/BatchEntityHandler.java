@@ -54,8 +54,8 @@ public class BatchEntityHandler implements EntityHandler {
         return totalCount;
     }
 
-    private boolean isMultiQuery(List<Object> rootEntities, CommonRepository repository) {
-        if (rootEntities.size() > 10) {
+    private boolean isMultiQuery(List<Object> entities, CommonRepository repository) {
+        if (entities.size() > 10) {
             BinderResolver binderResolver = repository.getBinderResolver();
             Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
             return mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/");
