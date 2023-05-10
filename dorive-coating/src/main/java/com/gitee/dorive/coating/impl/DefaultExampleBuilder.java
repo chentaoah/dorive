@@ -134,7 +134,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                     } else {
                         List<String> properties = binders.stream().map(PropertyBinder::getBoundName).collect(Collectors.toList());
                         MultiInBuilder builder = new MultiInBuilder(finalEntities.size(), properties);
-                        appendFieldValues(context, finalEntities, binders, builder);
+                        collectFieldValues(context, finalEntities, binders, builder);
                         if (!builder.isEmpty()) {
                             targetExample.getCriteria().add(builder.build());
                         } else {
@@ -146,7 +146,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
         });
     }
 
-    private void appendFieldValues(Context context, List<Object> entities, List<PropertyBinder> binders, MultiInBuilder builder) {
+    private void collectFieldValues(Context context, List<Object> entities, List<PropertyBinder> binders, MultiInBuilder builder) {
         for (Object entity : entities) {
             for (PropertyBinder binder : binders) {
                 Object fieldValue = binder.getFieldValue(context, entity);

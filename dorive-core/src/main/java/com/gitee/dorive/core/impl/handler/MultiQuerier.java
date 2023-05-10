@@ -3,8 +3,6 @@ package com.gitee.dorive.core.impl.handler;
 import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Selector;
-import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.MultiInBuilder;
 import com.gitee.dorive.core.entity.executor.MultiResult;
@@ -15,7 +13,6 @@ import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
 
 import java.util.ArrayList;
@@ -25,29 +22,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class MultiEntityHandler implements EntityHandler {
+public class MultiQuerier {
 
-    private final AbstractContextRepository<?, ?> repository;
     private final OperationFactory operationFactory;
 
-    public MultiEntityHandler(AbstractContextRepository<?, ?> repository, OperationFactory operationFactory) {
-        this.repository = repository;
+    public MultiQuerier(OperationFactory operationFactory) {
         this.operationFactory = operationFactory;
     }
 
-    @Override
-    public int handle(Context context, List<Object> entities) {
-        Selector selector = context.getSelector();
-        int totalCount = 0;
-        for (CommonRepository repository : this.repository.getSubRepositories()) {
-            if (selector.matches(context, repository)) {
-                totalCount += executeQuery(context, entities, repository);
-            }
-        }
-        return totalCount;
-    }
-
-    private long executeQuery(Context context, List<Object> rootEntities, CommonRepository repository) {
+    public long executeQuery(Context context, List<Object> rootEntities, CommonRepository repository) {
         Map<String, Object> entityIndex = new LinkedHashMap<>(rootEntities.size() * 4 / 3 + 1);
         Example example = newExample(context, rootEntities, repository, entityIndex);
         if (example.isDirtyQuery()) {
@@ -65,29 +48,27 @@ public class MultiEntityHandler implements EntityHandler {
     private Example newExample(Context context, List<Object> rootEntities, CommonRepository repository, Map<String, Object> entityIndex) {
         BinderResolver binderResolver = repository.getBinderResolver();
         Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
+        List<PropertyBinder> binders = mergedBindersMap.get("/");
 
         Example example = new Example();
-        if (mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/")) {
-            List<PropertyBinder> binders = mergedBindersMap.get("/");
-            if (binders.size() == 1) {
-                PropertyBinder propertyBinder = binders.get(0);
-                String fieldName = propertyBinder.getFieldName();
-                List<Object> boundValues = collectBoundValues(context, rootEntities, entityIndex, propertyBinder);
-                if (!boundValues.isEmpty()) {
-                    if (boundValues.size() == 1) {
-                        example.eq(fieldName, boundValues.get(0));
-                    } else {
-                        example.in(fieldName, boundValues);
-                    }
+        if (binders.size() == 1) {
+            PropertyBinder binder = binders.get(0);
+            String fieldName = binder.getFieldName();
+            List<Object> boundValues = collectBoundValues(context, rootEntities, entityIndex, binder);
+            if (!boundValues.isEmpty()) {
+                if (boundValues.size() == 1) {
+                    example.eq(fieldName, boundValues.get(0));
+                } else {
+                    example.in(fieldName, boundValues);
                 }
+            }
 
-            } else {
-                List<String> properties = binders.stream().map(AbstractBinder::getFieldName).collect(Collectors.toList());
-                MultiInBuilder builder = new MultiInBuilder(rootEntities.size(), properties);
-                appendBoundValues(context, rootEntities, entityIndex, binders, builder);
-                if (!builder.isEmpty()) {
-                    example.getCriteria().add(builder.build());
-                }
+        } else {
+            List<String> properties = binders.stream().map(AbstractBinder::getFieldName).collect(Collectors.toList());
+            MultiInBuilder builder = new MultiInBuilder(rootEntities.size(), properties);
+            collectBoundValues(context, rootEntities, entityIndex, binders, builder);
+            if (!builder.isEmpty()) {
+                example.getCriteria().add(builder.build());
             }
         }
 
@@ -104,9 +85,7 @@ public class MultiEntityHandler implements EntityHandler {
         return example;
     }
 
-    public List<Object> collectBoundValues(Context context,
-                                           List<Object> rootEntities,
-                                           Map<String, Object> entityIndex,
+    public List<Object> collectBoundValues(Context context, List<Object> rootEntities, Map<String, Object> entityIndex,
                                            PropertyBinder binder) {
         List<Object> fieldValues = new ArrayList<>(rootEntities.size());
         for (Object rootEntity : rootEntities) {
@@ -120,11 +99,8 @@ public class MultiEntityHandler implements EntityHandler {
         return fieldValues;
     }
 
-    private void appendBoundValues(Context context,
-                                   List<Object> rootEntities,
-                                   Map<String, Object> entityIndex,
-                                   List<PropertyBinder> binders,
-                                   MultiInBuilder multiInBuilder) {
+    private void collectBoundValues(Context context, List<Object> rootEntities, Map<String, Object> entityIndex,
+                                    List<PropertyBinder> binders, MultiInBuilder multiInBuilder) {
         for (Object rootEntity : rootEntities) {
             StringBuilder strBuilder = new StringBuilder();
             for (PropertyBinder binder : binders) {
@@ -149,11 +125,8 @@ public class MultiEntityHandler implements EntityHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private void setValueForRootEntities(Context context,
-                                         List<Object> rootEntities,
-                                         CommonRepository repository,
-                                         Map<String, Object> entityIndex,
-                                         MultiResult multiResult) {
+    private void setValueForRootEntities(Context context, List<Object> rootEntities, CommonRepository repository,
+                                         Map<String, Object> entityIndex, MultiResult multiResult) {
         boolean isCollection = repository.getEntityEle().isCollection();
         PropChain anchorPoint = repository.getAnchorPoint();
 

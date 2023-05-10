@@ -27,7 +27,9 @@ import com.gitee.dorive.core.entity.executor.MultiResult;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
+import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.NumberUtils;
@@ -41,10 +43,12 @@ public class BatchEntityHandler implements EntityHandler {
 
     private final AbstractContextRepository<?, ?> repository;
     private final OperationFactory operationFactory;
+    private final MultiQuerier multiQuerier;
 
     public BatchEntityHandler(AbstractContextRepository<?, ?> repository, OperationFactory operationFactory) {
         this.repository = repository;
         this.operationFactory = operationFactory;
+        this.multiQuerier = new MultiQuerier(operationFactory);
     }
 
     @Override
@@ -53,27 +57,40 @@ public class BatchEntityHandler implements EntityHandler {
         int totalCount = 0;
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (selector.matches(context, repository)) {
-                totalCount += executeQuery(repository, context, entities);
+                if (isMultiQuery(entities, repository)) {
+                    totalCount += multiQuerier.executeQuery(context, entities, repository);
+                } else {
+                    totalCount += executeQuery(context, entities, repository);
+                }
             }
         }
         return totalCount;
     }
 
-    private long executeQuery(CommonRepository repository, Context context, List<Object> rootEntities) {
-        UnionExample unionExample = newUnionExample(repository, context, rootEntities);
+    private boolean isMultiQuery(List<Object> rootEntities, CommonRepository repository) {
+        if (rootEntities.size() > 10) {
+            BinderResolver binderResolver = repository.getBinderResolver();
+            Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
+            return mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/");
+        }
+        return false;
+    }
+
+    private long executeQuery(Context context, List<Object> rootEntities, CommonRepository repository) {
+        UnionExample unionExample = newUnionExample(context, rootEntities, repository);
         if (unionExample.isDirtyQuery()) {
             Query query = operationFactory.buildQuery(unionExample);
             query.setType(query.getType() | OperationType.INCLUDE_ROOT);
             Result<Object> result = repository.executeQuery(context, query);
             if (result instanceof MultiResult) {
-                setValueForRootEntities(repository, rootEntities, (MultiResult) result);
+                setValueForRootEntities(rootEntities, repository, (MultiResult) result);
             }
             return result.getCount();
         }
         return 0;
     }
 
-    private UnionExample newUnionExample(CommonRepository repository, Context context, List<Object> rootEntities) {
+    private UnionExample newUnionExample(Context context, List<Object> rootEntities, CommonRepository repository) {
         PropChain anchorPoint = repository.getAnchorPoint();
         PropChain lastPropChain = anchorPoint.getLastPropChain();
         UnionExample unionExample = new UnionExample();
@@ -91,7 +108,7 @@ public class BatchEntityHandler implements EntityHandler {
         return unionExample;
     }
 
-    private void setValueForRootEntities(CommonRepository repository, List<Object> rootEntities, MultiResult multiResult) {
+    private void setValueForRootEntities(List<Object> rootEntities, CommonRepository repository, MultiResult multiResult) {
         boolean isCollection = repository.getEntityEle().isCollection();
         PropChain anchorPoint = repository.getAnchorPoint();
 
