@@ -33,6 +33,10 @@ public class Query extends Condition {
         super(OperationType.SELECT, entity);
     }
 
+    public boolean isEmpty() {
+        return getPrimaryKey() == null && getExample() == null;
+    }
+
     public boolean withoutPage() {
         return getExample().getPage() == null;
     }

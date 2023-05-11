@@ -54,25 +54,18 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
-        Assert.isTrue(query.getPrimaryKey() != null || query.getExample() != null, "The condition cannot be null!");
-
-        CommonRepository rootRepository = repository.getRootRepository();
+        Assert.isTrue(!query.isEmpty(), "The query cannot be empty!");
 
         Selector selector = context.getSelector();
         boolean isIncludeRoot = (query.getType() & OperationType.INCLUDE_ROOT) == OperationType.INCLUDE_ROOT;
-
-        if (selector.matches(context, rootRepository) || isIncludeRoot) {
-            int totalCount = 0;
-
-            Result<Object> result = rootRepository.executeQuery(context, query);
-            totalCount += result.getCount();
-
-            List<Object> rootEntities = result.getRecords();
-            if (!rootEntities.isEmpty()) {
-                totalCount += handle(context, rootEntities);
+        CommonRepository repository = this.repository.getRootRepository();
+        
+        if (selector.matches(context, repository) || isIncludeRoot) {
+            Result<Object> result = repository.executeQuery(context, query);
+            List<Object> entities = result.getRecords();
+            if (!entities.isEmpty()) {
+                handle(context, entities);
             }
-
-            result.setCount(totalCount);
             return result;
         }
 
