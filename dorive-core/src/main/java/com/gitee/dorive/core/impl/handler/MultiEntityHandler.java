@@ -49,8 +49,6 @@ public class MultiEntityHandler implements EntityHandler {
     }
 
     private Example newExample(Context context, List<Object> entities, Map<String, Object> entityIndex) {
-        entities = entities.stream().distinct().collect(Collectors.toList());
-
         BinderResolver binderResolver = repository.getBinderResolver();
         Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
         List<PropertyBinder> binders = mergedBindersMap.get("/");

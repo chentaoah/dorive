@@ -61,7 +61,7 @@ public class FactoryExecutor extends AbstractExecutor {
         if (resultMaps != null) {
             List<Object> entities;
             if (example instanceof UnionExample) {
-                entities = reconstituteByShared(context, resultMaps);
+                entities = reconstituteWithoutDuplicate(context, resultMaps);
             } else {
                 entities = reconstitute(context, resultMaps);
             }
@@ -80,7 +80,7 @@ public class FactoryExecutor extends AbstractExecutor {
         return new Result<>(Collections.emptyList());
     }
 
-    private List<Object> reconstituteByShared(Context context, List<Map<String, Object>> resultMaps) {
+    private List<Object> reconstituteWithoutDuplicate(Context context, List<Map<String, Object>> resultMaps) {
         int size = resultMaps.size();
         List<Object> entities = new ArrayList<>(size);
         Map<String, Object> existEntityMap = new LinkedHashMap<>(size * 4 / 3 + 1);
@@ -95,9 +95,10 @@ public class FactoryExecutor extends AbstractExecutor {
                 if (id != null) {
                     existEntityMap.put(String.valueOf(id), entity);
                 }
+                entities.add(entity);
             }
             if (entity != null) {
-                entities.add(entity);
+                resultMap.put("$entity", entity);
             }
         }
         return entities;

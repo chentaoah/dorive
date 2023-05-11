@@ -53,7 +53,7 @@ public class UnionEntityHandler implements EntityHandler {
             Object entity = entities.get(index);
             Object lastEntity = lastPropChain == null ? entity : lastPropChain.getValue(entity);
             if (lastEntity != null) {
-                Example example = newExampleByContext(context, entity);
+                Example example = newExample(context, entity);
                 if (example.isDirtyQuery()) {
                     example.selectExtra((index + 1) + " as $row");
                     unionExample.addExample(example);
@@ -63,7 +63,7 @@ public class UnionEntityHandler implements EntityHandler {
         return unionExample;
     }
 
-    public Example newExampleByContext(Context context, Object entity) {
+    public Example newExample(Context context, Object entity) {
         BinderResolver binderResolver = repository.getBinderResolver();
         Example example = new Example();
         for (PropertyBinder binder : binderResolver.getPropertyBinders()) {
@@ -97,15 +97,13 @@ public class UnionEntityHandler implements EntityHandler {
         PropChain anchorPoint = repository.getAnchorPoint();
 
         List<Map<String, Object>> resultMaps = multiResult.getResultMaps();
-        List<Object> entities = multiResult.getRecords();
-        int averageSize = entities.size() / rootEntities.size() + 1;
+        int averageSize = resultMaps.size() / rootEntities.size() + 1;
         int lastRowNum = -1;
         Collection<Object> lastCollection = null;
 
-        for (int index = 0; index < entities.size(); index++) {
-            Map<String, Object> resultMap = resultMaps.get(index);
-            Object entity = entities.get(index);
+        for (Map<String, Object> resultMap : resultMaps) {
             Integer rowNum = NumberUtils.intValue(resultMap.get("$row"));
+            Object entity = resultMap.get("$entity");
 
             if (rowNum == lastRowNum) {
                 if (isCollection && lastCollection != null) {
@@ -116,9 +114,9 @@ public class UnionEntityHandler implements EntityHandler {
                 Object rootEntity = rootEntities.get(rowNum - 1);
                 if (isCollection) {
                     Collection<Object> collection = new ArrayList<>(averageSize);
-                    anchorPoint.setValue(rootEntity, collection);
                     collection.add(entity);
                     lastCollection = collection;
+                    anchorPoint.setValue(rootEntity, collection);
                 } else {
                     anchorPoint.setValue(rootEntity, entity);
                 }
