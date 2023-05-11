@@ -26,6 +26,7 @@ import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.MultiResult;
 import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
@@ -37,6 +38,7 @@ import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +59,12 @@ public class FactoryExecutor extends AbstractExecutor {
 
         List<Map<String, Object>> resultMaps = queryResult.getResultMaps();
         if (resultMaps != null) {
-            List<Object> entities = reconstitute(context, resultMaps);
+            List<Object> entities;
+            if (example instanceof UnionExample) {
+                entities = reconstituteByShared(context, resultMaps);
+            } else {
+                entities = reconstitute(context, resultMaps);
+            }
             return new MultiResult(resultMaps, entities);
         }
 
@@ -71,6 +78,29 @@ public class FactoryExecutor extends AbstractExecutor {
         }
 
         return new Result<>(Collections.emptyList());
+    }
+
+    private List<Object> reconstituteByShared(Context context, List<Map<String, Object>> resultMaps) {
+        int size = resultMaps.size();
+        List<Object> entities = new ArrayList<>(size);
+        Map<String, Object> existEntityMap = new LinkedHashMap<>(size * 4 / 3 + 1);
+        for (Map<String, Object> resultMap : resultMaps) {
+            Object id = resultMap.get("id");
+            Object entity = null;
+            if (id != null) {
+                entity = existEntityMap.get(String.valueOf(id));
+            }
+            if (entity == null) {
+                entity = entityFactory.reconstitute(context, resultMap);
+                if (id != null) {
+                    existEntityMap.put(String.valueOf(id), entity);
+                }
+            }
+            if (entity != null) {
+                entities.add(entity);
+            }
+        }
+        return entities;
     }
 
     private List<Object> reconstitute(Context context, List<Map<String, Object>> resultMaps) {

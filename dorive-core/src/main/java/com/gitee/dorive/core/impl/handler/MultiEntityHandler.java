@@ -95,7 +95,7 @@ public class MultiEntityHandler implements EntityHandler {
             if (fieldValue != null) {
                 fieldValue = binder.input(context, fieldValue);
                 fieldValues.add(fieldValue);
-                entityIndex.put(String.valueOf(fieldValue), entity);
+                entityIndex.putIfAbsent(String.valueOf(fieldValue), entity);
             }
         }
         return fieldValues;
@@ -121,7 +121,7 @@ public class MultiEntityHandler implements EntityHandler {
                 if (strBuilder.length() > 0) {
                     strBuilder.deleteCharAt(strBuilder.length() - 1);
                 }
-                entityIndex.put(strBuilder.toString(), entity);
+                entityIndex.putIfAbsent(strBuilder.toString(), entity);
             }
         }
     }
