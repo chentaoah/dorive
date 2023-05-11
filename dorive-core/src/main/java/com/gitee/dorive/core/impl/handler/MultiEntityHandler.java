@@ -49,6 +49,8 @@ public class MultiEntityHandler implements EntityHandler {
     }
 
     private Example newExample(Context context, List<Object> entities, Map<String, Object> entityIndex) {
+        entities = entities.stream().distinct().collect(Collectors.toList());
+
         BinderResolver binderResolver = repository.getBinderResolver();
         Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
         List<PropertyBinder> binders = mergedBindersMap.get("/");
@@ -89,16 +91,19 @@ public class MultiEntityHandler implements EntityHandler {
     }
 
     public List<Object> collectBoundValues(Context context, List<Object> entities, Map<String, Object> entityIndex, PropertyBinder binder) {
-        List<Object> fieldValues = new ArrayList<>(entities.size());
+        List<Object> boundValues = new ArrayList<>(entities.size());
         for (Object entity : entities) {
-            Object fieldValue = binder.getBoundValue(context, entity);
-            if (fieldValue != null) {
-                fieldValue = binder.input(context, fieldValue);
-                fieldValues.add(fieldValue);
-                entityIndex.putIfAbsent(String.valueOf(fieldValue), entity);
+            Object boundValue = binder.getBoundValue(context, entity);
+            if (boundValue != null) {
+                boundValue = binder.input(context, boundValue);
+                String key = String.valueOf(boundValue);
+                if (!entityIndex.containsKey(key)) {
+                    boundValues.add(boundValue);
+                }
+                addToIndex(entityIndex, key, entity);
             }
         }
-        return fieldValues;
+        return boundValues;
     }
 
     private void collectBoundValues(Context context, List<Object> entities, Map<String, Object> entityIndex, List<PropertyBinder> binders,
@@ -106,11 +111,11 @@ public class MultiEntityHandler implements EntityHandler {
         for (Object entity : entities) {
             StringBuilder strBuilder = new StringBuilder();
             for (PropertyBinder binder : binders) {
-                Object fieldValue = binder.getBoundValue(context, entity);
-                if (fieldValue != null) {
-                    fieldValue = binder.input(context, fieldValue);
-                    multiInBuilder.append(fieldValue);
-                    strBuilder.append(fieldValue).append(",");
+                Object boundValue = binder.getBoundValue(context, entity);
+                if (boundValue != null) {
+                    boundValue = binder.input(context, boundValue);
+                    multiInBuilder.append(boundValue);
+                    strBuilder.append(boundValue).append(",");
                 } else {
                     multiInBuilder.clear();
                     strBuilder = null;
@@ -121,8 +126,29 @@ public class MultiEntityHandler implements EntityHandler {
                 if (strBuilder.length() > 0) {
                     strBuilder.deleteCharAt(strBuilder.length() - 1);
                 }
-                entityIndex.putIfAbsent(strBuilder.toString(), entity);
+                String key = strBuilder.toString();
+                if (entityIndex.containsKey(key)) {
+                    multiInBuilder.clear();
+                }
+                addToIndex(entityIndex, key, entity);
             }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addToIndex(Map<String, Object> entityIndex, String key, Object entity) {
+        Object object = entityIndex.get(key);
+        if (object instanceof Collection) {
+            ((Collection<Object>) object).add(entity);
+
+        } else if (object != null) {
+            List<Object> entities = new ArrayList<>(4);
+            entities.add(object);
+            entities.add(entity);
+            entityIndex.put(key, entities);
+
+        } else {
+            entityIndex.put(key, entity);
         }
     }
 
@@ -162,24 +188,35 @@ public class MultiEntityHandler implements EntityHandler {
                 }
             }
             if (strBuilder != null) {
-                Object rootEntity = entityIndex.get(strBuilder.toString());
-                if (rootEntity != null) {
-                    Object value = anchorPoint.getValue(rootEntity);
-                    if (isCollection) {
-                        Collection<Object> collection;
-                        if (value == null) {
-                            collection = new ArrayList<>(averageSize);
-                            anchorPoint.setValue(rootEntity, collection);
-                        } else {
-                            collection = (Collection<Object>) value;
-                        }
-                        collection.add(entity);
-
-                    } else {
-                        if (value == null) {
-                            anchorPoint.setValue(rootEntity, entity);
-                        }
+                Object object = entityIndex.get(strBuilder.toString());
+                if (object instanceof Collection) {
+                    for (Object rootEntity : (Collection<Object>) object) {
+                        setValueForRootEntity(isCollection, anchorPoint, averageSize, rootEntity, entity);
                     }
+                } else {
+                    setValueForRootEntity(isCollection, anchorPoint, averageSize, object, entity);
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void setValueForRootEntity(boolean isCollection, PropChain anchorPoint, int averageSize, Object rootEntity, Object entity) {
+        if (rootEntity != null) {
+            Object value = anchorPoint.getValue(rootEntity);
+            if (isCollection) {
+                Collection<Object> collection;
+                if (value == null) {
+                    collection = new ArrayList<>(averageSize);
+                    anchorPoint.setValue(rootEntity, collection);
+                } else {
+                    collection = (Collection<Object>) value;
+                }
+                collection.add(entity);
+
+            } else {
+                if (value == null) {
+                    anchorPoint.setValue(rootEntity, entity);
                 }
             }
         }
