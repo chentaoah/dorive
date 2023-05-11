@@ -42,7 +42,7 @@ public class BatchEntityHandler implements EntityHandler {
         int totalCount = 0;
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (selector.matches(context, repository)) {
-                if (isMultiQuery(entities, repository)) {
+                if (isMultiQuery(repository)) {
                     EntityHandler entityHandler = new MultiEntityHandler(repository);
                     totalCount += entityHandler.handle(context, entities);
                 } else {
@@ -54,13 +54,10 @@ public class BatchEntityHandler implements EntityHandler {
         return totalCount;
     }
 
-    private boolean isMultiQuery(List<Object> entities, CommonRepository repository) {
-        if (entities.size() > 1) {
-            BinderResolver binderResolver = repository.getBinderResolver();
-            Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
-            return mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/");
-        }
-        return false;
+    private boolean isMultiQuery(CommonRepository repository) {
+        BinderResolver binderResolver = repository.getBinderResolver();
+        Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
+        return mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/");
     }
 
 }
