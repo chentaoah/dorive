@@ -18,6 +18,7 @@
 package com.gitee.dorive.spring.boot.starter.impl.executor;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -30,11 +31,21 @@ import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.*;
-import com.gitee.dorive.core.entity.operation.*;
+import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.executor.UnionExample;
+import com.gitee.dorive.core.entity.operation.Delete;
+import com.gitee.dorive.core.entity.operation.Insert;
+import com.gitee.dorive.core.entity.operation.NullableUpdate;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
 import com.gitee.dorive.spring.boot.starter.entity.QueryResult;
+import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -115,18 +126,18 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     private QueryWrapper<Object> buildQueryWrapper(Example example) {
         QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
 
-        List<String> selectColumns = example.getSelectColumns();
-        if (selectColumns != null && !selectColumns.isEmpty()) {
-            queryWrapper.select(selectColumns);
+        List<String> selectProps = example.getSelectProps();
+        if (selectProps != null && !selectProps.isEmpty()) {
+            queryWrapper.select(selectProps);
         }
 
-        List<String> extraColumns = example.getExtraColumns();
-        if (extraColumns != null && !extraColumns.isEmpty()) {
+        List<String> extraProps = example.getExtraProps();
+        if (extraProps != null && !extraProps.isEmpty()) {
             String sqlSelect = queryWrapper.getSqlSelect();
             if (StringUtils.isBlank(sqlSelect)) {
                 sqlSelect = queryWrapper.select(pojoClass, i -> true).getSqlSelect();
             }
-            sqlSelect = sqlSelect + StringPool.COMMA + queryWrapper.select(extraColumns).getSqlSelect();
+            sqlSelect = sqlSelect + StringPool.COMMA + queryWrapper.select(extraProps).getSqlSelect();
             queryWrapper.select(sqlSelect);
         }
 
@@ -139,10 +150,10 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         if (orderBy != null) {
             String order = orderBy.getOrder();
             if (Order.ASC.equals(order)) {
-                queryWrapper.orderByAsc(orderBy.getColumns());
+                queryWrapper.orderByAsc(orderBy.getProperties());
 
             } else if (Order.DESC.equals(order)) {
-                queryWrapper.orderByDesc(orderBy.getColumns());
+                queryWrapper.orderByDesc(orderBy.getProperties());
             }
         }
 
@@ -167,7 +178,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
             String sqlSelect = nextQueryWrapper.getSqlSelect();
             String tableName = TableInfoHelper.getTableInfo(pojoClass).getTableName();
-            String criteria = nextExample.buildCriteria();
+            String criteria = CollUtil.join(nextExample.getCriteria(), " AND ", CriterionUtils::toString);
 
             String sql = "";
             if (nextExample.getOrderBy() == null && nextExample.getPage() == null) {

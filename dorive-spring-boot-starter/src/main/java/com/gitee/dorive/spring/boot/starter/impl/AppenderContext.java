@@ -18,13 +18,17 @@
 package com.gitee.dorive.spring.boot.starter.impl;
 
 import com.baomidou.mybatisplus.core.conditions.interfaces.Compare;
-import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.gitee.dorive.api.constant.Operator;
-import com.gitee.dorive.core.util.SqlUtils;
+import com.gitee.dorive.core.entity.executor.MultiInBuilder;
+import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
+import com.gitee.dorive.spring.boot.starter.util.SqlUtils;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class AppenderContext {
 
@@ -57,14 +61,35 @@ public class AppenderContext {
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NOT_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNotNull(property));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NULL_SWITCH, (abstractWrapper, property, value) -> {
             if (value instanceof Boolean) {
-                Boolean flag = (Boolean) value;
-                if (flag) {
+                if ((Boolean) value) {
                     abstractWrapper.isNull(property);
                 } else {
                     abstractWrapper.isNotNull(property);
                 }
             }
         });
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.MULTI_IN, (abstractWrapper, property, value) -> {
+            if (value instanceof MultiInBuilder) {
+                MultiInBuilder builder = (MultiInBuilder) value;
+                StringBuilder valuesStr = new StringBuilder();
+                for (int page = 1; page <= builder.page(); page++) {
+                    List<Object> values = builder.get(page);
+                    valuesStr.append(buildValuesStr(values));
+                }
+                if (valuesStr.length() > 0) {
+                    valuesStr.deleteCharAt(valuesStr.length() - 1);
+                }
+                if (abstractWrapper.isEmptyOfWhere()) {
+                    abstractWrapper.last(" WHERE (" + property + ") IN (" + valuesStr + ")");
+                } else {
+                    abstractWrapper.last(" AND (" + property + ") IN (" + valuesStr + ")");
+                }
+            }
+        });
+    }
+
+    public static String buildValuesStr(List<Object> values) {
+        return values.stream().map(StringUtils::sqlParam).collect(Collectors.joining(",", "(", "),"));
     }
 
 }

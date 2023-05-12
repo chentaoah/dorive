@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class MultiResult extends Result<Object> {
 
     private List<Map<String, Object>> resultMaps;

@@ -27,12 +27,12 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderBy {
 
-    private List<String> columns;
+    private List<String> properties;
     private String order;
 
     @Override
     public String toString() {
-        return "ORDER BY " + StrUtil.join(", ", columns) + " " + order.toUpperCase();
+        return "ORDER BY " + StrUtil.join(",", properties) + " " + order.toUpperCase();
     }
 
 }

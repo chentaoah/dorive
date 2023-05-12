@@ -15,19 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.coating.entity;
+package com.gitee.dorive.spring.boot.starter.util;
 
-import com.gitee.dorive.coating.entity.def.CoatingDef;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+public class SqlUtils {
 
-import java.util.List;
+    public static Object toLike(Object value) {
+        if (value instanceof String) {
+            String valueStr = (String) value;
+            if (!valueStr.startsWith("%") && !valueStr.endsWith("%")) {
+                return "%" + valueStr + "%";
+            }
+        }
+        return value;
+    }
 
-@Data
-@AllArgsConstructor
-public class CoatingRepositories {
-    private CoatingDef coatingDef;
-    private List<PropertyRepository> propertyRepositories;
-    private List<PropertyRepository> reversedPropertyRepositories;
-    private SpecificProperties specificProperties;
 }

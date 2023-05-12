@@ -99,7 +99,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setEntityDef(rootRepository.getEntityDef());
         setEntityEle(rootRepository.getEntityEle());
         setOperationFactory(rootRepository.getOperationFactory());
-        setExecutor(newExecutor(rootRepository));
+        setExecutor(newExecutor());
         setAttachments(new ConcurrentHashMap<>(rootRepository.getAttachments()));
     }
 
@@ -112,7 +112,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         boolean isRoot = "/".equals(accessPath);
         boolean isAggregated = entityEle.isAggregated();
-        OrderBy defaultOrderBy = newDefaultOrderBy(entityDef, entityEle);
+        OrderBy defaultOrderBy = newDefaultOrderBy(entityDef);
 
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
         PropChain anchorPoint = propChainMap.get(accessPath);
@@ -172,21 +172,20 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return (AbstractRepository<Object, Object>) repository;
     }
 
-    private OrderBy newDefaultOrderBy(EntityDef entityDef, EntityEle entityEle) {
+    private OrderBy newDefaultOrderBy(EntityDef entityDef) {
         String sortBy = entityDef.getSortBy();
         String order = entityDef.getOrder().toUpperCase();
         if (StringUtils.isNotBlank(sortBy) && (Order.ASC.equals(order) || Order.DESC.equals(order))) {
             List<String> properties = StrUtil.splitTrim(sortBy, ",");
-            List<String> columns = entityEle.toAliases(properties);
-            return new OrderBy(columns, order);
+            return new OrderBy(properties, order);
         }
         return null;
     }
 
-    private Executor newExecutor(CommonRepository rootRepository) {
+    private Executor newExecutor() {
         delegateResolver = new DelegateResolver(this);
 
-        EntityHandler entityHandler = new BatchEntityHandler(this, rootRepository.getOperationFactory());
+        EntityHandler entityHandler = new BatchEntityHandler(this);
         processEntityClass(entityHandler);
 
         if (delegateResolver.isDelegated()) {

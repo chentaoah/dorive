@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.core.entity.executor;
 
-import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.core.util.StringUtils;
@@ -34,11 +33,15 @@ public class Example {
 
     private boolean emptyQuery = false;
     private boolean countQueried = false;
-    private List<String> selectColumns;
-    private List<String> extraColumns;
+    private List<String> selectProps;
+    private List<String> extraProps;
     private List<Criterion> criteria = new ArrayList<>(4);
     private OrderBy orderBy;
     private Page<Object> page;
+
+    public Example(List<Criterion> criteria) {
+        this.criteria = criteria;
+    }
 
     public boolean isDirtyQuery() {
         return !criteria.isEmpty();
@@ -48,32 +51,24 @@ public class Example {
         return !emptyQuery && !isDirtyQuery();
     }
 
-    public void selectColumns(String... columns) {
-        selectColumns(StringUtils.toList(columns));
+    public void select(String... properties) {
+        select(StringUtils.toList(properties));
     }
 
-    public void selectColumns(List<String> columns) {
-        selectColumns = columns;
+    public void select(List<String> properties) {
+        selectProps = properties;
     }
 
-    public void extraColumns(String... columns) {
-        extraColumns(StringUtils.toList(columns));
+    public void selectExtra(String... properties) {
+        selectExtra(StringUtils.toList(properties));
     }
 
-    public void extraColumns(List<String> columns) {
-        if (extraColumns == null) {
-            extraColumns = columns;
+    public void selectExtra(List<String> properties) {
+        if (extraProps == null) {
+            extraProps = properties;
         } else {
-            extraColumns.addAll(columns);
+            extraProps.addAll(properties);
         }
-    }
-
-    public void addCriterion(Criterion criterion) {
-        criteria.add(criterion);
-    }
-
-    public String buildCriteria() {
-        return StrUtil.join(" AND ", criteria);
     }
 
     public Example eq(String property, Object value) {
@@ -136,13 +131,13 @@ public class Example {
         return this;
     }
 
-    public Example orderByAsc(String... columns) {
-        orderBy = new OrderBy(Arrays.asList(columns), Order.ASC);
+    public Example orderByAsc(String... properties) {
+        orderBy = new OrderBy(Arrays.asList(properties), Order.ASC);
         return this;
     }
 
-    public Example orderByDesc(String... columns) {
-        orderBy = new OrderBy(Arrays.asList(columns), Order.DESC);
+    public Example orderByDesc(String... properties) {
+        orderBy = new OrderBy(Arrays.asList(properties), Order.DESC);
         return this;
     }
 

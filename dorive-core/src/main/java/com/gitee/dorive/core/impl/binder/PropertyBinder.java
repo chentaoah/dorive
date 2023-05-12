@@ -17,10 +17,10 @@
 
 package com.gitee.dorive.core.impl.binder;
 
-import com.gitee.dorive.core.api.common.Processor;
-import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.element.PropChain;
+import com.gitee.dorive.core.api.common.Processor;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,6 +47,10 @@ public class PropertyBinder extends AbstractBinder {
         this.belongRepository = belongRepository;
         this.boundPropChain = boundPropChain;
         this.bindAlias = bindAlias;
+    }
+
+    public String getBoundName() {
+        return boundPropChain.getEntityField().getName();
     }
 
     public boolean isSameType() {

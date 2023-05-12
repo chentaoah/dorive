@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 @Slf4j
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class EntityType extends EntityEle {
 
     private static final Map<Class<?>, EntityType> CACHE = new ConcurrentHashMap<>();

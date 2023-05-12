@@ -34,7 +34,7 @@ public class RootSelector extends AbstractSelector {
     }
     
     @Override
-    public List<String> selectColumns(Context context, CommonRepository repository) {
+    public List<String> select(Context context, CommonRepository repository) {
         return null;
     }
 

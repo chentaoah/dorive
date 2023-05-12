@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.api.entity.element;
 
+import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.annotation.Aggregate;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.def.BindingDef;
@@ -25,7 +26,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,16 +41,6 @@ public abstract class EntityEle {
     private List<BindingDef> bindingDefs;
     private PropProxy pkProxy;
     private Map<String, String> aliasMap;
-
-    public static EntityEle fromElement(AnnotatedElement element) {
-        if (element instanceof Class) {
-            return EntityType.getInstance((Class<?>) element);
-
-        } else if (element instanceof Field) {
-            return new EntityField((Field) element);
-        }
-        throw new RuntimeException("Unsupported type!");
-    }
 
     public EntityEle(AnnotatedElement element) {
         this.element = element;
@@ -74,17 +64,21 @@ public abstract class EntityEle {
     }
 
     public String toAlias(String property) {
+        if (property.contains(",")) {
+            List<String> aliases = toAliases(StrUtil.splitTrim(property, ","));
+            return StrUtil.join(",", aliases);
+        }
         return aliasMap.getOrDefault(property, property);
     }
 
     public List<String> toAliases(List<String> properties) {
         if (properties != null && !properties.isEmpty()) {
-            List<String> columns = new ArrayList<>(properties.size());
+            List<String> aliases = new ArrayList<>(properties.size());
             for (String property : properties) {
                 String alias = toAlias(property);
-                columns.add(alias);
+                aliases.add(alias);
             }
-            return columns;
+            return aliases;
         }
         return properties;
     }

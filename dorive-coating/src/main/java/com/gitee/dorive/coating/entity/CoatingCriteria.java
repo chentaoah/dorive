@@ -15,18 +15,21 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.util;
+package com.gitee.dorive.coating.entity;
 
-public class SqlUtils {
+import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.Page;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-    public static Object toLike(Object value) {
-        if (value instanceof String) {
-            String valueStr = (String) value;
-            if (!valueStr.startsWith("%") && !valueStr.endsWith("%")) {
-                return "%" + valueStr + "%";
-            }
-        }
-        return value;
-    }
+import java.util.List;
+import java.util.Map;
 
+@Data
+@AllArgsConstructor
+public class CoatingCriteria {
+    private Map<String, List<Criterion>> criteriaMap;
+    private OrderBy orderBy;
+    private Page<Object> page;
 }

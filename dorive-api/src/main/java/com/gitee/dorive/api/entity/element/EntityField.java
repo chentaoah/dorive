@@ -29,7 +29,7 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class EntityField extends EntityEle {
 
     private Field field;

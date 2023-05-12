@@ -23,6 +23,6 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class DefaultRepository extends AbstractRepository<Object, Object> {
 }

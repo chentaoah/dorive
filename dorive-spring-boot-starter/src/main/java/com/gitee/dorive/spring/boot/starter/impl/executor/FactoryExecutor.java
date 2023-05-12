@@ -24,6 +24,7 @@ import com.gitee.dorive.core.api.common.EntityFactory;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.MultiResult;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Insert;
@@ -31,19 +32,19 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.entity.QueryResult;
-import com.gitee.dorive.core.entity.executor.MultiResult;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @Data
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class FactoryExecutor extends AbstractExecutor {
 
     private EntityEle entityEle;
@@ -58,12 +59,13 @@ public class FactoryExecutor extends AbstractExecutor {
 
         List<Map<String, Object>> resultMaps = queryResult.getResultMaps();
         if (resultMaps != null) {
-            List<Object> entities = reconstitute(context, resultMaps);
+            List<Object> entities;
             if (example instanceof UnionExample) {
-                return new MultiResult(resultMaps, entities);
+                entities = reconstituteWithoutDuplicate(context, resultMaps);
             } else {
-                return new Result<>(entities);
+                entities = reconstitute(context, resultMaps);
             }
+            return new MultiResult(resultMaps, entities);
         }
 
         Page<Map<String, Object>> queryPage = queryResult.getPage();
@@ -76,6 +78,30 @@ public class FactoryExecutor extends AbstractExecutor {
         }
 
         return new Result<>(Collections.emptyList());
+    }
+
+    private List<Object> reconstituteWithoutDuplicate(Context context, List<Map<String, Object>> resultMaps) {
+        int size = resultMaps.size();
+        List<Object> entities = new ArrayList<>(size);
+        Map<String, Object> existEntityMap = new LinkedHashMap<>(size * 4 / 3 + 1);
+        for (Map<String, Object> resultMap : resultMaps) {
+            Object id = resultMap.get("id");
+            Object entity = null;
+            if (id != null) {
+                entity = existEntityMap.get(String.valueOf(id));
+            }
+            if (entity == null) {
+                entity = entityFactory.reconstitute(context, resultMap);
+                if (id != null) {
+                    existEntityMap.put(String.valueOf(id), entity);
+                }
+                entities.add(entity);
+            }
+            if (entity != null) {
+                resultMap.put("$entity", entity);
+            }
+        }
+        return entities;
     }
 
     private List<Object> reconstitute(Context context, List<Map<String, Object>> resultMaps) {

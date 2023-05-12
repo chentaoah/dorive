@@ -18,15 +18,17 @@
 package com.gitee.dorive.coating.impl;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.coating.api.ExampleBuilder;
-import com.gitee.dorive.coating.entity.CoatingRepositories;
+import com.gitee.dorive.coating.entity.CoatingCriteria;
+import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.entity.MergedRepository;
-import com.gitee.dorive.coating.entity.PropertyRepository;
-import com.gitee.dorive.coating.impl.resolver.CoatingRepositoriesResolver;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.MultiInBuilder;
+import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -38,6 +40,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DefaultExampleBuilder implements ExampleBuilder {
 
@@ -49,49 +52,49 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
     @Override
     public Example buildExample(Context context, Object coating) {
-        CoatingRepositoriesResolver coatingRepositoriesResolver = repository.getCoatingRepositoriesResolver();
-        Map<String, CoatingRepositories> nameCoatingRepositoriesMap = coatingRepositoriesResolver.getNameCoatingRepositoriesMap();
+        CoatingType coatingType = repository.getCoatingType(coating);
+        CoatingCriteria coatingCriteria = coatingType.newCriteria(coating);
+        Map<String, List<Criterion>> criteriaMap = coatingCriteria.getCriteriaMap();
+        OrderBy orderBy = coatingCriteria.getOrderBy();
+        Page<Object> page = coatingCriteria.getPage();
 
-        CoatingRepositories coatingRepositories = nameCoatingRepositoriesMap.get(coating.getClass().getName());
-        Assert.notNull(coatingRepositories, "No coating definition found!");
-
-        Map<String, RepoCriterion> repoCriterionMap = new LinkedHashMap<>();
-        for (PropertyRepository propertyRepository : coatingRepositories.getReversedPropertyRepositories()) {
-            Example example = propertyRepository.newExampleByCoating(coating);
-            RepoCriterion repoCriterion = new RepoCriterion(propertyRepository, example);
-
-            MergedRepository mergedRepository = propertyRepository.getMergedRepository();
+        Map<String, RepoExample> repoExampleMap = new LinkedHashMap<>();
+        for (MergedRepository mergedRepository : coatingType.getReversedMergedRepositories()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-            String relativeAccessPath = mergedRepository.isMerged() ? absoluteAccessPath + "/" : absoluteAccessPath;
-            repoCriterionMap.put(relativeAccessPath, repoCriterion);
+            String relativeAccessPath = mergedRepository.getRelativeAccessPath();
+            List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> new ArrayList<>(2));
+            Example example = new Example(criteria);
+            repoExampleMap.put(relativeAccessPath, new RepoExample(mergedRepository, example));
         }
 
-        executeChainQuery(context, repoCriterionMap);
+        executeQuery(context, repoExampleMap);
 
-        RepoCriterion repoCriterion = repoCriterionMap.get("/");
-        Assert.notNull(repoCriterion, "The criterion cannot be null!");
-        return repoCriterion.getExample();
+        RepoExample repoExample = repoExampleMap.get("/");
+        Assert.notNull(repoExample, "The criterion cannot be null!");
+
+        Example example = repoExample.getExample();
+        example.setOrderBy(orderBy);
+        example.setPage(page);
+        return example;
     }
 
-    private void executeChainQuery(Context context, Map<String, RepoCriterion> repoCriterionMap) {
-        repoCriterionMap.forEach((accessPath, repoCriterion) -> {
+    private void executeQuery(Context context, Map<String, RepoExample> repoExampleMap) {
+        repoExampleMap.forEach((accessPath, repoExample) -> {
             if ("/".equals(accessPath)) return;
 
-            PropertyRepository propertyRepository = repoCriterion.getPropertyRepository();
-            Example example = repoCriterion.getExample();
+            MergedRepository mergedRepository = repoExample.getMergedRepository();
+            Example example = repoExample.getExample();
 
-            MergedRepository mergedRepository = propertyRepository.getMergedRepository();
-            String lastAccessPath = mergedRepository.getLastAccessPath();
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
+            Map<String, List<PropertyBinder>> mergedBindersMap = mergedRepository.getMergedBindersMap();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 
-            for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
-                String absoluteAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
-                RepoCriterion targetRepoCriterion = repoCriterionMap.get(absoluteAccessPath);
-                if (targetRepoCriterion != null) {
-                    Example targetExample = targetRepoCriterion.getExample();
+            for (String relativeAccessPath : mergedBindersMap.keySet()) {
+                RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
+                if (targetRepoExample != null) {
+                    Example targetExample = targetRepoExample.getExample();
                     if (targetExample.isEmptyQuery()) {
                         example.setEmptyQuery(true);
                         break;
@@ -105,51 +108,67 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
             List<Object> entities = Collections.emptyList();
             if (!example.isEmptyQuery() && example.isDirtyQuery()) {
-                example.selectColumns(new ArrayList<>(binderResolver.getBoundFields()));
+                example.select(new ArrayList<>(binderResolver.getBoundFields()));
                 entities = executedRepository.selectByExample(context, example);
             }
 
-            for (PropertyBinder propertyBinder : binderResolver.getPropertyBinders()) {
-                String absoluteAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
-                RepoCriterion targetRepoCriterion = repoCriterionMap.get(absoluteAccessPath);
-                if (targetRepoCriterion != null) {
-                    Example targetExample = targetRepoCriterion.getExample();
-                    if (entities.isEmpty()) {
+            List<Object> finalEntities = entities;
+            mergedBindersMap.forEach((relativeAccessPath, binders) -> {
+                RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
+                if (targetRepoExample != null) {
+                    Example targetExample = targetRepoExample.getExample();
+                    if (finalEntities.isEmpty()) {
                         targetExample.setEmptyQuery(true);
-                        continue;
+                        return;
                     }
+                    if (binders.size() == 1) {
+                        PropertyBinder binder = binders.get(0);
+                        List<Object> fieldValues = binder.collectFieldValues(context, finalEntities);
+                        if (!fieldValues.isEmpty()) {
+                            String boundName = binder.getBoundName();
+                            if (fieldValues.size() == 1) {
+                                targetExample.eq(boundName, fieldValues.get(0));
+                            } else {
+                                targetExample.in(boundName, fieldValues);
+                            }
+                        } else {
+                            targetExample.setEmptyQuery(true);
+                        }
 
-                    List<Object> fieldValues = collectFieldValues(context, entities, propertyBinder);
-                    if (fieldValues.isEmpty()) {
-                        targetExample.setEmptyQuery(true);
-                        continue;
+                    } else {
+                        List<String> properties = binders.stream().map(PropertyBinder::getBoundName).collect(Collectors.toList());
+                        MultiInBuilder builder = new MultiInBuilder(finalEntities.size(), properties);
+                        collectFieldValues(context, finalEntities, binders, builder);
+                        if (!builder.isEmpty()) {
+                            targetExample.getCriteria().add(builder.build());
+                        } else {
+                            targetExample.setEmptyQuery(true);
+                        }
                     }
-
-                    PropChain boundPropChain = propertyBinder.getBoundPropChain();
-                    String field = boundPropChain.getEntityField().getName();
-                    Object fieldValue = fieldValues.size() == 1 ? fieldValues.get(0) : fieldValues;
-                    fieldValue = propertyBinder.output(context, fieldValue);
-                    targetExample.eq(field, fieldValue);
                 }
-            }
+            });
         });
     }
 
-    private List<Object> collectFieldValues(Context context, List<Object> entities, PropertyBinder propertyBinder) {
-        List<Object> fieldValues = new ArrayList<>();
+    private void collectFieldValues(Context context, List<Object> entities, List<PropertyBinder> binders, MultiInBuilder builder) {
         for (Object entity : entities) {
-            Object fieldValue = propertyBinder.getFieldValue(context, entity);
-            if (fieldValue != null) {
-                fieldValues.add(fieldValue);
+            for (PropertyBinder binder : binders) {
+                Object fieldValue = binder.getFieldValue(context, entity);
+                if (fieldValue != null) {
+                    fieldValue = binder.output(context, fieldValue);
+                    builder.append(fieldValue);
+                } else {
+                    builder.clear();
+                    break;
+                }
             }
         }
-        return fieldValues;
     }
 
     @Data
     @AllArgsConstructor
-    public static class RepoCriterion {
-        private PropertyRepository propertyRepository;
+    public static class RepoExample {
+        private MergedRepository mergedRepository;
         private Example example;
     }
 
