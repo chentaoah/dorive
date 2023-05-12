@@ -73,9 +73,9 @@ public class MultiEntityHandler implements EntityHandler {
         Example example = new Example();
         if (binders.size() == 1) {
             PropertyBinder binder = binders.get(0);
-            String fieldName = binder.getFieldName();
             List<Object> boundValues = collectBoundValues(context, entities, entityIndex, binder);
             if (!boundValues.isEmpty()) {
+                String fieldName = binder.getFieldName();
                 if (boundValues.size() == 1) {
                     example.eq(fieldName, boundValues.get(0));
                 } else {

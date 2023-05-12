@@ -49,12 +49,12 @@ public class PropertyBinder extends AbstractBinder {
         this.bindAlias = bindAlias;
     }
 
-    public boolean isSameType() {
-        return getFieldPropChain().isSameType(boundPropChain);
-    }
-
     public String getBoundName() {
         return boundPropChain.getEntityField().getName();
+    }
+
+    public boolean isSameType() {
+        return getFieldPropChain().isSameType(boundPropChain);
     }
 
     @Override

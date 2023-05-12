@@ -122,14 +122,14 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                         return;
                     }
                     if (binders.size() == 1) {
-                        PropertyBinder propertyBinder = binders.get(0);
-                        List<Object> fieldValues = propertyBinder.collectFieldValues(context, finalEntities);
+                        PropertyBinder binder = binders.get(0);
+                        List<Object> fieldValues = binder.collectFieldValues(context, finalEntities);
                         if (!fieldValues.isEmpty()) {
-                            String fieldName = propertyBinder.getBoundName();
+                            String boundName = binder.getBoundName();
                             if (fieldValues.size() == 1) {
-                                targetExample.eq(fieldName, fieldValues.get(0));
+                                targetExample.eq(boundName, fieldValues.get(0));
                             } else {
-                                targetExample.in(fieldName, fieldValues);
+                                targetExample.in(boundName, fieldValues);
                             }
                         } else {
                             targetExample.setEmptyQuery(true);
