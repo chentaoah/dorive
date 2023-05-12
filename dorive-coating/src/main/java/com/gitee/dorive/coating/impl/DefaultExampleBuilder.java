@@ -27,6 +27,8 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.MultiInBuilder;
+import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -53,6 +55,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
         CoatingType coatingType = repository.getCoatingType(coating);
         CoatingCriteria coatingCriteria = coatingType.newCriteria(coating);
         Map<String, List<Criterion>> criteriaMap = coatingCriteria.getCriteriaMap();
+        OrderBy orderBy = coatingCriteria.getOrderBy();
+        Page<Object> page = coatingCriteria.getPage();
 
         Map<String, RepoExample> repoExampleMap = new LinkedHashMap<>();
         for (MergedRepository mergedRepository : coatingType.getReversedMergedRepositories()) {
@@ -69,8 +73,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
         Assert.notNull(repoExample, "The criterion cannot be null!");
 
         Example example = repoExample.getExample();
-        example.setOrderBy(coatingCriteria.getOrderBy());
-        example.setPage(coatingCriteria.getPage());
+        example.setOrderBy(orderBy);
+        example.setPage(page);
         return example;
     }
 
