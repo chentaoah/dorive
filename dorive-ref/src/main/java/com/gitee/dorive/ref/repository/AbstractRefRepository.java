@@ -65,11 +65,11 @@ public abstract class AbstractRefRepository<E, PK> extends AbstractCoatingReposi
     }
 
     @Override
-    public long selectCountByExample(Context context, Example example) {
+    public long selectCount(Context context, Example example) {
         if (context instanceof Selector) {
             context = new InnerContext((Selector) context);
         }
-        return super.selectCountByExample(context, example);
+        return super.selectCount(context, example);
     }
 
     @Override
