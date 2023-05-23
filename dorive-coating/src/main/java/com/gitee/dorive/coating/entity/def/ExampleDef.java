@@ -15,33 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.coating.annotation;
+package com.gitee.dorive.coating.entity.def;
 
-import org.springframework.core.annotation.AliasFor;
+import cn.hutool.core.bean.BeanUtil;
+import com.gitee.dorive.coating.annotation.Example;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.reflect.AnnotatedElement;
+import java.util.Map;
 
-@Inherited
-@Documented
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Property {
+public class ExampleDef {
 
-    @AliasFor("belongTo")
-    String value() default "/";
-    
-    @AliasFor("value")
-    String belongTo() default "/";
-
-    String field() default "";
-
-    String operator() default "=";
-
-    boolean ignore() default false;
+    public static ExampleDef fromElement(AnnotatedElement annotatedElement) {
+        Map<String, Object> annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Example.class);
+        return BeanUtil.copyProperties(annotationAttributes, ExampleDef.class);
+    }
 
 }

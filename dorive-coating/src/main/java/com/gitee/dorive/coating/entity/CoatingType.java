@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.coating.entity;
 
-import com.gitee.dorive.coating.entity.def.CoatingDef;
-import com.gitee.dorive.coating.entity.def.PropertyDef;
+import com.gitee.dorive.coating.entity.def.ExampleDef;
+import com.gitee.dorive.coating.entity.def.CriterionDef;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -34,7 +34,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class CoatingType {
 
-    private CoatingDef coatingDef;
+    private ExampleDef exampleDef;
     private List<CoatingField> fields;
     private SpecificFields specificFields;
     private List<MergedRepository> mergedRepositories;
@@ -52,10 +52,10 @@ public class CoatingType {
         for (CoatingField field : fields) {
             Object fieldValue = field.getFieldValue(coating);
             if (fieldValue != null) {
-                PropertyDef propertyDef = field.getPropertyDef();
-                String belongTo = propertyDef.getBelongTo();
-                String fieldName = propertyDef.getField();
-                String operator = propertyDef.getOperator();
+                CriterionDef criterionDef = field.getCriterionDef();
+                String belongTo = criterionDef.getBelongTo();
+                String fieldName = criterionDef.getField();
+                String operator = criterionDef.getOperator();
                 List<Criterion> criteria = criteriaMap.computeIfAbsent(belongTo, key -> new ArrayList<>(4));
                 criteria.add(new Criterion(fieldName, operator, fieldValue));
             }

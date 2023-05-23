@@ -19,13 +19,13 @@ package com.gitee.dorive.coating.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.coating.annotation.Coating;
+import com.gitee.dorive.coating.annotation.Example;
 import com.gitee.dorive.coating.entity.CoatingField;
 import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.entity.MergedRepository;
 import com.gitee.dorive.coating.entity.SpecificFields;
-import com.gitee.dorive.coating.entity.def.CoatingDef;
-import com.gitee.dorive.coating.entity.def.PropertyDef;
+import com.gitee.dorive.coating.entity.def.ExampleDef;
+import com.gitee.dorive.coating.entity.def.CriterionDef;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.coating.util.ResourceUtils;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -70,8 +70,8 @@ public class CoatingTypeResolver {
             }
 
             for (Class<?> coatingClass : classes) {
-                Coating coatingAnnotation = AnnotationUtils.getAnnotation(coatingClass, Coating.class);
-                if (coatingAnnotation == null) {
+                Example exampleAnnotation = AnnotationUtils.getAnnotation(coatingClass, Example.class);
+                if (exampleAnnotation == null) {
                     continue;
                 }
                 String simpleName = coatingClass.getSimpleName();
@@ -79,7 +79,7 @@ public class CoatingTypeResolver {
                     continue;
                 }
 
-                CoatingDef coatingDef = CoatingDef.fromElement(coatingClass);
+                ExampleDef exampleDef = ExampleDef.fromElement(coatingClass);
                 List<CoatingField> fields = new ArrayList<>();
                 SpecificFields specificFields = new SpecificFields();
 
@@ -98,7 +98,7 @@ public class CoatingTypeResolver {
                 List<MergedRepository> reversedMergedRepositories = new ArrayList<>(mergedRepositories);
                 Collections.reverse(reversedMergedRepositories);
 
-                CoatingType coatingType = new CoatingType(coatingDef, fields, specificFields, mergedRepositories, reversedMergedRepositories);
+                CoatingType coatingType = new CoatingType(exampleDef, fields, specificFields, mergedRepositories, reversedMergedRepositories);
                 classCoatingTypeMap.put(coatingClass, coatingType);
                 nameCoatingTypeMap.put(coatingClass.getName(), coatingType);
             }
@@ -113,8 +113,8 @@ public class CoatingTypeResolver {
         Set<MergedRepository> mergedRepositorySet = new LinkedHashSet<>();
 
         for (CoatingField field : fields) {
-            PropertyDef propertyDef = field.getPropertyDef();
-            String belongTo = propertyDef.getBelongTo();
+            CriterionDef criterionDef = field.getCriterionDef();
+            String belongTo = criterionDef.getBelongTo();
 
             if (!belongTo.startsWith("/")) {
                 MergedRepository mergedRepository = nameMergedRepositoryMap.get(belongTo);
@@ -125,7 +125,7 @@ public class CoatingTypeResolver {
             MergedRepository mergedRepository = mergedRepositoryMap.get(belongTo);
             Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
 
-            String fieldName = propertyDef.getField();
+            String fieldName = criterionDef.getField();
             CommonRepository repository = mergedRepository.getExecutedRepository();
             EntityEle entityEle = repository.getEntityEle();
             Map<String, String> aliasMap = entityEle.getAliasMap();

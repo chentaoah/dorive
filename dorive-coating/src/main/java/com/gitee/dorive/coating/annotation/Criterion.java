@@ -15,20 +15,33 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.coating.entity.def;
+package com.gitee.dorive.coating.annotation;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.coating.annotation.Coating;
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AliasFor;
 
-import java.lang.reflect.AnnotatedElement;
-import java.util.Map;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class CoatingDef {
+@Inherited
+@Documented
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Criterion {
 
-    public static CoatingDef fromElement(AnnotatedElement annotatedElement) {
-        Map<String, Object> annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Coating.class);
-        return BeanUtil.copyProperties(annotationAttributes, CoatingDef.class);
-    }
+    @AliasFor("belongTo")
+    String value() default "/";
+    
+    @AliasFor("value")
+    String belongTo() default "/";
+
+    String field() default "";
+
+    String operator() default "=";
+
+    boolean ignore() default false;
 
 }
