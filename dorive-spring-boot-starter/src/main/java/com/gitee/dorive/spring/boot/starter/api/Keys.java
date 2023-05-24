@@ -18,6 +18,7 @@
 package com.gitee.dorive.spring.boot.starter.api;
 
 public interface Keys {
+    String QUERIER = "QUERIER";
     String TABLE_INFO = "TABLE_INFO";
     String ALIAS_EXECUTOR = "ALIAS_EXECUTOR";
 }

@@ -43,17 +43,6 @@ public class RefImpl extends ProxyRepository implements Ref<Object> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <R extends AbstractRefRepository<?, ?>> R get() {
-        return (R) repository;
-    }
-
-    @Override
-    public RefObj forObj(Object object) {
-        return new RefObjImpl(this, object);
-    }
-
-    @Override
     public int insertList(Context context, List<Object> entities) {
         return repository.insertList(context, entities);
     }
@@ -81,6 +70,17 @@ public class RefImpl extends ProxyRepository implements Ref<Object> {
     @Override
     public Page<Object> selectPageByCoating(Context context, Object coating) {
         return repository.selectPageByCoating(context, coating);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <R extends AbstractRefRepository<?, ?>> R get() {
+        return (R) repository;
+    }
+
+    @Override
+    public RefObj forObj(Object object) {
+        return new RefObjImpl(this, object);
     }
 
 }

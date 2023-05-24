@@ -120,6 +120,7 @@ public class CoatingTypeResolver {
                 MergedRepository mergedRepository = nameMergedRepositoryMap.get(belongTo);
                 Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
                 belongTo = mergedRepository.getAbsoluteAccessPath();
+                criterionDef.setBelongTo(belongTo);
             }
 
             MergedRepository mergedRepository = mergedRepositoryMap.get(belongTo);

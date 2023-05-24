@@ -24,8 +24,11 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.core.api.common.EntityFactory;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.spring.boot.starter.api.Keys;
@@ -48,14 +51,13 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = false)
 public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
+    private ExampleBuilder sqlExampleBuilder;
     private CountQuerier countQuerier;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        if ("SQL".equals(getQuerier())) {
-            setExampleBuilder(new SQLExampleBuilder(this));
-        }
+        this.sqlExampleBuilder = new SQLExampleBuilder(this);
         this.countQuerier = new CountQuerier(this);
     }
 
@@ -124,6 +126,17 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
         executor = new AliasExecutor(entityEle, executor);
         attachments.put(Keys.ALIAS_EXECUTOR, executor);
         return executor;
+    }
+
+    @Override
+    public Example buildExample(Context context, Object coating) {
+        Map<String, Object> attachments = context.getAttachments();
+        String querier = (String) attachments.get(Keys.QUERIER);
+        if (querier == null || "SQL".equals(querier)) {
+            return sqlExampleBuilder.buildExample(context, coating);
+        } else {
+            return getExampleBuilder().buildExample(context, coating);
+        }
     }
 
 }

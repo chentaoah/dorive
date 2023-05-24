@@ -19,18 +19,5 @@ package com.gitee.dorive.core.impl.selector;
 
 import com.gitee.dorive.core.api.context.Selector;
 
-import java.util.Map;
-
 public abstract class AbstractSelector implements Selector {
-
-    @Override
-    public Selector getSelector() {
-        throw new RuntimeException("The method is not supported!");
-    }
-
-    @Override
-    public Map<String, Object> getAttachments() {
-        throw new RuntimeException("The method is not supported!");
-    }
-
 }

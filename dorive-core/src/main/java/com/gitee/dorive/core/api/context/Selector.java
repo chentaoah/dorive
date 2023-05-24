@@ -21,7 +21,7 @@ import com.gitee.dorive.core.repository.CommonRepository;
 
 import java.util.List;
 
-public interface Selector extends Context {
+public interface Selector {
 
     boolean matches(Context context, CommonRepository repository);
 
