@@ -73,7 +73,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     }
 
     @Override
-    public int handle(Context context, List<Object> entities) {
+    public long handle(Context context, List<Object> entities) {
         return entityHandler.handle(context, entities);
     }
 

@@ -17,9 +17,9 @@
 
 package com.gitee.dorive.core.impl.handler;
 
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.impl.resolver.DelegateResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import lombok.Data;
@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
 public class AdaptiveEntityHandler implements EntityHandler {
@@ -42,42 +41,40 @@ public class AdaptiveEntityHandler implements EntityHandler {
     }
 
     @Override
-    public int handle(Context context, List<Object> rootEntities) {
-        List<Object> newRootEntities = new ArrayList<>(rootEntities.size());
+    public long handle(Context context, List<Object> entities) {
+        List<Object> newEntities = new ArrayList<>(entities.size());
+        Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = distribute(entities, newEntities);
 
-        int delegateCount = repository.getDelegateResolver().getDelegateCount();
-        Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>(delegateCount * 4 / 3 + 1);
-
-        filterRootEntities(rootEntities, newRootEntities, repositoryEntitiesMap);
-
-        AtomicInteger totalCount = new AtomicInteger();
-
-        if (!newRootEntities.isEmpty()) {
-            totalCount.addAndGet(entityHandler.handle(context, newRootEntities));
+        long totalCount = 0L;
+        if (!newEntities.isEmpty()) {
+            totalCount += (entityHandler.handle(context, newEntities));
         }
-
-        repositoryEntitiesMap.forEach((repository, entities) -> {
+        for (Map.Entry<AbstractContextRepository<?, ?>, List<Object>> entry : repositoryEntitiesMap.entrySet()) {
+            AbstractContextRepository<?, ?> repository = entry.getKey();
+            List<Object> subclassEntities = entry.getValue();
             Executor executor = repository.getExecutor();
             if (executor instanceof EntityHandler) {
-                totalCount.addAndGet(((EntityHandler) executor).handle(context, entities));
-            }
-        });
-
-        return totalCount.get();
-    }
-
-    private void filterRootEntities(List<Object> rootEntities, List<Object> newRootEntities,
-                                    Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap) {
-        DelegateResolver delegateResolver = repository.getDelegateResolver();
-        for (Object rootEntity : rootEntities) {
-            AbstractContextRepository<?, ?> repository = delegateResolver.delegateRepository(rootEntity);
-            if (repository == null) {
-                newRootEntities.add(rootEntity);
-            } else {
-                List<Object> existRootEntities = repositoryEntitiesMap.computeIfAbsent(repository, key -> new ArrayList<>(rootEntities.size()));
-                existRootEntities.add(rootEntity);
+                totalCount += (((EntityHandler) executor).handle(context, subclassEntities));
             }
         }
+        return totalCount;
+    }
+
+    private Map<AbstractContextRepository<?, ?>, List<Object>> distribute(List<Object> entities, List<Object> newEntities) {
+        DelegateResolver delegateResolver = repository.getDelegateResolver();
+        Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>(delegateResolver.getDelegateCount() * 4 / 3 + 1);
+
+        for (Object entity : entities) {
+            AbstractContextRepository<?, ?> repository = delegateResolver.delegateRepository(entity);
+            if (repository == null) {
+                newEntities.add(entity);
+            } else {
+                List<Object> existEntities = repositoryEntitiesMap.computeIfAbsent(repository, key -> new ArrayList<>(entities.size()));
+                existEntities.add(entity);
+            }
+        }
+
+        return repositoryEntitiesMap;
     }
 
 }

@@ -37,9 +37,9 @@ public class BatchEntityHandler implements EntityHandler {
     private final AbstractContextRepository<?, ?> repository;
 
     @Override
-    public int handle(Context context, List<Object> entities) {
+    public long handle(Context context, List<Object> entities) {
         Selector selector = context.getSelector();
-        int totalCount = 0;
+        long totalCount = 0L;
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (selector.matches(context, repository)) {
                 if (isMultiQuery(repository)) {

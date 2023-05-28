@@ -23,6 +23,6 @@ import java.util.List;
 
 public interface EntityHandler {
 
-    int handle(Context context, List<Object> entities);
+    long handle(Context context, List<Object> entities);
 
 }

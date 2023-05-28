@@ -22,16 +22,16 @@ import com.gitee.dorive.core.api.context.Selector;
 
 public interface RefObj {
 
-    int select(Context context);
+    long select(Context context);
 
-    int insertOrUpdate(Context context);
+    long insertOrUpdate(Context context);
 
-    int delete(Context context);
+    long delete(Context context);
 
-    int select(Selector selector);
+    long select(Selector selector);
 
-    int insertOrUpdate(Selector selector);
+    long insertOrUpdate(Selector selector);
 
-    int delete(Selector selector);
+    long delete(Selector selector);
 
 }

@@ -49,7 +49,7 @@ public class MultiEntityHandler implements EntityHandler {
     private final CommonRepository repository;
 
     @Override
-    public int handle(Context context, List<Object> entities) {
+    public long handle(Context context, List<Object> entities) {
         Map<String, Object> entityIndex = new LinkedHashMap<>(entities.size() * 4 / 3 + 1);
         Example example = newExample(context, entities, entityIndex);
         if (example.isDirtyQuery()) {
@@ -60,9 +60,9 @@ public class MultiEntityHandler implements EntityHandler {
             if (result instanceof MultiResult) {
                 setValueForRootEntities(context, entities, entityIndex, (MultiResult) result);
             }
-            return (int) result.getCount();
+            return result.getCount();
         }
-        return 0;
+        return 0L;
     }
 
     private Example newExample(Context context, List<Object> entities, Map<String, Object> entityIndex) {

@@ -36,35 +36,35 @@ public class RefObjImpl implements RefObj {
     private Object object;
 
     @Override
-    public int select(Context context) {
+    public long select(Context context) {
         EntityHandler entityHandler = ref.getEntityHandler();
         return entityHandler.handle(context, Collections.singletonList(object));
     }
 
     @Override
-    public int insertOrUpdate(Context context) {
+    public long insertOrUpdate(Context context) {
         AbstractRepository<Object, Object> repository = ref.getProxyRepository();
         return repository.insertOrUpdate(context, object);
     }
 
     @Override
-    public int delete(Context context) {
+    public long delete(Context context) {
         AbstractRepository<Object, Object> repository = ref.getProxyRepository();
         return repository.delete(context, object);
     }
 
     @Override
-    public int select(Selector selector) {
+    public long select(Selector selector) {
         return select(new InnerContext(selector));
     }
 
     @Override
-    public int insertOrUpdate(Selector selector) {
+    public long insertOrUpdate(Selector selector) {
         return insertOrUpdate(new InnerContext(selector));
     }
-    
+
     @Override
-    public int delete(Selector selector) {
+    public long delete(Selector selector) {
         return delete(new InnerContext(selector));
     }
 
