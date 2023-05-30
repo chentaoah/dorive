@@ -129,8 +129,8 @@ public class CoatingTypeResolver {
             String fieldName = criterionDef.getField();
             CommonRepository repository = mergedRepository.getExecutedRepository();
             EntityEle entityEle = repository.getEntityEle();
-            Map<String, String> aliasMap = entityEle.getAliasMap();
-            Assert.isTrue(aliasMap.containsKey(fieldName), "The field does not exist within the entity! element: {}, field: {}",
+            Map<String, String> propAliasMap = entityEle.getPropAliasMap();
+            Assert.isTrue(propAliasMap.containsKey(fieldName), "The field does not exist within the entity! element: {}, field: {}",
                     entityEle.getElement(), fieldName);
 
             mergedRepositorySet.add(mergedRepository);

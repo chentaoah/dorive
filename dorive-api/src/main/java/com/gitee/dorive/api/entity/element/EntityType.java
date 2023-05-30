@@ -68,7 +68,7 @@ public class EntityType extends EntityEle {
         super(type);
         this.type = type;
         this.name = type.getName();
-        
+
         List<Field> fields = ReflectUtils.getAllFields(type);
         this.entityFields = new LinkedHashMap<>(fields.size() * 4 / 3 + 1);
 
@@ -94,14 +94,14 @@ public class EntityType extends EntityEle {
         PropProxy pkProxy = PropProxyFactory.newPropProxy(genericType, "id");
         setPkProxy(pkProxy);
 
-        Map<String, String> aliasMap = new LinkedHashMap<>();
+        Map<String, String> propAliasMap = new LinkedHashMap<>(entityFields.size() * 4 / 3 + 1);
         for (EntityField entityField : entityFields.values()) {
             String name = entityField.getName();
             AliasDef aliasDef = entityField.getAliasDef();
             String alias = aliasDef != null ? aliasDef.getValue() : StrUtil.toUnderlineCase(name);
-            aliasMap.put(name, alias);
+            propAliasMap.put(name, alias);
         }
-        setAliasMap(aliasMap);
+        setPropAliasMap(propAliasMap);
     }
 
     @Override

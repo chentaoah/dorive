@@ -46,6 +46,7 @@ import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -98,7 +99,9 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
             defaultEntityFactory.setEntityEle(entityEle);
             defaultEntityFactory.setPojoClass(pojoClass);
 
-            Map<String, String> aliasFieldMapping = entityEle.newAliasFieldMapping();
+            Map<String, String> propAliasMap = entityEle.getPropAliasMap();
+            Map<String, String> aliasFieldMapping = propAliasMap.entrySet().stream()
+                    .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
             defaultEntityFactory.setAliasFieldMapping(aliasFieldMapping);
 
             String keyColumn = tableInfo.getKeyColumn();
