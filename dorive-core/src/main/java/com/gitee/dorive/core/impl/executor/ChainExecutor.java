@@ -78,7 +78,7 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     }
 
     @Override
-    public long executeCountQuery(Context context, Query query) {
+    public long executeCount(Context context, Query query) {
         throw new RuntimeException("This method does not support!");
     }
 

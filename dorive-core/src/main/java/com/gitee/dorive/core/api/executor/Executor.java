@@ -26,7 +26,7 @@ public interface Executor {
 
     Result<Object> executeQuery(Context context, Query query);
 
-    long executeCountQuery(Context context, Query query);
+    long executeCount(Context context, Query query);
 
     int execute(Context context, Operation operation);
 

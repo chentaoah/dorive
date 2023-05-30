@@ -53,12 +53,12 @@ public class AliasExecutor extends AbstractExecutor {
     }
 
     @Override
-    public long executeCountQuery(Context context, Query query) {
+    public long executeCount(Context context, Query query) {
         Example example = query.getExample();
         if (example != null) {
             convert(example);
         }
-        return executor.executeCountQuery(context, query);
+        return executor.executeCount(context, query);
     }
 
     @Override
