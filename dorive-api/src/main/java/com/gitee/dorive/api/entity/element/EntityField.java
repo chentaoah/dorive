@@ -64,7 +64,7 @@ public class EntityField extends EntityEle {
 
     private void resolve(Field field) {
         EntityDef entityDef = getEntityDef();
-        if (entityDef != null) {
+        if (entityDef != null && type != genericType) {
             EntityDef genericEntityDef = EntityDef.fromElement(genericType);
             if (genericEntityDef != null) {
                 entityDef.merge(genericEntityDef);

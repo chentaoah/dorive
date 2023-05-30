@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,7 +48,7 @@ public class EntityType extends EntityEle {
 
     private Class<?> type;
     private String name;
-    private Map<String, EntityField> entityFields = new LinkedHashMap<>();
+    private Map<String, EntityField> entityFields;
 
     public static synchronized EntityType getInstance(Class<?> type) {
         EntityType entityType = CACHE.get(type);
@@ -67,7 +68,11 @@ public class EntityType extends EntityEle {
         super(type);
         this.type = type;
         this.name = type.getName();
-        for (Field field : ReflectUtils.getAllFields(type)) {
+        
+        List<Field> fields = ReflectUtils.getAllFields(type);
+        this.entityFields = new LinkedHashMap<>(fields.size() * 4 / 3 + 1);
+
+        for (Field field : fields) {
             if (!Modifier.isStatic(field.getModifiers())) {
                 try {
                     EntityField entityField = new EntityField(field);
