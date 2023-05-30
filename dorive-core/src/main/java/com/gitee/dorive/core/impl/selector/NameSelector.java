@@ -18,8 +18,8 @@
 package com.gitee.dorive.core.impl.selector;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,27 +35,20 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = false)
 public class NameSelector extends AbstractSelector {
 
-    public static final NameSelector EMPTY_SELECTOR = new NameSelector();
-
-    private boolean wildcard;
     private Map<String, NameDef> nameDefMap = Collections.emptyMap();
 
     public NameSelector(String... names) {
         if (names != null && names.length > 0) {
             this.nameDefMap = new LinkedHashMap<>(names.length * 4 / 3 + 1);
             for (String name : names) {
-                if ("*".equals(name)) {
-                    this.wildcard = true;
-                } else {
-                    if (name.contains("(") && name.contains(")")) {
-                        String realName = name.substring(0, name.indexOf("("));
-                        String propertiesText = name.substring(name.indexOf("(") + 1, name.indexOf(")"));
-                        List<String> properties = StrUtil.splitTrim(propertiesText, ",");
-                        nameDefMap.put(realName, new NameDef(realName, properties));
+                if (name.contains("(") && name.contains(")")) {
+                    String realName = name.substring(0, name.indexOf("("));
+                    String propText = name.substring(name.indexOf("(") + 1, name.indexOf(")"));
+                    List<String> properties = StrUtil.splitTrim(propText, ",");
+                    nameDefMap.put(realName, new NameDef(realName, Collections.unmodifiableList(properties)));
 
-                    } else {
-                        nameDefMap.put(name, new NameDef(name, Collections.emptyList()));
-                    }
+                } else {
+                    nameDefMap.put(name, new NameDef(name, Collections.emptyList()));
                 }
             }
         }
@@ -63,9 +56,6 @@ public class NameSelector extends AbstractSelector {
 
     @Override
     public boolean matches(Context context, CommonRepository repository) {
-        if (wildcard) {
-            return true;
-        }
         EntityDef entityDef = repository.getEntityDef();
         String name = entityDef.getName();
         return StringUtils.isBlank(name) || nameDefMap.containsKey(name);

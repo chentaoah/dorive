@@ -15,21 +15,27 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.context;
+package com.gitee.dorive.core.impl.selector;
 
-import com.gitee.dorive.core.impl.selector.AllSelector;
-import com.gitee.dorive.core.impl.selector.RootSelector;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.repository.CommonRepository;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
-public interface Selector {
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class AllSelector extends AbstractSelector {
 
-    Selector ALL = new AllSelector();
-    Selector ROOT = new RootSelector();
+    @Override
+    public boolean matches(Context context, CommonRepository repository) {
+        return true;
+    }
 
-    boolean matches(Context context, CommonRepository repository);
-
-    List<String> select(Context context, CommonRepository repository);
+    @Override
+    public List<String> select(Context context, CommonRepository repository) {
+        return null;
+    }
 
 }
