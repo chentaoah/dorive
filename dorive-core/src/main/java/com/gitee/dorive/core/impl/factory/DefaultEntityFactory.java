@@ -37,17 +37,27 @@ public class DefaultEntityFactory implements EntityFactory {
     private Class<?> pojoClass;
     private Map<String, String> aliasFieldMapping;
     private Map<String, String> fieldPropMapping;
+    private CopyOptions reCopyOptions;
+    private CopyOptions deCopyOptions;
+
+    public void setAliasFieldMapping(Map<String, String> aliasFieldMapping) {
+        this.aliasFieldMapping = aliasFieldMapping;
+        this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(aliasFieldMapping);
+    }
+
+    public void setFieldPropMapping(Map<String, String> fieldPropMapping) {
+        this.fieldPropMapping = fieldPropMapping;
+        this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(fieldPropMapping);
+    }
 
     @Override
     public Object reconstitute(Context context, Object persistent) {
-        CopyOptions copyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(aliasFieldMapping);
-        return BeanUtil.toBean(persistent, entityEle.getGenericType(), copyOptions);
+        return BeanUtil.toBean(persistent, entityEle.getGenericType(), reCopyOptions);
     }
 
     @Override
     public Object deconstruct(Context context, Object entity) {
-        CopyOptions copyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(fieldPropMapping);
-        return BeanUtil.toBean(entity, pojoClass, copyOptions);
+        return BeanUtil.toBean(entity, pojoClass, deCopyOptions);
     }
 
 }
