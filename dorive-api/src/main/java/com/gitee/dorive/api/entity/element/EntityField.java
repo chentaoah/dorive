@@ -40,7 +40,7 @@ public class EntityField extends EntityEle {
     private AliasDef aliasDef;
     private EntityType entityType;
 
-    public static boolean filter(Class<?> type) {
+    public static boolean isComplexType(Class<?> type) {
         String className = type.getName();
         return !className.startsWith("java.lang.") && !className.startsWith("java.util.") && !type.isEnum();
     }
@@ -71,7 +71,7 @@ public class EntityField extends EntityEle {
             }
         }
         aliasDef = AliasDef.fromElement(field);
-        if (filter(genericType)) {
+        if (isComplexType(genericType)) {
             entityType = EntityType.getInstance(genericType);
         }
     }
