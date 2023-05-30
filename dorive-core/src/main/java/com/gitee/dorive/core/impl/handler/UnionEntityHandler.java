@@ -80,7 +80,7 @@ public class UnionEntityHandler implements EntityHandler {
         return unionExample;
     }
 
-    public Example newExample(Context context, Object entity) {
+    private Example newExample(Context context, Object entity) {
         BinderResolver binderResolver = repository.getBinderResolver();
         Example example = new Example();
         for (PropertyBinder binder : binderResolver.getPropertyBinders()) {

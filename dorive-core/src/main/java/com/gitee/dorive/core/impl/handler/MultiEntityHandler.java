@@ -105,7 +105,7 @@ public class MultiEntityHandler implements EntityHandler {
         return example;
     }
 
-    public List<Object> collectBoundValues(Context context, List<Object> entities, Map<String, Object> entityIndex, PropertyBinder binder) {
+    private List<Object> collectBoundValues(Context context, List<Object> entities, Map<String, Object> entityIndex, PropertyBinder binder) {
         List<Object> boundValues = new ArrayList<>(entities.size());
         for (Object entity : entities) {
             Object boundValue = binder.getBoundValue(context, entity);
@@ -216,7 +216,7 @@ public class MultiEntityHandler implements EntityHandler {
     }
 
     @SuppressWarnings("unchecked")
-    public void setValueForRootEntity(boolean isCollection, PropChain anchorPoint, int averageSize, Object rootEntity, Object entity) {
+    private void setValueForRootEntity(boolean isCollection, PropChain anchorPoint, int averageSize, Object rootEntity, Object entity) {
         if (rootEntity != null) {
             Object value = anchorPoint.getValue(rootEntity);
             if (isCollection) {
