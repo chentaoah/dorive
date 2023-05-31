@@ -57,6 +57,10 @@ public class PropertyBinder extends AbstractBinder {
         return getFieldPropChain().isSameType(boundPropChain);
     }
 
+    public boolean isCollection() {
+        return boundPropChain.getEntityField().isCollection();
+    }
+
     @Override
     public Object getBoundValue(Context context, Object rootEntity) {
         return boundPropChain.getValue(rootEntity);

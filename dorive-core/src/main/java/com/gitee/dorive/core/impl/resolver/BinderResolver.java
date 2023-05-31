@@ -18,6 +18,7 @@
 package com.gitee.dorive.core.impl.resolver;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
@@ -52,6 +53,7 @@ public class BinderResolver {
     private List<Binder> allBinders;
     private List<PropertyBinder> propertyBinders;
     private Map<String, List<PropertyBinder>> mergedBindersMap;
+    private boolean directJoin;
     private List<String> boundFields;
     private List<ContextBinder> contextBinders;
     private List<Binder> boundValueBinders;
@@ -69,6 +71,7 @@ public class BinderResolver {
         allBinders = new ArrayList<>(bindingDefs.size());
         propertyBinders = new ArrayList<>(bindingDefs.size());
         mergedBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
+        directJoin = false;
         boundFields = new ArrayList<>(bindingDefs.size());
         contextBinders = new ArrayList<>(bindingDefs.size());
         boundValueBinders = new ArrayList<>(bindingDefs.size());
@@ -94,7 +97,7 @@ public class BinderResolver {
                 String belongAccessPath = propertyBinder.getBelongAccessPath();
                 List<PropertyBinder> propertyBinders = mergedBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
                 propertyBinders.add(propertyBinder);
-                
+
                 boundFields.add(bindingDef.getField());
 
                 if (propertyBinder.isSameType()) {
@@ -114,6 +117,10 @@ public class BinderResolver {
                 contextBinders.add(contextBinder);
                 boundValueBinders.add(contextBinder);
             }
+        }
+
+        if (mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/")) {
+            directJoin = CollUtil.findOne(mergedBindersMap.get("/"), PropertyBinder::isCollection) == null;
         }
     }
 
