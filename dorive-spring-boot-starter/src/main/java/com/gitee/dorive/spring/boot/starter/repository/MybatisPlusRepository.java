@@ -25,7 +25,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.coating.api.ExampleBuilder;
-import com.gitee.dorive.core.api.common.EntityFactory;
+import com.gitee.dorive.core.api.executor.EntityFactory;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Example;

@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.executor;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.api.entity.element.PropChain;
-import com.gitee.dorive.core.api.common.Binder;
+import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.api.executor.EntityHandler;

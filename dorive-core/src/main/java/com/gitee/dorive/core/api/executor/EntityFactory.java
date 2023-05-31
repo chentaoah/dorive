@@ -15,21 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.common;
+package com.gitee.dorive.core.api.executor;
 
-import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.core.api.context.Context;
 
-public interface Binder {
+public interface EntityFactory {
 
-    BindingDef getBindingDef();
+    Object reconstitute(Context context, Object persistent);
 
-    Object getFieldValue(Context context, Object entity);
-
-    void setFieldValue(Context context, Object entity, Object property);
-
-    Object getBoundValue(Context context, Object rootEntity);
-
-    void setBoundValue(Context context, Object rootEntity, Object property);
+    Object deconstruct(Context context, Object entity);
 
 }

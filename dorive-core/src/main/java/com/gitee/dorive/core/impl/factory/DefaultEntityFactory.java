@@ -21,7 +21,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.core.api.common.EntityFactory;
+import com.gitee.dorive.core.api.executor.EntityFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

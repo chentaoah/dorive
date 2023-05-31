@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.binder;
 
 import com.gitee.dorive.api.entity.def.BindingDef;
-import com.gitee.dorive.core.api.common.Processor;
+import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.api.entity.element.PropChain;
 
