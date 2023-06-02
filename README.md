@@ -105,6 +105,7 @@ package xxx.xxx.xxx.xxx.xxx.query;
 @Data
 @Example
 public class TenantQuery {
+    @Criterion(belongTo = "user")
     private String userCode;
     private String sortBy;
     private String order;
