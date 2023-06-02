@@ -149,7 +149,7 @@ List<Tenant> tenants = tenantRepository.selectByCoating(Selector.ALL, tenantQuer
 #### 更新数据
 
 ```java
-Tenant tenant = tenantRepository.selectByPrimaryKey(Tenant.ONLY_TENANT, 1);
+Tenant tenant = tenantRepository.selectByPrimaryKey(Selector.ROOT, 1);
 tenant.setTenantCode("tenant1");
 
 int count = tenantRepository.update(Selector.ROOT, tenant);
