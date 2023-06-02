@@ -27,12 +27,13 @@ import java.lang.reflect.Field;
 public abstract class AbstractRefRepository<E, PK> extends AbstractCoatingRepository<E, PK> implements SimpleRepository<E, PK> {
 
     @Override
-    protected void processEntityClass(EntityHandler entityHandler) {
+    protected EntityHandler processEntityHandler(EntityHandler entityHandler) {
         RefInjector refInjector = new RefInjector(this, entityHandler, getEntityClass());
         Field field = refInjector.getField();
         if (field != null) {
             refInjector.inject(field, refInjector.createRef());
         }
+        return entityHandler;
     }
 
 }

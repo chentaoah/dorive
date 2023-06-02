@@ -107,8 +107,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         EntityDef entityDef = renewEntityDef(entityEle);
         OperationFactory operationFactory = new OperationFactory(entityEle);
 
-        AbstractRepository<Object, Object> innerRepository = doNewRepository(entityDef, entityEle, operationFactory);
-        AbstractRepository<Object, Object> proxyRepository = processRepository(innerRepository);
+        AbstractRepository<Object, Object> actualRepository = doNewRepository(entityDef, entityEle, operationFactory);
+        AbstractRepository<Object, Object> proxyRepository = processRepository(actualRepository);
 
         boolean isRoot = "/".equals(accessPath);
         boolean isAggregated = entityEle.isAggregated();
@@ -125,7 +125,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         repository.setEntityEle(entityEle);
         repository.setOperationFactory(operationFactory);
         repository.setProxyRepository(proxyRepository);
-        repository.setAttachments(new ConcurrentHashMap<>(innerRepository.getAttachments()));
+        repository.setAttachments(new ConcurrentHashMap<>(actualRepository.getAttachments()));
 
         repository.setAccessPath(accessPath);
         repository.setRoot(isRoot);
@@ -184,10 +184,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     private Executor newExecutor() {
-        EntityHandler entityHandler = new BatchEntityHandler(this);
-
-        processEntityClass(entityHandler);
-
+        EntityHandler entityHandler = processEntityHandler(new BatchEntityHandler(this));
         delegateResolver = new DelegateResolver(this);
         if (delegateResolver.isDelegated()) {
             entityHandler = new AdaptiveEntityHandler(this, entityHandler);
@@ -199,6 +196,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     protected abstract AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository);
 
-    protected abstract void processEntityClass(EntityHandler entityHandler);
+    protected abstract EntityHandler processEntityHandler(EntityHandler entityHandler);
 
 }
