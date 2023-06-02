@@ -50,10 +50,6 @@ public class ReflectUtils {
         return fields;
     }
 
-    public static Object newInstance(Class<?> type) {
-        return org.springframework.cglib.core.ReflectUtils.newInstance(type);
-    }
-
     public static Class<?> getFirstArgumentType(Class<?> type) {
         Type genericSuperclass = type.getGenericSuperclass();
         ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;

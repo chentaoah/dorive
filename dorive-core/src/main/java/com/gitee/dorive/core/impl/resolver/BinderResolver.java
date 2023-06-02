@@ -20,12 +20,12 @@ package com.gitee.dorive.core.impl.resolver;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.api.impl.resolver.PropChainResolver;
-import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
@@ -151,7 +151,7 @@ public class BinderResolver {
                 processor = (Processor) applicationContext.getBean(beanNamesForType[0]);
             }
             if (processor == null) {
-                processor = (Processor) ReflectUtils.newInstance(processorClass);
+                processor = (Processor) ReflectUtil.newInstance(processorClass);
             }
         }
         if (processor instanceof DefaultProcessor) {
