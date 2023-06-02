@@ -185,7 +185,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     private Executor newExecutor() {
         EntityHandler entityHandler = new BatchEntityHandler(this);
-        
+
         processEntityClass(entityHandler);
 
         delegateResolver = new DelegateResolver(this);
