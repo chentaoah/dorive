@@ -53,7 +53,7 @@ public class BinderResolver {
     private List<Binder> allBinders;
     private List<PropertyBinder> propertyBinders;
     private Map<String, List<PropertyBinder>> mergedBindersMap;
-    private boolean directJoin;
+    private boolean simpleRootBinding;
     private List<String> boundFields;
     private List<ContextBinder> contextBinders;
     private List<Binder> boundValueBinders;
@@ -71,7 +71,7 @@ public class BinderResolver {
         allBinders = new ArrayList<>(bindingDefs.size());
         propertyBinders = new ArrayList<>(bindingDefs.size());
         mergedBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
-        directJoin = false;
+        simpleRootBinding = false;
         boundFields = new ArrayList<>(bindingDefs.size());
         contextBinders = new ArrayList<>(bindingDefs.size());
         boundValueBinders = new ArrayList<>(bindingDefs.size());
@@ -120,7 +120,7 @@ public class BinderResolver {
         }
 
         if (mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/")) {
-            directJoin = CollUtil.findOne(mergedBindersMap.get("/"), PropertyBinder::isCollection) == null;
+            simpleRootBinding = CollUtil.findOne(mergedBindersMap.get("/"), PropertyBinder::isCollection) == null;
         }
     }
 

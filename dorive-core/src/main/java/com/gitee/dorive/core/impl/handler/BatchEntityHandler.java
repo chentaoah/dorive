@@ -41,7 +41,7 @@ public class BatchEntityHandler implements EntityHandler {
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (selector.matches(context, repository)) {
                 BinderResolver binderResolver = repository.getBinderResolver();
-                EntityHandler entityHandler = binderResolver.isDirectJoin() ?
+                EntityHandler entityHandler = binderResolver.isSimpleRootBinding() ?
                         new MultiEntityHandler(repository) : new UnionEntityHandler(repository);
                 totalCount += entityHandler.handle(context, entities);
             }
