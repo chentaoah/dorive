@@ -17,38 +17,41 @@
 
 package com.gitee.dorive.core.config;
 
+import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.core.ResolvableType;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class RepositoryContext implements ApplicationContextAware, InitializingBean {
+public class RepositoryContext implements BeanFactoryPostProcessor {
 
-    private ApplicationContext applicationContext;
-
-    private static final Map<Class<?>, AbstractContextRepository<?, ?>> CLASS_REPOSITORY_MAP = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, Class<?>> ENTITY_REPOSITORY_MAP = new ConcurrentHashMap<>();
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
-
-    @Override
-    @SuppressWarnings("rawtypes")
-    public void afterPropertiesSet() {
-        Map<String, AbstractContextRepository> beansOfType = applicationContext.getBeansOfType(AbstractContextRepository.class);
-        for (AbstractContextRepository<?, ?> repository : beansOfType.values()) {
-            CLASS_REPOSITORY_MAP.put(repository.getEntityClass(), repository);
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        String[] beanNames = beanFactory.getBeanDefinitionNames();
+        for (String beanName : beanNames) {
+            BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
+            ResolvableType resolvableType = beanDefinition.getResolvableType();
+            Type type = resolvableType.getType();
+            if (type instanceof Class) {
+                Class<?> clazz = (Class<?>) type;
+                if (AbstractContextRepository.class.isAssignableFrom(clazz)) {
+                    Class<?> entityClass = ReflectUtils.getFirstArgumentType(clazz);
+                    ENTITY_REPOSITORY_MAP.put(entityClass, clazz);
+                }
+            }
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public static <R extends AbstractContextRepository<E, ?>, E> R getRepository(Class<E> entityClass) {
-        return (R) CLASS_REPOSITORY_MAP.get(entityClass);
+    public static Class<?> findTypeByEntity(Class<?> entityClass) {
+        return ENTITY_REPOSITORY_MAP.get(entityClass);
     }
 
 }

@@ -29,7 +29,7 @@ import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.config.RepositoryDefinition;
+import com.gitee.dorive.core.config.RepositoryContext;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.executor.ChainExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
@@ -144,7 +144,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         entityDef = BeanUtil.copyProperties(entityDef, EntityDef.class);
         if (!entityDef.isAggregated() && entityEle.isAggregated()) {
             Class<?> entityClass = entityEle.getGenericType();
-            Class<?> repositoryClass = RepositoryDefinition.findRepositoryType(entityClass);
+            Class<?> repositoryClass = RepositoryContext.findTypeByEntity(entityClass);
             Assert.notNull(repositoryClass, "No type of repository found! type: {}", entityClass.getName());
             entityDef.setRepository(repositoryClass);
         }
