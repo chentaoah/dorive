@@ -36,7 +36,7 @@ import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.impl.resolver.DelegateResolver;
+import com.gitee.dorive.core.impl.resolver.DerivedResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
@@ -59,7 +59,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     private ApplicationContext applicationContext;
 
     private PropChainResolver propChainResolver;
-    private DelegateResolver delegateResolver;
+    private DerivedResolver derivedResolver;
 
     private Map<String, CommonRepository> repositoryMap = new LinkedHashMap<>();
     private CommonRepository rootRepository;
@@ -185,8 +185,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     private Executor newExecutor() {
         EntityHandler entityHandler = processEntityHandler(new BatchEntityHandler(this));
-        delegateResolver = new DelegateResolver(this);
-        if (delegateResolver.isDelegated()) {
+        derivedResolver = new DerivedResolver(this);
+        if (derivedResolver.isDerived()) {
             entityHandler = new AdaptiveEntityHandler(this, entityHandler);
         }
         return new ChainExecutor(this, entityHandler);

@@ -26,12 +26,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
-public class DelegateResolver {
+public class DerivedResolver {
 
     private AbstractContextRepository<?, ?> repository;
-    private Map<Class<?>, AbstractContextRepository<?, ?>> delegateRepositoryMap = new LinkedHashMap<>(3 * 4 / 3 + 1);
+    private Map<Class<?>, AbstractContextRepository<?, ?>> derivedRepositoryMap = new LinkedHashMap<>(3 * 4 / 3 + 1);
 
-    public DelegateResolver(AbstractContextRepository<?, ?> repository) {
+    public DerivedResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
         resolve();
     }
@@ -45,22 +45,22 @@ public class DelegateResolver {
                 AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) beanInstance;
                 Class<?> fieldEntityClass = abstractContextRepository.getEntityClass();
                 if (repository.getEntityClass().isAssignableFrom(fieldEntityClass)) {
-                    delegateRepositoryMap.put(fieldEntityClass, abstractContextRepository);
+                    derivedRepositoryMap.put(fieldEntityClass, abstractContextRepository);
                 }
             }
         });
     }
 
-    public boolean isDelegated() {
-        return !delegateRepositoryMap.isEmpty();
+    public boolean isDerived() {
+        return !derivedRepositoryMap.isEmpty();
     }
 
-    public int getDelegateCount() {
-        return delegateRepositoryMap.size();
+    public int numberOf() {
+        return derivedRepositoryMap.size();
     }
 
-    public AbstractContextRepository<?, ?> delegateRepository(Object rootEntity) {
-        return delegateRepositoryMap.get(rootEntity.getClass());
+    public AbstractContextRepository<?, ?> deriveRepository(Object rootEntity) {
+        return derivedRepositoryMap.get(rootEntity.getClass());
     }
 
 }

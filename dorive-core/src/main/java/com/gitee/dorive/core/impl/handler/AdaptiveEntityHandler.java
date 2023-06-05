@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.handler;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.impl.resolver.DelegateResolver;
+import com.gitee.dorive.core.impl.resolver.DerivedResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import lombok.Data;
 
@@ -61,11 +61,11 @@ public class AdaptiveEntityHandler implements EntityHandler {
     }
 
     private Map<AbstractContextRepository<?, ?>, List<Object>> distribute(List<Object> entities, List<Object> newEntities) {
-        DelegateResolver delegateResolver = repository.getDelegateResolver();
-        Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>(delegateResolver.getDelegateCount() * 4 / 3 + 1);
+        DerivedResolver derivedResolver = repository.getDerivedResolver();
+        Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>(derivedResolver.numberOf() * 4 / 3 + 1);
 
         for (Object entity : entities) {
-            AbstractContextRepository<?, ?> repository = delegateResolver.delegateRepository(entity);
+            AbstractContextRepository<?, ?> repository = derivedResolver.deriveRepository(entity);
             if (repository == null) {
                 newEntities.add(entity);
             } else {
