@@ -63,8 +63,8 @@ public class RepositoryListener implements ApplicationListener<ExecutorEvent>, A
 
     @Override
     public void onApplicationEvent(ExecutorEvent event) {
-        EventExecutor executor = (EventExecutor) event.getSource();
-        EntityEle entityEle = executor.getEntityEle();
+        EventExecutor eventExecutor = (EventExecutor) event.getSource();
+        EntityEle entityEle = eventExecutor.getEntityEle();
         Class<?> entityClass = entityEle.getGenericType();
         List<EntityListener> entityListeners = classEventListenersMap.get(entityClass);
         if (entityListeners != null && !entityListeners.isEmpty()) {
