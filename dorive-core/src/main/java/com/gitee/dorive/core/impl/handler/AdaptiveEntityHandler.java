@@ -62,7 +62,8 @@ public class AdaptiveEntityHandler implements EntityHandler {
 
     private Map<AbstractContextRepository<?, ?>, List<Object>> distribute(List<Object> entities, List<Object> newEntities) {
         DerivedResolver derivedResolver = repository.getDerivedResolver();
-        Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>(derivedResolver.numberOf() * 4 / 3 + 1);
+        int numberOf = derivedResolver.numberOf();
+        Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>(numberOf * 4 / 3 + 1);
 
         for (Object entity : entities) {
             AbstractContextRepository<?, ?> repository = derivedResolver.deriveRepository(entity);
