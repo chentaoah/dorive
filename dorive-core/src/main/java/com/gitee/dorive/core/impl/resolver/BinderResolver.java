@@ -84,7 +84,8 @@ public class BinderResolver {
             String alias = entityEle.toAlias(field);
 
             PropChain fieldPropChain = propChainMap.get("/" + field);
-            Assert.notNull(fieldPropChain, "The field of @Binding may be wrong! type: {}, field: {}", entityEle.getGenericType().getName(), field);
+            Assert.notNull(fieldPropChain, "The field configured for @Binding does not exist within the entity! type: {}, field: {}",
+                    entityEle.getGenericType().getName(), field);
             fieldPropChain.newPropProxy();
 
             Processor processor = newProcessor(bindingDef);
@@ -180,8 +181,8 @@ public class BinderResolver {
         boundPropChain.newPropProxy();
 
         EntityEle entityEle = belongRepository.getEntityEle();
-        String fieldName = StringUtils.isBlank(property) ? PathUtils.getLastName(bindExp) : property;
-        String bindAlias = entityEle.toAlias(fieldName);
+        String boundName = StringUtils.isBlank(property) ? PathUtils.getLastName(bindExp) : property;
+        String bindAlias = entityEle.toAlias(boundName);
 
         return new PropertyBinder(bindingDef, alias, fieldPropChain, processor,
                 belongAccessPath, belongRepository, boundPropChain, bindAlias);
