@@ -113,6 +113,11 @@ public class ProxyRepository extends AbstractRepository<Object, Object> {
     }
 
     @Override
+    public long executeCount(Context context, Query query) {
+        return proxyRepository.executeCount(context, query);
+    }
+
+    @Override
     public int execute(Context context, Operation operation) {
         return proxyRepository.execute(context, operation);
     }
