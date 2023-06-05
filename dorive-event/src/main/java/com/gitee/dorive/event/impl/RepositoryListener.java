@@ -55,7 +55,7 @@ public class RepositoryListener implements ApplicationListener<ExecutorEvent>, A
             Listener listener = AnnotationUtils.getAnnotation(entityListener.getClass(), Listener.class);
             if (listener != null) {
                 Class<?> entityClass = listener.value();
-                List<EntityListener> existEntityListeners = classEventListenersMap.computeIfAbsent(entityClass, key -> new ArrayList<>());
+                List<EntityListener> existEntityListeners = classEventListenersMap.computeIfAbsent(entityClass, key -> new ArrayList<>(4));
                 existEntityListeners.add(entityListener);
             }
         }
