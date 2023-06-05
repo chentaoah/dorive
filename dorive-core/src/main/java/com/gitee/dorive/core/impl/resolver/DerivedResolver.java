@@ -59,8 +59,8 @@ public class DerivedResolver {
         return derivedRepositoryMap.size();
     }
 
-    public AbstractContextRepository<?, ?> deriveRepository(Object rootEntity) {
-        return derivedRepositoryMap.get(rootEntity.getClass());
+    public AbstractContextRepository<?, ?> deriveRepository(Object entity) {
+        return derivedRepositoryMap.get(entity.getClass());
     }
 
 }
