@@ -23,14 +23,6 @@ import java.util.Set;
 
 public class PathUtils {
 
-    public static String getPrevPath(String accessPath) {
-        return accessPath.lastIndexOf("/") > 0 ? accessPath.substring(0, accessPath.lastIndexOf("/")) : "/";
-    }
-
-    public static String getLastName(String accessPath) {
-        return accessPath.startsWith("/") && accessPath.length() > 1 ? accessPath.substring(accessPath.lastIndexOf("/") + 1) : "";
-    }
-
     public static String getAbsolutePath(String accessPath, String relativePath) {
         accessPath = "https://dorive" + accessPath;
         accessPath = URLUtil.completeUrl(accessPath, relativePath);
@@ -42,6 +34,14 @@ public class PathUtils {
             accessPath = PathUtils.getPrevPath(accessPath);
         }
         return accessPath;
+    }
+
+    public static String getPrevPath(String accessPath) {
+        return accessPath.lastIndexOf("/") > 0 ? accessPath.substring(0, accessPath.lastIndexOf("/")) : "/";
+    }
+
+    public static String getLastName(String accessPath) {
+        return accessPath.startsWith("/") && accessPath.length() > 1 ? accessPath.substring(accessPath.lastIndexOf("/") + 1) : "";
     }
 
 }
