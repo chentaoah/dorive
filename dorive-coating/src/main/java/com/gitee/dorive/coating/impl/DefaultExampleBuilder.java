@@ -137,8 +137,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                         }
 
                     } else {
-                        List<String> properties = binders.stream().map(PropertyBinder::getBoundName).collect(Collectors.toList());
-                        MultiInBuilder builder = new MultiInBuilder(entities.size(), properties);
+                        List<String> aliases = binders.stream().map(PropertyBinder::getBindAlias).collect(Collectors.toList());
+                        MultiInBuilder builder = new MultiInBuilder(entities.size(), aliases);
                         collectFieldValues(context, entities, binders, builder);
                         if (!builder.isEmpty()) {
                             targetExample.getCriteria().add(builder.build());

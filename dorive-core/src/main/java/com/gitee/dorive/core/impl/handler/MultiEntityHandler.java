@@ -84,8 +84,8 @@ public class MultiEntityHandler implements EntityHandler {
             }
 
         } else {
-            List<String> properties = binders.stream().map(AbstractBinder::getFieldName).collect(Collectors.toList());
-            MultiInBuilder builder = new MultiInBuilder(entities.size(), properties);
+            List<String> aliases = binders.stream().map(AbstractBinder::getAlias).collect(Collectors.toList());
+            MultiInBuilder builder = new MultiInBuilder(entities.size(), aliases);
             collectBoundValues(context, entities, entityIndex, binders, builder);
             if (!builder.isEmpty()) {
                 example.getCriteria().add(builder.build());

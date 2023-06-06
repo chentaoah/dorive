@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.api.entity.element;
 
-import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.annotation.Aggregate;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.def.BindingDef;
@@ -63,10 +62,6 @@ public abstract class EntityEle {
     }
 
     public String toAlias(String property) {
-        if (property.contains(",")) {
-            List<String> aliases = toAliases(StrUtil.splitTrim(property, ","));
-            return StrUtil.join(",", aliases);
-        }
         return propAliasMap.getOrDefault(property, property);
     }
 
