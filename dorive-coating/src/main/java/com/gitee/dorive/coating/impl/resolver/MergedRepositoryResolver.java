@@ -116,7 +116,7 @@ public class MergedRepositoryResolver {
         Map<String, List<PropertyBinder>> mergedBindersMap = new LinkedHashMap<>();
         for (PropertyBinder propertyBinder : propertyBinders) {
             String relativeAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
-            List<PropertyBinder> existPropertyBinders = mergedBindersMap.computeIfAbsent(relativeAccessPath, key -> new ArrayList<>());
+            List<PropertyBinder> existPropertyBinders = mergedBindersMap.computeIfAbsent(relativeAccessPath, key -> new ArrayList<>(4));
             existPropertyBinders.add(propertyBinder);
         }
         return mergedBindersMap;
