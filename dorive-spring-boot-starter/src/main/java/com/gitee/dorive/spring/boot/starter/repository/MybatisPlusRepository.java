@@ -80,13 +80,20 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
                 }
             }
         }
-
         Assert.notNull(pojoClass, "The class of pojo cannot be null! source: {}", mapperClass);
 
         TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
-        assert tableInfo != null;
         attachments.put(Keys.TABLE_INFO, tableInfo);
+        EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, pojoClass, tableInfo);
 
+        Executor executor = new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass);
+        executor = new FactoryExecutor(entityEle, entityFactory, executor);
+        executor = new AliasExecutor(entityEle, executor);
+        attachments.put(Keys.ALIAS_EXECUTOR, executor);
+        return executor;
+    }
+
+    private EntityFactory newEntityFactory(EntityDef entityDef, EntityEle entityEle, Class<?> pojoClass, TableInfo tableInfo) {
         Class<?> factoryClass = entityDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
@@ -99,36 +106,39 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
             defaultEntityFactory.setEntityEle(entityEle);
             defaultEntityFactory.setPojoClass(pojoClass);
 
-            Map<String, String> propAliasMap = entityEle.getPropAliasMap();
-            Map<String, String> aliasFieldMapping = propAliasMap.entrySet().stream()
-                    .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+            Map<String, String> aliasFieldMapping = newAliasFieldMapping(entityEle);
             defaultEntityFactory.setAliasFieldMapping(aliasFieldMapping);
 
-            String keyColumn = tableInfo.getKeyColumn();
-            String keyProperty = tableInfo.getKeyProperty();
-            List<TableFieldInfo> tableFieldInfos = tableInfo.getFieldList();
-
-            Map<String, String> fieldPropMapping = new LinkedHashMap<>();
-            if (StringUtils.isNotBlank(keyColumn) && StringUtils.isNotBlank(keyProperty)) {
-                String field = aliasFieldMapping.get(keyColumn);
-                if (field != null) {
-                    fieldPropMapping.put(field, keyProperty);
-                }
-            }
-            for (TableFieldInfo tableFieldInfo : tableFieldInfos) {
-                String field = aliasFieldMapping.get(tableFieldInfo.getColumn());
-                if (field != null) {
-                    fieldPropMapping.put(field, tableFieldInfo.getProperty());
-                }
-            }
+            Map<String, String> fieldPropMapping = newFieldPropMapping(tableInfo, aliasFieldMapping);
             defaultEntityFactory.setFieldPropMapping(fieldPropMapping);
         }
+        return entityFactory;
+    }
 
-        Executor executor = new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass);
-        executor = new FactoryExecutor(entityEle, entityFactory, executor);
-        executor = new AliasExecutor(entityEle, executor);
-        attachments.put(Keys.ALIAS_EXECUTOR, executor);
-        return executor;
+    private Map<String, String> newAliasFieldMapping(EntityEle entityEle) {
+        Map<String, String> propAliasMap = entityEle.getPropAliasMap();
+        return propAliasMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+    }
+
+    private Map<String, String> newFieldPropMapping(TableInfo tableInfo, Map<String, String> aliasFieldMapping) {
+        String keyColumn = tableInfo.getKeyColumn();
+        String keyProperty = tableInfo.getKeyProperty();
+        List<TableFieldInfo> tableFieldInfos = tableInfo.getFieldList();
+        Map<String, String> fieldPropMapping = new LinkedHashMap<>();
+
+        if (StringUtils.isNotBlank(keyColumn) && StringUtils.isNotBlank(keyProperty)) {
+            String field = aliasFieldMapping.get(keyColumn);
+            if (field != null) {
+                fieldPropMapping.put(field, keyProperty);
+            }
+        }
+        for (TableFieldInfo tableFieldInfo : tableFieldInfos) {
+            String field = aliasFieldMapping.get(tableFieldInfo.getColumn());
+            if (field != null) {
+                fieldPropMapping.put(field, tableFieldInfo.getProperty());
+            }
+        }
+        return fieldPropMapping;
     }
 
     @Override
