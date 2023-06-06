@@ -22,17 +22,11 @@ import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.ref.api.SimpleRepository;
 import com.gitee.dorive.ref.impl.RefInjector;
 
-import java.lang.reflect.Field;
-
 public abstract class AbstractRefRepository<E, PK> extends AbstractCoatingRepository<E, PK> implements SimpleRepository<E, PK> {
 
     @Override
     protected EntityHandler processEntityHandler(EntityHandler entityHandler) {
-        RefInjector refInjector = new RefInjector(this, entityHandler, getEntityClass());
-        Field field = refInjector.getField();
-        if (field != null) {
-            refInjector.inject(field, refInjector.createRef());
-        }
+        new RefInjector(this, entityHandler, getEntityClass());
         return entityHandler;
     }
 

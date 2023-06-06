@@ -24,14 +24,14 @@ public interface RefObj {
 
     long select(Context context);
 
-    long insertOrUpdate(Context context);
+    int insertOrUpdate(Context context);
 
-    long delete(Context context);
+    int delete(Context context);
 
     long select(Selector selector);
 
-    long insertOrUpdate(Selector selector);
+    int insertOrUpdate(Selector selector);
 
-    long delete(Selector selector);
+    int delete(Selector selector);
 
 }

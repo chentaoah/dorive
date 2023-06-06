@@ -21,21 +21,34 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.ref.api.Ref;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 @Data
-@AllArgsConstructor
 public class RefInjector {
 
     private AbstractRefRepository<?, ?> repository;
     private EntityHandler entityHandler;
     private Class<?> entityClass;
 
-    public Field getField() {
+    public RefInjector(AbstractRefRepository<?, ?> repository, EntityHandler entityHandler, Class<?> entityClass) {
+        this.repository = repository;
+        this.entityHandler = entityHandler;
+        this.entityClass = entityClass;
+        inject();
+    }
+
+    private void inject() {
+        Field staticRefField = findStaticRefField();
+        if (staticRefField != null) {
+            Ref<Object> ref = newRefImpl();
+            doInject(staticRefField, ref);
+        }
+    }
+
+    private Field findStaticRefField() {
         try {
             Field field = entityClass.getDeclaredField("ref");
             return Modifier.isStatic(field.getModifiers()) ? field : null;
@@ -44,9 +57,9 @@ public class RefInjector {
         }
         return null;
     }
-    
+
     @SuppressWarnings("unchecked")
-    public Ref<Object> createRef() {
+    private Ref<Object> newRefImpl() {
         RefImpl refImpl = new RefImpl((AbstractRefRepository<Object, Object>) repository, entityHandler);
         refImpl.setEntityDef(repository.getEntityDef());
         refImpl.setEntityEle(repository.getEntityEle());
@@ -56,7 +69,7 @@ public class RefInjector {
         return refImpl;
     }
 
-    public void inject(Field field, Ref<Object> ref) {
+    private void doInject(Field field, Ref<Object> ref) {
         ReflectUtil.setFieldValue(null, field, ref);
     }
 

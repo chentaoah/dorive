@@ -42,13 +42,13 @@ public class RefObjImpl implements RefObj {
     }
 
     @Override
-    public long insertOrUpdate(Context context) {
+    public int insertOrUpdate(Context context) {
         AbstractRepository<Object, Object> repository = ref.getProxyRepository();
         return repository.insertOrUpdate(context, object);
     }
 
     @Override
-    public long delete(Context context) {
+    public int delete(Context context) {
         AbstractRepository<Object, Object> repository = ref.getProxyRepository();
         return repository.delete(context, object);
     }
@@ -59,12 +59,12 @@ public class RefObjImpl implements RefObj {
     }
 
     @Override
-    public long insertOrUpdate(Selector selector) {
+    public int insertOrUpdate(Selector selector) {
         return insertOrUpdate(new InnerContext(selector));
     }
 
     @Override
-    public long delete(Selector selector) {
+    public int delete(Selector selector) {
         return delete(new InnerContext(selector));
     }
 
