@@ -35,7 +35,7 @@ import java.util.Map;
 public class CoatingType {
 
     private ExampleDef exampleDef;
-    private List<CoatingField> fields;
+    private List<CoatingField> coatingFields;
     private SpecificFields specificFields;
     private List<MergedRepository> mergedRepositories;
     private List<MergedRepository> reversedMergedRepositories;
@@ -49,10 +49,10 @@ public class CoatingType {
 
     public Map<String, List<Criterion>> newCriteriaMap(Object coating) {
         Map<String, List<Criterion>> criteriaMap = new LinkedHashMap<>(8);
-        for (CoatingField field : fields) {
-            Object fieldValue = field.getFieldValue(coating);
+        for (CoatingField coatingField : coatingFields) {
+            Object fieldValue = coatingField.getFieldValue(coating);
             if (fieldValue != null) {
-                CriterionDef criterionDef = field.getCriterionDef();
+                CriterionDef criterionDef = coatingField.getCriterionDef();
                 String belongTo = criterionDef.getBelongTo();
                 String fieldName = criterionDef.getField();
                 String operator = criterionDef.getOperator();

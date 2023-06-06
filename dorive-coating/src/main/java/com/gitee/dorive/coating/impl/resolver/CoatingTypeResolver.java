@@ -80,40 +80,40 @@ public class CoatingTypeResolver {
                 }
 
                 ExampleDef exampleDef = ExampleDef.fromElement(coatingClass);
-                List<CoatingField> fields = new ArrayList<>();
+                List<CoatingField> coatingFields = new ArrayList<>();
                 SpecificFields specificFields = new SpecificFields();
 
                 ReflectionUtils.doWithLocalFields(coatingClass, declaredField -> {
-                    CoatingField field = new CoatingField(declaredField);
-                    if (field.isIgnore()) {
+                    CoatingField coatingField = new CoatingField(declaredField);
+                    if (coatingField.isIgnore()) {
                         return;
                     }
-                    if (specificFields.addProperty(field)) {
+                    if (specificFields.addProperty(coatingField)) {
                         return;
                     }
-                    fields.add(field);
+                    coatingFields.add(coatingField);
                 });
 
-                List<MergedRepository> mergedRepositories = collectRepositories(fields);
+                List<MergedRepository> mergedRepositories = matchMergedRepositories(coatingFields);
                 List<MergedRepository> reversedMergedRepositories = new ArrayList<>(mergedRepositories);
                 Collections.reverse(reversedMergedRepositories);
 
-                CoatingType coatingType = new CoatingType(exampleDef, fields, specificFields, mergedRepositories, reversedMergedRepositories);
+                CoatingType coatingType = new CoatingType(exampleDef, coatingFields, specificFields, mergedRepositories, reversedMergedRepositories);
                 classCoatingTypeMap.put(coatingClass, coatingType);
                 nameCoatingTypeMap.put(coatingClass.getName(), coatingType);
             }
         }
     }
 
-    private List<MergedRepository> collectRepositories(List<CoatingField> fields) {
+    private List<MergedRepository> matchMergedRepositories(List<CoatingField> coatingFields) {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
         Map<String, MergedRepository> nameMergedRepositoryMap = mergedRepositoryResolver.getNameMergedRepositoryMap();
 
         Set<MergedRepository> mergedRepositorySet = new LinkedHashSet<>();
 
-        for (CoatingField field : fields) {
-            CriterionDef criterionDef = field.getCriterionDef();
+        for (CoatingField coatingField : coatingFields) {
+            CriterionDef criterionDef = coatingField.getCriterionDef();
             String belongTo = criterionDef.getBelongTo();
 
             if (!belongTo.startsWith("/")) {
@@ -144,7 +144,7 @@ public class CoatingTypeResolver {
         }
 
         List<MergedRepository> mergedRepositories = new ArrayList<>(mergedRepositorySet);
-        mergedRepositories.sort(Comparator.comparing(MergedRepository::getSequence));
+        mergedRepositories.sort(Comparator.comparing(MergedRepository::getOrder));
         return mergedRepositories;
     }
 
