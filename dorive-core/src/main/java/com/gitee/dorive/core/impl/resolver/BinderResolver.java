@@ -40,6 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class BinderResolver {
     private List<PropertyBinder> propertyBinders;
     private Map<String, List<PropertyBinder>> mergedBindersMap;
     private boolean simpleRootBinding;
-    private List<String> boundFields;
+    private List<String> selfFields;
     private List<ContextBinder> contextBinders;
     private List<Binder> boundValueBinders;
     private PropertyBinder boundIdBinder;
@@ -72,7 +73,7 @@ public class BinderResolver {
         propertyBinders = new ArrayList<>(bindingDefs.size());
         mergedBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
         simpleRootBinding = false;
-        boundFields = new ArrayList<>(bindingDefs.size());
+        selfFields = new ArrayList<>(bindingDefs.size());
         contextBinders = new ArrayList<>(bindingDefs.size());
         boundValueBinders = new ArrayList<>(bindingDefs.size());
         boundIdBinder = null;
@@ -99,7 +100,7 @@ public class BinderResolver {
                 List<PropertyBinder> propertyBinders = mergedBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
                 propertyBinders.add(propertyBinder);
 
-                boundFields.add(bindingDef.getField());
+                selfFields.add(bindingDef.getField());
 
                 if (propertyBinder.isSameType()) {
                     if (!"id".equals(field)) {
@@ -123,6 +124,7 @@ public class BinderResolver {
         if (mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/")) {
             simpleRootBinding = CollUtil.findOne(mergedBindersMap.get("/"), PropertyBinder::isCollection) == null;
         }
+        selfFields = Collections.unmodifiableList(selfFields);
     }
 
     private BindingDef renewBindingDef(String accessPath, BindingDef bindingDef) {
