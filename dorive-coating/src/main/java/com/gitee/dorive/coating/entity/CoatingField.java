@@ -50,7 +50,7 @@ public class CoatingField {
             Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
             this.genericType = (Class<?>) actualTypeArgument;
         }
-        criterionDef = CriterionDef.fromElement(field);
+        criterionDef = CriterionDef.fromField(field);
     }
 
     public boolean isIgnore() {

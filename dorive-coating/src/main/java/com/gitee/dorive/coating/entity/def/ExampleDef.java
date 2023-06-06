@@ -26,9 +26,9 @@ import java.util.Map;
 
 public class ExampleDef {
 
-    public static ExampleDef fromElement(AnnotatedElement annotatedElement) {
-        Map<String, Object> annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Example.class);
-        return BeanUtil.copyProperties(annotationAttributes, ExampleDef.class);
+    public static ExampleDef fromElement(AnnotatedElement element) {
+        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Example.class);
+        return BeanUtil.copyProperties(attributes, ExampleDef.class);
     }
 
 }

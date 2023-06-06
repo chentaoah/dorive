@@ -38,7 +38,7 @@ public class CriterionDef {
     private String operator;
     private boolean ignore;
 
-    public static CriterionDef fromElement(Field field) {
+    public static CriterionDef fromField(Field field) {
         if (field.isAnnotationPresent(Criterion.class)) {
             Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(field, Criterion.class);
             CriterionDef criterionDef = BeanUtil.copyProperties(attributes, CriterionDef.class);
