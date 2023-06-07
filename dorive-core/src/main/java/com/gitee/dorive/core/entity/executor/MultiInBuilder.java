@@ -30,15 +30,15 @@ import java.util.List;
 public class MultiInBuilder {
 
     private int size;
-    private List<String> properties;
+    private List<String> aliases;
     private int step;
     private List<Object> values;
     private int cursor;
 
-    public MultiInBuilder(int size, List<String> properties) {
+    public MultiInBuilder(int size, List<String> aliases) {
         this.size = size;
-        this.properties = properties;
-        this.step = properties.size();
+        this.aliases = aliases;
+        this.step = aliases.size();
         this.values = new ArrayList<>(size * step);
         this.cursor = 0;
     }
@@ -69,8 +69,8 @@ public class MultiInBuilder {
     }
 
     public Criterion build() {
-        String propStr = StrUtil.join(",", properties);
-        return new Criterion(propStr, Operator.MULTI_IN, this);
+        String aliasesStr = StrUtil.join(",", aliases);
+        return new Criterion(aliasesStr, Operator.MULTI_IN, this);
     }
 
 }

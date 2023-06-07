@@ -18,15 +18,16 @@
 package com.gitee.dorive.core.impl.resolver;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.api.impl.resolver.PropChainResolver;
-import com.gitee.dorive.api.util.ReflectUtils;
-import com.gitee.dorive.core.api.common.Binder;
-import com.gitee.dorive.core.api.common.Processor;
+import com.gitee.dorive.core.api.binder.Binder;
+import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.processor.DefaultProcessor;
@@ -39,6 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +54,8 @@ public class BinderResolver {
     private List<Binder> allBinders;
     private List<PropertyBinder> propertyBinders;
     private Map<String, List<PropertyBinder>> mergedBindersMap;
-    private List<String> boundFields;
+    private boolean simpleRootBinding;
+    private List<String> selfFields;
     private List<ContextBinder> contextBinders;
     private List<Binder> boundValueBinders;
     private PropertyBinder boundIdBinder;
@@ -69,7 +72,8 @@ public class BinderResolver {
         allBinders = new ArrayList<>(bindingDefs.size());
         propertyBinders = new ArrayList<>(bindingDefs.size());
         mergedBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
-        boundFields = new ArrayList<>(bindingDefs.size());
+        simpleRootBinding = false;
+        selfFields = new ArrayList<>(bindingDefs.size());
         contextBinders = new ArrayList<>(bindingDefs.size());
         boundValueBinders = new ArrayList<>(bindingDefs.size());
         boundIdBinder = null;
@@ -81,7 +85,8 @@ public class BinderResolver {
             String alias = entityEle.toAlias(field);
 
             PropChain fieldPropChain = propChainMap.get("/" + field);
-            Assert.notNull(fieldPropChain, "The field of @Binding may be wrong! type: {}, field: {}", entityEle.getGenericType().getName(), field);
+            Assert.notNull(fieldPropChain, "The field configured for @Binding does not exist within the entity! type: {}, field: {}",
+                    entityEle.getGenericType().getName(), field);
             fieldPropChain.newPropProxy();
 
             Processor processor = newProcessor(bindingDef);
@@ -94,8 +99,8 @@ public class BinderResolver {
                 String belongAccessPath = propertyBinder.getBelongAccessPath();
                 List<PropertyBinder> propertyBinders = mergedBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
                 propertyBinders.add(propertyBinder);
-                
-                boundFields.add(bindingDef.getField());
+
+                selfFields.add(bindingDef.getField());
 
                 if (propertyBinder.isSameType()) {
                     if (!"id".equals(field)) {
@@ -115,6 +120,11 @@ public class BinderResolver {
                 boundValueBinders.add(contextBinder);
             }
         }
+
+        if (mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/")) {
+            simpleRootBinding = CollUtil.findOne(mergedBindersMap.get("/"), PropertyBinder::isCollection) == null;
+        }
+        selfFields = Collections.unmodifiableList(selfFields);
     }
 
     private BindingDef renewBindingDef(String accessPath, BindingDef bindingDef) {
@@ -144,7 +154,7 @@ public class BinderResolver {
                 processor = (Processor) applicationContext.getBean(beanNamesForType[0]);
             }
             if (processor == null) {
-                processor = (Processor) ReflectUtils.newInstance(processorClass);
+                processor = (Processor) ReflectUtil.newInstance(processorClass);
             }
         }
         if (processor instanceof DefaultProcessor) {
@@ -173,8 +183,8 @@ public class BinderResolver {
         boundPropChain.newPropProxy();
 
         EntityEle entityEle = belongRepository.getEntityEle();
-        String fieldName = StringUtils.isBlank(property) ? PathUtils.getLastName(bindExp) : property;
-        String bindAlias = entityEle.toAlias(fieldName);
+        String boundName = StringUtils.isBlank(property) ? PathUtils.getLastName(bindExp) : property;
+        String bindAlias = entityEle.toAlias(boundName);
 
         return new PropertyBinder(bindingDef, alias, fieldPropChain, processor,
                 belongAccessPath, belongRepository, boundPropChain, bindAlias);

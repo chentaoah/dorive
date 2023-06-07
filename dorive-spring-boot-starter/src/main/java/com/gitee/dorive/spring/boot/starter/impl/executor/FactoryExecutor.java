@@ -20,7 +20,7 @@ package com.gitee.dorive.spring.boot.starter.impl.executor;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.core.api.common.EntityFactory;
+import com.gitee.dorive.core.api.executor.EntityFactory;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -116,8 +116,8 @@ public class FactoryExecutor extends AbstractExecutor {
     }
 
     @Override
-    public long executeCountQuery(Context context, Query query) {
-        return executor.executeCountQuery(context, query);
+    public long executeCount(Context context, Query query) {
+        return executor.executeCount(context, query);
     }
 
     @Override

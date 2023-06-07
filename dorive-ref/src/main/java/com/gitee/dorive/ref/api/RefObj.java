@@ -18,13 +18,20 @@
 package com.gitee.dorive.ref.api;
 
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Selector;
 
 public interface RefObj {
 
-    int select(Context context);
+    long select(Context context);
 
     int insertOrUpdate(Context context);
 
     int delete(Context context);
+
+    long select(Selector selector);
+
+    int insertOrUpdate(Selector selector);
+
+    int delete(Selector selector);
 
 }

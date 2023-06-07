@@ -20,7 +20,6 @@ package com.gitee.dorive.core.impl.handler;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -28,7 +27,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -37,27 +35,18 @@ public class BatchEntityHandler implements EntityHandler {
     private final AbstractContextRepository<?, ?> repository;
 
     @Override
-    public int handle(Context context, List<Object> entities) {
+    public long handle(Context context, List<Object> entities) {
         Selector selector = context.getSelector();
-        int totalCount = 0;
+        long totalCount = 0L;
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (selector.matches(context, repository)) {
-                if (isMultiQuery(repository)) {
-                    EntityHandler entityHandler = new MultiEntityHandler(repository);
-                    totalCount += entityHandler.handle(context, entities);
-                } else {
-                    EntityHandler entityHandler = new UnionEntityHandler(repository);
-                    totalCount += entityHandler.handle(context, entities);
-                }
+                BinderResolver binderResolver = repository.getBinderResolver();
+                EntityHandler entityHandler = binderResolver.isSimpleRootBinding() ?
+                        new MultiEntityHandler(repository) : new UnionEntityHandler(repository);
+                totalCount += entityHandler.handle(context, entities);
             }
         }
         return totalCount;
-    }
-
-    private boolean isMultiQuery(CommonRepository repository) {
-        BinderResolver binderResolver = repository.getBinderResolver();
-        Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
-        return mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/");
     }
 
 }

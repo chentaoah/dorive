@@ -114,7 +114,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     }
 
     @Override
-    public long executeCountQuery(Context context, Query query) {
+    public long executeCount(Context context, Query query) {
         Example example = query.getExample();
         if (example != null) {
             QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);

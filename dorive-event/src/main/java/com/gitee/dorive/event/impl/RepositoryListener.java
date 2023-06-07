@@ -31,15 +31,15 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class RepositoryListener implements ApplicationListener<ExecutorEvent>, ApplicationContextAware, InitializingBean {
 
     private ApplicationContext applicationContext;
-    private final Map<Class<?>, List<EntityListener>> classEventListenersMap = new LinkedHashMap<>();
+    private final Map<Class<?>, List<EntityListener>> classEventListenersMap = new ConcurrentHashMap<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -55,7 +55,7 @@ public class RepositoryListener implements ApplicationListener<ExecutorEvent>, A
             Listener listener = AnnotationUtils.getAnnotation(entityListener.getClass(), Listener.class);
             if (listener != null) {
                 Class<?> entityClass = listener.value();
-                List<EntityListener> existEntityListeners = classEventListenersMap.computeIfAbsent(entityClass, key -> new ArrayList<>());
+                List<EntityListener> existEntityListeners = classEventListenersMap.computeIfAbsent(entityClass, key -> new ArrayList<>(4));
                 existEntityListeners.add(entityListener);
             }
         }
@@ -63,8 +63,8 @@ public class RepositoryListener implements ApplicationListener<ExecutorEvent>, A
 
     @Override
     public void onApplicationEvent(ExecutorEvent event) {
-        EventExecutor executor = (EventExecutor) event.getSource();
-        EntityEle entityEle = executor.getEntityEle();
+        EventExecutor eventExecutor = (EventExecutor) event.getSource();
+        EntityEle entityEle = eventExecutor.getEntityEle();
         Class<?> entityClass = entityEle.getGenericType();
         List<EntityListener> entityListeners = classEventListenersMap.get(entityClass);
         if (entityListeners != null && !entityListeners.isEmpty()) {

@@ -26,11 +26,4 @@ public class NumberUtils {
         return null;
     }
 
-    public static Long longValue(Object object) {
-        if (object instanceof Number) {
-            return ((Number) object).longValue();
-        }
-        return null;
-    }
-
 }

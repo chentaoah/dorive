@@ -45,8 +45,8 @@ public class EventExecutor extends AbstractExecutor {
     }
 
     @Override
-    public long executeCountQuery(Context context, Query query) {
-        return executor.executeCountQuery(context, query);
+    public long executeCount(Context context, Query query) {
+        return executor.executeCount(context, query);
     }
 
     @Override

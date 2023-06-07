@@ -47,7 +47,7 @@ public class UnionEntityHandler implements EntityHandler {
     private final CommonRepository repository;
 
     @Override
-    public int handle(Context context, List<Object> entities) {
+    public long handle(Context context, List<Object> entities) {
         Example example = newExample(context, entities);
         if (example.isDirtyQuery()) {
             OperationFactory operationFactory = repository.getOperationFactory();
@@ -57,9 +57,9 @@ public class UnionEntityHandler implements EntityHandler {
             if (result instanceof MultiResult) {
                 setValueForRootEntities(entities, (MultiResult) result);
             }
-            return (int) result.getCount();
+            return result.getCount();
         }
-        return 0;
+        return 0L;
     }
 
     private Example newExample(Context context, List<Object> entities) {
@@ -80,7 +80,7 @@ public class UnionEntityHandler implements EntityHandler {
         return unionExample;
     }
 
-    public Example newExample(Context context, Object entity) {
+    private Example newExample(Context context, Object entity) {
         BinderResolver binderResolver = repository.getBinderResolver();
         Example example = new Example();
         for (PropertyBinder binder : binderResolver.getPropertyBinders()) {

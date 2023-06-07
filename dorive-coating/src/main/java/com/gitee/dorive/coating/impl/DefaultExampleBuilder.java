@@ -108,22 +108,23 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
             List<Object> entities = Collections.emptyList();
             if (!example.isEmptyQuery() && example.isDirtyQuery()) {
-                example.select(new ArrayList<>(binderResolver.getBoundFields()));
+                example.select(binderResolver.getSelfFields());
                 entities = executedRepository.selectByExample(context, example);
             }
 
-            List<Object> finalEntities = entities;
-            mergedBindersMap.forEach((relativeAccessPath, binders) -> {
+            for (Map.Entry<String, List<PropertyBinder>> entry : mergedBindersMap.entrySet()) {
+                String relativeAccessPath = entry.getKey();
+                List<PropertyBinder> binders = entry.getValue();
                 RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
                 if (targetRepoExample != null) {
                     Example targetExample = targetRepoExample.getExample();
-                    if (finalEntities.isEmpty()) {
+                    if (entities.isEmpty()) {
                         targetExample.setEmptyQuery(true);
                         return;
                     }
                     if (binders.size() == 1) {
                         PropertyBinder binder = binders.get(0);
-                        List<Object> fieldValues = binder.collectFieldValues(context, finalEntities);
+                        List<Object> fieldValues = binder.collectFieldValues(context, entities);
                         if (!fieldValues.isEmpty()) {
                             String boundName = binder.getBoundName();
                             if (fieldValues.size() == 1) {
@@ -136,9 +137,9 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                         }
 
                     } else {
-                        List<String> properties = binders.stream().map(PropertyBinder::getBoundName).collect(Collectors.toList());
-                        MultiInBuilder builder = new MultiInBuilder(finalEntities.size(), properties);
-                        collectFieldValues(context, finalEntities, binders, builder);
+                        List<String> aliases = binders.stream().map(PropertyBinder::getBindAlias).collect(Collectors.toList());
+                        MultiInBuilder builder = new MultiInBuilder(entities.size(), aliases);
+                        collectFieldValues(context, entities, binders, builder);
                         if (!builder.isEmpty()) {
                             targetExample.getCriteria().add(builder.build());
                         } else {
@@ -146,7 +147,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                         }
                     }
                 }
-            });
+            }
         });
     }
 

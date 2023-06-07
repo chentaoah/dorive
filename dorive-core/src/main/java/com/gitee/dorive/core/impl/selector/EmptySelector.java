@@ -15,21 +15,29 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.common;
+package com.gitee.dorive.core.impl.selector;
 
-import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.repository.CommonRepository;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-public interface Binder {
+import java.util.List;
 
-    BindingDef getBindingDef();
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class EmptySelector extends AbstractSelector {
 
-    Object getFieldValue(Context context, Object entity);
+    public static final EmptySelector EMPTY_SELECTOR = new EmptySelector();
 
-    void setFieldValue(Context context, Object entity, Object property);
+    @Override
+    public boolean matches(Context context, CommonRepository repository) {
+        return false;
+    }
 
-    Object getBoundValue(Context context, Object rootEntity);
-
-    void setBoundValue(Context context, Object rootEntity, Object property);
+    @Override
+    public List<String> select(Context context, CommonRepository repository) {
+        return null;
+    }
 
 }

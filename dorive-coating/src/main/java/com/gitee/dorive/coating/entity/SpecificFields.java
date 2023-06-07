@@ -34,22 +34,22 @@ public class SpecificFields {
     private CoatingField pageField;
     private CoatingField limitField;
 
-    public boolean addProperty(CoatingField field) {
-        String fieldName = field.getName();
+    public boolean addProperty(CoatingField coatingField) {
+        String fieldName = coatingField.getName();
         if ("sortBy".equals(fieldName)) {
-            sortByField = field;
+            sortByField = coatingField;
             return true;
 
         } else if ("order".equals(fieldName)) {
-            orderField = field;
+            orderField = coatingField;
             return true;
 
         } else if ("page".equals(fieldName)) {
-            pageField = field;
+            pageField = coatingField;
             return true;
 
         } else if ("limit".equals(fieldName)) {
-            limitField = field;
+            limitField = coatingField;
             return true;
         }
         return false;

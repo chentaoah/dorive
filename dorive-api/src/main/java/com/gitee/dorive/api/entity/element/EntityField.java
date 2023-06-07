@@ -40,7 +40,7 @@ public class EntityField extends EntityEle {
     private AliasDef aliasDef;
     private EntityType entityType;
 
-    public static boolean filter(Class<?> type) {
+    public static boolean isComplexType(Class<?> type) {
         String className = type.getName();
         return !className.startsWith("java.lang.") && !className.startsWith("java.util.") && !type.isEnum();
     }
@@ -64,14 +64,14 @@ public class EntityField extends EntityEle {
 
     private void resolve(Field field) {
         EntityDef entityDef = getEntityDef();
-        if (entityDef != null) {
+        if (entityDef != null && type != genericType) {
             EntityDef genericEntityDef = EntityDef.fromElement(genericType);
             if (genericEntityDef != null) {
                 entityDef.merge(genericEntityDef);
             }
         }
         aliasDef = AliasDef.fromElement(field);
-        if (filter(genericType)) {
+        if (isComplexType(genericType)) {
             entityType = EntityType.getInstance(genericType);
         }
     }
@@ -81,7 +81,7 @@ public class EntityField extends EntityEle {
         if (entityType != null) {
             entityType.initialize();
             setPkProxy(entityType.getPkProxy());
-            setAliasMap(entityType.getAliasMap());
+            setPropAliasMap(entityType.getPropAliasMap());
         }
     }
 

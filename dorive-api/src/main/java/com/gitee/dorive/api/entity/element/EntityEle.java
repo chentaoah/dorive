@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.api.entity.element;
 
-import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.annotation.Aggregate;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.def.BindingDef;
@@ -27,7 +26,6 @@ import lombok.NoArgsConstructor;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +38,7 @@ public abstract class EntityEle {
     private boolean aggregated;
     private List<BindingDef> bindingDefs;
     private PropProxy pkProxy;
-    private Map<String, String> aliasMap;
+    private Map<String, String> propAliasMap;
 
     public EntityEle(AnnotatedElement element) {
         this.element = element;
@@ -64,11 +62,7 @@ public abstract class EntityEle {
     }
 
     public String toAlias(String property) {
-        if (property.contains(",")) {
-            List<String> aliases = toAliases(StrUtil.splitTrim(property, ","));
-            return StrUtil.join(",", aliases);
-        }
-        return aliasMap.getOrDefault(property, property);
+        return propAliasMap.getOrDefault(property, property);
     }
 
     public List<String> toAliases(List<String> properties) {
@@ -81,12 +75,6 @@ public abstract class EntityEle {
             return aliases;
         }
         return properties;
-    }
-
-    public Map<String, String> newAliasFieldMapping() {
-        Map<String, String> map = new LinkedHashMap<>();
-        aliasMap.forEach((key, value) -> map.put(value, key));
-        return map;
     }
 
     protected abstract void doInitialize();

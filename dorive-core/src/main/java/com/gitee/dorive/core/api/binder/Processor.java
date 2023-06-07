@@ -15,20 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.coating.entity.def;
+package com.gitee.dorive.core.api.binder;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.coating.annotation.Coating;
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import com.gitee.dorive.core.api.context.Context;
 
-import java.lang.reflect.AnnotatedElement;
-import java.util.Map;
+public interface Processor {
 
-public class CoatingDef {
+    Object input(Context context, Object value);
 
-    public static CoatingDef fromElement(AnnotatedElement annotatedElement) {
-        Map<String, Object> annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, Coating.class);
-        return BeanUtil.copyProperties(annotationAttributes, CoatingDef.class);
-    }
+    Object output(Context context, Object value);
 
 }

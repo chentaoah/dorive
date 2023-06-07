@@ -18,7 +18,7 @@
 package com.gitee.dorive.coating.entity.def;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.coating.annotation.Property;
+import com.gitee.dorive.coating.annotation.Criterion;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,23 +31,23 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PropertyDef {
+public class CriterionDef {
 
     private String belongTo;
     private String field;
     private String operator;
     private boolean ignore;
 
-    public static PropertyDef fromElement(Field field) {
-        if (field.isAnnotationPresent(Property.class)) {
-            Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(field, Property.class);
-            PropertyDef propertyDef = BeanUtil.copyProperties(attributes, PropertyDef.class);
-            if (StringUtils.isBlank(propertyDef.getField())) {
-                propertyDef.setField(field.getName());
+    public static CriterionDef fromField(Field field) {
+        if (field.isAnnotationPresent(Criterion.class)) {
+            Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(field, Criterion.class);
+            CriterionDef criterionDef = BeanUtil.copyProperties(attributes, CriterionDef.class);
+            if (StringUtils.isBlank(criterionDef.getField())) {
+                criterionDef.setField(field.getName());
             }
-            return propertyDef;
+            return criterionDef;
         }
-        return new PropertyDef("/", field.getName(), "=", false);
+        return new CriterionDef("/", field.getName(), "=", false);
     }
 
 }

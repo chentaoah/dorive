@@ -19,7 +19,7 @@ package com.gitee.dorive.core.entity.context;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Selector;
-import com.gitee.dorive.core.impl.selector.NameSelector;
+import com.gitee.dorive.core.impl.selector.EmptySelector;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoArgsConstructor
 public abstract class AbstractContext implements Context {
 
-    private Selector selector = NameSelector.EMPTY_SELECTOR;
+    private Selector selector = EmptySelector.EMPTY_SELECTOR;
     private Map<String, Object> attachments = Collections.emptyMap();
 
     public AbstractContext(Selector selector) {

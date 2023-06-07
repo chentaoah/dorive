@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.constant;
+package com.gitee.dorive.core.api.executor;
 
-import com.gitee.dorive.core.api.context.Selector;
-import com.gitee.dorive.core.impl.selector.NameSelector;
-import com.gitee.dorive.core.impl.selector.RootSelector;
+import com.gitee.dorive.core.api.context.Context;
 
-public interface Select {
-    Selector ALL = new NameSelector("*");
-    Selector ROOT = new RootSelector();
+public interface EntityFactory {
+
+    Object reconstitute(Context context, Object persistent);
+
+    Object deconstruct(Context context, Object entity);
+
 }

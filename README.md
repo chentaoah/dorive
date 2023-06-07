@@ -14,7 +14,7 @@
 - **模型驱动**
 - **NoSQL**
 - **面向对象**
-- **事件驱动**
+- **事件模式**
 - **代码生成**
 
 ### 🤼‍♂️设计模式对比
@@ -47,7 +47,7 @@
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.3.1</version>
+    <version>3.3.9</version>
 </dependency>
 ```
 
@@ -66,11 +66,6 @@
 @Data
 @Entity(name = "tenant", source = SysTenantMapper.class)
 public class Tenant {
-    /**
-     * 选取器，决定每次操作的范围
-     */
-    public static final Selector ALL = new NameSelector("*");
-    public static final Selector ONLY_TENANT = new NameSelector("tenant");
     
     private Integer id;
     private String tenantCode;
@@ -98,8 +93,6 @@ public class Tenant {
 
 ```java
 @RootRepository
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 @CoatingScan("xxx.xxx.xxx.xxx.xxx.query")
 public class TenantRepository extends MybatisPlusRepository<Tenant, Integer> {
 }
@@ -110,8 +103,9 @@ public class TenantRepository extends MybatisPlusRepository<Tenant, Integer> {
 ```java
 package xxx.xxx.xxx.xxx.xxx.query;
 @Data
-@Coating
+@Example
 public class TenantQuery {
+    @Criterion(belongTo = "user")
     private String userCode;
     private String sortBy;
     private String order;
@@ -135,7 +129,7 @@ User user = new User();
 user.setUserCode("user");
 tenant.setUser(Collections.singletonList(user));
 
-int count = tenantRepository.insert(Tenant.ALL, tenant);
+int count = tenantRepository.insert(Selector.ALL, tenant);
 ```
 
 #### 查询数据
@@ -149,21 +143,21 @@ tenantQuery.setOrder("desc");
 tenantQuery.setPage(1);
 tenantQuery.setLimit(10);
 
-List<Tenant> tenants = tenantRepository.selectByCoating(Tenant.ALL, tenantQuery);
+List<Tenant> tenants = tenantRepository.selectByCoating(Selector.ALL, tenantQuery);
 ```
 
 #### 更新数据
 
 ```java
-Tenant tenant = tenantRepository.selectByPrimaryKey(Tenant.ONLY_TENANT, 1);
+Tenant tenant = tenantRepository.selectByPrimaryKey(Selector.ROOT, 1);
 tenant.setTenantCode("tenant1");
 
-int count = tenantRepository.update(Tenant.ONLY_TENANT, tenant);
+int count = tenantRepository.update(Selector.ROOT, tenant);
 ```
 
 #### 删除数据
 
 ```java
 // 开发者通过聚合对象的id，即可删除所有数据
-int count = tenantRepository.deleteByPrimaryKey(Tenant.ALL, 1);
+int count = tenantRepository.deleteByPrimaryKey(Selector.ALL, 1);
 ```

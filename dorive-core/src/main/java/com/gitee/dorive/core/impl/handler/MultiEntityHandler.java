@@ -49,7 +49,7 @@ public class MultiEntityHandler implements EntityHandler {
     private final CommonRepository repository;
 
     @Override
-    public int handle(Context context, List<Object> entities) {
+    public long handle(Context context, List<Object> entities) {
         Map<String, Object> entityIndex = new LinkedHashMap<>(entities.size() * 4 / 3 + 1);
         Example example = newExample(context, entities, entityIndex);
         if (example.isDirtyQuery()) {
@@ -60,9 +60,9 @@ public class MultiEntityHandler implements EntityHandler {
             if (result instanceof MultiResult) {
                 setValueForRootEntities(context, entities, entityIndex, (MultiResult) result);
             }
-            return (int) result.getCount();
+            return result.getCount();
         }
-        return 0;
+        return 0L;
     }
 
     private Example newExample(Context context, List<Object> entities, Map<String, Object> entityIndex) {
@@ -84,8 +84,8 @@ public class MultiEntityHandler implements EntityHandler {
             }
 
         } else {
-            List<String> properties = binders.stream().map(AbstractBinder::getFieldName).collect(Collectors.toList());
-            MultiInBuilder builder = new MultiInBuilder(entities.size(), properties);
+            List<String> aliases = binders.stream().map(AbstractBinder::getAlias).collect(Collectors.toList());
+            MultiInBuilder builder = new MultiInBuilder(entities.size(), aliases);
             collectBoundValues(context, entities, entityIndex, binders, builder);
             if (!builder.isEmpty()) {
                 example.getCriteria().add(builder.build());
@@ -105,7 +105,7 @@ public class MultiEntityHandler implements EntityHandler {
         return example;
     }
 
-    public List<Object> collectBoundValues(Context context, List<Object> entities, Map<String, Object> entityIndex, PropertyBinder binder) {
+    private List<Object> collectBoundValues(Context context, List<Object> entities, Map<String, Object> entityIndex, PropertyBinder binder) {
         List<Object> boundValues = new ArrayList<>(entities.size());
         for (Object entity : entities) {
             Object boundValue = binder.getBoundValue(context, entity);
@@ -216,7 +216,7 @@ public class MultiEntityHandler implements EntityHandler {
     }
 
     @SuppressWarnings("unchecked")
-    public void setValueForRootEntity(boolean isCollection, PropChain anchorPoint, int averageSize, Object rootEntity, Object entity) {
+    private void setValueForRootEntity(boolean isCollection, PropChain anchorPoint, int averageSize, Object rootEntity, Object entity) {
         if (rootEntity != null) {
             Object value = anchorPoint.getValue(rootEntity);
             if (isCollection) {

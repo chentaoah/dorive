@@ -18,7 +18,7 @@
 package com.gitee.dorive.coating.entity;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.coating.entity.def.PropertyDef;
+import com.gitee.dorive.coating.entity.def.CriterionDef;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -36,7 +36,7 @@ public class CoatingField {
     private boolean collection;
     private Class<?> genericType;
     private String name;
-    private PropertyDef propertyDef;
+    private CriterionDef criterionDef;
 
     public CoatingField(Field field) {
         this.field = field;
@@ -50,11 +50,11 @@ public class CoatingField {
             Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
             this.genericType = (Class<?>) actualTypeArgument;
         }
-        propertyDef = PropertyDef.fromElement(field);
+        criterionDef = CriterionDef.fromField(field);
     }
 
     public boolean isIgnore() {
-        return propertyDef.isIgnore();
+        return criterionDef.isIgnore();
     }
 
     public Object getFieldValue(Object object) {

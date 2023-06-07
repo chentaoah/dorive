@@ -44,22 +44,6 @@ public class CommonRepository extends ProxyRepository {
     private boolean boundEntity;
 
     @Override
-    public int updateByExample(Context context, Object entity, Example example) {
-        if (example.isEmptyQuery()) {
-            return 0;
-        }
-        return super.updateByExample(context, entity, example);
-    }
-
-    @Override
-    public int deleteByExample(Context context, Example example) {
-        if (example.isEmptyQuery()) {
-            return 0;
-        }
-        return super.deleteByExample(context, example);
-    }
-
-    @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Selector selector = context.getSelector();
         List<String> properties = selector.select(context, this);

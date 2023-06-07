@@ -35,6 +35,7 @@ import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,6 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> implements ExampleBuilder, CoatingRepository<E, PK> {
 
-    private String querier;
     private String[] scanPackages;
     private String regex;
     private MergedRepositoryResolver mergedRepositoryResolver;
@@ -55,14 +55,11 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
         Repository repository = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), Repository.class);
         CoatingScan coatingScan = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), CoatingScan.class);
         if (repository != null && coatingScan != null) {
-            this.querier = repository.querier();
             this.scanPackages = coatingScan.value();
             this.regex = StringUtils.isBlank(coatingScan.regex()) ? "^" + getEntityClass().getSimpleName() + ".*" : coatingScan.regex();
             this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
             this.coatingTypeResolver = new CoatingTypeResolver(this);
-            if ("default".equals(querier)) {
-                this.exampleBuilder = new DefaultExampleBuilder(this);
-            }
+            this.exampleBuilder = new DefaultExampleBuilder(this);
         }
     }
 
@@ -81,6 +78,9 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     @Override
     public List<E> selectByCoating(Context context, Object coating) {
         Example example = buildExample(context, coating);
+        if (example.isEmptyQuery()) {
+            return Collections.emptyList();
+        }
         if (example.isCountQueried()) {
             example.setPage(null);
         }
@@ -91,6 +91,9 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByCoating(Context context, Object coating) {
         Example example = buildExample(context, coating);
+        if (example.isEmptyQuery()) {
+            return (Page<E>) example.getPage();
+        }
         if (example.isCountQueried()) {
             Page<Object> page = example.getPage();
             example.setPage(null);

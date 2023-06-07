@@ -36,7 +36,7 @@ public class MergedRepository {
     private CommonRepository definedRepository;
     private Map<String, List<PropertyBinder>> mergedBindersMap;
     private CommonRepository executedRepository;
-    private Integer sequence;
+    private Integer order;
 
     public String getName() {
         return definedRepository.getEntityDef().getName();

@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.coating.entity;
 
-import com.gitee.dorive.coating.entity.def.CoatingDef;
-import com.gitee.dorive.coating.entity.def.PropertyDef;
+import com.gitee.dorive.coating.entity.def.ExampleDef;
+import com.gitee.dorive.coating.entity.def.CriterionDef;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -34,8 +34,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class CoatingType {
 
-    private CoatingDef coatingDef;
-    private List<CoatingField> fields;
+    private ExampleDef exampleDef;
+    private List<CoatingField> coatingFields;
     private SpecificFields specificFields;
     private List<MergedRepository> mergedRepositories;
     private List<MergedRepository> reversedMergedRepositories;
@@ -49,13 +49,13 @@ public class CoatingType {
 
     public Map<String, List<Criterion>> newCriteriaMap(Object coating) {
         Map<String, List<Criterion>> criteriaMap = new LinkedHashMap<>(8);
-        for (CoatingField field : fields) {
-            Object fieldValue = field.getFieldValue(coating);
+        for (CoatingField coatingField : coatingFields) {
+            Object fieldValue = coatingField.getFieldValue(coating);
             if (fieldValue != null) {
-                PropertyDef propertyDef = field.getPropertyDef();
-                String belongTo = propertyDef.getBelongTo();
-                String fieldName = propertyDef.getField();
-                String operator = propertyDef.getOperator();
+                CriterionDef criterionDef = coatingField.getCriterionDef();
+                String belongTo = criterionDef.getBelongTo();
+                String fieldName = criterionDef.getField();
+                String operator = criterionDef.getOperator();
                 List<Criterion> criteria = criteriaMap.computeIfAbsent(belongTo, key -> new ArrayList<>(4));
                 criteria.add(new Criterion(fieldName, operator, fieldValue));
             }

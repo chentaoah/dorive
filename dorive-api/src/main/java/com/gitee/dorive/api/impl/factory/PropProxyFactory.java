@@ -20,9 +20,8 @@ package com.gitee.dorive.api.impl.factory;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.api.PropProxy;
-import com.gitee.dorive.proxy.ProxyCompiler;
 import com.gitee.dorive.proxy.JavassistCompiler;
-import com.gitee.dorive.api.util.ReflectUtils;
+import com.gitee.dorive.proxy.ProxyCompiler;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -58,7 +57,7 @@ public class PropProxyFactory {
                     try {
                         String generatedCode = generateCode(entityClass, fieldClass, fieldName);
                         Class<?> generatedClass = PROXY_COMPILER.compile(generatedCode, null);
-                        PropProxy propProxy = (PropProxy) ReflectUtils.newInstance(generatedClass);
+                        PropProxy propProxy = (PropProxy) ReflectUtil.newInstance(generatedClass);
                         GENERATED_PROXY_CACHE.put(cacheKey, propProxy);
 
                     } catch (Exception e) {

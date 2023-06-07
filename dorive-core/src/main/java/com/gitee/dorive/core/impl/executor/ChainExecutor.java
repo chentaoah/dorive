@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.executor;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.api.entity.element.PropChain;
-import com.gitee.dorive.core.api.common.Binder;
+import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.api.executor.EntityHandler;
@@ -28,7 +28,7 @@ import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
-import com.gitee.dorive.core.impl.resolver.DelegateResolver;
+import com.gitee.dorive.core.impl.resolver.DerivedResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
@@ -73,12 +73,12 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
     }
 
     @Override
-    public int handle(Context context, List<Object> entities) {
+    public long handle(Context context, List<Object> entities) {
         return entityHandler.handle(context, entities);
     }
 
     @Override
-    public long executeCountQuery(Context context, Query query) {
+    public long executeCount(Context context, Query query) {
         throw new RuntimeException("This method does not support!");
     }
 
@@ -97,8 +97,8 @@ public class ChainExecutor extends AbstractExecutor implements EntityHandler {
         Object rootEntity = operation.getEntity();
         Assert.notNull(rootEntity, "The rootEntity cannot be null!");
 
-        DelegateResolver delegateResolver = repository.getDelegateResolver();
-        AbstractContextRepository<?, ?> delegateRepository = delegateResolver.delegateRepository(rootEntity);
+        DerivedResolver derivedResolver = repository.getDerivedResolver();
+        AbstractContextRepository<?, ?> delegateRepository = derivedResolver.deriveRepository(rootEntity);
         delegateRepository = delegateRepository == null ? repository : delegateRepository;
 
         Selector selector = context.getSelector();

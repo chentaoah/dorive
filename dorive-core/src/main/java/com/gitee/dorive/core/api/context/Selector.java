@@ -17,11 +17,16 @@
 
 package com.gitee.dorive.core.api.context;
 
+import com.gitee.dorive.core.impl.selector.AllSelector;
+import com.gitee.dorive.core.impl.selector.RootSelector;
 import com.gitee.dorive.core.repository.CommonRepository;
 
 import java.util.List;
 
-public interface Selector extends Context {
+public interface Selector {
+
+    Selector ALL = new AllSelector();
+    Selector ROOT = new RootSelector();
 
     boolean matches(Context context, CommonRepository repository);
 
