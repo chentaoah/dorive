@@ -24,8 +24,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 @NoArgsConstructor
@@ -40,7 +40,7 @@ public abstract class AbstractContext implements Context {
 
     public Object put(String key, Object value) {
         if (attachments == Collections.EMPTY_MAP) {
-            attachments = new ConcurrentHashMap<>();
+            attachments = new LinkedHashMap<>();
         }
         return attachments.put(key, value);
     }
