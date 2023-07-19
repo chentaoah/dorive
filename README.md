@@ -47,7 +47,7 @@
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.3.9</version>
+    <version>3.4.2</version>
 </dependency>
 ```
 
