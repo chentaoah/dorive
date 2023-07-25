@@ -23,7 +23,6 @@ import com.gitee.dorive.core.impl.selector.EmptySelector;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -32,16 +31,13 @@ import java.util.Map;
 public abstract class AbstractContext implements Context {
 
     private Selector selector = EmptySelector.EMPTY_SELECTOR;
-    private Map<String, Object> attachments = Collections.emptyMap();
+    private Map<String, Object> attachments = new LinkedHashMap<>(8);
 
     public AbstractContext(Selector selector) {
         this.selector = selector;
     }
 
     public Object put(String key, Object value) {
-        if (attachments == Collections.EMPTY_MAP) {
-            attachments = new LinkedHashMap<>();
-        }
         return attachments.put(key, value);
     }
 
