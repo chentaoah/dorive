@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/github/stars/chentaoah/dorive?color=%231890FF&style=flat-square" alt="stars">
 </p>
 <hr/>
-🔥🔥🔥轻量的级领域驱动式ORM框架，帮助开发者通过建模，快速构建具有可维护性、可拓展性的应用程序。
+🔥🔥🔥轻量的领域驱动的ORM框架，帮助开发者通过建模，快速构建具有可维护性、可拓展性的应用程序。
 
 ### 👍推荐理由
 
