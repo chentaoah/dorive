@@ -15,13 +15,30 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.coating.api;
+package com.gitee.dorive.coating.entity;
 
-import com.gitee.dorive.coating.entity.BuildExample;
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.core.entity.executor.Example;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-public interface ExampleBuilder {
+import java.util.List;
 
-    BuildExample buildExample(Context context, Object coating);
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class BuildExample extends Example {
+
+    private boolean emptyQuery = false;
+    private boolean countQueried = false;
+
+    public BuildExample(List<Criterion> criteria) {
+        super(criteria);
+    }
+
+    public boolean isQueryAll() {
+        return !emptyQuery && !isDirtyQuery();
+    }
 
 }

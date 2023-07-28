@@ -22,7 +22,6 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
@@ -60,10 +59,6 @@ public class CommonRepository extends ProxyRepository {
         }
         Example example = query.getExample();
         if (example != null) {
-            if (example.isEmptyQuery()) {
-                Page<Object> page = example.getPage();
-                return page != null ? new Result<>(page) : new Result<>();
-            }
             if (example.getOrderBy() == null && defaultOrderBy != null) {
                 OrderBy orderBy = new OrderBy(defaultOrderBy.getProperties(), defaultOrderBy.getOrder());
                 example.setOrderBy(orderBy);

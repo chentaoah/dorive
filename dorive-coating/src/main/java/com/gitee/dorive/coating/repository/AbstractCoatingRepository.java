@@ -22,12 +22,12 @@ import com.gitee.dorive.api.annotation.Repository;
 import com.gitee.dorive.coating.annotation.CoatingScan;
 import com.gitee.dorive.coating.api.CoatingRepository;
 import com.gitee.dorive.coating.api.ExampleBuilder;
+import com.gitee.dorive.coating.entity.BuildExample;
 import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.impl.DefaultExampleBuilder;
 import com.gitee.dorive.coating.impl.resolver.CoatingTypeResolver;
 import com.gitee.dorive.coating.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.event.repository.AbstractEventRepository;
 import lombok.Data;
@@ -71,13 +71,13 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     }
 
     @Override
-    public Example buildExample(Context context, Object coating) {
+    public BuildExample buildExample(Context context, Object coating) {
         return exampleBuilder.buildExample(context, coating);
     }
 
     @Override
     public List<E> selectByCoating(Context context, Object coating) {
-        Example example = buildExample(context, coating);
+        BuildExample example = buildExample(context, coating);
         if (example.isEmptyQuery()) {
             return Collections.emptyList();
         }
@@ -90,7 +90,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByCoating(Context context, Object coating) {
-        Example example = buildExample(context, coating);
+        BuildExample example = buildExample(context, coating);
         if (example.isEmptyQuery()) {
             return (Page<E>) example.getPage();
         }

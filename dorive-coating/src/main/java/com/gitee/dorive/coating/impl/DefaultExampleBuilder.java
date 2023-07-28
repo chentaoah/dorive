@@ -19,13 +19,13 @@ package com.gitee.dorive.coating.impl;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.coating.api.ExampleBuilder;
+import com.gitee.dorive.coating.entity.BuildExample;
 import com.gitee.dorive.coating.entity.CoatingCriteria;
 import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.entity.MergedRepository;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.MultiInBuilder;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -51,7 +51,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
     }
 
     @Override
-    public Example buildExample(Context context, Object coating) {
+    public BuildExample buildExample(Context context, Object coating) {
         CoatingType coatingType = repository.getCoatingType(coating);
         CoatingCriteria coatingCriteria = coatingType.newCriteria(coating);
         Map<String, List<Criterion>> criteriaMap = coatingCriteria.getCriteriaMap();
@@ -63,7 +63,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             String relativeAccessPath = mergedRepository.getRelativeAccessPath();
             List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> new ArrayList<>(2));
-            Example example = new Example(criteria);
+            BuildExample example = new BuildExample(criteria);
             repoExampleMap.put(relativeAccessPath, new RepoExample(mergedRepository, example));
         }
 
@@ -72,7 +72,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
         RepoExample repoExample = repoExampleMap.get("/");
         Assert.notNull(repoExample, "The criterion cannot be null!");
 
-        Example example = repoExample.getExample();
+        BuildExample example = repoExample.getExample();
         example.setOrderBy(orderBy);
         example.setPage(page);
         return example;
@@ -83,7 +83,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             if ("/".equals(accessPath)) return;
 
             MergedRepository mergedRepository = repoExample.getMergedRepository();
-            Example example = repoExample.getExample();
+            BuildExample example = repoExample.getExample();
 
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             Map<String, List<PropertyBinder>> mergedBindersMap = mergedRepository.getMergedBindersMap();
@@ -94,7 +94,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             for (String relativeAccessPath : mergedBindersMap.keySet()) {
                 RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
                 if (targetRepoExample != null) {
-                    Example targetExample = targetRepoExample.getExample();
+                    BuildExample targetExample = targetRepoExample.getExample();
                     if (targetExample.isEmptyQuery()) {
                         example.setEmptyQuery(true);
                         break;
@@ -117,7 +117,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                 List<PropertyBinder> binders = entry.getValue();
                 RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
                 if (targetRepoExample != null) {
-                    Example targetExample = targetRepoExample.getExample();
+                    BuildExample targetExample = targetRepoExample.getExample();
                     if (entities.isEmpty()) {
                         targetExample.setEmptyQuery(true);
                         return;
@@ -170,7 +170,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
     @AllArgsConstructor
     public static class RepoExample {
         private MergedRepository mergedRepository;
-        private Example example;
+        private BuildExample example;
     }
 
 }

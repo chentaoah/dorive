@@ -20,9 +20,9 @@ package com.gitee.dorive.spring.boot.starter.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.dorive.coating.api.ExampleBuilder;
+import com.gitee.dorive.coating.entity.BuildExample;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.spring.boot.starter.entity.SegmentResult;
@@ -45,7 +45,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
     }
 
     @Override
-    public Example buildExample(Context context, Object coating) {
+    public BuildExample buildExample(Context context, Object coating) {
         SegmentResult segmentResult = segmentBuilder.buildSegment(coating);
         char letter = segmentResult.getLetter();
         SelectSegment selectSegment = segmentResult.getSelectSegment();
@@ -53,7 +53,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         OrderBy orderBy = segmentResult.getOrderBy();
         Page<Object> page = segmentResult.getPage();
 
-        Example example = new Example();
+        BuildExample example = new BuildExample();
         example.setOrderBy(orderBy);
         example.setPage(page);
 

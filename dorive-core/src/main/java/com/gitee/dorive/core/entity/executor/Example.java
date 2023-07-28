@@ -31,8 +31,6 @@ import java.util.List;
 @NoArgsConstructor
 public class Example {
 
-    private boolean emptyQuery = false;
-    private boolean countQueried = false;
     private List<String> selectProps;
     private List<String> extraProps;
     private List<Criterion> criteria = new ArrayList<>(4);
@@ -45,10 +43,6 @@ public class Example {
 
     public boolean isDirtyQuery() {
         return !criteria.isEmpty();
-    }
-
-    public boolean isQueryAll() {
-        return !emptyQuery && !isDirtyQuery();
     }
 
     public void select(String... properties) {
