@@ -63,8 +63,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             String relativeAccessPath = mergedRepository.getRelativeAccessPath();
             List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> new ArrayList<>(2));
-            BuildExample example = new BuildExample(criteria);
-            repoExampleMap.put(relativeAccessPath, new RepoExample(mergedRepository, example));
+            BuildExample buildExample = new BuildExample(criteria);
+            repoExampleMap.put(relativeAccessPath, new RepoExample(mergedRepository, buildExample));
         }
 
         executeQuery(context, repoExampleMap);
@@ -72,10 +72,10 @@ public class DefaultExampleBuilder implements ExampleBuilder {
         RepoExample repoExample = repoExampleMap.get("/");
         Assert.notNull(repoExample, "The criterion cannot be null!");
 
-        BuildExample example = repoExample.getExample();
-        example.setOrderBy(orderBy);
-        example.setPage(page);
-        return example;
+        BuildExample buildExample = repoExample.getBuildExample();
+        buildExample.setOrderBy(orderBy);
+        buildExample.setPage(page);
+        return buildExample;
     }
 
     private void executeQuery(Context context, Map<String, RepoExample> repoExampleMap) {
@@ -83,7 +83,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             if ("/".equals(accessPath)) return;
 
             MergedRepository mergedRepository = repoExample.getMergedRepository();
-            BuildExample example = repoExample.getExample();
+            BuildExample buildExample = repoExample.getBuildExample();
 
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             Map<String, List<PropertyBinder>> mergedBindersMap = mergedRepository.getMergedBindersMap();
@@ -94,22 +94,22 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             for (String relativeAccessPath : mergedBindersMap.keySet()) {
                 RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
                 if (targetRepoExample != null) {
-                    BuildExample targetExample = targetRepoExample.getExample();
+                    BuildExample targetExample = targetRepoExample.getBuildExample();
                     if (targetExample.isEmptyQuery()) {
-                        example.setEmptyQuery(true);
+                        buildExample.setEmptyQuery(true);
                         break;
                     }
                 }
             }
 
-            if (example.isQueryAll()) {
+            if (buildExample.isQueryAll()) {
                 return;
             }
 
             List<Object> entities = Collections.emptyList();
-            if (!example.isEmptyQuery() && example.isDirtyQuery()) {
-                example.select(binderResolver.getSelfFields());
-                entities = executedRepository.selectByExample(context, example);
+            if (!buildExample.isEmptyQuery() && buildExample.isDirtyQuery()) {
+                buildExample.select(binderResolver.getSelfFields());
+                entities = executedRepository.selectByExample(context, buildExample);
             }
 
             for (Map.Entry<String, List<PropertyBinder>> entry : mergedBindersMap.entrySet()) {
@@ -117,7 +117,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                 List<PropertyBinder> binders = entry.getValue();
                 RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
                 if (targetRepoExample != null) {
-                    BuildExample targetExample = targetRepoExample.getExample();
+                    BuildExample targetExample = targetRepoExample.getBuildExample();
                     if (entities.isEmpty()) {
                         targetExample.setEmptyQuery(true);
                         return;
@@ -170,7 +170,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
     @AllArgsConstructor
     public static class RepoExample {
         private MergedRepository mergedRepository;
-        private BuildExample example;
+        private BuildExample buildExample;
     }
 
 }

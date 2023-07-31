@@ -77,31 +77,31 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
     @Override
     public List<E> selectByCoating(Context context, Object coating) {
-        BuildExample example = buildExample(context, coating);
-        if (example.isEmptyQuery()) {
+        BuildExample buildExample = buildExample(context, coating);
+        if (buildExample.isEmptyQuery()) {
             return Collections.emptyList();
         }
-        if (example.isCountQueried()) {
-            example.setPage(null);
+        if (buildExample.isCountQueried()) {
+            buildExample.setPage(null);
         }
-        return selectByExample(context, example);
+        return selectByExample(context, buildExample);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByCoating(Context context, Object coating) {
-        BuildExample example = buildExample(context, coating);
-        if (example.isEmptyQuery()) {
-            return (Page<E>) example.getPage();
+        BuildExample buildExample = buildExample(context, coating);
+        if (buildExample.isEmptyQuery()) {
+            return (Page<E>) buildExample.getPage();
         }
-        if (example.isCountQueried()) {
-            Page<Object> page = example.getPage();
-            example.setPage(null);
-            List<E> records = selectByExample(context, example);
+        if (buildExample.isCountQueried()) {
+            Page<Object> page = buildExample.getPage();
+            buildExample.setPage(null);
+            List<E> records = selectByExample(context, buildExample);
             page.setRecords((List<Object>) records);
             return (Page<E>) page;
         }
-        return selectPageByExample(context, example);
+        return selectPageByExample(context, buildExample);
     }
 
 }

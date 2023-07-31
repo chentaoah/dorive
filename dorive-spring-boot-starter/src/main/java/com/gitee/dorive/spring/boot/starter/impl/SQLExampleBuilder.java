@@ -53,18 +53,18 @@ public class SQLExampleBuilder implements ExampleBuilder {
         OrderBy orderBy = segmentResult.getOrderBy();
         Page<Object> page = segmentResult.getPage();
 
-        BuildExample example = new BuildExample();
-        example.setOrderBy(orderBy);
-        example.setPage(page);
+        BuildExample buildExample = new BuildExample();
+        buildExample.setOrderBy(orderBy);
+        buildExample.setPage(page);
 
         if (selectSegment == null) {
             throw new RuntimeException("Unable to build SQL statement!");
         }
         if (selectSegment.getArgSegments().isEmpty()) {
-            return example;
+            return buildExample;
         }
         if (!selectSegment.isDirtyQuery()) {
-            return example;
+            return buildExample;
         }
 
         selectSegment.setDistinct(true);
@@ -80,10 +80,10 @@ public class SQLExampleBuilder implements ExampleBuilder {
             String countSql = selectSegment.selectSql() + fromWhereSql;
             long count = SqlRunner.db().selectCount("SELECT COUNT(1) FROM (" + countSql + ") " + letter, args.toArray());
             page.setTotal(count);
-            example.setCountQueried(true);
+            buildExample.setCountQueried(true);
             if (count == 0) {
-                example.setEmptyQuery(true);
-                return example;
+                buildExample.setEmptyQuery(true);
+                return buildExample;
             }
         }
 
@@ -103,12 +103,12 @@ public class SQLExampleBuilder implements ExampleBuilder {
         List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(selectSql, args.toArray());
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
         if (!primaryKeys.isEmpty()) {
-            example.eq("id", primaryKeys);
+            buildExample.eq("id", primaryKeys);
         } else {
-            example.setEmptyQuery(true);
+            buildExample.setEmptyQuery(true);
         }
 
-        return example;
+        return buildExample;
     }
 
 }
