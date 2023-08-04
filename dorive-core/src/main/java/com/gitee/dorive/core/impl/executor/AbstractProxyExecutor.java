@@ -15,30 +15,39 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.coating.entity;
+package com.gitee.dorive.core.impl.executor;
 
-import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Query;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class BuildExample extends Example {
+public abstract class AbstractProxyExecutor extends AbstractExecutor {
 
-    private boolean emptyQuery = false;
-    private boolean countQueried = false;
+    private Executor executor;
 
-    public BuildExample(List<Criterion> criteria) {
-        super(criteria);
+    @Override
+    public Result<Object> executeQuery(Context context, Query query) {
+        return executor.executeQuery(context, query);
     }
 
-    public boolean isQueryAll() {
-        return !emptyQuery && !isDirtyQuery();
+    @Override
+    public long executeCount(Context context, Query query) {
+        return executor.executeCount(context, query);
+    }
+
+    @Override
+    public int execute(Context context, Operation operation) {
+        return executor.execute(context, operation);
     }
 
 }

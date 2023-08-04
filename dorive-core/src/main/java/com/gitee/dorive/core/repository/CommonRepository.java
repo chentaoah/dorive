@@ -32,7 +32,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class CommonRepository extends ProxyRepository {
+public class CommonRepository extends AbstractProxyRepository {
 
     private String accessPath;
     private boolean root;

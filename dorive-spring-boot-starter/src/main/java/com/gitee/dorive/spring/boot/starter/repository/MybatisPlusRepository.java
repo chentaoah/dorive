@@ -87,8 +87,9 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
         EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, pojoClass, tableInfo);
 
         Executor executor = new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass);
-        executor = new FactoryExecutor(entityEle, entityFactory, executor);
-        executor = new AliasExecutor(entityEle, executor);
+        executor = new FactoryExecutor(executor, entityEle, entityFactory);
+        executor = new AliasExecutor(executor, entityEle);
+        executor = processExecutor(entityDef, entityEle, executor);
         attachments.put(Keys.ALIAS_EXECUTOR, executor);
         return executor;
     }
@@ -139,6 +140,10 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
             }
         }
         return fieldPropMapping;
+    }
+
+    protected Executor processExecutor(EntityDef entityDef, EntityEle entityEle, Executor executor) {
+        return executor;
     }
 
     @Override

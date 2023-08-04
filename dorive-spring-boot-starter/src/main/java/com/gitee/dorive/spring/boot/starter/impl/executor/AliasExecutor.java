@@ -20,24 +20,30 @@ package com.gitee.dorive.spring.boot.starter.impl.executor;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.entity.executor.*;
+import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.impl.executor.AbstractExecutor;
-import lombok.AllArgsConstructor;
+import com.gitee.dorive.core.impl.executor.AbstractProxyExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class AliasExecutor extends AbstractExecutor {
+public class AliasExecutor extends AbstractProxyExecutor {
 
     private EntityEle entityEle;
-    private Executor executor;
+
+    public AliasExecutor(Executor executor, EntityEle entityEle) {
+        super(executor);
+        this.entityEle = entityEle;
+    }
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
@@ -49,7 +55,7 @@ public class AliasExecutor extends AbstractExecutor {
                 convert(example);
             }
         }
-        return executor.executeQuery(context, query);
+        return super.executeQuery(context, query);
     }
 
     @Override
@@ -58,7 +64,7 @@ public class AliasExecutor extends AbstractExecutor {
         if (example != null) {
             convert(example);
         }
-        return executor.executeCount(context, query);
+        return super.executeCount(context, query);
     }
 
     @Override
@@ -70,7 +76,7 @@ public class AliasExecutor extends AbstractExecutor {
                 convert(example);
             }
         }
-        return executor.execute(context, operation);
+        return super.execute(context, operation);
     }
 
     public void convert(UnionExample unionExample) {

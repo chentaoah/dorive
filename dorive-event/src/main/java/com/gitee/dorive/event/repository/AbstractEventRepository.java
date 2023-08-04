@@ -22,7 +22,7 @@ import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.repository.AbstractGenericRepository;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.core.repository.DefaultRepository;
-import com.gitee.dorive.core.repository.ProxyRepository;
+import com.gitee.dorive.core.repository.AbstractProxyRepository;
 import com.gitee.dorive.event.annotation.EnableEvent;
 import com.gitee.dorive.event.impl.EventExecutor;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -42,8 +42,8 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
     protected AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository) {
         if (enableEvent) {
             AbstractRepository<Object, Object> actualRepository = repository;
-            if (repository instanceof ProxyRepository) {
-                actualRepository = ((ProxyRepository) repository).getProxyRepository();
+            if (repository instanceof AbstractProxyRepository) {
+                actualRepository = ((AbstractProxyRepository) repository).getProxyRepository();
             }
             if (actualRepository instanceof DefaultRepository) {
                 DefaultRepository defaultRepository = (DefaultRepository) actualRepository;

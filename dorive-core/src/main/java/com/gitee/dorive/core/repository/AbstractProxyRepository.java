@@ -34,20 +34,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class ProxyRepository extends AbstractRepository<Object, Object> {
+public abstract class AbstractProxyRepository extends AbstractRepository<Object, Object> {
 
     private AbstractRepository<Object, Object> proxyRepository;
 
     public AbstractRepository<Object, Object> getProxyRepository() {
-        if (proxyRepository instanceof ProxyRepository) {
-            return ((ProxyRepository) proxyRepository).getProxyRepository();
+        if (proxyRepository instanceof AbstractProxyRepository) {
+            return ((AbstractProxyRepository) proxyRepository).getProxyRepository();
         }
         return proxyRepository;
     }
 
     public void setProxyRepository(AbstractRepository<Object, Object> repository) {
-        if (proxyRepository instanceof ProxyRepository) {
-            ((ProxyRepository) proxyRepository).setProxyRepository(repository);
+        if (proxyRepository instanceof AbstractProxyRepository) {
+            ((AbstractProxyRepository) proxyRepository).setProxyRepository(repository);
         }
         proxyRepository = repository;
     }
