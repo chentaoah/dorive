@@ -22,7 +22,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.api.PropProxy;
-import com.gitee.dorive.api.entity.def.AliasDef;
+import com.gitee.dorive.api.entity.def.FieldDef;
 import com.gitee.dorive.api.exception.CircularDependencyException;
 import com.gitee.dorive.api.impl.factory.PropProxyFactory;
 import com.gitee.dorive.api.util.ReflectUtils;
@@ -97,8 +97,8 @@ public class EntityType extends EntityEle {
         Map<String, String> propAliasMap = new LinkedHashMap<>(entityFields.size() * 4 / 3 + 1);
         for (EntityField entityField : entityFields.values()) {
             String name = entityField.getName();
-            AliasDef aliasDef = entityField.getAliasDef();
-            String alias = aliasDef != null ? aliasDef.getValue() : StrUtil.toUnderlineCase(name);
+            FieldDef fieldDef = entityField.getFieldDef();
+            String alias = fieldDef != null ? fieldDef.getValue() : StrUtil.toUnderlineCase(name);
             propAliasMap.put(name, alias);
         }
         setPropAliasMap(propAliasMap);

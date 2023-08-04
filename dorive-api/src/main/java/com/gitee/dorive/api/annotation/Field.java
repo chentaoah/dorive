@@ -17,14 +17,20 @@
 
 package com.gitee.dorive.api.annotation;
 
+import org.springframework.core.annotation.AliasFor;
+
 import java.lang.annotation.*;
 
 @Inherited
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Alias {
+public @interface Field {
 
+    @AliasFor("alias")
     String value() default "";
+
+    @AliasFor("value")
+    String alias() default "";
 
 }

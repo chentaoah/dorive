@@ -18,7 +18,7 @@
 package com.gitee.dorive.api.entity.element;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.api.entity.def.AliasDef;
+import com.gitee.dorive.api.entity.def.FieldDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,7 +37,7 @@ public class EntityField extends EntityEle {
     private boolean collection;
     private Class<?> genericType;
     private String name;
-    private AliasDef aliasDef;
+    private FieldDef fieldDef;
     private EntityType entityType;
 
     public static boolean isComplexType(Class<?> type) {
@@ -70,7 +70,7 @@ public class EntityField extends EntityEle {
                 entityDef.merge(genericEntityDef);
             }
         }
-        aliasDef = AliasDef.fromElement(field);
+        fieldDef = FieldDef.fromElement(field);
         if (isComplexType(genericType)) {
             entityType = EntityType.getInstance(genericType);
         }
