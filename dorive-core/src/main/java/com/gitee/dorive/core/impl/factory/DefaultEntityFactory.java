@@ -38,31 +38,35 @@ public class DefaultEntityFactory implements EntityFactory {
     private Class<?> pojoClass;
 
     private Map<String, String> aliasFieldMapping;
-    private Map<String, Converter> aliasConverterMap;
+    private Map<String, Converter> fieldConverterMap;
     private CopyOptions reCopyOptions;
 
     private Map<String, String> fieldPropMapping;
-    private Map<String, Converter> fieldConverterMap;
+    private Map<String, Converter> propConverterMap;
     private CopyOptions deCopyOptions;
 
-    public void setReCopyOptions(Map<String, String> aliasFieldMapping, Map<String, Converter> aliasConverterMap) {
+    public void setReCopyOptions(Map<String, String> aliasFieldMapping, Map<String, Converter> fieldConverterMap) {
         this.aliasFieldMapping = aliasFieldMapping;
-        this.aliasConverterMap = aliasConverterMap;
-        this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(aliasFieldMapping)
-                .setFieldValueEditor((name, value) -> {
-                    Converter converter = aliasConverterMap.get(name);
-                    return converter != null ? converter.reconstitute(name, value) : value;
-                });
+        this.fieldConverterMap = fieldConverterMap;
+        this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(aliasFieldMapping);
+        if (fieldConverterMap != null && !fieldConverterMap.isEmpty()) {
+            this.reCopyOptions.setFieldValueEditor((name, value) -> {
+                Converter converter = fieldConverterMap.get(name);
+                return converter != null ? converter.reconstitute(name, value) : value;
+            });
+        }
     }
 
-    public void setDeCopyOptions(Map<String, String> fieldPropMapping, Map<String, Converter> fieldConverterMap) {
+    public void setDeCopyOptions(Map<String, String> fieldPropMapping, Map<String, Converter> propConverterMap) {
         this.fieldPropMapping = fieldPropMapping;
-        this.fieldConverterMap = fieldConverterMap;
-        this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(fieldPropMapping)
-                .setFieldValueEditor((name, value) -> {
-                    Converter converter = fieldConverterMap.get(name);
-                    return converter != null ? converter.deconstruct(name, value) : value;
-                });
+        this.propConverterMap = propConverterMap;
+        this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(fieldPropMapping);
+        if (propConverterMap != null && !propConverterMap.isEmpty()) {
+            this.deCopyOptions.setFieldValueEditor((name, value) -> {
+                Converter converter = propConverterMap.get(name);
+                return converter != null ? converter.deconstruct(name, value) : value;
+            });
+        }
     }
 
     @Override

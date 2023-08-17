@@ -128,10 +128,10 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
             defaultEntityFactory.setPojoClass(pojoClass);
 
             Map<String, String> aliasFieldMapping = newAliasFieldMapping(entityEle);
-            defaultEntityFactory.setReCopyOptions(aliasFieldMapping, newAliasConverterMap(aliasFieldMapping, converterMap));
+            defaultEntityFactory.setReCopyOptions(aliasFieldMapping, converterMap);
 
             Map<String, String> fieldPropMapping = newFieldPropMapping(tableInfo, aliasFieldMapping);
-            defaultEntityFactory.setDeCopyOptions(fieldPropMapping, converterMap);
+            defaultEntityFactory.setDeCopyOptions(fieldPropMapping, newPropConverterMap(fieldPropMapping, converterMap));
         }
         return entityFactory;
     }
@@ -139,17 +139,6 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     private Map<String, String> newAliasFieldMapping(EntityEle entityEle) {
         Map<String, String> propAliasMap = entityEle.getPropAliasMap();
         return propAliasMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
-    }
-
-    private Map<String, Converter> newAliasConverterMap(Map<String, String> aliasFieldMapping, Map<String, Converter> converterMap) {
-        Map<String, Converter> aliasConverterMap = new LinkedHashMap<>(converterMap.size());
-        aliasFieldMapping.forEach((alias, field) -> {
-            Converter converter = converterMap.get(field);
-            if (converter != null) {
-                aliasConverterMap.put(alias, converter);
-            }
-        });
-        return aliasConverterMap;
     }
 
     private Map<String, String> newFieldPropMapping(TableInfo tableInfo, Map<String, String> aliasFieldMapping) {
@@ -171,6 +160,15 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
             }
         }
         return fieldPropMapping;
+    }
+
+    private Map<String, Converter> newPropConverterMap(Map<String, String> fieldPropMapping, Map<String, Converter> converterMap) {
+        Map<String, Converter> propConverterMap = new LinkedHashMap<>(converterMap.size());
+        converterMap.forEach((field, converter) -> {
+            String prop = fieldPropMapping.get(field);
+            propConverterMap.put(prop, converter);
+        });
+        return propConverterMap;
     }
 
     protected Executor processExecutor(EntityDef entityDef, EntityEle entityEle, Executor executor) {
