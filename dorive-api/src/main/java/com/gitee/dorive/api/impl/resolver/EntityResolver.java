@@ -36,7 +36,7 @@ public class EntityResolver {
     }
 
     private void resolve(String lastAccessPath, EntityType entityType) {
-        for (EntityField entityField : entityType.getEntityFields().values()) {
+        for (EntityField entityField : entityType.getEntityFieldMap().values()) {
             String accessPath = lastAccessPath + "/" + entityField.getName();
             entityEleMap.put(accessPath, entityField);
             EntityType fieldEntityType = entityField.getEntityType();

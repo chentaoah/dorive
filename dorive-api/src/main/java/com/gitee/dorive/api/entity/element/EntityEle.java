@@ -21,6 +21,7 @@ import com.gitee.dorive.api.annotation.Aggregate;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.def.FieldDef;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -37,6 +38,7 @@ public abstract class EntityEle {
     private EntityDef entityDef;
     private boolean aggregated;
     private List<BindingDef> bindingDefs;
+    private Map<String, FieldDef> fieldDefMap;
     private PropProxy pkProxy;
     private Map<String, String> propAliasMap;
 

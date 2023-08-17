@@ -36,7 +36,7 @@ public class PropChainResolver {
 
     private void resolve(String lastAccessPath, EntityType entityType) {
         PropChain lastPropChain = propChainMap.get(lastAccessPath);
-        for (EntityField entityField : entityType.getEntityFields().values()) {
+        for (EntityField entityField : entityType.getEntityFieldMap().values()) {
             String accessPath = lastAccessPath + "/" + entityField.getName();
             PropChain propChain = new PropChain(lastPropChain, entityType, accessPath, entityField);
             propChainMap.put(accessPath, propChain);

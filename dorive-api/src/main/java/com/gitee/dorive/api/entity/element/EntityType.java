@@ -19,7 +19,6 @@ package com.gitee.dorive.api.entity.element;
 
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.def.FieldDef;
@@ -48,7 +47,7 @@ public class EntityType extends EntityEle {
 
     private Class<?> type;
     private String name;
-    private Map<String, EntityField> entityFields;
+    private Map<String, EntityField> entityFieldMap;
 
     public static synchronized EntityType getInstance(Class<?> type) {
         EntityType entityType = CACHE.get(type);
@@ -70,13 +69,13 @@ public class EntityType extends EntityEle {
         this.name = type.getName();
 
         List<Field> fields = ReflectUtils.getAllFields(type);
-        this.entityFields = new LinkedHashMap<>(fields.size() * 4 / 3 + 1);
+        this.entityFieldMap = new LinkedHashMap<>(fields.size() * 4 / 3 + 1);
 
         for (Field field : fields) {
             if (!Modifier.isStatic(field.getModifiers())) {
                 try {
                     EntityField entityField = new EntityField(field);
-                    entityFields.put(entityField.getName(), entityField);
+                    entityFieldMap.put(entityField.getName(), entityField);
 
                 } catch (CircularDependencyException e) {
                     log.warn(e.getMessage());
@@ -89,18 +88,27 @@ public class EntityType extends EntityEle {
     @Override
     protected void doInitialize() {
         Class<?> genericType = getGenericType();
-        boolean hasField = ReflectUtil.hasField(genericType, "id");
-        Assert.isTrue(hasField, "The primary key not found! type: {}", genericType.getName());
-        PropProxy pkProxy = PropProxyFactory.newPropProxy(genericType, "id");
-        setPkProxy(pkProxy);
+        int initialCapacity = entityFieldMap.size() * 4 / 3 + 1;
+        Map<String, FieldDef> fieldDefMap = new LinkedHashMap<>(initialCapacity);
+        PropProxy pkProxy = null;
+        Map<String, String> propAliasMap = new LinkedHashMap<>(initialCapacity);
 
-        Map<String, String> propAliasMap = new LinkedHashMap<>(entityFields.size() * 4 / 3 + 1);
-        for (EntityField entityField : entityFields.values()) {
+        for (EntityField entityField : entityFieldMap.values()) {
             String name = entityField.getName();
             FieldDef fieldDef = entityField.getFieldDef();
-            String alias = fieldDef != null ? fieldDef.getValue() : StrUtil.toUnderlineCase(name);
+            if (fieldDef != null) {
+                fieldDefMap.put(name, fieldDef);
+            }
+            if ("id".equals(name)) {
+                pkProxy = PropProxyFactory.newPropProxy(genericType, "id");
+            }
+            String alias = fieldDef != null ? fieldDef.getAlias() : StrUtil.toUnderlineCase(name);
             propAliasMap.put(name, alias);
         }
+
+        Assert.notNull(pkProxy, "The primary key not found! type: {}", genericType.getName());
+        setFieldDefMap(fieldDefMap);
+        setPkProxy(pkProxy);
         setPropAliasMap(propAliasMap);
     }
 

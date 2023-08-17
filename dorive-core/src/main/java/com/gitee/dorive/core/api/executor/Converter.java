@@ -15,24 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.annotation;
+package com.gitee.dorive.core.api.executor;
 
-import org.springframework.core.annotation.AliasFor;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.executor.Criterion;
 
-import java.lang.annotation.*;
+public interface Converter {
 
-@Inherited
-@Documented
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Field {
+    Object convert(Context context, Criterion criterion, Object value);
 
-    @AliasFor("alias")
-    String value() default "";
+    Object reconstitute(String name, Object value);
 
-    @AliasFor("value")
-    String alias() default "";
-
-    Class<?> converter() default Object.class;
+    Object deconstruct(String name, Object value);
 
 }

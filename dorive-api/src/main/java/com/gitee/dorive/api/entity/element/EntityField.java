@@ -80,6 +80,7 @@ public class EntityField extends EntityEle {
     protected void doInitialize() {
         if (entityType != null) {
             entityType.initialize();
+            setFieldDefMap(entityType.getFieldDefMap());
             setPkProxy(entityType.getPkProxy());
             setPropAliasMap(entityType.getPropAliasMap());
         }

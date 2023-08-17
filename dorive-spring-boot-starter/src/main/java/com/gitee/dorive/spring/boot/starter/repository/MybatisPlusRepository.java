@@ -18,15 +18,18 @@
 package com.gitee.dorive.spring.boot.starter.repository;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.def.FieldDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.entity.BuildExample;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.executor.Converter;
 import com.gitee.dorive.core.api.executor.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
@@ -35,6 +38,7 @@ import com.gitee.dorive.spring.boot.starter.api.Keys;
 import com.gitee.dorive.spring.boot.starter.impl.CountQuerier;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
 import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;
+import com.gitee.dorive.spring.boot.starter.impl.executor.ConverterExecutor;
 import com.gitee.dorive.spring.boot.starter.impl.executor.FactoryExecutor;
 import com.gitee.dorive.spring.boot.starter.impl.executor.MybatisPlusExecutor;
 import lombok.Data;
@@ -84,17 +88,33 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
         TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
         attachments.put(Keys.TABLE_INFO, tableInfo);
-        EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, pojoClass, tableInfo);
+        Map<String, Converter> converterMap = newConverterMap(entityEle);
+        EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, pojoClass, tableInfo, converterMap);
 
         Executor executor = new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass);
         executor = new FactoryExecutor(executor, entityEle, entityFactory);
         executor = new AliasExecutor(executor, entityEle);
         attachments.put(Keys.ALIAS_EXECUTOR, executor);
+        executor = new ConverterExecutor(executor, entityEle, converterMap);
         executor = processExecutor(entityDef, entityEle, executor);
         return executor;
     }
 
-    private EntityFactory newEntityFactory(EntityDef entityDef, EntityEle entityEle, Class<?> pojoClass, TableInfo tableInfo) {
+    private Map<String, Converter> newConverterMap(EntityEle entityEle) {
+        Map<String, FieldDef> fieldDefMap = entityEle.getFieldDefMap();
+        Map<String, Converter> converterMap = new LinkedHashMap<>(fieldDefMap.size() * 4 / 3 + 1);
+        fieldDefMap.forEach((name, fieldDef) -> {
+            Class<?> converterClass = fieldDef.getConverter();
+            if (converterClass != Object.class) {
+                Converter converter = (Converter) ReflectUtil.newInstance(converterClass);
+                converterMap.put(name, converter);
+            }
+        });
+        return converterMap;
+    }
+
+    private EntityFactory newEntityFactory(EntityDef entityDef, EntityEle entityEle, Class<?> pojoClass, TableInfo tableInfo,
+                                           Map<String, Converter> converterMap) {
         Class<?> factoryClass = entityDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
@@ -108,10 +128,10 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
             defaultEntityFactory.setPojoClass(pojoClass);
 
             Map<String, String> aliasFieldMapping = newAliasFieldMapping(entityEle);
-            defaultEntityFactory.setAliasFieldMapping(aliasFieldMapping);
+            defaultEntityFactory.setReCopyOptions(aliasFieldMapping, newAliasConverterMap(aliasFieldMapping, converterMap));
 
             Map<String, String> fieldPropMapping = newFieldPropMapping(tableInfo, aliasFieldMapping);
-            defaultEntityFactory.setFieldPropMapping(fieldPropMapping);
+            defaultEntityFactory.setDeCopyOptions(fieldPropMapping, converterMap);
         }
         return entityFactory;
     }
@@ -119,6 +139,17 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     private Map<String, String> newAliasFieldMapping(EntityEle entityEle) {
         Map<String, String> propAliasMap = entityEle.getPropAliasMap();
         return propAliasMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+    }
+
+    private Map<String, Converter> newAliasConverterMap(Map<String, String> aliasFieldMapping, Map<String, Converter> converterMap) {
+        Map<String, Converter> aliasConverterMap = new LinkedHashMap<>(converterMap.size());
+        aliasFieldMapping.forEach((alias, field) -> {
+            Converter converter = converterMap.get(field);
+            if (converter != null) {
+                aliasConverterMap.put(alias, converter);
+            }
+        });
+        return aliasConverterMap;
     }
 
     private Map<String, String> newFieldPropMapping(TableInfo tableInfo, Map<String, String> aliasFieldMapping) {

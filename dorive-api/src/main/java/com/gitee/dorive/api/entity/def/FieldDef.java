@@ -32,7 +32,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class FieldDef {
 
-    private String value;
+    private String alias;
+    private Class<?> converter;
 
     public static FieldDef fromElement(AnnotatedElement element) {
         if (element.isAnnotationPresent(Field.class)) {
