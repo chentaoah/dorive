@@ -104,25 +104,27 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     }
 
     private Map<String, Converter> newConverterMap(EntityEle entityEle) {
-        Map<String, EntityField> entityFieldMap = entityEle.getEntityFieldMap();
         Map<String, Converter> converterMap = new LinkedHashMap<>(8);
-        entityFieldMap.forEach((name, entityField) -> {
-            FieldDef fieldDef = entityField.getFieldDef();
-            if (fieldDef != null) {
-                Class<?> converterClass = fieldDef.getConverter();
-                String mapExp = fieldDef.getMapExp();
-                Converter converter = null;
-                if (converterClass != Object.class) {
-                    converter = (Converter) ReflectUtil.newInstance(converterClass);
+        Map<String, EntityField> entityFieldMap = entityEle.getEntityFieldMap();
+        if (entityFieldMap != null) {
+            entityFieldMap.forEach((name, entityField) -> {
+                FieldDef fieldDef = entityField.getFieldDef();
+                if (fieldDef != null) {
+                    Class<?> converterClass = fieldDef.getConverter();
+                    String mapExp = fieldDef.getMapExp();
+                    Converter converter = null;
+                    if (converterClass != Object.class) {
+                        converter = (Converter) ReflectUtil.newInstance(converterClass);
 
-                } else if (StringUtils.isNotBlank(mapExp)) {
-                    converter = new DefaultConverter(entityField);
+                    } else if (StringUtils.isNotBlank(mapExp)) {
+                        converter = new DefaultConverter(entityField);
+                    }
+                    if (converter != null) {
+                        converterMap.put(name, converter);
+                    }
                 }
-                if (converter != null) {
-                    converterMap.put(name, converter);
-                }
-            }
-        });
+            });
+        }
         return converterMap;
     }
 
