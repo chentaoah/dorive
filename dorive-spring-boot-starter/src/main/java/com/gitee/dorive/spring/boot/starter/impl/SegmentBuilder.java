@@ -23,6 +23,7 @@ import com.gitee.dorive.coating.entity.CoatingCriteria;
 import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.entity.MergedRepository;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -32,6 +33,7 @@ import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.spring.boot.starter.api.Keys;
 import com.gitee.dorive.spring.boot.starter.entity.*;
 import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;
+import com.gitee.dorive.spring.boot.starter.impl.executor.ConverterExecutor;
 import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,7 +46,7 @@ public class SegmentBuilder {
 
     private final AbstractCoatingRepository<?, ?> repository;
 
-    public SegmentResult buildSegment(Object coating) {
+    public SegmentResult buildSegment(Context context, Object coating) {
         CoatingType coatingType = repository.getCoatingType(coating);
         CoatingCriteria coatingCriteria = coatingType.newCriteria(coating);
         Map<String, List<Criterion>> criteriaMap = coatingCriteria.getCriteriaMap();
@@ -70,12 +72,14 @@ public class SegmentBuilder {
             Map<String, Object> attachments = executedRepository.getAttachments();
             TableInfo tableInfo = (TableInfo) attachments.get(Keys.TABLE_INFO);
             AliasExecutor aliasExecutor = (AliasExecutor) attachments.get(Keys.ALIAS_EXECUTOR);
+            ConverterExecutor converterExecutor = (ConverterExecutor) attachments.get(Keys.CONVERTER_EXECUTOR);
 
             String tableName = tableInfo.getTableName();
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
             List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> Collections.emptyList());
+            converterExecutor.convertCriteria(context, criteria);
             aliasExecutor.convertCriteria(criteria);
             appendArguments(argSegments, args, tableAlias, criteria);
 

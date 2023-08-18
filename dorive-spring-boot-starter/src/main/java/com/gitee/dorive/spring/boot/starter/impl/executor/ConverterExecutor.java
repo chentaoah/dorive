@@ -23,12 +23,6 @@ import com.gitee.dorive.core.api.executor.Converter;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.executor.UnionExample;
-import com.gitee.dorive.core.entity.operation.Condition;
-import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.impl.executor.AbstractProxyExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -37,7 +31,7 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ConverterExecutor extends AbstractProxyExecutor {
+public class ConverterExecutor extends AbstractExampleExecutor {
 
     private EntityEle entityEle;
     private Map<String, Converter> converterMap;
@@ -49,56 +43,21 @@ public class ConverterExecutor extends AbstractProxyExecutor {
     }
 
     @Override
-    public Result<Object> executeQuery(Context context, Query query) {
-        Example example = query.getExample();
-        if (example != null) {
-            if (example instanceof UnionExample) {
-                convert(context, (UnionExample) example);
-            } else {
-                convert(context, example);
-            }
-        }
-        return super.executeQuery(context, query);
-    }
-
-    @Override
-    public long executeCount(Context context, Query query) {
-        Example example = query.getExample();
-        if (example != null) {
-            convert(context, example);
-        }
-        return super.executeCount(context, query);
-    }
-
-    @Override
-    public int execute(Context context, Operation operation) {
-        if (operation instanceof Condition) {
-            Condition condition = (Condition) operation;
-            Example example = condition.getExample();
-            if (example != null) {
-                convert(context, example);
-            }
-        }
-        return super.execute(context, operation);
-    }
-
-    public void convert(Context context, UnionExample unionExample) {
-        List<Example> examples = unionExample.getExamples();
-        for (Example example : examples) {
-            convert(context, example);
-        }
-    }
-
     public void convert(Context context, Example example) {
-        List<Criterion> criteria = example.getCriteria();
-        if (criteria != null && !criteria.isEmpty()) {
-            for (Criterion criterion : criteria) {
-                String property = criterion.getProperty();
-                Object value = criterion.getValue();
-                Converter converter = converterMap.get(property);
-                if (converter != null) {
-                    value = converter.convert(context, criterion, value);
-                    criterion.setValue(value);
+        convertCriteria(context, example.getCriteria());
+    }
+
+    public void convertCriteria(Context context, List<Criterion> criteria) {
+        if (converterMap != null && !converterMap.isEmpty()) {
+            if (criteria != null && !criteria.isEmpty()) {
+                for (Criterion criterion : criteria) {
+                    String property = criterion.getProperty();
+                    Object value = criterion.getValue();
+                    Converter converter = converterMap.get(property);
+                    if (converter != null) {
+                        value = converter.convert(context, criterion, value);
+                        criterion.setValue(value);
+                    }
                 }
             }
         }

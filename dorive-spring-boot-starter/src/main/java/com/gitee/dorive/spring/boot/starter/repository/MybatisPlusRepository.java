@@ -96,6 +96,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
         executor = new AliasExecutor(executor, entityEle);
         attachments.put(Keys.ALIAS_EXECUTOR, executor);
         executor = new ConverterExecutor(executor, entityEle, converterMap);
+        attachments.put(Keys.CONVERTER_EXECUTOR, executor);
         executor = processExecutor(entityDef, entityEle, executor);
         return executor;
     }

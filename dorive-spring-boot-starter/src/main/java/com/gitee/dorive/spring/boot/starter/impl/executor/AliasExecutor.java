@@ -23,12 +23,6 @@ import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.executor.UnionExample;
-import com.gitee.dorive.core.entity.operation.Condition;
-import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.impl.executor.AbstractProxyExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -36,7 +30,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class AliasExecutor extends AbstractProxyExecutor {
+public class AliasExecutor extends AbstractExampleExecutor {
 
     private EntityEle entityEle;
 
@@ -46,53 +40,13 @@ public class AliasExecutor extends AbstractProxyExecutor {
     }
 
     @Override
-    public Result<Object> executeQuery(Context context, Query query) {
-        Example example = query.getExample();
-        if (example != null) {
-            if (example instanceof UnionExample) {
-                convert((UnionExample) example);
-            } else {
-                convert(example);
-            }
-        }
-        return super.executeQuery(context, query);
-    }
-
-    @Override
-    public long executeCount(Context context, Query query) {
-        Example example = query.getExample();
-        if (example != null) {
-            convert(example);
-        }
-        return super.executeCount(context, query);
-    }
-
-    @Override
-    public int execute(Context context, Operation operation) {
-        if (operation instanceof Condition) {
-            Condition condition = (Condition) operation;
-            Example example = condition.getExample();
-            if (example != null) {
-                convert(example);
-            }
-        }
-        return super.execute(context, operation);
-    }
-
-    public void convert(UnionExample unionExample) {
-        List<Example> examples = unionExample.getExamples();
-        for (Example example : examples) {
-            convert(example);
-        }
-    }
-
-    public void convert(Example example) {
-        convertSelect(example);
+    public void convert(Context context, Example example) {
+        convertSelectProps(example);
         convertCriteria(example.getCriteria());
         convertOrderBy(example.getOrderBy());
     }
 
-    public void convertSelect(Example example) {
+    public void convertSelectProps(Example example) {
         List<String> properties = example.getSelectProps();
         if (properties != null && !properties.isEmpty()) {
             properties = entityEle.toAliases(properties);

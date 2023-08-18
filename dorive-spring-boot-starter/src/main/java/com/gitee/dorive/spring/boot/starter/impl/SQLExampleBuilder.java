@@ -46,7 +46,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
     @Override
     public BuildExample buildExample(Context context, Object coating) {
-        SegmentResult segmentResult = segmentBuilder.buildSegment(coating);
+        SegmentResult segmentResult = segmentBuilder.buildSegment(context, coating);
         char letter = segmentResult.getLetter();
         SelectSegment selectSegment = segmentResult.getSelectSegment();
         List<Object> args = segmentResult.getArgs();
