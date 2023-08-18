@@ -27,6 +27,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -80,10 +81,14 @@ public class EntityField extends EntityEle {
     protected void doInitialize() {
         if (entityType != null) {
             entityType.initialize();
-            setFieldDefMap(entityType.getFieldDefMap());
             setPkProxy(entityType.getPkProxy());
             setPropAliasMap(entityType.getPropAliasMap());
         }
+    }
+
+    @Override
+    public Map<String, EntityField> getEntityFieldMap() {
+        return entityType != null ? entityType.getEntityFieldMap() : null;
     }
 
     public boolean isSameType(EntityField entityField) {

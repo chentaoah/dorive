@@ -89,16 +89,12 @@ public class EntityType extends EntityEle {
     protected void doInitialize() {
         Class<?> genericType = getGenericType();
         int initialCapacity = entityFieldMap.size() * 4 / 3 + 1;
-        Map<String, FieldDef> fieldDefMap = new LinkedHashMap<>(initialCapacity);
         PropProxy pkProxy = null;
         Map<String, String> propAliasMap = new LinkedHashMap<>(initialCapacity);
 
         for (EntityField entityField : entityFieldMap.values()) {
             String name = entityField.getName();
             FieldDef fieldDef = entityField.getFieldDef();
-            if (fieldDef != null) {
-                fieldDefMap.put(name, fieldDef);
-            }
             if ("id".equals(name)) {
                 pkProxy = PropProxyFactory.newPropProxy(genericType, "id");
             }
@@ -107,7 +103,6 @@ public class EntityType extends EntityEle {
         }
 
         Assert.notNull(pkProxy, "The primary key not found! type: {}", genericType.getName());
-        setFieldDefMap(fieldDefMap);
         setPkProxy(pkProxy);
         setPropAliasMap(propAliasMap);
     }
@@ -125,6 +120,11 @@ public class EntityType extends EntityEle {
     @Override
     public EntityType getEntityType() {
         return this;
+    }
+
+    @Override
+    public Map<String, EntityField> getEntityFieldMap() {
+        return entityFieldMap;
     }
 
 }

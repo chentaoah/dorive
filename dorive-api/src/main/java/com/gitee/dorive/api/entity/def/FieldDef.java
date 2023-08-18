@@ -34,6 +34,7 @@ public class FieldDef {
 
     private String alias;
     private Class<?> converter;
+    private String mapExp;
 
     public static FieldDef fromElement(AnnotatedElement element) {
         if (element.isAnnotationPresent(Field.class)) {

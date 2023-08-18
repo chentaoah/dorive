@@ -26,12 +26,14 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.def.FieldDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.element.EntityField;
 import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.entity.BuildExample;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Converter;
 import com.gitee.dorive.core.api.executor.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.impl.converter.DefaultConverter;
 import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.spring.boot.starter.api.Keys;
@@ -102,13 +104,23 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     }
 
     private Map<String, Converter> newConverterMap(EntityEle entityEle) {
-        Map<String, FieldDef> fieldDefMap = entityEle.getFieldDefMap();
-        Map<String, Converter> converterMap = new LinkedHashMap<>(fieldDefMap.size() * 4 / 3 + 1);
-        fieldDefMap.forEach((name, fieldDef) -> {
-            Class<?> converterClass = fieldDef.getConverter();
-            if (converterClass != Object.class) {
-                Converter converter = (Converter) ReflectUtil.newInstance(converterClass);
-                converterMap.put(name, converter);
+        Map<String, EntityField> entityFieldMap = entityEle.getEntityFieldMap();
+        Map<String, Converter> converterMap = new LinkedHashMap<>(8);
+        entityFieldMap.forEach((name, entityField) -> {
+            FieldDef fieldDef = entityField.getFieldDef();
+            if (fieldDef != null) {
+                Class<?> converterClass = fieldDef.getConverter();
+                String mapExp = fieldDef.getMapExp();
+                Converter converter = null;
+                if (converterClass != Object.class) {
+                    converter = (Converter) ReflectUtil.newInstance(converterClass);
+
+                } else if (StringUtils.isNotBlank(mapExp)) {
+                    converter = new DefaultConverter(entityField);
+                }
+                if (converter != null) {
+                    converterMap.put(name, converter);
+                }
             }
         });
         return converterMap;

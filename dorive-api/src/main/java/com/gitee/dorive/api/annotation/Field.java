@@ -35,4 +35,6 @@ public @interface Field {
 
     Class<?> converter() default Object.class;
 
+    String mapExp() default "";
+
 }
