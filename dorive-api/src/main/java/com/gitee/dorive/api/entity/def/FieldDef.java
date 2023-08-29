@@ -37,11 +37,8 @@ public class FieldDef {
     private String mapExp;
 
     public static FieldDef fromElement(AnnotatedElement element) {
-        if (element.isAnnotationPresent(Field.class)) {
-            Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Field.class);
-            return BeanUtil.copyProperties(attributes, FieldDef.class);
-        }
-        return null;
+        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Field.class);
+        return attributes != null ? BeanUtil.copyProperties(attributes, FieldDef.class) : null;
     }
 
 }
