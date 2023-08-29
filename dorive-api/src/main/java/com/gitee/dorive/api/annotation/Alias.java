@@ -19,22 +19,21 @@ package com.gitee.dorive.api.annotation;
 
 import org.springframework.core.annotation.AliasFor;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
+@Field
 @Inherited
 @Documented
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-public @interface Field {
+public @interface Alias {
 
-    @AliasFor("alias")
+    @AliasFor(annotation = Field.class)
     String value() default "";
-
-    @AliasFor("value")
-    String alias() default "";
-
-    Class<?> converter() default Object.class;
-
-    String mapExp() default "";
 
 }
