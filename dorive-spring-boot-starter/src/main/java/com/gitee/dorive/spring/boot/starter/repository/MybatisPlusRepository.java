@@ -39,8 +39,7 @@ import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.spring.boot.starter.api.Keys;
 import com.gitee.dorive.spring.boot.starter.impl.CountQuerier;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
-import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;
-import com.gitee.dorive.spring.boot.starter.impl.executor.ConverterExecutor;
+import com.gitee.dorive.spring.boot.starter.impl.executor.FieldExecutor;
 import com.gitee.dorive.spring.boot.starter.impl.executor.FactoryExecutor;
 import com.gitee.dorive.spring.boot.starter.impl.executor.MybatisPlusExecutor;
 import lombok.Data;
@@ -95,10 +94,8 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
         Executor executor = new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass);
         executor = new FactoryExecutor(executor, entityEle, entityFactory);
-        executor = new AliasExecutor(executor, entityEle);
-        attachments.put(Keys.ALIAS_EXECUTOR, executor);
-        executor = new ConverterExecutor(executor, entityEle, converterMap);
-        attachments.put(Keys.CONVERTER_EXECUTOR, executor);
+        executor = new FieldExecutor(executor, entityEle, converterMap);
+        attachments.put(Keys.FIELD_EXECUTOR, executor);
         executor = processExecutor(entityDef, entityEle, executor);
         return executor;
     }

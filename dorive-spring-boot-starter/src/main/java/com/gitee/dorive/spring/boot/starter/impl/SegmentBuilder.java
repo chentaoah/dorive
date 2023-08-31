@@ -31,14 +31,22 @@ import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.spring.boot.starter.api.Keys;
-import com.gitee.dorive.spring.boot.starter.entity.*;
-import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;
-import com.gitee.dorive.spring.boot.starter.impl.executor.ConverterExecutor;
+import com.gitee.dorive.spring.boot.starter.entity.ArgSegment;
+import com.gitee.dorive.spring.boot.starter.entity.JoinSegment;
+import com.gitee.dorive.spring.boot.starter.entity.OnSegment;
+import com.gitee.dorive.spring.boot.starter.entity.Segment;
+import com.gitee.dorive.spring.boot.starter.entity.SegmentResult;
+import com.gitee.dorive.spring.boot.starter.entity.SelectSegment;
+import com.gitee.dorive.spring.boot.starter.impl.executor.FieldExecutor;
 import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -71,16 +79,14 @@ public class SegmentBuilder {
 
             Map<String, Object> attachments = executedRepository.getAttachments();
             TableInfo tableInfo = (TableInfo) attachments.get(Keys.TABLE_INFO);
-            AliasExecutor aliasExecutor = (AliasExecutor) attachments.get(Keys.ALIAS_EXECUTOR);
-            ConverterExecutor converterExecutor = (ConverterExecutor) attachments.get(Keys.CONVERTER_EXECUTOR);
+            FieldExecutor fieldExecutor = (FieldExecutor) attachments.get(Keys.FIELD_EXECUTOR);
 
             String tableName = tableInfo.getTableName();
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
             List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> Collections.emptyList());
-            converterExecutor.convertCriteria(context, criteria);
-            aliasExecutor.convertCriteria(criteria);
+            fieldExecutor.convertCriteria(context, criteria);
             appendArguments(argSegments, args, tableAlias, criteria);
 
             if ("/".equals(relativeAccessPath)) {
@@ -96,7 +102,7 @@ public class SegmentBuilder {
                 selectSegment.setArgSegments(argSegments);
                 segmentMap.put(relativeAccessPath, selectSegment);
 
-                aliasExecutor.convertOrderBy(orderBy);
+                fieldExecutor.convertOrderBy(orderBy);
 
             } else {
                 JoinSegment joinSegment = new JoinSegment();

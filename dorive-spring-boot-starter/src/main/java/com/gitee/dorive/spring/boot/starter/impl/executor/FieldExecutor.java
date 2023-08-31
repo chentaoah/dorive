@@ -23,6 +23,7 @@ import com.gitee.dorive.core.api.executor.Converter;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.OrderBy;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -31,12 +32,12 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ConverterExecutor extends AbstractExampleExecutor {
+public class FieldExecutor extends AbstractExampleExecutor {
 
     private EntityEle entityEle;
     private Map<String, Converter> converterMap;
 
-    public ConverterExecutor(Executor executor, EntityEle entityEle, Map<String, Converter> converterMap) {
+    public FieldExecutor(Executor executor, EntityEle entityEle, Map<String, Converter> converterMap) {
         super(executor);
         this.entityEle = entityEle;
         this.converterMap = converterMap;
@@ -44,22 +45,42 @@ public class ConverterExecutor extends AbstractExampleExecutor {
 
     @Override
     public void convert(Context context, Example example) {
+        convertSelectProps(example);
         convertCriteria(context, example.getCriteria());
+        convertOrderBy(example.getOrderBy());
+    }
+
+    public void convertSelectProps(Example example) {
+        List<String> properties = example.getSelectProps();
+        if (properties != null && !properties.isEmpty()) {
+            properties = entityEle.toAliases(properties);
+            example.setSelectProps(properties);
+        }
     }
 
     public void convertCriteria(Context context, List<Criterion> criteria) {
-        if (converterMap != null && !converterMap.isEmpty()) {
-            if (criteria != null && !criteria.isEmpty()) {
-                for (Criterion criterion : criteria) {
-                    String property = criterion.getProperty();
-                    Object value = criterion.getValue();
+        if (criteria != null && !criteria.isEmpty()) {
+            for (Criterion criterion : criteria) {
+                String property = criterion.getProperty();
+                Object value = criterion.getValue();
+                if (converterMap != null && !converterMap.isEmpty()) {
                     Converter converter = converterMap.get(property);
                     if (converter != null) {
                         value = converter.convert(context, criterion, value);
                         criterion.setValue(value);
                     }
                 }
+                property = entityEle.toAlias(property);
+                criterion.setProperty(property);
             }
+        }
+    }
+
+    public void convertOrderBy(OrderBy orderBy) {
+        if (orderBy != null) {
+            List<String> properties = orderBy.getProperties();
+            properties = entityEle.toAliases(properties);
+            orderBy.setProperties(properties);
         }
     }
 
