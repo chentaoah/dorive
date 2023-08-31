@@ -54,8 +54,8 @@ public class EntityType extends EntityEle {
         if (entityType == null) {
             if (LOCK.add(type)) {
                 entityType = new EntityType(type);
-                LOCK.remove(type);
                 CACHE.put(type, entityType);
+                LOCK.remove(type);
             } else {
                 throw new CircularDependencyException("Circular Dependency! type: " + type.getName());
             }
