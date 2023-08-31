@@ -62,16 +62,25 @@ public class FieldExecutor extends AbstractExampleExecutor {
         if (criteria != null && !criteria.isEmpty()) {
             for (Criterion criterion : criteria) {
                 String property = criterion.getProperty();
+                String alias = entityEle.toAlias(property);
+                criterion.setAlias(alias);
+
                 Object value = criterion.getValue();
+                boolean isConverted = false;
                 if (converterMap != null && !converterMap.isEmpty()) {
                     Converter converter = converterMap.get(property);
                     if (converter != null) {
-                        value = converter.convert(context, criterion, value);
-                        criterion.setValue(value);
+                        Object mappedValue = converter.convert(context, criterion, value);
+                        criterion.setMappedValue(mappedValue);
+                        isConverted = true;
                     }
                 }
-                property = entityEle.toAlias(property);
-                criterion.setProperty(property);
+                if (!isConverted) {
+                    Object mappedValue = criterion.getMappedValue();
+                    if (mappedValue == null && value != null) {
+                        criterion.setMappedValue(value);
+                    }
+                }
             }
         }
     }

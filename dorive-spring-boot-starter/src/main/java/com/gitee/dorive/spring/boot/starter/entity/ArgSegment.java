@@ -26,16 +26,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ArgSegment {
 
-    private String property;
+    private String tableAlias;
+    private String column;
     private String operator;
     private String expr;
 
     @Override
     public String toString() {
         if (expr != null) {
-            return property + " " + operator + " " + expr;
+            return tableAlias + "." + column + " " + operator + " " + expr;
         } else {
-            return property + " " + operator;
+            return tableAlias + "." + column + " " + operator;
         }
     }
 

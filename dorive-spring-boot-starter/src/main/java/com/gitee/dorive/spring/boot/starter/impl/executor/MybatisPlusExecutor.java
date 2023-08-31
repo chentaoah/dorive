@@ -27,6 +27,7 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
@@ -143,7 +144,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
         for (Criterion criterion : example.getCriteria()) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            criterionAppender.appendCriterion(queryWrapper, criterion.getProperty(), criterion.getValue());
+            criterionAppender.appendCriterion(queryWrapper, criterion.getAlias(), criterion.getMappedValue());
         }
 
         OrderBy orderBy = example.getOrderBy();
@@ -218,8 +219,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                 NullableUpdate nullableUpdate = (NullableUpdate) update;
                 Set<String> nullableSet = nullableUpdate.getNullableSet();
                 if (nullableSet != null && !nullableSet.isEmpty()) {
-                    example = primaryKey != null ? new Example().eq("id", primaryKey) : example;
-                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableSet, example);
+                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableSet, primaryKey, example);
                     return baseMapper.update(null, updateWrapper);
                 }
             }
@@ -250,12 +250,12 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
         for (Criterion criterion : example.getCriteria()) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            criterionAppender.appendCriterion(updateWrapper, criterion.getProperty(), criterion.getValue());
+            criterionAppender.appendCriterion(updateWrapper, criterion.getAlias(), criterion.getMappedValue());
         }
         return updateWrapper;
     }
 
-    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableSet, Example example) {
+    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableSet, Object primaryKey, Example example) {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
         List<TableFieldInfo> fieldList = TableInfoHelper.getTableInfo(pojoClass).getFieldList();
         for (TableFieldInfo tableFieldInfo : fieldList) {
@@ -265,9 +265,15 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                 updateWrapper.set(true, tableFieldInfo.getColumn(), value);
             }
         }
-        for (Criterion criterion : example.getCriteria()) {
-            CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            criterionAppender.appendCriterion(updateWrapper, criterion.getProperty(), criterion.getValue());
+        if (primaryKey != null) {
+            CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(Operator.EQ);
+            criterionAppender.appendCriterion(updateWrapper, "id", primaryKey);
+        }
+        if (example != null) {
+            for (Criterion criterion : example.getCriteria()) {
+                CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
+                criterionAppender.appendCriterion(updateWrapper, criterion.getAlias(), criterion.getMappedValue());
+            }
         }
         return updateWrapper;
     }

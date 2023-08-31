@@ -116,12 +116,12 @@ public class Example {
     }
 
     public Example isNull(String property) {
-        criteria.add(new Criterion(property, Operator.IS_NULL, null));
+        criteria.add(new Criterion(property, Operator.IS_NULL));
         return this;
     }
 
     public Example isNotNull(String property) {
-        criteria.add(new Criterion(property, Operator.IS_NOT_NULL, null));
+        criteria.add(new Criterion(property, Operator.IS_NOT_NULL));
         return this;
     }
 
