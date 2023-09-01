@@ -44,12 +44,10 @@ public class FieldExecutor extends AbstractExampleExecutor {
     }
 
     @Override
-    public Example convert(Context context, Example example) {
-        example = example.tryClone();
+    public void convert(Context context, Example example) {
         convertSelectProps(example);
         convertCriteria(context, example.getCriteria());
         convertOrderBy(example.getOrderBy());
-        return example;
     }
 
     public void convertSelectProps(Example example) {
