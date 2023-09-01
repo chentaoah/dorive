@@ -44,10 +44,12 @@ public class FieldExecutor extends AbstractExampleExecutor {
     }
 
     @Override
-    public void convert(Context context, Example example) {
+    public Example convert(Context context, Example example) {
+        example = example.tryClone();
         convertSelectProps(example);
         convertCriteria(context, example.getCriteria());
         convertOrderBy(example.getOrderBy());
+        return example;
     }
 
     public void convertSelectProps(Example example) {
@@ -63,22 +65,14 @@ public class FieldExecutor extends AbstractExampleExecutor {
             for (Criterion criterion : criteria) {
                 String property = criterion.getProperty();
                 String alias = entityEle.toAlias(property);
-                criterion.setAlias(alias);
+                criterion.setProperty(alias);
 
                 Object value = criterion.getValue();
-                boolean isConverted = false;
                 if (converterMap != null && !converterMap.isEmpty()) {
                     Converter converter = converterMap.get(property);
                     if (converter != null) {
                         Object mappedValue = converter.convert(context, criterion, value);
-                        criterion.setMappedValue(mappedValue);
-                        isConverted = true;
-                    }
-                }
-                if (!isConverted) {
-                    Object mappedValue = criterion.getMappedValue();
-                    if (mappedValue == null && value != null) {
-                        criterion.setMappedValue(value);
+                        criterion.setValue(mappedValue);
                     }
                 }
             }

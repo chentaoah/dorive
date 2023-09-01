@@ -22,6 +22,7 @@ import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.MultiInBuilder;
 import com.gitee.dorive.core.entity.executor.MultiResult;
 import com.gitee.dorive.core.entity.executor.Result;
@@ -70,7 +71,7 @@ public class MultiEntityHandler implements EntityHandler {
         Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
         List<PropertyBinder> binders = mergedBindersMap.get("/");
 
-        Example example = new Example();
+        Example example = new InnerExample();
         if (binders.size() == 1) {
             PropertyBinder binder = binders.get(0);
             List<Object> boundValues = collectBoundValues(context, entities, entityIndex, binder);

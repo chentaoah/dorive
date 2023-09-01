@@ -29,8 +29,8 @@ public class CriterionUtils {
 
     public static String getOperator(Criterion criterion) {
         String operator = criterion.getOperator();
-        Object mappedValue = criterion.getMappedValue();
-        if (mappedValue instanceof Collection) {
+        Object value = criterion.getValue();
+        if (value instanceof Collection) {
             if (Operator.EQ.equals(operator)) {
                 operator = Operator.IN;
 
@@ -44,8 +44,8 @@ public class CriterionUtils {
             } else if (Operator.NOT_IN.equals(operator)) {
                 operator = Operator.NE;
 
-            } else if (Operator.NULL_SWITCH.equals(operator) && mappedValue instanceof Boolean) {
-                return (Boolean) mappedValue ? Operator.IS_NULL : Operator.IS_NOT_NULL;
+            } else if (Operator.NULL_SWITCH.equals(operator) && value instanceof Boolean) {
+                return (Boolean) value ? Operator.IS_NULL : Operator.IS_NOT_NULL;
             }
         }
         return operator;
@@ -53,8 +53,8 @@ public class CriterionUtils {
 
     public static Object getValue(Criterion criterion) {
         String operator = criterion.getOperator();
-        Object mappedValue = criterion.getMappedValue();
-        return StringUtils.sqlParam(format(operator, mappedValue));
+        Object value = criterion.getValue();
+        return StringUtils.sqlParam(format(operator, value));
     }
 
     public static Object format(String operator, Object value) {
@@ -71,12 +71,12 @@ public class CriterionUtils {
     }
 
     public static String toString(Criterion criterion) {
-        String alias = criterion.getAlias();
+        String property = criterion.getProperty();
         String operator = getOperator(criterion);
         if (Operator.IS_NULL.equals(operator) || Operator.IS_NOT_NULL.equals(operator)) {
-            return alias + " " + operator;
+            return property + " " + operator;
         } else {
-            return alias + " " + operator + " " + getValue(criterion);
+            return property + " " + operator + " " + getValue(criterion);
         }
     }
 

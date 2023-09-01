@@ -136,17 +136,17 @@ public class SegmentBuilder {
                                  String tableAlias,
                                  List<Criterion> criteria) {
         for (Criterion criterion : criteria) {
-            String alias = criterion.getAlias();
+            String property = criterion.getProperty();
             String operator = CriterionUtils.getOperator(criterion);
             if (Operator.IS_NULL.equals(operator) || Operator.IS_NOT_NULL.equals(operator)) {
-                ArgSegment argSegment = new ArgSegment(tableAlias, alias, operator, null);
+                ArgSegment argSegment = new ArgSegment(tableAlias, property, operator, null);
                 argSegments.add(argSegment);
 
             } else {
-                Object mappedValue = criterion.getMappedValue();
-                args.add(CriterionUtils.format(operator, mappedValue));
+                Object value = criterion.getValue();
+                args.add(CriterionUtils.format(operator, value));
                 int index = args.size() - 1;
-                ArgSegment argSegment = new ArgSegment(tableAlias, alias, operator, "{" + index + "}");
+                ArgSegment argSegment = new ArgSegment(tableAlias, property, operator, "{" + index + "}");
                 argSegments.add(argSegment);
             }
         }

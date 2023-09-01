@@ -21,6 +21,7 @@ import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Query;
@@ -48,7 +49,7 @@ public class CommonRepository extends AbstractProxyRepository {
         List<String> properties = selector.select(context, this);
         if (properties != null && !properties.isEmpty()) {
             if (query.getPrimaryKey() != null) {
-                Example example = new Example().eq("id", query.getPrimaryKey());
+                Example example = new InnerExample().eq("id", query.getPrimaryKey());
                 query.setPrimaryKey(null);
                 query.setExample(example);
             }

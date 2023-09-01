@@ -22,6 +22,7 @@ import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.MultiResult;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
@@ -82,7 +83,7 @@ public class UnionEntityHandler implements EntityHandler {
 
     private Example newExample(Context context, Object entity) {
         BinderResolver binderResolver = repository.getBinderResolver();
-        Example example = new Example();
+        Example example = new InnerExample();
         for (PropertyBinder binder : binderResolver.getPropertyBinders()) {
             String fieldName = binder.getFieldName();
             Object boundValue = binder.getBoundValue(context, entity);

@@ -144,7 +144,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
         for (Criterion criterion : example.getCriteria()) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            criterionAppender.appendCriterion(queryWrapper, criterion.getAlias(), criterion.getMappedValue());
+            criterionAppender.appendCriterion(queryWrapper, criterion.getProperty(), criterion.getValue());
         }
 
         OrderBy orderBy = example.getOrderBy();
@@ -250,7 +250,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
         for (Criterion criterion : example.getCriteria()) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            criterionAppender.appendCriterion(updateWrapper, criterion.getAlias(), criterion.getMappedValue());
+            criterionAppender.appendCriterion(updateWrapper, criterion.getProperty(), criterion.getValue());
         }
         return updateWrapper;
     }
@@ -272,7 +272,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         if (example != null) {
             for (Criterion criterion : example.getCriteria()) {
                 CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-                criterionAppender.appendCriterion(updateWrapper, criterion.getAlias(), criterion.getMappedValue());
+                criterionAppender.appendCriterion(updateWrapper, criterion.getProperty(), criterion.getValue());
             }
         }
         return updateWrapper;

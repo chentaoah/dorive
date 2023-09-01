@@ -17,26 +17,24 @@
 
 package com.gitee.dorive.core.entity.executor;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class Criterion {
 
     private String property;
-    private String alias;
     private String operator;
     private Object value;
-    private Object mappedValue;
-
-    public Criterion(String property, String operator, Object value) {
-        this.property = property;
-        this.operator = operator;
-        this.value = value;
-    }
 
     public Criterion(String property, String operator) {
         this.property = property;
         this.operator = operator;
+    }
+
+    public Criterion tryClone() {
+        return new Criterion(property, operator, value);
     }
 
 }

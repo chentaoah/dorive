@@ -145,4 +145,27 @@ public class Example {
         return this;
     }
 
+    public Example tryClone() {
+        Example newExample = new InnerExample();
+        if (selectProps != null) {
+            newExample.select(new ArrayList<>(selectProps));
+        }
+        if (extraProps != null) {
+            newExample.selectExtra(new ArrayList<>(extraProps));
+        }
+        if (criteria != null && !criteria.isEmpty()) {
+            List<Criterion> criteria = newExample.getCriteria();
+            for (Criterion criterion : this.criteria) {
+                criteria.add(criterion.tryClone());
+            }
+        }
+        if (orderBy != null) {
+            newExample.setOrderBy(orderBy.tryClone());
+        }
+        if (page != null) {
+            newExample.setPage(page.tryClone());
+        }
+        return newExample;
+    }
+
 }
