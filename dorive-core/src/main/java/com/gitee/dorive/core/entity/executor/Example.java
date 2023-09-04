@@ -41,16 +41,12 @@ public class Example {
         this.criteria = criteria;
     }
 
-    public void select(String... properties) {
-        select(StringUtils.toList(properties));
-    }
-
     public void select(List<String> properties) {
         selectProps = properties;
     }
 
-    public void selectExtra(String... properties) {
-        selectExtra(StringUtils.toList(properties));
+    public void select(String... properties) {
+        select(StringUtils.toList(properties));
     }
 
     public void selectExtra(List<String> properties) {
@@ -59,6 +55,10 @@ public class Example {
         } else {
             extraProps.addAll(properties);
         }
+    }
+
+    public void selectExtra(String... properties) {
+        selectExtra(StringUtils.toList(properties));
     }
 
     public boolean isDirtyQuery() {
