@@ -39,7 +39,7 @@ public class PropChain implements PropProxy {
         this.entityType = entityType;
         this.accessPath = accessPath;
         this.entityField = entityField;
-        if (entityField.isAnnotatedEntity()) {
+        if (entityField.isEntityDef()) {
             newPropProxy();
         }
     }
@@ -53,8 +53,8 @@ public class PropChain implements PropProxy {
         }
     }
 
-    public boolean isAnnotatedEntity() {
-        return entityField.isAnnotatedEntity();
+    public boolean isEntityDef() {
+        return entityField.isEntityDef();
     }
 
     public boolean isSameType(PropChain propChain) {

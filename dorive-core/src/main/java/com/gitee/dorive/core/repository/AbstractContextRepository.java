@@ -75,7 +75,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     public void afterPropertiesSet() throws Exception {
         Class<?> entityClass = ReflectUtils.getFirstArgumentType(this.getClass());
         EntityType entityType = EntityType.getInstance(entityClass);
-        Assert.isTrue(entityType.isAnnotatedEntity(), "No @Entity annotation found! type: {}", entityType.getName());
+        Assert.isTrue(entityType.isEntityDef(), "No @Entity annotation found! type: {}", entityType.getName());
 
         propChainResolver = new PropChainResolver(entityType);
 
@@ -86,7 +86,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
         propChainMap.forEach((accessPath, propChain) -> {
-            if (propChain.isAnnotatedEntity()) {
+            if (propChain.isEntityDef()) {
                 CommonRepository subRepository = newRepository(accessPath, propChain.getEntityField());
                 repositoryMap.put(accessPath, subRepository);
                 subRepositories.add(subRepository);

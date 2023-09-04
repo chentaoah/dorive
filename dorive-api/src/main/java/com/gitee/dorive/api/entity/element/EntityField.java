@@ -59,11 +59,12 @@ public class EntityField extends EntityEle {
             Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
             this.genericType = (Class<?>) actualTypeArgument;
         }
-        resolve(field);
+        this.fieldDef = FieldDef.fromElement(field);
+        resolveGenericType(this.genericType);
         initialize();
     }
 
-    private void resolve(Field field) {
+    private void resolveGenericType(Class<?> genericType) {
         EntityDef entityDef = getEntityDef();
         if (entityDef != null) {
             EntityDef genericEntityDef = EntityDef.fromElement(genericType);
@@ -71,7 +72,6 @@ public class EntityField extends EntityEle {
                 entityDef.merge(genericEntityDef);
             }
         }
-        fieldDef = FieldDef.fromElement(field);
         if (isComplexType(genericType)) {
             entityType = EntityType.getInstance(genericType);
         }

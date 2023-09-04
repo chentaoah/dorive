@@ -40,7 +40,7 @@ public class PropChainResolver {
             String accessPath = lastAccessPath + "/" + entityField.getName();
             PropChain propChain = new PropChain(lastPropChain, entityType, accessPath, entityField);
             propChainMap.put(accessPath, propChain);
-            if (EntityField.isComplexType(entityField.getType()) && !entityField.isAnnotatedEntity()) {
+            if (EntityField.isComplexType(entityField.getType()) && !entityField.isEntityDef()) {
                 resolve(accessPath, entityField.getEntityType());
             }
         }
