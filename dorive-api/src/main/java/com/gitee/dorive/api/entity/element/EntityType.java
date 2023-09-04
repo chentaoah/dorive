@@ -82,6 +82,7 @@ public class EntityType extends EntityEle {
                 }
             }
         }
+
         initialize();
     }
 
