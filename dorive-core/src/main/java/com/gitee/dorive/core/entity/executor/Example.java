@@ -41,10 +41,6 @@ public class Example {
         this.criteria = criteria;
     }
 
-    public boolean isDirtyQuery() {
-        return !criteria.isEmpty();
-    }
-
     public void select(String... properties) {
         select(StringUtils.toList(properties));
     }
@@ -63,6 +59,10 @@ public class Example {
         } else {
             extraProps.addAll(properties);
         }
+    }
+
+    public boolean isDirtyQuery() {
+        return !criteria.isEmpty();
     }
 
     public Example eq(String property, Object value) {
