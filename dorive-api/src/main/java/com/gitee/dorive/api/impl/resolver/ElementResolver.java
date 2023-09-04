@@ -26,11 +26,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
-public class EntityResolver {
+public class ElementResolver {
 
     private Map<String, EntityEle> entityEleMap = new LinkedHashMap<>();
 
-    public EntityResolver(EntityType entityType) {
+    public ElementResolver(EntityType entityType) {
         this.entityEleMap.put("/", entityType);
         resolve("", entityType);
     }
