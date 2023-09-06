@@ -27,7 +27,7 @@ import java.util.Collection;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class PropertyProcessor extends DefaultProcessor {
+public class PropertyBindingProcessor extends DefaultBindingProcessor {
 
     @Override
     public Object input(Context context, Object value) {

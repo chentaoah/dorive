@@ -27,11 +27,11 @@ import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.binder.Binder;
-import com.gitee.dorive.core.api.binder.Processor;
+import com.gitee.dorive.core.api.binder.BindingProcessor;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
-import com.gitee.dorive.core.impl.processor.DefaultProcessor;
-import com.gitee.dorive.core.impl.processor.PropertyProcessor;
+import com.gitee.dorive.core.impl.processor.DefaultBindingProcessor;
+import com.gitee.dorive.core.impl.processor.PropertyBindingProcessor;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.PathUtils;
@@ -89,10 +89,10 @@ public class BinderResolver {
                     entityEle.getGenericType().getName(), field);
             fieldPropChain.newPropProxy();
 
-            Processor processor = newProcessor(bindingDef);
+            BindingProcessor bindingProcessor = newBindingProcessor(bindingDef);
 
             if (bindingDef.getBindExp().startsWith("/")) {
-                PropertyBinder propertyBinder = newPropertyBinder(bindingDef, alias, fieldPropChain, processor);
+                PropertyBinder propertyBinder = newPropertyBinder(bindingDef, alias, fieldPropChain, bindingProcessor);
                 allBinders.add(propertyBinder);
                 propertyBinders.add(propertyBinder);
 
@@ -114,7 +114,7 @@ public class BinderResolver {
                 }
 
             } else {
-                ContextBinder contextBinder = new ContextBinder(bindingDef, alias, fieldPropChain, processor);
+                ContextBinder contextBinder = new ContextBinder(bindingDef, alias, fieldPropChain, bindingProcessor);
                 allBinders.add(contextBinder);
                 contextBinders.add(contextBinder);
                 boundValueBinders.add(contextBinder);
@@ -137,37 +137,37 @@ public class BinderResolver {
         return bindingDef;
     }
 
-    private Processor newProcessor(BindingDef bindingDef) {
+    private BindingProcessor newBindingProcessor(BindingDef bindingDef) {
         Assert.notNull(bindingDef, "The bindingDef cannot be null!");
         Class<?> processorClass = bindingDef.getProcessor();
-        Processor processor = null;
+        BindingProcessor bindingProcessor = null;
         if (processorClass == Object.class) {
             if (StringUtils.isBlank(bindingDef.getProperty())) {
-                processor = new DefaultProcessor();
+                bindingProcessor = new DefaultBindingProcessor();
             } else {
-                processor = new PropertyProcessor();
+                bindingProcessor = new PropertyBindingProcessor();
             }
         } else {
             ApplicationContext applicationContext = repository.getApplicationContext();
             String[] beanNamesForType = applicationContext.getBeanNamesForType(processorClass);
             if (beanNamesForType.length > 0) {
-                processor = (Processor) applicationContext.getBean(beanNamesForType[0]);
+                bindingProcessor = (BindingProcessor) applicationContext.getBean(beanNamesForType[0]);
             }
-            if (processor == null) {
-                processor = (Processor) ReflectUtil.newInstance(processorClass);
+            if (bindingProcessor == null) {
+                bindingProcessor = (BindingProcessor) ReflectUtil.newInstance(processorClass);
             }
         }
-        if (processor instanceof DefaultProcessor) {
-            DefaultProcessor defaultProcessor = (DefaultProcessor) processor;
+        if (bindingProcessor instanceof DefaultBindingProcessor) {
+            DefaultBindingProcessor defaultProcessor = (DefaultBindingProcessor) bindingProcessor;
             defaultProcessor.setBindingDef(bindingDef);
         }
-        if (processor instanceof PropertyProcessor) {
+        if (bindingProcessor instanceof PropertyBindingProcessor) {
             Assert.notBlank(bindingDef.getProperty(), "The property of PropertyProcessor cannot be blank!");
         }
-        return processor;
+        return bindingProcessor;
     }
 
-    private PropertyBinder newPropertyBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor) {
+    private PropertyBinder newPropertyBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, BindingProcessor bindingProcessor) {
         String bindExp = bindingDef.getBindExp();
         String property = bindingDef.getProperty();
 
@@ -186,7 +186,7 @@ public class BinderResolver {
         String boundName = StringUtils.isBlank(property) ? PathUtils.getLastName(bindExp) : property;
         String bindAlias = entityEle.toAlias(boundName);
 
-        return new PropertyBinder(bindingDef, alias, fieldPropChain, processor,
+        return new PropertyBinder(bindingDef, alias, fieldPropChain, bindingProcessor,
                 belongAccessPath, belongRepository, boundPropChain, bindAlias);
     }
 
