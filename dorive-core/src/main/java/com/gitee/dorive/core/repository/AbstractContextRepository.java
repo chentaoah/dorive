@@ -31,7 +31,7 @@ import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.config.RepositoryContext;
 import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.impl.executor.ChainExecutor;
+import com.gitee.dorive.core.impl.executor.DefaultExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
@@ -189,7 +189,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         if (derivedResolver.isDerived()) {
             entityHandler = new AdaptiveEntityHandler(this, entityHandler);
         }
-        return new ChainExecutor(this, entityHandler);
+        return new DefaultExecutor(this, entityHandler);
     }
 
     protected abstract Executor newExecutor(EntityDef entityDef, EntityEle entityEle, Map<String, Object> attachments);
