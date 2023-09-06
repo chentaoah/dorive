@@ -20,7 +20,7 @@ package com.gitee.dorive.core.api.executor;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 
-public interface Converter {
+public interface FieldConverter {
 
     Object convert(Context context, Criterion criterion, Object value);
 

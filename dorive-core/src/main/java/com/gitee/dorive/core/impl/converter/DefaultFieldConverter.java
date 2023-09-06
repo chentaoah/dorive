@@ -21,7 +21,7 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.entity.def.FieldDef;
 import com.gitee.dorive.api.entity.element.EntityField;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.executor.Converter;
+import com.gitee.dorive.core.api.executor.FieldConverter;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -33,13 +33,13 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class DefaultConverter implements Converter {
+public class DefaultFieldConverter implements FieldConverter {
 
     private EntityField entityField;
     private Map<Object, Object> reMapping = Collections.emptyMap();
     private Map<Object, Object> deMapping = Collections.emptyMap();
 
-    public DefaultConverter(EntityField entityField) {
+    public DefaultFieldConverter(EntityField entityField) {
         this.entityField = entityField;
         FieldDef fieldDef = entityField.getFieldDef();
         Class<?> genericType = entityField.getGenericType();

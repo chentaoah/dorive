@@ -30,10 +30,10 @@ import com.gitee.dorive.api.entity.element.EntityField;
 import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.entity.BuildExample;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.executor.Converter;
+import com.gitee.dorive.core.api.executor.FieldConverter;
 import com.gitee.dorive.core.api.executor.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.impl.converter.DefaultConverter;
+import com.gitee.dorive.core.impl.converter.DefaultFieldConverter;
 import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.spring.boot.starter.api.Keys;
@@ -89,7 +89,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
         TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
         attachments.put(Keys.TABLE_INFO, tableInfo);
-        Map<String, Converter> converterMap = newConverterMap(entityEle);
+        Map<String, FieldConverter> converterMap = newConverterMap(entityEle);
         EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, pojoClass, tableInfo, converterMap);
 
         Executor executor = new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass);
@@ -100,8 +100,8 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
         return executor;
     }
 
-    private Map<String, Converter> newConverterMap(EntityEle entityEle) {
-        Map<String, Converter> converterMap = new LinkedHashMap<>(8);
+    private Map<String, FieldConverter> newConverterMap(EntityEle entityEle) {
+        Map<String, FieldConverter> converterMap = new LinkedHashMap<>(8);
         Map<String, EntityField> entityFieldMap = entityEle.getEntityFieldMap();
         if (entityFieldMap != null) {
             entityFieldMap.forEach((name, entityField) -> {
@@ -109,15 +109,15 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
                 if (fieldDef != null) {
                     Class<?> converterClass = fieldDef.getConverter();
                     String mapExp = fieldDef.getMapExp();
-                    Converter converter = null;
+                    FieldConverter fieldConverter = null;
                     if (converterClass != Object.class) {
-                        converter = (Converter) ReflectUtil.newInstance(converterClass);
+                        fieldConverter = (FieldConverter) ReflectUtil.newInstance(converterClass);
 
                     } else if (StringUtils.isNotBlank(mapExp)) {
-                        converter = new DefaultConverter(entityField);
+                        fieldConverter = new DefaultFieldConverter(entityField);
                     }
-                    if (converter != null) {
-                        converterMap.put(name, converter);
+                    if (fieldConverter != null) {
+                        converterMap.put(name, fieldConverter);
                     }
                 }
             });
@@ -126,7 +126,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     }
 
     private EntityFactory newEntityFactory(EntityDef entityDef, EntityEle entityEle, Class<?> pojoClass, TableInfo tableInfo,
-                                           Map<String, Converter> converterMap) {
+                                           Map<String, FieldConverter> converterMap) {
         Class<?> factoryClass = entityDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
@@ -174,11 +174,11 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
         return fieldPropMapping;
     }
 
-    private Map<String, Converter> newPropConverterMap(Map<String, String> fieldPropMapping, Map<String, Converter> converterMap) {
-        Map<String, Converter> propConverterMap = new LinkedHashMap<>(converterMap.size());
-        converterMap.forEach((field, converter) -> {
+    private Map<String, FieldConverter> newPropConverterMap(Map<String, String> fieldPropMapping, Map<String, FieldConverter> converterMap) {
+        Map<String, FieldConverter> propConverterMap = new LinkedHashMap<>(converterMap.size());
+        converterMap.forEach((field, fieldConverter) -> {
             String prop = fieldPropMapping.get(field);
-            propConverterMap.put(prop, converter);
+            propConverterMap.put(prop, fieldConverter);
         });
         return propConverterMap;
     }
