@@ -25,8 +25,8 @@ import java.util.List;
 
 public interface Selector {
 
-    Selector ALL = new AllSelector();
     Selector ROOT = new RootSelector();
+    Selector ALL = new AllSelector();
 
     boolean matches(Context context, CommonRepository repository);
 
