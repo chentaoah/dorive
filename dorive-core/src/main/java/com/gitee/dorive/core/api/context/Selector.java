@@ -18,6 +18,7 @@
 package com.gitee.dorive.core.api.context;
 
 import com.gitee.dorive.core.impl.selector.AllSelector;
+import com.gitee.dorive.core.impl.selector.EmptySelector;
 import com.gitee.dorive.core.impl.selector.RootSelector;
 import com.gitee.dorive.core.repository.CommonRepository;
 
@@ -25,6 +26,7 @@ import java.util.List;
 
 public interface Selector {
 
+    Selector EMPTY = new EmptySelector();
     Selector ROOT = new RootSelector();
     Selector ALL = new AllSelector();
 

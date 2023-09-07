@@ -26,8 +26,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class EmptySelector extends AbstractSelector {
 
-    public static final EmptySelector EMPTY_SELECTOR = new EmptySelector();
-
     @Override
     public boolean matches(Context context, CommonRepository repository) {
         return false;
