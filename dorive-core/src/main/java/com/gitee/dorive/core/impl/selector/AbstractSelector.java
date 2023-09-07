@@ -17,7 +17,17 @@
 
 package com.gitee.dorive.core.impl.selector;
 
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Selector;
+import com.gitee.dorive.core.repository.CommonRepository;
+
+import java.util.List;
 
 public abstract class AbstractSelector implements Selector {
+
+    @Override
+    public List<String> select(Context context, CommonRepository repository) {
+        return null;
+    }
+
 }

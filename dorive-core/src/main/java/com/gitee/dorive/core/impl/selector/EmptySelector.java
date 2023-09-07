@@ -22,8 +22,6 @@ import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
-
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class EmptySelector extends AbstractSelector {
@@ -33,11 +31,6 @@ public class EmptySelector extends AbstractSelector {
     @Override
     public boolean matches(Context context, CommonRepository repository) {
         return false;
-    }
-
-    @Override
-    public List<String> select(Context context, CommonRepository repository) {
-        return null;
     }
 
 }
