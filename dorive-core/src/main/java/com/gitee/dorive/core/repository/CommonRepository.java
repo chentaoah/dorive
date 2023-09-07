@@ -19,6 +19,7 @@ package com.gitee.dorive.core.repository;
 
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Node;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
@@ -33,7 +34,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class CommonRepository extends AbstractProxyRepository {
+public class CommonRepository extends AbstractProxyRepository implements Node {
 
     private String accessPath;
     private boolean root;
@@ -70,6 +71,11 @@ public class CommonRepository extends AbstractProxyRepository {
 
     public Object getPrimaryKey(Object entity) {
         return getEntityEle().getPkProxy().getValue(entity);
+    }
+
+    @Override
+    public String getName() {
+        return getEntityDef().getName();
     }
 
 }

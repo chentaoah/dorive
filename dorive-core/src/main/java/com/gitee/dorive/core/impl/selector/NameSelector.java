@@ -18,9 +18,8 @@
 package com.gitee.dorive.core.impl.selector;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.core.api.context.Node;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -55,16 +54,14 @@ public class NameSelector extends AbstractSelector {
     }
 
     @Override
-    public boolean matches(Context context, CommonRepository repository) {
-        EntityDef entityDef = repository.getEntityDef();
-        String name = entityDef.getName();
+    public boolean matches(Context context, Node node) {
+        String name = node.getName();
         return StringUtils.isBlank(name) || nameDefMap.containsKey(name);
     }
 
     @Override
-    public List<String> select(Context context, CommonRepository repository) {
-        EntityDef entityDef = repository.getEntityDef();
-        String name = entityDef.getName();
+    public List<String> select(Context context, Node node) {
+        String name = node.getName();
         NameDef nameDef = nameDefMap.get(name);
         return nameDef != null && !nameDef.getProperties().isEmpty() ? nameDef.getProperties() : null;
     }
