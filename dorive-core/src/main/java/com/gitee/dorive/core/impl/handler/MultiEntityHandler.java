@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.core.impl.handler;
 
-import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
@@ -55,8 +54,8 @@ public class MultiEntityHandler implements EntityHandler {
         Example example = newExample(context, entities, entityIndex);
         if (example.isDirtyQuery()) {
             OperationFactory operationFactory = repository.getOperationFactory();
-            Query query = operationFactory.buildQuery(example);
-            query.setType(query.getType() | OperationType.INCLUDE_ROOT);
+            Query query = operationFactory.buildQueryByExample(example);
+            query.setType(query.includeRoot());
             Result<Object> result = repository.executeQuery(context, query);
             if (result instanceof MultiResult) {
                 setValueForRootEntities(context, entities, entityIndex, (MultiResult) result);

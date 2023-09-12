@@ -17,12 +17,44 @@
 
 package com.gitee.dorive.core.entity.operation;
 
-import lombok.AllArgsConstructor;
+import com.gitee.dorive.api.constant.OperationType;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class Operation {
+
     private int type;
+    private int realType;
     private Object entity;
+
+    public Operation(int type, Object entity) {
+        this.type = type;
+        this.realType = type;
+        this.entity = entity;
+    }
+
+    public boolean isIncludeRoot() {
+        return (type & OperationType.INCLUDE_ROOT) != 0;
+    }
+
+    public boolean isIgnoreRoot() {
+        return (type & OperationType.IGNORE_ROOT) != 0;
+    }
+
+    public boolean isInsertContext() {
+        return (realType & OperationType.INSERT) != 0;
+    }
+
+    public int includeRoot() {
+        return realType | OperationType.INCLUDE_ROOT;
+    }
+
+    public int ignoreRoot() {
+        return realType | OperationType.IGNORE_ROOT;
+    }
+
+    public boolean isForceInsert() {
+        return realType == OperationType.FORCE_INSERT;
+    }
+
 }

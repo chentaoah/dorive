@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.core.impl.factory;
 
+import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.*;
@@ -35,7 +36,7 @@ public class OperationFactory {
         return query;
     }
 
-    public Query buildQuery(Example example) {
+    public Query buildQueryByExample(Example example) {
         Query query = new Query(null);
         query.setExample(example);
         return query;
@@ -52,7 +53,7 @@ public class OperationFactory {
         return update;
     }
 
-    public Update buildUpdate(Object entity, Example example) {
+    public Update buildUpdateByExample(Object entity, Example example) {
         Update update = new Update(entity);
         update.setExample(example);
         return update;
@@ -69,7 +70,7 @@ public class OperationFactory {
         }
     }
 
-    public Delete buildDeleteByEntity(Object entity) {
+    public Delete buildDelete(Object entity) {
         Delete delete = new Delete(entity);
         Object primaryKey = entityEle.getPkProxy().getValue(entity);
         delete.setPrimaryKey(primaryKey);
@@ -82,10 +83,27 @@ public class OperationFactory {
         return delete;
     }
 
-    public Delete buildDelete(Example example) {
+    public Delete buildDeleteByExample(Example example) {
         Delete delete = new Delete(null);
         delete.setExample(example);
         return delete;
+    }
+
+    public Operation rebuild(Operation operation, Object entity) {
+        int realType = operation.getRealType();
+        if (realType == OperationType.INSERT) {
+            return buildInsert(entity);
+
+        } else if (realType == OperationType.UPDATE) {
+            return buildUpdate(entity);
+
+        } else if (realType == OperationType.INSERT_OR_UPDATE) {
+            return new Operation(OperationType.INSERT_OR_UPDATE, entity);
+
+        } else if (realType == OperationType.DELETE) {
+            return buildDelete(entity);
+        }
+        return null;
     }
 
 }

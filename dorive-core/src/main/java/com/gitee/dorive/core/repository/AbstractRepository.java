@@ -63,7 +63,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     @SuppressWarnings("unchecked")
     public List<E> selectByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        Query query = operationFactory.buildQuery(example);
+        Query query = operationFactory.buildQueryByExample(example);
         Result<Object> result = executeQuery(context, query);
         return (List<E>) result.getRecords();
     }
@@ -73,7 +73,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     public Page<E> selectPageByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         Assert.notNull(example.getPage(), "The page cannot be null!");
-        Query query = operationFactory.buildQuery(example);
+        Query query = operationFactory.buildQueryByExample(example);
         Result<Object> result = executeQuery(context, query);
         return (Page<E>) result.getPage();
     }
@@ -81,7 +81,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     @Override
     public long selectCount(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        Query query = operationFactory.buildQuery(example);
+        Query query = operationFactory.buildQueryByExample(example);
         return executeCount(context, query);
     }
 
@@ -103,7 +103,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     public int updateByExample(Context context, Object entity, Example example) {
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
-        Update update = operationFactory.buildUpdate(entity, example);
+        Update update = operationFactory.buildUpdateByExample(entity, example);
         return execute(context, update);
     }
 
@@ -117,7 +117,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     @Override
     public int delete(Context context, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Delete delete = operationFactory.buildDeleteByEntity(entity);
+        Delete delete = operationFactory.buildDelete(entity);
         return execute(context, delete);
     }
 
@@ -131,7 +131,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     @Override
     public int deleteByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        Delete delete = operationFactory.buildDelete(example);
+        Delete delete = operationFactory.buildDeleteByExample(example);
         return execute(context, delete);
     }
 
