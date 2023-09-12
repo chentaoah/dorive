@@ -82,11 +82,9 @@ public class DefaultExecutor extends AbstractExecutor implements EntityHandler {
     public int execute(Context context, Operation operation) {
         Selector selector = context.getSelector();
 
+        boolean isInsertContext = operation.isInsertContext();
         boolean isIncludeRoot = operation.isIncludeRoot();
         boolean isIgnoreRoot = operation.isIgnoreRoot();
-        boolean isInsertContext = operation.isInsertContext();
-        int includeRoot = operation.includeRoot();
-        int ignoreRoot = operation.ignoreRoot();
 
         Object rootEntity = operation.getEntity();
         Assert.notNull(rootEntity, "The root entity cannot be null!");
@@ -131,12 +129,12 @@ public class DefaultExecutor extends AbstractExecutor implements EntityHandler {
                         OperationFactory operationFactory = repository.getOperationFactory();
                         Operation newOperation = operationFactory.rebuild(operation, entity);
                         if (newOperation != null) {
-                            newOperation.setType(operable ? includeRoot : ignoreRoot);
+                            newOperation.setRootType(operable ? Operation.INCLUDE_ROOT : Operation.IGNORE_ROOT);
                             totalCount += repository.execute(context, newOperation);
                         }
 
                     } else if (operable) {
-                        if (isRoot && operation.getRealType() == operationType) {
+                        if (isRoot && operation.getType() == operationType) {
                             totalCount += repository.execute(context, operation);
                         } else {
                             totalCount += doExecute(context, repository, entity, operationType);
@@ -155,10 +153,10 @@ public class DefaultExecutor extends AbstractExecutor implements EntityHandler {
         if (operation.isForceInsert()) {
             return OperationType.INSERT;
         }
-        int realType = operation.getRealType();
+        int type = operation.getType();
         Object primaryKey = repository.getPrimaryKey(entity);
         int operationType = primaryKey == null ? OperationType.INSERT : OperationType.UPDATE_OR_DELETE;
-        return realType & operationType;
+        return type & operationType;
     }
 
     private void getBoundValue(Context context, Object rootEntity, CommonRepository repository, Object entity) {

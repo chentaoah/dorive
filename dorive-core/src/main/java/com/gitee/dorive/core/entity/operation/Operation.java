@@ -23,38 +23,34 @@ import lombok.Data;
 @Data
 public class Operation {
 
+    public static final int UNKNOWN = 0;
+    public static final int INCLUDE_ROOT = 1;
+    public static final int IGNORE_ROOT = 2;
+
     private int type;
-    private int realType;
     private Object entity;
+    private int rootType;
 
     public Operation(int type, Object entity) {
         this.type = type;
-        this.realType = type;
         this.entity = entity;
-    }
-
-    public boolean isIncludeRoot() {
-        return (type & OperationType.INCLUDE_ROOT) != 0;
-    }
-
-    public boolean isIgnoreRoot() {
-        return (type & OperationType.IGNORE_ROOT) != 0;
+        this.rootType = UNKNOWN;
     }
 
     public boolean isInsertContext() {
-        return (realType & OperationType.INSERT) != 0;
-    }
-
-    public int includeRoot() {
-        return realType | OperationType.INCLUDE_ROOT;
-    }
-
-    public int ignoreRoot() {
-        return realType | OperationType.IGNORE_ROOT;
+        return (type & OperationType.INSERT) != 0;
     }
 
     public boolean isForceInsert() {
-        return realType == OperationType.FORCE_INSERT;
+        return type == OperationType.FORCE_INSERT;
+    }
+
+    public boolean isIncludeRoot() {
+        return rootType == 1;
+    }
+
+    public boolean isIgnoreRoot() {
+        return rootType == 2;
     }
 
 }

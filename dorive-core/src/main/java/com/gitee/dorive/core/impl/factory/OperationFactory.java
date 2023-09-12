@@ -90,17 +90,17 @@ public class OperationFactory {
     }
 
     public Operation rebuild(Operation operation, Object entity) {
-        int realType = operation.getRealType();
-        if (realType == OperationType.INSERT) {
+        int type = operation.getType();
+        if (type == OperationType.INSERT) {
             return buildInsert(entity);
 
-        } else if (realType == OperationType.UPDATE) {
+        } else if (type == OperationType.UPDATE) {
             return buildUpdate(entity);
 
-        } else if (realType == OperationType.INSERT_OR_UPDATE) {
+        } else if (type == OperationType.INSERT_OR_UPDATE) {
             return new Operation(OperationType.INSERT_OR_UPDATE, entity);
 
-        } else if (realType == OperationType.DELETE) {
+        } else if (type == OperationType.DELETE) {
             return buildDelete(entity);
         }
         return null;
