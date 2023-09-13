@@ -43,12 +43,16 @@ public abstract class EntityEle {
     public EntityEle(AnnotatedElement element) {
         this.element = element;
         this.entityDef = EntityDef.fromElement(element);
-        this.aggregated = (entityDef != null && entityDef.isAggregated()) || element.isAnnotationPresent(Aggregate.class);
+        this.aggregated = (entityDef != null && entityDef.hasRepository()) || isAggregateDef();
         this.bindingDefs = BindingDef.fromElement(element);
     }
 
     public boolean isEntityDef() {
         return entityDef != null;
+    }
+
+    public boolean isAggregateDef() {
+        return element.isAnnotationPresent(Aggregate.class);
     }
 
     public void initialize() {
