@@ -51,10 +51,6 @@ public abstract class EntityEle {
         return entityDef != null;
     }
 
-    public boolean isAggregated() {
-        return aggregated;
-    }
-
     public void initialize() {
         if (entityDef != null && pkProxy == null) {
             doInitialize();
