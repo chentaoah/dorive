@@ -127,7 +127,7 @@ public class DefaultExecutor extends AbstractExecutor implements EntityHandler {
                     }
                     if (isAggregated) {
                         OperationFactory operationFactory = repository.getOperationFactory();
-                        Operation newOperation = operationFactory.rebuild(operation, entity);
+                        Operation newOperation = operationFactory.renew(operation, entity);
                         if (newOperation != null) {
                             newOperation.setRootType(operable ? Operation.INCLUDE_ROOT : Operation.IGNORE_ROOT);
                             totalCount += repository.execute(context, newOperation);

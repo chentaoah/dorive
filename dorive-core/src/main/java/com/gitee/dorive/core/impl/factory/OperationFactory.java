@@ -89,7 +89,7 @@ public class OperationFactory {
         return delete;
     }
 
-    public Operation rebuild(Operation operation, Object entity) {
+    public Operation renew(Operation operation, Object entity) {
         int type = operation.getType();
         if (type == OperationType.INSERT) {
             return buildInsert(entity);
@@ -102,6 +102,9 @@ public class OperationFactory {
 
         } else if (type == OperationType.DELETE) {
             return buildDelete(entity);
+
+        } else if (type == OperationType.FORCE_INSERT) {
+            return new Insert(OperationType.FORCE_INSERT, entity);
         }
         return null;
     }
