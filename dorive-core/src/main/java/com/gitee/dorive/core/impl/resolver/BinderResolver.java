@@ -80,8 +80,9 @@ public class BinderResolver {
 
         for (BindingDef bindingDef : bindingDefs) {
             bindingDef = renewBindingDef(accessPath, bindingDef);
-
             String field = bindingDef.getField();
+            String bindExp = bindingDef.getBindExp();
+
             String alias = entityEle.toAlias(field);
 
             PropChain fieldPropChain = propChainMap.get("/" + field);
@@ -91,7 +92,7 @@ public class BinderResolver {
 
             BindingProcessor bindingProcessor = newBindingProcessor(bindingDef);
 
-            if (bindingDef.getBindExp().startsWith("/")) {
+            if (bindExp.startsWith("/")) {
                 PropertyBinder propertyBinder = newPropertyBinder(bindingDef, alias, fieldPropChain, bindingProcessor);
                 allBinders.add(propertyBinder);
                 propertyBinders.add(propertyBinder);
@@ -177,7 +178,8 @@ public class BinderResolver {
         Assert.notNull(belongRepository, "The belong repository cannot be null! bindExp: {}", bindExp);
         belongRepository.setBoundEntity(true);
 
-        Map<String, PropChain> propChainMap = repository.getPropChainResolver().getPropChainMap();
+        PropChainResolver propChainResolver = repository.getPropChainResolver();
+        Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
         PropChain boundPropChain = propChainMap.get(bindExp);
         Assert.notNull(boundPropChain, "The bound property chain cannot be null! bindExp: {}", bindExp);
         boundPropChain.newPropProxy();
