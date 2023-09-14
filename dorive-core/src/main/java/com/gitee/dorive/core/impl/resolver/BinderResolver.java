@@ -101,7 +101,7 @@ public class BinderResolver {
                 List<PropertyBinder> propertyBinders = mergedBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
                 propertyBinders.add(propertyBinder);
 
-                selfFields.add(bindingDef.getField());
+                selfFields.add(field);
 
                 if (propertyBinder.isSameType()) {
                     if (!"id".equals(field)) {
