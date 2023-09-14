@@ -17,11 +17,15 @@
 
 package com.gitee.dorive.core.entity.executor;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class InnerExample extends Example {
 
     public InnerExample(List<Criterion> criteria) {
