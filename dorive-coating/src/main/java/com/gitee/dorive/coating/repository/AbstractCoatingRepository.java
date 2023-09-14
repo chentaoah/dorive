@@ -78,7 +78,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     @Override
     public List<E> selectByCoating(Context context, Object coating) {
         BuildExample buildExample = buildExample(context, coating);
-        if (buildExample.isEmptyQuery()) {
+        if (buildExample.isAbandoned()) {
             return Collections.emptyList();
         }
         if (buildExample.isCountQueried()) {
@@ -91,7 +91,7 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByCoating(Context context, Object coating) {
         BuildExample buildExample = buildExample(context, coating);
-        if (buildExample.isEmptyQuery()) {
+        if (buildExample.isAbandoned()) {
             return (Page<E>) buildExample.getPage();
         }
         if (buildExample.isCountQueried()) {

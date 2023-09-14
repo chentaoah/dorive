@@ -17,7 +17,16 @@
 
 package com.gitee.dorive.core.entity.executor;
 
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@NoArgsConstructor
 public class InnerExample extends Example {
+
+    public InnerExample(List<Criterion> criteria) {
+        super(criteria);
+    }
 
     @Override
     public Example tryClone() {

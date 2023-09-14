@@ -82,7 +82,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
             page.setTotal(count);
             buildExample.setCountQueried(true);
             if (count == 0) {
-                buildExample.setEmptyQuery(true);
+                buildExample.setAbandoned(true);
                 return buildExample;
             }
         }
@@ -105,7 +105,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
         if (!primaryKeys.isEmpty()) {
             buildExample.eq("id", primaryKeys);
         } else {
-            buildExample.setEmptyQuery(true);
+            buildExample.setAbandoned(true);
         }
 
         return buildExample;

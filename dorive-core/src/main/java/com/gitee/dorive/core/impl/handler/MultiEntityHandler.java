@@ -53,7 +53,7 @@ public class MultiEntityHandler implements EntityHandler {
     public long handle(Context context, List<Object> entities) {
         Map<String, Object> entityIndex = new LinkedHashMap<>(entities.size() * 4 / 3 + 1);
         Example example = newExample(context, entities, entityIndex);
-        if (example.isDirtyQuery()) {
+        if (example.isNotEmpty()) {
             OperationFactory operationFactory = repository.getOperationFactory();
             Query query = operationFactory.buildQueryByExample(example);
             query.setRootType(Operation.INCLUDE_ROOT);
@@ -93,7 +93,7 @@ public class MultiEntityHandler implements EntityHandler {
             }
         }
 
-        if (example.isDirtyQuery()) {
+        if (example.isNotEmpty()) {
             for (ContextBinder binder : binderResolver.getContextBinders()) {
                 String fieldName = binder.getFieldName();
                 Object boundValue = binder.getBoundValue(context, null);

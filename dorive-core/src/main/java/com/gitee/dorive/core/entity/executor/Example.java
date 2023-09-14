@@ -61,7 +61,11 @@ public class Example {
         selectExtra(StringUtils.toList(properties));
     }
 
-    public boolean isDirtyQuery() {
+    public boolean isEmpty() {
+        return criteria.isEmpty();
+    }
+
+    public boolean isNotEmpty() {
         return !criteria.isEmpty();
     }
 

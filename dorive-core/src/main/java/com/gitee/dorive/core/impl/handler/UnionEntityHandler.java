@@ -50,7 +50,7 @@ public class UnionEntityHandler implements EntityHandler {
     @Override
     public long handle(Context context, List<Object> entities) {
         Example example = newExample(context, entities);
-        if (example.isDirtyQuery()) {
+        if (example.isNotEmpty()) {
             OperationFactory operationFactory = repository.getOperationFactory();
             Query query = operationFactory.buildQueryByExample(example);
             query.setRootType(Operation.INCLUDE_ROOT);
@@ -72,7 +72,7 @@ public class UnionEntityHandler implements EntityHandler {
             Object lastEntity = lastPropChain == null ? entity : lastPropChain.getValue(entity);
             if (lastEntity != null) {
                 Example example = newExample(context, entity);
-                if (example.isDirtyQuery()) {
+                if (example.isNotEmpty()) {
                     example.selectExtra((index + 1) + " as $row");
                     unionExample.addExample(example);
                 }
@@ -98,7 +98,7 @@ public class UnionEntityHandler implements EntityHandler {
                 break;
             }
         }
-        if (example.isDirtyQuery()) {
+        if (example.isNotEmpty()) {
             for (ContextBinder binder : binderResolver.getContextBinders()) {
                 String fieldName = binder.getFieldName();
                 Object boundValue = binder.getBoundValue(context, entity);

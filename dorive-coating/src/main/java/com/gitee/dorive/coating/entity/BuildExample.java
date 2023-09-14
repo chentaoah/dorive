@@ -18,7 +18,7 @@
 package com.gitee.dorive.coating.entity;
 
 import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.InnerExample;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -28,9 +28,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class BuildExample extends Example {
+public class BuildExample extends InnerExample {
 
-    private boolean emptyQuery = false;
+    private boolean abandoned = false;
     private boolean countQueried = false;
 
     public BuildExample(List<Criterion> criteria) {
@@ -38,7 +38,7 @@ public class BuildExample extends Example {
     }
 
     public boolean isQueryAll() {
-        return !emptyQuery && !isDirtyQuery();
+        return !abandoned && isEmpty();
     }
 
 }

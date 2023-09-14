@@ -95,8 +95,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                 RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
                 if (targetRepoExample != null) {
                     BuildExample targetExample = targetRepoExample.getBuildExample();
-                    if (targetExample.isEmptyQuery()) {
-                        buildExample.setEmptyQuery(true);
+                    if (targetExample.isAbandoned()) {
+                        buildExample.setAbandoned(true);
                         break;
                     }
                 }
@@ -107,8 +107,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             }
 
             List<Object> entities = Collections.emptyList();
-            if (!buildExample.isEmptyQuery() && buildExample.isDirtyQuery()) {
-                buildExample.select(binderResolver.getSelfFields());
+            if (!buildExample.isAbandoned() && buildExample.isNotEmpty()) {
+                buildExample.select(new ArrayList<>(binderResolver.getSelfFields()));
                 entities = executedRepository.selectByExample(context, buildExample);
             }
 
@@ -119,7 +119,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                 if (targetRepoExample != null) {
                     BuildExample targetExample = targetRepoExample.getBuildExample();
                     if (entities.isEmpty()) {
-                        targetExample.setEmptyQuery(true);
+                        targetExample.setAbandoned(true);
                         return;
                     }
                     if (binders.size() == 1) {
@@ -133,7 +133,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                                 targetExample.in(boundName, fieldValues);
                             }
                         } else {
-                            targetExample.setEmptyQuery(true);
+                            targetExample.setAbandoned(true);
                         }
 
                     } else {
@@ -143,7 +143,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                         if (!builder.isEmpty()) {
                             targetExample.getCriteria().add(builder.build());
                         } else {
-                            targetExample.setEmptyQuery(true);
+                            targetExample.setAbandoned(true);
                         }
                     }
                 }
