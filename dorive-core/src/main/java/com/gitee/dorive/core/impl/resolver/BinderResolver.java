@@ -162,7 +162,7 @@ public class BinderResolver {
             defaultProcessor.setBindingDef(bindingDef);
         }
         if (bindingProcessor instanceof PropertyBindingProcessor) {
-            Assert.notBlank(bindingDef.getProperty(), "The property of PropertyProcessor cannot be blank!");
+            Assert.notBlank(bindingDef.getProperty(), "The property of PropertyBindingProcessor cannot be blank!");
         }
         return bindingProcessor;
     }
