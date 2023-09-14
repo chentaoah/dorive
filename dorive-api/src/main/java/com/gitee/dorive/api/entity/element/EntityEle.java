@@ -43,7 +43,7 @@ public abstract class EntityEle {
     public EntityEle(AnnotatedElement element) {
         this.element = element;
         this.entityDef = EntityDef.fromElement(element);
-        this.aggregated = (entityDef != null && entityDef.hasRepository()) || isAggregateDef();
+        this.aggregated = (entityDef != null && entityDef.isRepositoryDef()) || isAggregateDef();
         this.bindingDefs = BindingDef.fromElement(element);
     }
 
