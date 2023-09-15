@@ -108,7 +108,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
             List<Object> entities = Collections.emptyList();
             if (!buildExample.isAbandoned() && buildExample.isNotEmpty()) {
-                buildExample.select(new ArrayList<>(binderResolver.getSelfFields()));
+                buildExample.select(binderResolver.getSelfFields());
                 entities = executedRepository.selectByExample(context, buildExample);
             }
 
