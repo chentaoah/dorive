@@ -31,17 +31,15 @@ import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.resolver.DerivedResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-@Getter
-@Setter
-@ToString
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class DefaultExecutor extends AbstractExecutor implements EntityHandler {
 
     private final AbstractContextRepository<?, ?> repository;
