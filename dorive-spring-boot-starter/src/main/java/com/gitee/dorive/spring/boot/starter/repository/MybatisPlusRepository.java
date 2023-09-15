@@ -40,7 +40,7 @@ import com.gitee.dorive.spring.boot.starter.api.Keys;
 import com.gitee.dorive.spring.boot.starter.impl.CountQuerier;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
 import com.gitee.dorive.spring.boot.starter.impl.executor.FactoryExecutor;
-import com.gitee.dorive.spring.boot.starter.impl.executor.FieldExecutor;
+import com.gitee.dorive.core.impl.executor.FieldExecutor;
 import com.gitee.dorive.spring.boot.starter.impl.executor.MybatisPlusExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

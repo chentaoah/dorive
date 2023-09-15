@@ -37,7 +37,7 @@ import com.gitee.dorive.spring.boot.starter.entity.OnSegment;
 import com.gitee.dorive.spring.boot.starter.entity.Segment;
 import com.gitee.dorive.spring.boot.starter.entity.SegmentResult;
 import com.gitee.dorive.spring.boot.starter.entity.SelectSegment;
-import com.gitee.dorive.spring.boot.starter.impl.executor.FieldExecutor;
+import com.gitee.dorive.core.impl.executor.FieldExecutor;
 import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;

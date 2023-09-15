@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.impl.executor;
+package com.gitee.dorive.core.impl.executor;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
@@ -25,7 +25,6 @@ import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.impl.executor.AbstractProxyExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
