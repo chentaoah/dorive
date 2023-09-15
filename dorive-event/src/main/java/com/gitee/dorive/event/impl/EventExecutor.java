@@ -20,38 +20,29 @@ package com.gitee.dorive.event.impl;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.impl.executor.AbstractExecutor;
+import com.gitee.dorive.core.impl.executor.AbstractProxyExecutor;
 import com.gitee.dorive.event.entity.ExecutorEvent;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.context.ApplicationContext;
 
 @Data
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class EventExecutor extends AbstractExecutor {
+public class EventExecutor extends AbstractProxyExecutor {
 
     private ApplicationContext applicationContext;
     private EntityEle entityEle;
-    private Executor executor;
 
-    @Override
-    public Result<Object> executeQuery(Context context, Query query) {
-        return executor.executeQuery(context, query);
-    }
-
-    @Override
-    public long executeCount(Context context, Query query) {
-        return executor.executeCount(context, query);
+    public EventExecutor(Executor executor, ApplicationContext applicationContext, EntityEle entityEle) {
+        super(executor);
+        this.applicationContext = applicationContext;
+        this.entityEle = entityEle;
     }
 
     @Override
     public int execute(Context context, Operation operation) {
-        int count = executor.execute(context, operation);
+        int count = super.execute(context, operation);
         if (count != 0) {
             ExecutorEvent executorEvent = new ExecutorEvent(this);
             executorEvent.setContext(context);

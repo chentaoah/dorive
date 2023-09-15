@@ -49,7 +49,7 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
                 DefaultRepository defaultRepository = (DefaultRepository) actualRepository;
                 EntityEle entityEle = defaultRepository.getEntityEle();
                 Executor executor = defaultRepository.getExecutor();
-                executor = new EventExecutor(getApplicationContext(), entityEle, executor);
+                executor = new EventExecutor(executor, getApplicationContext(), entityEle);
                 defaultRepository.setExecutor(executor);
             }
         }
