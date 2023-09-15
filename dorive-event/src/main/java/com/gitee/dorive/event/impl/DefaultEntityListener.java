@@ -15,19 +15,29 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.api;
+package com.gitee.dorive.event.impl;
 
-import com.gitee.dorive.event.annotation.Listener;
+import com.gitee.dorive.api.util.ReflectUtils;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.event.api.EntityListener;
 import com.gitee.dorive.event.entity.ExecutorEvent;
-import org.springframework.core.annotation.AnnotationUtils;
 
-public interface EntityListener {
+public abstract class DefaultEntityListener<E> implements EntityListener {
 
-    default Class<?> subscribe() {
-        Listener listener = AnnotationUtils.getAnnotation(this.getClass(), Listener.class);
-        return listener != null ? listener.value() : null;
+    @Override
+    public Class<?> subscribe() {
+        return ReflectUtils.getFirstArgumentType(this.getClass());
     }
 
-    void onApplicationEvent(ExecutorEvent executorEvent);
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onApplicationEvent(ExecutorEvent executorEvent) {
+        Context context = executorEvent.getContext();
+        Operation operation = executorEvent.getOperation();
+        onExecution(context, operation.getType(), (E) operation.getEntity());
+    }
+
+    protected abstract void onExecution(Context context, int type, E entity);
 
 }
