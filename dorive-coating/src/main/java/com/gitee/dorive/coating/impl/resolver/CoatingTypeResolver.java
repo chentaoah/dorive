@@ -73,10 +73,9 @@ public class CoatingTypeResolver {
             }
             for (Class<?> coatingClass : classes) {
                 String simpleName = coatingClass.getSimpleName();
-                if (!pattern.matcher(simpleName).matches()) {
-                    continue;
+                if (pattern.matcher(simpleName).matches()) {
+                    resolveCoatingClass(coatingClass);
                 }
-                resolveCoatingClass(coatingClass);
             }
         }
         for (Class<?> coatingClass : queries) {
