@@ -36,7 +36,9 @@ import java.util.Map;
 public class MergedRepositoryResolver {
 
     private AbstractContextRepository<?, ?> repository;
+    // absoluteAccessPath ==> MergedRepository
     private Map<String, MergedRepository> mergedRepositoryMap = new LinkedHashMap<>();
+    // name ==> MergedRepository
     private Map<String, MergedRepository> nameMergedRepositoryMap = new LinkedHashMap<>();
 
     public MergedRepositoryResolver(AbstractContextRepository<?, ?> repository) {
@@ -101,15 +103,6 @@ public class MergedRepositoryResolver {
         }
     }
 
-    private void addMergedRepository(MergedRepository mergedRepository) {
-        String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-        String name = mergedRepository.getName();
-        mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
-        if (StringUtils.isNotBlank(name)) {
-            nameMergedRepositoryMap.putIfAbsent(name, mergedRepository);
-        }
-    }
-
     private Map<String, List<PropertyBinder>> getMergedBindersMap(String lastAccessPath, CommonRepository repository) {
         BinderResolver binderResolver = repository.getBinderResolver();
         List<PropertyBinder> propertyBinders = binderResolver.getPropertyBinders();
@@ -120,6 +113,15 @@ public class MergedRepositoryResolver {
             existPropertyBinders.add(propertyBinder);
         }
         return mergedBindersMap;
+    }
+
+    private void addMergedRepository(MergedRepository mergedRepository) {
+        String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
+        String name = mergedRepository.getName();
+        mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
+        if (StringUtils.isNotBlank(name)) {
+            nameMergedRepositoryMap.putIfAbsent(name, mergedRepository);
+        }
     }
 
 }
