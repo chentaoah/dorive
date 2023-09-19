@@ -19,11 +19,11 @@ package com.gitee.dorive.coating.repository;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.annotation.Repository;
-import com.gitee.dorive.coating.annotation.CoatingScan;
 import com.gitee.dorive.coating.api.CoatingRepository;
 import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.entity.BuildExample;
 import com.gitee.dorive.coating.entity.CoatingType;
+import com.gitee.dorive.coating.entity.def.CoatingScanDef;
 import com.gitee.dorive.coating.impl.DefaultExampleBuilder;
 import com.gitee.dorive.coating.impl.resolver.CoatingTypeResolver;
 import com.gitee.dorive.coating.impl.resolver.MergedRepositoryResolver;
@@ -43,8 +43,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> implements ExampleBuilder, CoatingRepository<E, PK> {
 
-    private String[] scanPackages;
-    private String regex;
+    private CoatingScanDef coatingScanDef;
     private MergedRepositoryResolver mergedRepositoryResolver;
     private CoatingTypeResolver coatingTypeResolver;
     private ExampleBuilder exampleBuilder;
@@ -53,13 +52,14 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
         Repository repository = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), Repository.class);
-        CoatingScan coatingScan = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), CoatingScan.class);
-        if (repository != null && coatingScan != null) {
-            this.scanPackages = coatingScan.value();
-            this.regex = StringUtils.isBlank(coatingScan.regex()) ? "^" + getEntityClass().getSimpleName() + ".*" : coatingScan.regex();
-            this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
-            this.coatingTypeResolver = new CoatingTypeResolver(this);
-            this.exampleBuilder = new DefaultExampleBuilder(this);
+        coatingScanDef = CoatingScanDef.fromElement(this.getClass());
+        if (repository != null && coatingScanDef != null) {
+            if (StringUtils.isBlank(coatingScanDef.getRegex())) {
+                coatingScanDef.setRegex("^" + getEntityClass().getSimpleName() + ".*");
+            }
+            mergedRepositoryResolver = new MergedRepositoryResolver(this);
+            coatingTypeResolver = new CoatingTypeResolver(this);
+            exampleBuilder = new DefaultExampleBuilder(this);
         }
     }
 

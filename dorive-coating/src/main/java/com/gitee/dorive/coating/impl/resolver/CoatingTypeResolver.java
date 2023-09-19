@@ -24,13 +24,13 @@ import com.gitee.dorive.coating.entity.CoatingField;
 import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.entity.MergedRepository;
 import com.gitee.dorive.coating.entity.SpecificFields;
-import com.gitee.dorive.coating.entity.def.ExampleDef;
+import com.gitee.dorive.coating.entity.def.CoatingScanDef;
 import com.gitee.dorive.coating.entity.def.CriterionDef;
+import com.gitee.dorive.coating.entity.def.ExampleDef;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.coating.util.ResourceUtils;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.util.ArrayList;
@@ -58,8 +58,11 @@ public class CoatingTypeResolver {
     }
 
     public void resolve() throws Exception {
-        String[] scanPackages = repository.getScanPackages();
-        String regex = repository.getRegex();
+        CoatingScanDef coatingScanDef = repository.getCoatingScanDef();
+        String[] scanPackages = coatingScanDef.getValue();
+        String regex = coatingScanDef.getRegex();
+        Class<?>[] queries = coatingScanDef.getQueries();
+
         Pattern pattern = Pattern.compile(regex);
 
         for (String scanPackage : scanPackages) {
@@ -68,41 +71,46 @@ public class CoatingTypeResolver {
                 classes = ResourceUtils.resolveClasses(scanPackage);
                 scannedClasses.put(scanPackage, classes);
             }
-
             for (Class<?> coatingClass : classes) {
-                Example exampleAnnotation = AnnotationUtils.getAnnotation(coatingClass, Example.class);
-                if (exampleAnnotation == null) {
-                    continue;
-                }
                 String simpleName = coatingClass.getSimpleName();
                 if (!pattern.matcher(simpleName).matches()) {
                     continue;
                 }
-
-                ExampleDef exampleDef = ExampleDef.fromElement(coatingClass);
-                List<CoatingField> coatingFields = new ArrayList<>();
-                SpecificFields specificFields = new SpecificFields();
-
-                ReflectionUtils.doWithLocalFields(coatingClass, declaredField -> {
-                    CoatingField coatingField = new CoatingField(declaredField);
-                    if (coatingField.isIgnore()) {
-                        return;
-                    }
-                    if (specificFields.addProperty(coatingField)) {
-                        return;
-                    }
-                    coatingFields.add(coatingField);
-                });
-
-                List<MergedRepository> mergedRepositories = matchMergedRepositories(coatingFields);
-                List<MergedRepository> reversedMergedRepositories = new ArrayList<>(mergedRepositories);
-                Collections.reverse(reversedMergedRepositories);
-
-                CoatingType coatingType = new CoatingType(exampleDef, coatingFields, specificFields, mergedRepositories, reversedMergedRepositories);
-                classCoatingTypeMap.put(coatingClass, coatingType);
-                nameCoatingTypeMap.put(coatingClass.getName(), coatingType);
+                resolveCoatingClass(coatingClass);
             }
         }
+        for (Class<?> coatingClass : queries) {
+            resolveCoatingClass(coatingClass);
+        }
+    }
+
+    private void resolveCoatingClass(Class<?> coatingClass) {
+        if (!coatingClass.isAnnotationPresent(Example.class)) {
+            return;
+        }
+
+        ExampleDef exampleDef = ExampleDef.fromElement(coatingClass);
+        List<CoatingField> coatingFields = new ArrayList<>();
+        SpecificFields specificFields = new SpecificFields();
+
+        ReflectionUtils.doWithLocalFields(coatingClass, declaredField -> {
+            CoatingField coatingField = new CoatingField(declaredField);
+            if (coatingField.isIgnore()) {
+                return;
+            }
+            if (specificFields.addProperty(coatingField)) {
+                return;
+            }
+            coatingFields.add(coatingField);
+        });
+
+        List<MergedRepository> mergedRepositories = matchMergedRepositories(coatingFields);
+        List<MergedRepository> reversedMergedRepositories = new ArrayList<>(mergedRepositories);
+        Collections.reverse(reversedMergedRepositories);
+
+        CoatingType coatingType = new CoatingType(exampleDef, coatingFields, specificFields, mergedRepositories, reversedMergedRepositories);
+        classCoatingTypeMap.put(coatingClass, coatingType);
+        nameCoatingTypeMap.put(coatingClass.getName(), coatingType);
     }
 
     private List<MergedRepository> matchMergedRepositories(List<CoatingField> coatingFields) {
