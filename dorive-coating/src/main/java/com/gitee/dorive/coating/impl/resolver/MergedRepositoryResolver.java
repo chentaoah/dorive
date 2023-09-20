@@ -103,8 +103,8 @@ public class MergedRepositoryResolver {
 
     private void addMergedRepository(MergedRepository mergedRepository) {
         String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-        String name = mergedRepository.getName();
         mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
+        String name = mergedRepository.getName();
         if (StringUtils.isNotBlank(name)) {
             nameMergedRepositoryMap.putIfAbsent(name, mergedRepository);
         }
