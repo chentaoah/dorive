@@ -28,6 +28,7 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,62 +44,47 @@ public class MergedRepositoryResolver {
 
     public MergedRepositoryResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
-        resolve();
+        resolve(new ArrayList<>(), false, repository);
     }
 
-    public void resolve() {
-        CommonRepository rootRepository = repository.getRootRepository();
-        MergedRepository mergedRepository = new MergedRepository(
-                "",
-                "/",
-                false,
-                "/",
-                rootRepository,
-                getMergedBindersMap("", rootRepository),
-                rootRepository,
-                1);
-        addMergedRepository(mergedRepository);
-        resolve(new ArrayList<>(), repository);
-    }
-
-    private void resolve(List<String> multiAccessPath, AbstractContextRepository<?, ?> lastRepository) {
+    private void resolve(List<String> multiAccessPath, boolean ignoreRoot, AbstractContextRepository<?, ?> contextRepository) {
         String lastAccessPath = StrUtil.join("", multiAccessPath);
 
-        for (CommonRepository repository : lastRepository.getSubRepositories()) {
+        Collection<CommonRepository> repositories = contextRepository.getRepositoryMap().values();
+        for (CommonRepository repository : repositories) {
             String accessPath = repository.getAccessPath();
+            boolean isRoot = repository.isRoot();
+            if (ignoreRoot && isRoot) {
+                continue;
+            }
+
             String absoluteAccessPath = lastAccessPath + accessPath;
+            String relativeAccessPath = absoluteAccessPath;
+            CommonRepository executedRepository = repository;
+
             AbstractRepository<Object, Object> abstractRepository = repository.getProxyRepository();
-
+            AbstractContextRepository<?, ?> abstractContextRepository = null;
             if (abstractRepository instanceof AbstractContextRepository) {
-                AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) abstractRepository;
-                CommonRepository rootRepository = abstractContextRepository.getRootRepository();
+                abstractContextRepository = (AbstractContextRepository<?, ?>) abstractRepository;
+                relativeAccessPath = relativeAccessPath + "/";
+                executedRepository = abstractContextRepository.getRootRepository();
+            }
 
-                MergedRepository mergedRepository = new MergedRepository(
-                        lastAccessPath,
-                        absoluteAccessPath,
-                        true,
-                        absoluteAccessPath + "/",
-                        repository,
-                        getMergedBindersMap(lastAccessPath, repository),
-                        rootRepository,
-                        mergedRepositoryMap.size() + 1);
-                addMergedRepository(mergedRepository);
+            MergedRepository mergedRepository = new MergedRepository(
+                    lastAccessPath,
+                    absoluteAccessPath,
+                    repository,
+                    getMergedBindersMap(lastAccessPath, repository),
+                    abstractContextRepository != null,
+                    relativeAccessPath,
+                    executedRepository,
+                    mergedRepositoryMap.size() + 1);
+            addMergedRepository(mergedRepository);
 
+            if (abstractContextRepository != null) {
                 List<String> newMultiAccessPath = new ArrayList<>(multiAccessPath);
                 newMultiAccessPath.add(accessPath);
-                resolve(newMultiAccessPath, abstractContextRepository);
-
-            } else {
-                MergedRepository mergedRepository = new MergedRepository(
-                        lastAccessPath,
-                        absoluteAccessPath,
-                        false,
-                        absoluteAccessPath,
-                        repository,
-                        getMergedBindersMap(lastAccessPath, repository),
-                        repository,
-                        mergedRepositoryMap.size() + 1);
-                addMergedRepository(mergedRepository);
+                resolve(newMultiAccessPath, true, abstractContextRepository);
             }
         }
     }
