@@ -19,7 +19,6 @@ package com.gitee.dorive.coating.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.coating.annotation.Example;
 import com.gitee.dorive.coating.entity.CoatingField;
 import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.entity.MergedRepository;
@@ -84,11 +83,11 @@ public class CoatingTypeResolver {
     }
 
     private void resolveCoatingClass(Class<?> coatingClass) {
-        if (!coatingClass.isAnnotationPresent(Example.class)) {
+        ExampleDef exampleDef = ExampleDef.fromElement(coatingClass);
+        if (exampleDef == null) {
             return;
         }
 
-        ExampleDef exampleDef = ExampleDef.fromElement(coatingClass);
         List<CoatingField> coatingFields = new ArrayList<>();
         SpecificFields specificFields = new SpecificFields();
 
@@ -97,10 +96,9 @@ public class CoatingTypeResolver {
             if (coatingField.isIgnore()) {
                 return;
             }
-            if (specificFields.addProperty(coatingField)) {
-                return;
+            if (!specificFields.tryAddField(coatingField)) {
+                coatingFields.add(coatingField);
             }
-            coatingFields.add(coatingField);
         });
 
         List<MergedRepository> mergedRepositories = matchMergedRepositories(coatingFields);

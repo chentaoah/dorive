@@ -34,7 +34,7 @@ public class SpecificFields {
     private CoatingField pageField;
     private CoatingField limitField;
 
-    public boolean addProperty(CoatingField coatingField) {
+    public boolean tryAddField(CoatingField coatingField) {
         String fieldName = coatingField.getName();
         if ("sortBy".equals(fieldName)) {
             sortByField = coatingField;
