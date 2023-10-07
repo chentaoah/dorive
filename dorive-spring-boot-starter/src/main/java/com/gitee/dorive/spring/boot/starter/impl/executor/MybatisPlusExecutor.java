@@ -32,17 +32,8 @@ import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.executor.UnionExample;
-import com.gitee.dorive.core.entity.operation.Delete;
-import com.gitee.dorive.core.entity.operation.Insert;
-import com.gitee.dorive.core.entity.operation.NullableUpdate;
-import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.entity.operation.Update;
+import com.gitee.dorive.core.entity.executor.*;
+import com.gitee.dorive.core.entity.operation.*;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
 import com.gitee.dorive.spring.boot.starter.entity.QueryResult;
@@ -90,7 +81,17 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
         } else if (query.getExample() != null) {
             Example example = query.getExample();
-            if (query.withoutPage()) {
+            if (query.startPage()) {
+                com.gitee.dorive.core.entity.executor.Page<Object> page = example.getPage();
+
+                Page<Map<String, Object>> queryPage = new Page<>(page.getCurrent(), page.getSize());
+                QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
+                queryPage = baseMapper.selectMapsPage(queryPage, queryWrapper);
+
+                page.setTotal(queryPage.getTotal());
+                return new Result<>(new QueryResult(page, queryPage.getRecords()));
+
+            } else {
                 if (example instanceof UnionExample) {
                     UnionExample unionExample = (UnionExample) example;
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
@@ -102,13 +103,6 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
                     return new Result<>(new QueryResult(resultMaps));
                 }
-
-            } else {
-                com.gitee.dorive.core.entity.executor.Page<Object> page = example.getPage();
-                Page<Map<String, Object>> dataPage = new Page<>(page.getCurrent(), page.getSize());
-                QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
-                dataPage = baseMapper.selectMapsPage(dataPage, queryWrapper);
-                return new Result<>(new QueryResult(dataPage));
             }
         }
         return new Result<>(new QueryResult(Collections.emptyList()));

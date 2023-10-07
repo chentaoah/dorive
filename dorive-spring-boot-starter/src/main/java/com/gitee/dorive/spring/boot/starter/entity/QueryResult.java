@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.spring.boot.starter.entity;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gitee.dorive.core.entity.executor.Page;
 import lombok.Data;
 
 import java.util.List;
@@ -26,11 +26,12 @@ import java.util.Map;
 @Data
 public class QueryResult {
 
-    private Page<Map<String, Object>> page;
+    private Page<Object> page;
     private List<Map<String, Object>> resultMaps;
 
-    public QueryResult(Page<Map<String, Object>> page) {
+    public QueryResult(Page<Object> page, List<Map<String, Object>> resultMaps) {
         this.page = page;
+        this.resultMaps = resultMaps;
     }
 
     public QueryResult(List<Map<String, Object>> resultMaps) {

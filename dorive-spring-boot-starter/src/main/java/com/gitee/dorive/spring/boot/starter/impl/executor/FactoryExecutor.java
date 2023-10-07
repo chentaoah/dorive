@@ -18,15 +18,11 @@
 package com.gitee.dorive.spring.boot.starter.impl.executor;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.MultiResult;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.executor.UnionExample;
+import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.core.entity.operation.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
@@ -35,11 +31,7 @@ import com.gitee.dorive.spring.boot.starter.entity.QueryResult;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -57,30 +49,26 @@ public class FactoryExecutor extends AbstractProxyExecutor {
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Result<Object> result = super.executeQuery(context, query);
-        Example example = query.getExample();
         QueryResult queryResult = (QueryResult) result.getRecord();
-
+        Page<Object> page = queryResult.getPage();
         List<Map<String, Object>> resultMaps = queryResult.getResultMaps();
-        if (resultMaps != null) {
-            List<Object> entities;
+
+        List<Object> entities = Collections.emptyList();
+        if (resultMaps != null && !resultMaps.isEmpty()) {
+            Example example = query.getExample();
             if (example instanceof UnionExample) {
                 entities = reconstituteWithoutDuplicate(context, resultMaps);
             } else {
                 entities = reconstitute(context, resultMaps);
             }
-            return new MultiResult(resultMaps, entities);
         }
 
-        Page<Map<String, Object>> queryPage = queryResult.getPage();
-        if (queryPage != null) {
-            com.gitee.dorive.core.entity.executor.Page<Object> page = example.getPage();
-            page.setTotal(queryPage.getTotal());
-            List<Object> entities = reconstitute(context, queryPage.getRecords());
+        if (page != null) {
             page.setRecords(entities);
             return new Result<>(page);
         }
 
-        return new Result<>(Collections.emptyList());
+        return new MultiResult(resultMaps, entities);
     }
 
     private List<Object> reconstituteWithoutDuplicate(Context context, List<Map<String, Object>> resultMaps) {
