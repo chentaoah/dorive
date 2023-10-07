@@ -64,7 +64,6 @@ public class CoatingTypeResolver {
         Class<?>[] queries = coatingScanDef.getQueries();
 
         Pattern pattern = Pattern.compile(regex);
-
         for (String scanPackage : scanPackages) {
             List<Class<?>> classes = scannedClasses.get(scanPackage);
             if (classes == null) {
@@ -78,6 +77,7 @@ public class CoatingTypeResolver {
                 }
             }
         }
+
         for (Class<?> coatingClass : queries) {
             resolveCoatingClass(coatingClass);
         }
