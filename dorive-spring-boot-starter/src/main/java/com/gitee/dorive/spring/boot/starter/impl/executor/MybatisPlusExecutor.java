@@ -36,7 +36,6 @@ import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.core.entity.operation.*;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
-import com.gitee.dorive.spring.boot.starter.entity.QueryResult;
 import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -77,7 +76,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("id", query.getPrimaryKey());
             List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-            return new Result<>(new QueryResult(resultMaps));
+            return new MultiResult(resultMaps);
 
         } else if (query.getExample() != null) {
             Example example = query.getExample();
@@ -89,23 +88,23 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                 queryPage = baseMapper.selectMapsPage(queryPage, queryWrapper);
 
                 page.setTotal(queryPage.getTotal());
-                return new Result<>(new QueryResult(page, queryPage.getRecords()));
+                return new MultiResult(page, queryPage.getRecords());
 
             } else {
                 if (example instanceof UnionExample) {
                     UnionExample unionExample = (UnionExample) example;
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                    return new Result<>(new QueryResult(resultMaps));
+                    return new MultiResult(resultMaps);
 
                 } else {
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                    return new Result<>(new QueryResult(resultMaps));
+                    return new MultiResult(resultMaps);
                 }
             }
         }
-        return new Result<>(new QueryResult(Collections.emptyList()));
+        return new MultiResult(Collections.emptyList());
     }
 
     @Override

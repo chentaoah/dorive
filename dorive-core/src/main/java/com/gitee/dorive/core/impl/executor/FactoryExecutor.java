@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.impl.executor;
+package com.gitee.dorive.core.impl.executor;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.api.entity.element.EntityEle;
@@ -26,8 +26,6 @@ import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.core.entity.operation.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.impl.executor.AbstractProxyExecutor;
-import com.gitee.dorive.spring.boot.starter.entity.QueryResult;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -49,9 +47,9 @@ public class FactoryExecutor extends AbstractProxyExecutor {
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Result<Object> result = super.executeQuery(context, query);
-        QueryResult queryResult = (QueryResult) result.getRecord();
-        Page<Object> page = queryResult.getPage();
-        List<Map<String, Object>> resultMaps = queryResult.getResultMaps();
+        MultiResult multiResult = (MultiResult) result;
+        Page<Object> page = multiResult.getPage();
+        List<Map<String, Object>> resultMaps = multiResult.getResultMaps();
 
         List<Object> entities = Collections.emptyList();
         if (resultMaps != null && !resultMaps.isEmpty()) {
@@ -65,10 +63,11 @@ public class FactoryExecutor extends AbstractProxyExecutor {
 
         if (page != null) {
             page.setRecords(entities);
-            return new Result<>(page);
         }
-
-        return new MultiResult(resultMaps, entities);
+        multiResult.setRecords(entities);
+        multiResult.setRecord(!entities.isEmpty() ? entities.get(0) : null);
+        multiResult.setCount(entities.size());
+        return multiResult;
     }
 
     private List<Object> reconstituteWithoutDuplicate(Context context, List<Map<String, Object>> resultMaps) {
