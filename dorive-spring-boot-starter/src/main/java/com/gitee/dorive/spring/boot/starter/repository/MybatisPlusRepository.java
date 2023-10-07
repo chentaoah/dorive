@@ -149,8 +149,8 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     }
 
     private Map<String, String> newAliasFieldMapping(EntityEle entityEle) {
-        Map<String, String> propAliasMap = entityEle.getPropAliasMap();
-        return propAliasMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+        Map<String, String> fieldAliasMap = entityEle.getFieldAliasMap();
+        return fieldAliasMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
     }
 
     private Map<String, String> newFieldPropMapping(TableInfo tableInfo, Map<String, String> aliasFieldMapping) {

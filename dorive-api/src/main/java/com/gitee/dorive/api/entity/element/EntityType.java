@@ -105,7 +105,7 @@ public class EntityType extends EntityEle {
 
         Assert.notNull(pkProxy, "The primary key not found! type: {}", genericType.getName());
         setPkProxy(pkProxy);
-        setPropAliasMap(propAliasMap);
+        setFieldAliasMap(propAliasMap);
     }
 
     @Override

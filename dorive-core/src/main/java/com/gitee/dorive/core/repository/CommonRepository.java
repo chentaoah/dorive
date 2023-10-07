@@ -44,6 +44,19 @@ public class CommonRepository extends AbstractProxyRepository implements Node {
     private BinderResolver binderResolver;
     private boolean boundEntity;
 
+    public Object getPrimaryKey(Object entity) {
+        return getEntityEle().getPkProxy().getValue(entity);
+    }
+
+    public boolean hasField(String field) {
+        return getEntityEle().hasField(field);
+    }
+
+    @Override
+    public String getName() {
+        return getEntityDef().getName();
+    }
+
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Selector selector = context.getSelector();
@@ -67,15 +80,6 @@ public class CommonRepository extends AbstractProxyRepository implements Node {
             }
         }
         return super.executeQuery(context, query);
-    }
-
-    public Object getPrimaryKey(Object entity) {
-        return getEntityEle().getPkProxy().getValue(entity);
-    }
-
-    @Override
-    public String getName() {
-        return getEntityDef().getName();
     }
 
 }

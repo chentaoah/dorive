@@ -18,7 +18,6 @@
 package com.gitee.dorive.coating.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.coating.entity.CoatingField;
 import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.entity.MergedRepository;
@@ -120,6 +119,7 @@ public class CoatingTypeResolver {
         for (CoatingField coatingField : coatingFields) {
             CriterionDef criterionDef = coatingField.getCriterionDef();
             String belongTo = criterionDef.getBelongTo();
+            String field = criterionDef.getField();
 
             if (!belongTo.startsWith("/")) {
                 MergedRepository mergedRepository = nameMergedRepositoryMap.get(belongTo);
@@ -127,16 +127,13 @@ public class CoatingTypeResolver {
                 belongTo = mergedRepository.getAbsoluteAccessPath();
                 criterionDef.setBelongTo(belongTo);
             }
-
             MergedRepository mergedRepository = mergedRepositoryMap.get(belongTo);
             Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
 
-            String fieldName = criterionDef.getField();
             CommonRepository repository = mergedRepository.getExecutedRepository();
-            EntityEle entityEle = repository.getEntityEle();
-            Map<String, String> propAliasMap = entityEle.getPropAliasMap();
-            Assert.isTrue(propAliasMap.containsKey(fieldName), "The field does not exist within the entity! element: {}, field: {}",
-                    entityEle.getElement(), fieldName);
+            Assert.isTrue(repository.hasField(field),
+                    "The field of @Criterion does not exist in the entity! coating field: {}, entity: {}, field: {}",
+                    coatingField.getField(), repository.getEntityEle().getElement(), field);
 
             mergedRepositorySet.add(mergedRepository);
         }
