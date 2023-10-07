@@ -72,8 +72,8 @@ public abstract class EntityEle {
     public List<String> toAliases(List<String> fields) {
         if (fields != null && !fields.isEmpty()) {
             List<String> aliases = new ArrayList<>(fields.size());
-            for (String property : fields) {
-                String alias = toAlias(property);
+            for (String field : fields) {
+                String alias = toAlias(field);
                 aliases.add(alias);
             }
             return aliases;
