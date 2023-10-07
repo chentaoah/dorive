@@ -64,7 +64,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
 
     @Override
     public int deleteByPrimaryKey(Context context, PK primaryKey) {
-        Assert.notNull(primaryKey, "The primaryKey cannot be null!");
+        Assert.notNull(primaryKey, "The primary key cannot be null!");
         E entity = selectByPrimaryKey(context, primaryKey);
         return delete(context, entity);
     }
