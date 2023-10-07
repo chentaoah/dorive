@@ -75,8 +75,7 @@ public class CommonRepository extends AbstractProxyRepository implements Node {
         Example example = query.getExample();
         if (example != null) {
             if (example.getOrderBy() == null && defaultOrderBy != null) {
-                OrderBy orderBy = new OrderBy(defaultOrderBy.getProperties(), defaultOrderBy.getOrder());
-                example.setOrderBy(orderBy);
+                example.setOrderBy(defaultOrderBy.tryClone());
             }
         }
         return super.executeQuery(context, query);
