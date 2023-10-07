@@ -19,15 +19,15 @@ package com.gitee.dorive.event.repository;
 
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.repository.AbstractGenericRepository;
+import com.gitee.dorive.core.repository.AbstractExampleRepository;
+import com.gitee.dorive.core.repository.AbstractProxyRepository;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.core.repository.DefaultRepository;
-import com.gitee.dorive.core.repository.AbstractProxyRepository;
 import com.gitee.dorive.event.annotation.EnableEvent;
 import com.gitee.dorive.event.impl.EventExecutor;
 import org.springframework.core.annotation.AnnotationUtils;
 
-public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepository<E, PK> {
+public abstract class AbstractEventRepository<E, PK> extends AbstractExampleRepository<E, PK> {
 
     private boolean enableEvent;
 

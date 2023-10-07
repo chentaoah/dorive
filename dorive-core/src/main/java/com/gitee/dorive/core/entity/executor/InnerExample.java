@@ -32,9 +32,4 @@ public class InnerExample extends Example {
         super(criteria);
     }
 
-    @Override
-    public Example tryClone() {
-        return this;
-    }
-
 }

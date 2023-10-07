@@ -47,11 +47,7 @@ public abstract class AbstractExampleExecutor extends AbstractProxyExecutor {
             if (example instanceof UnionExample) {
                 convert(context, (UnionExample) example);
             } else {
-                Example newExample = example.tryClone();
-                convert(context, newExample);
-                if (example != newExample) {
-                    query.setExample(newExample);
-                }
+                convert(context, example);
             }
         }
         return super.executeQuery(context, query);
@@ -61,11 +57,7 @@ public abstract class AbstractExampleExecutor extends AbstractProxyExecutor {
     public long executeCount(Context context, Query query) {
         Example example = query.getExample();
         if (example != null) {
-            Example newExample = example.tryClone();
-            convert(context, newExample);
-            if (example != newExample) {
-                query.setExample(newExample);
-            }
+            convert(context, example);
         }
         return super.executeCount(context, query);
     }
@@ -76,11 +68,7 @@ public abstract class AbstractExampleExecutor extends AbstractProxyExecutor {
             Condition condition = (Condition) operation;
             Example example = condition.getExample();
             if (example != null) {
-                Example newExample = example.tryClone();
-                convert(context, newExample);
-                if (example != newExample) {
-                    condition.setExample(newExample);
-                }
+                convert(context, example);
             }
         }
         return super.execute(context, operation);
