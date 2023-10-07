@@ -25,7 +25,7 @@ import com.gitee.dorive.core.entity.executor.Page;
 
 import java.util.List;
 
-public interface SimpleRepository<E, PK> extends CoatingRepository<E, PK> {
+public interface SelectorRepository<E, PK> extends CoatingRepository<E, PK> {
 
     default E selectByPrimaryKey(Selector selector, PK primaryKey) {
         return selectByPrimaryKey(new InnerContext(selector), primaryKey);

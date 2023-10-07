@@ -19,10 +19,10 @@ package com.gitee.dorive.ref.repository;
 
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.ref.api.SimpleRepository;
+import com.gitee.dorive.ref.api.SelectorRepository;
 import com.gitee.dorive.ref.impl.RefInjector;
 
-public abstract class AbstractRefRepository<E, PK> extends AbstractCoatingRepository<E, PK> implements SimpleRepository<E, PK> {
+public abstract class AbstractRefRepository<E, PK> extends AbstractCoatingRepository<E, PK> implements SelectorRepository<E, PK> {
 
     @Override
     protected EntityHandler processEntityHandler(EntityHandler entityHandler) {
