@@ -237,8 +237,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return new DefaultExecutor(this, entityHandler);
     }
 
-    protected abstract ExecutorResult newExecutor(EntityDef entityDef, EntityEle entityEle,
-                                                  Map<String, FieldConverter> converterMap, Map<String, Object> attachments);
+    protected abstract ExecutorResult newExecutor(EntityDef entityDef, EntityEle entityEle, Map<String, FieldConverter> converterMap, Map<String, Object> attachments);
 
     protected abstract AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository);
 
