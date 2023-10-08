@@ -96,7 +96,6 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
         executor = new FactoryExecutor(executor, entityEle, entityFactory);
         executor = new FieldExecutor(executor, entityEle, converterMap);
         attachments.put(Keys.FIELD_EXECUTOR, executor);
-        executor = processExecutor(entityDef, entityEle, executor);
         return executor;
     }
 
@@ -181,10 +180,6 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
             propConverterMap.put(prop, fieldConverter);
         });
         return propConverterMap;
-    }
-
-    protected Executor processExecutor(EntityDef entityDef, EntityEle entityEle, Executor executor) {
-        return executor;
     }
 
     @Override
