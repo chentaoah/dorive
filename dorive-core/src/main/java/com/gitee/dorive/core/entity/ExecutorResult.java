@@ -15,10 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.api;
+package com.gitee.dorive.core.entity;
 
-public interface Keys {
-    String QUERIER = "QUERIER";
-    String TABLE_INFO = "TABLE_INFO";
-    String FIELD_EXECUTOR = "FIELD_EXECUTOR";
+import com.gitee.dorive.core.api.executor.EntityFactory;
+import com.gitee.dorive.core.api.executor.Executor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class ExecutorResult {
+    private EntityFactory entityFactory;
+    private Executor executor;
 }

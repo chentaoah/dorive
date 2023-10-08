@@ -30,7 +30,7 @@ import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.spring.boot.starter.api.Keys;
+import com.gitee.dorive.api.constant.Keys;
 import com.gitee.dorive.spring.boot.starter.entity.ArgSegment;
 import com.gitee.dorive.spring.boot.starter.entity.JoinSegment;
 import com.gitee.dorive.spring.boot.starter.entity.OnSegment;

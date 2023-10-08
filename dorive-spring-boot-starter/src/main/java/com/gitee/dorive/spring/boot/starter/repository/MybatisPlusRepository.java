@@ -18,29 +18,24 @@
 package com.gitee.dorive.spring.boot.starter.repository;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.gitee.dorive.api.constant.Keys;
 import com.gitee.dorive.api.entity.def.EntityDef;
-import com.gitee.dorive.api.entity.def.FieldDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.api.entity.element.EntityField;
 import com.gitee.dorive.coating.api.ExampleBuilder;
 import com.gitee.dorive.coating.entity.BuildExample;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.executor.FieldConverter;
 import com.gitee.dorive.core.api.executor.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.impl.converter.DefaultFieldConverter;
+import com.gitee.dorive.core.api.executor.FieldConverter;
+import com.gitee.dorive.core.entity.ExecutorResult;
 import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
-import com.gitee.dorive.spring.boot.starter.api.Keys;
 import com.gitee.dorive.spring.boot.starter.impl.CountQuerier;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
-import com.gitee.dorive.core.impl.executor.FactoryExecutor;
-import com.gitee.dorive.core.impl.executor.FieldExecutor;
 import com.gitee.dorive.spring.boot.starter.impl.executor.MybatisPlusExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -69,7 +64,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected Executor newExecutor(EntityDef entityDef, EntityEle entityEle, Map<String, Object> attachments) {
+    protected ExecutorResult newExecutor(EntityDef entityDef, EntityEle entityEle, Map<String, FieldConverter> converterMap, Map<String, Object> attachments) {
         Class<?> mapperClass = entityDef.getSource();
         Object mapper = null;
         Class<?> pojoClass = null;
@@ -85,43 +80,14 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
                 }
             }
         }
-        Assert.notNull(pojoClass, "The class of pojo cannot be null! source: {}", mapperClass);
 
+        Assert.notNull(pojoClass, "The class of pojo cannot be null! source: {}", mapperClass);
         TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
         attachments.put(Keys.TABLE_INFO, tableInfo);
-        Map<String, FieldConverter> converterMap = newConverterMap(entityEle);
+
         EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, pojoClass, tableInfo, converterMap);
-
         Executor executor = new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass);
-        executor = new FactoryExecutor(executor, entityEle, entityFactory);
-        executor = new FieldExecutor(executor, entityEle, converterMap);
-        attachments.put(Keys.FIELD_EXECUTOR, executor);
-        return executor;
-    }
-
-    private Map<String, FieldConverter> newConverterMap(EntityEle entityEle) {
-        Map<String, FieldConverter> converterMap = new LinkedHashMap<>(8);
-        Map<String, EntityField> entityFieldMap = entityEle.getEntityFieldMap();
-        if (entityFieldMap != null) {
-            entityFieldMap.forEach((name, entityField) -> {
-                FieldDef fieldDef = entityField.getFieldDef();
-                if (fieldDef != null) {
-                    Class<?> converterClass = fieldDef.getConverter();
-                    String mapExp = fieldDef.getMapExp();
-                    FieldConverter fieldConverter = null;
-                    if (converterClass != Object.class) {
-                        fieldConverter = (FieldConverter) ReflectUtil.newInstance(converterClass);
-
-                    } else if (StringUtils.isNotBlank(mapExp)) {
-                        fieldConverter = new DefaultFieldConverter(entityField);
-                    }
-                    if (fieldConverter != null) {
-                        converterMap.put(name, fieldConverter);
-                    }
-                }
-            });
-        }
-        return converterMap;
+        return new ExecutorResult(entityFactory, executor);
     }
 
     private EntityFactory newEntityFactory(EntityDef entityDef, EntityEle entityEle, Class<?> pojoClass, TableInfo tableInfo,
