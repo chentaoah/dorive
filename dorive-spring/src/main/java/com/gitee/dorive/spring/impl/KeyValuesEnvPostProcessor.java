@@ -41,14 +41,13 @@ public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Orde
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        Set<String> activeProfiles = new LinkedHashSet<>(Arrays.asList(environment.getActiveProfiles()));
         Properties properties = new Properties();
         Class<?> clazz = this.getClass();
         ReflectionUtils.doWithLocalFields(clazz, declaredField -> {
             if (Modifier.isStatic(declaredField.getModifiers())) {
                 return;
             }
-            Object value = determineValue(environment, activeProfiles, declaredField);
+            Object value = determineValue(environment, declaredField);
             if (value != null) {
                 ReflectUtil.setFieldValue(this, declaredField, value);
                 Key keyAnnotation = AnnotationUtils.getAnnotation(declaredField, Key.class);
@@ -66,12 +65,12 @@ public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Orde
         }
     }
 
-    private Object determineValue(ConfigurableEnvironment environment, Set<String> activeProfiles, Field declaredField) {
+    protected Object determineValue(ConfigurableEnvironment environment, Field declaredField) {
+        Set<String> activeProfiles = new LinkedHashSet<>(Arrays.asList(environment.getActiveProfiles()));
         Set<Value> valueAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(declaredField, Value.class);
         if (!valueAnnotations.isEmpty()) {
             for (Value valueAnnotation : valueAnnotations) {
-                String profile = valueAnnotation.profile();
-                if (StringUtils.isBlank(profile) || activeProfiles.contains(profile)) {
+                if (determineHandle(environment, activeProfiles, declaredField, valueAnnotation)) {
                     String valueStr = valueAnnotation.value();
                     if (StringUtils.isNotBlank(valueStr)) {
                         valueStr = environment.resolvePlaceholders(valueStr);
@@ -90,6 +89,11 @@ public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Orde
             }
         }
         return null;
+    }
+
+    protected boolean determineHandle(ConfigurableEnvironment environment, Set<String> activeProfiles, Field declaredField, Value valueAnnotation) {
+        String profile = valueAnnotation.profile();
+        return StringUtils.isBlank(profile) || activeProfiles.contains(profile);
     }
 
     @Override
