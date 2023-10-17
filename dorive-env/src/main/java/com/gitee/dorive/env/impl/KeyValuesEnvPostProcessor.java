@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.impl;
+package com.gitee.dorive.env.impl;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.spring.annotation.Key;
-import com.gitee.dorive.spring.annotation.Value;
+import com.gitee.dorive.env.annotation.Key;
+import com.gitee.dorive.env.annotation.Value;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;

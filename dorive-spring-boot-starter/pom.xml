@@ -17,6 +17,11 @@
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-env</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
             <artifactId>dorive-ref</artifactId>
             <version>${project.version}</version>
         </dependency>

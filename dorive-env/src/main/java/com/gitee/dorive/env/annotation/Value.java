@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.annotation;
+package com.gitee.dorive.env.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
