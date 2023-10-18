@@ -43,7 +43,7 @@ public class KeyValuesConfiguration extends KeyValuesEnvPostProcessor implements
         if (instance != null) {
             BeanUtil.copyProperties(instance, this);
         } else {
-            Class<?> targetClass = AopUtils.getTargetClass(this.getClass());
+            Class<?> targetClass = AopUtils.getTargetClass(this);
             ReflectionUtils.doWithLocalFields(targetClass, declaredField -> {
                 if (Modifier.isStatic(declaredField.getModifiers())) {
                     return;
