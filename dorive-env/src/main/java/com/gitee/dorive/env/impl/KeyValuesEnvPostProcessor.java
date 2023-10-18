@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.env.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.env.annotation.Key;
 import com.gitee.dorive.env.annotation.Value;
@@ -28,10 +27,10 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.util.ReflectionUtils;
 
-import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -41,7 +40,7 @@ import java.util.Set;
 
 public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Ordered {
 
-    private static KeyValuesEnvPostProcessor instance;
+    protected static KeyValuesEnvPostProcessor instance;
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
@@ -70,12 +69,12 @@ public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Orde
         instance = this;
     }
 
-    protected Object determineValue(ConfigurableEnvironment environment, Field declaredField) {
+    protected Object determineValue(Environment environment, Field declaredField) {
         Set<String> activeProfiles = new LinkedHashSet<>(Arrays.asList(environment.getActiveProfiles()));
         Set<Value> valueAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(declaredField, Value.class);
         if (!valueAnnotations.isEmpty()) {
             for (Value valueAnnotation : valueAnnotations) {
-                if (determineHandle(environment, activeProfiles, valueAnnotation, declaredField)) {
+                if (determineEnv(environment, activeProfiles, valueAnnotation, declaredField)) {
                     String valueStr = valueAnnotation.value();
                     if (StringUtils.isNotBlank(valueStr)) {
                         valueStr = environment.resolvePlaceholders(valueStr);
@@ -96,7 +95,7 @@ public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Orde
         return null;
     }
 
-    protected boolean determineHandle(ConfigurableEnvironment environment, Set<String> activeProfiles, Value valueAnnotation, Field declaredField) {
+    protected boolean determineEnv(Environment environment, Set<String> activeProfiles, Value valueAnnotation, Field declaredField) {
         String profile = valueAnnotation.profile();
         return StringUtils.isBlank(profile) || activeProfiles.contains(profile);
     }
@@ -104,11 +103,6 @@ public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Orde
     @Override
     public int getOrder() {
         return Ordered.LOWEST_PRECEDENCE;
-    }
-
-    @PostConstruct
-    public void initialize() {
-        BeanUtil.copyProperties(instance, this);
     }
 
 }
