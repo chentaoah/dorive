@@ -18,6 +18,7 @@
 package com.gitee.dorive.env.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.env.util.AopUtils;
 import lombok.Getter;
@@ -41,7 +42,7 @@ public class KeyValuesConfiguration extends KeyValuesEnvPostProcessor implements
     @PostConstruct
     public void initialize() {
         if (instance != null) {
-            BeanUtil.copyProperties(instance, this);
+            BeanUtil.copyProperties(instance, this, CopyOptions.create().ignoreNullValue());
         } else {
             doInitialize();
         }
