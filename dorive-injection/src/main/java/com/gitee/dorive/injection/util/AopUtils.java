@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.injection.utils;
+package com.gitee.dorive.injection.util;
 
 import java.lang.annotation.Annotation;
 

@@ -19,7 +19,7 @@ package com.gitee.dorive.injection.spring;
 
 import com.gitee.dorive.injection.annotation.Root;
 import com.gitee.dorive.injection.api.TypeDomainResolver;
-import com.gitee.dorive.injection.utils.AopUtils;
+import com.gitee.dorive.injection.util.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
