@@ -19,8 +19,8 @@ package com.gitee.dorive.env.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ReflectUtil;
+import com.gitee.dorive.env.util.AopUtils;
 import lombok.Getter;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ReflectionUtils;
