@@ -43,17 +43,21 @@ public class KeyValuesConfiguration extends KeyValuesEnvPostProcessor implements
         if (instance != null) {
             BeanUtil.copyProperties(instance, this);
         } else {
-            Class<?> targetClass = AopUtils.getTargetClass(this);
-            ReflectionUtils.doWithLocalFields(targetClass, declaredField -> {
-                if (Modifier.isStatic(declaredField.getModifiers())) {
-                    return;
-                }
-                Object value = determineValue(environment, declaredField);
-                if (value != null) {
-                    ReflectUtil.setFieldValue(this, declaredField, value);
-                }
-            });
+            doInitialize();
         }
+    }
+
+    public void doInitialize() {
+        Class<?> targetClass = AopUtils.getTargetClass(this);
+        ReflectionUtils.doWithLocalFields(targetClass, declaredField -> {
+            if (Modifier.isStatic(declaredField.getModifiers())) {
+                return;
+            }
+            Object value = determineValue(environment, declaredField);
+            if (value != null) {
+                ReflectUtil.setFieldValue(this, declaredField, value);
+            }
+        });
     }
 
 }
