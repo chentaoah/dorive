@@ -20,6 +20,7 @@ package com.gitee.dorive.env.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ReflectUtil;
 import lombok.Getter;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ReflectionUtils;
@@ -42,7 +43,8 @@ public class KeyValuesConfiguration extends KeyValuesEnvPostProcessor implements
         if (instance != null) {
             BeanUtil.copyProperties(instance, this);
         } else {
-            ReflectionUtils.doWithLocalFields(this.getClass(), declaredField -> {
+            Class<?> targetClass = AopUtils.getTargetClass(this.getClass());
+            ReflectionUtils.doWithLocalFields(targetClass, declaredField -> {
                 if (Modifier.isStatic(declaredField.getModifiers())) {
                     return;
                 }
