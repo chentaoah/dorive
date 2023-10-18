@@ -19,6 +19,7 @@ package com.gitee.dorive.env.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ReflectUtil;
+import lombok.Getter;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ReflectionUtils;
@@ -26,6 +27,7 @@ import org.springframework.util.ReflectionUtils;
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Modifier;
 
+@Getter
 public class KeyValuesConfiguration extends KeyValuesEnvPostProcessor implements EnvironmentAware {
 
     private Environment environment;
