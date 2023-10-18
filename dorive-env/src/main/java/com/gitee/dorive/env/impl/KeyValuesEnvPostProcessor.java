@@ -74,7 +74,7 @@ public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Orde
         Set<Value> valueAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(declaredField, Value.class);
         if (!valueAnnotations.isEmpty()) {
             for (Value valueAnnotation : valueAnnotations) {
-                if (determineEnv(environment, activeProfiles, valueAnnotation, declaredField)) {
+                if (matchEnvironment(environment, activeProfiles, valueAnnotation, declaredField)) {
                     String valueStr = valueAnnotation.value();
                     if (StringUtils.isNotBlank(valueStr)) {
                         valueStr = environment.resolvePlaceholders(valueStr);
@@ -95,7 +95,7 @@ public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Orde
         return null;
     }
 
-    protected boolean determineEnv(Environment environment, Set<String> activeProfiles, Value valueAnnotation, Field declaredField) {
+    protected boolean matchEnvironment(Environment environment, Set<String> activeProfiles, Value valueAnnotation, Field declaredField) {
         String profile = valueAnnotation.profile();
         return StringUtils.isBlank(profile) || activeProfiles.contains(profile);
     }
