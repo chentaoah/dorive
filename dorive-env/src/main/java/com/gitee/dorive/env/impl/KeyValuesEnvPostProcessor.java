@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.env.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.env.annotation.Key;
 import com.gitee.dorive.env.annotation.Value;
@@ -30,6 +31,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.util.ReflectionUtils;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -38,6 +40,8 @@ import java.util.Properties;
 import java.util.Set;
 
 public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Ordered {
+
+    private static KeyValuesEnvPostProcessor instance;
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
@@ -63,6 +67,7 @@ public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Orde
             PropertiesPropertySource propertySource = new PropertiesPropertySource(clazz.getName() + "@KeyValues", properties);
             environment.getPropertySources().addLast(propertySource);
         }
+        instance = this;
     }
 
     protected Object determineValue(ConfigurableEnvironment environment, Field declaredField) {
@@ -99,6 +104,11 @@ public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Orde
     @Override
     public int getOrder() {
         return Ordered.LOWEST_PRECEDENCE;
+    }
+
+    @PostConstruct
+    public void initialize() {
+        BeanUtil.copyProperties(instance, this);
     }
 
 }
