@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.env.impl;
+package com.gitee.dorive.env.spring;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
