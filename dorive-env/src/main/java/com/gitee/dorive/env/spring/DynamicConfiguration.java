@@ -26,7 +26,7 @@ import org.springframework.core.env.Environment;
 import javax.annotation.PostConstruct;
 
 @Getter
-public class KeyValuesConfiguration extends KeyValuesEnvPostProcessor implements EnvironmentAware {
+public class DynamicConfiguration extends KeyValuesEnvPostProcessor implements EnvironmentAware {
 
     private Environment environment;
 
