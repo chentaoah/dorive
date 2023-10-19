@@ -19,15 +19,11 @@ package com.gitee.dorive.env.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
-import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.env.util.AopUtils;
 import lombok.Getter;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
-import org.springframework.util.ReflectionUtils;
 
 import javax.annotation.PostConstruct;
-import java.lang.reflect.Modifier;
 
 @Getter
 public class KeyValuesConfiguration extends KeyValuesEnvPostProcessor implements EnvironmentAware {
@@ -49,16 +45,8 @@ public class KeyValuesConfiguration extends KeyValuesEnvPostProcessor implements
     }
 
     public void doInitialize() {
-        Class<?> targetClass = AopUtils.getTargetClass(this);
-        ReflectionUtils.doWithLocalFields(targetClass, declaredField -> {
-            if (Modifier.isStatic(declaredField.getModifiers())) {
-                return;
-            }
-            Object value = determineValue(environment, declaredField);
-            if (value != null) {
-                ReflectUtil.setFieldValue(this, declaredField, value);
-            }
-        });
+        KeyValuesResolver resolver = new KeyValuesResolver(environment);
+        resolver.resolveProperties(this);
     }
 
 }

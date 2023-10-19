@@ -17,26 +17,13 @@
 
 package com.gitee.dorive.env.impl;
 
-import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.env.annotation.Key;
-import com.gitee.dorive.env.annotation.Value;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertiesPropertySource;
-import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.Properties;
-import java.util.Set;
 
 public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Ordered {
 
@@ -44,60 +31,13 @@ public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Orde
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        Properties properties = new Properties();
-        Class<?> clazz = this.getClass();
-        ReflectionUtils.doWithLocalFields(clazz, declaredField -> {
-            if (Modifier.isStatic(declaredField.getModifiers())) {
-                return;
-            }
-            Object value = determineValue(environment, declaredField);
-            if (value != null) {
-                ReflectUtil.setFieldValue(this, declaredField, value);
-                Key keyAnnotation = AnnotationUtils.getAnnotation(declaredField, Key.class);
-                if (keyAnnotation != null) {
-                    String property = keyAnnotation.value();
-                    if (StringUtils.isNotBlank(property) && !environment.containsProperty(property)) {
-                        properties.setProperty(property, value.toString());
-                    }
-                }
-            }
-        });
+        KeyValuesResolver resolver = new KeyValuesResolver(environment);
+        Properties properties = resolver.resolveProperties(this);
         if (!properties.isEmpty()) {
-            PropertiesPropertySource propertySource = new PropertiesPropertySource(clazz.getName() + "@KeyValues", properties);
+            PropertiesPropertySource propertySource = new PropertiesPropertySource(this.getClass().getName() + "@KeyValues", properties);
             environment.getPropertySources().addLast(propertySource);
         }
         instance = this;
-    }
-
-    protected Object determineValue(Environment environment, Field declaredField) {
-        Set<String> activeProfiles = new LinkedHashSet<>(Arrays.asList(environment.getActiveProfiles()));
-        Set<Value> valueAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(declaredField, Value.class);
-        if (!valueAnnotations.isEmpty()) {
-            for (Value valueAnnotation : valueAnnotations) {
-                if (matchEnvironment(environment, activeProfiles, valueAnnotation, declaredField)) {
-                    String valueStr = valueAnnotation.value();
-                    if (StringUtils.isNotBlank(valueStr)) {
-                        valueStr = environment.resolvePlaceholders(valueStr);
-                        Class<?> type = declaredField.getType();
-                        if (type == Boolean.class) {
-                            return Boolean.valueOf(valueStr);
-
-                        } else if (type == Integer.class) {
-                            return Integer.valueOf(valueStr);
-
-                        } else if (type == String.class) {
-                            return valueStr;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    protected boolean matchEnvironment(Environment environment, Set<String> activeProfiles, Value valueAnnotation, Field declaredField) {
-        String profile = valueAnnotation.profile();
-        return StringUtils.isBlank(profile) || activeProfiles.contains(profile);
     }
 
     @Override
