@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.env.annotation;
 
+import org.springframework.core.annotation.AliasFor;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -30,6 +32,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Construct {
 
+    @AliasFor("profile")
+    String[] value() default {};
+
+    @AliasFor("value")
     String[] profile() default {};
 
 }

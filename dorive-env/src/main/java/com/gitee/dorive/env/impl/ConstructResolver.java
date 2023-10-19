@@ -21,6 +21,7 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.env.annotation.Construct;
 import com.gitee.dorive.env.util.AopUtils;
 import lombok.Data;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ReflectionUtils;
 
@@ -48,7 +49,7 @@ public class ConstructResolver {
             if (Modifier.isStatic(declaredMethod.getModifiers())) {
                 return;
             }
-            Construct constructAnnotation = declaredMethod.getAnnotation(Construct.class);
+            Construct constructAnnotation = AnnotatedElementUtils.getMergedAnnotation(declaredMethod, Construct.class);
             if (constructAnnotation != null) {
                 if (matchEnvironment(constructAnnotation, declaredMethod)) {
                     ReflectUtil.invoke(instance, declaredMethod);
