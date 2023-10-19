@@ -61,7 +61,10 @@ public class ConstructResolver {
     protected boolean matchEnvironment(Construct constructAnnotation, Method declaredMethod) {
         String[] profile = constructAnnotation.profile();
         Set<String> profiles = new LinkedHashSet<>(Arrays.asList(profile));
-        return profiles.isEmpty() || !Collections.disjoint(activeProfiles, profiles);
+        if (profiles.isEmpty()) {
+            profiles.add(declaredMethod.getName());
+        }
+        return !Collections.disjoint(activeProfiles, profiles);
     }
 
 }
