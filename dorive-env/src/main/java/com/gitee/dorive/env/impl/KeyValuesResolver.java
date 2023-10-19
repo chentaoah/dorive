@@ -27,6 +27,7 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ReflectionUtils;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -52,9 +53,8 @@ public class KeyValuesResolver {
             if (Modifier.isStatic(declaredField.getModifiers())) {
                 return;
             }
-            Object value = determineValue(declaredField);
+            Object value = determineValue(instance, declaredField);
             if (value != null) {
-                ReflectUtil.setFieldValue(instance, declaredField, value);
                 Key keyAnnotation = declaredField.getAnnotation(Key.class);
                 if (keyAnnotation != null) {
                     String property = keyAnnotation.value();
@@ -67,7 +67,17 @@ public class KeyValuesResolver {
         return properties;
     }
 
-    protected Object determineValue(Field declaredField) {
+    protected Object determineValue(Object instance, Field declaredField) {
+        Object value = determineValueByAnnotation(declaredField);
+        if (value != null) {
+            ReflectUtil.setFieldValue(instance, declaredField, value);
+        } else {
+            value = ReflectUtil.getFieldValue(instance, declaredField);
+        }
+        return value;
+    }
+
+    protected Serializable determineValueByAnnotation(Field declaredField) {
         Set<Value> valueAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(declaredField, Value.class);
         if (!valueAnnotations.isEmpty()) {
             for (Value valueAnnotation : valueAnnotations) {

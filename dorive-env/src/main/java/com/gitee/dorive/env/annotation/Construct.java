@@ -15,33 +15,21 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.env.impl;
+package com.gitee.dorive.env.annotation;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.CopyOptions;
-import lombok.Getter;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.annotation.PostConstruct;
+@Inherited
+@Documented
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Construct {
 
-@Getter
-public class KeyValuesConfiguration extends KeyValuesEnvPostProcessor implements EnvironmentAware {
-
-    private Environment environment;
-
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.environment = environment;
-    }
-
-    @PostConstruct
-    public void initialize() {
-        if (instance != null) {
-            BeanUtil.copyProperties(instance, this, CopyOptions.create().ignoreNullValue());
-        } else {
-            initialize(environment, this);
-        }
-    }
+    String[] profile() default {};
 
 }
