@@ -17,36 +17,25 @@
 
 package com.gitee.dorive.env.spring;
 
-import com.gitee.dorive.env.impl.ConstructResolver;
-import com.gitee.dorive.env.impl.KeyValuesResolver;
+import com.gitee.dorive.env.impl.ConfigResolver;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertiesPropertySource;
 
 import java.util.Properties;
 
-public class KeyValuesEnvPostProcessor implements EnvironmentPostProcessor, Ordered {
-
-    protected static KeyValuesEnvPostProcessor instance;
+public class DynamicEnvPostProcessor implements EnvironmentPostProcessor, Ordered {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        Properties properties = initialize(environment, this);
+        ConfigResolver configResolver = new ConfigResolver(environment);
+        Properties properties = configResolver.resolveInstance(this);
         if (!properties.isEmpty()) {
             PropertiesPropertySource propertySource = new PropertiesPropertySource(this.getClass().getName() + "@KeyValues", properties);
             environment.getPropertySources().addLast(propertySource);
         }
-        instance = this;
-    }
-
-    public Properties initialize(Environment environment, Object instance) {
-        ConstructResolver constructResolver = new ConstructResolver(environment);
-        constructResolver.initialize(instance);
-        KeyValuesResolver resolver = new KeyValuesResolver(environment);
-        return resolver.resolveProperties(instance);
     }
 
     @Override

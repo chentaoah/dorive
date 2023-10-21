@@ -17,8 +17,7 @@
 
 package com.gitee.dorive.env.spring;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.CopyOptions;
+import com.gitee.dorive.env.impl.ConfigResolver;
 import lombok.Getter;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
@@ -26,7 +25,7 @@ import org.springframework.core.env.Environment;
 import javax.annotation.PostConstruct;
 
 @Getter
-public class DynamicConfiguration extends KeyValuesEnvPostProcessor implements EnvironmentAware {
+public class DynamicConfiguration extends DynamicEnvPostProcessor implements EnvironmentAware {
 
     private Environment environment;
 
@@ -37,11 +36,8 @@ public class DynamicConfiguration extends KeyValuesEnvPostProcessor implements E
 
     @PostConstruct
     public void initialize() {
-        if (instance != null) {
-            BeanUtil.copyProperties(instance, this, CopyOptions.create().ignoreNullValue());
-        } else {
-            initialize(environment, this);
-        }
+        ConfigResolver configResolver = new ConfigResolver(environment);
+        configResolver.resolveInstance(this);
     }
 
 }

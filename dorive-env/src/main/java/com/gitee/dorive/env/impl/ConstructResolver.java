@@ -43,7 +43,7 @@ public class ConstructResolver {
         this.activeProfiles = new LinkedHashSet<>(Arrays.asList(environment.getActiveProfiles()));
     }
 
-    public void initialize(Object instance) {
+    public void resolveConstruct(Object instance) {
         Class<?> targetClass = AopUtils.getTargetClass(instance);
         ReflectionUtils.doWithLocalMethods(targetClass, declaredMethod -> {
             if (Modifier.isStatic(declaredMethod.getModifiers())) {
