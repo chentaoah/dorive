@@ -20,14 +20,25 @@ package com.gitee.dorive.spring.boot.starter.config;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.gitee.dorive.env.annotation.Key;
+import com.gitee.dorive.env.annotation.Value;
+import com.gitee.dorive.env.spring.DynamicConfiguration;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
+@Data
 @Order(-100)
 @Configuration
-public class MybatisPlusConfiguration {
-    
+@EqualsAndHashCode(callSuper = false)
+public class MybatisPlusConfiguration extends DynamicConfiguration {
+
+    @Key("mybatis-plus.global-config.enable-sql-runner")
+    @Value("true")
+    private Boolean enableSqlRunner;
+
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
