@@ -131,7 +131,9 @@ public class MultiEntityHandler implements EntityHandler {
                 if (boundValue != null) {
                     boundValue = binder.input(context, boundValue);
                     multiInBuilder.append(boundValue);
-                    strBuilder.append(boundValue).append(",");
+                    String boundValueStr = String.valueOf(boundValue);
+                    strBuilder.append("(").append(boundValueStr.length()).append(")").append(boundValueStr).append(",");
+
                 } else {
                     multiInBuilder.clear();
                     strBuilder = null;
@@ -174,7 +176,8 @@ public class MultiEntityHandler implements EntityHandler {
         PropChain anchorPoint = repository.getAnchorPoint();
 
         BinderResolver binderResolver = repository.getBinderResolver();
-        List<PropertyBinder> binders = binderResolver.getMergedBindersMap().get("/");
+        Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
+        List<PropertyBinder> binders = mergedBindersMap.get("/");
 
         List<Object> entities = multiResult.getRecords();
         int averageSize = entities.size() / rootEntities.size() + 1;
@@ -193,7 +196,9 @@ public class MultiEntityHandler implements EntityHandler {
                 for (PropertyBinder binder : binders) {
                     Object fieldValue = binder.getFieldValue(context, entity);
                     if (fieldValue != null) {
-                        strBuilder.append(fieldValue).append(",");
+                        String fieldValueStr = String.valueOf(fieldValue);
+                        strBuilder.append("(").append(fieldValueStr.length()).append(")").append(fieldValueStr).append(",");
+
                     } else {
                         strBuilder = null;
                         break;
