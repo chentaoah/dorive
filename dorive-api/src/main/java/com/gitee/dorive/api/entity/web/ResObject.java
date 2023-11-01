@@ -22,11 +22,11 @@ public class ResObject<T> {
     private String message;
     private T data;
 
-    public static ResObject<Object> success() {
+    public static <T> ResObject<T> success() {
         return new ResObject<>(SUCCESS_CODE, SUCCESS_MSG, null);
     }
 
-    public static ResObject<Object> fail() {
+    public static <T> ResObject<T> fail() {
         return new ResObject<>(FAIL_CODE, FAIL_MSG, null);
     }
 
