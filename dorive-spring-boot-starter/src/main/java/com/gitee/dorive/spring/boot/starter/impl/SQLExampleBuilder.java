@@ -78,7 +78,7 @@ public class SQLExampleBuilder implements ExampleBuilder {
 
         if (page != null) {
             String countSql = selectSegment.selectSql() + fromWhereSql;
-            long count = SqlRunner.db().selectCount("SELECT COUNT(*) FROM (" + countSql + ") " + letter, args.toArray());
+            long count = SqlRunner.db().selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
             page.setTotal(count);
             buildExample.setCountQueried(true);
             if (count == 0) {
