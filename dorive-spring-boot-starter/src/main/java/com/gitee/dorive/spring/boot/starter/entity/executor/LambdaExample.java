@@ -25,12 +25,33 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class LambdaExample<T> extends Example {
+
+    private List<String> toProperties(SFunction<T, ?>[] functions) {
+        if (functions != null && functions.length > 0) {
+            List<String> properties = new ArrayList<>(functions.length);
+            for (SFunction<T, ?> function : functions) {
+                properties.add(LambdaUtils.toProperty(function));
+            }
+            return properties;
+        }
+        return Collections.emptyList();
+    }
+
+    @SafeVarargs
+    public final LambdaExample<T> select(SFunction<T, ?>... functions) {
+        List<String> properties = toProperties(functions);
+        if (!properties.isEmpty()) {
+            super.select(properties);
+        }
+        return this;
+    }
 
     public LambdaExample<T> eq(SFunction<T, ?> function, Object value) {
         super.eq(LambdaUtils.toProperty(function), value);
@@ -94,11 +115,8 @@ public class LambdaExample<T> extends Example {
 
     @SafeVarargs
     public final LambdaExample<T> orderByAsc(SFunction<T, ?>... functions) {
-        if (functions != null && functions.length > 0) {
-            List<String> properties = new ArrayList<>(functions.length);
-            for (SFunction<T, ?> function : functions) {
-                properties.add(LambdaUtils.toProperty(function));
-            }
+        List<String> properties = toProperties(functions);
+        if (!properties.isEmpty()) {
             super.orderByAsc(properties.toArray(new String[0]));
         }
         return this;
@@ -106,11 +124,8 @@ public class LambdaExample<T> extends Example {
 
     @SafeVarargs
     public final LambdaExample<T> orderByDesc(SFunction<T, ?>... functions) {
-        if (functions != null && functions.length > 0) {
-            List<String> properties = new ArrayList<>(functions.length);
-            for (SFunction<T, ?> function : functions) {
-                properties.add(LambdaUtils.toProperty(function));
-            }
+        List<String> properties = toProperties(functions);
+        if (!properties.isEmpty()) {
             super.orderByDesc(properties.toArray(new String[0]));
         }
         return this;
