@@ -19,10 +19,11 @@ package com.gitee.dorive.core.repository;
 
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Node;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
@@ -33,7 +34,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class CommonRepository extends ProxyRepository {
+public class CommonRepository extends AbstractProxyRepository implements Node {
 
     private String accessPath;
     private boolean root;
@@ -43,13 +44,26 @@ public class CommonRepository extends ProxyRepository {
     private BinderResolver binderResolver;
     private boolean boundEntity;
 
+    public Object getPrimaryKey(Object entity) {
+        return getEntityEle().getPkProxy().getValue(entity);
+    }
+
+    public boolean hasField(String field) {
+        return getEntityEle().hasField(field);
+    }
+
+    @Override
+    public String getName() {
+        return getEntityDef().getName();
+    }
+
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Selector selector = context.getSelector();
         List<String> properties = selector.select(context, this);
         if (properties != null && !properties.isEmpty()) {
             if (query.getPrimaryKey() != null) {
-                Example example = new Example().eq("id", query.getPrimaryKey());
+                Example example = new InnerExample().eq("id", query.getPrimaryKey());
                 query.setPrimaryKey(null);
                 query.setExample(example);
             }
@@ -60,20 +74,11 @@ public class CommonRepository extends ProxyRepository {
         }
         Example example = query.getExample();
         if (example != null) {
-            if (example.isEmptyQuery()) {
-                Page<Object> page = example.getPage();
-                return page != null ? new Result<>(page) : new Result<>();
-            }
             if (example.getOrderBy() == null && defaultOrderBy != null) {
-                OrderBy orderBy = new OrderBy(defaultOrderBy.getProperties(), defaultOrderBy.getOrder());
-                example.setOrderBy(orderBy);
+                example.setOrderBy(defaultOrderBy.tryClone());
             }
         }
         return super.executeQuery(context, query);
-    }
-
-    public Object getPrimaryKey(Object entity) {
-        return getEntityEle().getPkProxy().getValue(entity);
     }
 
 }

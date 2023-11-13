@@ -15,28 +15,30 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.processor;
+package com.gitee.dorive.coating.entity.def;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.coating.annotation.CoatingScan;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
-import java.util.Collection;
+import java.lang.reflect.AnnotatedElement;
+import java.util.Map;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class PropertyProcessor extends DefaultProcessor {
+@NoArgsConstructor
+@AllArgsConstructor
+public class CoatingScanDef {
 
-    @Override
-    public Object input(Context context, Object value) {
-        String property = getBindingDef().getProperty();
-        if (value instanceof Collection) {
-            return CollUtil.map((Collection<?>) value, item -> BeanUtil.getFieldValue(item, property), true);
-        } else {
-            return BeanUtil.getFieldValue(value, property);
-        }
+    private String[] value;
+    private String regex;
+    private Class<?>[] queries;
+
+    public static CoatingScanDef fromElement(AnnotatedElement element) {
+        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, CoatingScan.class);
+        return attributes != null ? BeanUtil.copyProperties(attributes, CoatingScanDef.class) : null;
     }
 
 }

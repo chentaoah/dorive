@@ -15,28 +15,25 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.processor;
+package com.gitee.dorive.env.impl;
 
-import com.gitee.dorive.api.entity.def.BindingDef;
-import com.gitee.dorive.core.api.binder.Processor;
-import com.gitee.dorive.core.api.context.Context;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.core.env.Environment;
+
+import java.util.Properties;
 
 @Data
-@NoArgsConstructor
-public class DefaultProcessor implements Processor {
+@AllArgsConstructor
+public class ConfigResolver {
 
-    private BindingDef bindingDef;
+    private Environment environment;
 
-    @Override
-    public Object input(Context context, Object value) {
-        return value;
-    }
-
-    @Override
-    public Object output(Context context, Object value) {
-        return value;
+    public Properties resolveInstance(Object instance) {
+        ConstructResolver constructResolver = new ConstructResolver(environment);
+        constructResolver.resolveConstruct(instance);
+        KeyValuesResolver resolver = new KeyValuesResolver(environment);
+        return resolver.resolveProperties(instance);
     }
 
 }

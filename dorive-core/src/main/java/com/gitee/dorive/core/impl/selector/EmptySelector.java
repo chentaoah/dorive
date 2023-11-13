@@ -18,26 +18,17 @@
 package com.gitee.dorive.core.impl.selector;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.core.api.context.Node;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class EmptySelector extends AbstractSelector {
 
-    public static final EmptySelector EMPTY_SELECTOR = new EmptySelector();
-
     @Override
-    public boolean matches(Context context, CommonRepository repository) {
+    public boolean matches(Context context, Node node) {
         return false;
-    }
-
-    @Override
-    public List<String> select(Context context, CommonRepository repository) {
-        return null;
     }
 
 }

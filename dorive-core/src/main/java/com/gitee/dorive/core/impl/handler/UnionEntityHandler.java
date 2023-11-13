@@ -17,14 +17,15 @@
 
 package com.gitee.dorive.core.impl.handler;
 
-import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.MultiResult;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
+import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
@@ -49,10 +50,10 @@ public class UnionEntityHandler implements EntityHandler {
     @Override
     public long handle(Context context, List<Object> entities) {
         Example example = newExample(context, entities);
-        if (example.isDirtyQuery()) {
+        if (example.isNotEmpty()) {
             OperationFactory operationFactory = repository.getOperationFactory();
-            Query query = operationFactory.buildQuery(example);
-            query.setType(query.getType() | OperationType.INCLUDE_ROOT);
+            Query query = operationFactory.buildQueryByExample(example);
+            query.setRootType(Operation.INCLUDE_ROOT);
             Result<Object> result = repository.executeQuery(context, query);
             if (result instanceof MultiResult) {
                 setValueForRootEntities(entities, (MultiResult) result);
@@ -71,7 +72,7 @@ public class UnionEntityHandler implements EntityHandler {
             Object lastEntity = lastPropChain == null ? entity : lastPropChain.getValue(entity);
             if (lastEntity != null) {
                 Example example = newExample(context, entity);
-                if (example.isDirtyQuery()) {
+                if (example.isNotEmpty()) {
                     example.selectExtra((index + 1) + " as $row");
                     unionExample.addExample(example);
                 }
@@ -82,7 +83,7 @@ public class UnionEntityHandler implements EntityHandler {
 
     private Example newExample(Context context, Object entity) {
         BinderResolver binderResolver = repository.getBinderResolver();
-        Example example = new Example();
+        Example example = new InnerExample();
         for (PropertyBinder binder : binderResolver.getPropertyBinders()) {
             String fieldName = binder.getFieldName();
             Object boundValue = binder.getBoundValue(context, entity);
@@ -97,7 +98,7 @@ public class UnionEntityHandler implements EntityHandler {
                 break;
             }
         }
-        if (example.isDirtyQuery()) {
+        if (example.isNotEmpty()) {
             for (ContextBinder binder : binderResolver.getContextBinders()) {
                 String fieldName = binder.getFieldName();
                 Object boundValue = binder.getBoundValue(context, entity);

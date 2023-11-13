@@ -38,21 +38,21 @@ public abstract class EntityEle {
     private boolean aggregated;
     private List<BindingDef> bindingDefs;
     private PropProxy pkProxy;
-    private Map<String, String> propAliasMap;
+    private Map<String, String> fieldAliasMap;
 
     public EntityEle(AnnotatedElement element) {
         this.element = element;
         this.entityDef = EntityDef.fromElement(element);
-        this.aggregated = (entityDef != null && entityDef.isAggregated()) || element.isAnnotationPresent(Aggregate.class);
+        this.aggregated = (entityDef != null && entityDef.isRepositoryDef()) || isAggregateDef();
         this.bindingDefs = BindingDef.fromElement(element);
     }
 
-    public boolean isAnnotatedEntity() {
+    public boolean isEntityDef() {
         return entityDef != null;
     }
 
-    public boolean isAggregated() {
-        return aggregated;
+    public boolean isAggregateDef() {
+        return element.isAnnotationPresent(Aggregate.class);
     }
 
     public void initialize() {
@@ -61,20 +61,24 @@ public abstract class EntityEle {
         }
     }
 
-    public String toAlias(String property) {
-        return propAliasMap.getOrDefault(property, property);
+    public boolean hasField(String field) {
+        return fieldAliasMap.containsKey(field);
     }
 
-    public List<String> toAliases(List<String> properties) {
-        if (properties != null && !properties.isEmpty()) {
-            List<String> aliases = new ArrayList<>(properties.size());
-            for (String property : properties) {
-                String alias = toAlias(property);
+    public String toAlias(String field) {
+        return fieldAliasMap.getOrDefault(field, field);
+    }
+
+    public List<String> toAliases(List<String> fields) {
+        if (fields != null && !fields.isEmpty()) {
+            List<String> aliases = new ArrayList<>(fields.size());
+            for (String field : fields) {
+                String alias = toAlias(field);
                 aliases.add(alias);
             }
             return aliases;
         }
-        return properties;
+        return fields;
     }
 
     protected abstract void doInitialize();
@@ -84,5 +88,7 @@ public abstract class EntityEle {
     public abstract Class<?> getGenericType();
 
     public abstract EntityType getEntityType();
+
+    public abstract Map<String, EntityField> getEntityFieldMap();
 
 }

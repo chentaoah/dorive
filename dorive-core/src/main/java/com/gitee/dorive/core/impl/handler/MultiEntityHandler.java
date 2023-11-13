@@ -17,14 +17,15 @@
 
 package com.gitee.dorive.core.impl.handler;
 
-import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.MultiInBuilder;
 import com.gitee.dorive.core.entity.executor.MultiResult;
 import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.binder.AbstractBinder;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
@@ -52,10 +53,10 @@ public class MultiEntityHandler implements EntityHandler {
     public long handle(Context context, List<Object> entities) {
         Map<String, Object> entityIndex = new LinkedHashMap<>(entities.size() * 4 / 3 + 1);
         Example example = newExample(context, entities, entityIndex);
-        if (example.isDirtyQuery()) {
+        if (example.isNotEmpty()) {
             OperationFactory operationFactory = repository.getOperationFactory();
-            Query query = operationFactory.buildQuery(example);
-            query.setType(query.getType() | OperationType.INCLUDE_ROOT);
+            Query query = operationFactory.buildQueryByExample(example);
+            query.setRootType(Operation.INCLUDE_ROOT);
             Result<Object> result = repository.executeQuery(context, query);
             if (result instanceof MultiResult) {
                 setValueForRootEntities(context, entities, entityIndex, (MultiResult) result);
@@ -70,7 +71,7 @@ public class MultiEntityHandler implements EntityHandler {
         Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
         List<PropertyBinder> binders = mergedBindersMap.get("/");
 
-        Example example = new Example();
+        Example example = new InnerExample();
         if (binders.size() == 1) {
             PropertyBinder binder = binders.get(0);
             List<Object> boundValues = collectBoundValues(context, entities, entityIndex, binder);
@@ -92,7 +93,7 @@ public class MultiEntityHandler implements EntityHandler {
             }
         }
 
-        if (example.isDirtyQuery()) {
+        if (example.isNotEmpty()) {
             for (ContextBinder binder : binderResolver.getContextBinders()) {
                 String fieldName = binder.getFieldName();
                 Object boundValue = binder.getBoundValue(context, null);
@@ -130,7 +131,9 @@ public class MultiEntityHandler implements EntityHandler {
                 if (boundValue != null) {
                     boundValue = binder.input(context, boundValue);
                     multiInBuilder.append(boundValue);
-                    strBuilder.append(boundValue).append(",");
+                    String boundValueStr = String.valueOf(boundValue);
+                    strBuilder.append("(").append(boundValueStr.length()).append(")").append(boundValueStr).append(",");
+
                 } else {
                     multiInBuilder.clear();
                     strBuilder = null;
@@ -173,7 +176,8 @@ public class MultiEntityHandler implements EntityHandler {
         PropChain anchorPoint = repository.getAnchorPoint();
 
         BinderResolver binderResolver = repository.getBinderResolver();
-        List<PropertyBinder> binders = binderResolver.getMergedBindersMap().get("/");
+        Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
+        List<PropertyBinder> binders = mergedBindersMap.get("/");
 
         List<Object> entities = multiResult.getRecords();
         int averageSize = entities.size() / rootEntities.size() + 1;
@@ -192,7 +196,9 @@ public class MultiEntityHandler implements EntityHandler {
                 for (PropertyBinder binder : binders) {
                     Object fieldValue = binder.getFieldValue(context, entity);
                     if (fieldValue != null) {
-                        strBuilder.append(fieldValue).append(",");
+                        String fieldValueStr = String.valueOf(fieldValue);
+                        strBuilder.append("(").append(fieldValueStr.length()).append(")").append(fieldValueStr).append(",");
+
                     } else {
                         strBuilder = null;
                         break;

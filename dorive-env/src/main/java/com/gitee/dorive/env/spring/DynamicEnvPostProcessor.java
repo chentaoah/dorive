@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.config;
+package com.gitee.dorive.env.spring;
 
+import com.gitee.dorive.env.impl.ConfigResolver;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
@@ -25,16 +26,14 @@ import org.springframework.core.env.PropertiesPropertySource;
 
 import java.util.Properties;
 
-public class EnvironmentProcessor implements EnvironmentPostProcessor, Ordered {
-
-    private static final String PROPERTY_KEY = "mybatis-plus.global-config.enable-sql-runner";
+public class DynamicEnvPostProcessor implements EnvironmentPostProcessor, Ordered {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        if (!environment.containsProperty(PROPERTY_KEY)) {
-            Properties properties = new Properties();
-            properties.setProperty(PROPERTY_KEY, "true");
-            PropertiesPropertySource propertySource = new PropertiesPropertySource(PROPERTY_KEY, properties);
+        ConfigResolver configResolver = new ConfigResolver(environment);
+        Properties properties = configResolver.resolveInstance(this);
+        if (!properties.isEmpty()) {
+            PropertiesPropertySource propertySource = new PropertiesPropertySource(this.getClass().getName() + "@KeyValues", properties);
             environment.getPropertySources().addLast(propertySource);
         }
     }

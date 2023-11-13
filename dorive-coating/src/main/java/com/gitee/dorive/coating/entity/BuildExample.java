@@ -15,10 +15,30 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.api;
+package com.gitee.dorive.coating.entity;
 
-public interface Keys {
-    String QUERIER = "QUERIER";
-    String TABLE_INFO = "TABLE_INFO";
-    String ALIAS_EXECUTOR = "ALIAS_EXECUTOR";
+import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.core.entity.executor.InnerExample;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class BuildExample extends InnerExample {
+
+    private boolean abandoned = false;
+    private boolean countQueried = false;
+
+    public BuildExample(List<Criterion> criteria) {
+        super(criteria);
+    }
+
+    public boolean isQueryAll() {
+        return !abandoned && isEmpty();
+    }
+
 }

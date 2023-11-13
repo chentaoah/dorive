@@ -34,4 +34,6 @@ public @interface CoatingScan {
 
     String regex() default "";
 
+    Class<?>[] queries() default {};
+
 }

@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.binder;
 
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.element.PropChain;
-import com.gitee.dorive.core.api.binder.Processor;
+import com.gitee.dorive.core.api.binder.BindingProcessor;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
@@ -37,12 +37,12 @@ public class PropertyBinder extends AbstractBinder {
     public PropertyBinder(BindingDef bindingDef,
                           String alias,
                           PropChain fieldPropChain,
-                          Processor processor,
+                          BindingProcessor bindingProcessor,
                           String belongAccessPath,
                           CommonRepository belongRepository,
                           PropChain boundPropChain,
                           String bindAlias) {
-        super(bindingDef, alias, fieldPropChain, processor);
+        super(bindingDef, alias, fieldPropChain, bindingProcessor);
         this.belongAccessPath = belongAccessPath;
         this.belongRepository = belongRepository;
         this.boundPropChain = boundPropChain;

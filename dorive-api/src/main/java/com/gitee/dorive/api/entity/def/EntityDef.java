@@ -58,7 +58,7 @@ public class EntityDef {
         }
     }
 
-    public boolean isAggregated() {
+    public boolean isRepositoryDef() {
         return repository != Object.class;
     }
 

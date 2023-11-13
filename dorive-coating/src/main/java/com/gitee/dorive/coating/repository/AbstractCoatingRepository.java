@@ -19,15 +19,15 @@ package com.gitee.dorive.coating.repository;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.annotation.Repository;
-import com.gitee.dorive.coating.annotation.CoatingScan;
 import com.gitee.dorive.coating.api.CoatingRepository;
 import com.gitee.dorive.coating.api.ExampleBuilder;
+import com.gitee.dorive.coating.entity.BuildExample;
 import com.gitee.dorive.coating.entity.CoatingType;
+import com.gitee.dorive.coating.entity.def.CoatingScanDef;
 import com.gitee.dorive.coating.impl.DefaultExampleBuilder;
 import com.gitee.dorive.coating.impl.resolver.CoatingTypeResolver;
 import com.gitee.dorive.coating.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.event.repository.AbstractEventRepository;
 import lombok.Data;
@@ -43,8 +43,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> implements ExampleBuilder, CoatingRepository<E, PK> {
 
-    private String[] scanPackages;
-    private String regex;
+    private CoatingScanDef coatingScanDef;
     private MergedRepositoryResolver mergedRepositoryResolver;
     private CoatingTypeResolver coatingTypeResolver;
     private ExampleBuilder exampleBuilder;
@@ -53,13 +52,14 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
         Repository repository = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), Repository.class);
-        CoatingScan coatingScan = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), CoatingScan.class);
-        if (repository != null && coatingScan != null) {
-            this.scanPackages = coatingScan.value();
-            this.regex = StringUtils.isBlank(coatingScan.regex()) ? "^" + getEntityClass().getSimpleName() + ".*" : coatingScan.regex();
-            this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
-            this.coatingTypeResolver = new CoatingTypeResolver(this);
-            this.exampleBuilder = new DefaultExampleBuilder(this);
+        coatingScanDef = CoatingScanDef.fromElement(this.getClass());
+        if (repository != null && coatingScanDef != null) {
+            if (StringUtils.isBlank(coatingScanDef.getRegex())) {
+                coatingScanDef.setRegex("^" + getEntityClass().getSimpleName() + ".*");
+            }
+            mergedRepositoryResolver = new MergedRepositoryResolver(this);
+            coatingTypeResolver = new CoatingTypeResolver(this);
+            exampleBuilder = new DefaultExampleBuilder(this);
         }
     }
 
@@ -71,37 +71,37 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
     }
 
     @Override
-    public Example buildExample(Context context, Object coating) {
+    public BuildExample buildExample(Context context, Object coating) {
         return exampleBuilder.buildExample(context, coating);
     }
 
     @Override
     public List<E> selectByCoating(Context context, Object coating) {
-        Example example = buildExample(context, coating);
-        if (example.isEmptyQuery()) {
+        BuildExample buildExample = buildExample(context, coating);
+        if (buildExample.isAbandoned()) {
             return Collections.emptyList();
         }
-        if (example.isCountQueried()) {
-            example.setPage(null);
+        if (buildExample.isCountQueried()) {
+            buildExample.setPage(null);
         }
-        return selectByExample(context, example);
+        return selectByExample(context, buildExample);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByCoating(Context context, Object coating) {
-        Example example = buildExample(context, coating);
-        if (example.isEmptyQuery()) {
-            return (Page<E>) example.getPage();
+        BuildExample buildExample = buildExample(context, coating);
+        if (buildExample.isAbandoned()) {
+            return (Page<E>) buildExample.getPage();
         }
-        if (example.isCountQueried()) {
-            Page<Object> page = example.getPage();
-            example.setPage(null);
-            List<E> records = selectByExample(context, example);
+        if (buildExample.isCountQueried()) {
+            Page<Object> page = buildExample.getPage();
+            buildExample.setPage(null);
+            List<E> records = selectByExample(context, buildExample);
             page.setRecords((List<Object>) records);
             return (Page<E>) page;
         }
-        return selectPageByExample(context, example);
+        return selectPageByExample(context, buildExample);
     }
 
 }

@@ -17,11 +17,11 @@
 
 package com.gitee.dorive.coating.api;
 
+import com.gitee.dorive.coating.entity.BuildExample;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.Example;
 
 public interface ExampleBuilder {
 
-    Example buildExample(Context context, Object coating);
+    BuildExample buildExample(Context context, Object coating);
 
 }

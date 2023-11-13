@@ -29,8 +29,12 @@ public class MultiResult extends Result<Object> {
 
     private List<Map<String, Object>> resultMaps;
 
-    public MultiResult(List<Map<String, Object>> resultMaps, List<Object> entities) {
-        super(entities);
+    public MultiResult(Page<Object> page, List<Map<String, Object>> resultMaps) {
+        setPage(page);
+        this.resultMaps = resultMaps;
+    }
+
+    public MultiResult(List<Map<String, Object>> resultMaps) {
         this.resultMaps = resultMaps;
     }
 

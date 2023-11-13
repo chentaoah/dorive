@@ -23,7 +23,18 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class Criterion {
+
     private String property;
     private String operator;
     private Object value;
+
+    public Criterion(String property, String operator) {
+        this.property = property;
+        this.operator = operator;
+    }
+
+    public Criterion tryClone() {
+        return new Criterion(property, operator, value);
+    }
+
 }

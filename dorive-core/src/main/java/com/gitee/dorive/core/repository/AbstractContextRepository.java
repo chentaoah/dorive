@@ -19,19 +19,29 @@ package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.api.constant.Keys;
 import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.def.FieldDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.element.EntityField;
 import com.gitee.dorive.api.entity.element.EntityType;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
+import com.gitee.dorive.core.api.executor.EntityFactory;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.api.executor.FieldConverter;
 import com.gitee.dorive.core.config.RepositoryContext;
+import com.gitee.dorive.core.entity.ExecutorResult;
 import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.impl.executor.ChainExecutor;
+import com.gitee.dorive.core.impl.converter.DefaultFieldConverter;
+import com.gitee.dorive.core.impl.executor.DefaultExecutor;
+import com.gitee.dorive.core.impl.executor.FactoryExecutor;
+import com.gitee.dorive.core.impl.executor.FieldExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
@@ -75,7 +85,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     public void afterPropertiesSet() throws Exception {
         Class<?> entityClass = ReflectUtils.getFirstArgumentType(this.getClass());
         EntityType entityType = EntityType.getInstance(entityClass);
-        Assert.isTrue(entityType.isAnnotatedEntity(), "No @Entity annotation found! type: {}", entityType.getName());
+        Assert.isTrue(entityType.isEntityDef(), "No @Entity annotation found! type: {}", entityType.getName());
 
         propChainResolver = new PropChainResolver(entityType);
 
@@ -86,7 +96,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
         propChainMap.forEach((accessPath, propChain) -> {
-            if (propChain.isAnnotatedEntity()) {
+            if (propChain.isEntityDef()) {
                 CommonRepository subRepository = newRepository(accessPath, propChain.getEntityField());
                 repositoryMap.put(accessPath, subRepository);
                 subRepositories.add(subRepository);
@@ -99,7 +109,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setEntityDef(rootRepository.getEntityDef());
         setEntityEle(rootRepository.getEntityEle());
         setOperationFactory(rootRepository.getOperationFactory());
-        setExecutor(newExecutor());
+        setExecutor(newDefaultExecutor());
         setAttachments(new ConcurrentHashMap<>(rootRepository.getAttachments()));
     }
 
@@ -142,9 +152,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     private EntityDef renewEntityDef(EntityEle entityEle) {
         EntityDef entityDef = entityEle.getEntityDef();
         entityDef = BeanUtil.copyProperties(entityDef, EntityDef.class);
-        if (!entityDef.isAggregated() && entityEle.isAggregated()) {
+        if (entityEle.isAggregateDef()) {
             Class<?> entityClass = entityEle.getGenericType();
-            Class<?> repositoryClass = RepositoryContext.findTypeByEntity(entityClass);
+            Class<?> repositoryClass = RepositoryContext.findRepositoryClass(entityClass);
             Assert.notNull(repositoryClass, "No type of repository found! type: {}", entityClass.getName());
             entityDef.setRepository(repositoryClass);
         }
@@ -166,11 +176,46 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultRepository.setEntityEle(entityEle);
             defaultRepository.setOperationFactory(operationFactory);
 
+            Map<String, FieldConverter> converterMap = newConverterMap(entityEle);
             Map<String, Object> attachments = new ConcurrentHashMap<>(8);
-            defaultRepository.setExecutor(newExecutor(entityDef, entityEle, attachments));
+
+            ExecutorResult executorResult = newExecutor(entityDef, entityEle, converterMap, attachments);
+            EntityFactory entityFactory = executorResult.getEntityFactory();
+            Executor executor = executorResult.getExecutor();
+
+            executor = new FactoryExecutor(executor, entityEle, entityFactory);
+            executor = new FieldExecutor(executor, entityEle, converterMap);
+            attachments.put(Keys.FIELD_EXECUTOR, executor);
+
+            defaultRepository.setExecutor(executor);
             defaultRepository.setAttachments(attachments);
         }
         return (AbstractRepository<Object, Object>) repository;
+    }
+
+    private Map<String, FieldConverter> newConverterMap(EntityEle entityEle) {
+        Map<String, FieldConverter> converterMap = new LinkedHashMap<>(8);
+        Map<String, EntityField> entityFieldMap = entityEle.getEntityFieldMap();
+        if (entityFieldMap != null) {
+            entityFieldMap.forEach((name, entityField) -> {
+                FieldDef fieldDef = entityField.getFieldDef();
+                if (fieldDef != null) {
+                    Class<?> converterClass = fieldDef.getConverter();
+                    String mapExp = fieldDef.getMapExp();
+                    FieldConverter fieldConverter = null;
+                    if (converterClass != Object.class) {
+                        fieldConverter = (FieldConverter) ReflectUtil.newInstance(converterClass);
+
+                    } else if (StringUtils.isNotBlank(mapExp)) {
+                        fieldConverter = new DefaultFieldConverter(entityField);
+                    }
+                    if (fieldConverter != null) {
+                        converterMap.put(name, fieldConverter);
+                    }
+                }
+            });
+        }
+        return converterMap;
     }
 
     private OrderBy newDefaultOrderBy(EntityDef entityDef) {
@@ -183,16 +228,16 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return null;
     }
 
-    private Executor newExecutor() {
+    private Executor newDefaultExecutor() {
         EntityHandler entityHandler = processEntityHandler(new BatchEntityHandler(this));
         derivedResolver = new DerivedResolver(this);
         if (derivedResolver.isDerived()) {
             entityHandler = new AdaptiveEntityHandler(this, entityHandler);
         }
-        return new ChainExecutor(this, entityHandler);
+        return new DefaultExecutor(this, entityHandler);
     }
 
-    protected abstract Executor newExecutor(EntityDef entityDef, EntityEle entityEle, Map<String, Object> attachments);
+    protected abstract ExecutorResult newExecutor(EntityDef entityDef, EntityEle entityEle, Map<String, FieldConverter> converterMap, Map<String, Object> attachments);
 
     protected abstract AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository);
 

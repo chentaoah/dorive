@@ -27,24 +27,15 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.executor.UnionExample;
-import com.gitee.dorive.core.entity.operation.Delete;
-import com.gitee.dorive.core.entity.operation.Insert;
-import com.gitee.dorive.core.entity.operation.NullableUpdate;
-import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.entity.operation.Update;
+import com.gitee.dorive.core.entity.executor.*;
+import com.gitee.dorive.core.entity.operation.*;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
-import com.gitee.dorive.spring.boot.starter.entity.QueryResult;
 import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -85,32 +76,35 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("id", query.getPrimaryKey());
             List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-            return new Result<>(new QueryResult(resultMaps));
+            return new MultiResult(resultMaps);
 
         } else if (query.getExample() != null) {
             Example example = query.getExample();
-            if (query.withoutPage()) {
+            if (query.startPage()) {
+                com.gitee.dorive.core.entity.executor.Page<Object> page = example.getPage();
+
+                Page<Map<String, Object>> queryPage = new Page<>(page.getCurrent(), page.getSize());
+                QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
+                queryPage = baseMapper.selectMapsPage(queryPage, queryWrapper);
+
+                page.setTotal(queryPage.getTotal());
+                return new MultiResult(page, queryPage.getRecords());
+
+            } else {
                 if (example instanceof UnionExample) {
                     UnionExample unionExample = (UnionExample) example;
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                    return new Result<>(new QueryResult(resultMaps));
+                    return new MultiResult(resultMaps);
 
                 } else {
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                    return new Result<>(new QueryResult(resultMaps));
+                    return new MultiResult(resultMaps);
                 }
-
-            } else {
-                com.gitee.dorive.core.entity.executor.Page<Object> page = example.getPage();
-                Page<Map<String, Object>> dataPage = new Page<>(page.getCurrent(), page.getSize());
-                QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
-                dataPage = baseMapper.selectMapsPage(dataPage, queryWrapper);
-                return new Result<>(new QueryResult(dataPage));
             }
         }
-        return new Result<>(new QueryResult(Collections.emptyList()));
+        return new MultiResult(Collections.emptyList());
     }
 
     @Override
@@ -218,8 +212,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                 NullableUpdate nullableUpdate = (NullableUpdate) update;
                 Set<String> nullableSet = nullableUpdate.getNullableSet();
                 if (nullableSet != null && !nullableSet.isEmpty()) {
-                    example = primaryKey != null ? new Example().eq("id", primaryKey) : example;
-                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableSet, example);
+                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableSet, primaryKey, example);
                     return baseMapper.update(null, updateWrapper);
                 }
             }
@@ -255,7 +248,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         return updateWrapper;
     }
 
-    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableSet, Example example) {
+    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableSet, Object primaryKey, Example example) {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
         List<TableFieldInfo> fieldList = TableInfoHelper.getTableInfo(pojoClass).getFieldList();
         for (TableFieldInfo tableFieldInfo : fieldList) {
@@ -265,9 +258,15 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                 updateWrapper.set(true, tableFieldInfo.getColumn(), value);
             }
         }
-        for (Criterion criterion : example.getCriteria()) {
-            CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            criterionAppender.appendCriterion(updateWrapper, criterion.getProperty(), criterion.getValue());
+        if (primaryKey != null) {
+            CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(Operator.EQ);
+            criterionAppender.appendCriterion(updateWrapper, "id", primaryKey);
+        }
+        if (example != null) {
+            for (Criterion criterion : example.getCriteria()) {
+                CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
+                criterionAppender.appendCriterion(updateWrapper, criterion.getProperty(), criterion.getValue());
+            }
         }
         return updateWrapper;
     }

@@ -17,9 +17,16 @@
 
 package com.gitee.dorive.event.api;
 
+import com.gitee.dorive.event.annotation.Listener;
 import com.gitee.dorive.event.entity.ExecutorEvent;
+import org.springframework.core.annotation.AnnotationUtils;
 
 public interface EntityListener {
+
+    default Class<?> subscribe() {
+        Listener listener = AnnotationUtils.getAnnotation(this.getClass(), Listener.class);
+        return listener != null ? listener.value() : null;
+    }
 
     void onApplicationEvent(ExecutorEvent executorEvent);
 

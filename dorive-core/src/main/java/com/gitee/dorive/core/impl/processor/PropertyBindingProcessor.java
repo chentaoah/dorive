@@ -15,14 +15,28 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.binder;
+package com.gitee.dorive.core.impl.processor;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.core.api.context.Context;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-public interface Processor {
+import java.util.Collection;
 
-    Object input(Context context, Object value);
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class PropertyBindingProcessor extends DefaultBindingProcessor {
 
-    Object output(Context context, Object value);
+    @Override
+    public Object input(Context context, Object value) {
+        String property = getBindingDef().getProperty();
+        if (value instanceof Collection) {
+            return CollUtil.map((Collection<?>) value, item -> BeanUtil.getFieldValue(item, property), true);
+        } else {
+            return BeanUtil.getFieldValue(value, property);
+        }
+    }
 
 }

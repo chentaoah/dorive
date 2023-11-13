@@ -15,50 +15,51 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.impl.executor;
+package com.gitee.dorive.core.impl.executor;
 
-import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.entity.executor.*;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.impl.executor.AbstractExecutor;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class AliasExecutor extends AbstractExecutor {
+public abstract class AbstractExampleExecutor extends AbstractProxyExecutor {
 
-    private EntityEle entityEle;
-    private Executor executor;
+    public AbstractExampleExecutor(Executor executor) {
+        super(executor);
+    }
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Example example = query.getExample();
         if (example != null) {
             if (example instanceof UnionExample) {
-                convert((UnionExample) example);
+                convert(context, (UnionExample) example);
             } else {
-                convert(example);
+                convert(context, example);
             }
         }
-        return executor.executeQuery(context, query);
+        return super.executeQuery(context, query);
     }
 
     @Override
     public long executeCount(Context context, Query query) {
         Example example = query.getExample();
         if (example != null) {
-            convert(example);
+            convert(context, example);
         }
-        return executor.executeCount(context, query);
+        return super.executeCount(context, query);
     }
 
     @Override
@@ -67,49 +68,19 @@ public class AliasExecutor extends AbstractExecutor {
             Condition condition = (Condition) operation;
             Example example = condition.getExample();
             if (example != null) {
-                convert(example);
+                convert(context, example);
             }
         }
-        return executor.execute(context, operation);
+        return super.execute(context, operation);
     }
 
-    public void convert(UnionExample unionExample) {
+    private void convert(Context context, UnionExample unionExample) {
         List<Example> examples = unionExample.getExamples();
         for (Example example : examples) {
-            convert(example);
+            convert(context, example);
         }
     }
 
-    public void convert(Example example) {
-        convertSelect(example);
-        convertCriteria(example.getCriteria());
-        convertOrderBy(example.getOrderBy());
-    }
-
-    public void convertSelect(Example example) {
-        List<String> properties = example.getSelectProps();
-        if (properties != null && !properties.isEmpty()) {
-            properties = entityEle.toAliases(properties);
-            example.setSelectProps(properties);
-        }
-    }
-
-    public void convertCriteria(List<Criterion> criteria) {
-        if (criteria != null && !criteria.isEmpty()) {
-            for (Criterion criterion : criteria) {
-                String property = criterion.getProperty();
-                property = entityEle.toAlias(property);
-                criterion.setProperty(property);
-            }
-        }
-    }
-
-    public void convertOrderBy(OrderBy orderBy) {
-        if (orderBy != null) {
-            List<String> properties = orderBy.getProperties();
-            properties = entityEle.toAliases(properties);
-            orderBy.setProperties(properties);
-        }
-    }
+    public abstract void convert(Context context, Example example);
 
 }

@@ -15,26 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.entity;
+package com.gitee.dorive.core.api.context;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.Data;
+public interface Node {
 
-import java.util.List;
-import java.util.Map;
+    boolean isRoot();
 
-@Data
-public class QueryResult {
-
-    private Page<Map<String, Object>> page;
-    private List<Map<String, Object>> resultMaps;
-
-    public QueryResult(Page<Map<String, Object>> page) {
-        this.page = page;
-    }
-
-    public QueryResult(List<Map<String, Object>> resultMaps) {
-        this.resultMaps = resultMaps;
-    }
+    String getName();
 
 }

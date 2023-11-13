@@ -32,7 +32,7 @@ public class UnionExample extends Example {
     private List<Example> examples = new ArrayList<>();
 
     @Override
-    public boolean isDirtyQuery() {
+    public boolean isNotEmpty() {
         return !examples.isEmpty();
     }
 

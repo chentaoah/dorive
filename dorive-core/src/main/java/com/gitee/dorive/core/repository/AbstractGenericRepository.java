@@ -24,6 +24,7 @@ import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.api.repository.ListableRepository;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.util.ExampleUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -48,7 +49,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         int totalCount = 0;
         for (CommonRepository repository : getOrderedRepositories()) {
             if (selector.matches(context, repository)) {
-                totalCount += repository.updateByExample(context, entity, example);
+                totalCount += repository.updateByExample(context, entity, ExampleUtils.tryClone(example));
             }
         }
         return totalCount;
@@ -63,7 +64,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
 
     @Override
     public int deleteByPrimaryKey(Context context, PK primaryKey) {
-        Assert.notNull(primaryKey, "The primaryKey cannot be null!");
+        Assert.notNull(primaryKey, "The primary key cannot be null!");
         E entity = selectByPrimaryKey(context, primaryKey);
         return delete(context, entity);
     }
@@ -75,7 +76,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         int totalCount = 0;
         for (CommonRepository repository : getOrderedRepositories()) {
             if (selector.matches(context, repository)) {
-                totalCount += repository.deleteByExample(context, example);
+                totalCount += repository.deleteByExample(context, ExampleUtils.tryClone(example));
             }
         }
         return totalCount;

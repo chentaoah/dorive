@@ -19,7 +19,7 @@ package com.gitee.dorive.ref.api;
 
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
 
-public interface Ref<E> extends SimpleRepository<E, Object> {
+public interface Ref<E> extends SelectorRepository<E, Object> {
 
     <R extends AbstractRefRepository<?, ?>> R get();
 

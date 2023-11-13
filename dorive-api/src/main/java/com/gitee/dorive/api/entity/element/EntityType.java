@@ -19,10 +19,9 @@ package com.gitee.dorive.api.entity.element;
 
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.api.PropProxy;
-import com.gitee.dorive.api.entity.def.AliasDef;
+import com.gitee.dorive.api.entity.def.FieldDef;
 import com.gitee.dorive.api.exception.CircularDependencyException;
 import com.gitee.dorive.api.impl.factory.PropProxyFactory;
 import com.gitee.dorive.api.util.ReflectUtils;
@@ -48,15 +47,15 @@ public class EntityType extends EntityEle {
 
     private Class<?> type;
     private String name;
-    private Map<String, EntityField> entityFields;
+    private Map<String, EntityField> entityFieldMap;
 
     public static synchronized EntityType getInstance(Class<?> type) {
         EntityType entityType = CACHE.get(type);
         if (entityType == null) {
             if (LOCK.add(type)) {
                 entityType = new EntityType(type);
-                LOCK.remove(type);
                 CACHE.put(type, entityType);
+                LOCK.remove(type);
             } else {
                 throw new CircularDependencyException("Circular Dependency! type: " + type.getName());
             }
@@ -70,38 +69,43 @@ public class EntityType extends EntityEle {
         this.name = type.getName();
 
         List<Field> fields = ReflectUtils.getAllFields(type);
-        this.entityFields = new LinkedHashMap<>(fields.size() * 4 / 3 + 1);
+        this.entityFieldMap = new LinkedHashMap<>(fields.size() * 4 / 3 + 1);
 
         for (Field field : fields) {
             if (!Modifier.isStatic(field.getModifiers())) {
                 try {
                     EntityField entityField = new EntityField(field);
-                    entityFields.put(entityField.getName(), entityField);
+                    entityFieldMap.put(entityField.getName(), entityField);
 
                 } catch (CircularDependencyException e) {
                     log.warn(e.getMessage());
                 }
             }
         }
+
         initialize();
     }
 
     @Override
     protected void doInitialize() {
         Class<?> genericType = getGenericType();
-        boolean hasField = ReflectUtil.hasField(genericType, "id");
-        Assert.isTrue(hasField, "The primary key not found! type: {}", genericType.getName());
-        PropProxy pkProxy = PropProxyFactory.newPropProxy(genericType, "id");
-        setPkProxy(pkProxy);
+        int initialCapacity = entityFieldMap.size() * 4 / 3 + 1;
+        PropProxy pkProxy = null;
+        Map<String, String> propAliasMap = new LinkedHashMap<>(initialCapacity);
 
-        Map<String, String> propAliasMap = new LinkedHashMap<>(entityFields.size() * 4 / 3 + 1);
-        for (EntityField entityField : entityFields.values()) {
+        for (EntityField entityField : entityFieldMap.values()) {
             String name = entityField.getName();
-            AliasDef aliasDef = entityField.getAliasDef();
-            String alias = aliasDef != null ? aliasDef.getValue() : StrUtil.toUnderlineCase(name);
+            FieldDef fieldDef = entityField.getFieldDef();
+            if ("id".equals(name)) {
+                pkProxy = PropProxyFactory.newPropProxy(genericType, "id");
+            }
+            String alias = fieldDef != null ? fieldDef.getAlias() : StrUtil.toUnderlineCase(name);
             propAliasMap.put(name, alias);
         }
-        setPropAliasMap(propAliasMap);
+
+        Assert.notNull(pkProxy, "The primary key not found! type: {}", genericType.getName());
+        setPkProxy(pkProxy);
+        setFieldAliasMap(propAliasMap);
     }
 
     @Override
@@ -117,6 +121,11 @@ public class EntityType extends EntityEle {
     @Override
     public EntityType getEntityType() {
         return this;
+    }
+
+    @Override
+    public Map<String, EntityField> getEntityFieldMap() {
+        return entityFieldMap;
     }
 
 }

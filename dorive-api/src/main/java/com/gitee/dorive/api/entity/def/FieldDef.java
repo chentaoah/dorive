@@ -18,7 +18,7 @@
 package com.gitee.dorive.api.entity.def;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.api.annotation.Alias;
+import com.gitee.dorive.api.annotation.Field;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,16 +30,15 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AliasDef {
+public class FieldDef {
 
-    private String value;
+    private String alias;
+    private Class<?> converter;
+    private String mapExp;
 
-    public static AliasDef fromElement(AnnotatedElement element) {
-        if (element.isAnnotationPresent(Alias.class)) {
-            Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Alias.class);
-            return BeanUtil.copyProperties(attributes, AliasDef.class);
-        }
-        return null;
+    public static FieldDef fromElement(AnnotatedElement element) {
+        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Field.class);
+        return attributes != null ? BeanUtil.copyProperties(attributes, FieldDef.class) : null;
     }
 
 }

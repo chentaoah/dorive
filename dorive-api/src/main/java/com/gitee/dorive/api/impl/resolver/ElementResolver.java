@@ -26,17 +26,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
-public class EntityResolver {
+public class ElementResolver {
 
     private Map<String, EntityEle> entityEleMap = new LinkedHashMap<>();
 
-    public EntityResolver(EntityType entityType) {
+    public ElementResolver(EntityType entityType) {
         this.entityEleMap.put("/", entityType);
         resolve("", entityType);
     }
 
     private void resolve(String lastAccessPath, EntityType entityType) {
-        for (EntityField entityField : entityType.getEntityFields().values()) {
+        for (EntityField entityField : entityType.getEntityFieldMap().values()) {
             String accessPath = lastAccessPath + "/" + entityField.getName();
             entityEleMap.put(accessPath, entityField);
             EntityType fieldEntityType = entityField.getEntityType();

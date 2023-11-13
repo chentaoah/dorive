@@ -18,7 +18,7 @@
 package com.gitee.dorive.api.entity.element;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.api.entity.def.AliasDef;
+import com.gitee.dorive.api.entity.def.FieldDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,6 +27,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -37,7 +38,7 @@ public class EntityField extends EntityEle {
     private boolean collection;
     private Class<?> genericType;
     private String name;
-    private AliasDef aliasDef;
+    private FieldDef fieldDef;
     private EntityType entityType;
 
     public static boolean isComplexType(Class<?> type) {
@@ -58,11 +59,12 @@ public class EntityField extends EntityEle {
             Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
             this.genericType = (Class<?>) actualTypeArgument;
         }
-        resolve(field);
+        this.fieldDef = FieldDef.fromElement(field);
+        resolveGenericType(this.genericType);
         initialize();
     }
 
-    private void resolve(Field field) {
+    private void resolveGenericType(Class<?> genericType) {
         EntityDef entityDef = getEntityDef();
         if (entityDef != null) {
             EntityDef genericEntityDef = EntityDef.fromElement(genericType);
@@ -70,7 +72,6 @@ public class EntityField extends EntityEle {
                 entityDef.merge(genericEntityDef);
             }
         }
-        aliasDef = AliasDef.fromElement(field);
         if (isComplexType(genericType)) {
             entityType = EntityType.getInstance(genericType);
         }
@@ -81,8 +82,13 @@ public class EntityField extends EntityEle {
         if (entityType != null) {
             entityType.initialize();
             setPkProxy(entityType.getPkProxy());
-            setPropAliasMap(entityType.getPropAliasMap());
+            setFieldAliasMap(entityType.getFieldAliasMap());
         }
+    }
+
+    @Override
+    public Map<String, EntityField> getEntityFieldMap() {
+        return entityType != null ? entityType.getEntityFieldMap() : null;
     }
 
     public boolean isSameType(EntityField entityField) {

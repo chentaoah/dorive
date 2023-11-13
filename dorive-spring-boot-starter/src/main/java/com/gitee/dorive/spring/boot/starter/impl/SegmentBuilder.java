@@ -23,20 +23,30 @@ import com.gitee.dorive.coating.entity.CoatingCriteria;
 import com.gitee.dorive.coating.entity.CoatingType;
 import com.gitee.dorive.coating.entity.MergedRepository;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.spring.boot.starter.api.Keys;
-import com.gitee.dorive.spring.boot.starter.entity.*;
-import com.gitee.dorive.spring.boot.starter.impl.executor.AliasExecutor;
+import com.gitee.dorive.api.constant.Keys;
+import com.gitee.dorive.spring.boot.starter.entity.ArgSegment;
+import com.gitee.dorive.spring.boot.starter.entity.JoinSegment;
+import com.gitee.dorive.spring.boot.starter.entity.OnSegment;
+import com.gitee.dorive.spring.boot.starter.entity.Segment;
+import com.gitee.dorive.spring.boot.starter.entity.SegmentResult;
+import com.gitee.dorive.spring.boot.starter.entity.SelectSegment;
+import com.gitee.dorive.core.impl.executor.FieldExecutor;
 import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -44,7 +54,7 @@ public class SegmentBuilder {
 
     private final AbstractCoatingRepository<?, ?> repository;
 
-    public SegmentResult buildSegment(Object coating) {
+    public SegmentResult buildSegment(Context context, Object coating) {
         CoatingType coatingType = repository.getCoatingType(coating);
         CoatingCriteria coatingCriteria = coatingType.newCriteria(coating);
         Map<String, List<Criterion>> criteriaMap = coatingCriteria.getCriteriaMap();
@@ -69,14 +79,14 @@ public class SegmentBuilder {
 
             Map<String, Object> attachments = executedRepository.getAttachments();
             TableInfo tableInfo = (TableInfo) attachments.get(Keys.TABLE_INFO);
-            AliasExecutor aliasExecutor = (AliasExecutor) attachments.get(Keys.ALIAS_EXECUTOR);
+            FieldExecutor fieldExecutor = (FieldExecutor) attachments.get(Keys.FIELD_EXECUTOR);
 
             String tableName = tableInfo.getTableName();
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
             List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> Collections.emptyList());
-            aliasExecutor.convertCriteria(criteria);
+            fieldExecutor.convertCriteria(context, criteria);
             appendArguments(argSegments, args, tableAlias, criteria);
 
             if ("/".equals(relativeAccessPath)) {
@@ -92,7 +102,7 @@ public class SegmentBuilder {
                 selectSegment.setArgSegments(argSegments);
                 segmentMap.put(relativeAccessPath, selectSegment);
 
-                aliasExecutor.convertOrderBy(orderBy);
+                fieldExecutor.convertOrderBy(orderBy);
 
             } else {
                 JoinSegment joinSegment = new JoinSegment();
@@ -126,17 +136,17 @@ public class SegmentBuilder {
                                  String tableAlias,
                                  List<Criterion> criteria) {
         for (Criterion criterion : criteria) {
-            String property = tableAlias + "." + criterion.getProperty();
+            String property = criterion.getProperty();
             String operator = CriterionUtils.getOperator(criterion);
             if (Operator.IS_NULL.equals(operator) || Operator.IS_NOT_NULL.equals(operator)) {
-                ArgSegment argSegment = new ArgSegment(property, operator, null);
+                ArgSegment argSegment = new ArgSegment(tableAlias, property, operator, null);
                 argSegments.add(argSegment);
 
             } else {
                 Object value = criterion.getValue();
                 args.add(CriterionUtils.format(operator, value));
                 int index = args.size() - 1;
-                ArgSegment argSegment = new ArgSegment(property, operator, "{" + index + "}");
+                ArgSegment argSegment = new ArgSegment(tableAlias, property, operator, "{" + index + "}");
                 argSegments.add(argSegment);
             }
         }
