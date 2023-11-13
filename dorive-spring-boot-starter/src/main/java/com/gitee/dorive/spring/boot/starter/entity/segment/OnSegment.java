@@ -15,21 +15,23 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.entity;
+package com.gitee.dorive.spring.boot.starter.entity.segment;
 
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Page;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.List;
+import lombok.EqualsAndHashCode;
 
 @Data
-@AllArgsConstructor
-public class SegmentResult {
-    private char letter;
-    private SelectSegment selectSegment;
-    private List<Object> args;
-    private OrderBy orderBy;
-    private Page<Object> page;
+@EqualsAndHashCode(callSuper = false)
+public class OnSegment extends Segment {
+
+    private String tableAlias;
+    private String column;
+    private String joinTableAlias;
+    private String joinColumn;
+
+    @Override
+    public String toString() {
+        return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
+    }
+
 }

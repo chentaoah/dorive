@@ -22,8 +22,8 @@ import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.context.BoundedContext;
-import com.gitee.dorive.spring.boot.starter.entity.SegmentResult;
-import com.gitee.dorive.spring.boot.starter.entity.SelectSegment;
+import com.gitee.dorive.spring.boot.starter.entity.segment.SegmentResult;
+import com.gitee.dorive.spring.boot.starter.entity.segment.SelectSegment;
 import lombok.Data;
 
 import java.util.ArrayList;

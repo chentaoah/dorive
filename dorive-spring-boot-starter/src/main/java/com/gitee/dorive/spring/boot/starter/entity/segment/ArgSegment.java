@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.entity;
+package com.gitee.dorive.spring.boot.starter.entity.segment;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

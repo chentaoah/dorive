@@ -15,23 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.entity;
+package com.gitee.dorive.spring.boot.starter.entity.segment;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class OnSegment extends Segment {
-
+public class JoinSegment extends Segment {
+    private String tableName;
     private String tableAlias;
-    private String column;
-    private String joinTableAlias;
-    private String joinColumn;
-
-    @Override
-    public String toString() {
-        return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
-    }
-
+    private List<OnSegment> onSegments;
 }
