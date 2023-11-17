@@ -15,19 +15,31 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.repository;
+package com.gitee.dorive.query.entity;
 
-import com.gitee.dorive.query.repository.AbstractCoatingRepository;
-import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.ref.api.SelectorRepository;
-import com.gitee.dorive.ref.impl.RefInjector;
+import com.gitee.dorive.core.impl.binder.PropertyBinder;
+import com.gitee.dorive.core.repository.CommonRepository;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-public abstract class AbstractRefRepository<E, PK> extends AbstractCoatingRepository<E, PK> implements SelectorRepository<E, PK> {
+import java.util.List;
+import java.util.Map;
 
-    @Override
-    protected EntityHandler processEntityHandler(EntityHandler entityHandler) {
-        new RefInjector(this, entityHandler, getEntityClass());
-        return entityHandler;
+@Data
+@AllArgsConstructor
+public class MergedRepository {
+
+    private String lastAccessPath;
+    private String absoluteAccessPath;
+    private CommonRepository definedRepository;
+    private Map<String, List<PropertyBinder>> mergedBindersMap;
+    private boolean merged;
+    private String relativeAccessPath;
+    private CommonRepository executedRepository;
+    private Integer order;
+
+    public String getName() {
+        return definedRepository.getEntityDef().getName();
     }
 
 }

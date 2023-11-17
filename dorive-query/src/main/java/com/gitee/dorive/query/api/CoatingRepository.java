@@ -15,19 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.repository;
+package com.gitee.dorive.query.api;
 
-import com.gitee.dorive.query.repository.AbstractCoatingRepository;
-import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.ref.api.SelectorRepository;
-import com.gitee.dorive.ref.impl.RefInjector;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.repository.ListableRepository;
+import com.gitee.dorive.core.entity.executor.Page;
 
-public abstract class AbstractRefRepository<E, PK> extends AbstractCoatingRepository<E, PK> implements SelectorRepository<E, PK> {
+import java.util.List;
 
-    @Override
-    protected EntityHandler processEntityHandler(EntityHandler entityHandler) {
-        new RefInjector(this, entityHandler, getEntityClass());
-        return entityHandler;
-    }
+public interface CoatingRepository<E, PK> extends ListableRepository<E, PK> {
+
+    List<E> selectByCoating(Context context, Object coating);
+
+    Page<E> selectPageByCoating(Context context, Object coating);
 
 }

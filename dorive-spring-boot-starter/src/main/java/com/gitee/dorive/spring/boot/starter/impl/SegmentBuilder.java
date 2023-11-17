@@ -19,10 +19,10 @@ package com.gitee.dorive.spring.boot.starter.impl;
 
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.gitee.dorive.api.constant.Operator;
-import com.gitee.dorive.coating.entity.CoatingCriteria;
-import com.gitee.dorive.coating.entity.CoatingType;
-import com.gitee.dorive.coating.entity.MergedRepository;
-import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
+import com.gitee.dorive.query.entity.CoatingCriteria;
+import com.gitee.dorive.query.entity.CoatingType;
+import com.gitee.dorive.query.entity.MergedRepository;
+import com.gitee.dorive.query.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.OrderBy;

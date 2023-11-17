@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.ref.api;
 
-import com.gitee.dorive.coating.api.CoatingRepository;
+import com.gitee.dorive.query.api.CoatingRepository;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.context.InnerContext;
 import com.gitee.dorive.core.entity.executor.Example;

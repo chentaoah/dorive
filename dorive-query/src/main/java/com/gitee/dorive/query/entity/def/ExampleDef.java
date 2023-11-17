@@ -15,19 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.repository;
+package com.gitee.dorive.query.entity.def;
 
-import com.gitee.dorive.query.repository.AbstractCoatingRepository;
-import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.ref.api.SelectorRepository;
-import com.gitee.dorive.ref.impl.RefInjector;
+import cn.hutool.core.bean.BeanUtil;
+import com.gitee.dorive.query.annotation.Example;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
-public abstract class AbstractRefRepository<E, PK> extends AbstractCoatingRepository<E, PK> implements SelectorRepository<E, PK> {
+import java.lang.reflect.AnnotatedElement;
+import java.util.Map;
 
-    @Override
-    protected EntityHandler processEntityHandler(EntityHandler entityHandler) {
-        new RefInjector(this, entityHandler, getEntityClass());
-        return entityHandler;
+public class ExampleDef {
+
+    public static ExampleDef fromElement(AnnotatedElement element) {
+        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Example.class);
+        return attributes != null ? BeanUtil.copyProperties(attributes, ExampleDef.class) : null;
     }
 
 }

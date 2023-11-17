@@ -19,9 +19,9 @@ package com.gitee.dorive.spring.boot.starter.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
-import com.gitee.dorive.coating.api.ExampleBuilder;
-import com.gitee.dorive.coating.entity.BuildExample;
-import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
+import com.gitee.dorive.query.api.ExampleBuilder;
+import com.gitee.dorive.query.entity.BuildExample;
+import com.gitee.dorive.query.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;

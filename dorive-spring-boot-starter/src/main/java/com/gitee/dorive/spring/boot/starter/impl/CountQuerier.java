@@ -19,7 +19,7 @@ package com.gitee.dorive.spring.boot.starter.impl;
 
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.coating.repository.AbstractCoatingRepository;
+import com.gitee.dorive.query.repository.AbstractCoatingRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.context.BoundedContext;
 import com.gitee.dorive.spring.boot.starter.entity.segment.SegmentResult;
