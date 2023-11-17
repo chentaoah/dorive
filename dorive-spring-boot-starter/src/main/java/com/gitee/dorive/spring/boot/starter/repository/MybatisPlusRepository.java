@@ -25,14 +25,14 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.api.constant.Keys;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.query.api.ExampleBuilder;
-import com.gitee.dorive.query.entity.BuildExample;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.executor.FieldConverter;
 import com.gitee.dorive.core.entity.ExecutorResult;
 import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
+import com.gitee.dorive.query.api.ExampleBuilder;
+import com.gitee.dorive.query.entity.Query;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.spring.boot.starter.impl.CountQuerier;
 import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
@@ -149,14 +149,13 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     }
 
     @Override
-    public BuildExample buildExample(Context context, Object query) {
+    protected ExampleBuilder adaptiveExampleBuilder(Context context, Query query) {
         Map<String, Object> attachments = context.getAttachments();
         String querier = (String) attachments.get(Keys.QUERIER);
         if (querier == null || "SQL".equals(querier)) {
-            return sqlExampleBuilder.buildExample(context, query);
-        } else {
-            return getExampleBuilder().buildExample(context, query);
+            return sqlExampleBuilder;
         }
+        return super.adaptiveExampleBuilder(context, query);
     }
 
 }

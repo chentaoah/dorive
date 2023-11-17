@@ -19,7 +19,6 @@ package com.gitee.dorive.query.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.query.entity.QueryField;
-import com.gitee.dorive.query.entity.QueryType;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.SpecificFields;
 import com.gitee.dorive.query.entity.def.QueryScanDef;
@@ -47,8 +46,8 @@ public class QueryTypeResolver {
     private static Map<String, List<Class<?>>> scannedClasses = new ConcurrentHashMap<>();
 
     private AbstractQueryRepository<?, ?> repository;
-    private Map<Class<?>, QueryType> classQueryTypeMap = new ConcurrentHashMap<>();
-    private Map<String, QueryType> nameQueryTypeMap = new ConcurrentHashMap<>();
+    private Map<Class<?>, QueryResolver> classQueryResolverMap = new ConcurrentHashMap<>();
+    private Map<String, QueryResolver> nameQueryResolverMap = new ConcurrentHashMap<>();
 
     public QueryTypeResolver(AbstractQueryRepository<?, ?> repository) throws Exception {
         this.repository = repository;
@@ -104,9 +103,9 @@ public class QueryTypeResolver {
         List<MergedRepository> reversedMergedRepositories = new ArrayList<>(mergedRepositories);
         Collections.reverse(reversedMergedRepositories);
 
-        QueryType queryType = new QueryType(exampleDef, queryFields, specificFields, mergedRepositories, reversedMergedRepositories);
-        classQueryTypeMap.put(queryClass, queryType);
-        nameQueryTypeMap.put(queryClass.getName(), queryType);
+        QueryResolver queryResolver = new QueryResolver(exampleDef, queryFields, specificFields, mergedRepositories, reversedMergedRepositories);
+        classQueryResolverMap.put(queryClass, queryResolver);
+        nameQueryResolverMap.put(queryClass.getName(), queryResolver);
     }
 
     private List<MergedRepository> matchMergedRepositories(List<QueryField> queryFields) {

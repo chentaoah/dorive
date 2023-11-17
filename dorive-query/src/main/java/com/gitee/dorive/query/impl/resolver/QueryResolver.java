@@ -15,8 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.entity;
+package com.gitee.dorive.query.impl.resolver;
 
+import com.gitee.dorive.query.entity.MergedRepository;
+import com.gitee.dorive.query.entity.Query;
+import com.gitee.dorive.query.entity.QueryField;
+import com.gitee.dorive.query.entity.SpecificFields;
 import com.gitee.dorive.query.entity.def.ExampleDef;
 import com.gitee.dorive.query.entity.def.CriterionDef;
 import com.gitee.dorive.core.entity.executor.Criterion;
@@ -32,7 +36,7 @@ import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class QueryType {
+public class QueryResolver {
 
     private ExampleDef exampleDef;
     private List<QueryField> queryFields;
@@ -40,14 +44,14 @@ public class QueryType {
     private List<MergedRepository> mergedRepositories;
     private List<MergedRepository> reversedMergedRepositories;
 
-    public QueryCriteria newCriteria(Object query) {
+    public Query resolve(Object query) {
         Map<String, List<Criterion>> criteriaMap = newCriteriaMap(query);
         OrderBy orderBy = specificFields.newOrderBy(query);
         Page<Object> page = specificFields.newPage(query);
-        return new QueryCriteria(criteriaMap, orderBy, page);
+        return new Query(this, query, criteriaMap, orderBy, page);
     }
 
-    public Map<String, List<Criterion>> newCriteriaMap(Object query) {
+    private Map<String, List<Criterion>> newCriteriaMap(Object query) {
         Map<String, List<Criterion>> criteriaMap = new LinkedHashMap<>(8);
         for (QueryField queryField : queryFields) {
             Object fieldValue = queryField.getFieldValue(query);

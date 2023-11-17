@@ -22,7 +22,8 @@ import com.gitee.dorive.api.annotation.Repository;
 import com.gitee.dorive.query.api.QueryRepository;
 import com.gitee.dorive.query.api.ExampleBuilder;
 import com.gitee.dorive.query.entity.BuildExample;
-import com.gitee.dorive.query.entity.QueryType;
+import com.gitee.dorive.query.entity.Query;
+import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import com.gitee.dorive.query.entity.def.QueryScanDef;
 import com.gitee.dorive.query.impl.DefaultExampleBuilder;
 import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
@@ -63,16 +64,18 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         }
     }
 
-    public QueryType getQueryType(Object query) {
-        Map<String, QueryType> nameQueryTypeMap = queryTypeResolver.getNameQueryTypeMap();
-        QueryType queryType = nameQueryTypeMap.get(query.getClass().getName());
-        Assert.notNull(queryType, "No query type found!");
-        return queryType;
-    }
-
     @Override
     public BuildExample buildExample(Context context, Object query) {
-        return exampleBuilder.buildExample(context, query);
+        Map<String, QueryResolver> nameQueryResolverMap = queryTypeResolver.getNameQueryResolverMap();
+        QueryResolver queryResolver = nameQueryResolverMap.get(query.getClass().getName());
+        Assert.notNull(queryResolver, "No query resolver found!");
+        Query newQuery = queryResolver.resolve(query);
+        ExampleBuilder exampleBuilder = adaptiveExampleBuilder(context, newQuery);
+        return exampleBuilder.buildExample(context, newQuery);
+    }
+
+    protected ExampleBuilder adaptiveExampleBuilder(Context context, Query query) {
+        return exampleBuilder;
     }
 
     @Override

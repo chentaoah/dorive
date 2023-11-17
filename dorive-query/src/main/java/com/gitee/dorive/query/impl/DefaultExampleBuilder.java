@@ -18,20 +18,18 @@
 package com.gitee.dorive.query.impl;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.query.api.ExampleBuilder;
-import com.gitee.dorive.query.entity.BuildExample;
-import com.gitee.dorive.query.entity.QueryCriteria;
-import com.gitee.dorive.query.entity.QueryType;
-import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.MultiInBuilder;
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.query.api.ExampleBuilder;
+import com.gitee.dorive.query.entity.BuildExample;
+import com.gitee.dorive.query.entity.MergedRepository;
+import com.gitee.dorive.query.entity.Query;
+import com.gitee.dorive.query.impl.resolver.QueryResolver;
+import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -52,14 +50,12 @@ public class DefaultExampleBuilder implements ExampleBuilder {
 
     @Override
     public BuildExample buildExample(Context context, Object query) {
-        QueryType queryType = repository.getQueryType(query);
-        QueryCriteria queryCriteria = queryType.newCriteria(query);
-        Map<String, List<Criterion>> criteriaMap = queryCriteria.getCriteriaMap();
-        OrderBy orderBy = queryCriteria.getOrderBy();
-        Page<Object> page = queryCriteria.getPage();
+        Query newQuery = (Query) query;
+        QueryResolver queryResolver = newQuery.getQueryResolver();
+        Map<String, List<Criterion>> criteriaMap = newQuery.getCriteriaMap();
 
         Map<String, RepoExample> repoExampleMap = new LinkedHashMap<>();
-        for (MergedRepository mergedRepository : queryType.getReversedMergedRepositories()) {
+        for (MergedRepository mergedRepository : queryResolver.getReversedMergedRepositories()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             String relativeAccessPath = mergedRepository.getRelativeAccessPath();
             List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> new ArrayList<>(2));
@@ -73,8 +69,9 @@ public class DefaultExampleBuilder implements ExampleBuilder {
         Assert.notNull(repoExample, "The criterion cannot be null!");
 
         BuildExample buildExample = repoExample.getBuildExample();
-        buildExample.setOrderBy(orderBy);
-        buildExample.setPage(page);
+        buildExample.setOrderBy(newQuery.getOrderBy());
+        buildExample.setPage(newQuery.getPage());
+
         return buildExample;
     }
 

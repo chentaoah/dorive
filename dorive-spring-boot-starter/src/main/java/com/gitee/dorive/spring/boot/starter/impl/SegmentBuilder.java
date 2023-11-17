@@ -19,8 +19,8 @@ package com.gitee.dorive.spring.boot.starter.impl;
 
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.gitee.dorive.api.constant.Operator;
-import com.gitee.dorive.query.entity.QueryCriteria;
-import com.gitee.dorive.query.entity.QueryType;
+import com.gitee.dorive.query.entity.Query;
+import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.core.api.context.Context;
@@ -55,13 +55,13 @@ public class SegmentBuilder {
     private final AbstractQueryRepository<?, ?> repository;
 
     public SegmentResult buildSegment(Context context, Object query) {
-        QueryType queryType = repository.getQueryType(query);
-        QueryCriteria queryCriteria = queryType.newCriteria(query);
-        Map<String, List<Criterion>> criteriaMap = queryCriteria.getCriteriaMap();
-        OrderBy orderBy = queryCriteria.getOrderBy();
-        Page<Object> page = queryCriteria.getPage();
+        Query newQuery = (Query) query;
+        QueryResolver queryResolver = newQuery.getQueryResolver();
+        Map<String, List<Criterion>> criteriaMap = newQuery.getCriteriaMap();
+        OrderBy orderBy = newQuery.getOrderBy();
+        Page<Object> page = newQuery.getPage();
 
-        List<MergedRepository> mergedRepositories = queryType.getMergedRepositories();
+        List<MergedRepository> mergedRepositories = queryResolver.getMergedRepositories();
         Map<String, Segment> segmentMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);
         char letter = 'a';
         SelectSegment selectSegment = null;
