@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.injection.impl;
+package com.gitee.dorive.inject.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.injection.annotation.Root;
-import com.gitee.dorive.injection.api.TypeDomainResolver;
-import com.gitee.dorive.injection.entity.DomainDefinition;
+import com.gitee.dorive.inject.annotation.Root;
+import com.gitee.dorive.inject.api.TypeDomainResolver;
+import com.gitee.dorive.inject.entity.DomainDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.core.annotation.AnnotationUtils;

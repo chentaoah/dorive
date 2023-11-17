@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.injection.spring;
+package com.gitee.dorive.inject.spring;
 
-import com.gitee.dorive.injection.api.TypeDomainResolver;
+import com.gitee.dorive.inject.api.TypeDomainResolver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;

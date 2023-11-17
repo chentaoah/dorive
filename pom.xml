@@ -29,7 +29,7 @@
     </scm>
 
     <modules>
-        <module>dorive-injection</module>
+        <module>dorive-inject</module>
         <module>dorive-env</module>
         <module>dorive-web</module>
         <module>dorive-proxy</module>

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.injection.api;
+package com.gitee.dorive.inject.api;
 
-import com.gitee.dorive.injection.entity.DomainDefinition;
+import com.gitee.dorive.inject.entity.DomainDefinition;
 
 public interface TypeDomainResolver {
 

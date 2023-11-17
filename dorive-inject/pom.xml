@@ -8,7 +8,7 @@
         <artifactId>dorive</artifactId>
         <version>3.4.3.3</version>
     </parent>
-    <artifactId>dorive-injection</artifactId>
+    <artifactId>dorive-inject</artifactId>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

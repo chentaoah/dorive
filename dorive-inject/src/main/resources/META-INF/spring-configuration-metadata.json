@@ -12,7 +12,7 @@
     },
     {
       "name": "dorive.domains",
-      "type": "com.gitee.dorive.injection.entity.DomainDefinition",
+      "type": "com.gitee.dorive.inject.entity.DomainDefinition",
       "description": "Definition of domain."
     }
   ]

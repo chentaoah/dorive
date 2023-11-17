@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.injection.config;
+package com.gitee.dorive.inject.config;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.injection.impl.DefaultTypeDomainResolver;
-import com.gitee.dorive.injection.spring.LimitedAutowiredBeanPostProcessor;
-import com.gitee.dorive.injection.spring.LimitedCglibSubclassingInstantiationStrategy;
-import com.gitee.dorive.injection.spring.LimitedRootInitializingBean;
-import com.gitee.dorive.injection.api.TypeDomainResolver;
-import com.gitee.dorive.injection.entity.DomainDefinition;
+import com.gitee.dorive.inject.impl.DefaultTypeDomainResolver;
+import com.gitee.dorive.inject.spring.LimitedAutowiredBeanPostProcessor;
+import com.gitee.dorive.inject.spring.LimitedCglibSubclassingInstantiationStrategy;
+import com.gitee.dorive.inject.spring.LimitedRootInitializingBean;
+import com.gitee.dorive.inject.api.TypeDomainResolver;
+import com.gitee.dorive.inject.entity.DomainDefinition;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;

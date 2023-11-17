@@ -15,13 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.injection.annotation;
+package com.gitee.dorive.inject.entity;
 
-import java.lang.annotation.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@Inherited
-@Documented
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Root {
+@Data
+@AllArgsConstructor
+public class DomainDefinition {
+    private String name;
+    private String pattern;
+    private String protect;
 }

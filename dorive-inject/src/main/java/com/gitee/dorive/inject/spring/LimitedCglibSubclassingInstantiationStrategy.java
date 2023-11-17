@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.injection.spring;
+package com.gitee.dorive.inject.spring;
 
-import com.gitee.dorive.injection.api.TypeDomainResolver;
+import com.gitee.dorive.inject.api.TypeDomainResolver;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.RootBeanDefinition;
