@@ -29,36 +29,36 @@ import java.util.List;
 @Data
 public class SpecificFields {
 
-    private CoatingField sortByField;
-    private CoatingField orderField;
-    private CoatingField pageField;
-    private CoatingField limitField;
+    private QueryField sortByField;
+    private QueryField orderField;
+    private QueryField pageField;
+    private QueryField limitField;
 
-    public boolean tryAddField(CoatingField coatingField) {
-        String fieldName = coatingField.getName();
+    public boolean tryAddField(QueryField queryField) {
+        String fieldName = queryField.getName();
         if ("sortBy".equals(fieldName)) {
-            sortByField = coatingField;
+            sortByField = queryField;
             return true;
 
         } else if ("order".equals(fieldName)) {
-            orderField = coatingField;
+            orderField = queryField;
             return true;
 
         } else if ("page".equals(fieldName)) {
-            pageField = coatingField;
+            pageField = queryField;
             return true;
 
         } else if ("limit".equals(fieldName)) {
-            limitField = coatingField;
+            limitField = queryField;
             return true;
         }
         return false;
     }
 
-    public OrderBy newOrderBy(Object coating) {
+    public OrderBy newOrderBy(Object query) {
         if (sortByField != null && orderField != null) {
-            Object sortBy = sortByField.getFieldValue(coating);
-            Object order = orderField.getFieldValue(coating);
+            Object sortBy = sortByField.getFieldValue(query);
+            Object order = orderField.getFieldValue(query);
             if (sortBy != null && order instanceof String) {
                 List<String> properties = StringUtils.toList(sortBy);
                 if (properties != null && !properties.isEmpty()) {
@@ -72,10 +72,10 @@ public class SpecificFields {
         return null;
     }
 
-    public Page<Object> newPage(Object coating) {
+    public Page<Object> newPage(Object query) {
         if (pageField != null && limitField != null) {
-            Object page = pageField.getFieldValue(coating);
-            Object limit = limitField.getFieldValue(coating);
+            Object page = pageField.getFieldValue(query);
+            Object limit = limitField.getFieldValue(query);
             if (page != null && limit != null) {
                 return new Page<>(Convert.convert(Long.class, page), Convert.convert(Long.class, limit));
             }

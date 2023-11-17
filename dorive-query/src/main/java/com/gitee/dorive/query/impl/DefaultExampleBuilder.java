@@ -20,10 +20,10 @@ package com.gitee.dorive.query.impl;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.query.api.ExampleBuilder;
 import com.gitee.dorive.query.entity.BuildExample;
-import com.gitee.dorive.query.entity.CoatingCriteria;
-import com.gitee.dorive.query.entity.CoatingType;
+import com.gitee.dorive.query.entity.QueryCriteria;
+import com.gitee.dorive.query.entity.QueryType;
 import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.repository.AbstractCoatingRepository;
+import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.MultiInBuilder;
@@ -44,22 +44,22 @@ import java.util.stream.Collectors;
 
 public class DefaultExampleBuilder implements ExampleBuilder {
 
-    private final AbstractCoatingRepository<?, ?> repository;
+    private final AbstractQueryRepository<?, ?> repository;
 
-    public DefaultExampleBuilder(AbstractCoatingRepository<?, ?> repository) {
+    public DefaultExampleBuilder(AbstractQueryRepository<?, ?> repository) {
         this.repository = repository;
     }
 
     @Override
-    public BuildExample buildExample(Context context, Object coating) {
-        CoatingType coatingType = repository.getCoatingType(coating);
-        CoatingCriteria coatingCriteria = coatingType.newCriteria(coating);
-        Map<String, List<Criterion>> criteriaMap = coatingCriteria.getCriteriaMap();
-        OrderBy orderBy = coatingCriteria.getOrderBy();
-        Page<Object> page = coatingCriteria.getPage();
+    public BuildExample buildExample(Context context, Object query) {
+        QueryType queryType = repository.getQueryType(query);
+        QueryCriteria queryCriteria = queryType.newCriteria(query);
+        Map<String, List<Criterion>> criteriaMap = queryCriteria.getCriteriaMap();
+        OrderBy orderBy = queryCriteria.getOrderBy();
+        Page<Object> page = queryCriteria.getPage();
 
         Map<String, RepoExample> repoExampleMap = new LinkedHashMap<>();
-        for (MergedRepository mergedRepository : coatingType.getReversedMergedRepositories()) {
+        for (MergedRepository mergedRepository : queryType.getReversedMergedRepositories()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             String relativeAccessPath = mergedRepository.getRelativeAccessPath();
             List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> new ArrayList<>(2));

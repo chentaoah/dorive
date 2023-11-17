@@ -63,13 +63,13 @@ public class RefImpl extends AbstractProxyRepository implements Ref<Object> {
     }
 
     @Override
-    public List<Object> selectByCoating(Context context, Object coating) {
-        return repository.selectByCoating(context, coating);
+    public List<Object> selectByQuery(Context context, Object query) {
+        return repository.selectByQuery(context, query);
     }
 
     @Override
-    public Page<Object> selectPageByCoating(Context context, Object coating) {
-        return repository.selectPageByCoating(context, coating);
+    public Page<Object> selectPageByQuery(Context context, Object query) {
+        return repository.selectPageByQuery(context, query);
     }
 
     @Override

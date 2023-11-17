@@ -21,7 +21,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.dorive.query.api.ExampleBuilder;
 import com.gitee.dorive.query.entity.BuildExample;
-import com.gitee.dorive.query.repository.AbstractCoatingRepository;
+import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -36,17 +36,17 @@ import java.util.Map;
 @Data
 public class SQLExampleBuilder implements ExampleBuilder {
 
-    private final AbstractCoatingRepository<?, ?> repository;
+    private final AbstractQueryRepository<?, ?> repository;
     private final SegmentBuilder segmentBuilder;
 
-    public SQLExampleBuilder(AbstractCoatingRepository<?, ?> repository) {
+    public SQLExampleBuilder(AbstractQueryRepository<?, ?> repository) {
         this.repository = repository;
         this.segmentBuilder = new SegmentBuilder(repository);
     }
 
     @Override
-    public BuildExample buildExample(Context context, Object coating) {
-        SegmentResult segmentResult = segmentBuilder.buildSegment(context, coating);
+    public BuildExample buildExample(Context context, Object query) {
+        SegmentResult segmentResult = segmentBuilder.buildSegment(context, query);
         char letter = segmentResult.getLetter();
         SelectSegment selectSegment = segmentResult.getSelectSegment();
         List<Object> args = segmentResult.getArgs();

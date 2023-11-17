@@ -17,12 +17,12 @@
 
 package com.gitee.dorive.ref.repository;
 
-import com.gitee.dorive.query.repository.AbstractCoatingRepository;
+import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.ref.api.SelectorRepository;
 import com.gitee.dorive.ref.impl.RefInjector;
 
-public abstract class AbstractRefRepository<E, PK> extends AbstractCoatingRepository<E, PK> implements SelectorRepository<E, PK> {
+public abstract class AbstractRefRepository<E, PK> extends AbstractQueryRepository<E, PK> implements SelectorRepository<E, PK> {
 
     @Override
     protected EntityHandler processEntityHandler(EntityHandler entityHandler) {

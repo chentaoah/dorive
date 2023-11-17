@@ -35,10 +35,10 @@ import java.util.List;
 public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK> implements ListableRepository<E, PK> {
 
     @Override
-    public long selectCount(Context context, Example example) {
+    public long selectCountByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         CommonRepository repository = getRootRepository();
-        return repository.selectCount(context, example);
+        return repository.selectCountByExample(context, example);
     }
 
     @Override

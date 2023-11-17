@@ -32,27 +32,27 @@ import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class CoatingType {
+public class QueryType {
 
     private ExampleDef exampleDef;
-    private List<CoatingField> coatingFields;
+    private List<QueryField> queryFields;
     private SpecificFields specificFields;
     private List<MergedRepository> mergedRepositories;
     private List<MergedRepository> reversedMergedRepositories;
 
-    public CoatingCriteria newCriteria(Object coating) {
-        Map<String, List<Criterion>> criteriaMap = newCriteriaMap(coating);
-        OrderBy orderBy = specificFields.newOrderBy(coating);
-        Page<Object> page = specificFields.newPage(coating);
-        return new CoatingCriteria(criteriaMap, orderBy, page);
+    public QueryCriteria newCriteria(Object query) {
+        Map<String, List<Criterion>> criteriaMap = newCriteriaMap(query);
+        OrderBy orderBy = specificFields.newOrderBy(query);
+        Page<Object> page = specificFields.newPage(query);
+        return new QueryCriteria(criteriaMap, orderBy, page);
     }
 
-    public Map<String, List<Criterion>> newCriteriaMap(Object coating) {
+    public Map<String, List<Criterion>> newCriteriaMap(Object query) {
         Map<String, List<Criterion>> criteriaMap = new LinkedHashMap<>(8);
-        for (CoatingField coatingField : coatingFields) {
-            Object fieldValue = coatingField.getFieldValue(coating);
+        for (QueryField queryField : queryFields) {
+            Object fieldValue = queryField.getFieldValue(query);
             if (fieldValue != null) {
-                CriterionDef criterionDef = coatingField.getCriterionDef();
+                CriterionDef criterionDef = queryField.getCriterionDef();
                 String belongTo = criterionDef.getBelongTo();
                 String fieldName = criterionDef.getField();
                 String operator = criterionDef.getOperator();

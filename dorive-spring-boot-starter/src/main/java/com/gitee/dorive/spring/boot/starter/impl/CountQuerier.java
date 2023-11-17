@@ -19,7 +19,7 @@ package com.gitee.dorive.spring.boot.starter.impl;
 
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.query.repository.AbstractCoatingRepository;
+import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.context.BoundedContext;
 import com.gitee.dorive.spring.boot.starter.entity.segment.SegmentResult;
@@ -34,16 +34,16 @@ import java.util.Map;
 @Data
 public class CountQuerier {
 
-    private final AbstractCoatingRepository<?, ?> repository;
+    private final AbstractQueryRepository<?, ?> repository;
     private final SegmentBuilder segmentBuilder;
 
-    public CountQuerier(AbstractCoatingRepository<?, ?> repository) {
+    public CountQuerier(AbstractQueryRepository<?, ?> repository) {
         this.repository = repository;
         this.segmentBuilder = new SegmentBuilder(repository);
     }
 
-    public Map<String, Long> selectCount(Context context, String groupField, boolean distinct, String countField, Object coating) {
-        SegmentResult segmentResult = segmentBuilder.buildSegment(context, coating);
+    public Map<String, Long> selectCount(Context context, String groupField, boolean distinct, String countField, Object query) {
+        SegmentResult segmentResult = segmentBuilder.buildSegment(context, query);
         SelectSegment selectSegment = segmentResult.getSelectSegment();
         List<Object> args = segmentResult.getArgs();
 
@@ -71,12 +71,12 @@ public class CountQuerier {
         return countMap;
     }
 
-    public Map<String, Long> selectCount(Context context, String groupField, String countField, Object coating) {
-        return selectCount(context, groupField, true, countField, coating);
+    public Map<String, Long> selectCount(Context context, String groupField, String countField, Object query) {
+        return selectCount(context, groupField, true, countField, query);
     }
 
-    public Map<String, Long> selectCount(String groupField, String countField, Object coating) {
-        return selectCount(new BoundedContext(), groupField, true, countField, coating);
+    public Map<String, Long> selectCount(String groupField, String countField, Object query) {
+        return selectCount(new BoundedContext(), groupField, true, countField, query);
     }
 
 }

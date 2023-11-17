@@ -19,10 +19,10 @@ package com.gitee.dorive.spring.boot.starter.impl;
 
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.gitee.dorive.api.constant.Operator;
-import com.gitee.dorive.query.entity.CoatingCriteria;
-import com.gitee.dorive.query.entity.CoatingType;
+import com.gitee.dorive.query.entity.QueryCriteria;
+import com.gitee.dorive.query.entity.QueryType;
 import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.repository.AbstractCoatingRepository;
+import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -52,16 +52,16 @@ import java.util.Map;
 @AllArgsConstructor
 public class SegmentBuilder {
 
-    private final AbstractCoatingRepository<?, ?> repository;
+    private final AbstractQueryRepository<?, ?> repository;
 
-    public SegmentResult buildSegment(Context context, Object coating) {
-        CoatingType coatingType = repository.getCoatingType(coating);
-        CoatingCriteria coatingCriteria = coatingType.newCriteria(coating);
-        Map<String, List<Criterion>> criteriaMap = coatingCriteria.getCriteriaMap();
-        OrderBy orderBy = coatingCriteria.getOrderBy();
-        Page<Object> page = coatingCriteria.getPage();
+    public SegmentResult buildSegment(Context context, Object query) {
+        QueryType queryType = repository.getQueryType(query);
+        QueryCriteria queryCriteria = queryType.newCriteria(query);
+        Map<String, List<Criterion>> criteriaMap = queryCriteria.getCriteriaMap();
+        OrderBy orderBy = queryCriteria.getOrderBy();
+        Page<Object> page = queryCriteria.getPage();
 
-        List<MergedRepository> mergedRepositories = coatingType.getMergedRepositories();
+        List<MergedRepository> mergedRepositories = queryType.getMergedRepositories();
         Map<String, Segment> segmentMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);
         char letter = 'a';
         SelectSegment selectSegment = null;

@@ -22,6 +22,6 @@ import com.gitee.dorive.core.api.context.Context;
 
 public interface ExampleBuilder {
 
-    BuildExample buildExample(Context context, Object coating);
+    BuildExample buildExample(Context context, Object query);
 
 }

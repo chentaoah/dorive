@@ -18,7 +18,7 @@
 package com.gitee.dorive.query.entity.def;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.query.annotation.CoatingScan;
+import com.gitee.dorive.query.annotation.QueryScan;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,15 +30,15 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CoatingScanDef {
+public class QueryScanDef {
 
     private String[] value;
     private String regex;
     private Class<?>[] queries;
 
-    public static CoatingScanDef fromElement(AnnotatedElement element) {
-        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, CoatingScan.class);
-        return attributes != null ? BeanUtil.copyProperties(attributes, CoatingScanDef.class) : null;
+    public static QueryScanDef fromElement(AnnotatedElement element) {
+        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, QueryScan.class);
+        return attributes != null ? BeanUtil.copyProperties(attributes, QueryScanDef.class) : null;
     }
 
 }

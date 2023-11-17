@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.ref.api;
 
-import com.gitee.dorive.query.api.CoatingRepository;
+import com.gitee.dorive.query.api.QueryRepository;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.context.InnerContext;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -25,7 +25,7 @@ import com.gitee.dorive.core.entity.executor.Page;
 
 import java.util.List;
 
-public interface SelectorRepository<E, PK> extends CoatingRepository<E, PK> {
+public interface SelectorRepository<E, PK> extends QueryRepository<E, PK> {
 
     default E selectByPrimaryKey(Selector selector, PK primaryKey) {
         return selectByPrimaryKey(new InnerContext(selector), primaryKey);
@@ -39,8 +39,8 @@ public interface SelectorRepository<E, PK> extends CoatingRepository<E, PK> {
         return selectPageByExample(new InnerContext(selector), example);
     }
 
-    default long selectCount(Selector selector, Example example) {
-        return selectCount(new InnerContext(selector), example);
+    default long selectCountByExample(Selector selector, Example example) {
+        return selectCountByExample(new InnerContext(selector), example);
     }
 
     default int insert(Selector selector, E entity) {
@@ -87,12 +87,12 @@ public interface SelectorRepository<E, PK> extends CoatingRepository<E, PK> {
         return deleteList(new InnerContext(selector), entities);
     }
 
-    default List<E> selectByCoating(Selector selector, Object coating) {
-        return selectByCoating(new InnerContext(selector), coating);
+    default List<E> selectByQuery(Selector selector, Object query) {
+        return selectByQuery(new InnerContext(selector), query);
     }
 
-    default Page<E> selectPageByCoating(Selector selector, Object coating) {
-        return selectPageByCoating(new InnerContext(selector), coating);
+    default Page<E> selectPageByQuery(Selector selector, Object query) {
+        return selectPageByQuery(new InnerContext(selector), query);
     }
 
 }

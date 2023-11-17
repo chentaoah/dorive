@@ -48,11 +48,11 @@ public abstract class AbstractExampleRepository<E, PK> extends AbstractGenericRe
     }
 
     @Override
-    public long selectCount(Context context, Example example) {
+    public long selectCountByExample(Context context, Example example) {
         if (!(example instanceof InnerExample)) {
             example = ExampleUtils.tryClone(example);
         }
-        return super.selectCount(context, example);
+        return super.selectCountByExample(context, example);
     }
 
     @Override

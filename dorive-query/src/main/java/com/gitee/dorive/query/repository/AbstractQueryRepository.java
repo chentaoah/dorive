@@ -19,13 +19,13 @@ package com.gitee.dorive.query.repository;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.annotation.Repository;
-import com.gitee.dorive.query.api.CoatingRepository;
+import com.gitee.dorive.query.api.QueryRepository;
 import com.gitee.dorive.query.api.ExampleBuilder;
 import com.gitee.dorive.query.entity.BuildExample;
-import com.gitee.dorive.query.entity.CoatingType;
-import com.gitee.dorive.query.entity.def.CoatingScanDef;
+import com.gitee.dorive.query.entity.QueryType;
+import com.gitee.dorive.query.entity.def.QueryScanDef;
 import com.gitee.dorive.query.impl.DefaultExampleBuilder;
-import com.gitee.dorive.query.impl.resolver.CoatingTypeResolver;
+import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -41,43 +41,43 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepository<E, PK> implements ExampleBuilder, CoatingRepository<E, PK> {
+public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements ExampleBuilder, QueryRepository<E, PK> {
 
-    private CoatingScanDef coatingScanDef;
+    private QueryScanDef queryScanDef;
     private MergedRepositoryResolver mergedRepositoryResolver;
-    private CoatingTypeResolver coatingTypeResolver;
+    private QueryTypeResolver queryTypeResolver;
     private ExampleBuilder exampleBuilder;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
         Repository repository = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), Repository.class);
-        coatingScanDef = CoatingScanDef.fromElement(this.getClass());
-        if (repository != null && coatingScanDef != null) {
-            if (StringUtils.isBlank(coatingScanDef.getRegex())) {
-                coatingScanDef.setRegex("^" + getEntityClass().getSimpleName() + ".*");
+        queryScanDef = QueryScanDef.fromElement(this.getClass());
+        if (repository != null && queryScanDef != null) {
+            if (StringUtils.isBlank(queryScanDef.getRegex())) {
+                queryScanDef.setRegex("^" + getEntityClass().getSimpleName() + ".*");
             }
             mergedRepositoryResolver = new MergedRepositoryResolver(this);
-            coatingTypeResolver = new CoatingTypeResolver(this);
+            queryTypeResolver = new QueryTypeResolver(this);
             exampleBuilder = new DefaultExampleBuilder(this);
         }
     }
 
-    public CoatingType getCoatingType(Object coating) {
-        Map<String, CoatingType> nameCoatingTypeMap = coatingTypeResolver.getNameCoatingTypeMap();
-        CoatingType coatingType = nameCoatingTypeMap.get(coating.getClass().getName());
-        Assert.notNull(coatingType, "No coating type found!");
-        return coatingType;
+    public QueryType getQueryType(Object query) {
+        Map<String, QueryType> nameQueryTypeMap = queryTypeResolver.getNameQueryTypeMap();
+        QueryType queryType = nameQueryTypeMap.get(query.getClass().getName());
+        Assert.notNull(queryType, "No query type found!");
+        return queryType;
     }
 
     @Override
-    public BuildExample buildExample(Context context, Object coating) {
-        return exampleBuilder.buildExample(context, coating);
+    public BuildExample buildExample(Context context, Object query) {
+        return exampleBuilder.buildExample(context, query);
     }
 
     @Override
-    public List<E> selectByCoating(Context context, Object coating) {
-        BuildExample buildExample = buildExample(context, coating);
+    public List<E> selectByQuery(Context context, Object query) {
+        BuildExample buildExample = buildExample(context, query);
         if (buildExample.isAbandoned()) {
             return Collections.emptyList();
         }
@@ -89,8 +89,8 @@ public abstract class AbstractCoatingRepository<E, PK> extends AbstractEventRepo
 
     @Override
     @SuppressWarnings("unchecked")
-    public Page<E> selectPageByCoating(Context context, Object coating) {
-        BuildExample buildExample = buildExample(context, coating);
+    public Page<E> selectPageByQuery(Context context, Object query) {
+        BuildExample buildExample = buildExample(context, query);
         if (buildExample.isAbandoned()) {
             return (Page<E>) buildExample.getPage();
         }

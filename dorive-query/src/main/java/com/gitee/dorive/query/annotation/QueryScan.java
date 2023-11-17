@@ -15,21 +15,25 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.entity;
+package com.gitee.dorive.query.annotation;
 
-import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Page;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.util.List;
-import java.util.Map;
+@Inherited
+@Documented
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface QueryScan {
 
-@Data
-@AllArgsConstructor
-public class CoatingCriteria {
-    private Map<String, List<Criterion>> criteriaMap;
-    private OrderBy orderBy;
-    private Page<Object> page;
+    String[] value() default {};
+
+    String regex() default "";
+
+    Class<?>[] queries() default {};
+
 }

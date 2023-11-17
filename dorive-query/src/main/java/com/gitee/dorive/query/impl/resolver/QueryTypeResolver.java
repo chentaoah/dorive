@@ -18,14 +18,14 @@
 package com.gitee.dorive.query.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.query.entity.CoatingField;
-import com.gitee.dorive.query.entity.CoatingType;
+import com.gitee.dorive.query.entity.QueryField;
+import com.gitee.dorive.query.entity.QueryType;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.SpecificFields;
-import com.gitee.dorive.query.entity.def.CoatingScanDef;
+import com.gitee.dorive.query.entity.def.QueryScanDef;
 import com.gitee.dorive.query.entity.def.CriterionDef;
 import com.gitee.dorive.query.entity.def.ExampleDef;
-import com.gitee.dorive.query.repository.AbstractCoatingRepository;
+import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.query.util.ResourceUtils;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
@@ -42,24 +42,24 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 @Data
-public class CoatingTypeResolver {
+public class QueryTypeResolver {
 
     private static Map<String, List<Class<?>>> scannedClasses = new ConcurrentHashMap<>();
 
-    private AbstractCoatingRepository<?, ?> repository;
-    private Map<Class<?>, CoatingType> classCoatingTypeMap = new ConcurrentHashMap<>();
-    private Map<String, CoatingType> nameCoatingTypeMap = new ConcurrentHashMap<>();
+    private AbstractQueryRepository<?, ?> repository;
+    private Map<Class<?>, QueryType> classQueryTypeMap = new ConcurrentHashMap<>();
+    private Map<String, QueryType> nameQueryTypeMap = new ConcurrentHashMap<>();
 
-    public CoatingTypeResolver(AbstractCoatingRepository<?, ?> repository) throws Exception {
+    public QueryTypeResolver(AbstractQueryRepository<?, ?> repository) throws Exception {
         this.repository = repository;
         resolve();
     }
 
     public void resolve() throws Exception {
-        CoatingScanDef coatingScanDef = repository.getCoatingScanDef();
-        String[] scanPackages = coatingScanDef.getValue();
-        String regex = coatingScanDef.getRegex();
-        Class<?>[] queries = coatingScanDef.getQueries();
+        QueryScanDef queryScanDef = repository.getQueryScanDef();
+        String[] scanPackages = queryScanDef.getValue();
+        String regex = queryScanDef.getRegex();
+        Class<?>[] queries = queryScanDef.getQueries();
 
         Pattern pattern = Pattern.compile(regex);
         for (String scanPackage : scanPackages) {
@@ -68,56 +68,56 @@ public class CoatingTypeResolver {
                 classes = ResourceUtils.resolveClasses(scanPackage);
                 scannedClasses.put(scanPackage, classes);
             }
-            for (Class<?> coatingClass : classes) {
-                String simpleName = coatingClass.getSimpleName();
+            for (Class<?> queryClass : classes) {
+                String simpleName = queryClass.getSimpleName();
                 if (pattern.matcher(simpleName).matches()) {
-                    resolveCoatingClass(coatingClass);
+                    resolveQueryClass(queryClass);
                 }
             }
         }
 
-        for (Class<?> coatingClass : queries) {
-            resolveCoatingClass(coatingClass);
+        for (Class<?> queryClass : queries) {
+            resolveQueryClass(queryClass);
         }
     }
 
-    private void resolveCoatingClass(Class<?> coatingClass) {
-        ExampleDef exampleDef = ExampleDef.fromElement(coatingClass);
+    private void resolveQueryClass(Class<?> queryClass) {
+        ExampleDef exampleDef = ExampleDef.fromElement(queryClass);
         if (exampleDef == null) {
             return;
         }
 
-        List<CoatingField> coatingFields = new ArrayList<>();
+        List<QueryField> queryFields = new ArrayList<>();
         SpecificFields specificFields = new SpecificFields();
 
-        ReflectionUtils.doWithLocalFields(coatingClass, declaredField -> {
-            CoatingField coatingField = new CoatingField(declaredField);
-            if (coatingField.isIgnore()) {
+        ReflectionUtils.doWithLocalFields(queryClass, declaredField -> {
+            QueryField queryField = new QueryField(declaredField);
+            if (queryField.isIgnore()) {
                 return;
             }
-            if (!specificFields.tryAddField(coatingField)) {
-                coatingFields.add(coatingField);
+            if (!specificFields.tryAddField(queryField)) {
+                queryFields.add(queryField);
             }
         });
 
-        List<MergedRepository> mergedRepositories = matchMergedRepositories(coatingFields);
+        List<MergedRepository> mergedRepositories = matchMergedRepositories(queryFields);
         List<MergedRepository> reversedMergedRepositories = new ArrayList<>(mergedRepositories);
         Collections.reverse(reversedMergedRepositories);
 
-        CoatingType coatingType = new CoatingType(exampleDef, coatingFields, specificFields, mergedRepositories, reversedMergedRepositories);
-        classCoatingTypeMap.put(coatingClass, coatingType);
-        nameCoatingTypeMap.put(coatingClass.getName(), coatingType);
+        QueryType queryType = new QueryType(exampleDef, queryFields, specificFields, mergedRepositories, reversedMergedRepositories);
+        classQueryTypeMap.put(queryClass, queryType);
+        nameQueryTypeMap.put(queryClass.getName(), queryType);
     }
 
-    private List<MergedRepository> matchMergedRepositories(List<CoatingField> coatingFields) {
+    private List<MergedRepository> matchMergedRepositories(List<QueryField> queryFields) {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
         Map<String, MergedRepository> nameMergedRepositoryMap = mergedRepositoryResolver.getNameMergedRepositoryMap();
 
         Set<MergedRepository> mergedRepositorySet = new LinkedHashSet<>();
 
-        for (CoatingField coatingField : coatingFields) {
-            CriterionDef criterionDef = coatingField.getCriterionDef();
+        for (QueryField queryField : queryFields) {
+            CriterionDef criterionDef = queryField.getCriterionDef();
             String belongTo = criterionDef.getBelongTo();
             String field = criterionDef.getField();
 
@@ -132,8 +132,8 @@ public class CoatingTypeResolver {
 
             CommonRepository repository = mergedRepository.getExecutedRepository();
             Assert.isTrue(repository.hasField(field),
-                    "The field of @Criterion does not exist in the entity! coating field: {}, entity: {}, field: {}",
-                    coatingField.getField(), repository.getEntityEle().getElement(), field);
+                    "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",
+                    queryField.getField(), repository.getEntityEle().getElement(), field);
 
             mergedRepositorySet.add(mergedRepository);
         }

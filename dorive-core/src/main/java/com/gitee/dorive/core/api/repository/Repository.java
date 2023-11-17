@@ -65,7 +65,7 @@ public interface Repository<E, PK> {
      * @param example 条件
      * @return 计数
      */
-    long selectCount(Context context, Example example);
+    long selectCountByExample(Context context, Example example);
 
     /**
      * 插入一个实体

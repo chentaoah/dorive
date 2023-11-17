@@ -79,7 +79,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     }
 
     @Override
-    public long selectCount(Context context, Example example) {
+    public long selectCountByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         Query query = operationFactory.buildQueryByExample(example);
         return executeCount(context, query);

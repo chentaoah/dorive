@@ -149,13 +149,13 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     }
 
     @Override
-    public BuildExample buildExample(Context context, Object coating) {
+    public BuildExample buildExample(Context context, Object query) {
         Map<String, Object> attachments = context.getAttachments();
         String querier = (String) attachments.get(Keys.QUERIER);
         if (querier == null || "SQL".equals(querier)) {
-            return sqlExampleBuilder.buildExample(context, coating);
+            return sqlExampleBuilder.buildExample(context, query);
         } else {
-            return getExampleBuilder().buildExample(context, coating);
+            return getExampleBuilder().buildExample(context, query);
         }
     }
 

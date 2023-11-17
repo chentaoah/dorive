@@ -68,8 +68,8 @@ public abstract class AbstractProxyRepository extends AbstractRepository<Object,
     }
 
     @Override
-    public long selectCount(Context context, Example example) {
-        return proxyRepository.selectCount(context, example);
+    public long selectCountByExample(Context context, Example example) {
+        return proxyRepository.selectCountByExample(context, example);
     }
 
     @Override

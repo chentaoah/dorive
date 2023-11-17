@@ -29,7 +29,7 @@ import java.util.Collection;
 
 @Data
 @AllArgsConstructor
-public class CoatingField {
+public class QueryField {
 
     private Field field;
     private Class<?> type;
@@ -38,7 +38,7 @@ public class CoatingField {
     private String name;
     private CriterionDef criterionDef;
 
-    public CoatingField(Field field) {
+    public QueryField(Field field) {
         this.field = field;
         this.type = field.getType();
         this.collection = false;

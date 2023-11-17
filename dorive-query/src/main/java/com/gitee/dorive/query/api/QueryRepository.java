@@ -23,10 +23,10 @@ import com.gitee.dorive.core.entity.executor.Page;
 
 import java.util.List;
 
-public interface CoatingRepository<E, PK> extends ListableRepository<E, PK> {
+public interface QueryRepository<E, PK> extends ListableRepository<E, PK> {
 
-    List<E> selectByCoating(Context context, Object coating);
+    List<E> selectByQuery(Context context, Object query);
 
-    Page<E> selectPageByCoating(Context context, Object coating);
+    Page<E> selectPageByQuery(Context context, Object query);
 
 }
