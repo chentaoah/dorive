@@ -77,7 +77,7 @@ public class SqlQueryBuilder implements QueryBuilder {
             String countSql = selectSegment.selectSql() + fromWhereSql;
             long count = SqlRunner.db().selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
             page.setTotal(count);
-            queryCtx.setCountQueried(true);
+            queryCtx.setPageQueried(true);
             if (count == 0L) {
                 queryCtx.setAbandoned(true);
                 return queryCtx;

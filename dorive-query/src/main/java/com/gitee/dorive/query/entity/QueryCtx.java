@@ -32,5 +32,5 @@ public class QueryCtx {
     private Map<String, Example> exampleMap;
     private Example example;
     private boolean abandoned;
-    private boolean countQueried;
+    private boolean pageQueried;
 }
