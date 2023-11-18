@@ -29,8 +29,8 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 public class QueryCtx {
-    private Object query;
     private QueryResolver queryResolver;
+    private Object query;
     private Map<String, List<Criterion>> criteriaMap;
     private Example example;
     private boolean abandoned;

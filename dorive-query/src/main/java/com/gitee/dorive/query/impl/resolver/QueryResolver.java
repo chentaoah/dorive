@@ -47,7 +47,7 @@ public class QueryResolver {
         example.setOrderBy(specificFields.newOrderBy(query));
         example.setPage(specificFields.newPage(query));
 
-        return new QueryCtx(query, this, criteriaMap, example, false, false);
+        return new QueryCtx(this, query, criteriaMap, example, false, false);
     }
 
     private Map<String, List<Criterion>> newCriteriaMap(Object query) {
