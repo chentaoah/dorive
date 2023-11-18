@@ -18,7 +18,6 @@
 package com.gitee.dorive.query.impl;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.MultiInBuilder;
@@ -32,7 +31,10 @@ import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DefaultQueryBuilder implements QueryBuilder {
@@ -40,32 +42,37 @@ public class DefaultQueryBuilder implements QueryBuilder {
     @Override
     public QueryCtx build(Context context, Object query) {
         QueryCtx queryCtx = (QueryCtx) query;
-        QueryResolver queryResolver = queryCtx.getQueryResolver();
-        Map<String, List<Criterion>> criteriaMap = queryCtx.getCriteriaMap();
-        Example example = queryCtx.getExample();
 
-        Map<String, RepoExample> repoExampleMap = new LinkedHashMap<>();
-        for (MergedRepository mergedRepository : queryResolver.getReversedMergedRepositories()) {
-            String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-            String relativeAccessPath = mergedRepository.getRelativeAccessPath();
-            List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> new ArrayList<>(2));
-            repoExampleMap.put(relativeAccessPath, new RepoExample(mergedRepository, new InnerExample(criteria), false));
-        }
-        executeQuery(context, repoExampleMap);
+        Map<String, ExampleWrapper> exampleWrapperMap = buildExampleWrapperMap(queryCtx);
+        executeQuery(context, exampleWrapperMap);
 
-        RepoExample repoExample = repoExampleMap.get("/");
-        example.setCriteria(repoExample.getExample().getCriteria());
-        queryCtx.setAbandoned(repoExample.isAbandoned());
+        ExampleWrapper exampleWrapper = exampleWrapperMap.get("/");
+        queryCtx.setAbandoned(exampleWrapper.isAbandoned());
+
         return queryCtx;
     }
 
-    private void executeQuery(Context context, Map<String, RepoExample> repoExampleMap) {
-        repoExampleMap.forEach((accessPath, repoExample) -> {
+    private Map<String, ExampleWrapper> buildExampleWrapperMap(QueryCtx queryCtx) {
+        QueryResolver queryResolver = queryCtx.getQueryResolver();
+        Map<String, Example> exampleMap = queryCtx.getExampleMap();
+        Map<String, ExampleWrapper> exampleWrapperMap = new LinkedHashMap<>();
+        for (MergedRepository mergedRepository : queryResolver.getReversedMergedRepositories()) {
+            String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
+            String relativeAccessPath = mergedRepository.getRelativeAccessPath();
+            Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample());
+            ExampleWrapper exampleWrapper = new ExampleWrapper(mergedRepository, example, false);
+            exampleWrapperMap.put(relativeAccessPath, exampleWrapper);
+        }
+        return exampleWrapperMap;
+    }
+
+    private void executeQuery(Context context, Map<String, ExampleWrapper> exampleWrapperMap) {
+        exampleWrapperMap.forEach((accessPath, exampleWrapper) -> {
             if ("/".equals(accessPath)) return;
 
-            MergedRepository mergedRepository = repoExample.getMergedRepository();
-            Example example = repoExample.getExample();
-            boolean abandoned = repoExample.isAbandoned();
+            MergedRepository mergedRepository = exampleWrapper.getMergedRepository();
+            Example example = exampleWrapper.getExample();
+            boolean abandoned = exampleWrapper.isAbandoned();
 
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             Map<String, List<PropertyBinder>> mergedBindersMap = mergedRepository.getMergedBindersMap();
@@ -74,9 +81,9 @@ public class DefaultQueryBuilder implements QueryBuilder {
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 
             for (String relativeAccessPath : mergedBindersMap.keySet()) {
-                RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
-                if (targetRepoExample != null) {
-                    if (targetRepoExample.isAbandoned()) {
+                ExampleWrapper targetExampleWrapper = exampleWrapperMap.get(relativeAccessPath);
+                if (targetExampleWrapper != null) {
+                    if (targetExampleWrapper.isAbandoned()) {
                         abandoned = true;
                         break;
                     }
@@ -96,13 +103,13 @@ public class DefaultQueryBuilder implements QueryBuilder {
             for (Map.Entry<String, List<PropertyBinder>> entry : mergedBindersMap.entrySet()) {
                 String relativeAccessPath = entry.getKey();
                 List<PropertyBinder> binders = entry.getValue();
-                RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
-                if (targetRepoExample != null) {
+                ExampleWrapper targetExampleWrapper = exampleWrapperMap.get(relativeAccessPath);
+                if (targetExampleWrapper != null) {
                     if (entities.isEmpty()) {
-                        targetRepoExample.setAbandoned(true);
+                        targetExampleWrapper.setAbandoned(true);
                         return;
                     }
-                    Example targetExample = targetRepoExample.getExample();
+                    Example targetExample = targetExampleWrapper.getExample();
                     if (binders.size() == 1) {
                         PropertyBinder binder = binders.get(0);
                         List<Object> fieldValues = binder.collectFieldValues(context, entities);
@@ -114,7 +121,7 @@ public class DefaultQueryBuilder implements QueryBuilder {
                                 targetExample.in(boundName, fieldValues);
                             }
                         } else {
-                            targetRepoExample.setAbandoned(true);
+                            targetExampleWrapper.setAbandoned(true);
                         }
 
                     } else {
@@ -124,7 +131,7 @@ public class DefaultQueryBuilder implements QueryBuilder {
                         if (!builder.isEmpty()) {
                             targetExample.getCriteria().add(builder.build());
                         } else {
-                            targetRepoExample.setAbandoned(true);
+                            targetExampleWrapper.setAbandoned(true);
                         }
                     }
                 }
@@ -149,7 +156,7 @@ public class DefaultQueryBuilder implements QueryBuilder {
 
     @Data
     @AllArgsConstructor
-    public static class RepoExample {
+    public static class ExampleWrapper {
         private MergedRepository mergedRepository;
         private Example example;
         private boolean abandoned;

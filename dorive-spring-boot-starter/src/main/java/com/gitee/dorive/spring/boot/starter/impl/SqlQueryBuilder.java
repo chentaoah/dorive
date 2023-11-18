@@ -23,6 +23,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.util.ExampleUtils;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.QueryCtx;
 import com.gitee.dorive.spring.boot.starter.entity.segment.SegmentResult;
@@ -43,7 +44,10 @@ public class SqlQueryBuilder implements QueryBuilder {
         QueryCtx queryCtx = (QueryCtx) query;
         Example example = queryCtx.getExample();
         OrderBy orderBy = example.getOrderBy();
-        Page<Object> page = example.getPage();
+
+        Example newExample = ExampleUtils.tryClone(example);
+        queryCtx.setExample(newExample);
+        Page<Object> page = newExample.getPage();
 
         SegmentResult segmentResult = segmentBuilder.buildSegment(context, queryCtx);
         char letter = segmentResult.getLetter();

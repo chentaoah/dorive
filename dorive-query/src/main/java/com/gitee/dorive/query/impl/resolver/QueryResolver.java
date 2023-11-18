@@ -40,18 +40,17 @@ public class QueryResolver {
     private List<MergedRepository> reversedMergedRepositories;
 
     public QueryCtx newQuery(Object query) {
-        Map<String, List<Criterion>> criteriaMap = newCriteriaMap(query);
+        Map<String, Example> exampleMap = newExampleMap(query);
 
-        Example example = new InnerExample();
-        example.setCriteria(criteriaMap.computeIfAbsent("/", key -> new ArrayList<>(4)));
+        Example example = exampleMap.computeIfAbsent("/", key -> new InnerExample());
         example.setOrderBy(specificFields.newOrderBy(query));
         example.setPage(specificFields.newPage(query));
 
-        return new QueryCtx(this, query, criteriaMap, example, false, false);
+        return new QueryCtx(this, query, exampleMap, example, false, false);
     }
 
-    private Map<String, List<Criterion>> newCriteriaMap(Object query) {
-        Map<String, List<Criterion>> criteriaMap = new LinkedHashMap<>(8);
+    private Map<String, Example> newExampleMap(Object query) {
+        Map<String, Example> exampleMap = new LinkedHashMap<>(8);
         for (QueryField queryField : queryFields) {
             Object fieldValue = queryField.getFieldValue(query);
             if (fieldValue != null) {
@@ -59,11 +58,11 @@ public class QueryResolver {
                 String belongTo = criterionDef.getBelongTo();
                 String fieldName = criterionDef.getField();
                 String operator = criterionDef.getOperator();
-                List<Criterion> criteria = criteriaMap.computeIfAbsent(belongTo, key -> new ArrayList<>(4));
-                criteria.add(new Criterion(fieldName, operator, fieldValue));
+                Example example = exampleMap.computeIfAbsent(belongTo, key -> new InnerExample());
+                example.getCriteria().add(new Criterion(fieldName, operator, fieldValue));
             }
         }
-        return criteriaMap;
+        return exampleMap;
     }
 
 }

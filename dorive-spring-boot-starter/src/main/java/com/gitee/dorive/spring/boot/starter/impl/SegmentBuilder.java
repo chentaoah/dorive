@@ -23,6 +23,7 @@ import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.executor.FieldExecutor;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
@@ -41,8 +42,7 @@ public class SegmentBuilder {
 
     public SegmentResult buildSegment(Context context, QueryCtx queryCtx) {
         QueryResolver queryResolver = queryCtx.getQueryResolver();
-        Map<String, List<Criterion>> criteriaMap = queryCtx.getCriteriaMap();
-        Example example = queryCtx.getExample();
+        Map<String, Example> exampleMap = queryCtx.getExampleMap();
 
         List<MergedRepository> mergedRepositories = queryResolver.getMergedRepositories();
         Map<String, Segment> segmentMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);
@@ -68,14 +68,15 @@ public class SegmentBuilder {
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
-            List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> Collections.emptyList());
-            fieldExecutor.convertCriteria(context, criteria);
-            appendArguments(argSegments, args, tableAlias, criteria);
+            Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample(Collections.emptyList()));
+            fieldExecutor.convert(context, example);
+
+            appendArguments(argSegments, args, tableAlias, example);
 
             if ("/".equals(relativeAccessPath)) {
                 selectSegment = new SelectSegment();
                 selectSegment.setReachable(true);
-                selectSegment.setDirtyQuery(!criteria.isEmpty());
+                selectSegment.setDirtyQuery(example.isNotEmpty());
                 selectSegment.setDirectedSegments(new ArrayList<>(8));
                 selectSegment.setDistinct(false);
                 selectSegment.setColumns(Collections.emptyList());
@@ -85,12 +86,10 @@ public class SegmentBuilder {
                 selectSegment.setArgSegments(argSegments);
                 segmentMap.put(relativeAccessPath, selectSegment);
 
-                fieldExecutor.convertOrderBy(example.getOrderBy());
-
             } else {
                 JoinSegment joinSegment = new JoinSegment();
                 joinSegment.setReachable(false);
-                joinSegment.setDirtyQuery(!criteria.isEmpty());
+                joinSegment.setDirtyQuery(example.isNotEmpty());
                 joinSegment.setDirectedSegments(new ArrayList<>(4));
                 joinSegment.setTableName(tableName);
                 joinSegment.setTableAlias(tableAlias);
@@ -114,11 +113,8 @@ public class SegmentBuilder {
         return new SegmentResult(letter, selectSegment, args);
     }
 
-    private void appendArguments(List<ArgSegment> argSegments,
-                                 List<Object> args,
-                                 String tableAlias,
-                                 List<Criterion> criteria) {
-        for (Criterion criterion : criteria) {
+    private void appendArguments(List<ArgSegment> argSegments, List<Object> args, String tableAlias, Example example) {
+        for (Criterion criterion : example.getCriteria()) {
             String property = criterion.getProperty();
             String operator = CriterionUtils.getOperator(criterion);
             if (Operator.IS_NULL.equals(operator) || Operator.IS_NOT_NULL.equals(operator)) {

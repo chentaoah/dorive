@@ -50,7 +50,7 @@ public class FieldExecutor extends AbstractExampleExecutor {
         convertOrderBy(example.getOrderBy());
     }
 
-    public void convertSelectProps(Example example) {
+    private void convertSelectProps(Example example) {
         List<String> properties = example.getSelectProps();
         if (properties != null && !properties.isEmpty()) {
             properties = entityEle.toAliases(properties);
@@ -58,7 +58,7 @@ public class FieldExecutor extends AbstractExampleExecutor {
         }
     }
 
-    public void convertCriteria(Context context, List<Criterion> criteria) {
+    private void convertCriteria(Context context, List<Criterion> criteria) {
         if (criteria != null && !criteria.isEmpty()) {
             for (Criterion criterion : criteria) {
                 String property = criterion.getProperty();
@@ -77,7 +77,7 @@ public class FieldExecutor extends AbstractExampleExecutor {
         }
     }
 
-    public void convertOrderBy(OrderBy orderBy) {
+    private void convertOrderBy(OrderBy orderBy) {
         if (orderBy != null) {
             List<String> properties = orderBy.getProperties();
             properties = entityEle.toAliases(properties);
