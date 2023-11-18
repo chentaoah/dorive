@@ -19,12 +19,12 @@ package com.gitee.dorive.spring.boot.starter.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
-import com.gitee.dorive.query.api.ExampleBuilder;
-import com.gitee.dorive.query.entity.BuildExample;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.query.api.QueryBuilder;
+import com.gitee.dorive.query.entity.QueryCtx;
 import com.gitee.dorive.spring.boot.starter.entity.segment.SegmentResult;
 import com.gitee.dorive.spring.boot.starter.entity.segment.SelectSegment;
 import lombok.Data;
@@ -34,37 +34,30 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class SQLExampleBuilder implements ExampleBuilder {
+public class SqlQueryBuilder implements QueryBuilder {
 
-    private final AbstractQueryRepository<?, ?> repository;
-    private final SegmentBuilder segmentBuilder;
-
-    public SQLExampleBuilder(AbstractQueryRepository<?, ?> repository) {
-        this.repository = repository;
-        this.segmentBuilder = new SegmentBuilder(repository);
-    }
+    private SegmentBuilder segmentBuilder = new SegmentBuilder();
 
     @Override
-    public BuildExample buildExample(Context context, Object query) {
-        SegmentResult segmentResult = segmentBuilder.buildSegment(context, query);
+    public QueryCtx build(Context context, Object query) {
+        QueryCtx queryCtx = (QueryCtx) query;
+        Example example = queryCtx.getExample();
+        OrderBy orderBy = example.getOrderBy();
+        Page<Object> page = example.getPage();
+
+        SegmentResult segmentResult = segmentBuilder.buildSegment(context, queryCtx);
         char letter = segmentResult.getLetter();
         SelectSegment selectSegment = segmentResult.getSelectSegment();
         List<Object> args = segmentResult.getArgs();
-        OrderBy orderBy = segmentResult.getOrderBy();
-        Page<Object> page = segmentResult.getPage();
-
-        BuildExample buildExample = new BuildExample();
-        buildExample.setOrderBy(orderBy);
-        buildExample.setPage(page);
 
         if (selectSegment == null) {
             throw new RuntimeException("Unable to build SQL statement!");
         }
         if (selectSegment.getArgSegments().isEmpty()) {
-            return buildExample;
+            return queryCtx;
         }
         if (!selectSegment.isDirtyQuery()) {
-            return buildExample;
+            return queryCtx;
         }
 
         selectSegment.setDistinct(true);
@@ -80,10 +73,10 @@ public class SQLExampleBuilder implements ExampleBuilder {
             String countSql = selectSegment.selectSql() + fromWhereSql;
             long count = SqlRunner.db().selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
             page.setTotal(count);
-            buildExample.setCountQueried(true);
-            if (count == 0) {
-                buildExample.setAbandoned(true);
-                return buildExample;
+            queryCtx.setCountQueried(true);
+            if (count == 0L) {
+                queryCtx.setAbandoned(true);
+                return queryCtx;
             }
         }
 
@@ -103,12 +96,12 @@ public class SQLExampleBuilder implements ExampleBuilder {
         List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(selectSql, args.toArray());
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
         if (!primaryKeys.isEmpty()) {
-            buildExample.eq("id", primaryKeys);
+            example.eq("id", primaryKeys);
         } else {
-            buildExample.setAbandoned(true);
+            queryCtx.setAbandoned(true);
         }
 
-        return buildExample;
+        return queryCtx;
     }
 
 }

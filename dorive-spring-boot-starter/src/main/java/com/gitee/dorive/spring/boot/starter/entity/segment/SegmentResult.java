@@ -17,8 +17,6 @@
 
 package com.gitee.dorive.spring.boot.starter.entity.segment;
 
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Page;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -30,6 +28,4 @@ public class SegmentResult {
     private char letter;
     private SelectSegment selectSegment;
     private List<Object> args;
-    private OrderBy orderBy;
-    private Page<Object> page;
 }

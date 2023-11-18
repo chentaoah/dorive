@@ -18,48 +18,31 @@
 package com.gitee.dorive.spring.boot.starter.impl;
 
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.gitee.dorive.api.constant.Keys;
 import com.gitee.dorive.api.constant.Operator;
-import com.gitee.dorive.query.entity.Query;
-import com.gitee.dorive.query.impl.resolver.QueryResolver;
-import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
+import com.gitee.dorive.core.impl.executor.FieldExecutor;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.api.constant.Keys;
-import com.gitee.dorive.spring.boot.starter.entity.segment.ArgSegment;
-import com.gitee.dorive.spring.boot.starter.entity.segment.JoinSegment;
-import com.gitee.dorive.spring.boot.starter.entity.segment.OnSegment;
-import com.gitee.dorive.spring.boot.starter.entity.segment.Segment;
-import com.gitee.dorive.spring.boot.starter.entity.segment.SegmentResult;
-import com.gitee.dorive.spring.boot.starter.entity.segment.SelectSegment;
-import com.gitee.dorive.core.impl.executor.FieldExecutor;
+import com.gitee.dorive.query.entity.MergedRepository;
+import com.gitee.dorive.query.entity.QueryCtx;
+import com.gitee.dorive.query.impl.resolver.QueryResolver;
+import com.gitee.dorive.spring.boot.starter.entity.segment.*;
 import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
-@AllArgsConstructor
 public class SegmentBuilder {
 
-    private final AbstractQueryRepository<?, ?> repository;
-
-    public SegmentResult buildSegment(Context context, Object query) {
-        Query newQuery = (Query) query;
-        QueryResolver queryResolver = newQuery.getQueryResolver();
-        Map<String, List<Criterion>> criteriaMap = newQuery.getCriteriaMap();
-        OrderBy orderBy = newQuery.getOrderBy();
-        Page<Object> page = newQuery.getPage();
+    public SegmentResult buildSegment(Context context, QueryCtx queryCtx) {
+        QueryResolver queryResolver = queryCtx.getQueryResolver();
+        Map<String, List<Criterion>> criteriaMap = queryCtx.getCriteriaMap();
+        Example example = queryCtx.getExample();
 
         List<MergedRepository> mergedRepositories = queryResolver.getMergedRepositories();
         Map<String, Segment> segmentMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);
@@ -102,7 +85,7 @@ public class SegmentBuilder {
                 selectSegment.setArgSegments(argSegments);
                 segmentMap.put(relativeAccessPath, selectSegment);
 
-                fieldExecutor.convertOrderBy(orderBy);
+                fieldExecutor.convertOrderBy(example.getOrderBy());
 
             } else {
                 JoinSegment joinSegment = new JoinSegment();
@@ -128,7 +111,7 @@ public class SegmentBuilder {
             markReachableAndDirty(selectSegment);
         }
 
-        return new SegmentResult(letter, selectSegment, args, orderBy, page);
+        return new SegmentResult(letter, selectSegment, args);
     }
 
     private void appendArguments(List<ArgSegment> argSegments,

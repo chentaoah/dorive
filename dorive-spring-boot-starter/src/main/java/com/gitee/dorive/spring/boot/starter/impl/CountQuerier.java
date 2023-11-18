@@ -19,6 +19,7 @@ package com.gitee.dorive.spring.boot.starter.impl;
 
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.query.entity.QueryCtx;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.context.BoundedContext;
@@ -39,11 +40,13 @@ public class CountQuerier {
 
     public CountQuerier(AbstractQueryRepository<?, ?> repository) {
         this.repository = repository;
-        this.segmentBuilder = new SegmentBuilder(repository);
+        this.segmentBuilder = new SegmentBuilder();
     }
 
     public Map<String, Long> selectCount(Context context, String groupField, boolean distinct, String countField, Object query) {
-        SegmentResult segmentResult = segmentBuilder.buildSegment(context, query);
+        QueryCtx queryCtx = repository.newQuery(query);
+
+        SegmentResult segmentResult = segmentBuilder.buildSegment(context, queryCtx);
         SelectSegment selectSegment = segmentResult.getSelectSegment();
         List<Object> args = segmentResult.getArgs();
 

@@ -17,62 +17,46 @@
 
 package com.gitee.dorive.query.impl;
 
-import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.MultiInBuilder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.query.api.ExampleBuilder;
-import com.gitee.dorive.query.entity.BuildExample;
+import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.entity.Query;
+import com.gitee.dorive.query.entity.QueryCtx;
 import com.gitee.dorive.query.impl.resolver.QueryResolver;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class DefaultExampleBuilder implements ExampleBuilder {
-
-    private final AbstractQueryRepository<?, ?> repository;
-
-    public DefaultExampleBuilder(AbstractQueryRepository<?, ?> repository) {
-        this.repository = repository;
-    }
+public class DefaultQueryBuilder implements QueryBuilder {
 
     @Override
-    public BuildExample buildExample(Context context, Object query) {
-        Query newQuery = (Query) query;
-        QueryResolver queryResolver = newQuery.getQueryResolver();
-        Map<String, List<Criterion>> criteriaMap = newQuery.getCriteriaMap();
+    public QueryCtx build(Context context, Object query) {
+        QueryCtx queryCtx = (QueryCtx) query;
+        QueryResolver queryResolver = queryCtx.getQueryResolver();
+        Map<String, List<Criterion>> criteriaMap = queryCtx.getCriteriaMap();
 
         Map<String, RepoExample> repoExampleMap = new LinkedHashMap<>();
         for (MergedRepository mergedRepository : queryResolver.getReversedMergedRepositories()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             String relativeAccessPath = mergedRepository.getRelativeAccessPath();
             List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> new ArrayList<>(2));
-            BuildExample buildExample = new BuildExample(criteria);
-            repoExampleMap.put(relativeAccessPath, new RepoExample(mergedRepository, buildExample));
+            Example example = new InnerExample(criteria);
+            repoExampleMap.put(relativeAccessPath, new RepoExample(mergedRepository, example, false));
         }
-
         executeQuery(context, repoExampleMap);
 
         RepoExample repoExample = repoExampleMap.get("/");
-        Assert.notNull(repoExample, "The criterion cannot be null!");
-
-        BuildExample buildExample = repoExample.getBuildExample();
-        buildExample.setOrderBy(newQuery.getOrderBy());
-        buildExample.setPage(newQuery.getPage());
-
-        return buildExample;
+        queryCtx.getExample().setCriteria(repoExample.getExample().getCriteria());
+        queryCtx.setAbandoned(repoExample.isAbandoned());
+        return queryCtx;
     }
 
     private void executeQuery(Context context, Map<String, RepoExample> repoExampleMap) {
@@ -80,7 +64,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             if ("/".equals(accessPath)) return;
 
             MergedRepository mergedRepository = repoExample.getMergedRepository();
-            BuildExample buildExample = repoExample.getBuildExample();
+            Example example = repoExample.getExample();
+            boolean abandoned = repoExample.isAbandoned();
 
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             Map<String, List<PropertyBinder>> mergedBindersMap = mergedRepository.getMergedBindersMap();
@@ -91,22 +76,21 @@ public class DefaultExampleBuilder implements ExampleBuilder {
             for (String relativeAccessPath : mergedBindersMap.keySet()) {
                 RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
                 if (targetRepoExample != null) {
-                    BuildExample targetExample = targetRepoExample.getBuildExample();
-                    if (targetExample.isAbandoned()) {
-                        buildExample.setAbandoned(true);
+                    if (targetRepoExample.isAbandoned()) {
+                        abandoned = true;
                         break;
                     }
                 }
             }
 
-            if (buildExample.isQueryAll()) {
+            if (!abandoned && example.isEmpty()) {
                 return;
             }
 
             List<Object> entities = Collections.emptyList();
-            if (!buildExample.isAbandoned() && buildExample.isNotEmpty()) {
-                buildExample.select(binderResolver.getSelfFields());
-                entities = executedRepository.selectByExample(context, buildExample);
+            if (!abandoned && example.isNotEmpty()) {
+                example.select(binderResolver.getSelfFields());
+                entities = executedRepository.selectByExample(context, example);
             }
 
             for (Map.Entry<String, List<PropertyBinder>> entry : mergedBindersMap.entrySet()) {
@@ -114,11 +98,11 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                 List<PropertyBinder> binders = entry.getValue();
                 RepoExample targetRepoExample = repoExampleMap.get(relativeAccessPath);
                 if (targetRepoExample != null) {
-                    BuildExample targetExample = targetRepoExample.getBuildExample();
                     if (entities.isEmpty()) {
-                        targetExample.setAbandoned(true);
+                        targetRepoExample.setAbandoned(true);
                         return;
                     }
+                    Example targetExample = targetRepoExample.getExample();
                     if (binders.size() == 1) {
                         PropertyBinder binder = binders.get(0);
                         List<Object> fieldValues = binder.collectFieldValues(context, entities);
@@ -130,7 +114,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                                 targetExample.in(boundName, fieldValues);
                             }
                         } else {
-                            targetExample.setAbandoned(true);
+                            targetRepoExample.setAbandoned(true);
                         }
 
                     } else {
@@ -140,7 +124,7 @@ public class DefaultExampleBuilder implements ExampleBuilder {
                         if (!builder.isEmpty()) {
                             targetExample.getCriteria().add(builder.build());
                         } else {
-                            targetExample.setAbandoned(true);
+                            targetRepoExample.setAbandoned(true);
                         }
                     }
                 }
@@ -167,7 +151,8 @@ public class DefaultExampleBuilder implements ExampleBuilder {
     @AllArgsConstructor
     public static class RepoExample {
         private MergedRepository mergedRepository;
-        private BuildExample buildExample;
+        private Example example;
+        private boolean abandoned;
     }
 
 }

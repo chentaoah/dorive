@@ -31,11 +31,11 @@ import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.executor.FieldConverter;
 import com.gitee.dorive.core.entity.ExecutorResult;
 import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
-import com.gitee.dorive.query.api.ExampleBuilder;
-import com.gitee.dorive.query.entity.Query;
+import com.gitee.dorive.query.api.QueryBuilder;
+import com.gitee.dorive.query.entity.QueryCtx;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.spring.boot.starter.impl.CountQuerier;
-import com.gitee.dorive.spring.boot.starter.impl.SQLExampleBuilder;
+import com.gitee.dorive.spring.boot.starter.impl.SqlQueryBuilder;
 import com.gitee.dorive.spring.boot.starter.impl.executor.MybatisPlusExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -52,13 +52,13 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = false)
 public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
-    private ExampleBuilder sqlExampleBuilder;
+    private QueryBuilder sqlQueryBuilder;
     private CountQuerier countQuerier;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        this.sqlExampleBuilder = new SQLExampleBuilder(this);
+        this.sqlQueryBuilder = new SqlQueryBuilder();
         this.countQuerier = new CountQuerier(this);
     }
 
@@ -149,13 +149,13 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     }
 
     @Override
-    protected ExampleBuilder adaptiveExampleBuilder(Context context, Query query) {
+    protected QueryBuilder adaptiveBuilder(Context context, QueryCtx queryCtx) {
         Map<String, Object> attachments = context.getAttachments();
         String querier = (String) attachments.get(Keys.QUERIER);
         if (querier == null || "SQL".equals(querier)) {
-            return sqlExampleBuilder;
+            return sqlQueryBuilder;
         }
-        return super.adaptiveExampleBuilder(context, query);
+        return super.adaptiveBuilder(context, queryCtx);
     }
 
 }

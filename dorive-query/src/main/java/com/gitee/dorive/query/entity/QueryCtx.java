@@ -18,8 +18,7 @@
 package com.gitee.dorive.query.entity;
 
 import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,10 +28,11 @@ import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class Query {
+public class QueryCtx {
     private QueryResolver queryResolver;
     private Object query;
     private Map<String, List<Criterion>> criteriaMap;
-    private OrderBy orderBy;
-    private Page<Object> page;
+    private Example example;
+    private boolean abandoned;
+    private boolean countQueried;
 }

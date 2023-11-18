@@ -17,22 +17,17 @@
 
 package com.gitee.dorive.query.impl.resolver;
 
+import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.entity.Query;
+import com.gitee.dorive.query.entity.QueryCtx;
 import com.gitee.dorive.query.entity.QueryField;
 import com.gitee.dorive.query.entity.SpecificFields;
 import com.gitee.dorive.query.entity.def.ExampleDef;
 import com.gitee.dorive.query.entity.def.CriterionDef;
-import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Page;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -44,11 +39,15 @@ public class QueryResolver {
     private List<MergedRepository> mergedRepositories;
     private List<MergedRepository> reversedMergedRepositories;
 
-    public Query resolve(Object query) {
+    public QueryCtx newQuery(Object query) {
         Map<String, List<Criterion>> criteriaMap = newCriteriaMap(query);
-        OrderBy orderBy = specificFields.newOrderBy(query);
-        Page<Object> page = specificFields.newPage(query);
-        return new Query(this, query, criteriaMap, orderBy, page);
+
+        Example example = new InnerExample();
+        example.setCriteria(criteriaMap.computeIfAbsent("/", key -> new ArrayList<>(4)));
+        example.setOrderBy(specificFields.newOrderBy(query));
+        example.setPage(specificFields.newPage(query));
+
+        return new QueryCtx(this, query, criteriaMap, example, false, false);
     }
 
     private Map<String, List<Criterion>> newCriteriaMap(Object query) {

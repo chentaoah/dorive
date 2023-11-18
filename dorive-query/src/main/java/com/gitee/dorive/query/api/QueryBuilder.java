@@ -17,11 +17,11 @@
 
 package com.gitee.dorive.query.api;
 
-import com.gitee.dorive.query.entity.BuildExample;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.query.entity.QueryCtx;
 
-public interface ExampleBuilder {
+public interface QueryBuilder {
 
-    BuildExample buildExample(Context context, Object query);
+    QueryCtx build(Context context, Object query);
 
 }
