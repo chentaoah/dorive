@@ -42,19 +42,19 @@ public class DefaultQueryBuilder implements QueryBuilder {
         QueryCtx queryCtx = (QueryCtx) query;
         QueryResolver queryResolver = queryCtx.getQueryResolver();
         Map<String, List<Criterion>> criteriaMap = queryCtx.getCriteriaMap();
+        Example example = queryCtx.getExample();
 
         Map<String, RepoExample> repoExampleMap = new LinkedHashMap<>();
         for (MergedRepository mergedRepository : queryResolver.getReversedMergedRepositories()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             String relativeAccessPath = mergedRepository.getRelativeAccessPath();
             List<Criterion> criteria = criteriaMap.computeIfAbsent(absoluteAccessPath, key -> new ArrayList<>(2));
-            Example example = new InnerExample(criteria);
-            repoExampleMap.put(relativeAccessPath, new RepoExample(mergedRepository, example, false));
+            repoExampleMap.put(relativeAccessPath, new RepoExample(mergedRepository, new InnerExample(criteria), false));
         }
         executeQuery(context, repoExampleMap);
 
         RepoExample repoExample = repoExampleMap.get("/");
-        queryCtx.getExample().setCriteria(repoExample.getExample().getCriteria());
+        example.setCriteria(repoExample.getExample().getCriteria());
         queryCtx.setAbandoned(repoExample.isAbandoned());
         return queryCtx;
     }
