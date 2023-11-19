@@ -32,7 +32,7 @@ import com.gitee.dorive.core.api.executor.FieldConverter;
 import com.gitee.dorive.core.entity.ExecutorResult;
 import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.query.api.QueryBuilder;
-import com.gitee.dorive.query.entity.QueryCtx;
+import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.spring.boot.starter.impl.CountQuerier;
 import com.gitee.dorive.spring.boot.starter.impl.SqlQueryBuilder;
@@ -149,13 +149,13 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     }
 
     @Override
-    protected QueryBuilder adaptiveBuilder(Context context, QueryCtx queryCtx) {
+    protected QueryBuilder adaptiveBuilder(Context context, BuildQuery buildQuery) {
         Map<String, Object> attachments = context.getAttachments();
         String querier = (String) attachments.get(Keys.QUERIER);
         if (querier == null || "SQL".equals(querier)) {
             return sqlQueryBuilder;
         }
-        return super.adaptiveBuilder(context, queryCtx);
+        return super.adaptiveBuilder(context, buildQuery);
     }
 
 }

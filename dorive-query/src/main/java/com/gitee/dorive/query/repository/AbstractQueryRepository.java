@@ -25,7 +25,7 @@ import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.event.repository.AbstractEventRepository;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.api.QueryRepository;
-import com.gitee.dorive.query.entity.QueryCtx;
+import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.entity.def.QueryScanDef;
 import com.gitee.dorive.query.impl.DefaultQueryBuilder;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
@@ -65,31 +65,31 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     }
 
     @Override
-    public QueryCtx build(Context context, Object query) {
-        QueryCtx queryCtx = newQuery(query);
-        QueryBuilder queryBuilder = adaptiveBuilder(context, queryCtx);
-        return queryBuilder.build(context, queryCtx);
+    public BuildQuery build(Context context, Object query) {
+        BuildQuery buildQuery = newQuery(query);
+        QueryBuilder queryBuilder = adaptiveBuilder(context, buildQuery);
+        return queryBuilder.build(context, buildQuery);
     }
 
-    public QueryCtx newQuery(Object query) {
+    public BuildQuery newQuery(Object query) {
         Map<String, QueryResolver> nameQueryResolverMap = queryTypeResolver.getNameQueryResolverMap();
         QueryResolver queryResolver = nameQueryResolverMap.get(query.getClass().getName());
         Assert.notNull(queryResolver, "No query resolver found!");
         return queryResolver.newQuery(query);
     }
 
-    protected QueryBuilder adaptiveBuilder(Context context, QueryCtx queryCtx) {
+    protected QueryBuilder adaptiveBuilder(Context context, BuildQuery buildQuery) {
         return queryBuilder;
     }
 
     @Override
     public List<E> selectByQuery(Context context, Object query) {
-        QueryCtx queryCtx = build(context, query);
-        Example example = queryCtx.getExample();
-        if (queryCtx.isAbandoned()) {
+        BuildQuery buildQuery = build(context, query);
+        Example example = buildQuery.getExample();
+        if (buildQuery.isAbandoned()) {
             return Collections.emptyList();
         }
-        if (queryCtx.isPageQueried()) {
+        if (buildQuery.isPageQueried()) {
             example.setPage(null);
         }
         return selectByExample(context, example);
@@ -98,12 +98,12 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByQuery(Context context, Object query) {
-        QueryCtx queryCtx = build(context, query);
-        Example example = queryCtx.getExample();
-        if (queryCtx.isAbandoned()) {
+        BuildQuery buildQuery = build(context, query);
+        Example example = buildQuery.getExample();
+        if (buildQuery.isAbandoned()) {
             return (Page<E>) example.getPage();
         }
-        if (queryCtx.isPageQueried()) {
+        if (buildQuery.isPageQueried()) {
             Page<Object> page = example.getPage();
             example.setPage(null);
             List<E> records = selectByExample(context, example);

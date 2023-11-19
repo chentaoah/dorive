@@ -26,7 +26,7 @@ import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class QueryCtx {
+public class BuildQuery {
     private QueryResolver queryResolver;
     private Object query;
     private Map<String, Example> exampleMap;

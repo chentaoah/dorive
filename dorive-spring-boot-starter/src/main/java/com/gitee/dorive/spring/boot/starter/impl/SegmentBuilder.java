@@ -29,7 +29,7 @@ import com.gitee.dorive.core.impl.executor.FieldExecutor;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.entity.QueryCtx;
+import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import com.gitee.dorive.spring.boot.starter.entity.segment.*;
 import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
@@ -40,9 +40,9 @@ import java.util.*;
 @Data
 public class SegmentBuilder {
 
-    public SegmentResult buildSegment(Context context, QueryCtx queryCtx) {
-        QueryResolver queryResolver = queryCtx.getQueryResolver();
-        Map<String, Example> exampleMap = queryCtx.getExampleMap();
+    public SegmentResult buildSegment(Context context, BuildQuery buildQuery) {
+        QueryResolver queryResolver = buildQuery.getQueryResolver();
+        Map<String, Example> exampleMap = buildQuery.getExampleMap();
 
         List<MergedRepository> mergedRepositories = queryResolver.getMergedRepositories();
         Map<String, Segment> segmentMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);

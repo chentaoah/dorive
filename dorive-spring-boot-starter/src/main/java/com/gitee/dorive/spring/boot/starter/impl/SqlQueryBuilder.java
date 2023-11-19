@@ -25,7 +25,7 @@ import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.util.ExampleUtils;
 import com.gitee.dorive.query.api.QueryBuilder;
-import com.gitee.dorive.query.entity.QueryCtx;
+import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.spring.boot.starter.entity.segment.SegmentResult;
 import com.gitee.dorive.spring.boot.starter.entity.segment.SelectSegment;
 import lombok.Data;
@@ -40,16 +40,16 @@ public class SqlQueryBuilder implements QueryBuilder {
     private SegmentBuilder segmentBuilder = new SegmentBuilder();
 
     @Override
-    public QueryCtx build(Context context, Object query) {
-        QueryCtx queryCtx = (QueryCtx) query;
-        Example example = queryCtx.getExample();
+    public BuildQuery build(Context context, Object query) {
+        BuildQuery buildQuery = (BuildQuery) query;
+        Example example = buildQuery.getExample();
         OrderBy orderBy = example.getOrderBy();
 
         Example newExample = ExampleUtils.tryClone(example);
-        queryCtx.setExample(newExample);
+        buildQuery.setExample(newExample);
         Page<Object> page = newExample.getPage();
 
-        SegmentResult segmentResult = segmentBuilder.buildSegment(context, queryCtx);
+        SegmentResult segmentResult = segmentBuilder.buildSegment(context, buildQuery);
         char letter = segmentResult.getLetter();
         SelectSegment selectSegment = segmentResult.getSelectSegment();
         List<Object> args = segmentResult.getArgs();
@@ -58,10 +58,10 @@ public class SqlQueryBuilder implements QueryBuilder {
             throw new RuntimeException("Unable to build SQL statement!");
         }
         if (selectSegment.getArgSegments().isEmpty()) {
-            return queryCtx;
+            return buildQuery;
         }
         if (!selectSegment.isDirtyQuery()) {
-            return queryCtx;
+            return buildQuery;
         }
 
         selectSegment.setDistinct(true);
@@ -77,10 +77,10 @@ public class SqlQueryBuilder implements QueryBuilder {
             String countSql = selectSegment.selectSql() + fromWhereSql;
             long count = SqlRunner.db().selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
             page.setTotal(count);
-            queryCtx.setPageQueried(true);
+            buildQuery.setPageQueried(true);
             if (count == 0L) {
-                queryCtx.setAbandoned(true);
-                return queryCtx;
+                buildQuery.setAbandoned(true);
+                return buildQuery;
             }
         }
 
@@ -102,10 +102,10 @@ public class SqlQueryBuilder implements QueryBuilder {
         if (!primaryKeys.isEmpty()) {
             example.eq("id", primaryKeys);
         } else {
-            queryCtx.setAbandoned(true);
+            buildQuery.setAbandoned(true);
         }
 
-        return queryCtx;
+        return buildQuery;
     }
 
 }

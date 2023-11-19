@@ -26,7 +26,7 @@ import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.entity.QueryCtx;
+import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,21 +40,21 @@ import java.util.stream.Collectors;
 public class DefaultQueryBuilder implements QueryBuilder {
 
     @Override
-    public QueryCtx build(Context context, Object query) {
-        QueryCtx queryCtx = (QueryCtx) query;
+    public BuildQuery build(Context context, Object query) {
+        BuildQuery buildQuery = (BuildQuery) query;
 
-        Map<String, ExampleWrapper> exampleWrapperMap = buildExampleWrapperMap(queryCtx);
+        Map<String, ExampleWrapper> exampleWrapperMap = buildExampleWrapperMap(buildQuery);
         executeQuery(context, exampleWrapperMap);
 
         ExampleWrapper exampleWrapper = exampleWrapperMap.get("/");
-        queryCtx.setAbandoned(exampleWrapper.isAbandoned());
+        buildQuery.setAbandoned(exampleWrapper.isAbandoned());
 
-        return queryCtx;
+        return buildQuery;
     }
 
-    private Map<String, ExampleWrapper> buildExampleWrapperMap(QueryCtx queryCtx) {
-        QueryResolver queryResolver = queryCtx.getQueryResolver();
-        Map<String, Example> exampleMap = queryCtx.getExampleMap();
+    private Map<String, ExampleWrapper> buildExampleWrapperMap(BuildQuery buildQuery) {
+        QueryResolver queryResolver = buildQuery.getQueryResolver();
+        Map<String, Example> exampleMap = buildQuery.getExampleMap();
         Map<String, ExampleWrapper> exampleWrapperMap = new LinkedHashMap<>();
         for (MergedRepository mergedRepository : queryResolver.getReversedMergedRepositories()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();

@@ -19,7 +19,7 @@ package com.gitee.dorive.query.impl.resolver;
 
 import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.entity.QueryCtx;
+import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.entity.QueryField;
 import com.gitee.dorive.query.entity.SpecificFields;
 import com.gitee.dorive.query.entity.def.ExampleDef;
@@ -39,14 +39,14 @@ public class QueryResolver {
     private List<MergedRepository> mergedRepositories;
     private List<MergedRepository> reversedMergedRepositories;
 
-    public QueryCtx newQuery(Object query) {
+    public BuildQuery newQuery(Object query) {
         Map<String, Example> exampleMap = newExampleMap(query);
 
         Example example = exampleMap.computeIfAbsent("/", key -> new InnerExample());
         example.setOrderBy(specificFields.newOrderBy(query));
         example.setPage(specificFields.newPage(query));
 
-        return new QueryCtx(this, query, exampleMap, example, false, false);
+        return new BuildQuery(this, query, exampleMap, example, false, false);
     }
 
     private Map<String, Example> newExampleMap(Object query) {

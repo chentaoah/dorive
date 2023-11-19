@@ -18,10 +18,10 @@
 package com.gitee.dorive.query.api;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.query.entity.QueryCtx;
+import com.gitee.dorive.query.entity.BuildQuery;
 
 public interface QueryBuilder {
 
-    QueryCtx build(Context context, Object query);
+    BuildQuery build(Context context, Object query);
 
 }
