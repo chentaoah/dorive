@@ -90,14 +90,16 @@ public class DefaultQueryBuilder implements QueryBuilder {
                 }
             }
 
-            if (!abandoned && example.isEmpty()) {
-                return;
-            }
+            List<Object> entities;
+            if (abandoned) {
+                entities = Collections.emptyList();
 
-            List<Object> entities = Collections.emptyList();
-            if (!abandoned && example.isNotEmpty()) {
+            } else if (example.isNotEmpty()) {
                 example.select(binderResolver.getSelfFields());
                 entities = executedRepository.selectByExample(context, example);
+
+            } else {
+                return;
             }
 
             for (Map.Entry<String, List<PropertyBinder>> entry : mergedBindersMap.entrySet()) {
