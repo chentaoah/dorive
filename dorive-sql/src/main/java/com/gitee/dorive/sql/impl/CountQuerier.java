@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.impl;
+package com.gitee.dorive.sql.impl;
 
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.query.entity.BuildQuery;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.context.BoundedContext;
+import com.gitee.dorive.query.entity.BuildQuery;
+import com.gitee.dorive.query.repository.AbstractQueryRepository;
+import com.gitee.dorive.sql.api.SqlHelper;
 import com.gitee.dorive.sql.entity.SegmentResult;
 import com.gitee.dorive.sql.entity.SelectSegment;
-import com.gitee.dorive.sql.impl.SegmentBuilder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -34,15 +34,12 @@ import java.util.List;
 import java.util.Map;
 
 @Data
+@AllArgsConstructor
 public class CountQuerier {
 
-    private final AbstractQueryRepository<?, ?> repository;
-    private final SegmentBuilder segmentBuilder;
-
-    public CountQuerier(AbstractQueryRepository<?, ?> repository) {
-        this.repository = repository;
-        this.segmentBuilder = new SegmentBuilder();
-    }
+    private AbstractQueryRepository<?, ?> repository;
+    private SegmentBuilder segmentBuilder;
+    private SqlHelper sqlHelper;
 
     public Map<String, Long> selectCount(Context context, String groupField, boolean distinct, String countField, Object query) {
         BuildQuery buildQuery = repository.newQuery(query);
@@ -69,7 +66,7 @@ public class CountQuerier {
         selectSegment.setColumns(columns);
         selectSegment.setGroupBy("GROUP BY " + groupByColumn);
 
-        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(selectSegment.toString(), args.toArray());
+        List<Map<String, Object>> resultMaps = sqlHelper.selectList(selectSegment.toString(), args.toArray());
         Map<String, Long> countMap = new LinkedHashMap<>(resultMaps.size() * 4 / 3 + 1);
         resultMaps.forEach(resultMap -> countMap.put(resultMap.get("recordId").toString(), (Long) resultMap.get("totalCount")));
         return countMap;

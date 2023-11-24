@@ -34,8 +34,8 @@ import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
-import com.gitee.dorive.spring.boot.starter.impl.CountQuerier;
-import com.gitee.dorive.spring.boot.starter.impl.executor.MybatisPlusExecutor;
+import com.gitee.dorive.sql.impl.CountQuerier;
+import com.gitee.dorive.spring.boot.starter.impl.MybatisPlusExecutor;
 import com.gitee.dorive.api.api.ImplFactory;
 import com.gitee.dorive.sql.api.SqlHelper;
 import com.gitee.dorive.sql.impl.SegmentBuilder;
@@ -61,9 +61,14 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
+
+        SegmentBuilder segmentBuilder = new SegmentBuilder();
+
         ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
-        this.sqlQueryBuilder = new SqlQueryBuilder(new SegmentBuilder(), implFactory.getInstance(SqlHelper.class));
-        this.countQuerier = new CountQuerier(this);
+        SqlHelper sqlHelper = implFactory.getInstance(SqlHelper.class);
+
+        this.sqlQueryBuilder = new SqlQueryBuilder(segmentBuilder, sqlHelper);
+        this.countQuerier = new CountQuerier(this, segmentBuilder, sqlHelper);
     }
 
     @Override
