@@ -36,7 +36,7 @@ import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.core.entity.operation.*;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
-import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
+import com.gitee.dorive.sql.util.CriterionUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

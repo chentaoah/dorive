@@ -15,10 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.constant;
+package com.gitee.dorive.spring.boot.starter.impl;
 
-public interface Keys {
-    String FIELD_EXECUTOR = "FIELD_EXECUTOR";
-    String QUERIER = "QUERIER";
-    String TABLE_NAME = "TABLE_NAME";
+import com.gitee.dorive.api.api.ImplFactory;
+import com.gitee.dorive.sql.api.SqlHelper;
+
+public class DefaultImplFactory implements ImplFactory {
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T getInstance(Class<T> clazz, Object... args) {
+        if (clazz == SqlHelper.class) {
+            return (T) new DefaultSqlHelper();
+        }
+        return null;
+    }
+
 }

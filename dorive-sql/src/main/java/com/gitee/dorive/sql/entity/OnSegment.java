@@ -15,10 +15,23 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.constant;
+package com.gitee.dorive.sql.entity;
 
-public interface Keys {
-    String FIELD_EXECUTOR = "FIELD_EXECUTOR";
-    String QUERIER = "QUERIER";
-    String TABLE_NAME = "TABLE_NAME";
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class OnSegment extends Segment {
+
+    private String tableAlias;
+    private String column;
+    private String joinTableAlias;
+    private String joinColumn;
+
+    @Override
+    public String toString() {
+        return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
+    }
+
 }

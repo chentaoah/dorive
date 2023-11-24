@@ -35,8 +35,11 @@ import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.spring.boot.starter.impl.CountQuerier;
-import com.gitee.dorive.spring.boot.starter.impl.SqlQueryBuilder;
 import com.gitee.dorive.spring.boot.starter.impl.executor.MybatisPlusExecutor;
+import com.gitee.dorive.api.api.ImplFactory;
+import com.gitee.dorive.sql.api.SqlHelper;
+import com.gitee.dorive.sql.impl.SegmentBuilder;
+import com.gitee.dorive.sql.impl.SqlQueryBuilder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
@@ -58,7 +61,8 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        this.sqlQueryBuilder = new SqlQueryBuilder();
+        ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
+        this.sqlQueryBuilder = new SqlQueryBuilder(new SegmentBuilder(), implFactory.getInstance(SqlHelper.class));
         this.countQuerier = new CountQuerier(this);
     }
 
@@ -83,7 +87,9 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
         Assert.notNull(pojoClass, "The class of pojo cannot be null! source: {}", mapperClass);
         TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
-        attachments.put(Keys.TABLE_INFO, tableInfo);
+        if (tableInfo != null) {
+            attachments.put(Keys.TABLE_NAME, tableInfo.getTableName());
+        }
 
         EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, pojoClass, tableInfo, converterMap);
         Executor executor = new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass);

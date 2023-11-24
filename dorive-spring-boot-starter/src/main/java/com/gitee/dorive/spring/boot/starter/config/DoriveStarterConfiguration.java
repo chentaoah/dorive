@@ -15,10 +15,21 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.constant;
+package com.gitee.dorive.spring.boot.starter.config;
 
-public interface Keys {
-    String FIELD_EXECUTOR = "FIELD_EXECUTOR";
-    String QUERIER = "QUERIER";
-    String TABLE_NAME = "TABLE_NAME";
+import com.gitee.dorive.spring.boot.starter.impl.DefaultImplFactory;
+import com.gitee.dorive.api.api.ImplFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+
+@Order(-100)
+@Configuration
+public class DoriveStarterConfiguration {
+
+    @Bean
+    public static ImplFactory implFactory() {
+        return new DefaultImplFactory();
+    }
+
 }

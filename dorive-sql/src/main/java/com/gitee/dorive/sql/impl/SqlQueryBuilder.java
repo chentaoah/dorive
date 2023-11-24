@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.impl;
+package com.gitee.dorive.sql.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -26,8 +25,10 @@ import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.util.ExampleUtils;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;
-import com.gitee.dorive.spring.boot.starter.entity.segment.SegmentResult;
-import com.gitee.dorive.spring.boot.starter.entity.segment.SelectSegment;
+import com.gitee.dorive.sql.api.SqlHelper;
+import com.gitee.dorive.sql.entity.SegmentResult;
+import com.gitee.dorive.sql.entity.SelectSegment;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -35,9 +36,11 @@ import java.util.List;
 import java.util.Map;
 
 @Data
+@AllArgsConstructor
 public class SqlQueryBuilder implements QueryBuilder {
 
-    private SegmentBuilder segmentBuilder = new SegmentBuilder();
+    private SegmentBuilder segmentBuilder;
+    private SqlHelper sqlHelper;
 
     @Override
     public BuildQuery build(Context context, Object query) {
@@ -75,7 +78,7 @@ public class SqlQueryBuilder implements QueryBuilder {
 
         if (page != null) {
             String countSql = selectSegment.selectSql() + fromWhereSql;
-            long count = SqlRunner.db().selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
+            long count = sqlHelper.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
             page.setTotal(count);
             buildQuery.setPageQueried(true);
             if (count == 0L) {
@@ -97,7 +100,7 @@ public class SqlQueryBuilder implements QueryBuilder {
         }
 
         String selectSql = selectSegment.selectSql() + fromWhereSql + selectSegment.lastSql();
-        List<Map<String, Object>> resultMaps = SqlRunner.db().selectList(selectSql, args.toArray());
+        List<Map<String, Object>> resultMaps = sqlHelper.selectList(selectSql, args.toArray());
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
         if (!primaryKeys.isEmpty()) {
             example.eq("id", primaryKeys);

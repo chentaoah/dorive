@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-ref</artifactId>
+            <artifactId>dorive-sql</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

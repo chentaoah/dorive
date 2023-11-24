@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.entity.segment;
+package com.gitee.dorive.sql.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

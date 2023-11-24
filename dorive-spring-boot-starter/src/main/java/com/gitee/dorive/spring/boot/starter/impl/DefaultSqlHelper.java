@@ -15,17 +15,30 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.entity.segment;
+package com.gitee.dorive.spring.boot.starter.impl;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
+import com.gitee.dorive.sql.api.SqlHelper;
 
 import java.util.List;
+import java.util.Map;
 
-@Data
-@AllArgsConstructor
-public class SegmentResult {
-    private char letter;
-    private SelectSegment selectSegment;
-    private List<Object> args;
+public class DefaultSqlHelper implements SqlHelper {
+
+    @Override
+    public String sqlParam(Object obj) {
+        return StringUtils.sqlParam(obj);
+    }
+
+    @Override
+    public long selectCount(String sql, Object... args) {
+        return SqlRunner.db().selectCount(sql, args);
+    }
+
+    @Override
+    public List<Map<String, Object>> selectList(String sql, Object... args) {
+        return SqlRunner.db().selectList(sql, args);
+    }
+
 }

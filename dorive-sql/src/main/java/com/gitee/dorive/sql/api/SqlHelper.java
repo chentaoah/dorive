@@ -15,29 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.entity.segment;
+package com.gitee.dorive.sql.api;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.List;
+import java.util.Map;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class ArgSegment {
+public interface SqlHelper {
 
-    private String tableAlias;
-    private String column;
-    private String operator;
-    private String expr;
+    String sqlParam(Object obj);
 
-    @Override
-    public String toString() {
-        if (expr != null) {
-            return tableAlias + "." + column + " " + operator + " " + expr;
-        } else {
-            return tableAlias + "." + column + " " + operator;
-        }
-    }
+    long selectCount(String sql, Object... args);
+
+    List<Map<String, Object>> selectList(String sql, Object... args);
 
 }

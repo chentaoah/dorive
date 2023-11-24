@@ -15,10 +15,29 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.constant;
+package com.gitee.dorive.sql.entity;
 
-public interface Keys {
-    String FIELD_EXECUTOR = "FIELD_EXECUTOR";
-    String QUERIER = "QUERIER";
-    String TABLE_NAME = "TABLE_NAME";
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class Segment {
+
+    private boolean reachable;
+    private boolean dirtyQuery;
+    private List<Segment> directedSegments;
+
+    public boolean isAvailable() {
+        return reachable && dirtyQuery;
+    }
+
+    public String getTableName() {
+        return null;
+    }
+
+    public String getTableAlias() {
+        return null;
+    }
+
 }

@@ -15,18 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.util;
+package com.gitee.dorive.sql.entity;
 
-public class SqlUtils {
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-    public static Object toLike(Object value) {
-        if (value instanceof String) {
-            String valueStr = (String) value;
-            if (!valueStr.startsWith("%") && !valueStr.endsWith("%")) {
-                return "%" + valueStr + "%";
-            }
-        }
-        return value;
-    }
+import java.util.List;
 
+@Data
+@AllArgsConstructor
+public class SegmentResult {
+    private char letter;
+    private SelectSegment selectSegment;
+    private List<Object> args;
 }

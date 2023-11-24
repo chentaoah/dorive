@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.impl;
+package com.gitee.dorive.sql.impl;
 
-import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.gitee.dorive.api.constant.Keys;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.api.context.Context;
@@ -28,14 +27,23 @@ import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.executor.FieldExecutor;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.BuildQuery;
+import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.impl.resolver.QueryResolver;
-import com.gitee.dorive.spring.boot.starter.entity.segment.*;
-import com.gitee.dorive.spring.boot.starter.util.CriterionUtils;
+import com.gitee.dorive.sql.entity.ArgSegment;
+import com.gitee.dorive.sql.entity.JoinSegment;
+import com.gitee.dorive.sql.entity.OnSegment;
+import com.gitee.dorive.sql.entity.Segment;
+import com.gitee.dorive.sql.entity.SegmentResult;
+import com.gitee.dorive.sql.entity.SelectSegment;
+import com.gitee.dorive.sql.util.CriterionUtils;
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 public class SegmentBuilder {
@@ -61,10 +69,9 @@ public class SegmentBuilder {
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 
             Map<String, Object> attachments = executedRepository.getAttachments();
-            TableInfo tableInfo = (TableInfo) attachments.get(Keys.TABLE_INFO);
+            String tableName = (String) attachments.get(Keys.TABLE_NAME);
             FieldExecutor fieldExecutor = (FieldExecutor) attachments.get(Keys.FIELD_EXECUTOR);
 
-            String tableName = tableInfo.getTableName();
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 

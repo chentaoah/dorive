@@ -23,8 +23,9 @@ import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.context.BoundedContext;
-import com.gitee.dorive.spring.boot.starter.entity.segment.SegmentResult;
-import com.gitee.dorive.spring.boot.starter.entity.segment.SelectSegment;
+import com.gitee.dorive.sql.entity.SegmentResult;
+import com.gitee.dorive.sql.entity.SelectSegment;
+import com.gitee.dorive.sql.impl.SegmentBuilder;
 import lombok.Data;
 
 import java.util.ArrayList;

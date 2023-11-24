@@ -15,17 +15,26 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.util;
+package com.gitee.dorive.sql.util;
 
 import cn.hutool.core.date.DateUtil;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import cn.hutool.extra.spring.SpringUtil;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.api.api.ImplFactory;
+import com.gitee.dorive.sql.api.SqlHelper;
 
 import java.util.Collection;
 import java.util.Date;
 
 public class CriterionUtils {
+
+    private static final SqlHelper sqlHelper;
+
+    static {
+        ImplFactory implFactory = SpringUtil.getBean(ImplFactory.class);
+        sqlHelper = implFactory.getInstance(SqlHelper.class);
+    }
 
     public static String getOperator(Criterion criterion) {
         String operator = criterion.getOperator();
@@ -54,7 +63,7 @@ public class CriterionUtils {
     public static Object getValue(Criterion criterion) {
         String operator = criterion.getOperator();
         Object value = criterion.getValue();
-        return StringUtils.sqlParam(format(operator, value));
+        return sqlHelper.sqlParam(format(operator, value));
     }
 
     public static Object format(String operator, Object value) {

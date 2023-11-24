@@ -15,10 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.constant;
+package com.gitee.dorive.sql.util;
 
-public interface Keys {
-    String FIELD_EXECUTOR = "FIELD_EXECUTOR";
-    String QUERIER = "QUERIER";
-    String TABLE_NAME = "TABLE_NAME";
+public class SqlUtils {
+
+    public static Object toLike(Object value) {
+        if (value instanceof String) {
+            String valueStr = (String) value;
+            if (!valueStr.startsWith("%") && !valueStr.endsWith("%")) {
+                return "%" + valueStr + "%";
+            }
+        }
+        return value;
+    }
+
 }

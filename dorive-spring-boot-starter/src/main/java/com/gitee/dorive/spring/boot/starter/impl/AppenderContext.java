@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.entity.executor.MultiInBuilder;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
-import com.gitee.dorive.spring.boot.starter.util.SqlUtils;
+import com.gitee.dorive.sql.util.SqlUtils;
 
 import java.util.Collection;
 import java.util.List;

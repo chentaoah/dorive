@@ -38,6 +38,7 @@
         <module>dorive-event</module>
         <module>dorive-query</module>
         <module>dorive-ref</module>
+        <module>dorive-sql</module>
         <module>dorive-spring-boot-starter</module>
     </modules>
 
