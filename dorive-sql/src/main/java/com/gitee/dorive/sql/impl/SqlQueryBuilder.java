@@ -26,7 +26,7 @@ import com.gitee.dorive.core.util.ExampleUtils;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.sql.api.SqlHelper;
-import com.gitee.dorive.sql.entity.SegmentResult;
+import com.gitee.dorive.sql.entity.BuildResult;
 import com.gitee.dorive.sql.entity.SelectSegment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -52,10 +52,10 @@ public class SqlQueryBuilder implements QueryBuilder {
         buildQuery.setExample(newExample);
         Page<Object> page = newExample.getPage();
 
-        SegmentResult segmentResult = segmentBuilder.buildSegment(context, buildQuery);
-        char letter = segmentResult.getLetter();
-        SelectSegment selectSegment = segmentResult.getSelectSegment();
-        List<Object> args = segmentResult.getArgs();
+        BuildResult buildResult = segmentBuilder.buildSegment(context, buildQuery);
+        char letter = buildResult.getLetter();
+        SelectSegment selectSegment = buildResult.getSelectSegment();
+        List<Object> args = buildResult.getArgs();
 
         if (selectSegment == null) {
             throw new RuntimeException("Unable to build SQL statement!");

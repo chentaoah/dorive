@@ -17,27 +17,12 @@
 
 package com.gitee.dorive.sql.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class Segment {
-
-    private boolean reachable;
-    private boolean dirtyQuery;
-    private List<Segment> directedSegments;
-
-    public boolean isAvailable() {
-        return reachable && dirtyQuery;
-    }
-
-    public String getTableName() {
-        return null;
-    }
-
-    public String getTableAlias() {
-        return null;
-    }
-
+@AllArgsConstructor
+public class TableSegment {
+    private String tableName;
+    private String tableAlias;
 }

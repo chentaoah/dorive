@@ -24,8 +24,8 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class SegmentResult {
-    private char letter;
+public class BuildResult {
     private SelectSegment selectSegment;
     private List<Object> args;
+    private char letter;
 }

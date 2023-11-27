@@ -22,19 +22,19 @@ import cn.hutool.db.sql.SqlBuilder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class SelectSegment extends Segment {
+public class SelectSegment {
 
     private boolean distinct;
-    private List<String> columns;
-    private String tableName;
-    private String tableAlias;
-    private List<JoinSegment> joinSegments;
-    private List<ArgSegment> argSegments;
+    private List<String> columns = Collections.emptyList();
+    private TableSegment tableSegment;
+    private List<JoinSegment> joinSegments = new ArrayList<>();
+    private List<ArgSegment> argSegments = new ArrayList<>();
     private String groupBy;
     private String orderBy;
     private String limit;
@@ -49,13 +49,7 @@ public class SelectSegment extends Segment {
         SqlBuilder sqlBuilder = SqlBuilder.create();
         sqlBuilder.from(tableName + " " + tableAlias);
         for (JoinSegment joinSegment : joinSegments) {
-            if (joinSegment.isAvailable()) {
-                sqlBuilder.join(joinSegment.getTableName() + " " + joinSegment.getTableAlias(), SqlBuilder.Join.LEFT);
-                List<OnSegment> onSegments = joinSegment.getOnSegments().stream()
-                        .filter(onSegment -> onSegment.getDirectedSegments().get(0).isAvailable())
-                        .collect(Collectors.toList());
-                sqlBuilder.on(StrUtil.join(" AND ", onSegments));
-            }
+            sqlBuilder.on(StrUtil.join(" AND ", joinSegment.getOnSegments()));
         }
         sqlBuilder.where(StrUtil.join(" AND ", argSegments));
         return sqlBuilder.toString();

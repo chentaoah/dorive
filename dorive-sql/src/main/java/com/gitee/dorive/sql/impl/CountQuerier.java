@@ -23,7 +23,7 @@ import com.gitee.dorive.core.entity.context.BoundedContext;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlHelper;
-import com.gitee.dorive.sql.entity.SegmentResult;
+import com.gitee.dorive.sql.entity.BuildResult;
 import com.gitee.dorive.sql.entity.SelectSegment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,9 +44,9 @@ public class CountQuerier {
     public Map<String, Long> selectCount(Context context, String groupField, boolean distinct, String countField, Object query) {
         BuildQuery buildQuery = repository.newQuery(query);
 
-        SegmentResult segmentResult = segmentBuilder.buildSegment(context, buildQuery);
-        SelectSegment selectSegment = segmentResult.getSelectSegment();
-        List<Object> args = segmentResult.getArgs();
+        BuildResult buildResult = segmentBuilder.buildSegment(context, buildQuery);
+        SelectSegment selectSegment = buildResult.getSelectSegment();
+        List<Object> args = buildResult.getArgs();
 
         EntityEle entityEle = repository.getEntityEle();
         String groupByColumn = entityEle.toAlias(groupField);

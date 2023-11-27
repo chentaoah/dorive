@@ -17,15 +17,14 @@
 
 package com.gitee.dorive.sql.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class JoinSegment extends Segment {
-    private String tableName;
-    private String tableAlias;
+@AllArgsConstructor
+public class JoinSegment {
+    private TableSegment tableSegment;
     private List<OnSegment> onSegments;
 }

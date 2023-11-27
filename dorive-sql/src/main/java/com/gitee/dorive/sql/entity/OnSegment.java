@@ -18,11 +18,9 @@
 package com.gitee.dorive.sql.entity;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class OnSegment extends Segment {
+public class OnSegment {
 
     private String tableAlias;
     private String column;
