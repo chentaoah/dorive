@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.sql.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.constant.Keys;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.api.context.Context;
@@ -31,23 +30,12 @@ import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.impl.resolver.QueryResolver;
-import com.gitee.dorive.sql.entity.ArgSegment;
-import com.gitee.dorive.sql.entity.BuildResult;
-import com.gitee.dorive.sql.entity.JoinSegment;
-import com.gitee.dorive.sql.entity.OnSegment;
-import com.gitee.dorive.sql.entity.SelectSegment;
-import com.gitee.dorive.sql.entity.TableSegment;
+import com.gitee.dorive.sql.entity.*;
 import com.gitee.dorive.sql.util.CriterionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Data
 public class SegmentBuilder {
@@ -58,7 +46,6 @@ public class SegmentBuilder {
 
         List<MergedRepository> mergedRepositories = queryResolver.getMergedRepositories();
         Map<String, Node> nodeMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);
-
         SelectSegment selectSegment = new SelectSegment();
         List<Object> args = new ArrayList<>();
         char letter = 'a';
@@ -67,13 +54,9 @@ public class SegmentBuilder {
             String tableAlias = String.valueOf(letter);
             letter = (char) (letter + 1);
 
-            String lastAccessPath = mergedRepository.getLastAccessPath();
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             String relativeAccessPath = mergedRepository.getRelativeAccessPath();
-            CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
-
-            BinderResolver binderResolver = definedRepository.getBinderResolver();
 
             Map<String, Object> attachments = executedRepository.getAttachments();
             String tableName = (String) attachments.get(Keys.TABLE_NAME);
@@ -82,16 +65,15 @@ public class SegmentBuilder {
             Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample(Collections.emptyList()));
             fieldExecutor.convert(context, example);
 
-            TableSegment tableSegment = new TableSegment(tableName, tableAlias);
-            Node node = new Node(tableSegment, example.isNotEmpty(), new ArrayList<>(4));
+            TableSegment tableSegment = new TableSegment(tableName, tableAlias, example.isNotEmpty(), new ArrayList<>(example.getCriteria().size()));
+            Node node = new Node(tableSegment, new ArrayList<>(4));
             nodeMap.put(relativeAccessPath, node);
 
             if ("/".equals(relativeAccessPath)) {
-                node.setDirty(true);
                 selectSegment.setTableSegment(tableSegment);
 
             } else {
-                List<OnSegment> onSegments = newOnSegments(nodeMap, lastAccessPath, binderResolver, tableAlias, node);
+                List<OnSegment> onSegments = newOnSegments(nodeMap, mergedRepository, tableAlias, node);
                 if (onSegments.isEmpty()) {
                     nodeMap.remove(relativeAccessPath);
                     continue;
@@ -101,38 +83,30 @@ public class SegmentBuilder {
                 joinSegments.add(joinSegment);
             }
 
-            appendArguments(selectSegment, args, tableAlias, example);
+            appendArguments(args, tableAlias, example, tableSegment);
         }
 
-        markDirty(nodeMap.get("/"));
-        Set<TableSegment> tableSegments = new LinkedHashSet<>();
-        nodeMap.forEach((path, node) -> {
-            if (node.isDirty()) {
-                tableSegments.add(node.getTableSegment());
-            }
-        });
-        List<JoinSegment> joinSegments = selectSegment.getJoinSegments();
-        joinSegments = CollUtil.filter(joinSegments, joinSegment -> tableSegments.contains(joinSegment.getTableSegment()));
-        selectSegment.setJoinSegments(joinSegments);
+        markTableSegmentJoin(nodeMap.get("/"));
+        selectSegment.filterSegments();
 
         return new BuildResult(selectSegment, args, letter);
     }
 
-    private List<OnSegment> newOnSegments(Map<String, Node> nodeMap, String lastAccessPath, BinderResolver binderResolver, String tableAlias, Node node) {
+    private List<OnSegment> newOnSegments(Map<String, Node> nodeMap, MergedRepository mergedRepository, String tableAlias, Node node) {
+        String lastAccessPath = mergedRepository.getLastAccessPath();
+        CommonRepository definedRepository = mergedRepository.getDefinedRepository();
+        BinderResolver binderResolver = definedRepository.getBinderResolver();
         List<PropertyBinder> propertyBinders = binderResolver.getPropertyBinders();
         List<OnSegment> onSegments = new ArrayList<>(propertyBinders.size());
-
         for (PropertyBinder propertyBinder : propertyBinders) {
             String relativeAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
             Node targetNode = nodeMap.get(relativeAccessPath);
             if (targetNode != null) {
                 TableSegment tableSegment = targetNode.getTableSegment();
                 List<Node> children = targetNode.getChildren();
-
                 if (!children.contains(node)) {
                     children.add(node);
                 }
-
                 OnSegment onSegment = new OnSegment();
                 onSegment.setTableAlias(tableAlias);
                 onSegment.setColumn(propertyBinder.getAlias());
@@ -144,8 +118,8 @@ public class SegmentBuilder {
         return onSegments;
     }
 
-    private void appendArguments(SelectSegment selectSegment, List<Object> args, String tableAlias, Example example) {
-        List<ArgSegment> argSegments = selectSegment.getArgSegments();
+    private void appendArguments(List<Object> args, String tableAlias, Example example, TableSegment tableSegment) {
+        List<ArgSegment> argSegments = tableSegment.getArgSegments();
         for (Criterion criterion : example.getCriteria()) {
             String property = criterion.getProperty();
             String operator = CriterionUtils.getOperator(criterion);
@@ -163,13 +137,15 @@ public class SegmentBuilder {
         }
     }
 
-    private void markDirty(Node node) {
+    private void markTableSegmentJoin(Node node) {
         if (node != null) {
+            TableSegment tableSegment = node.getTableSegment();
             List<Node> children = node.getChildren();
             for (Node child : children) {
-                markDirty(child);
-                if (child.isDirty()) {
-                    node.setDirty(true);
+                markTableSegmentJoin(child);
+                TableSegment childTableSegment = child.getTableSegment();
+                if (childTableSegment.isJoin()) {
+                    tableSegment.setJoin(true);
                 }
             }
         }
@@ -179,7 +155,6 @@ public class SegmentBuilder {
     @AllArgsConstructor
     public static class Node {
         private TableSegment tableSegment;
-        private boolean dirty;
         private List<Node> children;
     }
 

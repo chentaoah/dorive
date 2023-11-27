@@ -20,12 +20,10 @@ package com.gitee.dorive.sql.entity;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlBuilder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 public class SelectSegment {
@@ -39,6 +37,19 @@ public class SelectSegment {
     private String orderBy;
     private String limit;
 
+    public void filterSegments() {
+        argSegments.addAll(tableSegment.getArgSegments());
+        List<JoinSegment> newJoinSegments = new ArrayList<>(joinSegments.size());
+        for (JoinSegment joinSegment : joinSegments) {
+            TableSegment tableSegment = joinSegment.getTableSegment();
+            if (tableSegment.isJoin()) {
+                newJoinSegments.add(joinSegment);
+                argSegments.addAll(tableSegment.getArgSegments());
+            }
+        }
+        joinSegments = newJoinSegments;
+    }
+
     public String selectSql() {
         SqlBuilder sqlBuilder = SqlBuilder.create();
         sqlBuilder.select(distinct, columns);
@@ -47,8 +58,10 @@ public class SelectSegment {
 
     public String fromWhereSql() {
         SqlBuilder sqlBuilder = SqlBuilder.create();
-        sqlBuilder.from(tableName + " " + tableAlias);
+        sqlBuilder.from(tableSegment.toString());
         for (JoinSegment joinSegment : joinSegments) {
+            TableSegment tableSegment = joinSegment.getTableSegment();
+            sqlBuilder.join(tableSegment.toString(), SqlBuilder.Join.LEFT);
             sqlBuilder.on(StrUtil.join(" AND ", joinSegment.getOnSegments()));
         }
         sqlBuilder.where(StrUtil.join(" AND ", argSegments));

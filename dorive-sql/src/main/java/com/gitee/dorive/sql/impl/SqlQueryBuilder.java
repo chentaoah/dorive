@@ -26,8 +26,10 @@ import com.gitee.dorive.core.util.ExampleUtils;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.sql.api.SqlHelper;
+import com.gitee.dorive.sql.entity.ArgSegment;
 import com.gitee.dorive.sql.entity.BuildResult;
 import com.gitee.dorive.sql.entity.SelectSegment;
+import com.gitee.dorive.sql.entity.TableSegment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -53,24 +55,20 @@ public class SqlQueryBuilder implements QueryBuilder {
         Page<Object> page = newExample.getPage();
 
         BuildResult buildResult = segmentBuilder.buildSegment(context, buildQuery);
-        char letter = buildResult.getLetter();
         SelectSegment selectSegment = buildResult.getSelectSegment();
         List<Object> args = buildResult.getArgs();
+        char letter = buildResult.getLetter();
 
-        if (selectSegment == null) {
-            throw new RuntimeException("Unable to build SQL statement!");
-        }
-        if (selectSegment.getArgSegments().isEmpty()) {
-            return buildQuery;
-        }
-        if (!selectSegment.isDirtyQuery()) {
+        TableSegment tableSegment = selectSegment.getTableSegment();
+        List<ArgSegment> argSegments = selectSegment.getArgSegments();
+        if (!tableSegment.isJoin() || argSegments.isEmpty()) {
             return buildQuery;
         }
 
         selectSegment.setDistinct(true);
 
         List<String> selectColumns = new ArrayList<>(2);
-        String tableAlias = selectSegment.getTableAlias();
+        String tableAlias = tableSegment.getTableAlias();
         selectColumns.add(tableAlias + ".id");
         selectSegment.setColumns(selectColumns);
 

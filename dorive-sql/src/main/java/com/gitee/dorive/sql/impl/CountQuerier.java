@@ -25,6 +25,7 @@ import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlHelper;
 import com.gitee.dorive.sql.entity.BuildResult;
 import com.gitee.dorive.sql.entity.SelectSegment;
+import com.gitee.dorive.sql.entity.TableSegment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -48,11 +49,13 @@ public class CountQuerier {
         SelectSegment selectSegment = buildResult.getSelectSegment();
         List<Object> args = buildResult.getArgs();
 
+        TableSegment tableSegment = selectSegment.getTableSegment();
+
         EntityEle entityEle = repository.getEntityEle();
         String groupByColumn = entityEle.toAlias(groupField);
         String countColumn = entityEle.toAlias(countField);
 
-        String tableAlias = selectSegment.getTableAlias();
+        String tableAlias = tableSegment.getTableAlias();
         groupByColumn = tableAlias + "." + groupByColumn;
         countColumn = tableAlias + "." + countColumn;
 

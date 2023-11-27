@@ -20,9 +20,20 @@ package com.gitee.dorive.sql.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 public class TableSegment {
+
     private String tableName;
     private String tableAlias;
+    private boolean join;
+    private List<ArgSegment> argSegments;
+
+    @Override
+    public String toString() {
+        return tableName + " " + tableAlias;
+    }
+
 }
