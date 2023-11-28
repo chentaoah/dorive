@@ -94,13 +94,14 @@ public class SqlQueryBuilder implements QueryBuilder {
             }
             selectSegment.setOrderBy(orderBy.toString());
         }
+        if (rebuildSql) {
+            selectSql = selectSegment.selectSql();
+        }
+
         if (page != null) {
             selectSegment.setLimit(page.toString());
         }
 
-        if (rebuildSql) {
-            selectSql = selectSegment.selectSql();
-        }
         String sql = selectSql + fromWhereSql + selectSegment.lastSql();
         List<Map<String, Object>> resultMaps = sqlHelper.selectList(sql, args.toArray());
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
