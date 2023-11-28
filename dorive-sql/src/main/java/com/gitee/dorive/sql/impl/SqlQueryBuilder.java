@@ -63,17 +63,18 @@ public class SqlQueryBuilder implements QueryBuilder {
             return buildQuery;
         }
 
-        selectSegment.setDistinct(true);
-
-        List<String> selectColumns = new ArrayList<>(2);
         String tableAlias = tableSegment.getTableAlias();
+
+        selectSegment.setDistinct(true);
+        List<String> selectColumns = new ArrayList<>(2);
         selectColumns.add(tableAlias + ".id");
         selectSegment.setSelectColumns(selectColumns);
 
+        String selectSql = selectSegment.selectSql();
         String fromWhereSql = selectSegment.fromWhereSql();
 
         if (page != null) {
-            String countSql = selectSegment.selectSql() + fromWhereSql;
+            String countSql = selectSql + fromWhereSql;
             long count = sqlHelper.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
             page.setTotal(count);
             buildQuery.setPageQueried(true);
@@ -83,10 +84,12 @@ public class SqlQueryBuilder implements QueryBuilder {
             }
         }
 
+        boolean rebuildSql = false;
         if (orderBy != null) {
             for (String property : orderBy.getProperties()) {
                 if (!"id".equals(property)) {
                     selectColumns.add(tableAlias + "." + property);
+                    rebuildSql = true;
                 }
             }
             selectSegment.setOrderBy(orderBy.toString());
@@ -95,8 +98,11 @@ public class SqlQueryBuilder implements QueryBuilder {
             selectSegment.setLimit(page.toString());
         }
 
-        String selectSql = selectSegment.selectSql() + fromWhereSql + selectSegment.lastSql();
-        List<Map<String, Object>> resultMaps = sqlHelper.selectList(selectSql, args.toArray());
+        if (rebuildSql) {
+            selectSql = selectSegment.selectSql();
+        }
+        String sql = selectSql + fromWhereSql + selectSegment.lastSql();
+        List<Map<String, Object>> resultMaps = sqlHelper.selectList(sql, args.toArray());
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
         if (!primaryKeys.isEmpty()) {
             example.eq("id", primaryKeys);
