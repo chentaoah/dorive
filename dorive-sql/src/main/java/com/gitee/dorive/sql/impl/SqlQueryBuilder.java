@@ -68,7 +68,7 @@ public class SqlQueryBuilder implements QueryBuilder {
         List<String> selectColumns = new ArrayList<>(2);
         String tableAlias = tableSegment.getTableAlias();
         selectColumns.add(tableAlias + ".id");
-        selectSegment.setColumns(selectColumns);
+        selectSegment.setSelectColumns(selectColumns);
 
         String fromWhereSql = selectSegment.fromWhereSql();
 

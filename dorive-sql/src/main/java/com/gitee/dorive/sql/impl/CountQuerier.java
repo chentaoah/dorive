@@ -63,7 +63,7 @@ public class CountQuerier {
         } else {
             columns.add("count(" + countColumn + ") AS totalCount");
         }
-        selectSegment.setColumns(columns);
+        selectSegment.setSelectColumns(columns);
         selectSegment.setGroupBy("GROUP BY " + groupByColumn);
 
         List<Map<String, Object>> resultMaps = sqlHelper.selectList(selectSegment.toString(), args.toArray());

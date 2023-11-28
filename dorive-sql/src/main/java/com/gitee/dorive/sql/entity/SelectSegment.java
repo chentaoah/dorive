@@ -30,7 +30,7 @@ public class SelectSegment {
 
     private char letter = 'a';
     private boolean distinct;
-    private List<String> columns = Collections.emptyList();
+    private List<String> selectColumns = Collections.emptyList();
     private TableSegment tableSegment;
     private List<JoinSegment> joinSegments = new ArrayList<>();
     private List<ArgSegment> argSegments = new ArrayList<>();
@@ -62,7 +62,7 @@ public class SelectSegment {
 
     public String selectSql() {
         SqlBuilder sqlBuilder = SqlBuilder.create();
-        sqlBuilder.select(distinct, columns);
+        sqlBuilder.select(distinct, selectColumns);
         return sqlBuilder.toString();
     }
 
