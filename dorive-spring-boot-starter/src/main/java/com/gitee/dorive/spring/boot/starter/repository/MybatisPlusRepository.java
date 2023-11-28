@@ -61,12 +61,9 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-
         SegmentBuilder segmentBuilder = new SegmentBuilder();
-
         ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
         SqlHelper sqlHelper = implFactory.getInstance(SqlHelper.class);
-
         this.sqlQueryBuilder = new SqlQueryBuilder(segmentBuilder, sqlHelper);
         this.countQuerier = new CountQuerier(this, segmentBuilder, sqlHelper);
     }
