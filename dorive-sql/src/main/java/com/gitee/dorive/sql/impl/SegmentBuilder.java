@@ -80,7 +80,7 @@ public class SegmentBuilder {
                 joinSegments.add(joinSegment);
             }
 
-            appendArguments(selectSegment, tableAlias, example, tableSegment);
+            addTableSegmentArgs(selectSegment, tableAlias, example, tableSegment);
         }
 
         markTableSegmentJoin(nodeMap.get("/"));
@@ -112,7 +112,7 @@ public class SegmentBuilder {
         return onSegments;
     }
 
-    private void appendArguments(SelectSegment selectSegment, String tableAlias, Example example, TableSegment tableSegment) {
+    private void addTableSegmentArgs(SelectSegment selectSegment, String tableAlias, Example example, TableSegment tableSegment) {
         List<Object> args = selectSegment.getArgs();
         List<ArgSegment> argSegments = tableSegment.getArgSegments();
         for (Criterion criterion : example.getCriteria()) {
