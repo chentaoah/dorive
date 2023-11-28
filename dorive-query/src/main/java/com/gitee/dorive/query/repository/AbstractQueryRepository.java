@@ -65,10 +65,10 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     }
 
     @Override
-    public BuildQuery build(Context context, Object query) {
+    public BuildQuery buildQuery(Context context, Object query) {
         BuildQuery buildQuery = newQuery(query);
         QueryBuilder queryBuilder = adaptiveBuilder(context, buildQuery);
-        return queryBuilder.build(context, buildQuery);
+        return queryBuilder.buildQuery(context, buildQuery);
     }
 
     public BuildQuery newQuery(Object query) {
@@ -84,7 +84,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
     @Override
     public List<E> selectByQuery(Context context, Object query) {
-        BuildQuery buildQuery = build(context, query);
+        BuildQuery buildQuery = buildQuery(context, query);
         Example example = buildQuery.getExample();
         if (buildQuery.isAbandoned()) {
             return Collections.emptyList();
@@ -98,7 +98,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByQuery(Context context, Object query) {
-        BuildQuery buildQuery = build(context, query);
+        BuildQuery buildQuery = buildQuery(context, query);
         Example example = buildQuery.getExample();
         if (buildQuery.isAbandoned()) {
             return (Page<E>) example.getPage();

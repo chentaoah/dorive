@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 public class DefaultQueryBuilder implements QueryBuilder {
 
     @Override
-    public BuildQuery build(Context context, Object query) {
+    public BuildQuery buildQuery(Context context, Object query) {
         BuildQuery buildQuery = (BuildQuery) query;
 
         Map<String, ExampleWrapper> exampleWrapperMap = buildExampleWrapperMap(buildQuery);

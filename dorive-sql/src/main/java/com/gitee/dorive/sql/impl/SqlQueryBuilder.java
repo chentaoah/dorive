@@ -44,7 +44,7 @@ public class SqlQueryBuilder implements QueryBuilder {
     private SqlHelper sqlHelper;
 
     @Override
-    public BuildQuery build(Context context, Object query) {
+    public BuildQuery buildQuery(Context context, Object query) {
         BuildQuery buildQuery = (BuildQuery) query;
         Example example = buildQuery.getExample();
         OrderBy orderBy = example.getOrderBy();
