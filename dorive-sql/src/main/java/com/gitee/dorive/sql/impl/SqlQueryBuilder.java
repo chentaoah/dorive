@@ -50,9 +50,9 @@ public class SqlQueryBuilder implements QueryBuilder {
         Example example = buildQuery.getExample();
         OrderBy orderBy = example.getOrderBy();
 
-        Example newExample = ExampleUtils.tryClone(example);
-        buildQuery.setExample(newExample);
-        Page<Object> page = newExample.getPage();
+        example = ExampleUtils.tryClone(example);
+        buildQuery.setExample(example);
+        Page<Object> page = example.getPage();
 
         BuildResult buildResult = segmentBuilder.buildSegment(context, buildQuery);
         SelectSegment selectSegment = buildResult.getSelectSegment();
