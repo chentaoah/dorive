@@ -106,7 +106,7 @@ public class SqlQueryBuilder implements QueryBuilder {
         List<Map<String, Object>> resultMaps = sqlHelper.selectList(sql, args.toArray());
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
         if (!primaryKeys.isEmpty()) {
-            example.eq("id", primaryKeys);
+            example.in("id", primaryKeys);
         } else {
             buildQuery.setAbandoned(true);
         }
