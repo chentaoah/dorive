@@ -37,7 +37,7 @@ public class SelectSegment {
     private String orderBy;
     private String limit;
 
-    public void filterSegments() {
+    public void filterTableSegments() {
         if (tableSegment.isJoin()) {
             argSegments.addAll(tableSegment.getArgSegments());
         }

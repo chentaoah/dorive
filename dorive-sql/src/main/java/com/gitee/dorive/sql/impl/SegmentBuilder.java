@@ -87,7 +87,7 @@ public class SegmentBuilder {
         }
 
         markTableSegmentJoin(nodeMap.get("/"));
-        selectSegment.filterSegments();
+        selectSegment.filterTableSegments();
 
         return new BuildResult(selectSegment, args, letter);
     }
