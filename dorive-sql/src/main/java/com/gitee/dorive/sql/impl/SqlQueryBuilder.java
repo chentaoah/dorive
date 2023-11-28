@@ -55,10 +55,10 @@ public class SqlQueryBuilder implements QueryBuilder {
 
         SelectSegment selectSegment = segmentBuilder.buildSegment(context, buildQuery);
         char letter = selectSegment.getLetter();
-        List<Object> args = selectSegment.getArgs();
-
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<ArgSegment> argSegments = selectSegment.getArgSegments();
+        List<Object> args = selectSegment.getArgs();
+
         if (!tableSegment.isJoin() || argSegments.isEmpty()) {
             return buildQuery;
         }

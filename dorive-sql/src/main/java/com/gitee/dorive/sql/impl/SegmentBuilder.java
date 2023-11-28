@@ -104,11 +104,8 @@ public class SegmentBuilder {
                 if (!children.contains(node)) {
                     children.add(node);
                 }
-                OnSegment onSegment = new OnSegment();
-                onSegment.setTableAlias(tableAlias);
-                onSegment.setColumn(propertyBinder.getAlias());
-                onSegment.setJoinTableAlias(tableSegment.getTableAlias());
-                onSegment.setJoinColumn(propertyBinder.getBindAlias());
+                OnSegment onSegment = new OnSegment(tableAlias, propertyBinder.getAlias(),
+                        tableSegment.getTableAlias(), propertyBinder.getBindAlias());
                 onSegments.add(onSegment);
             }
         }
