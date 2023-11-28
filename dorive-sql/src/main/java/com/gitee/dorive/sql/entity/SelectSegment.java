@@ -38,7 +38,9 @@ public class SelectSegment {
     private String limit;
 
     public void filterSegments() {
-        argSegments.addAll(tableSegment.getArgSegments());
+        if (tableSegment.isJoin()) {
+            argSegments.addAll(tableSegment.getArgSegments());
+        }
         List<JoinSegment> newJoinSegments = new ArrayList<>(joinSegments.size());
         for (JoinSegment joinSegment : joinSegments) {
             TableSegment tableSegment = joinSegment.getTableSegment();
