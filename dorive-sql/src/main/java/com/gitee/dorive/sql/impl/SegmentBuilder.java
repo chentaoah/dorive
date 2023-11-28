@@ -40,19 +40,17 @@ import java.util.*;
 @Data
 public class SegmentBuilder {
 
-    public BuildResult buildSegment(Context context, BuildQuery buildQuery) {
+    public SelectSegment buildSegment(Context context, BuildQuery buildQuery) {
         QueryResolver queryResolver = buildQuery.getQueryResolver();
         Map<String, Example> exampleMap = buildQuery.getExampleMap();
 
         List<MergedRepository> mergedRepositories = queryResolver.getMergedRepositories();
         Map<String, Node> nodeMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);
         SelectSegment selectSegment = new SelectSegment();
-        List<Object> args = new ArrayList<>();
-        char letter = 'a';
+        List<JoinSegment> joinSegments = selectSegment.getJoinSegments();
 
         for (MergedRepository mergedRepository : mergedRepositories) {
-            String tableAlias = String.valueOf(letter);
-            letter = (char) (letter + 1);
+            String tableAlias = selectSegment.generateTableAlias();
 
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             String relativeAccessPath = mergedRepository.getRelativeAccessPath();
@@ -79,17 +77,15 @@ public class SegmentBuilder {
                     continue;
                 }
                 JoinSegment joinSegment = new JoinSegment(tableSegment, onSegments);
-                List<JoinSegment> joinSegments = selectSegment.getJoinSegments();
                 joinSegments.add(joinSegment);
             }
 
-            appendArguments(args, tableAlias, example, tableSegment);
+            appendArguments(selectSegment, tableAlias, example, tableSegment);
         }
 
         markTableSegmentJoin(nodeMap.get("/"));
         selectSegment.filterTableSegments();
-
-        return new BuildResult(selectSegment, args, letter);
+        return selectSegment;
     }
 
     private List<OnSegment> newOnSegments(Map<String, Node> nodeMap, MergedRepository mergedRepository, String tableAlias, Node node) {
@@ -97,6 +93,7 @@ public class SegmentBuilder {
         CommonRepository definedRepository = mergedRepository.getDefinedRepository();
         BinderResolver binderResolver = definedRepository.getBinderResolver();
         List<PropertyBinder> propertyBinders = binderResolver.getPropertyBinders();
+
         List<OnSegment> onSegments = new ArrayList<>(propertyBinders.size());
         for (PropertyBinder propertyBinder : propertyBinders) {
             String relativeAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
@@ -118,7 +115,8 @@ public class SegmentBuilder {
         return onSegments;
     }
 
-    private void appendArguments(List<Object> args, String tableAlias, Example example, TableSegment tableSegment) {
+    private void appendArguments(SelectSegment selectSegment, String tableAlias, Example example, TableSegment tableSegment) {
+        List<Object> args = selectSegment.getArgs();
         List<ArgSegment> argSegments = tableSegment.getArgSegments();
         for (Criterion criterion : example.getCriteria()) {
             String property = criterion.getProperty();

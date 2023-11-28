@@ -28,14 +28,22 @@ import java.util.List;
 @Data
 public class SelectSegment {
 
+    private char letter = 'a';
     private boolean distinct;
     private List<String> columns = Collections.emptyList();
     private TableSegment tableSegment;
     private List<JoinSegment> joinSegments = new ArrayList<>();
     private List<ArgSegment> argSegments = new ArrayList<>();
+    private List<Object> args = new ArrayList<>();
     private String groupBy;
     private String orderBy;
     private String limit;
+
+    public String generateTableAlias() {
+        String tableAlias = String.valueOf(letter);
+        letter = (char) (letter + 1);
+        return tableAlias;
+    }
 
     public void filterTableSegments() {
         if (tableSegment.isJoin()) {

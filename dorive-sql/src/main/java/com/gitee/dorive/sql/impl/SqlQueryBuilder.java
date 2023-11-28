@@ -27,7 +27,6 @@ import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.sql.api.SqlHelper;
 import com.gitee.dorive.sql.entity.ArgSegment;
-import com.gitee.dorive.sql.entity.BuildResult;
 import com.gitee.dorive.sql.entity.SelectSegment;
 import com.gitee.dorive.sql.entity.TableSegment;
 import lombok.AllArgsConstructor;
@@ -54,10 +53,9 @@ public class SqlQueryBuilder implements QueryBuilder {
         buildQuery.setExample(example);
         Page<Object> page = example.getPage();
 
-        BuildResult buildResult = segmentBuilder.buildSegment(context, buildQuery);
-        SelectSegment selectSegment = buildResult.getSelectSegment();
-        List<Object> args = buildResult.getArgs();
-        char letter = buildResult.getLetter();
+        SelectSegment selectSegment = segmentBuilder.buildSegment(context, buildQuery);
+        char letter = selectSegment.getLetter();
+        List<Object> args = selectSegment.getArgs();
 
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<ArgSegment> argSegments = selectSegment.getArgSegments();
