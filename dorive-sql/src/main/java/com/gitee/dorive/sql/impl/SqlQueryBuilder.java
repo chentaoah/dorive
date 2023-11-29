@@ -119,6 +119,7 @@ public class SqlQueryBuilder implements QueryBuilder {
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
         if (!primaryKeys.isEmpty()) {
             example.in("id", primaryKeys);
+            buildQuery.setPageQueried(true);
         } else {
             buildQuery.setAbandoned(true);
         }
