@@ -22,6 +22,6 @@ import com.gitee.dorive.query.entity.BuildQuery;
 
 public interface QueryBuilder {
 
-    BuildQuery buildQuery(Context context, Object query);
+    void buildQuery(Context context, BuildQuery buildQuery);
 
 }

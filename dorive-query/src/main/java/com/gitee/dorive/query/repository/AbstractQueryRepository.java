@@ -42,7 +42,7 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryBuilder, QueryRepository<E, PK> {
+public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryRepository<E, PK> {
 
     private QueryScanDef queryScanDef;
     private MergedRepositoryResolver mergedRepositoryResolver;
@@ -64,11 +64,18 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         }
     }
 
-    @Override
-    public BuildQuery buildQuery(Context context, Object query) {
+    public BuildQuery buildQuery(Context context, Object query, QueryBuilder builder) {
         BuildQuery buildQuery = newQuery(query);
-        QueryBuilder queryBuilder = adaptiveBuilder(context, buildQuery);
-        return queryBuilder.buildQuery(context, buildQuery);
+        if (builder != null) {
+            builder.buildQuery(context, buildQuery);
+        }
+        QueryBuilder queryBuilder = adaptiveQueryBuilder(context, buildQuery);
+        queryBuilder.buildQuery(context, buildQuery);
+        return buildQuery;
+    }
+
+    public BuildQuery buildQuery(Context context, Object query) {
+        return buildQuery(context, query, null);
     }
 
     public BuildQuery newQuery(Object query) {
@@ -78,7 +85,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         return queryResolver.newQuery(query);
     }
 
-    protected QueryBuilder adaptiveBuilder(Context context, BuildQuery buildQuery) {
+    protected QueryBuilder adaptiveQueryBuilder(Context context, BuildQuery buildQuery) {
         return queryBuilder;
     }
 
@@ -89,7 +96,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         if (buildQuery.isAbandoned()) {
             return Collections.emptyList();
         }
-        if (buildQuery.isPageQueried()) {
+        if (buildQuery.isCountQueried()) {
             example.setPage(null);
         }
         return selectByExample(context, example);
@@ -103,7 +110,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         if (buildQuery.isAbandoned()) {
             return (Page<E>) example.getPage();
         }
-        if (buildQuery.isPageQueried()) {
+        if (buildQuery.isCountQueried()) {
             Page<Object> page = example.getPage();
             example.setPage(null);
             List<E> records = selectByExample(context, example);
@@ -111,6 +118,20 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
             return (Page<E>) page;
         }
         return selectPageByExample(context, example);
+    }
+
+    @Override
+    public long selectCountByQuery(Context context, Object query) {
+        BuildQuery buildQuery = buildQuery(context, query, (ctx, q) -> q.setOnlyCount(true));
+        Example example = buildQuery.getExample();
+        if (buildQuery.isAbandoned()) {
+            return 0L;
+        }
+        if (buildQuery.isCountQueried()) {
+            Page<Object> page = example.getPage();
+            return page.getTotal();
+        }
+        return selectCountByExample(context, example);
     }
 
 }

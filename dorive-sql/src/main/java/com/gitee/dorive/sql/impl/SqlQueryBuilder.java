@@ -44,9 +44,9 @@ public class SqlQueryBuilder implements QueryBuilder {
     private SqlHelper sqlHelper;
 
     @Override
-    public BuildQuery buildQuery(Context context, Object query) {
-        BuildQuery buildQuery = (BuildQuery) query;
+    public void buildQuery(Context context, BuildQuery buildQuery) {
         Example example = buildQuery.getExample();
+        boolean onlyCount = buildQuery.isOnlyCount();
         OrderBy orderBy = example.getOrderBy();
 
         example = ExampleUtils.tryClone(example);
@@ -60,7 +60,7 @@ public class SqlQueryBuilder implements QueryBuilder {
         List<Object> args = selectSegment.getArgs();
 
         if (!tableSegment.isJoin() || argSegments.isEmpty()) {
-            return buildQuery;
+            return;
         }
 
         String tableAlias = tableSegment.getTableAlias();
@@ -73,14 +73,26 @@ public class SqlQueryBuilder implements QueryBuilder {
         String selectSql = selectSegment.selectSql();
         String fromWhereSql = selectSegment.fromWhereSql();
 
+        if (onlyCount) {
+            String countSql = selectSql + fromWhereSql;
+            long count = sqlHelper.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
+            if (page == null) {
+                page = new Page<>();
+                example.setPage(page);
+            }
+            page.setTotal(count);
+            buildQuery.setCountQueried(true);
+            return;
+        }
+
         if (page != null) {
             String countSql = selectSql + fromWhereSql;
             long count = sqlHelper.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
             page.setTotal(count);
-            buildQuery.setPageQueried(true);
+            buildQuery.setCountQueried(true);
             if (count == 0L) {
                 buildQuery.setAbandoned(true);
-                return buildQuery;
+                return;
             }
         }
 
@@ -110,8 +122,6 @@ public class SqlQueryBuilder implements QueryBuilder {
         } else {
             buildQuery.setAbandoned(true);
         }
-
-        return buildQuery;
     }
 
 }

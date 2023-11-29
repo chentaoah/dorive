@@ -46,7 +46,7 @@ public class QueryResolver {
         example.setOrderBy(specificFields.newOrderBy(query));
         example.setPage(specificFields.newPage(query));
 
-        return new BuildQuery(this, query, exampleMap, example, false, false);
+        return new BuildQuery(this, query, exampleMap, example, false, false, false);
     }
 
     private Map<String, Example> newExampleMap(Object query) {

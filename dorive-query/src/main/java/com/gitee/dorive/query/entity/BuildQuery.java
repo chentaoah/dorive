@@ -31,6 +31,7 @@ public class BuildQuery {
     private Object query;
     private Map<String, Example> exampleMap;
     private Example example;
+    private boolean onlyCount;
     private boolean abandoned;
-    private boolean pageQueried;
+    private boolean countQueried;
 }

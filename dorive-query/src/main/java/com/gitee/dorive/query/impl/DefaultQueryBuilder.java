@@ -40,16 +40,11 @@ import java.util.stream.Collectors;
 public class DefaultQueryBuilder implements QueryBuilder {
 
     @Override
-    public BuildQuery buildQuery(Context context, Object query) {
-        BuildQuery buildQuery = (BuildQuery) query;
-
+    public void buildQuery(Context context, BuildQuery buildQuery) {
         Map<String, ExampleWrapper> exampleWrapperMap = buildExampleWrapperMap(buildQuery);
         executeQuery(context, exampleWrapperMap);
-
         ExampleWrapper exampleWrapper = exampleWrapperMap.get("/");
         buildQuery.setAbandoned(exampleWrapper.isAbandoned());
-
-        return buildQuery;
     }
 
     private Map<String, ExampleWrapper> buildExampleWrapperMap(BuildQuery buildQuery) {

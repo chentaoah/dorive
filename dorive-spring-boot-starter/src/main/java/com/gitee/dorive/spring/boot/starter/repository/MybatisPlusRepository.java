@@ -157,13 +157,13 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     }
 
     @Override
-    protected QueryBuilder adaptiveBuilder(Context context, BuildQuery buildQuery) {
+    protected QueryBuilder adaptiveQueryBuilder(Context context, BuildQuery buildQuery) {
         Map<String, Object> attachments = context.getAttachments();
         String querier = (String) attachments.get(Keys.QUERIER);
         if (querier == null || "SQL".equals(querier)) {
             return sqlQueryBuilder;
         }
-        return super.adaptiveBuilder(context, buildQuery);
+        return super.adaptiveQueryBuilder(context, buildQuery);
     }
 
 }

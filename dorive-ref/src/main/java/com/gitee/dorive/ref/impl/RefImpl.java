@@ -73,6 +73,11 @@ public class RefImpl extends AbstractProxyRepository implements Ref<Object> {
     }
 
     @Override
+    public long selectCountByQuery(Context context, Object query) {
+        return repository.selectCountByQuery(context, query);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public <R extends AbstractRefRepository<?, ?>> R get() {
         return (R) repository;

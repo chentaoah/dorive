@@ -29,4 +29,6 @@ public interface QueryRepository<E, PK> extends ListableRepository<E, PK> {
 
     Page<E> selectPageByQuery(Context context, Object query);
 
+    long selectCountByQuery(Context context, Object query);
+
 }
