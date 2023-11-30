@@ -34,5 +34,5 @@ public class BuildQuery {
     private boolean onlyCount;
     private boolean abandoned;
     private boolean countQueried;
-    private boolean pageQueried;
+    private boolean dataSetQueried;
 }

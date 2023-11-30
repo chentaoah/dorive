@@ -96,7 +96,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         if (buildQuery.isAbandoned()) {
             return Collections.emptyList();
         }
-        if (buildQuery.isPageQueried()) {
+        if (buildQuery.isDataSetQueried()) {
             example.setPage(null);
             return selectByExample(context, example);
         }
@@ -111,7 +111,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         if (buildQuery.isAbandoned()) {
             return (Page<E>) example.getPage();
         }
-        if (buildQuery.isPageQueried()) {
+        if (buildQuery.isDataSetQueried()) {
             Page<Object> page = example.getPage();
             example.setPage(null);
             List<E> records = selectByExample(context, example);
