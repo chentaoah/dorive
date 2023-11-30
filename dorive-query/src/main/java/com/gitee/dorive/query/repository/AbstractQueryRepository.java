@@ -42,7 +42,7 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryRepository<E, PK> {
+public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryBuilder, QueryRepository<E, PK> {
 
     private QueryScanDef queryScanDef;
     private MergedRepositoryResolver mergedRepositoryResolver;
@@ -64,25 +64,25 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         }
     }
 
-    public BuildQuery buildQuery(Context context, Object query, QueryBuilder builder) {
-        BuildQuery buildQuery = newQuery(query);
-        if (builder != null) {
-            builder.buildQuery(context, buildQuery);
-        }
-        QueryBuilder queryBuilder = adaptiveQueryBuilder(context, buildQuery);
-        queryBuilder.buildQuery(context, buildQuery);
+    public BuildQuery newQuery(Context context, Object query, boolean onlyCount) {
+        BuildQuery buildQuery = doNewQuery(context, query, onlyCount);
+        buildQuery(context, buildQuery);
         return buildQuery;
     }
 
-    public BuildQuery buildQuery(Context context, Object query) {
-        return buildQuery(context, query, null);
-    }
-
-    public BuildQuery newQuery(Object query) {
+    public BuildQuery doNewQuery(Context context, Object query, boolean onlyCount) {
+        BuildQuery buildQuery = new BuildQuery(query, onlyCount);
         Map<String, QueryResolver> nameQueryResolverMap = queryTypeResolver.getNameQueryResolverMap();
         QueryResolver queryResolver = nameQueryResolverMap.get(query.getClass().getName());
         Assert.notNull(queryResolver, "No query resolver found!");
-        return queryResolver.newQuery(query);
+        queryResolver.buildQuery(context, buildQuery);
+        return buildQuery;
+    }
+
+    @Override
+    public void buildQuery(Context context, BuildQuery buildQuery) {
+        QueryBuilder queryBuilder = adaptiveQueryBuilder(context, buildQuery);
+        queryBuilder.buildQuery(context, buildQuery);
     }
 
     protected QueryBuilder adaptiveQueryBuilder(Context context, BuildQuery buildQuery) {
@@ -91,7 +91,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
     @Override
     public List<E> selectByQuery(Context context, Object query) {
-        BuildQuery buildQuery = buildQuery(context, query);
+        BuildQuery buildQuery = newQuery(context, query, false);
         Example example = buildQuery.getExample();
         if (buildQuery.isAbandoned()) {
             return Collections.emptyList();
@@ -106,7 +106,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByQuery(Context context, Object query) {
-        BuildQuery buildQuery = buildQuery(context, query);
+        BuildQuery buildQuery = newQuery(context, query, false);
         Example example = buildQuery.getExample();
         if (buildQuery.isAbandoned()) {
             return (Page<E>) example.getPage();
@@ -124,7 +124,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
     @Override
     public long selectCountByQuery(Context context, Object query) {
-        BuildQuery buildQuery = buildQuery(context, query, (ctx, q) -> q.setOnlyCount(true));
+        BuildQuery buildQuery = newQuery(context, query, true);
         Example example = buildQuery.getExample();
         if (buildQuery.isAbandoned()) {
             return 0L;

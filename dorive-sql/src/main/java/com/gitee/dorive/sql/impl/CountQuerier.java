@@ -42,7 +42,7 @@ public class CountQuerier {
     private SqlHelper sqlHelper;
 
     public Map<String, Long> selectCount(Context context, String groupField, boolean distinct, String countField, Object query) {
-        BuildQuery buildQuery = repository.newQuery(query);
+        BuildQuery buildQuery = repository.doNewQuery(context, query, false);
 
         SelectSegment selectSegment = segmentBuilder.buildSegment(context, buildQuery);
         TableSegment tableSegment = selectSegment.getTableSegment();

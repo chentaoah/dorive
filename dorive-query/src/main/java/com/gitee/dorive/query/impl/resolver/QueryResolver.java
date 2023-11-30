@@ -17,7 +17,9 @@
 
 package com.gitee.dorive.query.impl.resolver;
 
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.*;
+import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.entity.QueryField;
@@ -31,7 +33,7 @@ import java.util.*;
 
 @Data
 @AllArgsConstructor
-public class QueryResolver {
+public class QueryResolver implements QueryBuilder {
 
     private ExampleDef exampleDef;
     private List<QueryField> queryFields;
@@ -39,15 +41,16 @@ public class QueryResolver {
     private List<MergedRepository> mergedRepositories;
     private List<MergedRepository> reversedMergedRepositories;
 
-    public BuildQuery newQuery(Object query) {
+    @Override
+    public void buildQuery(Context context, BuildQuery buildQuery) {
+        Object query = buildQuery.getQuery();
         Map<String, Example> exampleMap = newExampleMap(query);
-
         Example example = exampleMap.computeIfAbsent("/", key -> new InnerExample());
         example.setOrderBy(specificFields.newOrderBy(query));
         example.setPage(specificFields.newPage(query));
-
-        return new BuildQuery(this, query, exampleMap, example,
-                false, false, false, false);
+        buildQuery.setQueryResolver(this);
+        buildQuery.setExampleMap(exampleMap);
+        buildQuery.setExample(example);
     }
 
     private Map<String, Example> newExampleMap(Object query) {
