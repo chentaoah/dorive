@@ -18,7 +18,7 @@
 package com.gitee.dorive.query.entity;
 
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.query.impl.resolver.QueryResolver;
+import com.gitee.dorive.query.impl.builder.QueryResolver;
 import lombok.Data;
 
 import java.util.Map;

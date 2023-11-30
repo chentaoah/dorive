@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl;
+package com.gitee.dorive.query.impl.builder;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -27,7 +27,6 @@ import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.BuildQuery;
-import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

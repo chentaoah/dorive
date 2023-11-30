@@ -29,7 +29,7 @@ import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.impl.resolver.QueryResolver;
+import com.gitee.dorive.query.impl.builder.QueryResolver;
 import com.gitee.dorive.sql.entity.*;
 import com.gitee.dorive.sql.util.CriterionUtils;
 import lombok.AllArgsConstructor;

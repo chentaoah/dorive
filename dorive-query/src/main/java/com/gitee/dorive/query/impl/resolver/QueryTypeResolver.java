@@ -24,6 +24,7 @@ import com.gitee.dorive.query.entity.SpecificFields;
 import com.gitee.dorive.query.entity.def.QueryScanDef;
 import com.gitee.dorive.query.entity.def.CriterionDef;
 import com.gitee.dorive.query.entity.def.ExampleDef;
+import com.gitee.dorive.query.impl.builder.QueryResolver;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.query.util.ResourceUtils;
 import com.gitee.dorive.core.repository.CommonRepository;
