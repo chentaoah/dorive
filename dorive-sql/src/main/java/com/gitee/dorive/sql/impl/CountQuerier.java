@@ -19,14 +19,15 @@ package com.gitee.dorive.sql.impl;
 
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.context.BoundedContext;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlHelper;
 import com.gitee.dorive.sql.entity.SelectSegment;
 import com.gitee.dorive.sql.entity.TableSegment;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -41,43 +42,43 @@ public class CountQuerier {
     private SegmentBuilder segmentBuilder;
     private SqlHelper sqlHelper;
 
-    public Map<String, Long> selectCount(Context context, String groupField, boolean distinct, String countField, Object query) {
-        BuildQuery buildQuery = repository.doNewQuery(context, query, false);
+    public Map<String, Long> selectCount(Context context, CountQuery countQuery) {
+        BuildQuery buildQuery = repository.doNewQuery(context, countQuery.getQuery(), false);
 
         SelectSegment selectSegment = segmentBuilder.buildSegment(context, buildQuery);
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<Object> args = selectSegment.getArgs();
+        String tableAlias = tableSegment.getTableAlias();
 
         EntityEle entityEle = repository.getEntityEle();
-        String groupByColumn = entityEle.toAlias(groupField);
-        String countColumn = entityEle.toAlias(countField);
-
-        String tableAlias = tableSegment.getTableAlias();
-        groupByColumn = tableAlias + "." + groupByColumn;
-        countColumn = tableAlias + "." + countColumn;
+        String countByColumn = tableAlias + "." + entityEle.toAlias(countQuery.getCountBy());
+        String groupByColumn = tableAlias + "." + entityEle.toAlias(countQuery.getGroupBy());
 
         List<String> columns = new ArrayList<>(2);
-        columns.add(groupByColumn + " AS recordId");
-        if (distinct) {
-            columns.add("count(DISTINCT " + countColumn + ") AS totalCount");
-        } else {
-            columns.add("count(" + countColumn + ") AS totalCount");
-        }
+        columns.add(groupByColumn + " AS groupId");
+
+        String format = "COUNT(%s) AS total";
+        String countByColumnStr = String.format(format, countQuery.isDistinct() ? "DISTINCT " + countByColumn : countByColumn);
+        columns.add(countByColumnStr);
+
         selectSegment.setSelectColumns(columns);
         selectSegment.setGroupBy("GROUP BY " + groupByColumn);
 
         List<Map<String, Object>> resultMaps = sqlHelper.selectList(selectSegment.toString(), args.toArray());
         Map<String, Long> countMap = new LinkedHashMap<>(resultMaps.size() * 4 / 3 + 1);
-        resultMaps.forEach(resultMap -> countMap.put(resultMap.get("recordId").toString(), (Long) resultMap.get("totalCount")));
+        resultMaps.forEach(resultMap -> countMap.put(resultMap.get("groupId").toString(), (Long) resultMap.get("total")));
         return countMap;
     }
 
-    public Map<String, Long> selectCount(Context context, String groupField, String countField, Object query) {
-        return selectCount(context, groupField, true, countField, query);
-    }
-
-    public Map<String, Long> selectCount(String groupField, String countField, Object query) {
-        return selectCount(new BoundedContext(), groupField, true, countField, query);
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CountQuery {
+        private Object query;
+        private boolean distinct = true;
+        private String countBy;
+        private String groupBy;
     }
 
 }
