@@ -42,7 +42,7 @@ public class CountQuerier {
     private SegmentBuilder segmentBuilder;
     private SqlHelper sqlHelper;
 
-    public Map<String, Long> selectCount(Context context, CountQuery countQuery) {
+    public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
         BuildQuery buildQuery = repository.doNewQuery(context, countQuery.getQuery(), false);
 
         SelectSegment selectSegment = segmentBuilder.buildSegment(context, buildQuery);
