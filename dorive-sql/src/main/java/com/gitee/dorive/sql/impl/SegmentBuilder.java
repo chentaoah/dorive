@@ -50,8 +50,6 @@ public class SegmentBuilder {
         List<JoinSegment> joinSegments = selectSegment.getJoinSegments();
 
         for (MergedRepository mergedRepository : mergedRepositories) {
-            String tableAlias = selectSegment.generateTableAlias();
-
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             String relativeAccessPath = mergedRepository.getRelativeAccessPath();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
@@ -60,6 +58,7 @@ public class SegmentBuilder {
             String tableName = (String) attachments.get(Keys.TABLE_NAME);
             FieldExecutor fieldExecutor = (FieldExecutor) attachments.get(Keys.FIELD_EXECUTOR);
 
+            String tableAlias = selectSegment.generateTableAlias();
             Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample(Collections.emptyList()));
             fieldExecutor.convert(context, example);
 
@@ -71,7 +70,7 @@ public class SegmentBuilder {
                 selectSegment.setTableSegment(tableSegment);
 
             } else {
-                List<OnSegment> onSegments = newOnSegments(nodeMap, mergedRepository, tableAlias, node);
+                List<OnSegment> onSegments = newOnSegments(nodeMap, mergedRepository, node);
                 if (onSegments.isEmpty()) {
                     nodeMap.remove(relativeAccessPath);
                     continue;
@@ -80,7 +79,7 @@ public class SegmentBuilder {
                 joinSegments.add(joinSegment);
             }
 
-            addTableSegmentArgs(selectSegment, tableAlias, example, tableSegment);
+            addTableSegmentArgs(selectSegment, example, tableSegment);
         }
 
         markTableSegmentJoin(nodeMap.get("/"));
@@ -88,32 +87,34 @@ public class SegmentBuilder {
         return selectSegment;
     }
 
-    private List<OnSegment> newOnSegments(Map<String, Node> nodeMap, MergedRepository mergedRepository, String tableAlias, Node node) {
+    private List<OnSegment> newOnSegments(Map<String, Node> nodeMap, MergedRepository mergedRepository, Node node) {
         String lastAccessPath = mergedRepository.getLastAccessPath();
         CommonRepository definedRepository = mergedRepository.getDefinedRepository();
         BinderResolver binderResolver = definedRepository.getBinderResolver();
         List<PropertyBinder> propertyBinders = binderResolver.getPropertyBinders();
+        TableSegment tableSegment = node.getTableSegment();
 
         List<OnSegment> onSegments = new ArrayList<>(propertyBinders.size());
         for (PropertyBinder propertyBinder : propertyBinders) {
             String relativeAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
             Node targetNode = nodeMap.get(relativeAccessPath);
             if (targetNode != null) {
-                TableSegment tableSegment = targetNode.getTableSegment();
+                TableSegment targetTableSegment = targetNode.getTableSegment();
                 List<Node> children = targetNode.getChildren();
                 if (!children.contains(node)) {
                     children.add(node);
                 }
-                OnSegment onSegment = new OnSegment(tableAlias, propertyBinder.getAlias(),
-                        tableSegment.getTableAlias(), propertyBinder.getBindAlias());
+                OnSegment onSegment = new OnSegment(tableSegment.getTableAlias(), propertyBinder.getAlias(),
+                        targetTableSegment.getTableAlias(), propertyBinder.getBindAlias());
                 onSegments.add(onSegment);
             }
         }
         return onSegments;
     }
 
-    private void addTableSegmentArgs(SelectSegment selectSegment, String tableAlias, Example example, TableSegment tableSegment) {
+    private void addTableSegmentArgs(SelectSegment selectSegment, Example example, TableSegment tableSegment) {
         List<Object> args = selectSegment.getArgs();
+        String tableAlias = tableSegment.getTableAlias();
         List<ArgSegment> argSegments = tableSegment.getArgSegments();
         for (Criterion criterion : example.getCriteria()) {
             String property = criterion.getProperty();
