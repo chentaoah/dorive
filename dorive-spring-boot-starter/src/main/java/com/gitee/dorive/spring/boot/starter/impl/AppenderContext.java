@@ -22,7 +22,6 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.entity.executor.MultiInBuilder;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
-import com.gitee.dorive.sql.util.SqlUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -55,8 +54,8 @@ public class AppenderContext {
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LE, Compare::le);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IN, (abstractWrapper, property, value) -> abstractWrapper.in(property, (Collection<?>) value));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_IN, (abstractWrapper, property, value) -> abstractWrapper.notIn(property, (Collection<?>) value));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LIKE, (abstractWrapper, property, value) -> abstractWrapper.like(property, SqlUtils.toLike(value)));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_LIKE, (abstractWrapper, property, value) -> abstractWrapper.notLike(property, SqlUtils.toLike(value)));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LIKE, Compare::like);
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_LIKE, Compare::notLike);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNull(property));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NOT_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNotNull(property));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NULL_SWITCH, (abstractWrapper, property, value) -> {
