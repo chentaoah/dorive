@@ -74,7 +74,7 @@ public class CriterionUtils {
             value = DateUtil.formatDateTime((Date) value);
         }
         if (Operator.LIKE.equals(operator) || Operator.NOT_LIKE.equals(operator)) {
-            value = SqlUtils.toLike(value);
+            value = sqlHelper.concatLike(value);
         }
         return value;
     }

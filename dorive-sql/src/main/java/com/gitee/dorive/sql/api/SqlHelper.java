@@ -22,6 +22,8 @@ import java.util.Map;
 
 public interface SqlHelper {
 
+    Object concatLike(Object value);
+
     String sqlParam(Object obj);
 
     long selectCount(String sql, Object... args);

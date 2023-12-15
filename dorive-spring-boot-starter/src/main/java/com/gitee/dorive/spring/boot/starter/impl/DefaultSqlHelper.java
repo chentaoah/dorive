@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.spring.boot.starter.impl;
 
+import cn.hutool.db.sql.Condition;
+import cn.hutool.db.sql.SqlUtil;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.gitee.dorive.sql.api.SqlHelper;
@@ -25,6 +27,17 @@ import java.util.List;
 import java.util.Map;
 
 public class DefaultSqlHelper implements SqlHelper {
+
+    @Override
+    public Object concatLike(Object value) {
+        if (value instanceof String) {
+            String valueStr = (String) value;
+            if (!valueStr.startsWith("%") && !valueStr.endsWith("%")) {
+                return SqlUtil.buildLikeValue(valueStr, Condition.LikeType.Contains, false);
+            }
+        }
+        return value;
+    }
 
     @Override
     public String sqlParam(Object obj) {
