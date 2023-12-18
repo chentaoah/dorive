@@ -15,25 +15,25 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.util;
+package com.gitee.dorive.core.util;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import com.gitee.dorive.api.constant.Operator;
-import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.api.api.ImplFactory;
-import com.gitee.dorive.sql.api.SqlHelper;
+import com.gitee.dorive.api.constant.Operator;
+import com.gitee.dorive.core.api.format.SqlFormat;
+import com.gitee.dorive.core.entity.executor.Criterion;
 
 import java.util.Collection;
 import java.util.Date;
 
 public class CriterionUtils {
 
-    private static final SqlHelper sqlHelper;
+    private static final SqlFormat sqlFormat;
 
     static {
         ImplFactory implFactory = SpringUtil.getBean(ImplFactory.class);
-        sqlHelper = implFactory.getInstance(SqlHelper.class);
+        sqlFormat = implFactory.getInstance(SqlFormat.class);
     }
 
     public static String getOperator(Criterion criterion) {
@@ -63,7 +63,7 @@ public class CriterionUtils {
     public static Object getValue(Criterion criterion) {
         String operator = criterion.getOperator();
         Object value = criterion.getValue();
-        return sqlHelper.sqlParam(format(operator, value));
+        return sqlFormat.sqlParam(format(operator, value));
     }
 
     public static Object format(String operator, Object value) {
@@ -74,7 +74,7 @@ public class CriterionUtils {
             value = DateUtil.formatDateTime((Date) value);
         }
         if (Operator.LIKE.equals(operator) || Operator.NOT_LIKE.equals(operator)) {
-            value = sqlHelper.concatLike(value);
+            value = sqlFormat.concatLike(value);
         }
         return value;
     }

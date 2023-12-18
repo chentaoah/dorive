@@ -20,13 +20,13 @@ package com.gitee.dorive.spring.boot.starter.impl;
 import cn.hutool.db.sql.Condition;
 import cn.hutool.db.sql.SqlUtil;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
-import com.gitee.dorive.sql.api.SqlHelper;
+import com.gitee.dorive.core.api.format.SqlFormat;
+import com.gitee.dorive.sql.api.SqlRunner;
 
 import java.util.List;
 import java.util.Map;
 
-public class DefaultSqlHelper implements SqlHelper {
+public class DefaultSqlHelper implements SqlFormat, SqlRunner {
 
     @Override
     public Object concatLike(Object value) {
@@ -46,12 +46,12 @@ public class DefaultSqlHelper implements SqlHelper {
 
     @Override
     public long selectCount(String sql, Object... args) {
-        return SqlRunner.db().selectCount(sql, args);
+        return com.baomidou.mybatisplus.extension.toolkit.SqlRunner.db().selectCount(sql, args);
     }
 
     @Override
     public List<Map<String, Object>> selectList(String sql, Object... args) {
-        return SqlRunner.db().selectList(sql, args);
+        return com.baomidou.mybatisplus.extension.toolkit.SqlRunner.db().selectList(sql, args);
     }
 
 }

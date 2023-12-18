@@ -25,7 +25,7 @@ import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.util.ExampleUtils;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;
-import com.gitee.dorive.sql.api.SqlHelper;
+import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.ArgSegment;
 import com.gitee.dorive.sql.entity.SelectSegment;
 import com.gitee.dorive.sql.entity.TableSegment;
@@ -41,7 +41,7 @@ import java.util.Map;
 public class SqlQueryBuilder implements QueryBuilder {
 
     private SegmentBuilder segmentBuilder;
-    private SqlHelper sqlHelper;
+    private SqlRunner sqlRunner;
 
     @Override
     public void buildQuery(Context context, BuildQuery buildQuery) {
@@ -75,7 +75,7 @@ public class SqlQueryBuilder implements QueryBuilder {
 
         if (onlyCount) {
             String countSql = selectSql + fromWhereSql;
-            long count = sqlHelper.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
+            long count = sqlRunner.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
             if (page == null) {
                 page = new Page<>();
                 example.setPage(page);
@@ -87,7 +87,7 @@ public class SqlQueryBuilder implements QueryBuilder {
 
         if (page != null) {
             String countSql = selectSql + fromWhereSql;
-            long count = sqlHelper.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
+            long count = sqlRunner.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
             page.setTotal(count);
             buildQuery.setCountQueried(true);
             if (count == 0L) {
@@ -115,7 +115,7 @@ public class SqlQueryBuilder implements QueryBuilder {
         }
 
         String sql = selectSql + fromWhereSql + selectSegment.lastSql();
-        List<Map<String, Object>> resultMaps = sqlHelper.selectList(sql, args.toArray());
+        List<Map<String, Object>> resultMaps = sqlRunner.selectList(sql, args.toArray());
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
         if (!primaryKeys.isEmpty()) {
             example.in("id", primaryKeys);

@@ -20,11 +20,7 @@ package com.gitee.dorive.sql.api;
 import java.util.List;
 import java.util.Map;
 
-public interface SqlHelper {
-
-    Object concatLike(Object value);
-
-    String sqlParam(Object obj);
+public interface SqlRunner {
 
     long selectCount(String sql, Object... args);
 

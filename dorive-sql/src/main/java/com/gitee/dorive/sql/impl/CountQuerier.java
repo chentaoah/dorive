@@ -21,7 +21,7 @@ import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
-import com.gitee.dorive.sql.api.SqlHelper;
+import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.SelectSegment;
 import com.gitee.dorive.sql.entity.TableSegment;
 import lombok.AllArgsConstructor;
@@ -40,7 +40,7 @@ public class CountQuerier {
 
     private AbstractQueryRepository<?, ?> repository;
     private SegmentBuilder segmentBuilder;
-    private SqlHelper sqlHelper;
+    private SqlRunner sqlRunner;
 
     public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
         BuildQuery buildQuery = repository.doNewQuery(context, countQuery.getQuery(), false);
@@ -64,7 +64,7 @@ public class CountQuerier {
         selectSegment.setSelectColumns(columns);
         selectSegment.setGroupBy("GROUP BY " + groupByColumn);
 
-        List<Map<String, Object>> resultMaps = sqlHelper.selectList(selectSegment.toString(), args.toArray());
+        List<Map<String, Object>> resultMaps = sqlRunner.selectList(selectSegment.toString(), args.toArray());
         Map<String, Long> countMap = new LinkedHashMap<>(resultMaps.size() * 4 / 3 + 1);
         resultMaps.forEach(resultMap -> countMap.put(resultMap.get("groupId").toString(), (Long) resultMap.get("total")));
         return countMap;

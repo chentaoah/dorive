@@ -15,24 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.impl;
+package com.gitee.dorive.core.api.format;
 
-import com.gitee.dorive.api.api.ImplFactory;
-import com.gitee.dorive.core.api.format.SqlFormat;
-import com.gitee.dorive.sql.api.SqlRunner;
+public interface SqlFormat {
 
-public class DefaultImplFactory implements ImplFactory {
+    Object concatLike(Object value);
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getInstance(Class<T> clazz, Object... args) {
-        if (clazz == SqlFormat.class) {
-            return (T) new DefaultSqlHelper();
-
-        } else if (clazz == SqlRunner.class) {
-            return (T) new DefaultSqlHelper();
-        }
-        return null;
-    }
+    String sqlParam(Object obj);
 
 }
