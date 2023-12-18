@@ -32,11 +32,20 @@ import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.*;
-import com.gitee.dorive.core.entity.operation.*;
+import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.MultiResult;
+import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.executor.UnionExample;
+import com.gitee.dorive.core.entity.operation.Delete;
+import com.gitee.dorive.core.entity.operation.Insert;
+import com.gitee.dorive.core.entity.operation.NullableUpdate;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
-import com.gitee.dorive.core.util.CriterionUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -172,7 +181,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
             String sqlSelect = nextQueryWrapper.getSqlSelect();
             String tableName = TableInfoHelper.getTableInfo(pojoClass).getTableName();
-            String criteria = CollUtil.join(nextExample.getCriteria(), " AND ", CriterionUtils::toString);
+            String criteria = CollUtil.join(nextExample.getCriteria(), " AND ", Criterion::toString);
 
             String sql = "";
             if (nextExample.getOrderBy() == null && nextExample.getPage() == null) {
