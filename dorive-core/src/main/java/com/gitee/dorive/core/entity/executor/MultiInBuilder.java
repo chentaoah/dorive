@@ -19,68 +19,58 @@ package com.gitee.dorive.core.entity.executor;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.constant.Operator;
-import lombok.AllArgsConstructor;
+import com.gitee.dorive.core.util.CriterionUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class MultiInBuilder {
 
     private List<String> aliases;
-    private int recordSize;
-    private List<MultiValue> multiValues;
-    private int valueSize;
+    private int number;
+    private int size;
+    private List<Object> values;
 
-    public MultiInBuilder(int recordSize, List<String> aliases) {
+    public MultiInBuilder(List<String> aliases, int number) {
         this.aliases = aliases;
-        this.recordSize = recordSize;
-        this.multiValues = new ArrayList<>(recordSize);
-        this.valueSize = aliases.size();
+        this.number = number;
+        this.size = aliases.size();
+        this.values = new ArrayList<>(number * size);
     }
 
     public boolean isEmpty() {
-        return multiValues.isEmpty();
+        return values.isEmpty();
     }
 
     public void append(Object value) {
-        if (multiValues.isEmpty()) {
-            multiValues.add(new MultiValue(0, new Object[valueSize]));
-        }
-        MultiValue lastMultiValue = multiValues.get(multiValues.size() - 1);
-        int index = lastMultiValue.getIndex();
-        Object[] values = lastMultiValue.getValues();
-        if (index >= values.length) {
-            multiValues.add(new MultiValue(0, new Object[valueSize]));
-            lastMultiValue = multiValues.get(multiValues.size() - 1);
-        }
-        doAppend(lastMultiValue, value);
-    }
-
-    private void doAppend(MultiValue lastMultiValue, Object value) {
-        int index = lastMultiValue.getIndex();
-        Object[] values = lastMultiValue.getValues();
-        values[index] = value;
-        lastMultiValue.setIndex(index + 1);
+        values.add(value);
     }
 
     public void clear() {
-        multiValues.remove(multiValues.size() - 1);
+        int size = values.size();
+        int remainder = size % this.size;
+        values.subList(size - remainder, size).clear();
     }
 
-    public Criterion build() {
-        String aliasesStr = StrUtil.join(",", aliases);
-        return new Criterion(aliasesStr, Operator.MULTI_IN, this);
+    public Criterion toCriterion() {
+        String property = StrUtil.join(",", aliases);
+        StringBuilder builder = new StringBuilder();
+        int page = values.size() / size;
+        for (int current = 1; current <= page; current++) {
+            List<Object> subValues = values.subList((current - 1) * size, current * size);
+            builder.append(buildValuesStr(subValues));
+        }
+        String valuesStr = StrUtil.removeSuffix(builder, ",");
+        return new Criterion(property, Operator.MULTI_IN, valuesStr);
     }
 
-    @Data
-    @AllArgsConstructor
-    public static class MultiValue {
-        private int index;
-        private Object[] values;
+    public String buildValuesStr(List<Object> values) {
+        return values.stream().map(CriterionUtils::sqlParam).collect(Collectors.joining(",", "(", "),"));
     }
 
 }

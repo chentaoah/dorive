@@ -60,7 +60,8 @@ public class CriterionUtils {
     public static Object getValue(Criterion criterion) {
         String operator = criterion.getOperator();
         Object value = criterion.getValue();
-        return sqlFormat.sqlParam(format(operator, value));
+        value = format(operator, value);
+        return sqlParam(value);
     }
 
     public static Object format(String operator, Object value) {
@@ -74,6 +75,10 @@ public class CriterionUtils {
             value = sqlFormat.concatLike(value);
         }
         return value;
+    }
+
+    public static String sqlParam(Object obj) {
+        return sqlFormat.sqlParam(obj);
     }
 
     public static String toString(Criterion criterion) {

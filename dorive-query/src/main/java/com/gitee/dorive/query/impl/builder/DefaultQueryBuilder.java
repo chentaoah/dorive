@@ -122,10 +122,10 @@ public class DefaultQueryBuilder implements QueryBuilder {
 
                     } else {
                         List<String> aliases = binders.stream().map(PropertyBinder::getBindAlias).collect(Collectors.toList());
-                        MultiInBuilder builder = new MultiInBuilder(entities.size(), aliases);
+                        MultiInBuilder builder = new MultiInBuilder(aliases, entities.size());
                         collectFieldValues(context, entities, binders, builder);
                         if (!builder.isEmpty()) {
-                            targetExample.getCriteria().add(builder.build());
+                            targetExample.getCriteria().add(builder.toCriterion());
                         } else {
                             targetExampleWrapper.setAbandoned(true);
                         }
