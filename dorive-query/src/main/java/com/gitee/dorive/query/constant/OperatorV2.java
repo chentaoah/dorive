@@ -15,20 +15,8 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.constant;
+package com.gitee.dorive.query.constant;
 
-public interface Operator {
-    String EQ = "=";
-    String NE = "<>";
-    String GT = ">";
-    String GE = ">=";
-    String LT = "<";
-    String LE = "<=";
-    String IN = "IN";
-    String NOT_IN = "NOT IN";
-    String LIKE = "LIKE";
-    String NOT_LIKE = "NOT LIKE";
-    String IS_NULL = "IS NULL";
-    String IS_NOT_NULL = "IS NOT NULL";
-    String MULTI_IN = "MULTI_IN";
+public interface OperatorV2 {
+    String NULL_SWITCH = "NULL_SWITCH";
 }

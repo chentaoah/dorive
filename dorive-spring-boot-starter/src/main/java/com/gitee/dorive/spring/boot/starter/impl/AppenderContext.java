@@ -58,15 +58,6 @@ public class AppenderContext {
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_LIKE, Compare::notLike);
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNull(property));
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NOT_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNotNull(property));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NULL_SWITCH, (abstractWrapper, property, value) -> {
-            if (value instanceof Boolean) {
-                if ((Boolean) value) {
-                    abstractWrapper.isNull(property);
-                } else {
-                    abstractWrapper.isNotNull(property);
-                }
-            }
-        });
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.MULTI_IN, (abstractWrapper, property, value) -> {
             if (value instanceof MultiInBuilder) {
                 MultiInBuilder builder = (MultiInBuilder) value;

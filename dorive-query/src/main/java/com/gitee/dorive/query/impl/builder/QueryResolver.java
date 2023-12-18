@@ -17,9 +17,11 @@
 
 package com.gitee.dorive.query.impl.builder;
 
+import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.query.api.QueryBuilder;
+import com.gitee.dorive.query.constant.OperatorV2;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.entity.QueryField;
@@ -62,6 +64,10 @@ public class QueryResolver implements QueryBuilder {
                 String belongTo = criterionDef.getBelongTo();
                 String fieldName = criterionDef.getField();
                 String operator = criterionDef.getOperator();
+                if (OperatorV2.NULL_SWITCH.equals(operator) && fieldValue instanceof Boolean) {
+                    operator = (Boolean) fieldValue ? Operator.IS_NULL : Operator.IS_NOT_NULL;
+                    fieldValue = null;
+                }
                 Example example = exampleMap.computeIfAbsent(belongTo, key -> new InnerExample());
                 example.getCriteria().add(new Criterion(fieldName, operator, fieldValue));
             }

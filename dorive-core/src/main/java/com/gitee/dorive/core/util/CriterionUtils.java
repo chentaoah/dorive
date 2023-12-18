@@ -52,9 +52,6 @@ public class CriterionUtils {
 
             } else if (Operator.NOT_IN.equals(operator)) {
                 operator = Operator.NE;
-
-            } else if (Operator.NULL_SWITCH.equals(operator) && value instanceof Boolean) {
-                return (Boolean) value ? Operator.IS_NULL : Operator.IS_NOT_NULL;
             }
         }
         return operator;
