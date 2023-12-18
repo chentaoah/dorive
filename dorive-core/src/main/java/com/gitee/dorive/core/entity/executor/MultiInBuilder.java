@@ -19,6 +19,7 @@ package com.gitee.dorive.core.entity.executor;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.constant.Operator;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -29,48 +30,57 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class MultiInBuilder {
 
-    private int size;
     private List<String> aliases;
-    private int step;
-    private List<Object> values;
-    private int cursor;
+    private int recordSize;
+    private List<MultiValue> multiValues;
+    private int valueSize;
 
-    public MultiInBuilder(int size, List<String> aliases) {
-        this.size = size;
+    public MultiInBuilder(int recordSize, List<String> aliases) {
         this.aliases = aliases;
-        this.step = aliases.size();
-        this.values = new ArrayList<>(size * step);
-        this.cursor = 0;
-    }
-
-    public void append(Object value) {
-        if (values.size() - cursor >= step) {
-            cursor += step;
-        }
-        values.add(value);
-    }
-
-    public void clear() {
-        values.subList(cursor, values.size()).clear();
+        this.recordSize = recordSize;
+        this.multiValues = new ArrayList<>(recordSize);
+        this.valueSize = aliases.size();
     }
 
     public boolean isEmpty() {
-        return values.isEmpty();
+        return multiValues.isEmpty();
     }
 
-    public int page() {
-        return values.size() / step;
+    public void append(Object value) {
+        if (multiValues.isEmpty()) {
+            multiValues.add(new MultiValue(0, new Object[valueSize]));
+        }
+        MultiValue lastMultiValue = multiValues.get(multiValues.size() - 1);
+        int index = lastMultiValue.getIndex();
+        Object[] values = lastMultiValue.getValues();
+        if (index >= values.length) {
+            multiValues.add(new MultiValue(0, new Object[valueSize]));
+            lastMultiValue = multiValues.get(multiValues.size() - 1);
+        }
+        doAppend(lastMultiValue, value);
     }
 
-    public List<Object> get(int page) {
-        int fromIndex = (page - 1) * step;
-        int toIndex = fromIndex + step;
-        return values.subList(fromIndex, toIndex);
+    private void doAppend(MultiValue lastMultiValue, Object value) {
+        int index = lastMultiValue.getIndex();
+        Object[] values = lastMultiValue.getValues();
+        values[index] = value;
+        lastMultiValue.setIndex(index + 1);
+    }
+
+    public void clear() {
+        multiValues.remove(multiValues.size() - 1);
     }
 
     public Criterion build() {
         String aliasesStr = StrUtil.join(",", aliases);
         return new Criterion(aliasesStr, Operator.MULTI_IN, this);
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class MultiValue {
+        private int index;
+        private Object[] values;
     }
 
 }
