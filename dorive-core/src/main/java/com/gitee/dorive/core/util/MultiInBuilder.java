@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.executor;
+package com.gitee.dorive.core.util;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.constant.Operator;
-import com.gitee.dorive.core.util.CriterionUtils;
+import com.gitee.dorive.core.entity.executor.Criterion;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
