@@ -18,6 +18,8 @@
 package com.gitee.dorive.spring.boot.starter.entity;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.gitee.dorive.api.constant.Operator;
+import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.spring.boot.starter.util.LambdaUtils;
 import lombok.Data;
@@ -27,6 +29,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Data
 @NoArgsConstructor
@@ -110,6 +113,20 @@ public class LambdaExample<T> extends Example {
 
     public LambdaExample<T> isNotNull(SFunction<T, ?> function) {
         super.isNotNull(LambdaUtils.toProperty(function));
+        return this;
+    }
+
+    public LambdaExample<T> lambdaAnd(Consumer<LambdaExample<T>> consumer) {
+        LambdaExample<T> example = new LambdaExample<>();
+        consumer.accept(example);
+        getCriteria().add(new Criterion("@Lambda", Operator.AND, example));
+        return this;
+    }
+
+    public LambdaExample<T> lambdaOr(Consumer<LambdaExample<T>> consumer) {
+        LambdaExample<T> example = new LambdaExample<>();
+        consumer.accept(example);
+        getCriteria().add(new Criterion("@Lambda", Operator.OR, example));
         return this;
     }
 
