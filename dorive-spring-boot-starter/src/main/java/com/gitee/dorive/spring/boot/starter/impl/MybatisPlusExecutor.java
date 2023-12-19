@@ -46,6 +46,7 @@ import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
+import com.gitee.dorive.spring.boot.starter.util.WrapperUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -69,10 +70,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;
 
-    public MybatisPlusExecutor(EntityDef entityDef,
-                               EntityEle entityEle,
-                               BaseMapper<Object> baseMapper,
-                               Class<Object> pojoClass) {
+    public MybatisPlusExecutor(EntityDef entityDef, EntityEle entityEle, BaseMapper<Object> baseMapper, Class<Object> pojoClass) {
         this.entityDef = entityDef;
         this.entityEle = entityEle;
         this.baseMapper = baseMapper;
@@ -144,10 +142,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             queryWrapper.select(sqlSelect);
         }
 
-        for (Criterion criterion : example.getCriteria()) {
-            CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            criterionAppender.appendCriterion(queryWrapper, criterion.getProperty(), criterion.getValue());
-        }
+        WrapperUtils.appendCriterion(queryWrapper, example);
 
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
@@ -250,10 +245,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
     private UpdateWrapper<Object> buildUpdateWrapper(Example example) {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
-        for (Criterion criterion : example.getCriteria()) {
-            CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            criterionAppender.appendCriterion(updateWrapper, criterion.getProperty(), criterion.getValue());
-        }
+        WrapperUtils.appendCriterion(updateWrapper, example);
         return updateWrapper;
     }
 
@@ -272,10 +264,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             criterionAppender.appendCriterion(updateWrapper, "id", primaryKey);
         }
         if (example != null) {
-            for (Criterion criterion : example.getCriteria()) {
-                CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-                criterionAppender.appendCriterion(updateWrapper, criterion.getProperty(), criterion.getValue());
-            }
+            WrapperUtils.appendCriterion(updateWrapper, example);
         }
         return updateWrapper;
     }

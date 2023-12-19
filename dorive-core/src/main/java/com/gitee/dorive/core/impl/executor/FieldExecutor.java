@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.core.impl.executor;
 
+import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
@@ -61,18 +62,30 @@ public class FieldExecutor extends AbstractExampleExecutor {
     private void convertCriteria(Context context, List<Criterion> criteria) {
         if (criteria != null && !criteria.isEmpty()) {
             for (Criterion criterion : criteria) {
-                String property = criterion.getProperty();
-                String alias = entityEle.toAlias(property);
-                criterion.setProperty(alias);
-
-                Object value = criterion.getValue();
-                if (converterMap != null && !converterMap.isEmpty()) {
-                    FieldConverter fieldConverter = converterMap.get(property);
-                    if (fieldConverter != null) {
-                        Object mappedValue = fieldConverter.convert(context, criterion, value);
-                        criterion.setValue(mappedValue);
+                String operator = criterion.getOperator();
+                if (Operator.AND.equals(operator) || Operator.OR.equals(operator)) {
+                    Object value = criterion.getValue();
+                    if (value instanceof Example) {
+                        convert(context, (Example) value);
                     }
+                } else {
+                    doConvertCriteria(context, criterion);
                 }
+            }
+        }
+    }
+
+    private void doConvertCriteria(Context context, Criterion criterion) {
+        String property = criterion.getProperty();
+        String alias = entityEle.toAlias(property);
+        criterion.setProperty(alias);
+
+        Object value = criterion.getValue();
+        if (converterMap != null && !converterMap.isEmpty()) {
+            FieldConverter fieldConverter = converterMap.get(property);
+            if (fieldConverter != null) {
+                Object mappedValue = fieldConverter.convert(context, criterion, value);
+                criterion.setValue(mappedValue);
             }
         }
     }

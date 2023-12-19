@@ -32,4 +32,6 @@ public interface Operator {
     String IS_NOT_NULL = "IS NOT NULL";
     String MULTI_IN = "MULTI_IN";
     String MULTI_NOT_IN = "MULTI_NOT_IN";
+    String AND = "AND";
+    String OR = "OR";
 }

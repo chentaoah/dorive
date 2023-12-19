@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Data
 @NoArgsConstructor
@@ -126,6 +127,20 @@ public class Example {
 
     public Example isNotNull(String property) {
         criteria.add(new Criterion(property, Operator.IS_NOT_NULL));
+        return this;
+    }
+
+    public Example and(Consumer<Example> consumer) {
+        Example example = new InnerExample();
+        consumer.accept(example);
+        criteria.add(new Criterion("@Lambda", Operator.AND, example));
+        return this;
+    }
+
+    public Example or(Consumer<Example> consumer) {
+        Example example = new InnerExample();
+        consumer.accept(example);
+        criteria.add(new Criterion("@Lambda", Operator.OR, example));
         return this;
     }
 

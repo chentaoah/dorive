@@ -19,7 +19,9 @@ package com.gitee.dorive.spring.boot.starter.impl;
 
 import com.baomidou.mybatisplus.core.conditions.interfaces.Compare;
 import com.gitee.dorive.api.constant.Operator;
+import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
+import com.gitee.dorive.spring.boot.starter.util.WrapperUtils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -61,6 +63,16 @@ public class AppenderContext {
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.MULTI_NOT_IN, (abstractWrapper, property, value) -> {
             String prefix = abstractWrapper.isEmptyOfWhere() ? " WHERE " : " AND ";
             abstractWrapper.last(prefix + "(" + property + ") NOT IN (" + value + ")");
+        });
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.AND, (abstractWrapper, property, value) -> {
+            if (value instanceof Example) {
+                abstractWrapper.and(q -> WrapperUtils.appendCriterion(q, (Example) value));
+            }
+        });
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.OR, (abstractWrapper, property, value) -> {
+            if (value instanceof Example) {
+                abstractWrapper.or(q -> WrapperUtils.appendCriterion(q, (Example) value));
+            }
         });
     }
 
