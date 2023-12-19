@@ -58,6 +58,10 @@ public class AppenderContext {
             String prefix = abstractWrapper.isEmptyOfWhere() ? " WHERE " : " AND ";
             abstractWrapper.last(prefix + "(" + property + ") IN (" + value + ")");
         });
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.MULTI_NOT_IN, (abstractWrapper, property, value) -> {
+            String prefix = abstractWrapper.isEmptyOfWhere() ? " WHERE " : " AND ";
+            abstractWrapper.last(prefix + "(" + property + ") NOT IN (" + value + ")");
+        });
     }
 
 }
