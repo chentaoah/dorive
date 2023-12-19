@@ -51,7 +51,7 @@ public class MultiInBuilder {
         values.add(value);
     }
 
-    public void clear() {
+    public void clearLast() {
         int size = values.size();
         int remainder = size % this.size;
         values.subList(size - remainder, size).clear();
@@ -70,7 +70,9 @@ public class MultiInBuilder {
     }
 
     public String buildValuesStr(List<Object> values) {
-        return values.stream().map(CriterionUtils::sqlParam).collect(Collectors.joining(",", "(", "),"));
+        return values.stream()
+                .map(value -> CriterionUtils.doGetValue(null, value))
+                .collect(Collectors.joining(",", "(", "),"));
     }
 
 }

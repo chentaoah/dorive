@@ -135,7 +135,7 @@ public class MultiEntityHandler implements EntityHandler {
                     strBuilder.append("(").append(boundValueStr.length()).append(")").append(boundValueStr).append(",");
 
                 } else {
-                    multiInBuilder.clear();
+                    multiInBuilder.clearLast();
                     strBuilder = null;
                     break;
                 }
@@ -146,7 +146,7 @@ public class MultiEntityHandler implements EntityHandler {
                 }
                 String key = strBuilder.toString();
                 if (entityIndex.containsKey(key)) {
-                    multiInBuilder.clear();
+                    multiInBuilder.clearLast();
                 }
                 addToIndex(entityIndex, key, entity);
             }

@@ -57,9 +57,13 @@ public class CriterionUtils {
         return operator;
     }
 
-    public static Object getValue(Criterion criterion) {
+    public static String getValue(Criterion criterion) {
         String operator = criterion.getOperator();
         Object value = criterion.getValue();
+        return doGetValue(operator, value);
+    }
+
+    public static String doGetValue(String operator, Object value) {
         value = format(operator, value);
         return sqlParam(value);
     }
