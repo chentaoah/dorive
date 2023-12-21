@@ -95,4 +95,8 @@ public interface SelectorRepository<E, PK> extends QueryRepository<E, PK> {
         return selectPageByQuery(new InnerContext(selector), query);
     }
 
+    default long selectCountByQuery(Selector selector, Object query) {
+        return selectCountByQuery(new InnerContext(selector), query);
+    }
+
 }
