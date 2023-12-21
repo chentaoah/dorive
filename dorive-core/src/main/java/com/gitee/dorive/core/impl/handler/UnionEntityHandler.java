@@ -22,7 +22,6 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
-import com.gitee.dorive.core.entity.executor.MultiResult;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Operation;
@@ -55,9 +54,7 @@ public class UnionEntityHandler implements EntityHandler {
             Query query = operationFactory.buildQueryByExample(example);
             query.setRootType(Operation.INCLUDE_ROOT);
             Result<Object> result = repository.executeQuery(context, query);
-            if (result instanceof MultiResult) {
-                setValueForRootEntities(entities, (MultiResult) result);
-            }
+            setValueForRootEntities(entities, result);
             return result.getCount();
         }
         return 0L;
@@ -110,16 +107,16 @@ public class UnionEntityHandler implements EntityHandler {
         return example;
     }
 
-    private void setValueForRootEntities(List<Object> rootEntities, MultiResult multiResult) {
+    private void setValueForRootEntities(List<Object> rootEntities, Result<Object> result) {
         boolean isCollection = repository.getEntityEle().isCollection();
         PropChain anchorPoint = repository.getAnchorPoint();
 
-        List<Map<String, Object>> resultMaps = multiResult.getResultMaps();
-        int averageSize = resultMaps.size() / rootEntities.size() + 1;
+        List<Map<String, Object>> recordMaps = result.getRecordMaps();
+        int averageSize = recordMaps.size() / rootEntities.size() + 1;
         int lastRowNum = -1;
         Collection<Object> lastCollection = null;
 
-        for (Map<String, Object> resultMap : resultMaps) {
+        for (Map<String, Object> resultMap : recordMaps) {
             Integer rowNum = NumberUtils.intValue(resultMap.get("$row"));
             Object entity = resultMap.get("$entity");
 

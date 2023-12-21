@@ -47,27 +47,26 @@ public class FactoryExecutor extends AbstractProxyExecutor {
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Result<Object> result = super.executeQuery(context, query);
-        MultiResult multiResult = (MultiResult) result;
-        Page<Object> page = multiResult.getPage();
-        List<Map<String, Object>> resultMaps = multiResult.getResultMaps();
+        Page<Object> page = result.getPage();
+        List<Map<String, Object>> recordMaps = result.getRecordMaps();
 
         List<Object> entities = Collections.emptyList();
-        if (resultMaps != null && !resultMaps.isEmpty()) {
+        if (recordMaps != null && !recordMaps.isEmpty()) {
             Example example = query.getExample();
             if (example instanceof UnionExample) {
-                entities = reconstituteWithoutDuplicate(context, resultMaps);
+                entities = reconstituteWithoutDuplicate(context, recordMaps);
             } else {
-                entities = reconstitute(context, resultMaps);
+                entities = reconstitute(context, recordMaps);
             }
         }
 
         if (page != null) {
             page.setRecords(entities);
         }
-        multiResult.setRecords(entities);
-        multiResult.setRecord(!entities.isEmpty() ? entities.get(0) : null);
-        multiResult.setCount(entities.size());
-        return multiResult;
+        result.setRecords(entities);
+        result.setRecord(!entities.isEmpty() ? entities.get(0) : null);
+        result.setCount(entities.size());
+        return result;
     }
 
     private List<Object> reconstituteWithoutDuplicate(Context context, List<Map<String, Object>> resultMaps) {

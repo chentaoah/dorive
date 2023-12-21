@@ -22,8 +22,6 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
-import com.gitee.dorive.core.util.MultiInBuilder;
-import com.gitee.dorive.core.entity.executor.MultiResult;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
@@ -33,6 +31,7 @@ import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.core.util.MultiInBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -58,9 +57,7 @@ public class MultiEntityHandler implements EntityHandler {
             Query query = operationFactory.buildQueryByExample(example);
             query.setRootType(Operation.INCLUDE_ROOT);
             Result<Object> result = repository.executeQuery(context, query);
-            if (result instanceof MultiResult) {
-                setValueForRootEntities(context, entities, entityIndex, (MultiResult) result);
-            }
+            setValueForRootEntities(context, entities, entityIndex, result);
             return result.getCount();
         }
         return 0L;
@@ -171,7 +168,7 @@ public class MultiEntityHandler implements EntityHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private void setValueForRootEntities(Context context, List<Object> rootEntities, Map<String, Object> entityIndex, MultiResult multiResult) {
+    private void setValueForRootEntities(Context context, List<Object> rootEntities, Map<String, Object> entityIndex, Result<Object> result) {
         boolean isCollection = repository.getEntityEle().isCollection();
         PropChain anchorPoint = repository.getAnchorPoint();
 
@@ -179,7 +176,7 @@ public class MultiEntityHandler implements EntityHandler {
         Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
         List<PropertyBinder> binders = mergedBindersMap.get("/");
 
-        List<Object> entities = multiResult.getRecords();
+        List<Object> entities = result.getRecords();
         int averageSize = entities.size() / rootEntities.size() + 1;
 
         for (Object entity : entities) {

@@ -34,7 +34,6 @@ import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.MultiResult;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
@@ -83,7 +82,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("id", query.getPrimaryKey());
             List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-            return new MultiResult(resultMaps);
+            return new Result<>(null, resultMaps);
 
         } else if (query.getExample() != null) {
             Example example = query.getExample();
@@ -95,23 +94,23 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                 queryPage = baseMapper.selectMapsPage(queryPage, queryWrapper);
 
                 page.setTotal(queryPage.getTotal());
-                return new MultiResult(page, queryPage.getRecords());
+                return new Result<>(page, queryPage.getRecords());
 
             } else {
                 if (example instanceof UnionExample) {
                     UnionExample unionExample = (UnionExample) example;
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                    return new MultiResult(resultMaps);
+                    return new Result<>(null, resultMaps);
 
                 } else {
                     QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
                     List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                    return new MultiResult(resultMaps);
+                    return new Result<>(null, resultMaps);
                 }
             }
         }
-        return new MultiResult(Collections.emptyList());
+        return new Result<>(null, Collections.emptyList());
     }
 
     @Override
