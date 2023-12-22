@@ -73,10 +73,10 @@ public class MergedRepositoryResolver {
             MergedRepository mergedRepository = new MergedRepository(
                     lastAccessPath,
                     absoluteAccessPath,
+                    relativeAccessPath,
+                    abstractContextRepository != null,
                     repository,
                     getMergedBindersMap(lastAccessPath, repository),
-                    abstractContextRepository != null,
-                    relativeAccessPath,
                     executedRepository,
                     mergedRepositoryMap.size() + 1);
             addMergedRepository(mergedRepository);
