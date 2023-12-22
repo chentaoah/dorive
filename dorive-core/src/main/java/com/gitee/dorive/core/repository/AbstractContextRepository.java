@@ -189,7 +189,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             Map<String, FieldConverter> fieldConverterMap = newFieldConverterMap(entityEle);
 
             Executor executor = newExecutor(entityDef, entityEle);
-            EntityFactoryBuilder entityFactoryBuilder = new EntityFactoryBuilder(applicationContext, entityInfo, fieldConverterMap);
+            EntityFactoryBuilder entityFactoryBuilder = new EntityFactoryBuilder(this, entityInfo, fieldConverterMap);
             EntityFactory entityFactory = entityFactoryBuilder.build(entityDef, entityEle);
 
             executor = new FactoryExecutor(executor, entityEle, entityFactory);

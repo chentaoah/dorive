@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class EntityFactoryBuilder {
 
-    private ApplicationContext applicationContext;
+    private AbstractContextRepository<?, ?> repository;
     private AbstractContextRepository.EntityInfo entityInfo;
     private Map<String, FieldConverter> fieldConverterMap;
 
@@ -44,6 +44,7 @@ public class EntityFactoryBuilder {
         if (factoryClass == Object.class) {
             entityFactory = new DefaultEntityFactory();
         } else {
+            ApplicationContext applicationContext = repository.getApplicationContext();
             entityFactory = (EntityFactory) applicationContext.getBean(factoryClass);
         }
         if (entityFactory instanceof DefaultEntityFactory) {
