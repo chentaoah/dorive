@@ -21,7 +21,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.api.constant.Keys;
 import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.def.FieldDef;
@@ -67,6 +66,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, InitializingBean {
 
+    private static final Map<EntityEle, EntityInfo> ENTITY_INFO_MAP = new ConcurrentHashMap<>();
+    private static final Map<EntityEle, FieldExecutor> FIELD_EXECUTOR_MAP = new ConcurrentHashMap<>();
+
     private ApplicationContext applicationContext;
 
     private PropChainResolver propChainResolver;
@@ -76,6 +78,14 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     private CommonRepository rootRepository;
     private List<CommonRepository> subRepositories = new ArrayList<>();
     private List<CommonRepository> orderedRepositories = new ArrayList<>();
+
+    public static EntityInfo getEntityInfo(EntityEle entityEle) {
+        return ENTITY_INFO_MAP.get(entityEle);
+    }
+
+    public static FieldExecutor getFieldExecutor(EntityEle entityEle) {
+        return FIELD_EXECUTOR_MAP.get(entityEle);
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -111,7 +121,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setEntityEle(rootRepository.getEntityEle());
         setOperationFactory(rootRepository.getOperationFactory());
         setExecutor(newDefaultExecutor());
-        setAttachments(new ConcurrentHashMap<>(rootRepository.getAttachments()));
     }
 
     private CommonRepository newRepository(String accessPath, EntityEle entityEle) {
@@ -136,7 +145,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         repository.setEntityEle(entityEle);
         repository.setOperationFactory(operationFactory);
         repository.setProxyRepository(proxyRepository);
-        repository.setAttachments(new ConcurrentHashMap<>(actualRepository.getAttachments()));
 
         repository.setAccessPath(accessPath);
         repository.setRoot(isRoot);
@@ -146,7 +154,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         repository.setAnchorPoint(anchorPoint);
         repository.setBinderResolver(binderResolver);
         repository.setBoundEntity(false);
-
         return repository;
     }
 
@@ -177,8 +184,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultRepository.setEntityEle(entityEle);
             defaultRepository.setOperationFactory(operationFactory);
 
-            Map<String, Object> attachments = new ConcurrentHashMap<>(8);
-            EntityInfo entityInfo = resolveEntityInfo(entityDef, entityEle, attachments);
+            EntityInfo entityInfo = resolveEntityInfo(entityDef, entityEle);
+            ENTITY_INFO_MAP.put(entityEle, entityInfo);
             Map<String, FieldConverter> fieldConverterMap = newFieldConverterMap(entityEle);
 
             Executor executor = newExecutor(entityDef, entityEle);
@@ -187,10 +194,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
             executor = new FactoryExecutor(executor, entityEle, entityFactory);
             executor = new FieldExecutor(executor, entityEle, fieldConverterMap);
-            attachments.put(Keys.FIELD_EXECUTOR, executor);
-
+            FIELD_EXECUTOR_MAP.put(entityEle, (FieldExecutor) executor);
             defaultRepository.setExecutor(executor);
-            defaultRepository.setAttachments(attachments);
         }
         return (AbstractRepository<Object, Object>) repository;
     }
@@ -239,7 +244,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return new DefaultExecutor(this, entityHandler);
     }
 
-    protected abstract EntityInfo resolveEntityInfo(EntityDef entityDef, EntityEle entityEle, Map<String, Object> attachments);
+    protected abstract EntityInfo resolveEntityInfo(EntityDef entityDef, EntityEle entityEle);
 
     protected abstract Executor newExecutor(EntityDef entityDef, EntityEle entityEle);
 
@@ -251,6 +256,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     @AllArgsConstructor
     public static class EntityInfo {
         private Class<?> pojoClass;
+        private String tableName;
         private Map<String, String> propAliasMapping;
     }
 

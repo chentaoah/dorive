@@ -18,7 +18,5 @@
 package com.gitee.dorive.api.constant;
 
 public interface Keys {
-    String FIELD_EXECUTOR = "FIELD_EXECUTOR";
     String QUERIER = "QUERIER";
-    String TABLE_NAME = "TABLE_NAME";
 }

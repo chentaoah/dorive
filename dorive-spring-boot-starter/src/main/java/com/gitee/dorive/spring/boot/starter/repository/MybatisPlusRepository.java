@@ -68,7 +68,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected EntityInfo resolveEntityInfo(EntityDef entityDef, EntityEle entityEle, Map<String, Object> attachments) {
+    protected EntityInfo resolveEntityInfo(EntityDef entityDef, EntityEle entityEle) {
         Class<?> mapperClass = entityDef.getSource();
         if (mapperClass != Object.class) {
             mapper = (BaseMapper<Object>) getApplicationContext().getBean(mapperClass);
@@ -86,10 +86,9 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
         Assert.notNull(pojoClass, "The class of pojo cannot be null! source: {}", mapperClass);
         tableInfo = TableInfoHelper.getTableInfo(pojoClass);
         Assert.notNull(tableInfo, "The table info cannot be null! source: {}", mapperClass);
-        if (tableInfo != null) {
-            attachments.put(Keys.TABLE_NAME, tableInfo.getTableName());
-        }
-        return new EntityInfo(pojoClass, getPropAliasMapping());
+        String tableName = tableInfo != null ? tableInfo.getTableName() : null;
+        Map<String, String> propAliasMapping = getPropAliasMapping();
+        return new EntityInfo(pojoClass, tableName, propAliasMapping);
     }
 
     private Map<String, String> getPropAliasMapping() {

@@ -35,7 +35,6 @@ import com.gitee.dorive.core.impl.factory.OperationFactory;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Map;
 
 @Data
 public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Executor {
@@ -44,7 +43,6 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     private EntityEle entityEle;
     private OperationFactory operationFactory;
     private Executor executor;
-    private Map<String, Object> attachments;
 
     public Class<?> getEntityClass() {
         return entityEle.getGenericType();

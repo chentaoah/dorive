@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.sql.impl;
 
-import com.gitee.dorive.api.constant.Keys;
 import com.gitee.dorive.api.constant.Operator;
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -26,16 +26,25 @@ import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.executor.FieldExecutor;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
+import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.core.util.CriterionUtils;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.impl.builder.QueryResolver;
-import com.gitee.dorive.sql.entity.*;
-import com.gitee.dorive.core.util.CriterionUtils;
+import com.gitee.dorive.sql.entity.ArgSegment;
+import com.gitee.dorive.sql.entity.JoinSegment;
+import com.gitee.dorive.sql.entity.OnSegment;
+import com.gitee.dorive.sql.entity.SelectSegment;
+import com.gitee.dorive.sql.entity.TableSegment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 public class SegmentBuilder {
@@ -54,10 +63,11 @@ public class SegmentBuilder {
             String relativeAccessPath = mergedRepository.getRelativeAccessPath();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
-            Map<String, Object> attachments = executedRepository.getAttachments();
-            String tableName = (String) attachments.get(Keys.TABLE_NAME);
-            FieldExecutor fieldExecutor = (FieldExecutor) attachments.get(Keys.FIELD_EXECUTOR);
+            EntityEle entityEle = executedRepository.getEntityEle();
+            AbstractContextRepository.EntityInfo entityInfo = AbstractContextRepository.getEntityInfo(entityEle);
+            FieldExecutor fieldExecutor = AbstractContextRepository.getFieldExecutor(entityEle);
 
+            String tableName = entityInfo.getTableName();
             String tableAlias = selectSegment.generateTableAlias();
             Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample(Collections.emptyList()));
             fieldExecutor.convert(context, example);
