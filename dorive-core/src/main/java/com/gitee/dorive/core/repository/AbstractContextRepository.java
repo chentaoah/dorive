@@ -251,7 +251,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     @AllArgsConstructor
     public static class EntityInfo {
         private Class<?> pojoClass;
-        Map<String, String> propAliasMapping;
+        private Map<String, String> propAliasMapping;
     }
 
 }
