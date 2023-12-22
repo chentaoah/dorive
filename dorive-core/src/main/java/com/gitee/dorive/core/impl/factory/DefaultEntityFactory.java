@@ -45,7 +45,7 @@ public class DefaultEntityFactory implements EntityFactory {
     private Map<String, FieldConverter> propConverterMap;
     private CopyOptions deCopyOptions;
 
-    public void setReCopyOptions(Map<String, String> aliasFieldMapping, Map<String, FieldConverter> fieldConverterMap) {
+    public void newReCopyOptions(Map<String, String> aliasFieldMapping, Map<String, FieldConverter> fieldConverterMap) {
         this.aliasFieldMapping = aliasFieldMapping;
         this.fieldConverterMap = fieldConverterMap;
         this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(aliasFieldMapping::get);
@@ -57,7 +57,7 @@ public class DefaultEntityFactory implements EntityFactory {
         }
     }
 
-    public void setDeCopyOptions(Map<String, String> fieldPropMapping, Map<String, FieldConverter> propConverterMap) {
+    public void newDeCopyOptions(Map<String, String> fieldPropMapping, Map<String, FieldConverter> propConverterMap) {
         this.fieldPropMapping = fieldPropMapping;
         this.propConverterMap = propConverterMap;
         this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(fieldPropMapping::get);

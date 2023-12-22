@@ -36,17 +36,18 @@ import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.executor.FieldConverter;
 import com.gitee.dorive.core.config.RepositoryContext;
-import com.gitee.dorive.core.entity.ExecutorResult;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.converter.DefaultFieldConverter;
 import com.gitee.dorive.core.impl.executor.DefaultExecutor;
 import com.gitee.dorive.core.impl.executor.FactoryExecutor;
 import com.gitee.dorive.core.impl.executor.FieldExecutor;
+import com.gitee.dorive.core.impl.factory.EntityFactoryBuilder;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DerivedResolver;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
@@ -176,15 +177,16 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultRepository.setEntityEle(entityEle);
             defaultRepository.setOperationFactory(operationFactory);
 
-            Map<String, FieldConverter> converterMap = newConverterMap(entityEle);
             Map<String, Object> attachments = new ConcurrentHashMap<>(8);
+            EntityInfo entityInfo = resolveEntityInfo(entityDef, entityEle, attachments);
+            Map<String, FieldConverter> fieldConverterMap = newFieldConverterMap(entityEle);
 
-            ExecutorResult executorResult = newExecutor(entityDef, entityEle, converterMap, attachments);
-            EntityFactory entityFactory = executorResult.getEntityFactory();
-            Executor executor = executorResult.getExecutor();
+            Executor executor = newExecutor(entityDef, entityEle);
+            EntityFactoryBuilder entityFactoryBuilder = new EntityFactoryBuilder(applicationContext, entityInfo, fieldConverterMap);
+            EntityFactory entityFactory = entityFactoryBuilder.build(entityDef, entityEle);
 
             executor = new FactoryExecutor(executor, entityEle, entityFactory);
-            executor = new FieldExecutor(executor, entityEle, converterMap);
+            executor = new FieldExecutor(executor, entityEle, fieldConverterMap);
             attachments.put(Keys.FIELD_EXECUTOR, executor);
 
             defaultRepository.setExecutor(executor);
@@ -193,7 +195,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return (AbstractRepository<Object, Object>) repository;
     }
 
-    private Map<String, FieldConverter> newConverterMap(EntityEle entityEle) {
+    private Map<String, FieldConverter> newFieldConverterMap(EntityEle entityEle) {
         Map<String, FieldConverter> converterMap = new LinkedHashMap<>(8);
         Map<String, EntityField> entityFieldMap = entityEle.getEntityFieldMap();
         if (entityFieldMap != null) {
@@ -237,10 +239,19 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return new DefaultExecutor(this, entityHandler);
     }
 
-    protected abstract ExecutorResult newExecutor(EntityDef entityDef, EntityEle entityEle, Map<String, FieldConverter> converterMap, Map<String, Object> attachments);
+    protected abstract EntityInfo resolveEntityInfo(EntityDef entityDef, EntityEle entityEle, Map<String, Object> attachments);
+
+    protected abstract Executor newExecutor(EntityDef entityDef, EntityEle entityEle);
 
     protected abstract AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository);
 
     protected abstract EntityHandler processEntityHandler(EntityHandler entityHandler);
+
+    @Data
+    @AllArgsConstructor
+    public static class EntityInfo {
+        private Class<?> pojoClass;
+        Map<String, String> propAliasMapping;
+    }
 
 }

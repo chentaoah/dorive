@@ -22,22 +22,18 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.gitee.dorive.api.api.ImplFactory;
 import com.gitee.dorive.api.constant.Keys;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.executor.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.api.executor.FieldConverter;
-import com.gitee.dorive.core.entity.ExecutorResult;
-import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
-import com.gitee.dorive.sql.impl.CountQuerier;
 import com.gitee.dorive.spring.boot.starter.impl.MybatisPlusExecutor;
-import com.gitee.dorive.api.api.ImplFactory;
 import com.gitee.dorive.sql.api.SqlRunner;
+import com.gitee.dorive.sql.impl.CountQuerier;
 import com.gitee.dorive.sql.impl.SegmentBuilder;
 import com.gitee.dorive.sql.impl.SqlQueryBuilder;
 import lombok.Data;
@@ -49,12 +45,14 @@ import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
+    private BaseMapper<Object> mapper;
+    private Class<?> pojoClass;
+    private TableInfo tableInfo;
     private QueryBuilder sqlQueryBuilder;
     private CountQuerier countQuerier;
 
@@ -70,12 +68,11 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected ExecutorResult newExecutor(EntityDef entityDef, EntityEle entityEle, Map<String, FieldConverter> converterMap, Map<String, Object> attachments) {
+    protected EntityInfo resolveEntityInfo(EntityDef entityDef, EntityEle entityEle, Map<String, Object> attachments) {
         Class<?> mapperClass = entityDef.getSource();
-        Object mapper = null;
-        Class<?> pojoClass = null;
         if (mapperClass != Object.class) {
-            mapper = getApplicationContext().getBean(mapperClass);
+            mapper = (BaseMapper<Object>) getApplicationContext().getBean(mapperClass);
+            Assert.notNull(mapper, "The mapper cannot be null! source: {}", mapperClass);
             Type[] genericInterfaces = mapperClass.getGenericInterfaces();
             if (genericInterfaces.length > 0) {
                 Type genericInterface = mapperClass.getGenericInterfaces()[0];
@@ -86,74 +83,34 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
                 }
             }
         }
-
         Assert.notNull(pojoClass, "The class of pojo cannot be null! source: {}", mapperClass);
-        TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
+        tableInfo = TableInfoHelper.getTableInfo(pojoClass);
+        Assert.notNull(tableInfo, "The table info cannot be null! source: {}", mapperClass);
         if (tableInfo != null) {
             attachments.put(Keys.TABLE_NAME, tableInfo.getTableName());
         }
-
-        EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, pojoClass, tableInfo, converterMap);
-        Executor executor = new MybatisPlusExecutor(entityDef, entityEle, (BaseMapper<Object>) mapper, (Class<Object>) pojoClass);
-        return new ExecutorResult(entityFactory, executor);
+        return new EntityInfo(pojoClass, getPropAliasMapping());
     }
 
-    private EntityFactory newEntityFactory(EntityDef entityDef, EntityEle entityEle, Class<?> pojoClass, TableInfo tableInfo,
-                                           Map<String, FieldConverter> converterMap) {
-        Class<?> factoryClass = entityDef.getFactory();
-        EntityFactory entityFactory;
-        if (factoryClass == Object.class) {
-            entityFactory = new DefaultEntityFactory();
-        } else {
-            entityFactory = (EntityFactory) getApplicationContext().getBean(factoryClass);
-        }
-        if (entityFactory instanceof DefaultEntityFactory) {
-            DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
-            defaultEntityFactory.setEntityEle(entityEle);
-            defaultEntityFactory.setPojoClass(pojoClass);
-
-            Map<String, String> aliasFieldMapping = newAliasFieldMapping(entityEle);
-            defaultEntityFactory.setReCopyOptions(aliasFieldMapping, converterMap);
-
-            Map<String, String> fieldPropMapping = newFieldPropMapping(tableInfo, aliasFieldMapping);
-            defaultEntityFactory.setDeCopyOptions(fieldPropMapping, newPropConverterMap(fieldPropMapping, converterMap));
-        }
-        return entityFactory;
-    }
-
-    private Map<String, String> newAliasFieldMapping(EntityEle entityEle) {
-        Map<String, String> fieldAliasMap = entityEle.getFieldAliasMap();
-        return fieldAliasMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
-    }
-
-    private Map<String, String> newFieldPropMapping(TableInfo tableInfo, Map<String, String> aliasFieldMapping) {
-        String keyColumn = tableInfo.getKeyColumn();
+    private Map<String, String> getPropAliasMapping() {
         String keyProperty = tableInfo.getKeyProperty();
+        String keyColumn = tableInfo.getKeyColumn();
         List<TableFieldInfo> tableFieldInfos = tableInfo.getFieldList();
-        Map<String, String> fieldPropMapping = new LinkedHashMap<>();
 
-        if (StringUtils.isNotBlank(keyColumn) && StringUtils.isNotBlank(keyProperty)) {
-            String field = aliasFieldMapping.get(keyColumn);
-            if (field != null) {
-                fieldPropMapping.put(field, keyProperty);
-            }
+        Map<String, String> propAliasMapping = new LinkedHashMap<>();
+        if (StringUtils.isNotBlank(keyProperty) && StringUtils.isNotBlank(keyColumn)) {
+            propAliasMapping.put(keyProperty, keyColumn);
         }
         for (TableFieldInfo tableFieldInfo : tableFieldInfos) {
-            String field = aliasFieldMapping.get(tableFieldInfo.getColumn());
-            if (field != null) {
-                fieldPropMapping.put(field, tableFieldInfo.getProperty());
-            }
+            propAliasMapping.put(tableFieldInfo.getProperty(), tableFieldInfo.getColumn());
         }
-        return fieldPropMapping;
+        return propAliasMapping;
     }
 
-    private Map<String, FieldConverter> newPropConverterMap(Map<String, String> fieldPropMapping, Map<String, FieldConverter> converterMap) {
-        Map<String, FieldConverter> propConverterMap = new LinkedHashMap<>(converterMap.size());
-        converterMap.forEach((field, fieldConverter) -> {
-            String prop = fieldPropMapping.get(field);
-            propConverterMap.put(prop, fieldConverter);
-        });
-        return propConverterMap;
+    @Override
+    @SuppressWarnings("unchecked")
+    protected Executor newExecutor(EntityDef entityDef, EntityEle entityEle) {
+        return new MybatisPlusExecutor(entityDef, entityEle, mapper, (Class<Object>) pojoClass);
     }
 
     @Override
