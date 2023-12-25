@@ -31,6 +31,7 @@ public abstract class AbstractContext implements Context {
 
     private Selector selector = Selector.EMPTY;
     private Map<String, Object> attachments = new LinkedHashMap<>(8);
+    private Strategy strategy = new Strategy();
 
     public AbstractContext(Selector selector) {
         this.selector = selector;

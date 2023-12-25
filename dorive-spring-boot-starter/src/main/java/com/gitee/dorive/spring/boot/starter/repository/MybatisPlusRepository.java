@@ -23,11 +23,11 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.api.api.ImplFactory;
-import com.gitee.dorive.api.constant.Keys;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.entity.context.Strategy;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
@@ -114,9 +114,9 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
     @Override
     protected QueryBuilder adaptiveQueryBuilder(Context context, BuildQuery buildQuery) {
-        Map<String, Object> attachments = context.getAttachments();
-        String querier = (String) attachments.get(Keys.QUERIER);
-        if (querier == null || "SQL".equals(querier)) {
+        Strategy strategy = context.getStrategy();
+        Strategy.Query query = strategy.getQuery();
+        if (query == null || Strategy.Query.SQL.equals(query)) {
             return sqlQueryBuilder;
         }
         return super.adaptiveQueryBuilder(context, buildQuery);

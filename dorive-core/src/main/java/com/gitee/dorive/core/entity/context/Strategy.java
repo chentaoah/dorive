@@ -15,8 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.constant;
+package com.gitee.dorive.core.entity.context;
 
-public interface Keys {
-    String QUERIER = "QUERIER";
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Strategy {
+
+    private Query query;
+
+    public enum Query {DEFAULT, SQL,}
+
 }

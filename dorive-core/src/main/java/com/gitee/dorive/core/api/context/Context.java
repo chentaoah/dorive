@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.core.api.context;
 
+import com.gitee.dorive.core.entity.context.Strategy;
+
 import java.util.Map;
 
 public interface Context {
@@ -24,5 +26,7 @@ public interface Context {
     Selector getSelector();
 
     Map<String, Object> getAttachments();
+
+    Strategy getStrategy();
 
 }
