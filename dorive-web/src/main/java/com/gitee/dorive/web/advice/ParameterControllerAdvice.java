@@ -25,8 +25,9 @@ public class ParameterControllerAdvice {
                 Object value;
                 boolean isNumber = NumberUtil.isNumber(text);
                 if (isNumber) {
-                    int multi = NumberUtil.pow(10, 13 - text.length()).intValue();
-                    value = DateUtil.date(NumberUtil.parseLong(text) * multi);
+                    long number = NumberUtil.parseLong(text);
+                    int multi = NumberUtil.pow(10, 13 - String.valueOf(number).length()).intValue();
+                    value = DateUtil.date(number * multi);
                 } else {
                     value = DateUtil.parseDateTime(text);
                 }
