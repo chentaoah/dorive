@@ -39,7 +39,6 @@ import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Delete;
 import com.gitee.dorive.core.entity.operation.Insert;
-import com.gitee.dorive.core.entity.operation.NullableUpdate;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.operation.Update;
@@ -211,13 +210,10 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             Object primaryKey = update.getPrimaryKey();
             Example example = update.getExample();
 
-            if (update instanceof NullableUpdate) {
-                NullableUpdate nullableUpdate = (NullableUpdate) update;
-                Set<String> nullableSet = nullableUpdate.getNullableSet();
-                if (nullableSet != null && !nullableSet.isEmpty()) {
-                    UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableSet, primaryKey, example);
-                    return baseMapper.update(null, updateWrapper);
-                }
+            Set<String> nullableFields = update.getNullableFields();
+            if (nullableFields != null && !nullableFields.isEmpty()) {
+                UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableFields, primaryKey, example);
+                return baseMapper.update(null, updateWrapper);
             }
 
             if (primaryKey != null) {
@@ -248,13 +244,13 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         return updateWrapper;
     }
 
-    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableSet, Object primaryKey, Example example) {
+    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableFields, Object primaryKey, Example example) {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
         List<TableFieldInfo> fieldList = TableInfoHelper.getTableInfo(pojoClass).getFieldList();
         for (TableFieldInfo tableFieldInfo : fieldList) {
             String property = tableFieldInfo.getProperty();
             Object value = BeanUtil.getFieldValue(persistent, property);
-            if (value != null || nullableSet.contains(property)) {
+            if (value != null || nullableFields.contains(property)) {
                 updateWrapper.set(true, tableFieldInfo.getColumn(), value);
             }
         }

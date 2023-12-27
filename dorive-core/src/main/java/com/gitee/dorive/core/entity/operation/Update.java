@@ -20,9 +20,14 @@ package com.gitee.dorive.core.entity.operation;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collections;
+import java.util.Set;
+
 @Getter
 @Setter
 public class Update extends Condition {
+
+    private Set<String> nullableFields = Collections.emptySet();
 
     public Update(int type, Object entity) {
         super(type, entity);
