@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.binder;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.binder.Binder;
-import com.gitee.dorive.core.api.binder.BindingProcessor;
+import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,12 +30,12 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public abstract class AbstractBinder implements Binder, BindingProcessor {
+public abstract class AbstractBinder implements Binder, Processor {
 
     private BindingDef bindingDef;
     private String alias;
     private PropChain fieldPropChain;
-    private BindingProcessor bindingProcessor;
+    private Processor processor;
 
     public String getFieldName() {
         return fieldPropChain.getEntityField().getName();
@@ -53,12 +53,12 @@ public abstract class AbstractBinder implements Binder, BindingProcessor {
 
     @Override
     public Object input(Context context, Object value) {
-        return bindingProcessor.input(context, value);
+        return processor.input(context, value);
     }
 
     @Override
     public Object output(Context context, Object value) {
-        return bindingProcessor.output(context, value);
+        return processor.output(context, value);
     }
 
     public List<Object> collectFieldValues(Context context, List<Object> entities) {

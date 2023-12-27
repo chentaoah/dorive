@@ -15,28 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.processor;
+package com.gitee.dorive.core.api.binder;
 
-import com.gitee.dorive.api.entity.def.BindingDef;
-import com.gitee.dorive.core.api.binder.BindingProcessor;
 import com.gitee.dorive.core.api.context.Context;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-public class DefaultBindingProcessor implements BindingProcessor {
+public interface Processor {
 
-    private BindingDef bindingDef;
+    Object input(Context context, Object value);
 
-    @Override
-    public Object input(Context context, Object value) {
-        return value;
-    }
-
-    @Override
-    public Object output(Context context, Object value) {
-        return value;
-    }
+    Object output(Context context, Object value);
 
 }

@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.binder;
 
 import com.gitee.dorive.api.entity.def.BindingDef;
-import com.gitee.dorive.core.api.binder.BindingProcessor;
+import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.api.entity.element.PropChain;
 
@@ -26,8 +26,8 @@ import java.util.Map;
 
 public class ContextBinder extends AbstractBinder {
 
-    public ContextBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, BindingProcessor bindingProcessor) {
-        super(bindingDef, alias, fieldPropChain, bindingProcessor);
+    public ContextBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor) {
+        super(bindingDef, alias, fieldPropChain, processor);
     }
 
     @Override
