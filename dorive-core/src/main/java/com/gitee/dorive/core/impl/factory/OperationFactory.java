@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.core.impl.factory;
 
-import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.*;
@@ -91,20 +90,20 @@ public class OperationFactory {
 
     public Operation renewOperation(Operation operation, Object entity) {
         int type = operation.getType();
-        if (type == OperationType.INSERT) {
+        if (type == Operation.Type.INSERT) {
             return buildInsert(entity);
 
-        } else if (type == OperationType.UPDATE) {
+        } else if (type == Operation.Type.UPDATE) {
             return buildUpdate(entity);
 
-        } else if (type == OperationType.INSERT_OR_UPDATE) {
-            return new Operation(OperationType.INSERT_OR_UPDATE, entity);
+        } else if (type == Operation.Type.INSERT_OR_UPDATE) {
+            return new Operation(Operation.Type.INSERT_OR_UPDATE, entity);
 
-        } else if (type == OperationType.DELETE) {
+        } else if (type == Operation.Type.DELETE) {
             return buildDelete(entity);
 
-        } else if (type == OperationType.FORCE_INSERT) {
-            return new Insert(OperationType.FORCE_INSERT, entity);
+        } else if (type == Operation.Type.FORCE_INSERT) {
+            return new Insert(Operation.Type.FORCE_INSERT, entity);
         }
         return null;
     }

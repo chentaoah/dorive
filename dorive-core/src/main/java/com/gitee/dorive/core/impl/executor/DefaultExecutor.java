@@ -18,7 +18,6 @@
 package com.gitee.dorive.core.impl.executor;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.context.Context;
@@ -114,12 +113,12 @@ public class DefaultExecutor extends AbstractExecutor implements EntityHandler {
                     collection = Collections.singletonList(targetEntity);
                 }
                 for (Object entity : collection) {
-                    int operationType = OperationType.NONE;
+                    int operationType = Operation.Type.NONE;
                     boolean operable = false;
                     if (isMatch) {
                         operationType = determineType(operation, repository, entity);
-                        operable = (operationType & OperationType.INSERT_OR_UPDATE_OR_DELETE) != 0;
-                        if ((operationType & OperationType.INSERT) != 0) {
+                        operable = (operationType & Operation.Type.INSERT_OR_UPDATE_OR_DELETE) != 0;
+                        if ((operationType & Operation.Type.INSERT) != 0) {
                             getBoundValue(context, rootEntity, repository, entity);
                         }
                     }
@@ -127,7 +126,11 @@ public class DefaultExecutor extends AbstractExecutor implements EntityHandler {
                         OperationFactory operationFactory = repository.getOperationFactory();
                         Operation newOperation = operationFactory.renewOperation(operation, entity);
                         if (newOperation != null) {
-                            newOperation.setRootType(operable ? Operation.INCLUDE_ROOT : Operation.IGNORE_ROOT);
+                            if (operable) {
+                                newOperation.includeRoot();
+                            } else {
+                                newOperation.ignoreRoot();
+                            }
                             totalCount += repository.execute(context, newOperation);
                         }
 
@@ -149,11 +152,11 @@ public class DefaultExecutor extends AbstractExecutor implements EntityHandler {
 
     private int determineType(Operation operation, CommonRepository repository, Object entity) {
         if (operation.isForceInsert()) {
-            return OperationType.INSERT;
+            return Operation.Type.INSERT;
         }
         int type = operation.getType();
         Object primaryKey = repository.getPrimaryKey(entity);
-        int operationType = primaryKey == null ? OperationType.INSERT : OperationType.UPDATE_OR_DELETE;
+        int operationType = primaryKey == null ? Operation.Type.INSERT : Operation.Type.UPDATE_OR_DELETE;
         return type & operationType;
     }
 
@@ -170,13 +173,13 @@ public class DefaultExecutor extends AbstractExecutor implements EntityHandler {
     }
 
     private int doExecute(Context context, CommonRepository repository, Object entity, int operationType) {
-        if (operationType == OperationType.INSERT) {
+        if (operationType == Operation.Type.INSERT) {
             return repository.insert(context, entity);
 
-        } else if (operationType == OperationType.UPDATE) {
+        } else if (operationType == Operation.Type.UPDATE) {
             return repository.update(context, entity);
 
-        } else if (operationType == OperationType.DELETE) {
+        } else if (operationType == Operation.Type.DELETE) {
             return repository.delete(context, entity);
         }
         return 0;

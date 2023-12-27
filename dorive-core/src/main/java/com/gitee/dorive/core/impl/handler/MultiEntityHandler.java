@@ -23,7 +23,6 @@ import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.binder.AbstractBinder;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
@@ -55,7 +54,7 @@ public class MultiEntityHandler implements EntityHandler {
         if (example.isNotEmpty()) {
             OperationFactory operationFactory = repository.getOperationFactory();
             Query query = operationFactory.buildQueryByExample(example);
-            query.setRootType(Operation.INCLUDE_ROOT);
+            query.includeRoot();
             Result<Object> result = repository.executeQuery(context, query);
             setValueForRootEntities(context, entities, entityIndex, result);
             return result.getCount();

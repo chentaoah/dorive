@@ -24,7 +24,6 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
-import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
@@ -52,7 +51,7 @@ public class UnionEntityHandler implements EntityHandler {
         if (example.isNotEmpty()) {
             OperationFactory operationFactory = repository.getOperationFactory();
             Query query = operationFactory.buildQueryByExample(example);
-            query.setRootType(Operation.INCLUDE_ROOT);
+            query.includeRoot();
             Result<Object> result = repository.executeQuery(context, query);
             setValueForRootEntities(entities, result);
             return result.getCount();

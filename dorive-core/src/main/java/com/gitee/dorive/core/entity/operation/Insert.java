@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.core.entity.operation;
 
-import com.gitee.dorive.api.constant.OperationType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,7 +29,7 @@ public class Insert extends Operation {
     }
 
     public Insert(Object entity) {
-        super(OperationType.INSERT, entity);
+        super(Type.INSERT, entity);
     }
 
 }

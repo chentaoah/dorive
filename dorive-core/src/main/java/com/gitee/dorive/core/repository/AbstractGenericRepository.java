@@ -18,7 +18,6 @@
 package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.api.repository.ListableRepository;
@@ -58,7 +57,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     @Override
     public int insertOrUpdate(Context context, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = new Operation(OperationType.INSERT_OR_UPDATE, entity);
+        Operation operation = new Operation(Operation.Type.INSERT_OR_UPDATE, entity);
         return execute(context, operation);
     }
 

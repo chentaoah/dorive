@@ -17,40 +17,56 @@
 
 package com.gitee.dorive.core.entity.operation;
 
-import com.gitee.dorive.api.constant.OperationType;
 import lombok.Data;
 
 @Data
 public class Operation {
 
-    public static final int UNKNOWN = 0;
-    public static final int INCLUDE_ROOT = 1;
-    public static final int IGNORE_ROOT = 2;
-
     private int type;
     private Object entity;
-    private int rootType;
+    private RootControl rootControl = RootControl.NONE;
 
     public Operation(int type, Object entity) {
         this.type = type;
         this.entity = entity;
-        this.rootType = UNKNOWN;
     }
 
     public boolean isInsertContext() {
-        return (type & OperationType.INSERT) != 0;
+        return (type & Type.INSERT) != 0;
     }
 
     public boolean isForceInsert() {
-        return type == OperationType.FORCE_INSERT;
+        return type == Type.FORCE_INSERT;
+    }
+
+    public void includeRoot() {
+        rootControl = RootControl.INCLUDE_ROOT;
     }
 
     public boolean isIncludeRoot() {
-        return rootType == 1;
+        return rootControl == RootControl.INCLUDE_ROOT;
+    }
+
+    public void ignoreRoot() {
+        rootControl = RootControl.IGNORE_ROOT;
     }
 
     public boolean isIgnoreRoot() {
-        return rootType == 2;
+        return rootControl == RootControl.IGNORE_ROOT;
     }
+
+    public interface Type {
+        int NONE = 0x00000000;
+        int SELECT = 0x00000001;
+        int INSERT = 0x00000002;
+        int UPDATE = 0x00000004;
+        int INSERT_OR_UPDATE = INSERT | UPDATE;
+        int DELETE = 0x00000008;
+        int UPDATE_OR_DELETE = UPDATE | DELETE;
+        int INSERT_OR_UPDATE_OR_DELETE = INSERT | UPDATE | DELETE;
+        int FORCE_INSERT = 0x00000010 | INSERT;
+    }
+
+    public enum RootControl {NONE, INCLUDE_ROOT, IGNORE_ROOT,}
 
 }
