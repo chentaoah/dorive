@@ -27,6 +27,7 @@ import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
+import com.gitee.dorive.core.util.ExampleUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -75,7 +76,7 @@ public class CommonRepository extends AbstractProxyRepository implements Node {
         Example example = query.getExample();
         if (example != null) {
             if (example.getOrderBy() == null && defaultOrderBy != null) {
-                example.setOrderBy(defaultOrderBy.tryClone());
+                example.setOrderBy(ExampleUtils.clone(defaultOrderBy));
             }
         }
         return super.executeQuery(context, query);

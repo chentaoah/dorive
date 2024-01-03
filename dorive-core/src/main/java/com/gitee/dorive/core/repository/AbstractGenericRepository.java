@@ -48,7 +48,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         int totalCount = 0;
         for (CommonRepository repository : getOrderedRepositories()) {
             if (selector.matches(context, repository)) {
-                totalCount += repository.updateByExample(context, entity, ExampleUtils.tryClone(example));
+                totalCount += repository.updateByExample(context, entity, ExampleUtils.clone(example));
             }
         }
         return totalCount;
@@ -75,7 +75,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         int totalCount = 0;
         for (CommonRepository repository : getOrderedRepositories()) {
             if (selector.matches(context, repository)) {
-                totalCount += repository.deleteByExample(context, ExampleUtils.tryClone(example));
+                totalCount += repository.deleteByExample(context, ExampleUtils.clone(example));
             }
         }
         return totalCount;

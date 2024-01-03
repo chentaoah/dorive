@@ -21,7 +21,6 @@ import cn.hutool.core.util.StrUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -30,10 +29,6 @@ public class OrderBy {
 
     private List<String> properties;
     private String order;
-
-    public OrderBy tryClone() {
-        return new OrderBy(new ArrayList<>(properties), order);
-    }
 
     @Override
     public String toString() {

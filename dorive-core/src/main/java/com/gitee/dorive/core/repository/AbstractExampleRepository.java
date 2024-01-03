@@ -34,7 +34,7 @@ public abstract class AbstractExampleRepository<E, PK> extends AbstractGenericRe
     @Override
     public List<E> selectByExample(Context context, Example example) {
         if (!(example instanceof InnerExample)) {
-            example = ExampleUtils.tryClone(example);
+            example = ExampleUtils.clone(example);
         }
         return super.selectByExample(context, example);
     }
@@ -42,7 +42,7 @@ public abstract class AbstractExampleRepository<E, PK> extends AbstractGenericRe
     @Override
     public Page<E> selectPageByExample(Context context, Example example) {
         if (!(example instanceof InnerExample)) {
-            example = ExampleUtils.tryClone(example);
+            example = ExampleUtils.clone(example);
         }
         return super.selectPageByExample(context, example);
     }
@@ -50,7 +50,7 @@ public abstract class AbstractExampleRepository<E, PK> extends AbstractGenericRe
     @Override
     public long selectCountByExample(Context context, Example example) {
         if (!(example instanceof InnerExample)) {
-            example = ExampleUtils.tryClone(example);
+            example = ExampleUtils.clone(example);
         }
         return super.selectCountByExample(context, example);
     }
@@ -58,7 +58,7 @@ public abstract class AbstractExampleRepository<E, PK> extends AbstractGenericRe
     @Override
     public int updateByExample(Context context, Object entity, Example example) {
         if (!(example instanceof InnerExample)) {
-            example = ExampleUtils.tryClone(example);
+            example = ExampleUtils.clone(example);
         }
         return super.updateByExample(context, entity, example);
     }
@@ -66,7 +66,7 @@ public abstract class AbstractExampleRepository<E, PK> extends AbstractGenericRe
     @Override
     public int deleteByExample(Context context, Example example) {
         if (!(example instanceof InnerExample)) {
-            example = ExampleUtils.tryClone(example);
+            example = ExampleUtils.clone(example);
         }
         return super.deleteByExample(context, example);
     }

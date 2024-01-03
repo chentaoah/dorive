@@ -34,10 +34,6 @@ public class Criterion {
         this.operator = operator;
     }
 
-    public Criterion tryClone() {
-        return new Criterion(property, operator, value);
-    }
-
     @Override
     public String toString() {
         return CriterionUtils.toString(this);

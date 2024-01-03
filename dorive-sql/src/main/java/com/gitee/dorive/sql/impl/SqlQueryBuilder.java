@@ -49,7 +49,7 @@ public class SqlQueryBuilder implements QueryBuilder {
         boolean onlyCount = buildQuery.isOnlyCount();
         OrderBy orderBy = example.getOrderBy();
 
-        example = ExampleUtils.tryClone(example);
+        example = ExampleUtils.clone(example);
         buildQuery.setExample(example);
         Page<Object> page = example.getPage();
 
