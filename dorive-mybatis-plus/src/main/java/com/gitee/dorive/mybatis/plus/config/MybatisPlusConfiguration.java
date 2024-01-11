@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.config;
+package com.gitee.dorive.mybatis.plus.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;

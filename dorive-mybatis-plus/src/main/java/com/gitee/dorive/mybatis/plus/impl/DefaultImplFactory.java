@@ -15,17 +15,24 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.util;
+package com.gitee.dorive.mybatis.plus.impl;
 
-import com.baomidou.mybatisplus.core.toolkit.support.LambdaMeta;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import org.apache.ibatis.reflection.property.PropertyNamer;
+import com.gitee.dorive.api.api.ImplFactory;
+import com.gitee.dorive.core.api.format.SqlFormat;
+import com.gitee.dorive.sql.api.SqlRunner;
 
-public class LambdaUtils {
+public class DefaultImplFactory implements ImplFactory {
 
-    public static String toProperty(SFunction<?, ?> function) {
-        LambdaMeta meta = com.baomidou.mybatisplus.core.toolkit.LambdaUtils.extract(function);
-        return PropertyNamer.methodToProperty(meta.getImplMethodName());
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T getInstance(Class<T> clazz, Object... args) {
+        if (clazz == SqlFormat.class) {
+            return (T) new DefaultSqlHelper();
+
+        } else if (clazz == SqlRunner.class) {
+            return (T) new DefaultSqlHelper();
+        }
+        return null;
     }
 
 }

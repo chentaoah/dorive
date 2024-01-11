@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.impl;
+package com.gitee.dorive.mybatis.plus.impl;
 
 import com.baomidou.mybatisplus.core.conditions.interfaces.Compare;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
-import com.gitee.dorive.spring.boot.starter.util.WrapperUtils;
+import com.gitee.dorive.mybatis.plus.api.CriterionAppender;
+import com.gitee.dorive.mybatis.plus.util.WrapperUtils;
 
 import java.util.Collection;
 import java.util.Map;

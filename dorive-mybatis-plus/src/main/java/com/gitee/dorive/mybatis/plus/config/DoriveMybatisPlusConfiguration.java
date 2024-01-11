@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.config;
+package com.gitee.dorive.mybatis.plus.config;
 
-import com.gitee.dorive.spring.boot.starter.impl.DefaultImplFactory;
+import com.gitee.dorive.mybatis.plus.impl.DefaultImplFactory;
 import com.gitee.dorive.api.api.ImplFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +25,7 @@ import org.springframework.core.annotation.Order;
 
 @Order(-100)
 @Configuration
-public class DoriveStarterConfiguration {
+public class DoriveMybatisPlusConfiguration {
 
     @Bean
     public static ImplFactory implFactory() {

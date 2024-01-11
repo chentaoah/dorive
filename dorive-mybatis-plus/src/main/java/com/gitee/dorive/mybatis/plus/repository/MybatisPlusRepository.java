@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.repository;
+package com.gitee.dorive.mybatis.plus.repository;
 
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -31,7 +31,7 @@ import com.gitee.dorive.core.entity.context.Strategy;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
-import com.gitee.dorive.spring.boot.starter.impl.MybatisPlusExecutor;
+import com.gitee.dorive.mybatis.plus.impl.MybatisPlusExecutor;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.impl.CountQuerier;
 import com.gitee.dorive.sql.impl.SegmentBuilder;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.impl;
+package com.gitee.dorive.mybatis.plus.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -43,8 +43,8 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
-import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
-import com.gitee.dorive.spring.boot.starter.util.WrapperUtils;
+import com.gitee.dorive.mybatis.plus.api.CriterionAppender;
+import com.gitee.dorive.mybatis.plus.util.WrapperUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.gitee.dorive.spring.boot.starter.impl.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
+import static com.gitee.dorive.mybatis.plus.impl.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
 
 @Getter
 @Setter

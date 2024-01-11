@@ -15,22 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.util;
+package com.gitee.dorive.mybatis.plus.api;
 
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
-import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.spring.boot.starter.api.CriterionAppender;
 
-import static com.gitee.dorive.spring.boot.starter.impl.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
+public interface CriterionAppender {
 
-public class WrapperUtils {
-
-    public static void appendCriterion(AbstractWrapper<?, String, ?> abstractWrapper, Example example) {
-        for (Criterion criterion : example.getCriteria()) {
-            CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            criterionAppender.appendCriterion(abstractWrapper, criterion.getProperty(), criterion.getValue());
-        }
-    }
+    void appendCriterion(AbstractWrapper<?, String, ?> abstractWrapper, String property, Object value);
 
 }

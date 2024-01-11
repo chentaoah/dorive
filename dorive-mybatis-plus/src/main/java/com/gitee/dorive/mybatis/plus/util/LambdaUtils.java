@@ -15,12 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.api;
+package com.gitee.dorive.mybatis.plus.util;
 
-import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
+import com.baomidou.mybatisplus.core.toolkit.support.LambdaMeta;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import org.apache.ibatis.reflection.property.PropertyNamer;
 
-public interface CriterionAppender {
+public class LambdaUtils {
 
-    void appendCriterion(AbstractWrapper<?, String, ?> abstractWrapper, String property, Object value);
+    public static String toProperty(SFunction<?, ?> function) {
+        LambdaMeta meta = com.baomidou.mybatisplus.core.toolkit.LambdaUtils.extract(function);
+        return PropertyNamer.methodToProperty(meta.getImplMethodName());
+    }
 
 }

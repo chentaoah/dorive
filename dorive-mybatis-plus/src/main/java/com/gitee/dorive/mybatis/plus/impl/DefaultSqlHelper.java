@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.impl;
+package com.gitee.dorive.mybatis.plus.impl;
 
 import cn.hutool.db.sql.Condition;
 import cn.hutool.db.sql.SqlUtil;

@@ -15,24 +15,22 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.impl;
+package com.gitee.dorive.mybatis.plus.util;
 
-import com.gitee.dorive.api.api.ImplFactory;
-import com.gitee.dorive.core.api.format.SqlFormat;
-import com.gitee.dorive.sql.api.SqlRunner;
+import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
+import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.mybatis.plus.api.CriterionAppender;
 
-public class DefaultImplFactory implements ImplFactory {
+import static com.gitee.dorive.mybatis.plus.impl.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getInstance(Class<T> clazz, Object... args) {
-        if (clazz == SqlFormat.class) {
-            return (T) new DefaultSqlHelper();
+public class WrapperUtils {
 
-        } else if (clazz == SqlRunner.class) {
-            return (T) new DefaultSqlHelper();
+    public static void appendCriterion(AbstractWrapper<?, String, ?> abstractWrapper, Example example) {
+        for (Criterion criterion : example.getCriteria()) {
+            CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
+            criterionAppender.appendCriterion(abstractWrapper, criterion.getProperty(), criterion.getValue());
         }
-        return null;
     }
 
 }
