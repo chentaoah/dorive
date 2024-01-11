@@ -19,11 +19,16 @@ package com.gitee.dorive.event.impl;
 
 import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.operation.Delete;
+import com.gitee.dorive.core.entity.operation.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.event.api.EntityListener;
 import com.gitee.dorive.event.entity.ExecutorEvent;
 
 public abstract class DefaultEntityListener<E> implements EntityListener {
+
+    public enum OperationType {UNKNOWN, INSERT, UPDATE, DELETE,}
 
     @Override
     public Class<?> subscribe() {
@@ -35,9 +40,19 @@ public abstract class DefaultEntityListener<E> implements EntityListener {
     public void onApplicationEvent(ExecutorEvent executorEvent) {
         Context context = executorEvent.getContext();
         Operation operation = executorEvent.getOperation();
-        onExecution(context, operation.getType(), (E) operation.getEntity());
+        OperationType operationType = OperationType.UNKNOWN;
+        if (operation instanceof Insert) {
+            operationType = OperationType.INSERT;
+
+        } else if (operation instanceof Update) {
+            operationType = OperationType.UPDATE;
+
+        } else if (operation instanceof Delete) {
+            operationType = OperationType.DELETE;
+        }
+        onExecution(context, operationType, (E) operation.getEntity());
     }
 
-    protected abstract void onExecution(Context context, int type, E entity);
+    protected abstract void onExecution(Context context, OperationType operationType, E entity);
 
 }

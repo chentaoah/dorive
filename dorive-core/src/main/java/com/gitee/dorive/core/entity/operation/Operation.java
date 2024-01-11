@@ -22,6 +22,20 @@ import lombok.Data;
 @Data
 public class Operation {
 
+    public interface Type {
+        int NONE = 0x00000000;
+        int SELECT = 0x00000001;
+        int INSERT = 0x00000002;
+        int UPDATE = 0x00000004;
+        int INSERT_OR_UPDATE = INSERT | UPDATE;
+        int DELETE = 0x00000008;
+        int UPDATE_OR_DELETE = UPDATE | DELETE;
+        int INSERT_OR_UPDATE_OR_DELETE = INSERT | UPDATE | DELETE;
+        int FORCE_INSERT = 0x00000010 | INSERT;
+    }
+
+    public enum RootControl {NONE, INCLUDE_ROOT, IGNORE_ROOT,}
+
     private int type;
     private Object entity;
     private RootControl rootControl = RootControl.NONE;
@@ -54,19 +68,5 @@ public class Operation {
     public boolean isIgnoreRoot() {
         return rootControl == RootControl.IGNORE_ROOT;
     }
-
-    public interface Type {
-        int NONE = 0x00000000;
-        int SELECT = 0x00000001;
-        int INSERT = 0x00000002;
-        int UPDATE = 0x00000004;
-        int INSERT_OR_UPDATE = INSERT | UPDATE;
-        int DELETE = 0x00000008;
-        int UPDATE_OR_DELETE = UPDATE | DELETE;
-        int INSERT_OR_UPDATE_OR_DELETE = INSERT | UPDATE | DELETE;
-        int FORCE_INSERT = 0x00000010 | INSERT;
-    }
-
-    public enum RootControl {NONE, INCLUDE_ROOT, IGNORE_ROOT,}
 
 }

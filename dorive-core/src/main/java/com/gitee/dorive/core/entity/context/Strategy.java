@@ -26,8 +26,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Strategy {
 
-    private Query query;
-
     public enum Query {DEFAULT, SQL,}
+
+    private Query query;
 
 }

@@ -39,12 +39,12 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class DefaultExecutor extends AbstractExecutor implements EntityHandler {
+public class DefaultContextExecutor extends AbstractExecutor implements EntityHandler {
 
     private final AbstractContextRepository<?, ?> repository;
     private final EntityHandler entityHandler;
 
-    public DefaultExecutor(AbstractContextRepository<?, ?> repository, EntityHandler entityHandler) {
+    public DefaultContextExecutor(AbstractContextRepository<?, ?> repository, EntityHandler entityHandler) {
         this.repository = repository;
         this.entityHandler = entityHandler;
     }
