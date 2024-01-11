@@ -67,6 +67,12 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     }
 
     @Override
+    public E selectOneByExample(Context context, Example example) {
+        List<E> list = selectByExample(context, example);
+        return list != null && !list.isEmpty() ? list.get(0) : null;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByExample(Context context, Example example) {
         Assert.notNull(example, "The example cannot be null!");

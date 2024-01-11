@@ -35,6 +35,10 @@ public interface SelectorRepository<E, PK> extends QueryRepository<E, PK> {
         return selectByExample(new InnerContext(selector), example);
     }
 
+    default E selectOneByExample(Selector selector, Example example) {
+        return selectOneByExample(new InnerContext(selector), example);
+    }
+
     default Page<E> selectPageByExample(Selector selector, Example example) {
         return selectPageByExample(new InnerContext(selector), example);
     }

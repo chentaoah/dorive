@@ -40,6 +40,14 @@ public abstract class AbstractExampleRepository<E, PK> extends AbstractGenericRe
     }
 
     @Override
+    public E selectOneByExample(Context context, Example example) {
+        if (!(example instanceof InnerExample)) {
+            example = ExampleUtils.clone(example);
+        }
+        return super.selectOneByExample(context, example);
+    }
+
+    @Override
     public Page<E> selectPageByExample(Context context, Example example) {
         if (!(example instanceof InnerExample)) {
             example = ExampleUtils.clone(example);

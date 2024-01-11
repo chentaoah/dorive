@@ -50,6 +50,16 @@ public interface Repository<E, PK> {
     List<E> selectByExample(Context context, Example example);
 
     /**
+     * 根据条件，查询实体
+     * 如果存在多条记录，取第一条
+     *
+     * @param context 上下文
+     * @param example 条件
+     * @return 实体
+     */
+    E selectOneByExample(Context context, Example example);
+
+    /**
      * 根据条件，查询分页
      *
      * @param context 上下文
