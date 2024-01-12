@@ -37,7 +37,7 @@ import com.gitee.dorive.core.api.executor.FieldConverter;
 import com.gitee.dorive.core.config.RepositoryContext;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.converter.DefaultFieldConverter;
-import com.gitee.dorive.core.impl.executor.DefaultContextExecutor;
+import com.gitee.dorive.core.impl.executor.ContextExecutor;
 import com.gitee.dorive.core.impl.executor.FactoryExecutor;
 import com.gitee.dorive.core.impl.executor.FieldExecutor;
 import com.gitee.dorive.core.impl.factory.EntityFactoryBuilder;
@@ -120,7 +120,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setEntityDef(rootRepository.getEntityDef());
         setEntityEle(rootRepository.getEntityEle());
         setOperationFactory(rootRepository.getOperationFactory());
-        setExecutor(newDefaultContextExecutor());
+        setExecutor(newContextExecutor());
     }
 
     private CommonRepository newRepository(String accessPath, EntityEle entityEle) {
@@ -235,13 +235,13 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return null;
     }
 
-    private Executor newDefaultContextExecutor() {
+    private Executor newContextExecutor() {
         EntityHandler entityHandler = processEntityHandler(new BatchEntityHandler(this));
         derivedResolver = new DerivedResolver(this);
         if (derivedResolver.isDerived()) {
             entityHandler = new AdaptiveEntityHandler(this, entityHandler);
         }
-        return new DefaultContextExecutor(this, entityHandler);
+        return new ContextExecutor(this, entityHandler);
     }
 
     protected abstract EntityInfo resolveEntityInfo(EntityDef entityDef, EntityEle entityEle);
