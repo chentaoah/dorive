@@ -25,6 +25,11 @@ import com.gitee.dorive.core.api.executor.FieldConverter;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.executor.UnionExample;
+import com.gitee.dorive.core.entity.operation.Condition;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Query;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -33,18 +38,58 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class FieldExecutor extends AbstractExampleExecutor {
+public class ExampleExecutor extends AbstractProxyExecutor {
 
     private EntityEle entityEle;
     private Map<String, FieldConverter> converterMap;
 
-    public FieldExecutor(Executor executor, EntityEle entityEle, Map<String, FieldConverter> converterMap) {
+    public ExampleExecutor(Executor executor, EntityEle entityEle, Map<String, FieldConverter> converterMap) {
         super(executor);
         this.entityEle = entityEle;
         this.converterMap = converterMap;
     }
 
     @Override
+    public Result<Object> executeQuery(Context context, Query query) {
+        Example example = query.getExample();
+        if (example != null) {
+            if (example instanceof UnionExample) {
+                convert(context, (UnionExample) example);
+            } else {
+                convert(context, example);
+            }
+        }
+        return super.executeQuery(context, query);
+    }
+
+    @Override
+    public long executeCount(Context context, Query query) {
+        Example example = query.getExample();
+        if (example != null) {
+            convert(context, example);
+        }
+        return super.executeCount(context, query);
+    }
+
+    @Override
+    public int execute(Context context, Operation operation) {
+        if (operation instanceof Condition) {
+            Condition condition = (Condition) operation;
+            Example example = condition.getExample();
+            if (example != null) {
+                convert(context, example);
+            }
+        }
+        return super.execute(context, operation);
+    }
+
+    private void convert(Context context, UnionExample unionExample) {
+        List<Example> examples = unionExample.getExamples();
+        for (Example example : examples) {
+            convert(context, example);
+        }
+    }
+
     public void convert(Context context, Example example) {
         convertSelectProps(example);
         convertCriteria(context, example.getCriteria());

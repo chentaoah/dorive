@@ -39,7 +39,7 @@ import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.converter.DefaultFieldConverter;
 import com.gitee.dorive.core.impl.executor.ContextExecutor;
 import com.gitee.dorive.core.impl.executor.FactoryExecutor;
-import com.gitee.dorive.core.impl.executor.FieldExecutor;
+import com.gitee.dorive.core.impl.executor.ExampleExecutor;
 import com.gitee.dorive.core.impl.factory.EntityFactoryBuilder;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.handler.AdaptiveEntityHandler;
@@ -67,7 +67,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, InitializingBean {
 
     private static final Map<EntityEle, EntityInfo> ENTITY_INFO_MAP = new ConcurrentHashMap<>();
-    private static final Map<EntityEle, FieldExecutor> FIELD_EXECUTOR_MAP = new ConcurrentHashMap<>();
+    private static final Map<EntityEle, ExampleExecutor> EXAMPLE_EXECUTOR_MAP = new ConcurrentHashMap<>();
 
     private ApplicationContext applicationContext;
 
@@ -83,8 +83,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return ENTITY_INFO_MAP.get(entityEle);
     }
 
-    public static FieldExecutor getFieldExecutor(EntityEle entityEle) {
-        return FIELD_EXECUTOR_MAP.get(entityEle);
+    public static ExampleExecutor getExampleExecutor(EntityEle entityEle) {
+        return EXAMPLE_EXECUTOR_MAP.get(entityEle);
     }
 
     @Override
@@ -193,8 +193,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
             Executor executor = newExecutor(entityDef, entityEle);
             executor = new FactoryExecutor(executor, entityEle, entityFactory);
-            executor = new FieldExecutor(executor, entityEle, fieldConverterMap);
-            FIELD_EXECUTOR_MAP.put(entityEle, (FieldExecutor) executor);
+            executor = new ExampleExecutor(executor, entityEle, fieldConverterMap);
+            EXAMPLE_EXECUTOR_MAP.put(entityEle, (ExampleExecutor) executor);
             defaultRepository.setExecutor(executor);
         }
         return (AbstractRepository<Object, Object>) repository;
