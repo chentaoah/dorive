@@ -186,12 +186,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
             EntityInfo entityInfo = resolveEntityInfo(entityDef, entityEle);
             ENTITY_INFO_MAP.put(entityEle, entityInfo);
-            Map<String, FieldConverter> fieldConverterMap = newFieldConverterMap(entityEle);
 
-            Executor executor = newExecutor(entityDef, entityEle);
+            Map<String, FieldConverter> fieldConverterMap = newFieldConverterMap(entityEle);
             EntityFactoryBuilder entityFactoryBuilder = new EntityFactoryBuilder(this, entityInfo, fieldConverterMap);
             EntityFactory entityFactory = entityFactoryBuilder.build(entityDef, entityEle);
 
+            Executor executor = newExecutor(entityDef, entityEle);
             executor = new FactoryExecutor(executor, entityEle, entityFactory);
             executor = new FieldExecutor(executor, entityEle, fieldConverterMap);
             FIELD_EXECUTOR_MAP.put(entityEle, (FieldExecutor) executor);
