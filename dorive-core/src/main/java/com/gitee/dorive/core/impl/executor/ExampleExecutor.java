@@ -21,7 +21,7 @@ import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.api.executor.FieldConverter;
+import com.gitee.dorive.core.api.executor.FieldsMapper;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -34,19 +34,18 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.List;
-import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class ExampleExecutor extends AbstractProxyExecutor {
 
     private EntityEle entityEle;
-    private Map<String, FieldConverter> converterMap;
+    private FieldsMapper fieldsMapper;
 
-    public ExampleExecutor(Executor executor, EntityEle entityEle, Map<String, FieldConverter> converterMap) {
+    public ExampleExecutor(Executor executor, EntityEle entityEle, FieldsMapper fieldsMapper) {
         super(executor);
         this.entityEle = entityEle;
-        this.converterMap = converterMap;
+        this.fieldsMapper = fieldsMapper;
     }
 
     @Override
@@ -114,24 +113,22 @@ public class ExampleExecutor extends AbstractProxyExecutor {
                         convert(context, (Example) value);
                     }
                 } else {
-                    doConvertCriteria(context, criterion);
+                    doConvertCriteria(criterion);
                 }
             }
         }
     }
 
-    private void doConvertCriteria(Context context, Criterion criterion) {
+    private void doConvertCriteria(Criterion criterion) {
         String property = criterion.getProperty();
-        String alias = entityEle.toAlias(property);
-        criterion.setProperty(alias);
-
-        Object value = criterion.getValue();
-        if (converterMap != null && !converterMap.isEmpty()) {
-            FieldConverter fieldConverter = converterMap.get(property);
-            if (fieldConverter != null) {
-                Object mappedValue = fieldConverter.convert(context, criterion, value);
-                criterion.setValue(mappedValue);
-            }
+        String alias = fieldsMapper.fieldToAlias(property);
+        if (alias != null) {
+            criterion.setProperty(alias);
+        }
+        if (fieldsMapper.hasConverter()) {
+            Object value = criterion.getValue();
+            value = fieldsMapper.fieldToAlias(alias, value);
+            criterion.setValue(value);
         }
     }
 

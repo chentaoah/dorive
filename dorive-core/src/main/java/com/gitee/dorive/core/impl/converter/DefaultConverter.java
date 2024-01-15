@@ -20,26 +20,23 @@ package com.gitee.dorive.core.impl.converter;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.entity.def.FieldDef;
 import com.gitee.dorive.api.entity.element.EntityField;
-import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.executor.FieldConverter;
-import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.core.api.executor.Converter;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @Data
-public class DefaultFieldConverter implements FieldConverter {
+public class DefaultConverter implements Converter {
 
     private EntityField entityField;
     private Map<Object, Object> reMapping = Collections.emptyMap();
     private Map<Object, Object> deMapping = Collections.emptyMap();
 
-    public DefaultFieldConverter(EntityField entityField) {
+    public DefaultConverter(EntityField entityField) {
         this.entityField = entityField;
         FieldDef fieldDef = entityField.getFieldDef();
         Class<?> genericType = entityField.getGenericType();
@@ -67,32 +64,21 @@ public class DefaultFieldConverter implements FieldConverter {
     }
 
     @Override
-    public Object convert(Context context, Criterion criterion, Object value) {
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof List) {
-            List<?> list = (List<?>) value;
-            List<Object> newList = new ArrayList<>(list.size());
-            for (Object item : list) {
-                Object mapValue = deMapping.get(item);
-                if (mapValue != null) {
-                    newList.add(mapValue);
-                } else {
-                    newList.add(item);
-                }
-            }
-            return newList;
-        }
-        Object mapValue = deMapping.get(value);
-        if (mapValue != null) {
-            return mapValue;
-        }
-        return value;
+    public Object fieldToAlias(String alias, Object value) {
+        return deconstruct(value);
     }
 
     @Override
-    public Object reconstitute(String name, Object value) {
+    public Object aliasToField(String field, Object value) {
+        return reconstitute(value);
+    }
+
+    @Override
+    public Object fieldToProp(String prop, Object value) {
+        return deconstruct(value);
+    }
+
+    private Object reconstitute(Object value) {
         if (value == null) {
             return null;
         }
@@ -103,8 +89,7 @@ public class DefaultFieldConverter implements FieldConverter {
         return value;
     }
 
-    @Override
-    public Object deconstruct(String name, Object value) {
+    private Object deconstruct(Object value) {
         if (value == null) {
             return null;
         }

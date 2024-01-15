@@ -21,13 +21,11 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.executor.FieldConverter;
 import com.gitee.dorive.core.api.executor.EntityFactory;
+import com.gitee.dorive.core.api.executor.FieldsMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -36,36 +34,27 @@ public class DefaultEntityFactory implements EntityFactory {
 
     private EntityEle entityEle;
     private Class<?> pojoClass;
-
-    private Map<String, String> aliasFieldMapping;
-    private Map<String, FieldConverter> fieldConverterMap;
+    private FieldsMapper fieldsMapper;
     private CopyOptions reCopyOptions;
-
-    private Map<String, String> fieldPropMapping;
-    private Map<String, FieldConverter> propConverterMap;
     private CopyOptions deCopyOptions;
 
-    public void newReCopyOptions(Map<String, String> aliasFieldMapping, Map<String, FieldConverter> fieldConverterMap) {
-        this.aliasFieldMapping = aliasFieldMapping;
-        this.fieldConverterMap = fieldConverterMap;
-        this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(aliasFieldMapping::get);
-        if (fieldConverterMap != null && !fieldConverterMap.isEmpty()) {
-            this.reCopyOptions.setFieldValueEditor((name, value) -> {
-                FieldConverter fieldConverter = fieldConverterMap.get(name);
-                return fieldConverter != null ? fieldConverter.reconstitute(name, value) : value;
-            });
+    public void setFieldsMapper(FieldsMapper fieldsMapper) {
+        this.fieldsMapper = fieldsMapper;
+        initReCopyOptions();
+        initDeCopyOptions();
+    }
+
+    private void initReCopyOptions() {
+        this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(fieldsMapper::aliasToField);
+        if (fieldsMapper.hasConverter()) {
+            this.reCopyOptions.setFieldValueEditor((field, value) -> fieldsMapper.aliasToField(field, value));
         }
     }
 
-    public void newDeCopyOptions(Map<String, String> fieldPropMapping, Map<String, FieldConverter> propConverterMap) {
-        this.fieldPropMapping = fieldPropMapping;
-        this.propConverterMap = propConverterMap;
-        this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(fieldPropMapping::get);
-        if (propConverterMap != null && !propConverterMap.isEmpty()) {
-            this.deCopyOptions.setFieldValueEditor((name, value) -> {
-                FieldConverter fieldConverter = propConverterMap.get(name);
-                return fieldConverter != null ? fieldConverter.deconstruct(name, value) : value;
-            });
+    private void initDeCopyOptions() {
+        this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(fieldsMapper::fieldToProp);
+        if (fieldsMapper.hasConverter()) {
+            this.deCopyOptions.setFieldValueEditor((prop, value) -> fieldsMapper.fieldToProp(prop, value));
         }
     }
 

@@ -19,13 +19,10 @@ package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
-import com.gitee.dorive.api.entity.def.FieldDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.api.entity.element.EntityField;
 import com.gitee.dorive.api.entity.element.EntityType;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.api.impl.resolver.PropChainResolver;
@@ -33,19 +30,19 @@ import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.executor.EntityFactory;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.api.executor.FieldConverter;
+import com.gitee.dorive.core.api.executor.FieldsMapper;
 import com.gitee.dorive.core.config.RepositoryContext;
 import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.impl.converter.DefaultFieldConverter;
 import com.gitee.dorive.core.impl.executor.ContextExecutor;
-import com.gitee.dorive.core.impl.executor.FactoryExecutor;
 import com.gitee.dorive.core.impl.executor.ExampleExecutor;
-import com.gitee.dorive.core.impl.factory.EntityFactoryBuilder;
+import com.gitee.dorive.core.impl.executor.FactoryExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DerivedResolver;
+import com.gitee.dorive.core.impl.resolver.EntityFactoryResolver;
+import com.gitee.dorive.core.impl.resolver.FieldsMapperResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -187,42 +184,19 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityInfo entityInfo = resolveEntityInfo(entityDef, entityEle);
             ENTITY_INFO_MAP.put(entityEle, entityInfo);
 
-            Map<String, FieldConverter> fieldConverterMap = newFieldConverterMap(entityEle);
-            EntityFactoryBuilder entityFactoryBuilder = new EntityFactoryBuilder(this, entityInfo, fieldConverterMap);
-            EntityFactory entityFactory = entityFactoryBuilder.build(entityDef, entityEle);
+            FieldsMapperResolver fieldsMapperResolver = new FieldsMapperResolver(entityEle, entityInfo);
+            FieldsMapper fieldsMapper = fieldsMapperResolver.resolve();
+
+            EntityFactoryResolver entityFactoryResolver = new EntityFactoryResolver(this, entityInfo, fieldsMapper);
+            EntityFactory entityFactory = entityFactoryResolver.resolve(entityDef, entityEle);
 
             Executor executor = newExecutor(entityDef, entityEle);
             executor = new FactoryExecutor(executor, entityEle, entityFactory);
-            executor = new ExampleExecutor(executor, entityEle, fieldConverterMap);
+            executor = new ExampleExecutor(executor, entityEle, fieldsMapper);
             EXAMPLE_EXECUTOR_MAP.put(entityEle, (ExampleExecutor) executor);
             defaultRepository.setExecutor(executor);
         }
         return (AbstractRepository<Object, Object>) repository;
-    }
-
-    private Map<String, FieldConverter> newFieldConverterMap(EntityEle entityEle) {
-        Map<String, FieldConverter> converterMap = new LinkedHashMap<>(8);
-        Map<String, EntityField> entityFieldMap = entityEle.getEntityFieldMap();
-        if (entityFieldMap != null) {
-            entityFieldMap.forEach((name, entityField) -> {
-                FieldDef fieldDef = entityField.getFieldDef();
-                if (fieldDef != null) {
-                    Class<?> converterClass = fieldDef.getConverter();
-                    String mapExp = fieldDef.getMapExp();
-                    FieldConverter fieldConverter = null;
-                    if (converterClass != Object.class) {
-                        fieldConverter = (FieldConverter) ReflectUtil.newInstance(converterClass);
-
-                    } else if (StringUtils.isNotBlank(mapExp)) {
-                        fieldConverter = new DefaultFieldConverter(entityField);
-                    }
-                    if (fieldConverter != null) {
-                        converterMap.put(name, fieldConverter);
-                    }
-                }
-            });
-        }
-        return converterMap;
     }
 
     private OrderBy newDefaultOrderBy(EntityDef entityDef) {

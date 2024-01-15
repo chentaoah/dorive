@@ -17,15 +17,12 @@
 
 package com.gitee.dorive.core.api.executor;
 
-import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.Criterion;
+public interface Converter {
 
-public interface FieldConverter {
+    Object fieldToAlias(String alias, Object value);
 
-    Object convert(Context context, Criterion criterion, Object value);
+    Object aliasToField(String field, Object value);
 
-    Object reconstitute(String name, Object value);
-
-    Object deconstruct(String name, Object value);
+    Object fieldToProp(String prop, Object value);
 
 }
