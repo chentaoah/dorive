@@ -72,10 +72,10 @@ public class EntityMapperResolver {
     }
 
     private Map<String, Converter> newFieldConverterMap() {
-        Map<String, Converter> converterMap = new LinkedHashMap<>(8);
+        Map<String, Converter> fieldConverterMap = new LinkedHashMap<>(8);
         Map<String, EntityField> entityFieldMap = entityEle.getEntityFieldMap();
         if (entityFieldMap != null) {
-            entityFieldMap.forEach((name, entityField) -> {
+            entityFieldMap.forEach((field, entityField) -> {
                 FieldDef fieldDef = entityField.getFieldDef();
                 if (fieldDef != null) {
                     Class<?> converterClass = fieldDef.getConverter();
@@ -88,12 +88,12 @@ public class EntityMapperResolver {
                         converter = new DefaultConverter(entityField);
                     }
                     if (converter != null) {
-                        converterMap.put(name, converter);
+                        fieldConverterMap.put(field, converter);
                     }
                 }
             });
         }
-        return converterMap;
+        return fieldConverterMap;
     }
 
     private Map<String, Converter> newAliasConverterMap(Map<String, String> fieldAliasMapping, Map<String, Converter> fieldConverterMap) {
