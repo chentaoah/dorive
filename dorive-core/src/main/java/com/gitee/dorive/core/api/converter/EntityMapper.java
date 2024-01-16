@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.executor;
+package com.gitee.dorive.core.api.converter;
 
-public interface FieldsMapper extends Converter {
+public interface EntityMapper extends Converter {
 
     String fieldToAlias(String field);
 

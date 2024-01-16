@@ -21,10 +21,10 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.api.entity.def.FieldDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.api.entity.element.EntityField;
-import com.gitee.dorive.core.api.executor.Converter;
-import com.gitee.dorive.core.api.executor.FieldsMapper;
+import com.gitee.dorive.core.api.converter.Converter;
+import com.gitee.dorive.core.api.converter.EntityMapper;
 import com.gitee.dorive.core.impl.converter.DefaultConverter;
-import com.gitee.dorive.core.impl.converter.DefaultFieldsMapper;
+import com.gitee.dorive.core.impl.converter.DefaultEntityMapper;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,13 +36,13 @@ import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
-public class FieldsMapperResolver {
+public class EntityMapperResolver {
 
     private EntityEle entityEle;
     private AbstractContextRepository.EntityInfo entityInfo;
 
-    public FieldsMapper resolve() {
-        Map<String, String> fieldAliasMapping = entityEle.getFieldAliasMap();
+    public EntityMapper resolve() {
+        Map<String, String> fieldAliasMapping = entityEle.getFieldAliasMapping();
         Map<String, String> aliasFieldMapping = newAliasFieldMapping(fieldAliasMapping);
         Map<String, String> fieldPropMapping = newFieldPropMapping(aliasFieldMapping);
 
@@ -50,7 +50,7 @@ public class FieldsMapperResolver {
         Map<String, Converter> aliasConverterMap = newAliasConverterMap(fieldAliasMapping, fieldConverterMap);
         Map<String, Converter> propConverterMap = newPropConverterMap(fieldPropMapping, fieldConverterMap);
 
-        return new DefaultFieldsMapper(fieldAliasMapping, aliasFieldMapping, fieldPropMapping,
+        return new DefaultEntityMapper(fieldAliasMapping, aliasFieldMapping, fieldPropMapping,
                 fieldConverterMap, aliasConverterMap, propConverterMap);
     }
 

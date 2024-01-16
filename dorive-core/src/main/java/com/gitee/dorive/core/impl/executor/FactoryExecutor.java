@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.executor;
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.executor.EntityFactory;
+import com.gitee.dorive.core.api.converter.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.core.entity.operation.Insert;

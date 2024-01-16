@@ -27,22 +27,22 @@ import com.gitee.dorive.api.entity.element.EntityType;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
-import com.gitee.dorive.core.api.executor.EntityFactory;
+import com.gitee.dorive.core.api.converter.EntityFactory;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.api.executor.FieldsMapper;
+import com.gitee.dorive.core.api.converter.EntityMapper;
 import com.gitee.dorive.core.config.RepositoryContext;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.executor.ContextExecutor;
 import com.gitee.dorive.core.impl.executor.ExampleExecutor;
 import com.gitee.dorive.core.impl.executor.FactoryExecutor;
+import com.gitee.dorive.core.impl.converter.DefaultEntityFactory;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DerivedResolver;
-import com.gitee.dorive.core.impl.resolver.EntityFactoryResolver;
-import com.gitee.dorive.core.impl.resolver.FieldsMapperResolver;
+import com.gitee.dorive.core.impl.resolver.EntityMapperResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -184,19 +184,33 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityInfo entityInfo = resolveEntityInfo(entityDef, entityEle);
             ENTITY_INFO_MAP.put(entityEle, entityInfo);
 
-            FieldsMapperResolver fieldsMapperResolver = new FieldsMapperResolver(entityEle, entityInfo);
-            FieldsMapper fieldsMapper = fieldsMapperResolver.resolve();
-
-            EntityFactoryResolver entityFactoryResolver = new EntityFactoryResolver(this, entityInfo, fieldsMapper);
-            EntityFactory entityFactory = entityFactoryResolver.resolve(entityDef, entityEle);
+            EntityMapper entityMapper = new EntityMapperResolver(entityEle, entityInfo).resolve();
+            EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, entityInfo, entityMapper);
 
             Executor executor = newExecutor(entityDef, entityEle);
             executor = new FactoryExecutor(executor, entityEle, entityFactory);
-            executor = new ExampleExecutor(executor, entityEle, fieldsMapper);
+            executor = new ExampleExecutor(executor, entityEle, entityMapper);
             EXAMPLE_EXECUTOR_MAP.put(entityEle, (ExampleExecutor) executor);
             defaultRepository.setExecutor(executor);
         }
         return (AbstractRepository<Object, Object>) repository;
+    }
+
+    private EntityFactory newEntityFactory(EntityDef entityDef, EntityEle entityEle, EntityInfo entityInfo, EntityMapper entityMapper) {
+        Class<?> factoryClass = entityDef.getFactory();
+        EntityFactory entityFactory;
+        if (factoryClass == Object.class) {
+            entityFactory = new DefaultEntityFactory();
+        } else {
+            entityFactory = (EntityFactory) applicationContext.getBean(factoryClass);
+        }
+        if (entityFactory instanceof DefaultEntityFactory) {
+            DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
+            defaultEntityFactory.setEntityEle(entityEle);
+            defaultEntityFactory.setPojoClass(entityInfo.getPojoClass());
+            defaultEntityFactory.setEntityMapper(entityMapper);
+        }
+        return entityFactory;
     }
 
     private OrderBy newDefaultOrderBy(EntityDef entityDef) {

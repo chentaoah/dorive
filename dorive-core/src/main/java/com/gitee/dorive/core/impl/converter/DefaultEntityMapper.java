@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.core.impl.converter;
 
-import com.gitee.dorive.core.api.executor.Converter;
-import com.gitee.dorive.core.api.executor.FieldsMapper;
+import com.gitee.dorive.core.api.converter.Converter;
+import com.gitee.dorive.core.api.converter.EntityMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -28,7 +28,7 @@ import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class DefaultFieldsMapper implements FieldsMapper {
+public class DefaultEntityMapper implements EntityMapper {
 
     private Map<String, String> fieldAliasMapping;
     private Map<String, String> aliasFieldMapping;

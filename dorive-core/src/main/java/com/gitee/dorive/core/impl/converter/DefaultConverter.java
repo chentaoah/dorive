@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.converter;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.entity.def.FieldDef;
 import com.gitee.dorive.api.entity.element.EntityField;
-import com.gitee.dorive.core.api.executor.Converter;
+import com.gitee.dorive.core.api.converter.Converter;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 

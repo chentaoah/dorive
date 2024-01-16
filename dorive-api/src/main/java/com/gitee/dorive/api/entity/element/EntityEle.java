@@ -38,7 +38,7 @@ public abstract class EntityEle {
     private boolean aggregated;
     private List<BindingDef> bindingDefs;
     private PropProxy pkProxy;
-    private Map<String, String> fieldAliasMap;
+    private Map<String, String> fieldAliasMapping;
 
     public EntityEle(AnnotatedElement element) {
         this.element = element;
@@ -62,11 +62,11 @@ public abstract class EntityEle {
     }
 
     public boolean hasField(String field) {
-        return fieldAliasMap.containsKey(field);
+        return fieldAliasMapping.containsKey(field);
     }
 
     public String toAlias(String field) {
-        return fieldAliasMap.getOrDefault(field, field);
+        return fieldAliasMapping.getOrDefault(field, field);
     }
 
     public List<String> toAliases(List<String> fields) {

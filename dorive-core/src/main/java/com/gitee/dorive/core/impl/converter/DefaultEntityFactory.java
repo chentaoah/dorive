@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.factory;
+package com.gitee.dorive.core.impl.converter;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.executor.EntityFactory;
-import com.gitee.dorive.core.api.executor.FieldsMapper;
+import com.gitee.dorive.core.api.converter.EntityFactory;
+import com.gitee.dorive.core.api.converter.EntityMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,27 +34,27 @@ public class DefaultEntityFactory implements EntityFactory {
 
     private EntityEle entityEle;
     private Class<?> pojoClass;
-    private FieldsMapper fieldsMapper;
+    private EntityMapper entityMapper;
     private CopyOptions reCopyOptions;
     private CopyOptions deCopyOptions;
 
-    public void setFieldsMapper(FieldsMapper fieldsMapper) {
-        this.fieldsMapper = fieldsMapper;
+    public void setEntityMapper(EntityMapper entityMapper) {
+        this.entityMapper = entityMapper;
         initReCopyOptions();
         initDeCopyOptions();
     }
 
     private void initReCopyOptions() {
-        this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(fieldsMapper::aliasToField);
-        if (fieldsMapper.hasConverter()) {
-            this.reCopyOptions.setFieldValueEditor((field, value) -> fieldsMapper.aliasToField(field, value));
+        this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(entityMapper::aliasToField);
+        if (entityMapper.hasConverter()) {
+            this.reCopyOptions.setFieldValueEditor((field, value) -> entityMapper.aliasToField(field, value));
         }
     }
 
     private void initDeCopyOptions() {
-        this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(fieldsMapper::fieldToProp);
-        if (fieldsMapper.hasConverter()) {
-            this.deCopyOptions.setFieldValueEditor((prop, value) -> fieldsMapper.fieldToProp(prop, value));
+        this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(entityMapper::fieldToProp);
+        if (entityMapper.hasConverter()) {
+            this.deCopyOptions.setFieldValueEditor((prop, value) -> entityMapper.fieldToProp(prop, value));
         }
     }
 

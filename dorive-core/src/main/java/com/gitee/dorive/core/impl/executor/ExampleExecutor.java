@@ -21,7 +21,7 @@ import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.api.executor.FieldsMapper;
+import com.gitee.dorive.core.api.converter.EntityMapper;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -40,12 +40,12 @@ import java.util.List;
 public class ExampleExecutor extends AbstractProxyExecutor {
 
     private EntityEle entityEle;
-    private FieldsMapper fieldsMapper;
+    private EntityMapper entityMapper;
 
-    public ExampleExecutor(Executor executor, EntityEle entityEle, FieldsMapper fieldsMapper) {
+    public ExampleExecutor(Executor executor, EntityEle entityEle, EntityMapper entityMapper) {
         super(executor);
         this.entityEle = entityEle;
-        this.fieldsMapper = fieldsMapper;
+        this.entityMapper = entityMapper;
     }
 
     @Override
@@ -121,13 +121,13 @@ public class ExampleExecutor extends AbstractProxyExecutor {
 
     private void doConvertCriteria(Criterion criterion) {
         String property = criterion.getProperty();
-        String alias = fieldsMapper.fieldToAlias(property);
+        String alias = entityMapper.fieldToAlias(property);
         if (alias != null) {
             criterion.setProperty(alias);
         }
-        if (fieldsMapper.hasConverter()) {
+        if (entityMapper.hasConverter()) {
             Object value = criterion.getValue();
-            value = fieldsMapper.fieldToAlias(alias, value);
+            value = entityMapper.fieldToAlias(alias, value);
             criterion.setValue(value);
         }
     }
