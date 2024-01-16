@@ -63,22 +63,7 @@ public class DefaultConverter implements Converter {
         }
     }
 
-    @Override
-    public Object fieldToAlias(String alias, Object value) {
-        return deconstruct(value);
-    }
-
-    @Override
-    public Object aliasToField(String field, Object value) {
-        return reconstitute(value);
-    }
-
-    @Override
-    public Object fieldToProp(String prop, Object value) {
-        return deconstruct(value);
-    }
-
-    private Object reconstitute(Object value) {
+    public Object reconstitute(Object value) {
         if (value == null) {
             return null;
         }
@@ -89,7 +74,7 @@ public class DefaultConverter implements Converter {
         return value;
     }
 
-    private Object deconstruct(Object value) {
+    public Object deconstruct(Object value) {
         if (value == null) {
             return null;
         }

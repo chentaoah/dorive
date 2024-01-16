@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.api.converter;
 
-public interface EntityMapper extends Converter {
+public interface EntityMapper {
 
     String fieldToAlias(String field);
 
@@ -26,5 +26,11 @@ public interface EntityMapper extends Converter {
     String fieldToProp(String field);
 
     boolean hasConverter();
+
+    Object fieldToAlias(String alias, Object value);
+
+    Object aliasToField(String field, Object value);
+
+    Object fieldToProp(String prop, Object value);
 
 }

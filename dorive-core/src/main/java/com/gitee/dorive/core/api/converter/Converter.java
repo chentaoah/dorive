@@ -19,10 +19,8 @@ package com.gitee.dorive.core.api.converter;
 
 public interface Converter {
 
-    Object fieldToAlias(String alias, Object value);
+    Object reconstitute(Object value);
 
-    Object aliasToField(String field, Object value);
-
-    Object fieldToProp(String prop, Object value);
+    Object deconstruct(Object value);
 
 }

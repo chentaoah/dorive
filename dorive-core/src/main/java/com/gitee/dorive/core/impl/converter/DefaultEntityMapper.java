@@ -65,7 +65,7 @@ public class DefaultEntityMapper implements EntityMapper {
                 List<?> list = (List<?>) value;
                 List<Object> newList = new ArrayList<>(list.size());
                 for (Object item : list) {
-                    Object mapValue = converter.fieldToAlias(alias, item);
+                    Object mapValue = converter.deconstruct(item);
                     if (mapValue != null) {
                         newList.add(mapValue);
                     } else {
@@ -75,7 +75,7 @@ public class DefaultEntityMapper implements EntityMapper {
                 return newList;
 
             } else {
-                Object mapValue = converter.fieldToAlias(alias, value);
+                Object mapValue = converter.deconstruct(value);
                 if (mapValue != null) {
                     return mapValue;
                 }
@@ -87,13 +87,13 @@ public class DefaultEntityMapper implements EntityMapper {
     @Override
     public Object aliasToField(String field, Object value) {
         Converter converter = fieldConverterMap.get(field);
-        return converter != null ? converter.aliasToField(field, value) : value;
+        return converter != null ? converter.reconstitute(value) : value;
     }
 
     @Override
     public Object fieldToProp(String prop, Object value) {
         Converter converter = propConverterMap.get(prop);
-        return converter != null ? converter.fieldToProp(prop, value) : value;
+        return converter != null ? converter.deconstruct(value) : value;
     }
 
 }
