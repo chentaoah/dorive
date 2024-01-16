@@ -27,7 +27,7 @@ import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.entity.common.EntityInfo;
+import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.context.Strategy;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;
@@ -69,7 +69,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected EntityInfo resolveEntityInfo(EntityDef entityDef, EntityEle entityEle) {
+    protected EntityStoreInfo resolveEntityStoreInfo(EntityDef entityDef, EntityEle entityEle) {
         Class<?> mapperClass = entityDef.getSource();
         if (mapperClass != Object.class) {
             mapper = (BaseMapper<Object>) getApplicationContext().getBean(mapperClass);
@@ -89,7 +89,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
         Assert.notNull(tableInfo, "The table info cannot be null! source: {}", mapperClass);
         String tableName = tableInfo != null ? tableInfo.getTableName() : null;
         Map<String, String> propAliasMapping = getPropAliasMapping();
-        return new EntityInfo(pojoClass, tableName, propAliasMapping);
+        return new EntityStoreInfo(pojoClass, tableName, propAliasMapping);
     }
 
     private Map<String, String> getPropAliasMapping() {

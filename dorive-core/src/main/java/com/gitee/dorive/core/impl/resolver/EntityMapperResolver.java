@@ -23,7 +23,7 @@ import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.api.entity.element.EntityField;
 import com.gitee.dorive.core.api.converter.Converter;
 import com.gitee.dorive.core.api.converter.EntityMapper;
-import com.gitee.dorive.core.entity.common.EntityInfo;
+import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.impl.converter.DefaultConverter;
 import com.gitee.dorive.core.impl.converter.DefaultEntityMapper;
 import lombok.AllArgsConstructor;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 public class EntityMapperResolver {
 
     private EntityEle entityEle;
-    private EntityInfo entityInfo;
+    private EntityStoreInfo entityStoreInfo;
 
     public EntityMapper resolve() {
         Map<String, String> fieldAliasMapping = entityEle.getFieldAliasMapping();
@@ -60,7 +60,7 @@ public class EntityMapperResolver {
 
     private Map<String, String> newFieldPropMapping(Map<String, String> aliasFieldMapping) {
         Map<String, String> fieldPropMapping = new LinkedHashMap<>();
-        Map<String, String> propAliasMapping = entityInfo.getPropAliasMapping();
+        Map<String, String> propAliasMapping = entityStoreInfo.getPropAliasMapping();
         propAliasMapping.forEach((prop, alias) -> {
             String field = aliasFieldMapping.get(alias);
             if (field != null) {

@@ -24,7 +24,7 @@ import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class EntityInfo {
+public class EntityStoreInfo {
     private Class<?> pojoClass;
     private String tableName;
     private Map<String, String> propAliasMapping;

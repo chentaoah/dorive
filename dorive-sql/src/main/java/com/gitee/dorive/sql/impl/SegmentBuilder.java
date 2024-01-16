@@ -20,7 +20,7 @@ package com.gitee.dorive.sql.impl;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.common.EntityInfo;
+import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
@@ -65,10 +65,10 @@ public class SegmentBuilder {
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
             EntityEle entityEle = executedRepository.getEntityEle();
-            EntityInfo entityInfo = AbstractContextRepository.getEntityInfo(entityEle);
+            EntityStoreInfo entityStoreInfo = AbstractContextRepository.getEntityStoreInfo(entityEle);
             ExampleExecutor exampleExecutor = AbstractContextRepository.getExampleExecutor(entityEle);
 
-            String tableName = entityInfo.getTableName();
+            String tableName = entityStoreInfo.getTableName();
             String tableAlias = selectSegment.generateTableAlias();
             Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample(Collections.emptyList()));
             exampleExecutor.convert(context, example);

@@ -32,7 +32,7 @@ import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.converter.EntityMapper;
 import com.gitee.dorive.core.config.RepositoryContext;
-import com.gitee.dorive.core.entity.common.EntityInfo;
+import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.impl.executor.ContextExecutor;
 import com.gitee.dorive.core.impl.executor.ExampleExecutor;
@@ -63,7 +63,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @EqualsAndHashCode(callSuper = false)
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, InitializingBean {
 
-    private static final Map<EntityEle, EntityInfo> ENTITY_INFO_MAP = new ConcurrentHashMap<>();
+    private static final Map<EntityEle, EntityStoreInfo> ENTITY_STORE_INFO_MAP = new ConcurrentHashMap<>();
     private static final Map<EntityEle, ExampleExecutor> EXAMPLE_EXECUTOR_MAP = new ConcurrentHashMap<>();
 
     private ApplicationContext applicationContext;
@@ -76,8 +76,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     private List<CommonRepository> subRepositories = new ArrayList<>();
     private List<CommonRepository> orderedRepositories = new ArrayList<>();
 
-    public static EntityInfo getEntityInfo(EntityEle entityEle) {
-        return ENTITY_INFO_MAP.get(entityEle);
+    public static EntityStoreInfo getEntityStoreInfo(EntityEle entityEle) {
+        return ENTITY_STORE_INFO_MAP.get(entityEle);
     }
 
     public static ExampleExecutor getExampleExecutor(EntityEle entityEle) {
@@ -181,11 +181,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultRepository.setEntityEle(entityEle);
             defaultRepository.setOperationFactory(operationFactory);
 
-            EntityInfo entityInfo = resolveEntityInfo(entityDef, entityEle);
-            ENTITY_INFO_MAP.put(entityEle, entityInfo);
+            EntityStoreInfo entityStoreInfo = resolveEntityStoreInfo(entityDef, entityEle);
+            ENTITY_STORE_INFO_MAP.put(entityEle, entityStoreInfo);
 
-            EntityMapper entityMapper = new EntityMapperResolver(entityEle, entityInfo).resolve();
-            EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, entityInfo, entityMapper);
+            EntityMapper entityMapper = new EntityMapperResolver(entityEle, entityStoreInfo).resolve();
+            EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, entityStoreInfo, entityMapper);
 
             Executor executor = newExecutor(entityDef, entityEle);
             executor = new FactoryExecutor(executor, entityEle, entityFactory);
@@ -196,7 +196,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return (AbstractRepository<Object, Object>) repository;
     }
 
-    private EntityFactory newEntityFactory(EntityDef entityDef, EntityEle entityEle, EntityInfo entityInfo, EntityMapper entityMapper) {
+    private EntityFactory newEntityFactory(EntityDef entityDef, EntityEle entityEle, EntityStoreInfo entityStoreInfo, EntityMapper entityMapper) {
         Class<?> factoryClass = entityDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
@@ -207,7 +207,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         if (entityFactory instanceof DefaultEntityFactory) {
             DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
             defaultEntityFactory.setEntityEle(entityEle);
-            defaultEntityFactory.setPojoClass(entityInfo.getPojoClass());
+            defaultEntityFactory.setPojoClass(entityStoreInfo.getPojoClass());
             defaultEntityFactory.setEntityMapper(entityMapper);
         }
         return entityFactory;
@@ -232,7 +232,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return new ContextExecutor(this, entityHandler);
     }
 
-    protected abstract EntityInfo resolveEntityInfo(EntityDef entityDef, EntityEle entityEle);
+    protected abstract EntityStoreInfo resolveEntityStoreInfo(EntityDef entityDef, EntityEle entityEle);
 
     protected abstract Executor newExecutor(EntityDef entityDef, EntityEle entityEle);
 
