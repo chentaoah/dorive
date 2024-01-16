@@ -32,7 +32,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -55,7 +54,9 @@ public class EntityMapperResolver {
     }
 
     private Map<String, String> newAliasFieldMapping(Map<String, String> fieldAliasMapping) {
-        return fieldAliasMapping.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+        Map<String, String> aliasFieldMapping = new LinkedHashMap<>();
+        fieldAliasMapping.forEach((field, alias) -> aliasFieldMapping.put(alias, field));
+        return aliasFieldMapping;
     }
 
     private Map<String, String> newFieldPropMapping(Map<String, String> aliasFieldMapping) {
