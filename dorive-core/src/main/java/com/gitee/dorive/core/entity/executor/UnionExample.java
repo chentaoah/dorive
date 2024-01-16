@@ -37,10 +37,10 @@ public class UnionExample extends Example {
     }
 
     @Override
-    public void select(List<String> properties) {
+    public void select(List<String> fields) {
         if (examples != null && !examples.isEmpty()) {
             for (Example example : examples) {
-                example.select(properties);
+                example.select(fields);
             }
         }
     }
