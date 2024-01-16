@@ -124,6 +124,8 @@ public class ExampleExecutor extends AbstractProxyExecutor {
         String alias = entityMapper.fieldToAlias(property);
         if (alias != null) {
             criterion.setProperty(alias);
+        } else {
+            alias = property;
         }
         if (entityMapper.hasConverter()) {
             Object value = criterion.getValue();

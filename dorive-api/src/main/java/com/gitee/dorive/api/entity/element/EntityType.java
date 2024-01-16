@@ -91,21 +91,21 @@ public class EntityType extends EntityEle {
         Class<?> genericType = getGenericType();
         int initialCapacity = entityFieldMap.size() * 4 / 3 + 1;
         PropProxy pkProxy = null;
-        Map<String, String> propAliasMap = new LinkedHashMap<>(initialCapacity);
+        Map<String, String> fieldAliasMapping = new LinkedHashMap<>(initialCapacity);
 
         for (EntityField entityField : entityFieldMap.values()) {
-            String name = entityField.getName();
+            String field = entityField.getName();
             FieldDef fieldDef = entityField.getFieldDef();
-            if ("id".equals(name)) {
+            if ("id".equals(field)) {
                 pkProxy = PropProxyFactory.newPropProxy(genericType, "id");
             }
-            String alias = fieldDef != null ? fieldDef.getAlias() : StrUtil.toUnderlineCase(name);
-            propAliasMap.put(name, alias);
+            String alias = fieldDef != null ? fieldDef.getAlias() : StrUtil.toUnderlineCase(field);
+            fieldAliasMapping.put(field, alias);
         }
 
         Assert.notNull(pkProxy, "The primary key not found! type: {}", genericType.getName());
         setPkProxy(pkProxy);
-        setFieldAliasMapping(propAliasMap);
+        setFieldAliasMapping(fieldAliasMapping);
     }
 
     @Override
