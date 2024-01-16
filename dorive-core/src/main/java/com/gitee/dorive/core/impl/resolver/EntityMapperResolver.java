@@ -23,9 +23,9 @@ import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.api.entity.element.EntityField;
 import com.gitee.dorive.core.api.converter.Converter;
 import com.gitee.dorive.core.api.converter.EntityMapper;
+import com.gitee.dorive.core.entity.common.EntityInfo;
 import com.gitee.dorive.core.impl.converter.DefaultConverter;
 import com.gitee.dorive.core.impl.converter.DefaultEntityMapper;
-import com.gitee.dorive.core.repository.AbstractContextRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 public class EntityMapperResolver {
 
     private EntityEle entityEle;
-    private AbstractContextRepository.EntityInfo entityInfo;
+    private EntityInfo entityInfo;
 
     public EntityMapper resolve() {
         Map<String, String> fieldAliasMapping = entityEle.getFieldAliasMapping();

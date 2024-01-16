@@ -27,6 +27,7 @@ import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.entity.common.EntityInfo;
 import com.gitee.dorive.core.entity.context.Strategy;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;

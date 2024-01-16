@@ -20,6 +20,7 @@ package com.gitee.dorive.sql.impl;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.common.EntityInfo;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
@@ -64,7 +65,7 @@ public class SegmentBuilder {
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
             EntityEle entityEle = executedRepository.getEntityEle();
-            AbstractContextRepository.EntityInfo entityInfo = AbstractContextRepository.getEntityInfo(entityEle);
+            EntityInfo entityInfo = AbstractContextRepository.getEntityInfo(entityEle);
             ExampleExecutor exampleExecutor = AbstractContextRepository.getExampleExecutor(entityEle);
 
             String tableName = entityInfo.getTableName();
