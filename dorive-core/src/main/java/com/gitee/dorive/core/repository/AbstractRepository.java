@@ -68,8 +68,8 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
 
     @Override
     public E selectOneByExample(Context context, Example example) {
-        List<E> list = selectByExample(context, example);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
+        List<E> entities = selectByExample(context, example);
+        return entities != null && !entities.isEmpty() ? entities.get(0) : null;
     }
 
     @Override
