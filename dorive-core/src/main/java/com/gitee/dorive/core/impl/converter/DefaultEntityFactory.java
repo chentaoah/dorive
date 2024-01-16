@@ -23,6 +23,7 @@ import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.converter.EntityFactory;
 import com.gitee.dorive.core.api.converter.EntityMapper;
+import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,7 +34,7 @@ import lombok.NoArgsConstructor;
 public class DefaultEntityFactory implements EntityFactory {
 
     private EntityEle entityEle;
-    private Class<?> pojoClass;
+    private EntityStoreInfo entityStoreInfo;
     private EntityMapper entityMapper;
     private CopyOptions reCopyOptions;
     private CopyOptions deCopyOptions;
@@ -65,7 +66,7 @@ public class DefaultEntityFactory implements EntityFactory {
 
     @Override
     public Object deconstruct(Context context, Object entity) {
-        return BeanUtil.toBean(entity, pojoClass, deCopyOptions);
+        return BeanUtil.toBean(entity, entityStoreInfo.getPojoClass(), deCopyOptions);
     }
 
 }

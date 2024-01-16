@@ -207,7 +207,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         if (entityFactory instanceof DefaultEntityFactory) {
             DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
             defaultEntityFactory.setEntityEle(entityEle);
-            defaultEntityFactory.setPojoClass(entityStoreInfo.getPojoClass());
+            defaultEntityFactory.setEntityStoreInfo(entityStoreInfo);
             defaultEntityFactory.setEntityMapper(entityMapper);
         }
         return entityFactory;
