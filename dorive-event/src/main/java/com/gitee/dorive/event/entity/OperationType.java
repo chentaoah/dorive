@@ -15,20 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.config;
+package com.gitee.dorive.event.entity;
 
-import com.gitee.dorive.event.impl.ExecutorEventListener;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-
-@Order(-100)
-@Configuration
-public class DoriveEventConfiguration {
-
-    @Bean("executorEventListenerV3")
-    public ExecutorEventListener executorEventListener() {
-        return new ExecutorEventListener();
-    }
-
+public enum OperationType {
+    UNKNOWN,
+    INSERT,
+    UPDATE,
+    DELETE,
 }

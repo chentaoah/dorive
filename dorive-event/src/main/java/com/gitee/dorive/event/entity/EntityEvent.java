@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.api;
+package com.gitee.dorive.event.entity;
 
-import com.gitee.dorive.event.annotation.Listener;
-import com.gitee.dorive.event.entity.ExecutorEvent;
-import org.springframework.core.annotation.AnnotationUtils;
+import com.gitee.dorive.core.api.context.Context;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public interface EntityListener {
-
-    default Class<?> subscribe() {
-        Listener listener = AnnotationUtils.getAnnotation(this.getClass(), Listener.class);
-        return listener != null ? listener.value() : null;
-    }
-
-    void onApplicationEvent(ExecutorEvent executorEvent);
-
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class EntityEvent {
+    private ExecutorEvent executorEvent;
+    private Context context;
+    private OperationType operationType;
+    private Object entity;
 }

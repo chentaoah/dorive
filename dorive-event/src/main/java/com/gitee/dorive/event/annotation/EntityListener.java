@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.event.annotation;
 
+import com.gitee.dorive.event.entity.OperationType;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Documented;
@@ -26,11 +27,23 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import static com.gitee.dorive.event.entity.OperationType.DELETE;
+import static com.gitee.dorive.event.entity.OperationType.INSERT;
+import static com.gitee.dorive.event.entity.OperationType.UPDATE;
+
 @Component
 @Inherited
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Listener {
+public @interface EntityListener {
+
     Class<?> value();
+
+    OperationType[] subscribeTo() default {INSERT, UPDATE, DELETE};
+
+    boolean afterCommit() default false;
+
+    Class<? extends Throwable>[] rollbackFor() default {};
+
 }
