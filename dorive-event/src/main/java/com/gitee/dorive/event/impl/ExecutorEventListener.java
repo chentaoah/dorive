@@ -59,7 +59,7 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
     public void afterPropertiesSet() {
         Map<String, EntityEventListener> entityEventListenerMap = applicationContext.getBeansOfType(EntityEventListener.class);
         List<EntityEventListener> entityEventListeners = new ArrayList<>(entityEventListenerMap.values());
-        entityEventListeners.sort(new AnnotationAwareOrderComparator());
+        AnnotationAwareOrderComparator.sort(entityEventListeners);
 
         for (EntityEventListener entityEventListener : entityEventListeners) {
             EntityListenerDef entityListenerDef = EntityListenerDef.fromElement(entityEventListener.getClass());
