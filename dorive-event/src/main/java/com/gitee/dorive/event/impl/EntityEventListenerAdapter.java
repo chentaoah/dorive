@@ -77,9 +77,9 @@ public class EntityEventListenerAdapter implements EntityEventListener {
 
         } catch (Throwable throwable) {
             if (rollbackFor != null && rollbackFor.length > 0) {
-                Class<? extends Throwable> throwType = throwable.getClass();
+                Class<? extends Throwable> throwableType = throwable.getClass();
                 for (Class<? extends Throwable> rollbackType : rollbackFor) {
-                    if (rollbackType.isAssignableFrom(throwType)) {
+                    if (rollbackType.isAssignableFrom(throwableType)) {
                         throw throwable;
                     }
                 }
