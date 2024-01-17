@@ -75,16 +75,16 @@ public class EntityEventListenerAdapter implements EntityEventListener {
         try {
             entityEventListener.onEntityEvent(entityEvent);
 
-        } catch (Throwable t) {
+        } catch (Throwable throwable) {
             if (rollbackFor != null && rollbackFor.length > 0) {
-                Class<? extends Throwable> throwType = t.getClass();
+                Class<? extends Throwable> throwType = throwable.getClass();
                 for (Class<? extends Throwable> rollbackType : rollbackFor) {
                     if (rollbackType.isAssignableFrom(throwType)) {
-                        throw t;
+                        throw throwable;
                     }
                 }
             }
-            log.error("Exception occurred in entity event listening!", t);
+            log.error("Exception occurred in entity event listening!", throwable);
         }
     }
 
