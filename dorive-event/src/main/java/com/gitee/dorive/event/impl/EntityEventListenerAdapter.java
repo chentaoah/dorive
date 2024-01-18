@@ -21,7 +21,6 @@ import cn.hutool.core.util.ArrayUtil;
 import com.gitee.dorive.event.api.EntityEventListener;
 import com.gitee.dorive.event.entity.EntityEvent;
 import com.gitee.dorive.event.entity.EntityListenerDef;
-import com.gitee.dorive.event.entity.OperationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -42,8 +41,7 @@ public class EntityEventListenerAdapter implements EntityEventListener {
 
     @Override
     public void onEntityEvent(EntityEvent entityEvent) {
-        OperationType[] subscribeTo = entityListenerDef.getSubscribeTo();
-        boolean isSubscribe = ArrayUtil.contains(subscribeTo, entityEvent.getOperationType());
+        boolean isSubscribe = ArrayUtil.contains(entityListenerDef.getSubscribeTo(), entityEvent.getOperationType());
         if (isSubscribe) {
             boolean isTxActive = entityListenerDef.isAfterCommit() && TransactionSynchronizationManager.isActualTransactionActive();
             if (!isTxActive) {
