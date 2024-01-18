@@ -45,25 +45,26 @@ public class EntityEventListenerAdapter implements EntityEventListener {
         if (isSubscribe) {
             boolean isTxActive = entityListenerDef.isAfterCommit() && TransactionSynchronizationManager.isActualTransactionActive();
             if (!isTxActive) {
-                doOnEntityEvent(entityEvent, entityListenerDef.getRollbackFor());
+                handleEntityEvent(entityEvent, true);
             } else {
-                onEntityEventWhenTxActive(entityEvent);
+                handleEntityEventWhenTxActive(entityEvent);
             }
         }
     }
 
-    private void doOnEntityEvent(EntityEvent entityEvent, Class<? extends Throwable>[] rollbackFor) {
+    private void handleEntityEvent(EntityEvent entityEvent, boolean canRollback) {
         try {
             entityEventListener.onEntityEvent(entityEvent);
         } catch (Throwable throwable) {
-            if (determineThrowException(throwable, rollbackFor)) {
+            if (canRollback && matchException(throwable)) {
                 throw throwable;
             }
             log.error("Exception occurred in entity event listening!", throwable);
         }
     }
 
-    private boolean determineThrowException(Throwable throwable, Class<? extends Throwable>[] rollbackFor) {
+    private boolean matchException(Throwable throwable) {
+        Class<? extends Throwable>[] rollbackFor = entityListenerDef.getRollbackFor();
         if (rollbackFor != null && rollbackFor.length > 0) {
             Class<? extends Throwable> throwableType = throwable.getClass();
             for (Class<? extends Throwable> rollbackType : rollbackFor) {
@@ -75,7 +76,7 @@ public class EntityEventListenerAdapter implements EntityEventListener {
         return false;
     }
 
-    private void onEntityEventWhenTxActive(EntityEvent entityEvent) {
+    private void handleEntityEventWhenTxActive(EntityEvent entityEvent) {
         try {
             TransactionSynchronizationManager.registerSynchronization(new TransactionInvoker(entityEvent));
         } catch (Exception e) {
@@ -98,7 +99,7 @@ public class EntityEventListenerAdapter implements EntityEventListener {
 
         @Override
         public void afterCommit() {
-            doOnEntityEvent(entityEvent, null);
+            handleEntityEvent(entityEvent, false);
         }
 
     }
