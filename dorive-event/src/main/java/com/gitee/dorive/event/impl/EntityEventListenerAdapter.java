@@ -79,7 +79,7 @@ public class EntityEventListenerAdapter implements EntityEventListener {
 
     private void onEntityEventWhenTxActive(EntityEvent entityEvent) {
         try {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionInvoker(entityEvent));
+            TransactionSynchronizationManager.registerSynchronization(new TransactionInvoker(this, entityEvent));
         } catch (Exception e) {
             log.error("Transaction registration failed: " + e.getMessage(), e);
         }
@@ -92,6 +92,7 @@ public class EntityEventListenerAdapter implements EntityEventListener {
     @AllArgsConstructor
     private class TransactionInvoker implements TransactionSynchronization, Ordered {
 
+        private EntityEventListenerAdapter adapter;
         private EntityEvent entityEvent;
 
         @Override
