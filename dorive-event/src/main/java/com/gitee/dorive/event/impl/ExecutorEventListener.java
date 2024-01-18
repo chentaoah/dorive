@@ -70,8 +70,14 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
             if (entityClass == null) {
                 continue;
             }
-            if (!(entityEventListener instanceof EntityEventListenerAdapter)) {
-                Integer order = OrderUtils.getOrder(entityEventListener.getClass(), LOWEST_PRECEDENCE);
+            Integer order = OrderUtils.getOrder(entityEventListener.getClass(), LOWEST_PRECEDENCE);
+            if (entityEventListener instanceof EntityEventListenerAdapter) {
+                EntityEventListenerAdapter entityEventListenerAdapter = (EntityEventListenerAdapter) entityEventListener;
+                entityEventListenerAdapter.setEntityListenerDef(entityListenerDef);
+//                entityEventListenerAdapter.setEntityEventListener(null);
+                entityEventListenerAdapter.setOrder(order);
+
+            } else {
                 entityEventListener = new EntityEventListenerAdapter(entityListenerDef, entityEventListener, order);
             }
             List<EntityEventListener> existEntityEventListeners = classEntityEventListenersMap.computeIfAbsent(entityClass, key -> new ArrayList<>(4));
