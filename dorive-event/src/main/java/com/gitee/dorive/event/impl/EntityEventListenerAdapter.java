@@ -35,9 +35,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @AllArgsConstructor
 public class EntityEventListenerAdapter implements EntityEventListener {
 
+    private Integer order;
     private EntityListenerDef entityListenerDef;
     private EntityEventListener entityEventListener;
-    private Integer order;
 
     @Override
     public void onEntityEvent(EntityEvent entityEvent) {

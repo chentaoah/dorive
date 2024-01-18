@@ -62,7 +62,9 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
         AnnotationAwareOrderComparator.sort(entityEventListeners);
 
         for (EntityEventListener entityEventListener : entityEventListeners) {
-            EntityListenerDef entityListenerDef = EntityListenerDef.fromElement(entityEventListener.getClass());
+            Class<?> listenerType = entityEventListener.getClass();
+            Integer order = OrderUtils.getOrder(listenerType, LOWEST_PRECEDENCE);
+            EntityListenerDef entityListenerDef = EntityListenerDef.fromElement(listenerType);
             if (entityListenerDef == null) {
                 continue;
             }
@@ -70,15 +72,13 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
             if (entityClass == null) {
                 continue;
             }
-            Integer order = OrderUtils.getOrder(entityEventListener.getClass(), LOWEST_PRECEDENCE);
             if (entityEventListener instanceof EntityEventListenerAdapter) {
                 EntityEventListenerAdapter entityEventListenerAdapter = (EntityEventListenerAdapter) entityEventListener;
-                entityEventListenerAdapter.setEntityListenerDef(entityListenerDef);
-//                entityEventListenerAdapter.setEntityEventListener(null);
                 entityEventListenerAdapter.setOrder(order);
+                entityEventListenerAdapter.setEntityListenerDef(entityListenerDef);
 
             } else {
-                entityEventListener = new EntityEventListenerAdapter(entityListenerDef, entityEventListener, order);
+                entityEventListener = new EntityEventListenerAdapter(order, entityListenerDef, entityEventListener);
             }
             List<EntityEventListener> existEntityEventListeners = classEntityEventListenersMap.computeIfAbsent(entityClass, key -> new ArrayList<>(4));
             existEntityEventListeners.add(entityEventListener);
