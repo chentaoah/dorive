@@ -79,7 +79,7 @@ public class EntityEventListenerAdapter implements EntityEventListener {
 
     private void onEntityEventWhenTxActive(EntityEvent entityEvent) {
         try {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionInvoker(this, entityEvent));
+            TransactionSynchronizationManager.registerSynchronization(new TransactionInvoker(entityEvent));
         } catch (Exception e) {
             log.error("Transaction registration failed: " + e.getMessage(), e);
         }
@@ -88,12 +88,10 @@ public class EntityEventListenerAdapter implements EntityEventListener {
     /**
      * 实现Ordered接口，是为了兼容spring-boot的2.3.2版本与2.7.8版本
      */
-    @Data
     @AllArgsConstructor
     private class TransactionInvoker implements TransactionSynchronization, Ordered {
 
-        private EntityEventListenerAdapter adapter;
-        private EntityEvent entityEvent;
+        private final EntityEvent entityEvent;
 
         @Override
         public int getOrder() {
