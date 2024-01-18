@@ -26,6 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -44,48 +45,65 @@ public class EntityEventListenerAdapter implements EntityEventListener {
         OperationType[] subscribeTo = entityListenerDef.getSubscribeTo();
         boolean isSubscribe = ArrayUtil.contains(subscribeTo, entityEvent.getOperationType());
         if (isSubscribe) {
-            boolean afterCommit = entityListenerDef.isAfterCommit();
-            if (afterCommit && TransactionSynchronizationManager.isActualTransactionActive()) {
-                onEntityEventWhenTxActive(entityEvent);
-            } else {
+            boolean isTxActive = entityListenerDef.isAfterCommit() && TransactionSynchronizationManager.isActualTransactionActive();
+            if (!isTxActive) {
                 doOnEntityEvent(entityEvent, entityListenerDef.getRollbackFor());
+            } else {
+                onEntityEventWhenTxActive(entityEvent);
             }
-        }
-    }
-
-    private void onEntityEventWhenTxActive(EntityEvent entityEvent) {
-        try {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public int getOrder() {
-                    return order;
-                }
-
-                @Override
-                public void afterCommit() {
-                    doOnEntityEvent(entityEvent, null);
-                }
-            });
-        } catch (Exception e) {
-            log.error("Transaction registration failed: " + e.getMessage(), e);
         }
     }
 
     private void doOnEntityEvent(EntityEvent entityEvent, Class<? extends Throwable>[] rollbackFor) {
         try {
             entityEventListener.onEntityEvent(entityEvent);
-
         } catch (Throwable throwable) {
-            if (rollbackFor != null && rollbackFor.length > 0) {
-                Class<? extends Throwable> throwableType = throwable.getClass();
-                for (Class<? extends Throwable> rollbackType : rollbackFor) {
-                    if (rollbackType.isAssignableFrom(throwableType)) {
-                        throw throwable;
-                    }
-                }
+            if (determineThrowException(throwable, rollbackFor)) {
+                throw throwable;
             }
             log.error("Exception occurred in entity event listening!", throwable);
         }
+    }
+
+    private boolean determineThrowException(Throwable throwable, Class<? extends Throwable>[] rollbackFor) {
+        if (rollbackFor != null && rollbackFor.length > 0) {
+            Class<? extends Throwable> throwableType = throwable.getClass();
+            for (Class<? extends Throwable> rollbackType : rollbackFor) {
+                if (rollbackType.isAssignableFrom(throwableType)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void onEntityEventWhenTxActive(EntityEvent entityEvent) {
+        try {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionInvoker(entityEvent));
+        } catch (Exception e) {
+            log.error("Transaction registration failed: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 实现Ordered接口，是为了兼容spring-boot的2.3.2版本与2.7.8版本
+     */
+    @Data
+    @AllArgsConstructor
+    private class TransactionInvoker implements TransactionSynchronization, Ordered {
+
+        private EntityEvent entityEvent;
+
+        @Override
+        public int getOrder() {
+            return order;
+        }
+
+        @Override
+        public void afterCommit() {
+            doOnEntityEvent(entityEvent, null);
+        }
+
     }
 
 }
