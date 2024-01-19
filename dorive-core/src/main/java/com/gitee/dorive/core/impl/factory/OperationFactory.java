@@ -88,24 +88,4 @@ public class OperationFactory {
         return delete;
     }
 
-    public Operation renewOperation(Operation operation, Object entity) {
-        int type = operation.getType();
-        if (type == Operation.Type.INSERT) {
-            return buildInsert(entity);
-
-        } else if (type == Operation.Type.UPDATE) {
-            return buildUpdate(entity);
-
-        } else if (type == Operation.Type.INSERT_OR_UPDATE) {
-            return new Operation(Operation.Type.INSERT_OR_UPDATE, entity);
-
-        } else if (type == Operation.Type.DELETE) {
-            return buildDelete(entity);
-
-        } else if (type == Operation.Type.FORCE_INSERT) {
-            return new Insert(Operation.Type.FORCE_INSERT, entity);
-        }
-        return null;
-    }
-
 }

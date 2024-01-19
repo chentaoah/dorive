@@ -24,17 +24,21 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.operation.Delete;
+import com.gitee.dorive.core.entity.operation.Insert;
+import com.gitee.dorive.core.entity.operation.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.resolver.DerivedResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.core.util.CollectionUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -77,12 +81,6 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
 
     @Override
     public int execute(Context context, Operation operation) {
-        Selector selector = context.getSelector();
-
-        boolean isInsertContext = operation.isInsertContext();
-        boolean isIncludeRoot = operation.isIncludeRoot();
-        boolean isIgnoreRoot = operation.isIgnoreRoot();
-
         Object rootEntity = operation.getEntity();
         Assert.notNull(rootEntity, "The root entity cannot be null!");
 
@@ -90,74 +88,157 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
         AbstractContextRepository<?, ?> delegateRepository = derivedResolver.deriveRepository(rootEntity);
         delegateRepository = delegateRepository == null ? repository : delegateRepository;
 
+        if (operation instanceof Insert) {
+            return executeInsert(context, operation, delegateRepository);
+
+        } else if (operation instanceof Update || operation instanceof Delete) {
+            return executeUpdateOrDelete(context, operation, delegateRepository);
+
+        } else if (operation instanceof InsertOrUpdate) {
+            return executeInsertOrUpdate(context, operation, delegateRepository);
+        }
+        return 0;
+    }
+
+    private int executeInsert(Context context, Operation operation, AbstractContextRepository<?, ?> delegateRepository) {
+        Selector selector = context.getSelector();
+        Object rootEntity = operation.getEntity();
         int totalCount = 0;
         for (CommonRepository repository : delegateRepository.getOrderedRepositories()) {
-            boolean isRoot = repository.isRoot();
-            if (isIgnoreRoot && isRoot) {
-                continue;
-            }
-
-            boolean isMatch = selector.matches(context, repository) || (isIncludeRoot && isRoot);
-            boolean isAggregated = repository.isAggregated();
-            if (!isMatch && !isAggregated) {
-                continue;
-            }
-
-            PropChain anchorPoint = repository.getAnchorPoint();
-            Object targetEntity = isRoot ? rootEntity : anchorPoint.getValue(rootEntity);
-            if (targetEntity != null) {
-                Collection<?> collection;
-                if (targetEntity instanceof Collection) {
-                    collection = (Collection<?>) targetEntity;
-                } else {
-                    collection = Collections.singletonList(targetEntity);
+            if (repository.isRoot()) {
+                if (!operation.isIgnoreRoot()) {
+                    if (selector.matches(context, repository) || operation.isIncludeRoot()) {
+                        getBoundValue(context, rootEntity, repository, rootEntity);
+                        totalCount += repository.execute(context, operation);
+                        setBoundId(context, rootEntity, repository, rootEntity);
+                    }
                 }
-                for (Object entity : collection) {
-                    int operationType = Operation.Type.NONE;
-                    boolean operable = false;
-                    if (isMatch) {
-                        operationType = determineType(operation, repository, entity);
-                        operable = (operationType & Operation.Type.INSERT_OR_UPDATE_OR_DELETE) != 0;
-                        if ((operationType & Operation.Type.INSERT) != 0) {
+            } else {
+                boolean isMatch = selector.matches(context, repository);
+                boolean isAggregated = repository.isAggregated();
+                if (isMatch || isAggregated) {
+                    PropChain anchorPoint = repository.getAnchorPoint();
+                    Object targetEntity = anchorPoint.getValue(rootEntity);
+                    if (targetEntity == null) {
+                        continue;
+                    }
+                    OperationFactory operationFactory = repository.getOperationFactory();
+                    Collection<?> collection = CollectionUtils.toCollection(targetEntity);
+                    for (Object entity : collection) {
+                        Operation newOperation = operationFactory.buildInsert(entity);
+                        if (isMatch) {
                             getBoundValue(context, rootEntity, repository, entity);
-                        }
-                    }
-                    if (isAggregated) {
-                        OperationFactory operationFactory = repository.getOperationFactory();
-                        Operation newOperation = operationFactory.renewOperation(operation, entity);
-                        if (newOperation != null) {
-                            if (operable) {
-                                newOperation.includeRoot();
-                            } else {
-                                newOperation.ignoreRoot();
-                            }
-                            totalCount += repository.execute(context, newOperation);
-                        }
-
-                    } else if (operable) {
-                        if (isRoot && operation.getType() == operationType) {
-                            totalCount += repository.execute(context, operation);
+                            newOperation.includeRoot();
                         } else {
-                            totalCount += doExecute(context, repository, entity, operationType);
+                            newOperation.ignoreRoot();
                         }
+                        totalCount += repository.execute(context, newOperation);
                     }
-                }
-                if (isInsertContext && collection.size() == 1) {
-                    setBoundId(context, rootEntity, repository, targetEntity);
+                    if (collection.size() == 1) {
+                        setBoundId(context, rootEntity, repository, collection.iterator().next());
+                    }
                 }
             }
         }
         return totalCount;
     }
 
-    private int determineType(Operation operation, CommonRepository repository, Object entity) {
-        if (operation.isForceInsert()) {
-            return Operation.Type.INSERT;
+    private int executeUpdateOrDelete(Context context, Operation operation, AbstractContextRepository<?, ?> delegateRepository) {
+        Selector selector = context.getSelector();
+        Object rootEntity = operation.getEntity();
+        int totalCount = 0;
+        if (!operation.isIgnoreRoot()) {
+            CommonRepository rootRepository = delegateRepository.getRootRepository();
+            if (selector.matches(context, rootRepository) || operation.isIncludeRoot()) {
+                Object primaryKey = rootRepository.getPrimaryKey(rootEntity);
+                if (primaryKey != null) {
+                    totalCount += rootRepository.execute(context, operation);
+                }
+            }
         }
-        int type = operation.getType();
-        Object primaryKey = repository.getPrimaryKey(entity);
-        int operationType = primaryKey == null ? Operation.Type.INSERT : Operation.Type.UPDATE_OR_DELETE;
-        return type & operationType;
+        for (CommonRepository subRepository : delegateRepository.getSubRepositories()) {
+            boolean isMatch = selector.matches(context, subRepository);
+            boolean isAggregated = subRepository.isAggregated();
+            if (isMatch || isAggregated) {
+                PropChain anchorPoint = subRepository.getAnchorPoint();
+                Object targetEntity = anchorPoint.getValue(rootEntity);
+                if (targetEntity == null) {
+                    continue;
+                }
+                OperationFactory operationFactory = subRepository.getOperationFactory();
+                Collection<?> collection = CollectionUtils.toCollection(targetEntity);
+                for (Object entity : collection) {
+                    Operation newOperation = null;
+                    Object primaryKey = subRepository.getPrimaryKey(entity);
+                    if (isMatch && primaryKey != null) {
+                        newOperation = operation instanceof Update ? operationFactory.buildUpdate(entity) : operationFactory.buildDelete(entity);
+                        newOperation.includeRoot();
+
+                    } else if (isAggregated) {
+                        newOperation = operation instanceof Update ? operationFactory.buildUpdate(entity) : operationFactory.buildDelete(entity);
+                        newOperation.ignoreRoot();
+                    }
+                    if (newOperation != null) {
+                        totalCount += subRepository.execute(context, newOperation);
+                    }
+                }
+            }
+        }
+        return totalCount;
+    }
+
+    private int executeInsertOrUpdate(Context context, Operation operation, AbstractContextRepository<?, ?> delegateRepository) {
+        Selector selector = context.getSelector();
+        Object rootEntity = operation.getEntity();
+        int totalCount = 0;
+        for (CommonRepository repository : delegateRepository.getOrderedRepositories()) {
+            OperationFactory operationFactory = repository.getOperationFactory();
+            if (repository.isRoot()) {
+                if (!operation.isIgnoreRoot()) {
+                    if (selector.matches(context, repository) || operation.isIncludeRoot()) {
+                        Operation newOperation = operationFactory.buildInsertOrUpdate(rootEntity);
+                        if (newOperation instanceof Insert) {
+                            getBoundValue(context, rootEntity, repository, rootEntity);
+                            totalCount += repository.execute(context, newOperation);
+                            setBoundId(context, rootEntity, repository, rootEntity);
+                        } else {
+                            totalCount += repository.execute(context, newOperation);
+                        }
+                    }
+                }
+            } else {
+                boolean isMatch = selector.matches(context, repository);
+                boolean isAggregated = repository.isAggregated();
+                if (isMatch || isAggregated) {
+                    PropChain anchorPoint = repository.getAnchorPoint();
+                    Object targetEntity = anchorPoint.getValue(rootEntity);
+                    if (targetEntity == null) {
+                        continue;
+                    }
+                    Collection<?> collection = CollectionUtils.toCollection(targetEntity);
+                    Object onlyOne = collection.size() == 1 ? collection.iterator().next() : null;
+                    boolean isOnlyOneInsert = onlyOne != null && repository.getPrimaryKey(onlyOne) == null;
+                    for (Object entity : collection) {
+                        Operation newOperation;
+                        Object primaryKey = repository.getPrimaryKey(entity);
+                        if (isMatch && primaryKey == null) {
+                            getBoundValue(context, rootEntity, repository, entity);
+                        }
+                        if (isAggregated) {
+                            newOperation = new InsertOrUpdate(entity);
+                        } else {
+                            newOperation = primaryKey == null ? operationFactory.buildInsert(entity) : operationFactory.buildUpdate(entity);
+                        }
+                        newOperation.switchRoot(isMatch);
+                        totalCount += repository.execute(context, newOperation);
+                    }
+                    if (isOnlyOneInsert) {
+                        setBoundId(context, rootEntity, repository, onlyOne);
+                    }
+                }
+            }
+        }
+        return totalCount;
     }
 
     private void getBoundValue(Context context, Object rootEntity, CommonRepository repository, Object entity) {
@@ -170,19 +251,6 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
                 }
             }
         }
-    }
-
-    private int doExecute(Context context, CommonRepository repository, Object entity, int operationType) {
-        if (operationType == Operation.Type.INSERT) {
-            return repository.insert(context, entity);
-
-        } else if (operationType == Operation.Type.UPDATE) {
-            return repository.update(context, entity);
-
-        } else if (operationType == Operation.Type.DELETE) {
-            return repository.delete(context, entity);
-        }
-        return 0;
     }
 
     private void setBoundId(Context context, Object rootEntity, CommonRepository repository, Object entity) {

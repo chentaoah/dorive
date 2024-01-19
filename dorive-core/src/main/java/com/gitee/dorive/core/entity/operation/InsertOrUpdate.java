@@ -17,42 +17,15 @@
 
 package com.gitee.dorive.core.entity.operation;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class Operation {
+@Getter
+@Setter
+public class InsertOrUpdate extends Operation {
 
-    public enum RootControl {NONE, INCLUDE_ROOT, IGNORE_ROOT,}
-
-    private RootControl rootControl = RootControl.NONE;
-    private Object entity;
-
-    public Operation(Object entity) {
-        this.entity = entity;
-    }
-
-    public void includeRoot() {
-        rootControl = RootControl.INCLUDE_ROOT;
-    }
-
-    public void ignoreRoot() {
-        rootControl = RootControl.IGNORE_ROOT;
-    }
-
-    public boolean isIncludeRoot() {
-        return rootControl == RootControl.INCLUDE_ROOT;
-    }
-
-    public boolean isIgnoreRoot() {
-        return rootControl == RootControl.IGNORE_ROOT;
-    }
-
-    public void switchRoot(boolean flag) {
-        if (flag) {
-            includeRoot();
-        } else {
-            ignoreRoot();
-        }
+    public InsertOrUpdate(Object entity) {
+        super(entity);
     }
 
 }

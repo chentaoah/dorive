@@ -24,12 +24,8 @@ import lombok.Setter;
 @Setter
 public class Query extends Condition {
 
-    public Query(int type, Object entity) {
-        super(type, entity);
-    }
-
     public Query(Object entity) {
-        super(Type.SELECT, entity);
+        super(entity);
     }
 
     public boolean isEmpty() {

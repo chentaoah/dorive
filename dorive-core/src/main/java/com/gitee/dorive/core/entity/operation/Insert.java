@@ -24,12 +24,8 @@ import lombok.Setter;
 @Setter
 public class Insert extends Operation {
 
-    public Insert(int type, Object entity) {
-        super(type, entity);
-    }
-
     public Insert(Object entity) {
-        super(Type.INSERT, entity);
+        super(entity);
     }
 
 }

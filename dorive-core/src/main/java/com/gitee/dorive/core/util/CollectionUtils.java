@@ -15,44 +15,21 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.operation;
+package com.gitee.dorive.core.util;
 
-import lombok.Data;
+import java.util.Collection;
+import java.util.Collections;
 
-@Data
-public class Operation {
+public class CollectionUtils {
 
-    public enum RootControl {NONE, INCLUDE_ROOT, IGNORE_ROOT,}
-
-    private RootControl rootControl = RootControl.NONE;
-    private Object entity;
-
-    public Operation(Object entity) {
-        this.entity = entity;
-    }
-
-    public void includeRoot() {
-        rootControl = RootControl.INCLUDE_ROOT;
-    }
-
-    public void ignoreRoot() {
-        rootControl = RootControl.IGNORE_ROOT;
-    }
-
-    public boolean isIncludeRoot() {
-        return rootControl == RootControl.INCLUDE_ROOT;
-    }
-
-    public boolean isIgnoreRoot() {
-        return rootControl == RootControl.IGNORE_ROOT;
-    }
-
-    public void switchRoot(boolean flag) {
-        if (flag) {
-            includeRoot();
+    public static Collection<?> toCollection(Object object) {
+        Collection<?> collection;
+        if (object instanceof Collection) {
+            collection = (Collection<?>) object;
         } else {
-            ignoreRoot();
+            collection = Collections.singletonList(object);
         }
+        return collection;
     }
 
 }

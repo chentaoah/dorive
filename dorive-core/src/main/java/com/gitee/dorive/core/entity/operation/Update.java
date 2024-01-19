@@ -29,12 +29,8 @@ public class Update extends Condition {
 
     private Set<String> nullableFields = Collections.emptySet();
 
-    public Update(int type, Object entity) {
-        super(type, entity);
-    }
-
     public Update(Object entity) {
-        super(Type.UPDATE, entity);
+        super(entity);
     }
 
 }
