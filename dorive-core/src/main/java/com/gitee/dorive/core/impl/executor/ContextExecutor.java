@@ -116,27 +116,26 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
             } else {
                 boolean isMatch = selector.matches(context, repository);
                 boolean isAggregated = repository.isAggregated();
-                if (isMatch || isAggregated) {
-                    PropChain anchorPoint = repository.getAnchorPoint();
-                    Object targetEntity = anchorPoint.getValue(rootEntity);
-                    if (targetEntity == null) {
-                        continue;
+                if (!isMatch && !isAggregated) {
+                    continue;
+                }
+                PropChain anchorPoint = repository.getAnchorPoint();
+                Object targetEntity = anchorPoint.getValue(rootEntity);
+                if (targetEntity == null) {
+                    continue;
+                }
+                OperationFactory operationFactory = repository.getOperationFactory();
+                Collection<?> collection = CollectionUtils.toCollection(targetEntity);
+                for (Object entity : collection) {
+                    if (isMatch) {
+                        getBoundValue(context, rootEntity, repository, entity);
                     }
-                    OperationFactory operationFactory = repository.getOperationFactory();
-                    Collection<?> collection = CollectionUtils.toCollection(targetEntity);
-                    for (Object entity : collection) {
-                        Operation newOperation = operationFactory.buildInsert(entity);
-                        if (isMatch) {
-                            getBoundValue(context, rootEntity, repository, entity);
-                            newOperation.includeRoot();
-                        } else {
-                            newOperation.ignoreRoot();
-                        }
-                        totalCount += repository.execute(context, newOperation);
-                    }
-                    if (collection.size() == 1) {
-                        setBoundId(context, rootEntity, repository, collection.iterator().next());
-                    }
+                    Operation newOperation = operationFactory.buildInsert(entity);
+                    newOperation.switchRoot(isMatch);
+                    totalCount += repository.execute(context, newOperation);
+                }
+                if (collection.size() == 1) {
+                    setBoundId(context, rootEntity, repository, collection.iterator().next());
                 }
             }
         }
@@ -159,28 +158,25 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
         for (CommonRepository subRepository : delegateRepository.getSubRepositories()) {
             boolean isMatch = selector.matches(context, subRepository);
             boolean isAggregated = subRepository.isAggregated();
-            if (isMatch || isAggregated) {
-                PropChain anchorPoint = subRepository.getAnchorPoint();
-                Object targetEntity = anchorPoint.getValue(rootEntity);
-                if (targetEntity == null) {
-                    continue;
+            if (!isMatch && !isAggregated) {
+                continue;
+            }
+            PropChain anchorPoint = subRepository.getAnchorPoint();
+            Object targetEntity = anchorPoint.getValue(rootEntity);
+            if (targetEntity == null) {
+                continue;
+            }
+            OperationFactory operationFactory = subRepository.getOperationFactory();
+            Collection<?> collection = CollectionUtils.toCollection(targetEntity);
+            for (Object entity : collection) {
+                Object primaryKey = subRepository.getPrimaryKey(entity);
+                Operation newOperation = null;
+                if ((isMatch && primaryKey != null) || isAggregated) {
+                    newOperation = operation instanceof Update ? operationFactory.buildUpdate(entity) : operationFactory.buildDelete(entity);
                 }
-                OperationFactory operationFactory = subRepository.getOperationFactory();
-                Collection<?> collection = CollectionUtils.toCollection(targetEntity);
-                for (Object entity : collection) {
-                    Operation newOperation = null;
-                    Object primaryKey = subRepository.getPrimaryKey(entity);
-                    if (isMatch && primaryKey != null) {
-                        newOperation = operation instanceof Update ? operationFactory.buildUpdate(entity) : operationFactory.buildDelete(entity);
-                        newOperation.includeRoot();
-
-                    } else if (isAggregated) {
-                        newOperation = operation instanceof Update ? operationFactory.buildUpdate(entity) : operationFactory.buildDelete(entity);
-                        newOperation.ignoreRoot();
-                    }
-                    if (newOperation != null) {
-                        totalCount += subRepository.execute(context, newOperation);
-                    }
+                if (newOperation != null) {
+                    newOperation.switchRoot(isMatch);
+                    totalCount += subRepository.execute(context, newOperation);
                 }
             }
         }
@@ -209,32 +205,35 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
             } else {
                 boolean isMatch = selector.matches(context, repository);
                 boolean isAggregated = repository.isAggregated();
-                if (isMatch || isAggregated) {
-                    PropChain anchorPoint = repository.getAnchorPoint();
-                    Object targetEntity = anchorPoint.getValue(rootEntity);
-                    if (targetEntity == null) {
-                        continue;
+                if (!isMatch && !isAggregated) {
+                    continue;
+                }
+                PropChain anchorPoint = repository.getAnchorPoint();
+                Object targetEntity = anchorPoint.getValue(rootEntity);
+                if (targetEntity == null) {
+                    continue;
+                }
+                Collection<?> collection = CollectionUtils.toCollection(targetEntity);
+                Object onlyOne = collection.size() == 1 ? collection.iterator().next() : null;
+                boolean isOnlyOneInsert = onlyOne != null && repository.getPrimaryKey(onlyOne) == null;
+                for (Object entity : collection) {
+                    Object primaryKey = repository.getPrimaryKey(entity);
+                    if (isMatch && primaryKey == null) {
+                        getBoundValue(context, rootEntity, repository, entity);
                     }
-                    Collection<?> collection = CollectionUtils.toCollection(targetEntity);
-                    Object onlyOne = collection.size() == 1 ? collection.iterator().next() : null;
-                    boolean isOnlyOneInsert = onlyOne != null && repository.getPrimaryKey(onlyOne) == null;
-                    for (Object entity : collection) {
-                        Operation newOperation;
-                        Object primaryKey = repository.getPrimaryKey(entity);
-                        if (isMatch && primaryKey == null) {
-                            getBoundValue(context, rootEntity, repository, entity);
-                        }
-                        if (isAggregated) {
-                            newOperation = new InsertOrUpdate(entity);
-                        } else {
-                            newOperation = primaryKey == null ? operationFactory.buildInsert(entity) : operationFactory.buildUpdate(entity);
-                        }
-                        newOperation.switchRoot(isMatch);
-                        totalCount += repository.execute(context, newOperation);
+                    Operation newOperation;
+                    if (isAggregated) {
+                        newOperation = new InsertOrUpdate(entity);
+                    } else if (primaryKey == null) {
+                        newOperation = operationFactory.buildInsert(entity);
+                    } else {
+                        newOperation = operationFactory.buildUpdate(entity);
                     }
-                    if (isOnlyOneInsert) {
-                        setBoundId(context, rootEntity, repository, onlyOne);
-                    }
+                    newOperation.switchRoot(isMatch);
+                    totalCount += repository.execute(context, newOperation);
+                }
+                if (isOnlyOneInsert) {
+                    setBoundId(context, rootEntity, repository, onlyOne);
                 }
             }
         }
