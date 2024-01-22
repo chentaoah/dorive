@@ -224,10 +224,8 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
                     Operation newOperation;
                     if (isAggregated) {
                         newOperation = new InsertOrUpdate(entity);
-                    } else if (primaryKey == null) {
-                        newOperation = operationFactory.buildInsert(entity);
                     } else {
-                        newOperation = operationFactory.buildUpdate(entity);
+                        newOperation = primaryKey == null ? operationFactory.buildInsert(entity) : operationFactory.buildUpdate(entity);
                     }
                     newOperation.switchRoot(isMatch);
                     totalCount += repository.execute(context, newOperation);
