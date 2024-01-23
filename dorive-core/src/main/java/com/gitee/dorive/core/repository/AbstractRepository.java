@@ -32,11 +32,13 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Executor {
 
     private EntityDef entityDef;
