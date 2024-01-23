@@ -15,20 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.selector;
+package com.gitee.dorive.core.util;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Node;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.gitee.dorive.core.entity.context.InnerContext;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class RootSelector extends AbstractSelector {
+public class ContextUtils {
 
-    @Override
-    public boolean matches(Context context, Node node) {
-        return node.isRoot();
+    public static Context clone(Context context) {
+        return new InnerContext(context);
     }
 
 }

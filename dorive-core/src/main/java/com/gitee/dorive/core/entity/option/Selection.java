@@ -15,19 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.context;
+package com.gitee.dorive.core.entity.option;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Strategy {
-
-    public enum Query {DEFAULT, SQL,}
-
-    private Query query;
-
+public enum Selection {
+    NONE,
+    ROOT,
+    ALL,
+    NAME
 }

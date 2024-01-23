@@ -18,36 +18,36 @@
 package com.gitee.dorive.core.entity.context;
 
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.option.Selection;
-import lombok.Data;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Data
-public abstract class AbstractContext implements Context {
+public class StaticContext implements Context {
 
-    protected Map<Class<?>, Object> instances = new LinkedHashMap<>(4);
-    protected Map<String, Object> attachments = new LinkedHashMap<>(8);
+    private Map<Class<?>, Object> instances = new LinkedHashMap<>(3);
 
-    public AbstractContext() {
-        this.instances.put(Selection.class, Selection.NONE);
+    public StaticContext(Selection selection) {
+        this.instances.put(Selection.class, selection);
+        this.instances = Collections.unmodifiableMap(this.instances);
     }
 
-    public Object put(String key, Object value) {
-        return attachments.put(key, value);
+    public StaticContext(Selection selection, Selector selector) {
+        this.instances.put(Selection.class, selection);
+        this.instances.put(Selector.class, selector);
+        this.instances = Collections.unmodifiableMap(this.instances);
     }
 
-    public boolean containsKey(String key) {
-        return attachments.containsKey(key);
+    @Override
+    public Map<Class<?>, Object> getInstances() {
+        return instances;
     }
 
-    public Object get(String key) {
-        return attachments.get(key);
-    }
-
-    public Object remove(String key) {
-        return attachments.remove(key);
+    @Override
+    public Map<String, Object> getAttachments() {
+        return Collections.emptyMap();
     }
 
 }

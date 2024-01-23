@@ -15,20 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.selector;
+package com.gitee.dorive.core.api.context;
 
-import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Node;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+public interface Matcher {
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class EmptySelector extends AbstractSelector {
-
-    @Override
-    public boolean matches(Context context, Node node) {
-        return false;
-    }
+    boolean matches(Context context);
 
 }

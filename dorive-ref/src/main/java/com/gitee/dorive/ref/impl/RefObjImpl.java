@@ -18,10 +18,10 @@
 package com.gitee.dorive.ref.impl;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.context.InnerContext;
 import com.gitee.dorive.core.repository.AbstractRepository;
+import com.gitee.dorive.core.util.ContextUtils;
 import com.gitee.dorive.ref.api.RefObj;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,35 +37,29 @@ public class RefObjImpl implements RefObj {
 
     @Override
     public long select(Context context) {
+        if (!(context instanceof InnerContext)) {
+            context = ContextUtils.clone(context);
+        }
         EntityHandler entityHandler = ref.getEntityHandler();
         return entityHandler.handle(context, Collections.singletonList(object));
     }
 
     @Override
     public int insertOrUpdate(Context context) {
+        if (!(context instanceof InnerContext)) {
+            context = ContextUtils.clone(context);
+        }
         AbstractRepository<Object, Object> repository = ref.getProxyRepository();
         return repository.insertOrUpdate(context, object);
     }
 
     @Override
     public int delete(Context context) {
+        if (!(context instanceof InnerContext)) {
+            context = ContextUtils.clone(context);
+        }
         AbstractRepository<Object, Object> repository = ref.getProxyRepository();
         return repository.delete(context, object);
-    }
-
-    @Override
-    public long select(Selector selector) {
-        return select(new InnerContext(selector));
-    }
-
-    @Override
-    public int insertOrUpdate(Selector selector) {
-        return insertOrUpdate(new InnerContext(selector));
-    }
-
-    @Override
-    public int delete(Selector selector) {
-        return delete(new InnerContext(selector));
     }
 
 }

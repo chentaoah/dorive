@@ -21,7 +21,6 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Delete;
@@ -56,9 +55,8 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Assert.isTrue(!query.isEmpty(), "The query cannot be empty!");
-        Selector selector = context.getSelector();
         CommonRepository rootRepository = repository.getRootRepository();
-        if (selector.matches(context, rootRepository) || query.isIncludeRoot()) {
+        if (rootRepository.matches(context) || query.isIncludeRoot()) {
             Result<Object> result = rootRepository.executeQuery(context, query);
             List<Object> entities = result.getRecords();
             if (!entities.isEmpty()) {
@@ -101,20 +99,19 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
     }
 
     private int executeInsert(Context context, Operation operation, AbstractContextRepository<?, ?> delegateRepository) {
-        Selector selector = context.getSelector();
         Object rootEntity = operation.getEntity();
         int totalCount = 0;
         for (CommonRepository repository : delegateRepository.getOrderedRepositories()) {
             if (repository.isRoot()) {
                 if (!operation.isIgnoreRoot()) {
-                    if (selector.matches(context, repository) || operation.isIncludeRoot()) {
+                    if (repository.matches(context) || operation.isIncludeRoot()) {
                         getBoundValue(context, rootEntity, repository, rootEntity);
                         totalCount += repository.execute(context, operation);
                         setBoundId(context, rootEntity, repository, rootEntity);
                     }
                 }
             } else {
-                boolean isMatch = selector.matches(context, repository);
+                boolean isMatch = repository.matches(context);
                 boolean isAggregated = repository.isAggregated();
                 if (!isMatch && !isAggregated) {
                     continue;
@@ -143,12 +140,11 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
     }
 
     private int executeUpdateOrDelete(Context context, Operation operation, AbstractContextRepository<?, ?> delegateRepository) {
-        Selector selector = context.getSelector();
         Object rootEntity = operation.getEntity();
         int totalCount = 0;
         if (!operation.isIgnoreRoot()) {
             CommonRepository rootRepository = delegateRepository.getRootRepository();
-            if (selector.matches(context, rootRepository) || operation.isIncludeRoot()) {
+            if (rootRepository.matches(context) || operation.isIncludeRoot()) {
                 Object primaryKey = rootRepository.getPrimaryKey(rootEntity);
                 if (primaryKey != null) {
                     totalCount += rootRepository.execute(context, operation);
@@ -156,7 +152,7 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
             }
         }
         for (CommonRepository subRepository : delegateRepository.getSubRepositories()) {
-            boolean isMatch = selector.matches(context, subRepository);
+            boolean isMatch = subRepository.matches(context);
             boolean isAggregated = subRepository.isAggregated();
             if (!isMatch && !isAggregated) {
                 continue;
@@ -184,14 +180,13 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
     }
 
     private int executeInsertOrUpdate(Context context, Operation operation, AbstractContextRepository<?, ?> delegateRepository) {
-        Selector selector = context.getSelector();
         Object rootEntity = operation.getEntity();
         int totalCount = 0;
         for (CommonRepository repository : delegateRepository.getOrderedRepositories()) {
             OperationFactory operationFactory = repository.getOperationFactory();
             if (repository.isRoot()) {
                 if (!operation.isIgnoreRoot()) {
-                    if (selector.matches(context, repository) || operation.isIncludeRoot()) {
+                    if (repository.matches(context) || operation.isIncludeRoot()) {
                         Operation newOperation = operationFactory.buildInsertOrUpdate(rootEntity);
                         if (newOperation instanceof Insert) {
                             getBoundValue(context, rootEntity, repository, rootEntity);
@@ -203,7 +198,7 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
                     }
                 }
             } else {
-                boolean isMatch = selector.matches(context, repository);
+                boolean isMatch = repository.matches(context);
                 boolean isAggregated = repository.isAggregated();
                 if (!isMatch && !isAggregated) {
                     continue;

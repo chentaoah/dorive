@@ -19,7 +19,7 @@ package com.gitee.dorive.core.repository;
 
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Node;
+import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
@@ -32,10 +32,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class CommonRepository extends AbstractProxyRepository implements Node {
+public class CommonRepository extends AbstractProxyRepository implements Matcher {
 
     private String accessPath;
     private boolean root;
@@ -44,6 +45,11 @@ public class CommonRepository extends AbstractProxyRepository implements Node {
     private PropChain anchorPoint;
     private BinderResolver binderResolver;
     private boolean boundEntity;
+    private Matcher matcher;
+
+    public String getName() {
+        return getEntityDef().getName();
+    }
 
     public Object getPrimaryKey(Object entity) {
         return getEntityEle().getPkProxy().getValue(entity);
@@ -54,23 +60,26 @@ public class CommonRepository extends AbstractProxyRepository implements Node {
     }
 
     @Override
-    public String getName() {
-        return getEntityDef().getName();
+    public boolean matches(Context context) {
+        return matcher.matches(context);
     }
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
-        Selector selector = context.getSelector();
-        List<String> properties = selector.select(context, this);
-        if (properties != null && !properties.isEmpty()) {
-            if (query.getPrimaryKey() != null) {
-                Example example = new InnerExample().eq("id", query.getPrimaryKey());
-                query.setPrimaryKey(null);
-                query.setExample(example);
-            }
-            Example example = query.getExample();
-            if (example != null) {
-                example.select(properties);
+        Map<Class<?>, Object> instances = context.getInstances();
+        Selector selector = (Selector) instances.get(Selector.class);
+        if (selector != null) {
+            List<String> properties = selector.select(getName());
+            if (properties != null && !properties.isEmpty()) {
+                if (query.getPrimaryKey() != null) {
+                    Example example = new InnerExample().eq("id", query.getPrimaryKey());
+                    query.setPrimaryKey(null);
+                    query.setExample(example);
+                }
+                Example example = query.getExample();
+                if (example != null) {
+                    example.select(properties);
+                }
             }
         }
         Example example = query.getExample();

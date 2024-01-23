@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.entity.context;
 
-import com.gitee.dorive.core.api.context.Selector;
+import com.gitee.dorive.core.api.context.Context;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -27,8 +27,9 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class InnerContext extends AbstractContext {
 
-    public InnerContext(Selector selector) {
-        super(selector);
+    public InnerContext(Context anotherContext) {
+        this.instances.putAll(anotherContext.getInstances());
+        this.attachments.putAll(anotherContext.getAttachments());
     }
 
 }

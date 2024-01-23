@@ -28,7 +28,7 @@ import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
-import com.gitee.dorive.core.entity.context.Strategy;
+import com.gitee.dorive.core.entity.option.QueryStrategy;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
@@ -115,9 +115,9 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
     @Override
     protected QueryBuilder adaptiveQueryBuilder(Context context, BuildQuery buildQuery) {
-        Strategy strategy = context.getStrategy();
-        Strategy.Query query = strategy.getQuery();
-        if (query == null || Strategy.Query.SQL.equals(query)) {
+        Map<Class<?>, Object> instances = context.getInstances();
+        QueryStrategy queryStrategy = (QueryStrategy) instances.get(QueryStrategy.class);
+        if (queryStrategy == null || queryStrategy == QueryStrategy.SQL) {
             return sqlQueryBuilder;
         }
         return super.adaptiveQueryBuilder(context, buildQuery);

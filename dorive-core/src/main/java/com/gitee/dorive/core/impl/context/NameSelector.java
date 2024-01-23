@@ -15,53 +15,57 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.selector;
+package com.gitee.dorive.core.impl.context;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Node;
+import com.gitee.dorive.core.api.context.Selector;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class NameSelector extends AbstractSelector {
+public class NameSelector implements Selector {
 
+    private Set<String> names = Collections.emptySet();
     private Map<String, NameDef> nameDefMap = Collections.emptyMap();
 
     public NameSelector(String... names) {
         if (names != null && names.length > 0) {
-            this.nameDefMap = new LinkedHashMap<>(names.length * 4 / 3 + 1);
+            int size = names.length * 4 / 3 + 1;
+            this.names = new LinkedHashSet<>(size);
+            this.nameDefMap = new LinkedHashMap<>(size);
             for (String name : names) {
                 if (name.contains("(") && name.contains(")")) {
                     String realName = name.substring(0, name.indexOf("("));
                     String propText = name.substring(name.indexOf("(") + 1, name.indexOf(")"));
                     List<String> properties = StrUtil.splitTrim(propText, ",");
-                    nameDefMap.put(realName, new NameDef(realName, Collections.unmodifiableList(properties)));
+                    this.names.add(realName);
+                    this.nameDefMap.put(realName, new NameDef(realName, Collections.unmodifiableList(properties)));
 
                 } else {
-                    nameDefMap.put(name, new NameDef(name, Collections.emptyList()));
+                    this.names.add(name);
+                    this.nameDefMap.put(name, new NameDef(name, Collections.emptyList()));
                 }
             }
+            this.names = Collections.unmodifiableSet(this.names);
         }
     }
 
     @Override
-    public boolean matches(Context context, Node node) {
-        String name = node.getName();
-        return StringUtils.isBlank(name) || nameDefMap.containsKey(name);
+    public Set<String> getNames() {
+        return names;
     }
 
     @Override
-    public List<String> select(Context context, Node node) {
-        String name = node.getName();
+    public List<String> select(String name) {
         NameDef nameDef = nameDefMap.get(name);
         return nameDef != null && !nameDef.getProperties().isEmpty() ? nameDef.getProperties() : null;
     }

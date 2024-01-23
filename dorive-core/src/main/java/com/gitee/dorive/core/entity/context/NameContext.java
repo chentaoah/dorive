@@ -15,12 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.context;
+package com.gitee.dorive.core.entity.context;
 
-public interface Node {
+import com.gitee.dorive.core.entity.option.Selection;
+import com.gitee.dorive.core.impl.context.NameSelector;
 
-    boolean isRoot();
+public class NameContext extends StaticContext {
 
-    String getName();
+    public NameContext(String... names) {
+        super(Selection.NAME, new NameSelector(names));
+    }
 
 }

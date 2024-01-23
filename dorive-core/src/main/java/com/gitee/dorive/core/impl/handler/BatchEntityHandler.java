@@ -18,7 +18,6 @@
 package com.gitee.dorive.core.impl.handler;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
@@ -36,10 +35,9 @@ public class BatchEntityHandler implements EntityHandler {
 
     @Override
     public long handle(Context context, List<Object> entities) {
-        Selector selector = context.getSelector();
         long totalCount = 0L;
         for (CommonRepository repository : this.repository.getSubRepositories()) {
-            if (selector.matches(context, repository)) {
+            if (repository.matches(context)) {
                 BinderResolver binderResolver = repository.getBinderResolver();
                 EntityHandler entityHandler = binderResolver.isSimpleRootBinding() ?
                         new MultiEntityHandler(repository) : new UnionEntityHandler(repository);

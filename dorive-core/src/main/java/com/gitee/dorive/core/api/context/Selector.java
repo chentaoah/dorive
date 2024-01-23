@@ -17,20 +17,13 @@
 
 package com.gitee.dorive.core.api.context;
 
-import com.gitee.dorive.core.impl.selector.AllSelector;
-import com.gitee.dorive.core.impl.selector.EmptySelector;
-import com.gitee.dorive.core.impl.selector.RootSelector;
-
 import java.util.List;
+import java.util.Set;
 
 public interface Selector {
 
-    Selector EMPTY = new EmptySelector();
-    Selector ROOT = new RootSelector();
-    Selector ALL = new AllSelector();
+    Set<String> getNames();
 
-    boolean matches(Context context, Node node);
-
-    List<String> select(Context context, Node node);
+    List<String> select(String name);
 
 }

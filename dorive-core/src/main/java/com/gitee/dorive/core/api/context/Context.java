@@ -17,16 +17,19 @@
 
 package com.gitee.dorive.core.api.context;
 
-import com.gitee.dorive.core.entity.context.Strategy;
+import com.gitee.dorive.core.entity.context.StaticContext;
+import com.gitee.dorive.core.entity.option.Selection;
 
 import java.util.Map;
 
 public interface Context {
 
-    Selector getSelector();
+    Context NONE = new StaticContext(Selection.NONE);
+    Context ROOT = new StaticContext(Selection.ROOT);
+    Context ALL = new StaticContext(Selection.ALL);
+
+    Map<Class<?>, Object> getInstances();
 
     Map<String, Object> getAttachments();
-
-    Strategy getStrategy();
 
 }
