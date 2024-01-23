@@ -24,13 +24,9 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.util.ExampleUtils;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
 public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK> implements ListableRepository<E, PK> {
 
     @Override

@@ -22,8 +22,8 @@ import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.option.Selection;
 import com.gitee.dorive.core.repository.CommonRepository;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,8 +32,8 @@ import java.util.Set;
 /**
  * 双向依赖，在获取hashCode时，会栈溢出
  */
-@Data
-@EqualsAndHashCode(exclude = "repository")
+@Getter
+@Setter
 public class SelectionMatcher implements Matcher {
 
     private CommonRepository repository;

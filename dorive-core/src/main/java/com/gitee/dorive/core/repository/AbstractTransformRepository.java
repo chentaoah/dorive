@@ -24,13 +24,9 @@ import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.util.ContextUtils;
 import com.gitee.dorive.core.util.ExampleUtils;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
 public abstract class AbstractTransformRepository<E, PK> extends AbstractGenericRepository<E, PK> {
 
     @Override
