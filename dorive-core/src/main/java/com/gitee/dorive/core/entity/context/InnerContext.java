@@ -18,13 +18,9 @@
 package com.gitee.dorive.core.entity.context;
 
 import com.gitee.dorive.core.api.context.Context;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class InnerContext extends AbstractContext {
 
     public InnerContext(Context anotherContext) {
