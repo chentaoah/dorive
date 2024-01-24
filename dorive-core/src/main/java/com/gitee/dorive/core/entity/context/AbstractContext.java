@@ -27,11 +27,11 @@ import java.util.Map;
 @Data
 public abstract class AbstractContext implements Context {
 
-    protected Map<Class<?>, Object> instances = new LinkedHashMap<>(4);
+    protected Map<Class<?>, Object> options = new LinkedHashMap<>(4);
     protected Map<String, Object> attachments = new LinkedHashMap<>(8);
 
     public AbstractContext() {
-        this.instances.put(Selection.class, Selection.NONE);
+        this.options.put(Selection.class, Selection.NONE);
     }
 
     public Object put(String key, Object value) {

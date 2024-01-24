@@ -49,8 +49,8 @@ public class SelectionMatcher implements Matcher {
 
     @Override
     public boolean matches(Context context) {
-        Map<Class<?>, Object> instances = context.getInstances();
-        Selection selection = (Selection) instances.get(Selection.class);
+        Map<Class<?>, Object> options = context.getOptions();
+        Selection selection = (Selection) options.get(Selection.class);
         if (selection != null) {
             Matcher matcher = matcherMap.get(selection);
             if (matcher != null) {
@@ -63,8 +63,8 @@ public class SelectionMatcher implements Matcher {
     private class NameMatcher implements Matcher {
         @Override
         public boolean matches(Context context) {
-            Map<Class<?>, Object> instances = context.getInstances();
-            Selector selector = (Selector) instances.get(Selector.class);
+            Map<Class<?>, Object> options = context.getOptions();
+            Selector selector = (Selector) options.get(Selector.class);
             if (selector != null) {
                 Set<String> names = selector.getNames();
                 String name = repository.getName();

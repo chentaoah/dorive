@@ -28,7 +28,7 @@ public interface Context {
     Context ROOT = new StaticContext(Selection.ROOT);
     Context ALL = new StaticContext(Selection.ALL);
 
-    Map<Class<?>, Object> getInstances();
+    Map<Class<?>, Object> getOptions();
 
     Map<String, Object> getAttachments();
 

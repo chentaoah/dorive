@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 public class InnerContext extends AbstractContext {
 
     public InnerContext(Context anotherContext) {
-        this.instances.putAll(anotherContext.getInstances());
+        this.options.putAll(anotherContext.getOptions());
         this.attachments.putAll(anotherContext.getAttachments());
     }
 

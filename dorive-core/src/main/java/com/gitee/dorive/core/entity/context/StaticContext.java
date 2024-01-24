@@ -27,22 +27,22 @@ import java.util.Map;
 
 public class StaticContext implements Context {
 
-    private Map<Class<?>, Object> instances = new LinkedHashMap<>(3);
+    private Map<Class<?>, Object> options = new LinkedHashMap<>(3);
 
     public StaticContext(Selection selection) {
-        this.instances.put(Selection.class, selection);
-        this.instances = Collections.unmodifiableMap(this.instances);
+        this.options.put(Selection.class, selection);
+        this.options = Collections.unmodifiableMap(this.options);
     }
 
     public StaticContext(Selection selection, Selector selector) {
-        this.instances.put(Selection.class, selection);
-        this.instances.put(Selector.class, selector);
-        this.instances = Collections.unmodifiableMap(this.instances);
+        this.options.put(Selection.class, selection);
+        this.options.put(Selector.class, selector);
+        this.options = Collections.unmodifiableMap(this.options);
     }
 
     @Override
-    public Map<Class<?>, Object> getInstances() {
-        return instances;
+    public Map<Class<?>, Object> getOptions() {
+        return options;
     }
 
     @Override
