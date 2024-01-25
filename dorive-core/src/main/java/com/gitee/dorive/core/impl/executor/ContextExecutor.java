@@ -22,6 +22,7 @@ import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Delete;
 import com.gitee.dorive.core.entity.operation.Insert;
@@ -39,10 +40,11 @@ import lombok.EqualsAndHashCode;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ContextExecutor extends AbstractExecutor implements EntityHandler {
+public class ContextExecutor extends AbstractExecutor {
 
     private final AbstractContextRepository<?, ?> repository;
     private final EntityHandler entityHandler;
@@ -60,16 +62,31 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
             Result<Object> result = rootRepository.executeQuery(context, query);
             List<Object> entities = result.getRecords();
             if (!entities.isEmpty()) {
-                handle(context, entities);
+                populate(context, entities);
             }
             return result;
         }
         return new Result<>();
     }
 
-    @Override
-    public long handle(Context context, List<Object> entities) {
-        return entityHandler.handle(context, entities);
+    public void populate(Context context, List<Object> entities) {
+        DerivedResolver derivedResolver = repository.getDerivedResolver();
+        if (!derivedResolver.hasDerived()) {
+            entityHandler.handle(context, entities);
+        } else {
+            Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = derivedResolver.distribute(entities);
+            repositoryEntitiesMap.forEach((repository, partEntities) -> {
+                if (repository == this.repository) { // 避免自循环
+                    entityHandler.handle(context, partEntities);
+                } else {
+                    Executor executor = repository.getExecutor();
+                    if (executor instanceof ContextExecutor) {
+                        ContextExecutor contextExecutor = (ContextExecutor) executor;
+                        contextExecutor.populate(context, partEntities);
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -83,25 +100,28 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
         Assert.notNull(rootEntity, "The root entity cannot be null!");
 
         DerivedResolver derivedResolver = repository.getDerivedResolver();
-        AbstractContextRepository<?, ?> delegateRepository = derivedResolver.deriveRepository(rootEntity);
-        delegateRepository = delegateRepository == null ? repository : delegateRepository;
+        AbstractContextRepository<?, ?> repository = derivedResolver.distribute(rootEntity);
 
-        if (operation instanceof Insert) {
-            return executeInsert(context, operation, delegateRepository);
+        Executor executor = repository.getExecutor();
+        if (executor instanceof ContextExecutor) {
+            ContextExecutor contextExecutor = (ContextExecutor) executor;
+            if (operation instanceof Insert) {
+                return contextExecutor.executeInsert(context, operation);
 
-        } else if (operation instanceof Update || operation instanceof Delete) {
-            return executeUpdateOrDelete(context, operation, delegateRepository);
+            } else if (operation instanceof Update || operation instanceof Delete) {
+                return contextExecutor.executeUpdateOrDelete(context, operation);
 
-        } else if (operation instanceof InsertOrUpdate) {
-            return executeInsertOrUpdate(context, operation, delegateRepository);
+            } else if (operation instanceof InsertOrUpdate) {
+                return contextExecutor.executeInsertOrUpdate(context, operation);
+            }
         }
         return 0;
     }
 
-    private int executeInsert(Context context, Operation operation, AbstractContextRepository<?, ?> delegateRepository) {
+    public int executeInsert(Context context, Operation operation) {
         Object rootEntity = operation.getEntity();
         int totalCount = 0;
-        for (CommonRepository repository : delegateRepository.getOrderedRepositories()) {
+        for (CommonRepository repository : this.repository.getOrderedRepositories()) {
             if (repository.isRoot()) {
                 if (!operation.isIgnoreRoot()) {
                     if (repository.matches(context) || operation.isIncludeRoot()) {
@@ -139,11 +159,11 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
         return totalCount;
     }
 
-    private int executeUpdateOrDelete(Context context, Operation operation, AbstractContextRepository<?, ?> delegateRepository) {
+    public int executeUpdateOrDelete(Context context, Operation operation) {
         Object rootEntity = operation.getEntity();
         int totalCount = 0;
         if (!operation.isIgnoreRoot()) {
-            CommonRepository rootRepository = delegateRepository.getRootRepository();
+            CommonRepository rootRepository = this.repository.getRootRepository();
             if (rootRepository.matches(context) || operation.isIncludeRoot()) {
                 Object primaryKey = rootRepository.getPrimaryKey(rootEntity);
                 if (primaryKey != null) {
@@ -151,7 +171,7 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
                 }
             }
         }
-        for (CommonRepository subRepository : delegateRepository.getSubRepositories()) {
+        for (CommonRepository subRepository : this.repository.getSubRepositories()) {
             boolean isMatch = subRepository.matches(context);
             boolean isAggregated = subRepository.isAggregated();
             if (!isMatch && !isAggregated) {
@@ -179,10 +199,10 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
         return totalCount;
     }
 
-    private int executeInsertOrUpdate(Context context, Operation operation, AbstractContextRepository<?, ?> delegateRepository) {
+    public int executeInsertOrUpdate(Context context, Operation operation) {
         Object rootEntity = operation.getEntity();
         int totalCount = 0;
-        for (CommonRepository repository : delegateRepository.getOrderedRepositories()) {
+        for (CommonRepository repository : this.repository.getOrderedRepositories()) {
             OperationFactory operationFactory = repository.getOperationFactory();
             if (repository.isRoot()) {
                 if (!operation.isIgnoreRoot()) {

@@ -22,21 +22,23 @@ import lombok.Data;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.ReflectionUtils;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Data
 public class DerivedResolver {
 
     private AbstractContextRepository<?, ?> repository;
-    private Map<Class<?>, AbstractContextRepository<?, ?>> derivedRepositoryMap = new LinkedHashMap<>(3 * 4 / 3 + 1);
+    private Map<Class<?>, AbstractContextRepository<?, ?>> classRepositoryMap = new LinkedHashMap<>(3 * 4 / 3 + 1);
 
     public DerivedResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
         resolve();
     }
 
-    public void resolve() {
+    private void resolve() {
         ReflectionUtils.doWithLocalFields(repository.getClass(), declaredField -> {
             Class<?> fieldClass = declaredField.getType();
             if (AbstractContextRepository.class.isAssignableFrom(fieldClass)) {
@@ -45,22 +47,29 @@ public class DerivedResolver {
                 AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) beanInstance;
                 Class<?> fieldEntityClass = abstractContextRepository.getEntityClass();
                 if (repository.getEntityClass().isAssignableFrom(fieldEntityClass)) {
-                    derivedRepositoryMap.put(fieldEntityClass, abstractContextRepository);
+                    classRepositoryMap.put(fieldEntityClass, abstractContextRepository);
                 }
             }
         });
     }
 
-    public boolean isDerived() {
-        return !derivedRepositoryMap.isEmpty();
+    public boolean hasDerived() {
+        return !classRepositoryMap.isEmpty();
     }
 
-    public int numberOf() {
-        return derivedRepositoryMap.size();
+    public AbstractContextRepository<?, ?> distribute(Object entity) {
+        return classRepositoryMap.getOrDefault(entity.getClass(), repository);
     }
 
-    public AbstractContextRepository<?, ?> deriveRepository(Object entity) {
-        return derivedRepositoryMap.get(entity.getClass());
+    public Map<AbstractContextRepository<?, ?>, List<Object>> distribute(List<Object> entities) {
+        int size = classRepositoryMap.size() + 1;
+        Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>(size * 4 / 3 + 1);
+        for (Object entity : entities) {
+            AbstractContextRepository<?, ?> repository = distribute(entity);
+            List<Object> existEntities = repositoryEntitiesMap.computeIfAbsent(repository, key -> new ArrayList<>(entities.size()));
+            existEntities.add(entity);
+        }
+        return repositoryEntitiesMap;
     }
 
 }
