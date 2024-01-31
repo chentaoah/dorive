@@ -48,16 +48,17 @@ public class UnionEntityJoiner extends AbstractEntityJoiner {
         for (int index = 0; index < entities.size(); index++) {
             Object entity = entities.get(index);
             Object lastEntity = lastPropChain == null ? entity : lastPropChain.getValue(entity);
-            if (lastEntity != null) {
-                Example example = newExample(context, entity);
-                if (example.isEmpty()) {
-                    continue;
-                }
-                String row = Integer.toString(index + 1);
-                example.selectExtra(row + " as $row");
-                unionExample.addExample(example);
-                addToRootIndex(entity, row);
+            if (lastEntity == null) {
+                continue;
             }
+            Example example = newExample(context, entity);
+            if (example.isEmpty()) {
+                continue;
+            }
+            String row = Integer.toString(index + 1);
+            example.selectExtra(row + " as $row");
+            unionExample.addExample(example);
+            addToRootIndex(entity, row);
         }
         return unionExample;
     }
