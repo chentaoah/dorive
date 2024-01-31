@@ -70,8 +70,7 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
     }
 
     public List<PropertyBinder> getRootBinders() {
-        Map<String, List<PropertyBinder>> mergedBindersMap = binderResolver.getMergedBindersMap();
-        return mergedBindersMap.get("/");
+        return binderResolver.getMergedBindersMap().get("/");
     }
 
     @Override
