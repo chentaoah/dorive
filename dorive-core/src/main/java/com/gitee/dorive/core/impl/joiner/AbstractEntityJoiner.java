@@ -87,8 +87,7 @@ public abstract class AbstractEntityJoiner implements EntityJoiner {
         if (StringUtils.isBlank(key) || entity == null) {
             return;
         }
-        boolean isCollection = repository.isCollection();
-        if (isCollection) {
+        if (repository.isCollection()) {
             Collection<Object> collection = (Collection<Object>) recordIndex.computeIfAbsent(key, k -> new ArrayList<>(averageSize));
             collection.add(entity);
         } else {
