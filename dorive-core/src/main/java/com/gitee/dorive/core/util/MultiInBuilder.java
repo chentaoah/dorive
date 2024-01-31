@@ -32,15 +32,15 @@ import java.util.stream.Collectors;
 public class MultiInBuilder {
 
     private List<String> aliases;
-    private int number;
     private int size;
+    private int count;
     private List<Object> values;
 
-    public MultiInBuilder(List<String> aliases, int number) {
+    public MultiInBuilder(List<String> aliases, int count) {
         this.aliases = aliases;
-        this.number = number;
         this.size = aliases.size();
-        this.values = new ArrayList<>(number * size);
+        this.count = count;
+        this.values = new ArrayList<>(count * size);
     }
 
     public boolean isEmpty() {
@@ -51,10 +51,20 @@ public class MultiInBuilder {
         values.add(value);
     }
 
+    public void clearRemainder() {
+        int total = values.size();
+        int remainder = total % size;
+        if (remainder != 0) {
+            values.subList(total - remainder, total).clear();
+        }
+    }
+
     public void clearLast() {
-        int size = values.size();
-        int remainder = size % this.size;
-        values.subList(size - remainder, size).clear();
+        int total = values.size();
+        int remainder = total % size;
+        if (remainder == 0) {
+            values.subList(total - size, total).clear();
+        }
     }
 
     public Criterion toCriterion() {

@@ -143,7 +143,7 @@ public class DefaultQueryBuilder implements QueryBuilder {
                     fieldValue = binder.output(context, fieldValue);
                     builder.append(fieldValue);
                 } else {
-                    builder.clearLast();
+                    builder.clearRemainder();
                     break;
                 }
             }

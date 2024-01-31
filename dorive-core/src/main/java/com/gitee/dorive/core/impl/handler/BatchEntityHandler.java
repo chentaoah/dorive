@@ -19,7 +19,15 @@ package com.gitee.dorive.core.impl.handler;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.core.impl.resolver.BinderResolver;
+import com.gitee.dorive.core.api.executor.EntityJoiner;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.entity.option.JoinType;
+import com.gitee.dorive.core.impl.factory.OperationFactory;
+import com.gitee.dorive.core.impl.joiner.MultiEntityJoiner;
+import com.gitee.dorive.core.impl.joiner.SingleEntityJoiner;
+import com.gitee.dorive.core.impl.joiner.UnionEntityJoiner;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
@@ -38,13 +46,38 @@ public class BatchEntityHandler implements EntityHandler {
         long totalCount = 0L;
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (repository.matches(context)) {
-                BinderResolver binderResolver = repository.getBinderResolver();
-                EntityHandler entityHandler = binderResolver.isSimpleRootBinding() ?
-                        new MultiEntityHandler(repository) : new UnionEntityHandler(repository);
-                totalCount += entityHandler.handle(context, entities);
+                EntityJoiner entityJoiner = getEntityJoiner(repository, entities);
+                if (entityJoiner == null) {
+                    continue;
+                }
+                Example example = entityJoiner.newExample(context, entities);
+                if (example.isEmpty()) {
+                    continue;
+                }
+                OperationFactory operationFactory = repository.getOperationFactory();
+                Query query = operationFactory.buildQueryByExample(example);
+                query.includeRoot();
+                Result<Object> result = repository.executeQuery(context, query);
+                entityJoiner.join(context, entities, result);
+                totalCount += result.getCount();
             }
         }
         return totalCount;
+    }
+
+    protected EntityJoiner getEntityJoiner(CommonRepository repository, List<Object> entities) {
+        JoinType joinType = repository.getJoinType();
+        int entitiesSize = entities.size();
+        if (joinType == JoinType.SINGLE) {
+            return new SingleEntityJoiner(repository, entitiesSize);
+
+        } else if (joinType == JoinType.MULTI) {
+            return new MultiEntityJoiner(repository, entitiesSize);
+
+        } else if (joinType == JoinType.UNION) {
+            return new UnionEntityJoiner(repository, entitiesSize);
+        }
+        return null;
     }
 
 }

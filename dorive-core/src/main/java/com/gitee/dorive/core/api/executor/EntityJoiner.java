@@ -15,43 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.executor;
+package com.gitee.dorive.core.api.executor;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.Result;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-public class UnionExample extends Example {
+public interface EntityJoiner {
 
-    private List<Example> examples = new ArrayList<>();
+    Example newExample(Context context, List<Object> entities);
 
-    @Override
-    public boolean isEmpty() {
-        return examples.isEmpty();
-    }
-
-    @Override
-    public boolean isNotEmpty() {
-        return !examples.isEmpty();
-    }
-
-    @Override
-    public void select(List<String> fields) {
-        if (examples != null && !examples.isEmpty()) {
-            for (Example example : examples) {
-                example.select(fields);
-            }
-        }
-    }
-
-    public void addExample(Example example) {
-        examples.add(example);
-    }
+    void join(Context context, List<Object> entities, Result<Object> result);
 
 }

@@ -28,6 +28,7 @@ import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.binder.Processor;
+import com.gitee.dorive.core.entity.option.JoinType;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.processor.DefaultProcessor;
@@ -54,7 +55,7 @@ public class BinderResolver {
     private List<Binder> allBinders;
     private List<PropertyBinder> propertyBinders;
     private Map<String, List<PropertyBinder>> mergedBindersMap;
-    private boolean simpleRootBinding;
+    private JoinType joinType;
     private List<String> selfFields;
     private List<ContextBinder> contextBinders;
     private List<Binder> boundValueBinders;
@@ -72,7 +73,7 @@ public class BinderResolver {
         allBinders = new ArrayList<>(bindingDefs.size());
         propertyBinders = new ArrayList<>(bindingDefs.size());
         mergedBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
-        simpleRootBinding = false;
+        joinType = JoinType.UNKNOWN;
         selfFields = new ArrayList<>(bindingDefs.size());
         contextBinders = new ArrayList<>(bindingDefs.size());
         boundValueBinders = new ArrayList<>(bindingDefs.size());
@@ -123,7 +124,14 @@ public class BinderResolver {
         }
 
         if (mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/")) {
-            simpleRootBinding = CollUtil.findOne(mergedBindersMap.get("/"), PropertyBinder::isCollection) == null;
+            List<PropertyBinder> binders = mergedBindersMap.get("/");
+            boolean hasCollection = CollUtil.findOne(binders, PropertyBinder::isCollection) != null;
+            if (!hasCollection) {
+                joinType = binders.size() == 1 ? JoinType.SINGLE : JoinType.MULTI;
+            }
+        }
+        if (joinType == JoinType.UNKNOWN) {
+            joinType = JoinType.UNION;
         }
         selfFields = Collections.unmodifiableList(selfFields);
     }
