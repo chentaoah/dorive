@@ -32,6 +32,15 @@ public class UnionExample extends Example {
     private List<Example> examples = new ArrayList<>();
 
     @Override
+    public void select(List<String> fields) {
+        if (examples != null && !examples.isEmpty()) {
+            for (Example example : examples) {
+                example.select(fields);
+            }
+        }
+    }
+
+    @Override
     public boolean isEmpty() {
         return examples.isEmpty();
     }
@@ -39,15 +48,6 @@ public class UnionExample extends Example {
     @Override
     public boolean isNotEmpty() {
         return !examples.isEmpty();
-    }
-
-    @Override
-    public void select(List<String> fields) {
-        if (examples != null && !examples.isEmpty()) {
-            for (Example example : examples) {
-                example.select(fields);
-            }
-        }
     }
 
     public void addExample(Example example) {
