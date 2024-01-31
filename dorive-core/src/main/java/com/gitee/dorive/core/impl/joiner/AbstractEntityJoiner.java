@@ -58,9 +58,9 @@ public abstract class AbstractEntityJoiner implements EntityJoiner {
         BinderResolver binderResolver = repository.getBinderResolver();
         List<ContextBinder> contextBinders = binderResolver.getContextBinders();
         for (ContextBinder contextBinder : contextBinders) {
-            String fieldName = contextBinder.getFieldName();
             Object boundValue = contextBinder.getBoundValue(context, null);
             if (boundValue != null) {
+                String fieldName = contextBinder.getFieldName();
                 example.eq(fieldName, boundValue);
             }
         }
