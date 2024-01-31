@@ -60,18 +60,16 @@ public class SingleEntityJoiner extends AbstractEntityJoiner {
         List<Object> boundValues = new ArrayList<>(entities.size());
         for (Object entity : entities) {
             Object boundValue = binder.getBoundValue(context, entity);
-            if (boundValue == null) {
-                continue;
+            if (boundValue != null) {
+                boundValue = binder.input(context, boundValue);
             }
-            boundValue = binder.input(context, boundValue);
-            if (boundValue == null) {
-                continue;
+            if (boundValue != null) {
+                String key = boundValue.toString();
+                if (!keys.contains(key)) {
+                    boundValues.add(boundValue);
+                }
+                addToRootIndex(entity, key);
             }
-            String key = boundValue.toString();
-            if (!keys.contains(key)) {
-                boundValues.add(boundValue);
-            }
-            addToRootIndex(entity, key);
         }
         return boundValues;
     }
@@ -81,11 +79,10 @@ public class SingleEntityJoiner extends AbstractEntityJoiner {
         List<Object> records = result.getRecords();
         for (Object entity : records) {
             Object fieldValue = binder.getFieldValue(context, entity);
-            if (fieldValue == null) {
-                continue;
+            if (fieldValue != null) {
+                String key = fieldValue.toString();
+                addToRecordIndex(key, entity);
             }
-            String key = fieldValue.toString();
-            addToRecordIndex(key, entity);
         }
     }
 

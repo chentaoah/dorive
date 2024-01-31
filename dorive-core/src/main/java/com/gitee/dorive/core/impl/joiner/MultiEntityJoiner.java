@@ -61,20 +61,18 @@ public class MultiEntityJoiner extends AbstractEntityJoiner {
             StringBuilder keyBuilder = new StringBuilder();
             for (PropertyBinder binder : binders) {
                 Object boundValue = binder.getBoundValue(context, entity);
-                if (boundValue == null) {
+                if (boundValue != null) {
+                    boundValue = binder.input(context, boundValue);
+                }
+                if (boundValue != null) {
+                    multiInBuilder.append(boundValue);
+                    String key = boundValue.toString();
+                    keyBuilder.append("(").append(key.length()).append(")").append(key).append(",");
+                } else {
                     multiInBuilder.clearRemainder();
                     keyBuilder = null;
                     break;
                 }
-                boundValue = binder.input(context, boundValue);
-                if (boundValue == null) {
-                    multiInBuilder.clearRemainder();
-                    keyBuilder = null;
-                    break;
-                }
-                multiInBuilder.append(boundValue);
-                String key = boundValue.toString();
-                keyBuilder.append("(").append(key.length()).append(")").append(key).append(",");
             }
             if (keyBuilder != null && keyBuilder.length() > 0) {
                 keyBuilder.deleteCharAt(keyBuilder.length() - 1);
@@ -96,12 +94,13 @@ public class MultiEntityJoiner extends AbstractEntityJoiner {
             StringBuilder keyBuilder = new StringBuilder();
             for (PropertyBinder binder : binders) {
                 Object fieldValue = binder.getFieldValue(context, entity);
-                if (fieldValue == null) {
+                if (fieldValue != null) {
+                    String key = fieldValue.toString();
+                    keyBuilder.append("(").append(key.length()).append(")").append(key).append(",");
+                } else {
                     keyBuilder = null;
                     break;
                 }
-                String key = fieldValue.toString();
-                keyBuilder.append("(").append(key.length()).append(")").append(key).append(",");
             }
             if (keyBuilder != null && keyBuilder.length() > 0) {
                 keyBuilder.deleteCharAt(keyBuilder.length() - 1);

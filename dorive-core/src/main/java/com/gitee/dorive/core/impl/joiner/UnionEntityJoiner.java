@@ -73,17 +73,16 @@ public class UnionEntityJoiner extends AbstractEntityJoiner {
                     boundValue = null;
                 }
             }
-            if (boundValue == null) {
+            if (boundValue != null) {
+                boundValue = binder.input(context, boundValue);
+            }
+            if (boundValue != null) {
+                String fieldName = binder.getFieldName();
+                example.eq(fieldName, boundValue);
+            } else {
                 example.getCriteria().clear();
                 break;
             }
-            boundValue = binder.input(context, boundValue);
-            if (boundValue == null) {
-                example.getCriteria().clear();
-                break;
-            }
-            String fieldName = binder.getFieldName();
-            example.eq(fieldName, boundValue);
         }
         appendContext(context, example);
         return example;
