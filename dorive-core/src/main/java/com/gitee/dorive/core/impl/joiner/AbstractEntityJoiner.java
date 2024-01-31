@@ -112,10 +112,9 @@ public abstract class AbstractEntityJoiner implements EntityJoiner {
         }
         PropChain anchorPoint = repository.getAnchorPoint();
         Object value = anchorPoint.getValue(entity);
-        if (value != null) {
-            return;
+        if (value == null) {
+            anchorPoint.setValue(entity, object);
         }
-        anchorPoint.setValue(entity, object);
     }
 
     protected abstract void addToRecordIndex(Context context, List<Object> entities, Result<Object> result);
