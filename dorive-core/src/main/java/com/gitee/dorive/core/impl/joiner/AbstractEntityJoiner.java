@@ -78,7 +78,7 @@ public abstract class AbstractEntityJoiner implements EntityJoiner {
     public void join(Context context, List<Object> entities, Result<Object> result) {
         List<Object> records = result.getRecords();
         averageSize = records.size() / entities.size() + 1;
-        addToRecordIndex(context, entities, result);
+        buildRecordIndex(context, entities, result);
         joinMany(entities);
     }
 
@@ -116,6 +116,6 @@ public abstract class AbstractEntityJoiner implements EntityJoiner {
         }
     }
 
-    protected abstract void addToRecordIndex(Context context, List<Object> entities, Result<Object> result);
+    protected abstract void buildRecordIndex(Context context, List<Object> entities, Result<Object> result);
 
 }

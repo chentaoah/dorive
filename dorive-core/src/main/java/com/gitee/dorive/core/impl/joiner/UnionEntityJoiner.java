@@ -90,7 +90,7 @@ public class UnionEntityJoiner extends AbstractEntityJoiner {
     }
 
     @Override
-    protected void addToRecordIndex(Context context, List<Object> entities, Result<Object> result) {
+    protected void buildRecordIndex(Context context, List<Object> entities, Result<Object> result) {
         List<Map<String, Object>> recordMaps = result.getRecordMaps();
         for (Map<String, Object> resultMap : recordMaps) {
             Object row = resultMap.get("$row");

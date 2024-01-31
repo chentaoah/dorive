@@ -90,7 +90,7 @@ public class MultiEntityJoiner extends AbstractEntityJoiner {
     }
 
     @Override
-    protected void addToRecordIndex(Context context, List<Object> entities, Result<Object> result) {
+    protected void buildRecordIndex(Context context, List<Object> entities, Result<Object> result) {
         List<Object> records = result.getRecords();
         for (Object entity : records) {
             StringBuilder keyBuilder = new StringBuilder();
