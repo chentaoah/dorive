@@ -46,7 +46,7 @@ public class BatchEntityHandler implements EntityHandler {
         long totalCount = 0L;
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (repository.matches(context)) {
-                EntityJoiner entityJoiner = getEntityJoiner(repository, entities.size());
+                EntityJoiner entityJoiner = newEntityJoiner(repository, entities.size());
                 if (entityJoiner == null) {
                     continue;
                 }
@@ -65,7 +65,7 @@ public class BatchEntityHandler implements EntityHandler {
         return totalCount;
     }
 
-    protected EntityJoiner getEntityJoiner(CommonRepository repository, int entitiesSize) {
+    protected EntityJoiner newEntityJoiner(CommonRepository repository, int entitiesSize) {
         JoinType joinType = repository.getJoinType();
         if (joinType == JoinType.SINGLE) {
             return new SingleEntityJoiner(repository, entitiesSize);
