@@ -20,7 +20,7 @@ package com.gitee.dorive.core.api.context;
 import java.util.List;
 import java.util.Set;
 
-public interface Selector {
+public interface Selector extends Options {
 
     Set<String> getNames();
 

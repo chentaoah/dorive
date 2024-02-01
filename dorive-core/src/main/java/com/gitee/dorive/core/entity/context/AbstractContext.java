@@ -18,20 +18,27 @@
 package com.gitee.dorive.core.entity.context;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.option.Selection;
+import com.gitee.dorive.core.api.context.Options;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
+@NoArgsConstructor
 public abstract class AbstractContext implements Context {
 
     protected Map<Class<?>, Object> options = new LinkedHashMap<>(4);
     protected Map<String, Object> attachments = new LinkedHashMap<>(8);
 
-    public AbstractContext() {
-        this.options.put(Selection.class, Selection.NONE);
+    public AbstractContext(Options options) {
+        this.options.putAll(options.get());
+    }
+
+    public AbstractContext(Context anotherContext) {
+        this.options.putAll(anotherContext.getOptions());
+        this.attachments.putAll(anotherContext.getAttachments());
     }
 
     public Object put(String key, Object value) {

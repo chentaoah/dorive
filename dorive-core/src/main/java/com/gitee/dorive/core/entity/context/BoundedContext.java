@@ -18,10 +18,15 @@
 package com.gitee.dorive.core.entity.context;
 
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Options;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class BoundedContext extends InnerContext {
+public class BoundedContext extends AbstractContext {
+
+    public BoundedContext(Options options) {
+        super(options);
+    }
 
     public BoundedContext(Context anotherContext) {
         super(anotherContext);

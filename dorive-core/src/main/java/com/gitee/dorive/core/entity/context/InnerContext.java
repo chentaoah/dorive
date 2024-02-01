@@ -18,14 +18,18 @@
 package com.gitee.dorive.core.entity.context;
 
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Options;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class InnerContext extends AbstractContext {
 
+    public InnerContext(Options options) {
+        super(options);
+    }
+
     public InnerContext(Context anotherContext) {
-        this.options.putAll(anotherContext.getOptions());
-        this.attachments.putAll(anotherContext.getAttachments());
+        super(anotherContext);
     }
 
 }

@@ -18,6 +18,7 @@
 package com.gitee.dorive.ref.api;
 
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Options;
 
 public interface RefObj {
 
@@ -26,5 +27,11 @@ public interface RefObj {
     int insertOrUpdate(Context context);
 
     int delete(Context context);
+
+    long select(Options options);
+
+    int insertOrUpdate(Options options);
+
+    int delete(Options options);
 
 }

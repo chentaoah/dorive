@@ -20,18 +20,16 @@ package com.gitee.dorive.query.repository;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.annotation.Repository;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.context.InnerContext;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
-import com.gitee.dorive.core.util.ContextUtils;
 import com.gitee.dorive.event.repository.AbstractEventRepository;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.api.QueryRepository;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.entity.def.QueryScanDef;
 import com.gitee.dorive.query.impl.builder.DefaultQueryBuilder;
-import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.impl.builder.QueryResolver;
+import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -93,9 +91,6 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
     @Override
     public List<E> selectByQuery(Context context, Object query) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
         BuildQuery buildQuery = newQuery(context, query, false);
         Example example = buildQuery.getExample();
         if (buildQuery.isAbandoned()) {
@@ -111,9 +106,6 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByQuery(Context context, Object query) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
         BuildQuery buildQuery = newQuery(context, query, false);
         Example example = buildQuery.getExample();
         if (buildQuery.isAbandoned()) {
@@ -132,9 +124,6 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
     @Override
     public long selectCountByQuery(Context context, Object query) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
         BuildQuery buildQuery = newQuery(context, query, true);
         Example example = buildQuery.getExample();
         if (buildQuery.isAbandoned()) {

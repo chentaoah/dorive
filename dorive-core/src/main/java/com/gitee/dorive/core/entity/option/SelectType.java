@@ -17,9 +17,19 @@
 
 package com.gitee.dorive.core.entity.option;
 
-public enum Selection {
+import com.gitee.dorive.core.api.context.Options;
+
+import java.util.Collections;
+import java.util.Map;
+
+public enum SelectType implements Options {
     NONE,
     ROOT,
     ALL,
-    NAME
+    NAME;
+
+    @Override
+    public Map<Class<?>, Object> get() {
+        return Collections.singletonMap(SelectType.class, this);
+    }
 }

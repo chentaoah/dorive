@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.context;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Selector;
-import com.gitee.dorive.core.entity.option.Selection;
+import com.gitee.dorive.core.entity.option.SelectType;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,25 +34,25 @@ import java.util.Set;
  */
 @Getter
 @Setter
-public class SelectionMatcher implements Matcher {
+public class SelectTypeMatcher implements Matcher {
 
     private CommonRepository repository;
-    private Map<Selection, Matcher> matcherMap = new LinkedHashMap<>(8);
+    private Map<SelectType, Matcher> matcherMap = new LinkedHashMap<>(8);
 
-    public SelectionMatcher(CommonRepository repository) {
+    public SelectTypeMatcher(CommonRepository repository) {
         this.repository = repository;
-        this.matcherMap.put(Selection.NONE, context -> false);
-        this.matcherMap.put(Selection.ROOT, context -> repository.isRoot());
-        this.matcherMap.put(Selection.ALL, context -> true);
-        this.matcherMap.put(Selection.NAME, new NameMatcher());
+        this.matcherMap.put(SelectType.NONE, context -> false);
+        this.matcherMap.put(SelectType.ROOT, context -> repository.isRoot());
+        this.matcherMap.put(SelectType.ALL, context -> true);
+        this.matcherMap.put(SelectType.NAME, new NameMatcher());
     }
 
     @Override
     public boolean matches(Context context) {
         Map<Class<?>, Object> options = context.getOptions();
-        Selection selection = (Selection) options.get(Selection.class);
-        if (selection != null) {
-            Matcher matcher = matcherMap.get(selection);
+        SelectType selectType = (SelectType) options.get(SelectType.class);
+        if (selectType != null) {
+            Matcher matcher = matcherMap.get(selectType);
             if (matcher != null) {
                 return matcher.matches(context);
             }

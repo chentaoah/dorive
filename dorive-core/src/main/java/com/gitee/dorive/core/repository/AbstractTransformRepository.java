@@ -18,11 +18,9 @@
 package com.gitee.dorive.core.repository;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.context.InnerContext;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Page;
-import com.gitee.dorive.core.util.ContextUtils;
 import com.gitee.dorive.core.util.ExampleUtils;
 
 import java.util.List;
@@ -30,18 +28,7 @@ import java.util.List;
 public abstract class AbstractTransformRepository<E, PK> extends AbstractGenericRepository<E, PK> {
 
     @Override
-    public E selectByPrimaryKey(Context context, PK primaryKey) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
-        return super.selectByPrimaryKey(context, primaryKey);
-    }
-
-    @Override
     public List<E> selectByExample(Context context, Example example) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
         if (!(example instanceof InnerExample)) {
             example = ExampleUtils.clone(example);
         }
@@ -50,9 +37,6 @@ public abstract class AbstractTransformRepository<E, PK> extends AbstractGeneric
 
     @Override
     public E selectOneByExample(Context context, Example example) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
         if (!(example instanceof InnerExample)) {
             example = ExampleUtils.clone(example);
         }
@@ -61,9 +45,6 @@ public abstract class AbstractTransformRepository<E, PK> extends AbstractGeneric
 
     @Override
     public Page<E> selectPageByExample(Context context, Example example) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
         if (!(example instanceof InnerExample)) {
             example = ExampleUtils.clone(example);
         }
@@ -72,9 +53,6 @@ public abstract class AbstractTransformRepository<E, PK> extends AbstractGeneric
 
     @Override
     public long selectCountByExample(Context context, Example example) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
         if (!(example instanceof InnerExample)) {
             example = ExampleUtils.clone(example);
         }
@@ -82,26 +60,7 @@ public abstract class AbstractTransformRepository<E, PK> extends AbstractGeneric
     }
 
     @Override
-    public int insert(Context context, E entity) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
-        return super.insert(context, entity);
-    }
-
-    @Override
-    public int update(Context context, E entity) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
-        return super.update(context, entity);
-    }
-
-    @Override
     public int updateByExample(Context context, Object entity, Example example) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
         if (!(example instanceof InnerExample)) {
             example = ExampleUtils.clone(example);
         }
@@ -109,70 +68,11 @@ public abstract class AbstractTransformRepository<E, PK> extends AbstractGeneric
     }
 
     @Override
-    public int insertOrUpdate(Context context, E entity) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
-        return super.insertOrUpdate(context, entity);
-    }
-
-    @Override
-    public int delete(Context context, E entity) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
-        return super.delete(context, entity);
-    }
-
-    @Override
-    public int deleteByPrimaryKey(Context context, PK primaryKey) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
-        return super.deleteByPrimaryKey(context, primaryKey);
-    }
-
-    @Override
     public int deleteByExample(Context context, Example example) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
         if (!(example instanceof InnerExample)) {
             example = ExampleUtils.clone(example);
         }
         return super.deleteByExample(context, example);
-    }
-
-    @Override
-    public int insertList(Context context, List<E> entities) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
-        return super.insertList(context, entities);
-    }
-
-    @Override
-    public int updateList(Context context, List<E> entities) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
-        return super.updateList(context, entities);
-    }
-
-    @Override
-    public int insertOrUpdateList(Context context, List<E> entities) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
-        return super.insertOrUpdateList(context, entities);
-    }
-
-    @Override
-    public int deleteList(Context context, List<E> entities) {
-        if (!(context instanceof InnerContext)) {
-            context = ContextUtils.clone(context);
-        }
-        return super.deleteList(context, entities);
     }
 
 }
