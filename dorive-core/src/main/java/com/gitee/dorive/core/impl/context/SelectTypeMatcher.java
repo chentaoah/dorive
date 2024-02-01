@@ -44,7 +44,7 @@ public class SelectTypeMatcher implements Matcher {
         this.matcherMap.put(SelectType.NONE, context -> false);
         this.matcherMap.put(SelectType.ROOT, context -> repository.isRoot());
         this.matcherMap.put(SelectType.ALL, context -> true);
-        this.matcherMap.put(SelectType.NAME, new NameMatcher());
+        this.matcherMap.put(SelectType.SELECTOR, new SelectorMatcher());
     }
 
     @Override
@@ -60,7 +60,7 @@ public class SelectTypeMatcher implements Matcher {
         return false;
     }
 
-    private class NameMatcher implements Matcher {
+    private class SelectorMatcher implements Matcher {
         @Override
         public boolean matches(Context context) {
             Map<Class<?>, Object> options = context.getOptions();

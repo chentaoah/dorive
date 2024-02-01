@@ -74,7 +74,7 @@ public class NameSelector implements Selector {
     @Override
     public Map<Class<?>, Object> get() {
         Map<Class<?>, Object> options = new LinkedHashMap<>(3);
-        options.put(SelectType.class, SelectType.NAME);
+        options.put(SelectType.class, SelectType.SELECTOR);
         options.put(Selector.class, this);
         return options;
     }

@@ -21,5 +21,5 @@ public enum SelectType {
     NONE,
     ROOT,
     ALL,
-    NAME
+    SELECTOR
 }
