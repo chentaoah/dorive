@@ -17,9 +17,15 @@
 
 package com.gitee.dorive.core.api.context;
 
+import com.gitee.dorive.core.entity.option.SelectType;
+
+import java.util.Collections;
 import java.util.Map;
 
 public interface Context {
+
+    Options ROOT = () -> Collections.singletonMap(SelectType.class, SelectType.ROOT);
+    Options ALL = () -> Collections.singletonMap(SelectType.class, SelectType.ALL);
 
     Map<Class<?>, Object> getOptions();
 
