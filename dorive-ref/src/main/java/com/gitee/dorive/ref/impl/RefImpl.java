@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.ref.impl;
 
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.repository.AbstractProxyRepository;
@@ -43,38 +43,38 @@ public class RefImpl extends AbstractProxyRepository implements Ref<Object> {
     }
 
     @Override
-    public int insertList(Context context, List<Object> entities) {
-        return repository.insertList(context, entities);
+    public int insertList(Options options, List<Object> entities) {
+        return repository.insertList(options, entities);
     }
 
     @Override
-    public int updateList(Context context, List<Object> entities) {
-        return repository.updateList(context, entities);
+    public int updateList(Options options, List<Object> entities) {
+        return repository.updateList(options, entities);
     }
 
     @Override
-    public int insertOrUpdateList(Context context, List<Object> entities) {
-        return repository.insertOrUpdateList(context, entities);
+    public int insertOrUpdateList(Options options, List<Object> entities) {
+        return repository.insertOrUpdateList(options, entities);
     }
 
     @Override
-    public int deleteList(Context context, List<Object> entities) {
-        return repository.deleteList(context, entities);
+    public int deleteList(Options options, List<Object> entities) {
+        return repository.deleteList(options, entities);
     }
 
     @Override
-    public List<Object> selectByQuery(Context context, Object query) {
-        return repository.selectByQuery(context, query);
+    public List<Object> selectByQuery(Options options, Object query) {
+        return repository.selectByQuery(options, query);
     }
 
     @Override
-    public Page<Object> selectPageByQuery(Context context, Object query) {
-        return repository.selectPageByQuery(context, query);
+    public Page<Object> selectPageByQuery(Options options, Object query) {
+        return repository.selectPageByQuery(options, query);
     }
 
     @Override
-    public long selectCountByQuery(Context context, Object query) {
-        return repository.selectCountByQuery(context, query);
+    public long selectCountByQuery(Options options, Object query) {
+        return repository.selectCountByQuery(options, query);
     }
 
     @Override

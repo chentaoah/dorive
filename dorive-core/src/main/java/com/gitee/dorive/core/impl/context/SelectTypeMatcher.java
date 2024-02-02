@@ -49,8 +49,7 @@ public class SelectTypeMatcher implements Matcher {
 
     @Override
     public boolean matches(Context context) {
-        Map<Class<?>, Object> options = context.getOptions();
-        SelectType selectType = (SelectType) options.get(SelectType.class);
+        SelectType selectType = (SelectType) context.getOption(SelectType.class);
         if (selectType != null) {
             Matcher matcher = matcherMap.get(selectType);
             if (matcher != null) {
@@ -63,8 +62,7 @@ public class SelectTypeMatcher implements Matcher {
     private class SelectorMatcher implements Matcher {
         @Override
         public boolean matches(Context context) {
-            Map<Class<?>, Object> options = context.getOptions();
-            Selector selector = (Selector) options.get(Selector.class);
+            Selector selector = (Selector) context.getOption(Selector.class);
             if (selector != null) {
                 Set<String> names = selector.getNames();
                 String name = repository.getName();

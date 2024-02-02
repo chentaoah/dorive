@@ -18,6 +18,7 @@
 package com.gitee.dorive.core.repository;
 
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
@@ -53,58 +54,58 @@ public abstract class AbstractProxyRepository extends AbstractRepository<Object,
     }
 
     @Override
-    public Object selectByPrimaryKey(Context context, Object primaryKey) {
-        return proxyRepository.selectByPrimaryKey(context, primaryKey);
+    public Object selectByPrimaryKey(Options options, Object primaryKey) {
+        return proxyRepository.selectByPrimaryKey(options, primaryKey);
     }
 
     @Override
-    public List<Object> selectByExample(Context context, Example example) {
-        return proxyRepository.selectByExample(context, example);
+    public List<Object> selectByExample(Options options, Example example) {
+        return proxyRepository.selectByExample(options, example);
     }
 
     @Override
-    public Page<Object> selectPageByExample(Context context, Example example) {
-        return proxyRepository.selectPageByExample(context, example);
+    public Page<Object> selectPageByExample(Options options, Example example) {
+        return proxyRepository.selectPageByExample(options, example);
     }
 
     @Override
-    public long selectCountByExample(Context context, Example example) {
-        return proxyRepository.selectCountByExample(context, example);
+    public long selectCountByExample(Options options, Example example) {
+        return proxyRepository.selectCountByExample(options, example);
     }
 
     @Override
-    public int insert(Context context, Object entity) {
-        return proxyRepository.insert(context, entity);
+    public int insert(Options options, Object entity) {
+        return proxyRepository.insert(options, entity);
     }
 
     @Override
-    public int update(Context context, Object entity) {
-        return proxyRepository.update(context, entity);
+    public int update(Options options, Object entity) {
+        return proxyRepository.update(options, entity);
     }
 
     @Override
-    public int updateByExample(Context context, Object entity, Example example) {
-        return proxyRepository.updateByExample(context, entity, example);
+    public int updateByExample(Options options, Object entity, Example example) {
+        return proxyRepository.updateByExample(options, entity, example);
     }
 
     @Override
-    public int insertOrUpdate(Context context, Object entity) {
-        return proxyRepository.insertOrUpdate(context, entity);
+    public int insertOrUpdate(Options options, Object entity) {
+        return proxyRepository.insertOrUpdate(options, entity);
     }
 
     @Override
-    public int delete(Context context, Object entity) {
-        return proxyRepository.delete(context, entity);
+    public int delete(Options options, Object entity) {
+        return proxyRepository.delete(options, entity);
     }
 
     @Override
-    public int deleteByPrimaryKey(Context context, Object primaryKey) {
-        return proxyRepository.deleteByPrimaryKey(context, primaryKey);
+    public int deleteByPrimaryKey(Options options, Object primaryKey) {
+        return proxyRepository.deleteByPrimaryKey(options, primaryKey);
     }
 
     @Override
-    public int deleteByExample(Context context, Example example) {
-        return proxyRepository.deleteByExample(context, example);
+    public int deleteByExample(Options options, Example example) {
+        return proxyRepository.deleteByExample(options, example);
     }
 
     @Override

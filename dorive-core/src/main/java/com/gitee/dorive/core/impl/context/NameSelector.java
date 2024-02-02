@@ -18,8 +18,6 @@
 package com.gitee.dorive.core.impl.context;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.core.api.context.Selector;
-import com.gitee.dorive.core.entity.option.SelectType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,7 +31,7 @@ import java.util.Set;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class NameSelector implements Selector {
+public class NameSelector extends AbstractSelector {
 
     private Set<String> names = Collections.emptySet();
     private Map<String, NameDef> nameDefMap = Collections.emptyMap();
@@ -69,14 +67,6 @@ public class NameSelector implements Selector {
     public List<String> select(String name) {
         NameDef nameDef = nameDefMap.get(name);
         return nameDef != null && !nameDef.getProperties().isEmpty() ? nameDef.getProperties() : null;
-    }
-
-    @Override
-    public Map<Class<?>, Object> get() {
-        Map<Class<?>, Object> options = new LinkedHashMap<>(3);
-        options.put(SelectType.class, SelectType.SELECTOR);
-        options.put(Selector.class, this);
-        return options;
     }
 
     @Data

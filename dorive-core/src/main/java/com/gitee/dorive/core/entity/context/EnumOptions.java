@@ -15,16 +15,39 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.api;
+package com.gitee.dorive.core.entity.context;
 
 import com.gitee.dorive.core.api.context.Options;
 
-public interface RefObj {
+import java.util.Collections;
+import java.util.Map;
 
-    long select(Options options);
+public class EnumOptions implements Options {
 
-    int insertOrUpdate(Options options);
+    private final Map<Class<?>, Object> options;
 
-    int delete(Options options);
+    public EnumOptions(Class<?> type, Object value) {
+        this.options = Collections.singletonMap(type, value);
+    }
+
+    @Override
+    public Map<Class<?>, Object> getOptions() {
+        return options;
+    }
+
+    @Override
+    public void setOption(Class<?> type, Object value) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Object getOption(Class<?> type) {
+        return options.get(type);
+    }
+
+    @Override
+    public void removeOption(Class<?> type) {
+        throw new UnsupportedOperationException();
+    }
 
 }

@@ -15,24 +15,41 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.context;
+package com.gitee.dorive.core.impl.context;
 
-import com.gitee.dorive.core.entity.context.EnumOptions;
+import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.option.SelectType;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-public interface Options {
+public abstract class AbstractSelector implements Selector {
 
-    Options ROOT = new EnumOptions(SelectType.class, SelectType.ROOT);
-    Options ALL = new EnumOptions(SelectType.class, SelectType.ALL);
+    private final Map<Class<?>, Object> options = new LinkedHashMap<>(3);
 
-    Map<Class<?>, Object> getOptions();
+    public AbstractSelector() {
+        this.options.put(SelectType.class, SelectType.SELECTOR);
+        this.options.put(Selector.class, this);
+    }
 
-    void setOption(Class<?> type, Object value);
+    @Override
+    public Map<Class<?>, Object> getOptions() {
+        return options;
+    }
 
-    Object getOption(Class<?> type);
+    @Override
+    public void setOption(Class<?> type, Object value) {
+        throw new UnsupportedOperationException();
+    }
 
-    void removeOption(Class<?> type);
+    @Override
+    public Object getOption(Class<?> type) {
+        return options.get(type);
+    }
+
+    @Override
+    public void removeOption(Class<?> type) {
+        throw new UnsupportedOperationException();
+    }
 
 }

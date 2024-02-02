@@ -115,8 +115,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
     @Override
     protected QueryBuilder adaptiveQueryBuilder(Context context, BuildQuery buildQuery) {
-        Map<Class<?>, Object> options = context.getOptions();
-        QueryStrategy queryStrategy = (QueryStrategy) options.get(QueryStrategy.class);
+        QueryStrategy queryStrategy = (QueryStrategy) context.getOption(QueryStrategy.class);
         if (queryStrategy == null || queryStrategy == QueryStrategy.SQL) {
             return sqlQueryBuilder;
         }

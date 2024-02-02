@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.query.api;
 
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.repository.ListableRepository;
 import com.gitee.dorive.core.entity.executor.Page;
 
@@ -25,10 +25,10 @@ import java.util.List;
 
 public interface QueryRepository<E, PK> extends ListableRepository<E, PK> {
 
-    List<E> selectByQuery(Context context, Object query);
+    List<E> selectByQuery(Options options, Object query);
 
-    Page<E> selectPageByQuery(Context context, Object query);
+    Page<E> selectPageByQuery(Options options, Object query);
 
-    long selectCountByQuery(Context context, Object query);
+    long selectCountByQuery(Options options, Object query);
 
 }

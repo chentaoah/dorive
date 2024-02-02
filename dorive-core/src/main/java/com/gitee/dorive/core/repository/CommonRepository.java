@@ -34,7 +34,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -80,8 +79,7 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
-        Map<Class<?>, Object> options = context.getOptions();
-        Selector selector = (Selector) options.get(Selector.class);
+        Selector selector = (Selector) context.getOption(Selector.class);
         if (selector != null) {
             List<String> properties = selector.select(getName());
             if (properties != null && !properties.isEmpty()) {

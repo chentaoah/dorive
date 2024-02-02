@@ -17,18 +17,18 @@
 
 package com.gitee.dorive.core.api.repository;
 
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Options;
 
 import java.util.List;
 
 public interface ListableRepository<E, PK> extends Repository<E, PK> {
 
-    int insertList(Context context, List<E> entities);
+    int insertList(Options options, List<E> entities);
 
-    int updateList(Context context, List<E> entities);
+    int updateList(Options options, List<E> entities);
 
-    int insertOrUpdateList(Context context, List<E> entities);
+    int insertOrUpdateList(Options options, List<E> entities);
 
-    int deleteList(Context context, List<E> entities);
+    int deleteList(Options options, List<E> entities);
 
 }

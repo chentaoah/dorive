@@ -20,6 +20,7 @@ package com.gitee.dorive.query.repository;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.annotation.Repository;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.event.repository.AbstractEventRepository;
@@ -90,7 +91,8 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     }
 
     @Override
-    public List<E> selectByQuery(Context context, Object query) {
+    public List<E> selectByQuery(Options options, Object query) {
+        Context context = (Context) options;
         BuildQuery buildQuery = newQuery(context, query, false);
         Example example = buildQuery.getExample();
         if (buildQuery.isAbandoned()) {
@@ -105,7 +107,8 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
     @Override
     @SuppressWarnings("unchecked")
-    public Page<E> selectPageByQuery(Context context, Object query) {
+    public Page<E> selectPageByQuery(Options options, Object query) {
+        Context context = (Context) options;
         BuildQuery buildQuery = newQuery(context, query, false);
         Example example = buildQuery.getExample();
         if (buildQuery.isAbandoned()) {
@@ -123,7 +126,8 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     }
 
     @Override
-    public long selectCountByQuery(Context context, Object query) {
+    public long selectCountByQuery(Options options, Object query) {
+        Context context = (Context) options;
         BuildQuery buildQuery = newQuery(context, query, true);
         Example example = buildQuery.getExample();
         if (buildQuery.isAbandoned()) {
