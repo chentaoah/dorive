@@ -33,7 +33,7 @@ import java.util.function.Consumer;
 public class Example {
 
     private List<String> selectProps;
-    private List<String> extraProps;
+    private String selectSuffix;
     private List<Criterion> criteria = new ArrayList<>(4);
     private OrderBy orderBy;
     private Page<Object> page;
@@ -48,18 +48,6 @@ public class Example {
 
     public void select(String... fields) {
         select(StringUtils.toList(fields));
-    }
-
-    public void selectExtra(List<String> fields) {
-        if (extraProps == null) {
-            extraProps = fields;
-        } else {
-            extraProps.addAll(fields);
-        }
-    }
-
-    public void selectExtra(String... fields) {
-        selectExtra(StringUtils.toList(fields));
     }
 
     public boolean isEmpty() {

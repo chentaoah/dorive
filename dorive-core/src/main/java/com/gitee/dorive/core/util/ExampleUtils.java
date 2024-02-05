@@ -39,9 +39,9 @@ public class ExampleUtils {
             newExample.select(new ArrayList<>(selectProps));
         }
 
-        List<String> extraProps = example.getExtraProps();
-        if (extraProps != null) {
-            newExample.selectExtra(new ArrayList<>(extraProps));
+        String selectSuffix = example.getSelectSuffix();
+        if (selectSuffix != null) {
+            newExample.setSelectSuffix(selectSuffix);
         }
 
         List<Criterion> criteria = example.getCriteria();

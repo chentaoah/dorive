@@ -56,7 +56,7 @@ public class UnionEntityJoiner extends AbstractEntityJoiner {
                 continue;
             }
             String row = Integer.toString(index + 1);
-            example.selectExtra(row + " as $row");
+            example.setSelectSuffix(row + " as $row");
             unionExample.addExample(example);
             addToRootIndex(entity, row);
         }

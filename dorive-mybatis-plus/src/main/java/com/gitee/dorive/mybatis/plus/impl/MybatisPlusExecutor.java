@@ -130,14 +130,13 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             queryWrapper.select(selectProps);
         }
 
-        List<String> extraProps = example.getExtraProps();
-        if (extraProps != null && !extraProps.isEmpty()) {
+        String selectSuffix = example.getSelectSuffix();
+        if (StringUtils.isNotBlank(selectSuffix)) {
             String sqlSelect = queryWrapper.getSqlSelect();
             if (StringUtils.isBlank(sqlSelect)) {
                 sqlSelect = queryWrapper.select(pojoClass, i -> true).getSqlSelect();
             }
-            sqlSelect = sqlSelect + StringPool.COMMA + queryWrapper.select(extraProps).getSqlSelect();
-            queryWrapper.select(sqlSelect);
+            queryWrapper.select(sqlSelect + StringPool.COMMA + selectSuffix);
         }
 
         WrapperUtils.appendCriterion(queryWrapper, example);
