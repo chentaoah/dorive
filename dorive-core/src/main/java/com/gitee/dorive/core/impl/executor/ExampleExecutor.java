@@ -20,8 +20,8 @@ package com.gitee.dorive.core.impl.executor;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.converter.EntityMapper;
+import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -30,13 +30,13 @@ import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
+@Setter
 public class ExampleExecutor extends AbstractProxyExecutor {
 
     private EntityEle entityEle;

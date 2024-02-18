@@ -35,15 +35,15 @@ import com.gitee.dorive.core.impl.resolver.DerivedResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.CollectionUtils;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
+@Setter
 public class ContextExecutor extends AbstractExecutor {
 
     private final AbstractContextRepository<?, ?> repository;

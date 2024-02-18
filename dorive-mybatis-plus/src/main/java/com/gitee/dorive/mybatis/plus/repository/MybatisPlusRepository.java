@@ -18,6 +18,7 @@
 package com.gitee.dorive.mybatis.plus.repository;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
@@ -29,20 +30,22 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.option.QueryStrategy;
+import com.gitee.dorive.mybatis.plus.impl.MybatisPlusExecutor;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
-import com.gitee.dorive.mybatis.plus.impl.MybatisPlusExecutor;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.impl.CountQuerier;
 import com.gitee.dorive.sql.impl.SegmentBuilder;
 import com.gitee.dorive.sql.impl.SqlQueryBuilder;
+import com.gitee.dorive.sql.impl.UnionExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,8 +55,8 @@ import java.util.Map;
 public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
     private BaseMapper<Object> mapper;
-    private Class<?> pojoClass;
-    private TableInfo tableInfo;
+    private EntityStoreInfo entityStoreInfo;
+    private SqlRunner sqlRunner;
     private QueryBuilder sqlQueryBuilder;
     private CountQuerier countQuerier;
 
@@ -61,8 +64,6 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
         SegmentBuilder segmentBuilder = new SegmentBuilder();
-        ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
-        SqlRunner sqlRunner = implFactory.getInstance(SqlRunner.class);
         this.sqlQueryBuilder = new SqlQueryBuilder(segmentBuilder, sqlRunner);
         this.countQuerier = new CountQuerier(this, segmentBuilder, sqlRunner);
     }
@@ -71,6 +72,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     @SuppressWarnings("unchecked")
     protected EntityStoreInfo resolveEntityStoreInfo(EntityDef entityDef, EntityEle entityEle) {
         Class<?> mapperClass = entityDef.getSource();
+        Class<?> pojoClass = null;
         if (mapperClass != Object.class) {
             mapper = (BaseMapper<Object>) getApplicationContext().getBean(mapperClass);
             Assert.notNull(mapper, "The mapper cannot be null! source: {}", mapperClass);
@@ -84,15 +86,20 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
                 }
             }
         }
+
         Assert.notNull(pojoClass, "The class of pojo cannot be null! source: {}", mapperClass);
-        tableInfo = TableInfoHelper.getTableInfo(pojoClass);
+        TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
         Assert.notNull(tableInfo, "The table info cannot be null! source: {}", mapperClass);
-        String tableName = tableInfo != null ? tableInfo.getTableName() : null;
-        Map<String, String> propAliasMapping = getPropAliasMapping();
-        return new EntityStoreInfo(pojoClass, tableName, propAliasMapping);
+        assert tableInfo != null;
+
+        String tableName = tableInfo.getTableName();
+        Map<String, String> propAliasMapping = getPropAliasMapping(tableInfo);
+        String selectColumns = getSelectColumns(propAliasMapping);
+        entityStoreInfo = new EntityStoreInfo(pojoClass, tableName, propAliasMapping, selectColumns);
+        return entityStoreInfo;
     }
 
-    private Map<String, String> getPropAliasMapping() {
+    private Map<String, String> getPropAliasMapping(TableInfo tableInfo) {
         String keyProperty = tableInfo.getKeyProperty();
         String keyColumn = tableInfo.getKeyColumn();
         List<TableFieldInfo> tableFieldInfos = tableInfo.getFieldList();
@@ -107,10 +114,18 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
         return propAliasMapping;
     }
 
+    private String getSelectColumns(Map<String, String> propAliasMapping) {
+        List<String> selectColumns = new ArrayList<>(propAliasMapping.values());
+        return StrUtil.join(",", selectColumns);
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     protected Executor newExecutor(EntityDef entityDef, EntityEle entityEle) {
-        return new MybatisPlusExecutor(entityDef, entityEle, mapper, (Class<Object>) pojoClass);
+        Executor executor = new MybatisPlusExecutor(entityDef, entityEle, mapper, (Class<Object>) entityStoreInfo.getPojoClass());
+        ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
+        sqlRunner = implFactory.getInstance(SqlRunner.class);
+        return new UnionExecutor(executor, entityStoreInfo, sqlRunner);
     }
 
     @Override

@@ -28,4 +28,5 @@ public class EntityStoreInfo {
     private Class<?> pojoClass;
     private String tableName;
     private Map<String, String> propAliasMapping;
+    private String selectColumns;
 }

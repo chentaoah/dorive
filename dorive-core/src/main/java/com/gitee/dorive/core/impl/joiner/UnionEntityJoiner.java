@@ -89,13 +89,21 @@ public class UnionEntityJoiner extends AbstractEntityJoiner {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void buildRecordIndex(Context context, List<Object> entities, Result<Object> result) {
         List<Map<String, Object>> recordMaps = result.getRecordMaps();
         for (Map<String, Object> resultMap : recordMaps) {
             Object row = resultMap.get("$row");
+            List<String> rows = (List<String>) resultMap.get("$rows");
             Object entity = resultMap.get("$entity");
-            if (row != null && entity != null) {
-                addToRecordIndex(row.toString(), entity);
+            if (entity != null) {
+                if (rows != null) {
+                    for (String eachRow : rows) {
+                        addToRecordIndex(eachRow, entity);
+                    }
+                } else if (row != null) {
+                    addToRecordIndex(row.toString(), entity);
+                }
             }
         }
     }

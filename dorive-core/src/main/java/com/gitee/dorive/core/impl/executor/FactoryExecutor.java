@@ -22,17 +22,22 @@ import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.converter.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.entity.executor.*;
+import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
+@Setter
 public class FactoryExecutor extends AbstractProxyExecutor {
 
     private EntityEle entityEle;
@@ -52,12 +57,8 @@ public class FactoryExecutor extends AbstractProxyExecutor {
 
         List<Object> entities = Collections.emptyList();
         if (recordMaps != null && !recordMaps.isEmpty()) {
-            Example example = query.getExample();
-            if (example instanceof UnionExample) {
-                entities = reconstituteWithoutDuplicate(context, recordMaps);
-            } else {
-                entities = reconstitute(context, recordMaps);
-            }
+            boolean isUnion = query.getExample() instanceof UnionExample;
+            entities = reconstitute(context, recordMaps, isUnion);
         }
 
         if (page != null) {
@@ -69,35 +70,14 @@ public class FactoryExecutor extends AbstractProxyExecutor {
         return result;
     }
 
-    private List<Object> reconstituteWithoutDuplicate(Context context, List<Map<String, Object>> resultMaps) {
-        int size = resultMaps.size();
-        List<Object> entities = new ArrayList<>(size);
-        Map<String, Object> existEntityMap = new LinkedHashMap<>(size * 4 / 3 + 1);
-        for (Map<String, Object> resultMap : resultMaps) {
-            Object id = resultMap.get("id");
-            Object entity = null;
-            if (id != null) {
-                entity = existEntityMap.get(String.valueOf(id));
-            }
-            if (entity == null) {
-                entity = entityFactory.reconstitute(context, resultMap);
-                if (id != null) {
-                    existEntityMap.put(String.valueOf(id), entity);
-                }
-                entities.add(entity);
-            }
-            if (entity != null) {
-                resultMap.put("$entity", entity);
-            }
-        }
-        return entities;
-    }
-
-    private List<Object> reconstitute(Context context, List<Map<String, Object>> resultMaps) {
+    private List<Object> reconstitute(Context context, List<Map<String, Object>> resultMaps, boolean isUnion) {
         List<Object> entities = new ArrayList<>(resultMaps.size());
         for (Map<String, Object> resultMap : resultMaps) {
             Object entity = entityFactory.reconstitute(context, resultMap);
             if (entity != null) {
+                if (isUnion) {
+                    resultMap.put("$entity", entity);
+                }
                 entities.add(entity);
             }
         }

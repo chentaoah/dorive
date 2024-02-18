@@ -18,8 +18,10 @@
 package com.gitee.dorive.core.impl.executor;
 
 import com.gitee.dorive.core.api.executor.Executor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public abstract class AbstractExecutor implements Executor {
 }

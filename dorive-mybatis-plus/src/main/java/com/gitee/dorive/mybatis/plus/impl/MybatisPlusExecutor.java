@@ -18,8 +18,6 @@
 package com.gitee.dorive.mybatis.plus.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -32,11 +30,9 @@ import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Delete;
 import com.gitee.dorive.core.entity.operation.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
@@ -96,17 +92,9 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                 return new Result<>(page, queryPage.getRecords());
 
             } else {
-                if (example instanceof UnionExample) {
-                    UnionExample unionExample = (UnionExample) example;
-                    QueryWrapper<Object> queryWrapper = buildQueryWrapper(unionExample);
-                    List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                    return new Result<>(null, resultMaps);
-
-                } else {
-                    QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
-                    List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
-                    return new Result<>(null, resultMaps);
-                }
+                QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
+                List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
+                return new Result<>(null, resultMaps);
             }
         }
         return new Result<>(null, Collections.emptyList());
@@ -152,48 +140,6 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             }
         }
 
-        return queryWrapper;
-    }
-
-    private QueryWrapper<Object> buildQueryWrapper(UnionExample unionExample) {
-        List<Example> examples = unionExample.getExamples();
-        Assert.notEmpty(examples, "The examples cannot be empty!");
-
-        Example example = examples.get(0);
-        QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
-
-        StringBuilder lastSql = new StringBuilder();
-        if (example.getPage() != null) {
-            lastSql.append(example.getPage()).append(" ");
-        }
-
-        for (int index = 1; index < examples.size(); index++) {
-            Example nextExample = examples.get(index);
-            QueryWrapper<Object> nextQueryWrapper = buildQueryWrapper(nextExample);
-
-            String sqlSelect = nextQueryWrapper.getSqlSelect();
-            String tableName = TableInfoHelper.getTableInfo(pojoClass).getTableName();
-            String criteria = CollUtil.join(nextExample.getCriteria(), " AND ", Criterion::toString);
-
-            String sql = "";
-            if (nextExample.getOrderBy() == null && nextExample.getPage() == null) {
-                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s) ", sqlSelect, tableName, criteria);
-
-            } else if (nextExample.getOrderBy() != null && nextExample.getPage() != null) {
-                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s %s %s) ", sqlSelect, tableName, criteria, nextExample.getOrderBy(), nextExample.getPage());
-
-            } else if (nextExample.getOrderBy() != null) {
-                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s %s) ", sqlSelect, tableName, criteria, nextExample.getOrderBy());
-
-            } else if (nextExample.getPage() != null) {
-                sql = String.format("UNION ALL (SELECT %s FROM %s WHERE %s %s) ", sqlSelect, tableName, criteria, nextExample.getPage());
-            }
-            lastSql.append(sql);
-        }
-
-        if (lastSql.length() > 0) {
-            queryWrapper.last(lastSql.toString());
-        }
         return queryWrapper;
     }
 
