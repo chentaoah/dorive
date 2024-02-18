@@ -68,28 +68,52 @@ public class UnionExecutor extends AbstractProxyExecutor {
     }
 
     private String buildSql(UnionExample unionExample) {
-        List<Example> examples = unionExample.getExamples();
-        if (examples.isEmpty()) {
+        if (unionExample.isEmpty()) {
             return null;
         }
-        String selectColumns = entityStoreInfo.getSelectColumns();
-        List<String> selectProps = unionExample.getSelectProps();
-        if (selectProps != null && !selectProps.isEmpty()) {
-            selectColumns = StrUtil.join(",", selectProps);
-        }
-        List<String> sqls = new ArrayList<>(examples.size());
-        Example example = examples.get(0);
-        String sql = buildSql(false, selectColumns, example);
-        sqls.add(sql);
-        for (int index = 1; index < examples.size(); index++) {
-            Example nextExample = examples.get(index);
-            String nextSql = buildSql(true, selectColumns, nextExample);
-            sqls.add(nextSql);
-        }
+        String selectColumns = buildSelectColumns(unionExample);
+        String lastSql = buildLastSql(unionExample);
+        List<String> sqls = buildSqls(unionExample, selectColumns, lastSql);
         return StrUtil.join(" UNION ALL ", sqls);
     }
 
-    private String buildSql(boolean hasBrackets, String selectColumns, Example example) {
+    private String buildSelectColumns(Example example) {
+        String selectColumns = entityStoreInfo.getSelectColumns();
+        List<String> selectProps = example.getSelectProps();
+        if (selectProps != null && !selectProps.isEmpty()) {
+            selectColumns = StrUtil.join(",", selectProps);
+        }
+        return selectColumns;
+    }
+
+    private String buildLastSql(Example example) {
+        StringBuilder lastSql = new StringBuilder();
+        OrderBy orderBy = example.getOrderBy();
+        if (orderBy != null) {
+            lastSql.append(" ").append(orderBy);
+        }
+        Page<Object> page = example.getPage();
+        if (page != null) {
+            lastSql.append(" ").append(page);
+        }
+        return lastSql.toString();
+    }
+
+    private List<String> buildSqls(UnionExample unionExample, String selectColumns, String lastSql) {
+        List<Example> examples = unionExample.getExamples();
+        List<String> sqls = new ArrayList<>(examples.size());
+        Example example = examples.get(0);
+        String sql = doBuildSql(false, selectColumns, example, lastSql);
+        sqls.add(sql);
+        for (int index = 1; index < examples.size(); index++) {
+            Example nextExample = examples.get(index);
+            String nextSql = doBuildSql(true, selectColumns, nextExample, lastSql);
+            sqls.add(nextSql);
+        }
+        return sqls;
+    }
+
+    private String doBuildSql(boolean hasBrackets, String selectColumns, Example example, String lastSql) {
         StringBuilder sqlBuilder = new StringBuilder();
         if (hasBrackets) {
             sqlBuilder.append("(");
@@ -100,14 +124,7 @@ public class UnionExecutor extends AbstractProxyExecutor {
         String criteria = CollUtil.join(example.getCriteria(), " AND ", Criterion::toString);
         String sql = String.format(template, selectColumns, selectSuffix, tableName, criteria);
         sqlBuilder.append(sql);
-        OrderBy orderBy = example.getOrderBy();
-        if (orderBy != null) {
-            sqlBuilder.append(" ").append(orderBy);
-        }
-        Page<Object> page = example.getPage();
-        if (page != null) {
-            sqlBuilder.append(" ").append(page);
-        }
+        sqlBuilder.append(lastSql);
         if (hasBrackets) {
             sqlBuilder.append(")");
         }

@@ -32,16 +32,6 @@ public class UnionExample extends Example {
     private List<Example> examples = new ArrayList<>();
 
     @Override
-    public void select(List<String> fields) {
-        super.select(fields);
-        if (examples != null && !examples.isEmpty()) {
-            for (Example example : examples) {
-                example.select(fields);
-            }
-        }
-    }
-
-    @Override
     public boolean isEmpty() {
         return examples.isEmpty();
     }

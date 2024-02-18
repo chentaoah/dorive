@@ -83,16 +83,18 @@ public class ExampleExecutor extends AbstractProxyExecutor {
     }
 
     private void convert(Context context, UnionExample unionExample) {
+        convertSelectProps(unionExample);
         List<Example> examples = unionExample.getExamples();
         for (Example example : examples) {
-            convert(context, example);
+            convertCriteria(context, example);
         }
+        convertOrderBy(unionExample);
     }
 
     public void convert(Context context, Example example) {
         convertSelectProps(example);
-        convertCriteria(context, example.getCriteria());
-        convertOrderBy(example.getOrderBy());
+        convertCriteria(context, example);
+        convertOrderBy(example);
     }
 
     private void convertSelectProps(Example example) {
@@ -103,7 +105,8 @@ public class ExampleExecutor extends AbstractProxyExecutor {
         }
     }
 
-    private void convertCriteria(Context context, List<Criterion> criteria) {
+    private void convertCriteria(Context context, Example example) {
+        List<Criterion> criteria = example.getCriteria();
         if (criteria != null && !criteria.isEmpty()) {
             for (Criterion criterion : criteria) {
                 String operator = criterion.getOperator();
@@ -134,7 +137,8 @@ public class ExampleExecutor extends AbstractProxyExecutor {
         }
     }
 
-    private void convertOrderBy(OrderBy orderBy) {
+    private void convertOrderBy(Example example) {
+        OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
             List<String> properties = orderBy.getProperties();
             properties = entityEle.toAliases(properties);
