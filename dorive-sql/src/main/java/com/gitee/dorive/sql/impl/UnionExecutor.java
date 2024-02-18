@@ -69,28 +69,32 @@ public class UnionExecutor extends AbstractProxyExecutor {
 
     private String buildSql(UnionExample unionExample) {
         List<Example> examples = unionExample.getExamples();
-        if (!examples.isEmpty()) {
-            List<String> sqls = new ArrayList<>(examples.size());
-            Example example = examples.get(0);
-            String sql = buildSql(example, false);
-            sqls.add(sql);
-            for (int index = 1; index < examples.size(); index++) {
-                Example nextExample = examples.get(index);
-                String nextSql = buildSql(nextExample, true);
-                sqls.add(nextSql);
-            }
-            return StrUtil.join(" UNION ALL ", sqls);
+        if (examples.isEmpty()) {
+            return null;
         }
-        return null;
+        String selectColumns = entityStoreInfo.getSelectColumns();
+        List<String> selectProps = unionExample.getSelectProps();
+        if (selectProps != null && !selectProps.isEmpty()) {
+            selectColumns = StrUtil.join(",", selectProps);
+        }
+        List<String> sqls = new ArrayList<>(examples.size());
+        Example example = examples.get(0);
+        String sql = buildSql(false, selectColumns, example);
+        sqls.add(sql);
+        for (int index = 1; index < examples.size(); index++) {
+            Example nextExample = examples.get(index);
+            String nextSql = buildSql(true, selectColumns, nextExample);
+            sqls.add(nextSql);
+        }
+        return StrUtil.join(" UNION ALL ", sqls);
     }
 
-    private String buildSql(Example example, boolean hasBrackets) {
+    private String buildSql(boolean hasBrackets, String selectColumns, Example example) {
         StringBuilder sqlBuilder = new StringBuilder();
         if (hasBrackets) {
             sqlBuilder.append("(");
         }
         String template = "SELECT %s,%s FROM %s WHERE %s";
-        String selectColumns = entityStoreInfo.getSelectColumns();
         String selectSuffix = example.getSelectSuffix();
         String tableName = entityStoreInfo.getTableName();
         String criteria = CollUtil.join(example.getCriteria(), " AND ", Criterion::toString);

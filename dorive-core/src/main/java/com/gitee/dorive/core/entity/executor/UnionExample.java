@@ -33,6 +33,7 @@ public class UnionExample extends Example {
 
     @Override
     public void select(List<String> fields) {
+        super.select(fields);
         if (examples != null && !examples.isEmpty()) {
             for (Example example : examples) {
                 example.select(fields);
