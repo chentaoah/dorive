@@ -51,12 +51,11 @@ public class ExampleExecutor extends AbstractProxyExecutor {
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Example example = query.getExample();
+        if (example instanceof UnionExample) {
+            convertUnion(context, (UnionExample) example);
+        }
         if (example != null) {
-            if (example instanceof UnionExample) {
-                convert(context, (UnionExample) example);
-            } else {
-                convert(context, example);
-            }
+            convert(context, example);
         }
         return super.executeQuery(context, query);
     }
@@ -82,13 +81,11 @@ public class ExampleExecutor extends AbstractProxyExecutor {
         return super.execute(context, operation);
     }
 
-    private void convert(Context context, UnionExample unionExample) {
-        convertSelectProps(unionExample);
+    private void convertUnion(Context context, UnionExample unionExample) {
         List<Example> examples = unionExample.getExamples();
         for (Example example : examples) {
             convertCriteria(context, example);
         }
-        convertOrderBy(unionExample);
     }
 
     public void convert(Context context, Example example) {
