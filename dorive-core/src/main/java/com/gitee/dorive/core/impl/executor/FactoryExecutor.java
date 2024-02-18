@@ -22,6 +22,7 @@ import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.converter.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
@@ -57,8 +58,7 @@ public class FactoryExecutor extends AbstractProxyExecutor {
 
         List<Object> entities = Collections.emptyList();
         if (recordMaps != null && !recordMaps.isEmpty()) {
-            boolean isUnion = query.getExample() instanceof UnionExample;
-            entities = reconstitute(context, recordMaps, isUnion);
+            entities = reconstitute(context, query, recordMaps);
         }
 
         if (page != null) {
@@ -70,7 +70,9 @@ public class FactoryExecutor extends AbstractProxyExecutor {
         return result;
     }
 
-    private List<Object> reconstitute(Context context, List<Map<String, Object>> resultMaps, boolean isUnion) {
+    private List<Object> reconstitute(Context context, Query query, List<Map<String, Object>> resultMaps) {
+        Example example = query.getExample();
+        boolean isUnion = example instanceof UnionExample;
         List<Object> entities = new ArrayList<>(resultMaps.size());
         for (Map<String, Object> resultMap : resultMaps) {
             Object entity = entityFactory.reconstitute(context, resultMap);
