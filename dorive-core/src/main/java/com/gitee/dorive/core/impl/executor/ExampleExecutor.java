@@ -51,11 +51,11 @@ public class ExampleExecutor extends AbstractProxyExecutor {
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Example example = query.getExample();
-        if (example instanceof UnionExample) {
-            convertUnion(context, (UnionExample) example);
-        }
         if (example != null) {
             convert(context, example);
+        }
+        if (example instanceof UnionExample) {
+            convertUnion(context, (UnionExample) example);
         }
         return super.executeQuery(context, query);
     }
