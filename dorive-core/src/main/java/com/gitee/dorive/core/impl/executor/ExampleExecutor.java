@@ -81,17 +81,17 @@ public class ExampleExecutor extends AbstractProxyExecutor {
         return super.execute(context, operation);
     }
 
+    public void convert(Context context, Example example) {
+        convertSelectProps(example);
+        convertCriteria(context, example);
+        convertOrderBy(example);
+    }
+
     private void convertUnion(Context context, UnionExample unionExample) {
         List<Example> examples = unionExample.getExamples();
         for (Example example : examples) {
             convertCriteria(context, example);
         }
-    }
-
-    public void convert(Context context, Example example) {
-        convertSelectProps(example);
-        convertCriteria(context, example);
-        convertOrderBy(example);
     }
 
     private void convertSelectProps(Example example) {
