@@ -17,11 +17,12 @@
 
 package com.gitee.dorive.mybatis.plus.impl;
 
+import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.conditions.interfaces.Compare;
 import com.gitee.dorive.api.constant.Operator;
+import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.mybatis.plus.api.CriterionAppender;
-import com.gitee.dorive.mybatis.plus.util.WrapperUtils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -66,14 +67,21 @@ public class AppenderContext {
         });
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.AND, (abstractWrapper, property, value) -> {
             if (value instanceof Example) {
-                abstractWrapper.and(q -> WrapperUtils.appendCriterion(q, (Example) value));
+                abstractWrapper.and(q -> appendCriterion(q, (Example) value));
             }
         });
         OPERATOR_CRITERION_APPENDER_MAP.put(Operator.OR, (abstractWrapper, property, value) -> {
             if (value instanceof Example) {
-                abstractWrapper.or(q -> WrapperUtils.appendCriterion(q, (Example) value));
+                abstractWrapper.or(q -> appendCriterion(q, (Example) value));
             }
         });
+    }
+
+    public static void appendCriterion(AbstractWrapper<?, String, ?> abstractWrapper, Example example) {
+        for (Criterion criterion : example.getCriteria()) {
+            CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
+            criterionAppender.appendCriterion(abstractWrapper, criterion.getProperty(), criterion.getValue());
+        }
     }
 
 }

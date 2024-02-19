@@ -39,7 +39,6 @@ import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import com.gitee.dorive.mybatis.plus.api.CriterionAppender;
-import com.gitee.dorive.mybatis.plus.util.WrapperUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -129,7 +128,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             queryWrapper.select(sqlSelect + StringPool.COMMA + selectSuffix);
         }
 
-        WrapperUtils.appendCriterion(queryWrapper, example);
+        AppenderContext.appendCriterion(queryWrapper, example);
 
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
@@ -187,7 +186,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
     private UpdateWrapper<Object> buildUpdateWrapper(Example example) {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
-        WrapperUtils.appendCriterion(updateWrapper, example);
+        AppenderContext.appendCriterion(updateWrapper, example);
         return updateWrapper;
     }
 
@@ -207,7 +206,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             criterionAppender.appendCriterion(updateWrapper, "id", primaryKey);
         }
         if (example != null) {
-            WrapperUtils.appendCriterion(updateWrapper, example);
+            AppenderContext.appendCriterion(updateWrapper, example);
         }
         return updateWrapper;
     }
