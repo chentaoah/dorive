@@ -114,21 +114,21 @@ public class UnionExecutor extends AbstractProxyExecutor {
     }
 
     private String doBuildSql(boolean hasBrackets, String selectColumns, Example example, String lastSql) {
-        StringBuilder sqlBuilder = new StringBuilder();
+        StringBuilder sql = new StringBuilder();
         if (hasBrackets) {
-            sqlBuilder.append("(");
+            sql.append("(");
         }
         String template = "SELECT %s,%s FROM %s WHERE %s";
         String selectSuffix = example.getSelectSuffix();
         String tableName = entityStoreInfo.getTableName();
         String criteria = CollUtil.join(example.getCriteria(), " AND ", Criterion::toString);
-        String sql = String.format(template, selectColumns, selectSuffix, tableName, criteria);
-        sqlBuilder.append(sql);
-        sqlBuilder.append(lastSql);
+        String selectSql = String.format(template, selectColumns, selectSuffix, tableName, criteria);
+        sql.append(selectSql);
+        sql.append(lastSql);
         if (hasBrackets) {
-            sqlBuilder.append(")");
+            sql.append(")");
         }
-        return sqlBuilder.toString();
+        return sql.toString();
     }
 
     @SuppressWarnings("unchecked")
