@@ -26,8 +26,10 @@ import lombok.NoArgsConstructor;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -72,6 +74,18 @@ public abstract class EntityEle {
     public List<String> toAliases(List<String> fields) {
         if (fields != null && !fields.isEmpty()) {
             List<String> aliases = new ArrayList<>(fields.size());
+            for (String field : fields) {
+                String alias = toAlias(field);
+                aliases.add(alias);
+            }
+            return aliases;
+        }
+        return fields;
+    }
+
+    public Set<String> toAliases(Set<String> fields) {
+        if (fields != null && !fields.isEmpty()) {
+            Set<String> aliases = new LinkedHashSet<>(fields.size() * 4 / 3 + 1);
             for (String field : fields) {
                 String alias = toAlias(field);
                 aliases.add(alias);

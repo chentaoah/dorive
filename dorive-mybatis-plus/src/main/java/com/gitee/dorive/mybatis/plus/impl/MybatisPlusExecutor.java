@@ -157,9 +157,9 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             Object primaryKey = update.getPrimaryKey();
             Example example = update.getExample();
 
-            Set<String> nullableFields = update.getNullableFields();
-            if (nullableFields != null && !nullableFields.isEmpty()) {
-                UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableFields, primaryKey, example);
+            Set<String> nullableProps = update.getNullableProps();
+            if (nullableProps != null && !nullableProps.isEmpty()) {
+                UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableProps, primaryKey, example);
                 return baseMapper.update(null, updateWrapper);
             }
 
@@ -191,13 +191,13 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         return updateWrapper;
     }
 
-    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableFields, Object primaryKey, Example example) {
+    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableProps, Object primaryKey, Example example) {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
 
         Map<String, String> propAliasMappingWithoutPk = entityStoreInfo.getPropAliasMappingWithoutPk();
         propAliasMappingWithoutPk.forEach((prop, alias) -> {
             Object value = BeanUtil.getFieldValue(persistent, prop);
-            if (value != null || nullableFields.contains(prop)) {
+            if (value != null || nullableProps.contains(alias)) {
                 updateWrapper.set(true, alias, value);
             }
         });

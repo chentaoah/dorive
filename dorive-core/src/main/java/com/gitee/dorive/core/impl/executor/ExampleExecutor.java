@@ -30,10 +30,12 @@ import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.entity.operation.Update;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -78,6 +80,9 @@ public class ExampleExecutor extends AbstractProxyExecutor {
                 convert(context, example);
             }
         }
+        if (operation instanceof Update) {
+            convertUpdate((Update) operation);
+        }
         return super.execute(context, operation);
     }
 
@@ -91,6 +96,14 @@ public class ExampleExecutor extends AbstractProxyExecutor {
         List<Example> examples = unionExample.getExamples();
         for (Example example : examples) {
             convertCriteria(context, example);
+        }
+    }
+
+    private void convertUpdate(Update update) {
+        Set<String> nullableProps = update.getNullableProps();
+        if (nullableProps != null && !nullableProps.isEmpty()) {
+            nullableProps = entityEle.toAliases(nullableProps);
+            update.setNullableProps(nullableProps);
         }
     }
 

@@ -27,7 +27,7 @@ import java.util.Set;
 @Setter
 public class Update extends Condition {
 
-    private Set<String> nullableFields = Collections.emptySet();
+    private Set<String> nullableProps = Collections.emptySet();
 
     public Update(Object entity) {
         super(entity);
