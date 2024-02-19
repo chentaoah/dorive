@@ -44,13 +44,13 @@ import java.util.Map;
 @Setter
 public class UnionExecutor extends AbstractProxyExecutor {
 
-    private EntityStoreInfo entityStoreInfo;
     private SqlRunner sqlRunner;
+    private EntityStoreInfo entityStoreInfo;
 
-    public UnionExecutor(Executor executor, EntityStoreInfo entityStoreInfo, SqlRunner sqlRunner) {
+    public UnionExecutor(Executor executor, SqlRunner sqlRunner, EntityStoreInfo entityStoreInfo) {
         super(executor);
-        this.entityStoreInfo = entityStoreInfo;
         this.sqlRunner = sqlRunner;
+        this.entityStoreInfo = entityStoreInfo;
     }
 
     @Override

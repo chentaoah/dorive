@@ -25,8 +25,13 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 public class EntityStoreInfo {
+    private Class<?> mapperClass;
+    private Object mapper;
     private Class<?> pojoClass;
     private String tableName;
+    private String primaryProp;
+    private String primaryAlias;
+    private Map<String, String> propAliasMappingWithoutPk;
     private Map<String, String> propAliasMapping;
     private String selectColumns;
 }

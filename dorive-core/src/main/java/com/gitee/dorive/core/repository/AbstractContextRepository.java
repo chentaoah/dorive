@@ -193,7 +193,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityMapper entityMapper = new EntityMapperResolver(entityEle, entityStoreInfo).resolve();
             EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, entityStoreInfo, entityMapper);
 
-            Executor executor = newExecutor(entityDef, entityEle);
+            Executor executor = newExecutor(entityDef, entityEle, entityStoreInfo);
             executor = new FactoryExecutor(executor, entityEle, entityFactory);
             executor = new ExampleExecutor(executor, entityEle, entityMapper);
             EXAMPLE_EXECUTOR_MAP.put(entityEle, (ExampleExecutor) executor);
@@ -231,7 +231,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     protected abstract EntityStoreInfo resolveEntityStoreInfo(EntityDef entityDef, EntityEle entityEle);
 
-    protected abstract Executor newExecutor(EntityDef entityDef, EntityEle entityEle);
+    protected abstract Executor newExecutor(EntityDef entityDef, EntityEle entityEle, EntityStoreInfo entityStoreInfo);
 
     protected abstract AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository);
 

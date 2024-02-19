@@ -21,8 +21,6 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.dorive.api.constant.Operator;
@@ -30,6 +28,7 @@ import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Result;
@@ -61,14 +60,17 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
     private EntityDef entityDef;
     private EntityEle entityEle;
+    private EntityStoreInfo entityStoreInfo;
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;
 
-    public MybatisPlusExecutor(EntityDef entityDef, EntityEle entityEle, BaseMapper<Object> baseMapper, Class<Object> pojoClass) {
+    @SuppressWarnings("unchecked")
+    public MybatisPlusExecutor(EntityDef entityDef, EntityEle entityEle, EntityStoreInfo entityStoreInfo) {
         this.entityDef = entityDef;
         this.entityEle = entityEle;
-        this.baseMapper = baseMapper;
-        this.pojoClass = pojoClass;
+        this.entityStoreInfo = entityStoreInfo;
+        this.baseMapper = (BaseMapper<Object>) entityStoreInfo.getMapper();
+        this.pojoClass = (Class<Object>) entityStoreInfo.getPojoClass();
     }
 
     @Override
@@ -191,14 +193,15 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
     private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableFields, Object primaryKey, Example example) {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
-        List<TableFieldInfo> fieldList = TableInfoHelper.getTableInfo(pojoClass).getFieldList();
-        for (TableFieldInfo tableFieldInfo : fieldList) {
-            String property = tableFieldInfo.getProperty();
-            Object value = BeanUtil.getFieldValue(persistent, property);
-            if (value != null || nullableFields.contains(property)) {
-                updateWrapper.set(true, tableFieldInfo.getColumn(), value);
+
+        Map<String, String> propAliasMappingWithoutPk = entityStoreInfo.getPropAliasMappingWithoutPk();
+        propAliasMappingWithoutPk.forEach((prop, alias) -> {
+            Object value = BeanUtil.getFieldValue(persistent, prop);
+            if (value != null || nullableFields.contains(prop)) {
+                updateWrapper.set(true, alias, value);
             }
-        }
+        });
+
         if (primaryKey != null) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(Operator.EQ);
             criterionAppender.appendCriterion(updateWrapper, "id", primaryKey);
