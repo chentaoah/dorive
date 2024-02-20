@@ -68,6 +68,9 @@ public class BinderResolver {
 
     public void resolve(String accessPath, EntityDef entityDef, EntityEle entityEle) {
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
+
+        Class<?> genericType = entityEle.getGenericType();
+        String idName = entityEle.getIdName();
         List<BindingDef> bindingDefs = entityEle.getBindingDefs();
 
         allBinders = new ArrayList<>(bindingDefs.size());
@@ -88,7 +91,7 @@ public class BinderResolver {
 
             PropChain fieldPropChain = propChainMap.get("/" + field);
             Assert.notNull(fieldPropChain, "The field configured for @Binding does not exist within the entity! type: {}, field: {}",
-                    entityEle.getGenericType().getName(), field);
+                    genericType.getName(), field);
             fieldPropChain.newPropProxy();
 
             Processor processor = newProcessor(bindingDef);
@@ -105,7 +108,7 @@ public class BinderResolver {
                 selfFields.add(field);
 
                 if (propertyBinder.isSameType()) {
-                    if (!"id".equals(field)) {
+                    if (!idName.equals(field)) {
                         boundValueBinders.add(propertyBinder);
                     } else {
                         if (entityDef.getPriority() == 0) {

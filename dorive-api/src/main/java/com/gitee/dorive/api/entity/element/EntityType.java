@@ -22,7 +22,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.def.FieldDef;
-import com.gitee.dorive.api.exception.CircularDependencyException;
+import com.gitee.dorive.api.exception.DefineEntityException;
 import com.gitee.dorive.api.impl.factory.PropProxyFactory;
 import com.gitee.dorive.api.util.ReflectUtils;
 import lombok.Data;
@@ -47,6 +47,7 @@ public class EntityType extends EntityEle {
 
     private Class<?> type;
     private String name;
+    private EntityField idField;
     private Map<String, EntityField> entityFieldMap;
 
     public static synchronized EntityType getInstance(Class<?> type) {
@@ -57,7 +58,7 @@ public class EntityType extends EntityEle {
                 CACHE.put(type, entityType);
                 LOCK.remove(type);
             } else {
-                throw new CircularDependencyException("Circular Dependency! type: " + type.getName());
+                throw new DefineEntityException("The entity nested itself! type: " + type.getName());
             }
         }
         return entityType;
@@ -67,44 +68,43 @@ public class EntityType extends EntityEle {
         super(type);
         this.type = type;
         this.name = type.getName();
-
         List<Field> fields = ReflectUtils.getAllFields(type);
         this.entityFieldMap = new LinkedHashMap<>(fields.size() * 4 / 3 + 1);
-
         for (Field field : fields) {
             if (!Modifier.isStatic(field.getModifiers())) {
                 try {
                     EntityField entityField = new EntityField(field);
-                    entityFieldMap.put(entityField.getName(), entityField);
+                    String fieldName = entityField.getName();
+                    if (idField == null) {
+                        FieldDef fieldDef = entityField.getFieldDef();
+                        if ("id".equals(fieldName) || fieldDef.isId()) {
+                            idField = entityField;
+                        }
+                    }
+                    entityFieldMap.put(fieldName, entityField);
 
-                } catch (CircularDependencyException e) {
+                } catch (DefineEntityException e) {
                     log.warn(e.getMessage());
                 }
             }
         }
-
         initialize();
     }
 
     @Override
     protected void doInitialize() {
         Class<?> genericType = getGenericType();
-        int initialCapacity = entityFieldMap.size() * 4 / 3 + 1;
-        PropProxy pkProxy = null;
-        Map<String, String> fieldAliasMapping = new LinkedHashMap<>(initialCapacity);
+        Assert.notNull(idField, "The id field cannot be null! type: {}", genericType.getName());
+        PropProxy idProxy = PropProxyFactory.newPropProxy(genericType, idField.getName());
+        setIdProxy(idProxy);
 
+        Map<String, String> fieldAliasMapping = new LinkedHashMap<>(entityFieldMap.size() * 4 / 3 + 1);
         for (EntityField entityField : entityFieldMap.values()) {
-            String field = entityField.getName();
+            String fieldName = entityField.getName();
             FieldDef fieldDef = entityField.getFieldDef();
-            if ("id".equals(field)) {
-                pkProxy = PropProxyFactory.newPropProxy(genericType, "id");
-            }
-            String alias = fieldDef != null ? fieldDef.getAlias() : StrUtil.toUnderlineCase(field);
-            fieldAliasMapping.put(field, alias);
+            String alias = fieldDef != null ? fieldDef.getAlias() : StrUtil.toUnderlineCase(fieldName);
+            fieldAliasMapping.put(fieldName, alias);
         }
-
-        Assert.notNull(pkProxy, "The primary key not found! type: {}", genericType.getName());
-        setPkProxy(pkProxy);
         setFieldAliasMapping(fieldAliasMapping);
     }
 
@@ -126,6 +126,11 @@ public class EntityType extends EntityEle {
     @Override
     public Map<String, EntityField> getEntityFieldMap() {
         return entityFieldMap;
+    }
+
+    @Override
+    public String getIdName() {
+        return idField.getName();
     }
 
 }

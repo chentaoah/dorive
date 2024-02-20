@@ -22,6 +22,7 @@ import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.converter.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
@@ -42,11 +43,13 @@ import java.util.Map;
 public class FactoryExecutor extends AbstractProxyExecutor {
 
     private EntityEle entityEle;
+    private EntityStoreInfo entityStoreInfo;
     private EntityFactory entityFactory;
 
-    public FactoryExecutor(Executor executor, EntityEle entityEle, EntityFactory entityFactory) {
+    public FactoryExecutor(Executor executor, EntityEle entityEle, EntityStoreInfo entityStoreInfo, EntityFactory entityFactory) {
         super(executor);
         this.entityEle = entityEle;
+        this.entityStoreInfo = entityStoreInfo;
         this.entityFactory = entityFactory;
     }
 
@@ -96,8 +99,10 @@ public class FactoryExecutor extends AbstractProxyExecutor {
         int totalCount = super.execute(context, operation);
         if (operation instanceof Insert) {
             Object persistent = operation.getEntity();
-            Object primaryKey = BeanUtil.getFieldValue(persistent, "id");
-            entityEle.getPkProxy().setValue(entity, primaryKey);
+            Object primaryKey = BeanUtil.getFieldValue(persistent, entityStoreInfo.getIdProperty());
+            if (primaryKey != null) {
+                entityEle.getIdProxy().setValue(entity, primaryKey);
+            }
         }
         operation.setEntity(entity);
         return totalCount;

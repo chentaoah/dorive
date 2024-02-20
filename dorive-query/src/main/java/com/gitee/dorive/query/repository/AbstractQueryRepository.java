@@ -72,7 +72,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     }
 
     public BuildQuery doNewQuery(Context context, Object query, boolean onlyCount) {
-        BuildQuery buildQuery = new BuildQuery(query, onlyCount);
+        BuildQuery buildQuery = new BuildQuery(this, query, onlyCount);
         Map<String, QueryResolver> nameQueryResolverMap = queryTypeResolver.getNameQueryResolverMap();
         QueryResolver queryResolver = nameQueryResolverMap.get(query.getClass().getName());
         Assert.notNull(queryResolver, "No query resolver found!");

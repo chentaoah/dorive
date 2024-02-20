@@ -15,28 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.annotation;
+package com.gitee.dorive.api.exception;
 
-import org.springframework.core.annotation.AliasFor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.lang.annotation.*;
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class DefineEntityException extends RuntimeException {
 
-@Inherited
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-public @interface Field {
-
-    boolean isId() default false;
-
-    @AliasFor("alias")
-    String value() default "";
-
-    @AliasFor("value")
-    String alias() default "";
-
-    Class<?> converter() default Object.class;
-
-    String mapExp() default "";
+    public DefineEntityException(String message) {
+        super(message);
+    }
 
 }

@@ -18,13 +18,17 @@
 package com.gitee.dorive.sql.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.util.ExampleUtils;
 import com.gitee.dorive.query.api.QueryBuilder;
 import com.gitee.dorive.query.entity.BuildQuery;
+import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.ArgSegment;
 import com.gitee.dorive.sql.entity.SelectSegment;
@@ -45,6 +49,11 @@ public class SqlQueryBuilder implements QueryBuilder {
 
     @Override
     public void buildQuery(Context context, BuildQuery buildQuery) {
+        AbstractQueryRepository<?, ?> repository = buildQuery.getRepository();
+        EntityEle entityEle = repository.getEntityEle();
+        EntityStoreInfo entityStoreInfo = AbstractContextRepository.getEntityStoreInfo(entityEle);
+        String idColumn = entityStoreInfo.getIdColumn();
+
         Example example = buildQuery.getExample();
         boolean onlyCount = buildQuery.isOnlyCount();
         OrderBy orderBy = example.getOrderBy();
@@ -67,7 +76,7 @@ public class SqlQueryBuilder implements QueryBuilder {
 
         selectSegment.setDistinct(true);
         List<String> selectColumns = new ArrayList<>(2);
-        selectColumns.add(tableAlias + ".id");
+        selectColumns.add(tableAlias + "." + idColumn);
         selectSegment.setSelectColumns(selectColumns);
 
         String selectSql = selectSegment.selectSql();
@@ -99,7 +108,7 @@ public class SqlQueryBuilder implements QueryBuilder {
         boolean rebuildSql = false;
         if (orderBy != null) {
             for (String property : orderBy.getProperties()) {
-                if (!"id".equals(property)) {
+                if (!idColumn.equals(property)) {
                     selectColumns.add(tableAlias + "." + property);
                     rebuildSql = true;
                 }
@@ -116,9 +125,9 @@ public class SqlQueryBuilder implements QueryBuilder {
 
         String sql = selectSql + fromWhereSql + selectSegment.lastSql();
         List<Map<String, Object>> resultMaps = sqlRunner.selectList(sql, args.toArray());
-        List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get("id"), true);
+        List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get(idColumn), true);
         if (!primaryKeys.isEmpty()) {
-            example.in("id", primaryKeys);
+            example.in(entityEle.getIdName(), primaryKeys);
             buildQuery.setDataSetQueried(true);
         } else {
             buildQuery.setAbandoned(true);

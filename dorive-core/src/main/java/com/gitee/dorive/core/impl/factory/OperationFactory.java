@@ -47,7 +47,7 @@ public class OperationFactory {
 
     public Update buildUpdate(Object entity) {
         Update update = new Update(entity);
-        Object primaryKey = entityEle.getPkProxy().getValue(entity);
+        Object primaryKey = entityEle.getIdProxy().getValue(entity);
         update.setPrimaryKey(primaryKey);
         return update;
     }
@@ -59,7 +59,7 @@ public class OperationFactory {
     }
 
     public Operation buildInsertOrUpdate(Object entity) {
-        Object primaryKey = entityEle.getPkProxy().getValue(entity);
+        Object primaryKey = entityEle.getIdProxy().getValue(entity);
         if (primaryKey == null) {
             return new Insert(entity);
         } else {
@@ -71,7 +71,7 @@ public class OperationFactory {
 
     public Delete buildDelete(Object entity) {
         Delete delete = new Delete(entity);
-        Object primaryKey = entityEle.getPkProxy().getValue(entity);
+        Object primaryKey = entityEle.getIdProxy().getValue(entity);
         delete.setPrimaryKey(primaryKey);
         return delete;
     }

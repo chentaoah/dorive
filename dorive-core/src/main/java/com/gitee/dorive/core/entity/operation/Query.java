@@ -32,8 +32,4 @@ public class Query extends Condition {
         return getPrimaryKey() == null && getExample() == null;
     }
 
-    public boolean startPage() {
-        return getExample() != null && getExample().getPage() != null;
-    }
-
 }

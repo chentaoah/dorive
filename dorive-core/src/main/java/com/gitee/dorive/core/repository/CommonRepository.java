@@ -57,7 +57,7 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
     }
 
     public Object getPrimaryKey(Object entity) {
-        return getEntityEle().getPkProxy().getValue(entity);
+        return getEntityEle().getIdProxy().getValue(entity);
     }
 
     public boolean hasField(String field) {
@@ -83,8 +83,9 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
         if (selector != null) {
             List<String> properties = selector.select(getName());
             if (properties != null && !properties.isEmpty()) {
-                if (query.getPrimaryKey() != null) {
-                    Example example = new InnerExample().eq("id", query.getPrimaryKey());
+                Object primaryKey = query.getPrimaryKey();
+                if (primaryKey != null) {
+                    Example example = new InnerExample().eq(getEntityEle().getIdName(), primaryKey);
                     query.setPrimaryKey(null);
                     query.setExample(example);
                 }

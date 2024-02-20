@@ -23,7 +23,6 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.api.constant.Order;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
@@ -38,7 +37,6 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
-import com.gitee.dorive.mybatis.plus.api.CriterionAppender;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -49,8 +47,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static com.gitee.dorive.mybatis.plus.impl.AppenderContext.OPERATOR_CRITERION_APPENDER_MAP;
 
 @Getter
 @Setter
@@ -74,30 +70,29 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
-        if (query.getPrimaryKey() != null) {
+        Object primaryKey = query.getPrimaryKey();
+        if (primaryKey != null) {
             QueryWrapper<Object> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("id", query.getPrimaryKey());
+            queryWrapper.eq(entityStoreInfo.getIdColumn(), primaryKey);
             List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
             return new Result<>(null, resultMaps);
+        }
 
-        } else if (query.getExample() != null) {
-            Example example = query.getExample();
-            if (query.startPage()) {
-                com.gitee.dorive.core.entity.executor.Page<Object> page = example.getPage();
-
-                Page<Map<String, Object>> queryPage = new Page<>(page.getCurrent(), page.getSize());
-                QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
-                queryPage = baseMapper.selectMapsPage(queryPage, queryWrapper);
-
+        Example example = query.getExample();
+        if (example != null) {
+            QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
+            com.gitee.dorive.core.entity.executor.Page<Object> page = example.getPage();
+            if (page != null) {
+                Page<Map<String, Object>> queryPage = baseMapper.selectMapsPage(new Page<>(page.getCurrent(), page.getSize()), queryWrapper);
                 page.setTotal(queryPage.getTotal());
                 return new Result<>(page, queryPage.getRecords());
 
             } else {
-                QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
                 List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
                 return new Result<>(null, resultMaps);
             }
         }
+
         return new Result<>(null, Collections.emptyList());
     }
 
@@ -202,8 +197,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         });
 
         if (primaryKey != null) {
-            CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(Operator.EQ);
-            criterionAppender.appendCriterion(updateWrapper, "id", primaryKey);
+            updateWrapper.eq(entityStoreInfo.getIdColumn(), primaryKey);
         }
         if (example != null) {
             AppenderContext.appendCriterion(updateWrapper, example);

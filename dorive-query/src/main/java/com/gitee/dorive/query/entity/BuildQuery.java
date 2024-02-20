@@ -19,6 +19,7 @@ package com.gitee.dorive.query.entity;
 
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.query.impl.builder.QueryResolver;
+import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import lombok.Data;
 
 import java.util.Map;
@@ -26,6 +27,7 @@ import java.util.Map;
 @Data
 public class BuildQuery {
 
+    private AbstractQueryRepository<?, ?> repository;
     private Object query;
     private boolean onlyCount;
     private QueryResolver queryResolver;
@@ -35,7 +37,8 @@ public class BuildQuery {
     private boolean countQueried;
     private boolean dataSetQueried;
 
-    public BuildQuery(Object query, boolean onlyCount) {
+    public BuildQuery(AbstractQueryRepository<?, ?> repository, Object query, boolean onlyCount) {
+        this.repository = repository;
         this.query = query;
         this.onlyCount = onlyCount;
     }

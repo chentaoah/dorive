@@ -135,7 +135,7 @@ public class UnionExecutor extends AbstractProxyExecutor {
     private Result<Object> buildResult(List<Map<String, Object>> resultMaps) {
         Map<String, Map<String, Object>> idResultMapMapping = new LinkedHashMap<>(resultMaps.size() * 4 / 3 + 1);
         for (Map<String, Object> resultMap : resultMaps) {
-            Object id = resultMap.get("id");
+            Object id = resultMap.get(entityStoreInfo.getIdColumn());
             Object row = resultMap.get("$row");
             if (id == null || row == null) {
                 continue;

@@ -39,7 +39,7 @@ public abstract class EntityEle {
     private EntityDef entityDef;
     private boolean aggregated;
     private List<BindingDef> bindingDefs;
-    private PropProxy pkProxy;
+    private PropProxy idProxy;
     private Map<String, String> fieldAliasMapping;
 
     public EntityEle(AnnotatedElement element) {
@@ -58,7 +58,7 @@ public abstract class EntityEle {
     }
 
     public void initialize() {
-        if (entityDef != null && pkProxy == null) {
+        if (entityDef != null && idProxy == null) {
             doInitialize();
         }
     }
@@ -104,5 +104,7 @@ public abstract class EntityEle {
     public abstract EntityType getEntityType();
 
     public abstract Map<String, EntityField> getEntityFieldMap();
+
+    public abstract String getIdName();
 
 }

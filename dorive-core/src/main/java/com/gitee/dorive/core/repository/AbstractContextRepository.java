@@ -194,7 +194,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, entityStoreInfo, entityMapper);
 
             Executor executor = newExecutor(entityDef, entityEle, entityStoreInfo);
-            executor = new FactoryExecutor(executor, entityEle, entityFactory);
+            executor = new FactoryExecutor(executor, entityEle, entityStoreInfo, entityFactory);
             executor = new ExampleExecutor(executor, entityEle, entityMapper);
             EXAMPLE_EXECUTOR_MAP.put(entityEle, (ExampleExecutor) executor);
             defaultRepository.setExecutor(executor);

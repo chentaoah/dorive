@@ -18,8 +18,8 @@
 package com.gitee.dorive.api.entity.element;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.api.entity.def.FieldDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.def.FieldDef;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -81,7 +81,7 @@ public class EntityField extends EntityEle {
     protected void doInitialize() {
         if (entityType != null) {
             entityType.initialize();
-            setPkProxy(entityType.getPkProxy());
+            setIdProxy(entityType.getIdProxy());
             setFieldAliasMapping(entityType.getFieldAliasMapping());
         }
     }
@@ -89,6 +89,11 @@ public class EntityField extends EntityEle {
     @Override
     public Map<String, EntityField> getEntityFieldMap() {
         return entityType != null ? entityType.getEntityFieldMap() : null;
+    }
+
+    @Override
+    public String getIdName() {
+        return entityType != null ? entityType.getIdName() : null;
     }
 
     public boolean isSameType(EntityField entityField) {

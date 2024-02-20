@@ -15,17 +15,28 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.exception;
+package com.gitee.dorive.api.annotation;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import org.springframework.core.annotation.AliasFor;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class CircularDependencyException extends RuntimeException {
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    public CircularDependencyException(String message) {
-        super(message);
-    }
+@Field
+@Inherited
+@Documented
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Id {
+
+    @AliasFor(annotation = Field.class)
+    boolean isId() default true;
+
+    @AliasFor(annotation = Field.class)
+    String value() default "id";
 
 }

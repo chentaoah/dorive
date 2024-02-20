@@ -29,8 +29,8 @@ public class EntityStoreInfo {
     private Object mapper;
     private Class<?> pojoClass;
     private String tableName;
-    private String primaryProp;
-    private String primaryAlias;
+    private String idProperty;
+    private String idColumn;
     private Map<String, String> propAliasMappingWithoutPk;
     private Map<String, String> propAliasMapping;
     private String selectColumns;
