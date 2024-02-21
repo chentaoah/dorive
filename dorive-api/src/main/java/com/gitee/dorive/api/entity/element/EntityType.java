@@ -77,7 +77,7 @@ public class EntityType extends EntityEle {
                     String fieldName = entityField.getName();
                     if (idField == null) {
                         FieldDef fieldDef = entityField.getFieldDef();
-                        if ("id".equals(fieldName) || fieldDef.isId()) {
+                        if ("id".equals(fieldName) || (fieldDef != null && fieldDef.isId())) {
                             idField = entityField;
                         }
                     }
