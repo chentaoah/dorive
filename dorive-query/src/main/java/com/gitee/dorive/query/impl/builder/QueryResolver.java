@@ -18,24 +18,23 @@
 package com.gitee.dorive.query.impl.builder;
 
 import com.gitee.dorive.api.constant.Operator;
-import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.*;
-import com.gitee.dorive.query.api.QueryBuilder;
+import com.gitee.dorive.core.entity.executor.Criterion;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.query.constant.OperatorV2;
-import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.entity.BuildQuery;
-import com.gitee.dorive.query.entity.QueryField;
-import com.gitee.dorive.query.entity.SpecificFields;
-import com.gitee.dorive.query.entity.def.ExampleDef;
+import com.gitee.dorive.query.entity.*;
 import com.gitee.dorive.query.entity.def.CriterionDef;
+import com.gitee.dorive.query.entity.def.ExampleDef;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class QueryResolver implements QueryBuilder {
+public class QueryResolver {
 
     private ExampleDef exampleDef;
     private List<QueryField> queryFields;
@@ -43,16 +42,14 @@ public class QueryResolver implements QueryBuilder {
     private List<MergedRepository> mergedRepositories;
     private List<MergedRepository> reversedMergedRepositories;
 
-    @Override
-    public void buildQuery(Context context, BuildQuery buildQuery) {
-        Object query = buildQuery.getQuery();
+    public void resolve(QueryContext queryContext, QueryWrapper queryWrapper) {
+        Object query = queryWrapper.getQuery();
         Map<String, Example> exampleMap = newExampleMap(query);
         Example example = exampleMap.computeIfAbsent("/", key -> new InnerExample());
         example.setOrderBy(specificFields.newOrderBy(query));
         example.setPage(specificFields.newPage(query));
-        buildQuery.setQueryResolver(this);
-        buildQuery.setExampleMap(exampleMap);
-        buildQuery.setExample(example);
+        queryContext.setExampleMap(exampleMap);
+        queryContext.setExample(example);
     }
 
     private Map<String, Example> newExampleMap(Object query) {

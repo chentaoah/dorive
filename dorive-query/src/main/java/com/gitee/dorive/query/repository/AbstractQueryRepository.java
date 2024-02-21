@@ -21,14 +21,15 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.annotation.Repository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Options;
-import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.event.repository.AbstractEventRepository;
-import com.gitee.dorive.query.api.QueryBuilder;
+import com.gitee.dorive.query.api.QueryExecutor;
 import com.gitee.dorive.query.api.QueryRepository;
-import com.gitee.dorive.query.entity.BuildQuery;
+import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.entity.def.QueryScanDef;
-import com.gitee.dorive.query.impl.builder.DefaultQueryBuilder;
+import com.gitee.dorive.query.impl.builder.DefaultQueryExecutor;
 import com.gitee.dorive.query.impl.builder.QueryResolver;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
@@ -37,107 +38,83 @@ import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryBuilder, QueryRepository<E, PK> {
+public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryRepository<E, PK>, QueryExecutor {
 
     private QueryScanDef queryScanDef;
     private MergedRepositoryResolver mergedRepositoryResolver;
     private QueryTypeResolver queryTypeResolver;
-    private QueryBuilder queryBuilder;
+    private QueryExecutor defaultQueryExecutor;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
         Repository repository = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), Repository.class);
-        queryScanDef = QueryScanDef.fromElement(this.getClass());
-        if (repository != null && queryScanDef != null) {
-            if (StringUtils.isBlank(queryScanDef.getRegex())) {
-                queryScanDef.setRegex("^" + getEntityClass().getSimpleName() + ".*");
+        this.queryScanDef = QueryScanDef.fromElement(this.getClass());
+        if (repository != null && this.queryScanDef != null) {
+            if (StringUtils.isBlank(this.queryScanDef.getRegex())) {
+                this.queryScanDef.setRegex("^" + getEntityClass().getSimpleName() + ".*");
             }
-            mergedRepositoryResolver = new MergedRepositoryResolver(this);
-            queryTypeResolver = new QueryTypeResolver(this);
-            queryBuilder = new DefaultQueryBuilder();
+            this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
+            this.queryTypeResolver = new QueryTypeResolver(this);
+            this.defaultQueryExecutor = new DefaultQueryExecutor();
         }
     }
 
-    public BuildQuery newQuery(Context context, Object query, boolean onlyCount) {
-        BuildQuery buildQuery = doNewQuery(context, query, onlyCount);
-        buildQuery(context, buildQuery);
-        return buildQuery;
-    }
-
-    public BuildQuery doNewQuery(Context context, Object query, boolean onlyCount) {
-        BuildQuery buildQuery = new BuildQuery(this, query, onlyCount);
-        Map<String, QueryResolver> nameQueryResolverMap = queryTypeResolver.getNameQueryResolverMap();
-        QueryResolver queryResolver = nameQueryResolverMap.get(query.getClass().getName());
-        Assert.notNull(queryResolver, "No query resolver found!");
-        queryResolver.buildQuery(context, buildQuery);
-        return buildQuery;
-    }
-
     @Override
-    public void buildQuery(Context context, BuildQuery buildQuery) {
-        QueryBuilder queryBuilder = adaptiveQueryBuilder(context, buildQuery);
-        queryBuilder.buildQuery(context, buildQuery);
-    }
-
-    protected QueryBuilder adaptiveQueryBuilder(Context context, BuildQuery buildQuery) {
-        return queryBuilder;
-    }
-
-    @Override
+    @SuppressWarnings("unchecked")
     public List<E> selectByQuery(Options options, Object query) {
-        Context context = (Context) options;
-        BuildQuery buildQuery = newQuery(context, query, false);
-        Example example = buildQuery.getExample();
-        if (buildQuery.isAbandoned()) {
-            return Collections.emptyList();
-        }
-        if (buildQuery.isDataSetQueried()) {
-            example.setPage(null);
-            return selectByExample(context, example);
-        }
-        return selectByExample(context, example);
+        QueryContext queryContext = new QueryContext(this, (Context) options);
+        QueryWrapper queryWrapper = new QueryWrapper(query);
+        resolveQuery(queryContext, queryWrapper);
+        Result<Object> result = executeQuery(queryContext, queryWrapper);
+        return (List<E>) result.getRecords();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByQuery(Options options, Object query) {
-        Context context = (Context) options;
-        BuildQuery buildQuery = newQuery(context, query, false);
-        Example example = buildQuery.getExample();
-        if (buildQuery.isAbandoned()) {
-            return (Page<E>) example.getPage();
-        }
-        if (buildQuery.isDataSetQueried()) {
-            Page<Object> page = example.getPage();
-            example.setPage(null);
-            List<E> records = selectByExample(context, example);
-            example.setPage(page);
-            page.setRecords((List<Object>) records);
-            return (Page<E>) page;
-        }
-        return selectPageByExample(context, example);
+        QueryContext queryContext = new QueryContext(this, (Context) options);
+        QueryWrapper queryWrapper = new QueryWrapper(query);
+        resolveQuery(queryContext, queryWrapper);
+        Result<Object> result = executeQuery(queryContext, queryWrapper);
+        return (Page<E>) result.getPage();
     }
 
     @Override
     public long selectCountByQuery(Options options, Object query) {
-        Context context = (Context) options;
-        BuildQuery buildQuery = newQuery(context, query, true);
-        Example example = buildQuery.getExample();
-        if (buildQuery.isAbandoned()) {
-            return 0L;
-        }
-        if (buildQuery.isCountQueried()) {
-            Page<Object> page = example.getPage();
-            return page.getTotal();
-        }
-        return selectCountByExample(context, example);
+        QueryContext queryContext = new QueryContext(this, (Context) options);
+        QueryWrapper queryWrapper = new QueryWrapper(query);
+        resolveQuery(queryContext, queryWrapper);
+        return executeCount(queryContext, queryWrapper);
+    }
+
+    public void resolveQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
+        Map<String, QueryResolver> nameQueryResolverMap = queryTypeResolver.getNameQueryResolverMap();
+        QueryResolver queryResolver = nameQueryResolverMap.get(queryWrapper.getQuery().getClass().getName());
+        Assert.notNull(queryResolver, "No query resolver found!");
+        queryContext.setQueryResolver(queryResolver);
+        queryResolver.resolve(queryContext, queryWrapper);
+    }
+
+    @Override
+    public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
+        QueryExecutor queryExecutor = adaptiveQueryExecutor(queryContext, queryWrapper);
+        return queryExecutor.executeQuery(queryContext, queryWrapper);
+    }
+
+    @Override
+    public long executeCount(QueryContext queryContext, QueryWrapper queryWrapper) {
+        QueryExecutor queryExecutor = adaptiveQueryExecutor(queryContext, queryWrapper);
+        return queryExecutor.executeCount(queryContext, queryWrapper);
+    }
+
+    protected QueryExecutor adaptiveQueryExecutor(QueryContext queryContext, QueryWrapper queryWrapper) {
+        return defaultQueryExecutor;
     }
 
 }

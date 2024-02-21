@@ -20,13 +20,15 @@ package com.gitee.dorive.query.impl.builder;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
+import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.util.MultiInBuilder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.query.api.QueryBuilder;
+import com.gitee.dorive.query.api.QueryExecutor;
 import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.entity.BuildQuery;
+import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.QueryWrapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -36,19 +38,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class DefaultQueryBuilder implements QueryBuilder {
+public class DefaultQueryExecutor implements QueryExecutor {
 
     @Override
-    public void buildQuery(Context context, BuildQuery buildQuery) {
-        Map<String, ExampleWrapper> exampleWrapperMap = buildExampleWrapperMap(buildQuery);
-        executeQuery(context, exampleWrapperMap);
-        ExampleWrapper exampleWrapper = exampleWrapperMap.get("/");
-        buildQuery.setAbandoned(exampleWrapper.isAbandoned());
+    public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
+        return null;
     }
 
-    private Map<String, ExampleWrapper> buildExampleWrapperMap(BuildQuery buildQuery) {
-        QueryResolver queryResolver = buildQuery.getQueryResolver();
-        Map<String, Example> exampleMap = buildQuery.getExampleMap();
+    @Override
+    public long executeCount(QueryContext queryContext, QueryWrapper queryWrapper) {
+        return 0;
+    }
+
+    public void buildQuery(Context context, QueryWrapper queryWrapper) {
+        Map<String, ExampleWrapper> exampleWrapperMap = buildExampleWrapperMap(queryWrapper);
+        executeQuery(context, exampleWrapperMap);
+        ExampleWrapper exampleWrapper = exampleWrapperMap.get("/");
+        queryWrapper.setAbandoned(exampleWrapper.isAbandoned());
+    }
+
+    private Map<String, ExampleWrapper> buildExampleWrapperMap(QueryWrapper queryWrapper) {
+        QueryResolver queryResolver = queryWrapper.getQueryResolver();
+        Map<String, Example> exampleMap = queryWrapper.getExampleMap();
         Map<String, ExampleWrapper> exampleWrapperMap = new LinkedHashMap<>();
         for (MergedRepository mergedRepository : queryResolver.getReversedMergedRepositories()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();

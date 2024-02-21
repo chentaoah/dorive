@@ -19,15 +19,16 @@ package com.gitee.dorive.sql.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.util.ExampleUtils;
-import com.gitee.dorive.query.api.QueryBuilder;
-import com.gitee.dorive.query.entity.BuildQuery;
+import com.gitee.dorive.query.api.QueryExecutor;
+import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.ArgSegment;
@@ -42,27 +43,36 @@ import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class SqlQueryBuilder implements QueryBuilder {
+public class SqlQueryExecutor implements QueryExecutor {
 
     private SegmentBuilder segmentBuilder;
     private SqlRunner sqlRunner;
 
     @Override
-    public void buildQuery(Context context, BuildQuery buildQuery) {
-        AbstractQueryRepository<?, ?> repository = buildQuery.getRepository();
+    public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
+        return null;
+    }
+
+    @Override
+    public long executeCount(QueryContext queryContext, QueryWrapper queryWrapper) {
+        return 0;
+    }
+
+    public Result<Object> doExecuteQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
+        AbstractQueryRepository<?, ?> repository = queryContext.getRepository();
         EntityEle entityEle = repository.getEntityEle();
         EntityStoreInfo entityStoreInfo = AbstractContextRepository.getEntityStoreInfo(entityEle);
         String idColumn = entityStoreInfo.getIdColumn();
 
-        Example example = buildQuery.getExample();
-        boolean onlyCount = buildQuery.isOnlyCount();
+        Example example = queryContext.getExample();
+        boolean onlyCount = queryContext.isOnlyCount();
         OrderBy orderBy = example.getOrderBy();
 
         example = ExampleUtils.clone(example);
-        buildQuery.setExample(example);
+        queryContext.setExample(example);
         Page<Object> page = example.getPage();
 
-        SelectSegment selectSegment = segmentBuilder.buildSegment(context, buildQuery);
+        SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext);
         char letter = selectSegment.getLetter();
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<ArgSegment> argSegments = selectSegment.getArgSegments();
@@ -90,7 +100,7 @@ public class SqlQueryBuilder implements QueryBuilder {
                 example.setPage(page);
             }
             page.setTotal(count);
-            buildQuery.setCountQueried(true);
+            queryWrapper.setCountQueried(true);
             return;
         }
 
@@ -98,9 +108,9 @@ public class SqlQueryBuilder implements QueryBuilder {
             String countSql = selectSql + fromWhereSql;
             long count = sqlRunner.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
             page.setTotal(count);
-            buildQuery.setCountQueried(true);
+            queryWrapper.setCountQueried(true);
             if (count == 0L) {
-                buildQuery.setAbandoned(true);
+                queryWrapper.setAbandoned(true);
                 return;
             }
         }
@@ -128,9 +138,9 @@ public class SqlQueryBuilder implements QueryBuilder {
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get(idColumn), true);
         if (!primaryKeys.isEmpty()) {
             example.in(entityEle.getIdName(), primaryKeys);
-            buildQuery.setDataSetQueried(true);
+            queryWrapper.setDataSetQueried(true);
         } else {
-            buildQuery.setAbandoned(true);
+            queryWrapper.setAbandoned(true);
         }
     }
 

@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.query.entity;
 
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.query.impl.builder.QueryResolver;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
@@ -25,22 +26,18 @@ import lombok.Data;
 import java.util.Map;
 
 @Data
-public class BuildQuery {
+public class QueryContext {
 
     private AbstractQueryRepository<?, ?> repository;
-    private Object query;
-    private boolean onlyCount;
+    private Context context;
     private QueryResolver queryResolver;
     private Map<String, Example> exampleMap;
     private Example example;
-    private boolean abandoned;
-    private boolean countQueried;
-    private boolean dataSetQueried;
+    private boolean onlyCount;
 
-    public BuildQuery(AbstractQueryRepository<?, ?> repository, Object query, boolean onlyCount) {
+    public QueryContext(AbstractQueryRepository<?, ?> repository, Context context) {
         this.repository = repository;
-        this.query = query;
-        this.onlyCount = onlyCount;
+        this.context = context;
     }
 
 }

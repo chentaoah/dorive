@@ -30,13 +30,14 @@ import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.option.QueryStrategy;
 import com.gitee.dorive.mybatis.plus.impl.MybatisPlusExecutor;
-import com.gitee.dorive.query.api.QueryBuilder;
-import com.gitee.dorive.query.entity.BuildQuery;
+import com.gitee.dorive.query.api.QueryExecutor;
+import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.impl.CountQuerier;
 import com.gitee.dorive.sql.impl.SegmentBuilder;
-import com.gitee.dorive.sql.impl.SqlQueryBuilder;
+import com.gitee.dorive.sql.impl.SqlQueryExecutor;
 import com.gitee.dorive.sql.impl.UnionExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -54,7 +55,7 @@ import java.util.Map;
 public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
 
     private SqlRunner sqlRunner;
-    private QueryBuilder sqlQueryBuilder;
+    private QueryExecutor sqlQueryExecutor;
     private CountQuerier countQuerier;
 
     @Override
@@ -62,7 +63,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
         ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
         this.sqlRunner = implFactory.getInstance(SqlRunner.class);
         SegmentBuilder segmentBuilder = new SegmentBuilder();
-        this.sqlQueryBuilder = new SqlQueryBuilder(segmentBuilder, this.sqlRunner);
+        this.sqlQueryExecutor = new SqlQueryExecutor(segmentBuilder, this.sqlRunner);
         this.countQuerier = new CountQuerier(this, segmentBuilder, this.sqlRunner);
         super.afterPropertiesSet();
     }
@@ -125,12 +126,13 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
     }
 
     @Override
-    protected QueryBuilder adaptiveQueryBuilder(Context context, BuildQuery buildQuery) {
+    protected QueryExecutor adaptiveQueryExecutor(QueryContext queryContext, QueryWrapper queryWrapper) {
+        Context context = queryContext.getContext();
         QueryStrategy queryStrategy = (QueryStrategy) context.getOption(QueryStrategy.class);
         if (queryStrategy == null || queryStrategy == QueryStrategy.SQL) {
-            return sqlQueryBuilder;
+            return sqlQueryExecutor;
         }
-        return super.adaptiveQueryBuilder(context, buildQuery);
+        return super.adaptiveQueryExecutor(queryContext, queryWrapper);
     }
 
 }

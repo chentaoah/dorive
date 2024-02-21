@@ -30,29 +30,22 @@ import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.CriterionUtils;
-import com.gitee.dorive.query.entity.BuildQuery;
 import com.gitee.dorive.query.entity.MergedRepository;
+import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.impl.builder.QueryResolver;
-import com.gitee.dorive.sql.entity.ArgSegment;
-import com.gitee.dorive.sql.entity.JoinSegment;
-import com.gitee.dorive.sql.entity.OnSegment;
-import com.gitee.dorive.sql.entity.SelectSegment;
-import com.gitee.dorive.sql.entity.TableSegment;
+import com.gitee.dorive.sql.entity.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 public class SegmentBuilder {
 
-    public SelectSegment buildSegment(Context context, BuildQuery buildQuery) {
-        QueryResolver queryResolver = buildQuery.getQueryResolver();
-        Map<String, Example> exampleMap = buildQuery.getExampleMap();
+    public SelectSegment buildSegment(QueryContext queryContext) {
+        Context context = queryContext.getContext();
+        QueryResolver queryResolver = queryContext.getQueryResolver();
+        Map<String, Example> exampleMap = queryContext.getExampleMap();
 
         List<MergedRepository> mergedRepositories = queryResolver.getMergedRepositories();
         Map<String, Node> nodeMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);

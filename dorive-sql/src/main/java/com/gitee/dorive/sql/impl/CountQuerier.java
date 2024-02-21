@@ -19,7 +19,8 @@ package com.gitee.dorive.sql.impl;
 
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.query.entity.BuildQuery;
+import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.SelectSegment;
@@ -43,9 +44,11 @@ public class CountQuerier {
     private SqlRunner sqlRunner;
 
     public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
-        BuildQuery buildQuery = repository.doNewQuery(context, countQuery.getQuery(), false);
+        QueryContext queryContext = new QueryContext(repository, context);
+        QueryWrapper queryWrapper = new QueryWrapper(countQuery.getQuery());
+        repository.resolveQuery(queryContext, queryWrapper);
 
-        SelectSegment selectSegment = segmentBuilder.buildSegment(context, buildQuery);
+        SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext);
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<Object> args = selectSegment.getArgs();
         String tableAlias = tableSegment.getTableAlias();

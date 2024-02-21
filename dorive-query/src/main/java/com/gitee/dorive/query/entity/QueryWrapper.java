@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.api;
+package com.gitee.dorive.query.entity;
 
-import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.query.entity.BuildQuery;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-public interface QueryBuilder {
-
-    void buildQuery(Context context, BuildQuery buildQuery);
-
+@Data
+@AllArgsConstructor
+public class QueryWrapper {
+    private Object query;
 }
