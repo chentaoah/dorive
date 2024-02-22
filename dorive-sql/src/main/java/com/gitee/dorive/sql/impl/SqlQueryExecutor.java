@@ -63,6 +63,15 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         ResultType resultType = queryContext.getResultType();
         Example example = queryContext.getExample();
 
+        SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext);
+        char letter = selectSegment.getLetter();
+        TableSegment tableSegment = selectSegment.getTableSegment();
+        List<ArgSegment> argSegments = selectSegment.getArgSegments();
+        List<Object> args = selectSegment.getArgs();
+        if (!tableSegment.isJoin() || argSegments.isEmpty()) {
+            return super.executeQuery(queryContext, queryWrapper);
+        }
+
         EntityEle entityEle = repository.getEntityEle();
         EntityStoreInfo entityStoreInfo = AbstractContextRepository.getEntityStoreInfo(entityEle);
         String idColumn = entityStoreInfo.getIdColumn();
@@ -72,15 +81,6 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
 
         boolean needCount = queryContext.isNeedCount();
         Result<Object> emptyResult = queryContext.newEmptyResult();
-
-        SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext);
-        char letter = selectSegment.getLetter();
-        TableSegment tableSegment = selectSegment.getTableSegment();
-        List<ArgSegment> argSegments = selectSegment.getArgSegments();
-        List<Object> args = selectSegment.getArgs();
-        if (!tableSegment.isJoin() || argSegments.isEmpty()) {
-            return super.executeQuery(queryContext, queryWrapper);
-        }
 
         String tableAlias = tableSegment.getTableAlias();
         selectSegment.setDistinct(true);
