@@ -31,9 +31,14 @@ import java.util.List;
 
 public abstract class AbstractQueryExecutor implements QueryExecutor {
 
+    private final AbstractQueryRepository<?, ?> repository;
+
+    public AbstractQueryExecutor(AbstractQueryRepository<?, ?> repository) {
+        this.repository = repository;
+    }
+
     @Override
     public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
-        AbstractQueryRepository<?, ?> repository = queryContext.getRepository();
         Context context = queryContext.getContext();
         ResultType resultType = queryContext.getResultType();
         Example example = queryContext.getExample();

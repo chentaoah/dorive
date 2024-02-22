@@ -62,14 +62,14 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
             }
             this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
             this.queryTypeResolver = new QueryTypeResolver(this);
-            this.defaultQueryExecutor = new DefaultQueryExecutor();
+            this.defaultQueryExecutor = new DefaultQueryExecutor(this);
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<E> selectByQuery(Options options, Object query) {
-        QueryContext queryContext = new QueryContext(this, (Context) options, ResultType.DATA);
+        QueryContext queryContext = new QueryContext((Context) options, ResultType.DATA);
         QueryWrapper queryWrapper = new QueryWrapper(query);
         Result<Object> result = executeQuery(queryContext, queryWrapper);
         return (List<E>) result.getRecords();
@@ -78,7 +78,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByQuery(Options options, Object query) {
-        QueryContext queryContext = new QueryContext(this, (Context) options, ResultType.COUNT_AND_DATA);
+        QueryContext queryContext = new QueryContext((Context) options, ResultType.COUNT_AND_DATA);
         QueryWrapper queryWrapper = new QueryWrapper(query);
         Result<Object> result = executeQuery(queryContext, queryWrapper);
         return (Page<E>) result.getPage();
@@ -86,7 +86,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
     @Override
     public long selectCountByQuery(Options options, Object query) {
-        QueryContext queryContext = new QueryContext(this, (Context) options, ResultType.COUNT);
+        QueryContext queryContext = new QueryContext((Context) options, ResultType.COUNT);
         QueryWrapper queryWrapper = new QueryWrapper(query);
         Result<Object> result = executeQuery(queryContext, queryWrapper);
         return result.getCount();

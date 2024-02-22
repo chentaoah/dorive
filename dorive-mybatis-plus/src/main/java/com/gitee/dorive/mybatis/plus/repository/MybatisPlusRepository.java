@@ -63,7 +63,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
         ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
         this.sqlRunner = implFactory.getInstance(SqlRunner.class);
         SegmentBuilder segmentBuilder = new SegmentBuilder();
-        this.sqlQueryExecutor = new SqlQueryExecutor(segmentBuilder, this.sqlRunner);
+        this.sqlQueryExecutor = new SqlQueryExecutor(this, segmentBuilder, this.sqlRunner);
         this.countQuerier = new CountQuerier(this, segmentBuilder, this.sqlRunner);
         super.afterPropertiesSet();
     }

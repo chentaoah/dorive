@@ -49,13 +49,13 @@ import java.util.Map;
 @AllArgsConstructor
 public class SqlQueryExecutor implements QueryExecutor {
 
+    private AbstractQueryRepository<?, ?> repository;
     private SegmentBuilder segmentBuilder;
     private SqlRunner sqlRunner;
 
     @Override
     @SuppressWarnings("unchecked")
     public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
-        AbstractQueryRepository<?, ?> repository = queryContext.getRepository();
         Context context = queryContext.getContext();
         ResultType resultType = queryContext.getResultType();
         Example example = queryContext.getExample();

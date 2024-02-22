@@ -45,7 +45,7 @@ public class CountQuerier {
     private SqlRunner sqlRunner;
 
     public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
-        QueryContext queryContext = new QueryContext(repository, context, ResultType.COUNT);
+        QueryContext queryContext = new QueryContext(context, ResultType.COUNT);
         QueryWrapper queryWrapper = new QueryWrapper(countQuery.getQuery());
         repository.resolveQuery(queryContext, queryWrapper);
 

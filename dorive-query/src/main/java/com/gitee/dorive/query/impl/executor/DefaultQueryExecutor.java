@@ -29,6 +29,7 @@ import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.impl.resolver.QueryResolver;
+import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -39,6 +40,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DefaultQueryExecutor extends AbstractQueryExecutor {
+
+    public DefaultQueryExecutor(AbstractQueryRepository<?, ?> repository) {
+        super(repository);
+    }
 
     @Override
     public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
