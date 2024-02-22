@@ -15,20 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.builder;
+package com.gitee.dorive.query.impl.executor;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.util.MultiInBuilder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.query.api.QueryExecutor;
+import com.gitee.dorive.core.util.MultiInBuilder;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryWrapper;
+import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -38,28 +38,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class DefaultQueryExecutor implements QueryExecutor {
+public class DefaultQueryExecutor extends AbstractQueryExecutor {
 
     @Override
     public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
-        return null;
-    }
-
-    @Override
-    public long executeCount(QueryContext queryContext, QueryWrapper queryWrapper) {
-        return 0;
-    }
-
-    public void buildQuery(Context context, QueryWrapper queryWrapper) {
-        Map<String, ExampleWrapper> exampleWrapperMap = buildExampleWrapperMap(queryWrapper);
-        executeQuery(context, exampleWrapperMap);
+        Map<String, ExampleWrapper> exampleWrapperMap = buildExampleWrapperMap(queryContext);
+        executeQuery(queryContext, exampleWrapperMap);
         ExampleWrapper exampleWrapper = exampleWrapperMap.get("/");
-        queryWrapper.setAbandoned(exampleWrapper.isAbandoned());
+        boolean abandoned = exampleWrapper.isAbandoned();
+        if (abandoned) {
+            return queryContext.newEmptyResult();
+        }
+        return super.executeQuery(queryContext, queryWrapper);
     }
 
-    private Map<String, ExampleWrapper> buildExampleWrapperMap(QueryWrapper queryWrapper) {
-        QueryResolver queryResolver = queryWrapper.getQueryResolver();
-        Map<String, Example> exampleMap = queryWrapper.getExampleMap();
+    private Map<String, ExampleWrapper> buildExampleWrapperMap(QueryContext queryContext) {
+        QueryResolver queryResolver = queryContext.getQueryResolver();
+        Map<String, Example> exampleMap = queryContext.getExampleMap();
         Map<String, ExampleWrapper> exampleWrapperMap = new LinkedHashMap<>();
         for (MergedRepository mergedRepository : queryResolver.getReversedMergedRepositories()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
@@ -71,7 +66,8 @@ public class DefaultQueryExecutor implements QueryExecutor {
         return exampleWrapperMap;
     }
 
-    private void executeQuery(Context context, Map<String, ExampleWrapper> exampleWrapperMap) {
+    private void executeQuery(QueryContext queryContext, Map<String, ExampleWrapper> exampleWrapperMap) {
+        Context context = queryContext.getContext();
         exampleWrapperMap.forEach((accessPath, exampleWrapper) -> {
             if ("/".equals(accessPath)) return;
 

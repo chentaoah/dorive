@@ -15,14 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.builder;
+package com.gitee.dorive.query.impl.resolver;
 
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.query.constant.OperatorV2;
-import com.gitee.dorive.query.entity.*;
+import com.gitee.dorive.query.entity.MergedRepository;
+import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.QueryField;
+import com.gitee.dorive.query.entity.QueryWrapper;
+import com.gitee.dorive.query.entity.SpecificFields;
 import com.gitee.dorive.query.entity.def.CriterionDef;
 import com.gitee.dorive.query.entity.def.ExampleDef;
 import lombok.AllArgsConstructor;

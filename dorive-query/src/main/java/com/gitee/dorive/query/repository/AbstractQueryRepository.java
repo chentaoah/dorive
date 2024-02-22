@@ -27,10 +27,11 @@ import com.gitee.dorive.event.repository.AbstractEventRepository;
 import com.gitee.dorive.query.api.QueryExecutor;
 import com.gitee.dorive.query.api.QueryRepository;
 import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.entity.def.QueryScanDef;
-import com.gitee.dorive.query.impl.builder.DefaultQueryExecutor;
-import com.gitee.dorive.query.impl.builder.QueryResolver;
+import com.gitee.dorive.query.impl.executor.DefaultQueryExecutor;
+import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
 import lombok.Data;
@@ -68,9 +69,8 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     @SuppressWarnings("unchecked")
     public List<E> selectByQuery(Options options, Object query) {
-        QueryContext queryContext = new QueryContext(this, (Context) options);
+        QueryContext queryContext = new QueryContext(this, (Context) options, ResultType.DATA);
         QueryWrapper queryWrapper = new QueryWrapper(query);
-        resolveQuery(queryContext, queryWrapper);
         Result<Object> result = executeQuery(queryContext, queryWrapper);
         return (List<E>) result.getRecords();
     }
@@ -78,19 +78,25 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByQuery(Options options, Object query) {
-        QueryContext queryContext = new QueryContext(this, (Context) options);
+        QueryContext queryContext = new QueryContext(this, (Context) options, ResultType.COUNT_AND_DATA);
         QueryWrapper queryWrapper = new QueryWrapper(query);
-        resolveQuery(queryContext, queryWrapper);
         Result<Object> result = executeQuery(queryContext, queryWrapper);
         return (Page<E>) result.getPage();
     }
 
     @Override
     public long selectCountByQuery(Options options, Object query) {
-        QueryContext queryContext = new QueryContext(this, (Context) options);
+        QueryContext queryContext = new QueryContext(this, (Context) options, ResultType.COUNT);
         QueryWrapper queryWrapper = new QueryWrapper(query);
+        Result<Object> result = executeQuery(queryContext, queryWrapper);
+        return result.getCount();
+    }
+
+    @Override
+    public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
         resolveQuery(queryContext, queryWrapper);
-        return executeCount(queryContext, queryWrapper);
+        QueryExecutor queryExecutor = adaptiveQueryExecutor(queryContext, queryWrapper);
+        return queryExecutor.executeQuery(queryContext, queryWrapper);
     }
 
     public void resolveQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
@@ -99,18 +105,6 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         Assert.notNull(queryResolver, "No query resolver found!");
         queryContext.setQueryResolver(queryResolver);
         queryResolver.resolve(queryContext, queryWrapper);
-    }
-
-    @Override
-    public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
-        QueryExecutor queryExecutor = adaptiveQueryExecutor(queryContext, queryWrapper);
-        return queryExecutor.executeQuery(queryContext, queryWrapper);
-    }
-
-    @Override
-    public long executeCount(QueryContext queryContext, QueryWrapper queryWrapper) {
-        QueryExecutor queryExecutor = adaptiveQueryExecutor(queryContext, queryWrapper);
-        return queryExecutor.executeCount(queryContext, queryWrapper);
     }
 
     protected QueryExecutor adaptiveQueryExecutor(QueryContext queryContext, QueryWrapper queryWrapper) {

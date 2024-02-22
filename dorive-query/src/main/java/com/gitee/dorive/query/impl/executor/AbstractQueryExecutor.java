@@ -15,50 +15,41 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.entity;
+package com.gitee.dorive.query.impl.executor;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.query.api.QueryExecutor;
+import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.entity.enums.ResultType;
-import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
-import lombok.Data;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 
-@Data
-public class QueryContext {
+public abstract class AbstractQueryExecutor implements QueryExecutor {
 
-    private AbstractQueryRepository<?, ?> repository;
-    private Context context;
-    private ResultType resultType;
-    private QueryResolver queryResolver;
-    private Map<String, Example> exampleMap;
-    private Example example;
-
-    public QueryContext(AbstractQueryRepository<?, ?> repository, Context context, ResultType resultType) {
-        this.repository = repository;
-        this.context = context;
-        this.resultType = resultType;
-    }
-
-    public Result<Object> newEmptyResult() {
+    @Override
+    public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
+        AbstractQueryRepository<?, ?> repository = queryContext.getRepository();
+        Context context = queryContext.getContext();
+        ResultType resultType = queryContext.getResultType();
+        Example example = queryContext.getExample();
         if (resultType == ResultType.COUNT_AND_DATA) {
-            return new Result<>(example.getPage());
+            Page<?> page = repository.selectPageByExample(context, example);
+            return new Result<Object>(page);
 
         } else if (resultType == ResultType.DATA) {
-            return new Result<>(Collections.emptyList());
+            List<?> entities = repository.selectByExample(context, example);
+            return new Result<Object>(entities);
 
         } else if (resultType == ResultType.COUNT) {
-            return new Result<>(0L);
+            long count = repository.selectCountByExample(context, example);
+            return new Result<>(count);
         }
-        throw new RuntimeException("Unsupported type!");
-    }
-
-    public boolean isNeedCount() {
-        return resultType == ResultType.COUNT_AND_DATA || resultType == ResultType.COUNT;
+        return queryContext.newEmptyResult();
     }
 
 }

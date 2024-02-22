@@ -19,29 +19,33 @@ package com.gitee.dorive.sql.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
-import com.gitee.dorive.core.util.ExampleUtils;
 import com.gitee.dorive.query.api.QueryExecutor;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryWrapper;
+import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.ArgSegment;
 import com.gitee.dorive.sql.entity.SelectSegment;
 import com.gitee.dorive.sql.entity.TableSegment;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 public class SqlQueryExecutor implements QueryExecutor {
 
@@ -49,41 +53,33 @@ public class SqlQueryExecutor implements QueryExecutor {
     private SqlRunner sqlRunner;
 
     @Override
+    @SuppressWarnings("unchecked")
     public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
-        return null;
-    }
-
-    @Override
-    public long executeCount(QueryContext queryContext, QueryWrapper queryWrapper) {
-        return 0;
-    }
-
-    public Result<Object> doExecuteQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
         AbstractQueryRepository<?, ?> repository = queryContext.getRepository();
+        Context context = queryContext.getContext();
+        ResultType resultType = queryContext.getResultType();
+        Example example = queryContext.getExample();
+
         EntityEle entityEle = repository.getEntityEle();
         EntityStoreInfo entityStoreInfo = AbstractContextRepository.getEntityStoreInfo(entityEle);
         String idColumn = entityStoreInfo.getIdColumn();
 
-        Example example = queryContext.getExample();
-        boolean onlyCount = queryContext.isOnlyCount();
         OrderBy orderBy = example.getOrderBy();
-
-        example = ExampleUtils.clone(example);
-        queryContext.setExample(example);
         Page<Object> page = example.getPage();
+
+        Result<Object> emptyResult = queryContext.newEmptyResult();
+        boolean needCount = queryContext.isNeedCount();
 
         SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext);
         char letter = selectSegment.getLetter();
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<ArgSegment> argSegments = selectSegment.getArgSegments();
         List<Object> args = selectSegment.getArgs();
-
         if (!tableSegment.isJoin() || argSegments.isEmpty()) {
-            return;
+            return emptyResult;
         }
 
         String tableAlias = tableSegment.getTableAlias();
-
         selectSegment.setDistinct(true);
         List<String> selectColumns = new ArrayList<>(2);
         selectColumns.add(tableAlias + "." + idColumn);
@@ -92,26 +88,17 @@ public class SqlQueryExecutor implements QueryExecutor {
         String selectSql = selectSegment.selectSql();
         String fromWhereSql = selectSegment.fromWhereSql();
 
-        if (onlyCount) {
+        if (needCount) {
             String countSql = selectSql + fromWhereSql;
             long count = sqlRunner.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
-            if (page == null) {
-                page = new Page<>();
-                example.setPage(page);
-            }
-            page.setTotal(count);
-            queryWrapper.setCountQueried(true);
-            return;
-        }
-
-        if (page != null) {
-            String countSql = selectSql + fromWhereSql;
-            long count = sqlRunner.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
-            page.setTotal(count);
-            queryWrapper.setCountQueried(true);
             if (count == 0L) {
-                queryWrapper.setAbandoned(true);
-                return;
+                return emptyResult;
+            }
+            if (resultType == ResultType.COUNT) {
+                return new Result<>(count);
+
+            } else if (page != null) {
+                page.setTotal(count);
             }
         }
 
@@ -128,7 +115,6 @@ public class SqlQueryExecutor implements QueryExecutor {
         if (rebuildSql) {
             selectSql = selectSegment.selectSql();
         }
-
         if (page != null) {
             selectSegment.setLimit(page.toString());
         }
@@ -137,11 +123,16 @@ public class SqlQueryExecutor implements QueryExecutor {
         List<Map<String, Object>> resultMaps = sqlRunner.selectList(sql, args.toArray());
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get(idColumn), true);
         if (!primaryKeys.isEmpty()) {
-            example.in(entityEle.getIdName(), primaryKeys);
-            queryWrapper.setDataSetQueried(true);
-        } else {
-            queryWrapper.setAbandoned(true);
+            Example newExample = new InnerExample().in(entityEle.getIdName(), primaryKeys);
+            List<Object> entities = (List<Object>) repository.selectByExample(context, newExample);
+            if (page != null) {
+                page.setRecords(entities);
+                return new Result<>(page);
+            } else {
+                return new Result<>(entities);
+            }
         }
+        return emptyResult;
     }
 
 }

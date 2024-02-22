@@ -15,14 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.api;
+package com.gitee.dorive.query.entity.enums;
 
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.QueryWrapper;
-
-public interface QueryExecutor {
-
-    Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper);
-
+public enum ResultType {
+    COUNT,
+    DATA,
+    COUNT_AND_DATA
 }

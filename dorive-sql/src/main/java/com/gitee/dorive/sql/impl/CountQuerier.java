@@ -20,6 +20,7 @@ package com.gitee.dorive.sql.impl;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
@@ -44,7 +45,7 @@ public class CountQuerier {
     private SqlRunner sqlRunner;
 
     public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
-        QueryContext queryContext = new QueryContext(repository, context);
+        QueryContext queryContext = new QueryContext(repository, context, ResultType.COUNT);
         QueryWrapper queryWrapper = new QueryWrapper(countQuery.getQuery());
         repository.resolveQuery(queryContext, queryWrapper);
 
