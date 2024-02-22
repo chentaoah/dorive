@@ -38,17 +38,18 @@ public abstract class AbstractQueryExecutor implements QueryExecutor {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
         Context context = queryContext.getContext();
         ResultType resultType = queryContext.getResultType();
         Example example = queryContext.getExample();
         if (resultType == ResultType.COUNT_AND_DATA) {
-            Page<?> page = repository.selectPageByExample(context, example);
-            return new Result<Object>(page);
+            Page<Object> page = (Page<Object>) repository.selectPageByExample(context, example);
+            return new Result<>(page);
 
         } else if (resultType == ResultType.DATA) {
-            List<?> entities = repository.selectByExample(context, example);
-            return new Result<Object>(entities);
+            List<Object> entities = (List<Object>) repository.selectByExample(context, example);
+            return new Result<>(entities);
 
         } else if (resultType == ResultType.COUNT) {
             long count = repository.selectCountByExample(context, example);
