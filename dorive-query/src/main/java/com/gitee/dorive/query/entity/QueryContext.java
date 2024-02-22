@@ -41,6 +41,10 @@ public class QueryContext {
         this.resultType = resultType;
     }
 
+    public boolean isNeedCount() {
+        return resultType == ResultType.COUNT_AND_DATA || resultType == ResultType.COUNT;
+    }
+
     public Result<Object> newEmptyResult() {
         if (resultType == ResultType.COUNT_AND_DATA) {
             return new Result<>(example.getPage());
@@ -52,10 +56,6 @@ public class QueryContext {
             return new Result<>(0L);
         }
         throw new RuntimeException("Unsupported type!");
-    }
-
-    public boolean isNeedCount() {
-        return resultType == ResultType.COUNT_AND_DATA || resultType == ResultType.COUNT;
     }
 
 }

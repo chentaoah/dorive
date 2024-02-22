@@ -70,8 +70,8 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         OrderBy orderBy = example.getOrderBy();
         Page<Object> page = example.getPage();
 
-        Result<Object> emptyResult = queryContext.newEmptyResult();
         boolean needCount = queryContext.isNeedCount();
+        Result<Object> emptyResult = queryContext.newEmptyResult();
 
         SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext);
         char letter = selectSegment.getLetter();
