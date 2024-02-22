@@ -31,7 +31,7 @@ import java.util.List;
 
 public abstract class AbstractQueryExecutor implements QueryExecutor {
 
-    private final AbstractQueryRepository<?, ?> repository;
+    protected final AbstractQueryRepository<?, ?> repository;
 
     public AbstractQueryExecutor(AbstractQueryRepository<?, ?> repository) {
         this.repository = repository;

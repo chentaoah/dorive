@@ -27,16 +27,15 @@ import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
-import com.gitee.dorive.query.api.QueryExecutor;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.entity.enums.ResultType;
+import com.gitee.dorive.query.impl.executor.AbstractQueryExecutor;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.ArgSegment;
 import com.gitee.dorive.sql.entity.SelectSegment;
 import com.gitee.dorive.sql.entity.TableSegment;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -46,12 +45,16 @@ import java.util.Map;
 
 @Getter
 @Setter
-@AllArgsConstructor
-public class SqlQueryExecutor implements QueryExecutor {
+public class SqlQueryExecutor extends AbstractQueryExecutor {
 
-    private AbstractQueryRepository<?, ?> repository;
     private SegmentBuilder segmentBuilder;
     private SqlRunner sqlRunner;
+
+    public SqlQueryExecutor(AbstractQueryRepository<?, ?> repository, SegmentBuilder segmentBuilder, SqlRunner sqlRunner) {
+        super(repository);
+        this.segmentBuilder = segmentBuilder;
+        this.sqlRunner = sqlRunner;
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -76,7 +79,7 @@ public class SqlQueryExecutor implements QueryExecutor {
         List<ArgSegment> argSegments = selectSegment.getArgSegments();
         List<Object> args = selectSegment.getArgs();
         if (!tableSegment.isJoin() || argSegments.isEmpty()) {
-            return emptyResult;
+            return super.executeQuery(queryContext, queryWrapper);
         }
 
         String tableAlias = tableSegment.getTableAlias();
