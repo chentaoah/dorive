@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.entity.option;
 
-public enum QueryStrategy {
+public enum QueryMethod {
     DEFAULT,
     SQL
 }
