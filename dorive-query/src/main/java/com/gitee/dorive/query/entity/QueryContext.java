@@ -41,6 +41,10 @@ public class QueryContext {
         this.resultType = resultType;
     }
 
+    public boolean isSimpleQuery() {
+        return exampleMap.size() == 1 && exampleMap.containsKey("/");
+    }
+
     public boolean isNeedCount() {
         return resultType == ResultType.COUNT_AND_DATA || resultType == ResultType.COUNT;
     }

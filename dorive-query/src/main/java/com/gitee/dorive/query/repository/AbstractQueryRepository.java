@@ -27,12 +27,13 @@ import com.gitee.dorive.event.repository.AbstractEventRepository;
 import com.gitee.dorive.query.api.QueryExecutor;
 import com.gitee.dorive.query.api.QueryRepository;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.entity.def.QueryScanDef;
-import com.gitee.dorive.query.impl.executor.DefaultQueryExecutor;
-import com.gitee.dorive.query.impl.resolver.QueryResolver;
+import com.gitee.dorive.query.entity.enums.ResultType;
+import com.gitee.dorive.query.impl.executor.SimpleQueryExecutor;
+import com.gitee.dorive.query.impl.executor.StepwiseQueryExecutor;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
+import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -49,7 +50,8 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     private QueryScanDef queryScanDef;
     private MergedRepositoryResolver mergedRepositoryResolver;
     private QueryTypeResolver queryTypeResolver;
-    private QueryExecutor defaultQueryExecutor;
+    private SimpleQueryExecutor simpleQueryExecutor;
+    private QueryExecutor stepwiseQueryExecutor;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -62,7 +64,8 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
             }
             this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
             this.queryTypeResolver = new QueryTypeResolver(this);
-            this.defaultQueryExecutor = new DefaultQueryExecutor(this);
+            this.simpleQueryExecutor = new SimpleQueryExecutor(this);
+            this.stepwiseQueryExecutor = new StepwiseQueryExecutor(this);
         }
     }
 
@@ -95,8 +98,12 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
         resolveQuery(queryContext, queryWrapper);
-        QueryExecutor queryExecutor = adaptiveQueryExecutor(queryContext, queryWrapper);
-        return queryExecutor.executeQuery(queryContext, queryWrapper);
+        if (queryContext.isSimpleQuery()) {
+            return simpleQueryExecutor.executeQuery(queryContext, queryWrapper);
+        } else {
+            QueryExecutor queryExecutor = adaptiveQueryExecutor(queryContext, queryWrapper);
+            return queryExecutor.executeQuery(queryContext, queryWrapper);
+        }
     }
 
     public void resolveQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
@@ -108,7 +115,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     }
 
     protected QueryExecutor adaptiveQueryExecutor(QueryContext queryContext, QueryWrapper queryWrapper) {
-        return defaultQueryExecutor;
+        return stepwiseQueryExecutor;
     }
 
 }

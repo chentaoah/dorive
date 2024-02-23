@@ -39,9 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class DefaultQueryExecutor extends AbstractQueryExecutor {
+public class StepwiseQueryExecutor extends AbstractQueryExecutor {
 
-    public DefaultQueryExecutor(AbstractQueryRepository<?, ?> repository) {
+    public StepwiseQueryExecutor(AbstractQueryRepository<?, ?> repository) {
         super(repository);
     }
 
