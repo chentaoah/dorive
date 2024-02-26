@@ -18,7 +18,7 @@
 package com.gitee.dorive.query.entity.enums;
 
 public enum ResultType {
-    COUNT,
+    COUNT_AND_DATA,
     DATA,
-    COUNT_AND_DATA
+    COUNT
 }
