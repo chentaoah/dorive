@@ -50,7 +50,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     private QueryScanDef queryScanDef;
     private MergedRepositoryResolver mergedRepositoryResolver;
     private QueryTypeResolver queryTypeResolver;
-    private SimpleQueryExecutor simpleQueryExecutor;
+    private QueryExecutor simpleQueryExecutor;
     private QueryExecutor stepwiseQueryExecutor;
 
     @Override
