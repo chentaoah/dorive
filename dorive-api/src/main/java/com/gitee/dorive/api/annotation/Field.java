@@ -27,6 +27,8 @@ import java.lang.annotation.*;
 @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
 public @interface Field {
 
+    boolean isId() default false;
+
     @AliasFor("alias")
     String value() default "";
 

@@ -18,7 +18,7 @@
 package com.gitee.dorive.ref.impl;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Selector;
+import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.context.InnerContext;
 import com.gitee.dorive.core.repository.AbstractRepository;
@@ -36,36 +36,30 @@ public class RefObjImpl implements RefObj {
     private Object object;
 
     @Override
-    public long select(Context context) {
+    public long select(Options options) {
+        if (!(options instanceof Context)) {
+            options = new InnerContext(options);
+        }
         EntityHandler entityHandler = ref.getEntityHandler();
-        return entityHandler.handle(context, Collections.singletonList(object));
+        return entityHandler.handle((Context) options, Collections.singletonList(object));
     }
 
     @Override
-    public int insertOrUpdate(Context context) {
+    public int insertOrUpdate(Options options) {
+        if (!(options instanceof Context)) {
+            options = new InnerContext(options);
+        }
         AbstractRepository<Object, Object> repository = ref.getProxyRepository();
-        return repository.insertOrUpdate(context, object);
+        return repository.insertOrUpdate(options, object);
     }
 
     @Override
-    public int delete(Context context) {
+    public int delete(Options options) {
+        if (!(options instanceof Context)) {
+            options = new InnerContext(options);
+        }
         AbstractRepository<Object, Object> repository = ref.getProxyRepository();
-        return repository.delete(context, object);
-    }
-
-    @Override
-    public long select(Selector selector) {
-        return select(new InnerContext(selector));
-    }
-
-    @Override
-    public int insertOrUpdate(Selector selector) {
-        return insertOrUpdate(new InnerContext(selector));
-    }
-
-    @Override
-    public int delete(Selector selector) {
-        return delete(new InnerContext(selector));
+        return repository.delete(options, object);
     }
 
 }

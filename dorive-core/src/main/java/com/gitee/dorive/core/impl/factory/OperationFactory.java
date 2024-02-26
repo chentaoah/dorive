@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.core.impl.factory;
 
-import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.*;
@@ -48,7 +47,7 @@ public class OperationFactory {
 
     public Update buildUpdate(Object entity) {
         Update update = new Update(entity);
-        Object primaryKey = entityEle.getPkProxy().getValue(entity);
+        Object primaryKey = entityEle.getIdProxy().getValue(entity);
         update.setPrimaryKey(primaryKey);
         return update;
     }
@@ -60,7 +59,7 @@ public class OperationFactory {
     }
 
     public Operation buildInsertOrUpdate(Object entity) {
-        Object primaryKey = entityEle.getPkProxy().getValue(entity);
+        Object primaryKey = entityEle.getIdProxy().getValue(entity);
         if (primaryKey == null) {
             return new Insert(entity);
         } else {
@@ -72,7 +71,7 @@ public class OperationFactory {
 
     public Delete buildDelete(Object entity) {
         Delete delete = new Delete(entity);
-        Object primaryKey = entityEle.getPkProxy().getValue(entity);
+        Object primaryKey = entityEle.getIdProxy().getValue(entity);
         delete.setPrimaryKey(primaryKey);
         return delete;
     }
@@ -87,26 +86,6 @@ public class OperationFactory {
         Delete delete = new Delete(null);
         delete.setExample(example);
         return delete;
-    }
-
-    public Operation renewOperation(Operation operation, Object entity) {
-        int type = operation.getType();
-        if (type == OperationType.INSERT) {
-            return buildInsert(entity);
-
-        } else if (type == OperationType.UPDATE) {
-            return buildUpdate(entity);
-
-        } else if (type == OperationType.INSERT_OR_UPDATE) {
-            return new Operation(OperationType.INSERT_OR_UPDATE, entity);
-
-        } else if (type == OperationType.DELETE) {
-            return buildDelete(entity);
-
-        } else if (type == OperationType.FORCE_INSERT) {
-            return new Insert(OperationType.FORCE_INSERT, entity);
-        }
-        return null;
     }
 
 }

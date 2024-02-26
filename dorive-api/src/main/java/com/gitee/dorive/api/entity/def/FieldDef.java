@@ -32,6 +32,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class FieldDef {
 
+    private boolean isId;
     private String alias;
     private Class<?> converter;
     private String mapExp;

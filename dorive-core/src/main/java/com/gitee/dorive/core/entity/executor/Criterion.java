@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.core.entity.executor;
 
+import com.gitee.dorive.core.util.CriterionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -33,8 +34,9 @@ public class Criterion {
         this.operator = operator;
     }
 
-    public Criterion tryClone() {
-        return new Criterion(property, operator, value);
+    @Override
+    public String toString() {
+        return CriterionUtils.toString(this);
     }
 
 }

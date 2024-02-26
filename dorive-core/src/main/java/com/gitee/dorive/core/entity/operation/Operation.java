@@ -17,40 +17,42 @@
 
 package com.gitee.dorive.core.entity.operation;
 
-import com.gitee.dorive.api.constant.OperationType;
 import lombok.Data;
 
 @Data
 public class Operation {
 
-    public static final int UNKNOWN = 0;
-    public static final int INCLUDE_ROOT = 1;
-    public static final int IGNORE_ROOT = 2;
+    public enum RootControl {NONE, INCLUDE_ROOT, IGNORE_ROOT,}
 
-    private int type;
+    private RootControl rootControl = RootControl.NONE;
     private Object entity;
-    private int rootType;
 
-    public Operation(int type, Object entity) {
-        this.type = type;
+    public Operation(Object entity) {
         this.entity = entity;
-        this.rootType = UNKNOWN;
     }
 
-    public boolean isInsertContext() {
-        return (type & OperationType.INSERT) != 0;
+    public void includeRoot() {
+        rootControl = RootControl.INCLUDE_ROOT;
     }
 
-    public boolean isForceInsert() {
-        return type == OperationType.FORCE_INSERT;
+    public void ignoreRoot() {
+        rootControl = RootControl.IGNORE_ROOT;
     }
 
     public boolean isIncludeRoot() {
-        return rootType == 1;
+        return rootControl == RootControl.INCLUDE_ROOT;
     }
 
     public boolean isIgnoreRoot() {
-        return rootType == 2;
+        return rootControl == RootControl.IGNORE_ROOT;
+    }
+
+    public void switchRoot(boolean flag) {
+        if (flag) {
+            includeRoot();
+        } else {
+            ignoreRoot();
+        }
     }
 
 }

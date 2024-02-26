@@ -17,18 +17,19 @@
 
 package com.gitee.dorive.core.entity.context;
 
-import com.gitee.dorive.core.api.context.Selector;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Options;
 import lombok.NoArgsConstructor;
 
-@Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class InnerContext extends AbstractContext {
 
-    public InnerContext(Selector selector) {
-        super(selector);
+    public InnerContext(Options options) {
+        super(options);
+    }
+
+    public InnerContext(Context anotherContext) {
+        super(anotherContext);
     }
 
 }

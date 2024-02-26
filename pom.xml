@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive</artifactId>
-    <version>3.4.3.1</version>
+    <version>3.4.3.3</version>
     <packaging>pom</packaging>
 
     <licenses>
@@ -29,15 +29,17 @@
     </scm>
 
     <modules>
-        <module>dorive-injection</module>
+        <module>dorive-inject</module>
         <module>dorive-env</module>
         <module>dorive-web</module>
         <module>dorive-proxy</module>
         <module>dorive-api</module>
         <module>dorive-core</module>
         <module>dorive-event</module>
-        <module>dorive-coating</module>
+        <module>dorive-query</module>
         <module>dorive-ref</module>
+        <module>dorive-sql</module>
+        <module>dorive-mybatis-plus</module>
         <module>dorive-spring-boot-starter</module>
     </modules>
 
@@ -56,9 +58,14 @@
                 <version>2.7.8</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>2.13.4</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>2.7.8</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-tx</artifactId>
+                <version>5.3.9</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>

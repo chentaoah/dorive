@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "dorive.enable",
+      "type": "java.lang.Boolean",
+      "description": "Switch of dependency injection verification."
+    },
+    {
+      "name": "dorive.scan",
+      "type": "java.lang.String",
+      "description": "Global scan path."
+    },
+    {
+      "name": "dorive.domains",
+      "type": "com.gitee.dorive.inject.entity.DomainDefinition",
+      "description": "Definition of domain."
+    }
+  ]
+}

@@ -19,10 +19,14 @@ package com.gitee.dorive.core.api.context;
 
 import java.util.Map;
 
-public interface Context {
-
-    Selector getSelector();
+public interface Context extends Options {
 
     Map<String, Object> getAttachments();
+
+    void setAttachment(String name, Object value);
+
+    Object getAttachment(String name);
+
+    void removeAttachment(String name);
 
 }

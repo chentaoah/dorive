@@ -47,7 +47,7 @@
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.4.2</version>
+    <version>3.4.3.3</version>
 </dependency>
 ```
 
@@ -93,7 +93,7 @@ public class Tenant {
 
 ```java
 @RootRepository
-@CoatingScan("xxx.xxx.xxx.xxx.xxx.query")
+@QueryScan("xxx.xxx.xxx.xxx.xxx.query")
 public class TenantRepository extends MybatisPlusRepository<Tenant, Integer> {
 }
 ```
@@ -143,7 +143,7 @@ tenantQuery.setOrder("desc");
 tenantQuery.setPage(1);
 tenantQuery.setLimit(10);
 
-List<Tenant> tenants = tenantRepository.selectByCoating(Selector.ALL, tenantQuery);
+List<Tenant> tenants = tenantRepository.selectByQuery(Selector.ALL, tenantQuery);
 ```
 
 #### 更新数据

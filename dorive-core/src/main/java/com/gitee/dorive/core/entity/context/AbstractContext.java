@@ -18,38 +18,59 @@
 package com.gitee.dorive.core.entity.context;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Selector;
-import lombok.Data;
+import com.gitee.dorive.core.api.context.Options;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public abstract class AbstractContext implements Context {
 
-    private Selector selector = Selector.EMPTY;
-    private Map<String, Object> attachments = new LinkedHashMap<>(8);
+    protected Map<Class<?>, Object> options = new LinkedHashMap<>(4);
+    protected Map<String, Object> attachments = new LinkedHashMap<>(8);
 
-    public AbstractContext(Selector selector) {
-        this.selector = selector;
+    public AbstractContext(Options options) {
+        this.options.putAll(options.getOptions());
     }
 
-    public Object put(String key, Object value) {
-        return attachments.put(key, value);
+    public AbstractContext(Context anotherContext) {
+        this.options.putAll(anotherContext.getOptions());
+        this.attachments.putAll(anotherContext.getAttachments());
     }
 
-    public boolean containsKey(String key) {
-        return attachments.containsKey(key);
+    @Override
+    public void setOption(Class<?> type, Object value) {
+        options.put(type, value);
     }
 
-    public Object get(String key) {
-        return attachments.get(key);
+    @Override
+    public Object getOption(Class<?> type) {
+        return options.get(type);
     }
 
-    public Object remove(String key) {
-        return attachments.remove(key);
+    @Override
+    public void removeOption(Class<?> type) {
+        options.remove(type);
+    }
+
+    @Override
+    public void setAttachment(String name, Object value) {
+        attachments.put(name, value);
+    }
+
+    @Override
+    public Object getAttachment(String name) {
+        return attachments.get(name);
+    }
+
+    @Override
+    public void removeAttachment(String name) {
+        attachments.remove(name);
     }
 
 }

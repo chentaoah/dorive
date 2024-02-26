@@ -18,88 +18,82 @@
 package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.api.constant.OperationType;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Selector;
+import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.repository.ListableRepository;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.operation.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.util.ExampleUtils;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
 public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK> implements ListableRepository<E, PK> {
 
     @Override
-    public long selectCount(Context context, Example example) {
+    public long selectCountByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         CommonRepository repository = getRootRepository();
-        return repository.selectCount(context, example);
+        return repository.selectCountByExample(options, example);
     }
 
     @Override
-    public int updateByExample(Context context, Object entity, Example example) {
+    public int updateByExample(Options options, Object entity, Example example) {
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
-        Selector selector = context.getSelector();
         int totalCount = 0;
         for (CommonRepository repository : getOrderedRepositories()) {
-            if (selector.matches(context, repository)) {
-                totalCount += repository.updateByExample(context, entity, ExampleUtils.tryClone(example));
+            if (repository.matches((Context) options)) {
+                totalCount += repository.updateByExample(options, entity, ExampleUtils.clone(example));
             }
         }
         return totalCount;
     }
 
     @Override
-    public int insertOrUpdate(Context context, E entity) {
+    public int insertOrUpdate(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = new Operation(OperationType.INSERT_OR_UPDATE, entity);
-        return execute(context, operation);
+        Operation operation = new InsertOrUpdate(entity);
+        return execute((Context) options, operation);
     }
 
     @Override
-    public int deleteByPrimaryKey(Context context, PK primaryKey) {
+    public int deleteByPrimaryKey(Options options, PK primaryKey) {
         Assert.notNull(primaryKey, "The primary key cannot be null!");
-        E entity = selectByPrimaryKey(context, primaryKey);
-        return delete(context, entity);
+        E entity = selectByPrimaryKey(options, primaryKey);
+        return delete(options, entity);
     }
 
     @Override
-    public int deleteByExample(Context context, Example example) {
+    public int deleteByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        Selector selector = context.getSelector();
         int totalCount = 0;
         for (CommonRepository repository : getOrderedRepositories()) {
-            if (selector.matches(context, repository)) {
-                totalCount += repository.deleteByExample(context, ExampleUtils.tryClone(example));
+            if (repository.matches((Context) options)) {
+                totalCount += repository.deleteByExample(options, ExampleUtils.clone(example));
             }
         }
         return totalCount;
     }
 
     @Override
-    public int insertList(Context context, List<E> entities) {
-        return entities.stream().mapToInt(entity -> insert(context, entity)).sum();
+    public int insertList(Options options, List<E> entities) {
+        return entities.stream().mapToInt(entity -> insert(options, entity)).sum();
     }
 
     @Override
-    public int updateList(Context context, List<E> entities) {
-        return entities.stream().mapToInt(entity -> update(context, entity)).sum();
+    public int updateList(Options options, List<E> entities) {
+        return entities.stream().mapToInt(entity -> update(options, entity)).sum();
     }
 
     @Override
-    public int insertOrUpdateList(Context context, List<E> entities) {
-        return entities.stream().mapToInt(entity -> insertOrUpdate(context, entity)).sum();
+    public int insertOrUpdateList(Options options, List<E> entities) {
+        return entities.stream().mapToInt(entity -> insertOrUpdate(options, entity)).sum();
     }
 
     @Override
-    public int deleteList(Context context, List<E> entities) {
-        return entities.stream().mapToInt(entity -> delete(context, entity)).sum();
+    public int deleteList(Options options, List<E> entities) {
+        return entities.stream().mapToInt(entity -> delete(options, entity)).sum();
     }
 
 }

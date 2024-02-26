@@ -1,0 +1,5 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  com.gitee.dorive.mybatis.plus.config.MybatisPlusConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.gitee.dorive.mybatis.plus.config.MybatisPlusConfiguration,\
+  com.gitee.dorive.mybatis.plus.config.DoriveMybatisPlusConfiguration

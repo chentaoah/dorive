@@ -26,8 +26,10 @@ import lombok.NoArgsConstructor;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -37,8 +39,8 @@ public abstract class EntityEle {
     private EntityDef entityDef;
     private boolean aggregated;
     private List<BindingDef> bindingDefs;
-    private PropProxy pkProxy;
-    private Map<String, String> fieldAliasMap;
+    private PropProxy idProxy;
+    private Map<String, String> fieldAliasMapping;
 
     public EntityEle(AnnotatedElement element) {
         this.element = element;
@@ -56,22 +58,34 @@ public abstract class EntityEle {
     }
 
     public void initialize() {
-        if (entityDef != null && pkProxy == null) {
+        if (entityDef != null && idProxy == null) {
             doInitialize();
         }
     }
 
     public boolean hasField(String field) {
-        return fieldAliasMap.containsKey(field);
+        return fieldAliasMapping.containsKey(field);
     }
 
     public String toAlias(String field) {
-        return fieldAliasMap.getOrDefault(field, field);
+        return fieldAliasMapping.getOrDefault(field, field);
     }
 
     public List<String> toAliases(List<String> fields) {
         if (fields != null && !fields.isEmpty()) {
             List<String> aliases = new ArrayList<>(fields.size());
+            for (String field : fields) {
+                String alias = toAlias(field);
+                aliases.add(alias);
+            }
+            return aliases;
+        }
+        return fields;
+    }
+
+    public Set<String> toAliases(Set<String> fields) {
+        if (fields != null && !fields.isEmpty()) {
+            Set<String> aliases = new LinkedHashSet<>(fields.size() * 4 / 3 + 1);
             for (String field : fields) {
                 String alias = toAlias(field);
                 aliases.add(alias);
@@ -90,5 +104,7 @@ public abstract class EntityEle {
     public abstract EntityType getEntityType();
 
     public abstract Map<String, EntityField> getEntityFieldMap();
+
+    public abstract String getIdName();
 
 }

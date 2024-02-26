@@ -65,7 +65,6 @@ public class RefInjector {
         refImpl.setEntityEle(repository.getEntityEle());
         refImpl.setOperationFactory(repository.getOperationFactory());
         refImpl.setExecutor(repository.getExecutor());
-        refImpl.setAttachments(repository.getAttachments());
         return refImpl;
     }
 

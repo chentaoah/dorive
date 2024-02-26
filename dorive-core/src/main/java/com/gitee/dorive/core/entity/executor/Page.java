@@ -21,7 +21,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,10 +37,6 @@ public class Page<T> {
     public Page(long current, long size) {
         this.current = current;
         this.size = size;
-    }
-
-    public Page<T> tryClone() {
-        return new Page<>(total, current, size, new ArrayList<>(records));
     }
 
     @Override

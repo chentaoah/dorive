@@ -22,15 +22,23 @@ import lombok.NoArgsConstructor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
 public class Result<E> {
 
     private Page<E> page;
+    private List<Map<String, Object>> recordMaps = Collections.emptyList();
     private List<E> records = Collections.emptyList();
     private E record;
     private long count = 0L;
+
+    public Result(Page<E> page, List<Map<String, Object>> recordMaps) {
+        this.page = page;
+        this.recordMaps = recordMaps;
+        this.count = this.recordMaps.size();
+    }
 
     public Result(Page<E> page) {
         this.page = page;

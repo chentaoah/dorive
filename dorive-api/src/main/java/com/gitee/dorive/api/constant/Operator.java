@@ -30,6 +30,8 @@ public interface Operator {
     String NOT_LIKE = "NOT LIKE";
     String IS_NULL = "IS NULL";
     String IS_NOT_NULL = "IS NOT NULL";
-    String NULL_SWITCH = "NULL_SWITCH";
     String MULTI_IN = "MULTI_IN";
+    String MULTI_NOT_IN = "MULTI_NOT_IN";
+    String AND = "AND";
+    String OR = "OR";
 }

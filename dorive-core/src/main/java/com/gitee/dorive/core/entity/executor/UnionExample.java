@@ -32,17 +32,13 @@ public class UnionExample extends Example {
     private List<Example> examples = new ArrayList<>();
 
     @Override
-    public boolean isNotEmpty() {
-        return !examples.isEmpty();
+    public boolean isEmpty() {
+        return examples.isEmpty();
     }
 
     @Override
-    public void select(List<String> properties) {
-        if (examples != null && !examples.isEmpty()) {
-            for (Example example : examples) {
-                example.select(properties);
-            }
-        }
+    public boolean isNotEmpty() {
+        return !examples.isEmpty();
     }
 
     public void addExample(Example example) {

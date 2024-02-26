@@ -28,7 +28,7 @@ import java.util.List;
 
 public class ExampleUtils {
 
-    public static Example tryClone(Example example) {
+    public static Example clone(Example example) {
         if (example == null) {
             return null;
         }
@@ -39,30 +39,42 @@ public class ExampleUtils {
             newExample.select(new ArrayList<>(selectProps));
         }
 
-        List<String> extraProps = example.getExtraProps();
-        if (extraProps != null) {
-            newExample.selectExtra(new ArrayList<>(extraProps));
+        String selectSuffix = example.getSelectSuffix();
+        if (selectSuffix != null) {
+            newExample.setSelectSuffix(selectSuffix);
         }
 
         List<Criterion> criteria = example.getCriteria();
         if (criteria != null && !criteria.isEmpty()) {
             List<Criterion> newCriteria = newExample.getCriteria();
             for (Criterion criterion : criteria) {
-                newCriteria.add(criterion.tryClone());
+                newCriteria.add(clone(criterion));
             }
         }
 
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
-            newExample.setOrderBy(orderBy.tryClone());
+            newExample.setOrderBy(clone(orderBy));
         }
 
         Page<Object> page = example.getPage();
         if (page != null) {
-            newExample.setPage(page.tryClone());
+            newExample.setPage(clone(page));
         }
 
         return newExample;
+    }
+
+    public static Criterion clone(Criterion criterion) {
+        return new Criterion(criterion.getProperty(), criterion.getOperator(), criterion.getValue());
+    }
+
+    public static OrderBy clone(OrderBy orderBy) {
+        return new OrderBy(new ArrayList<>(orderBy.getProperties()), orderBy.getOrder());
+    }
+
+    public static <T> Page<T> clone(Page<T> page) {
+        return new Page<>(page.getTotal(), page.getCurrent(), page.getSize(), new ArrayList<>(page.getRecords()));
     }
 
 }

@@ -19,22 +19,25 @@ package com.gitee.dorive.core.repository;
 
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Node;
+import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.entity.option.JoinType;
+import com.gitee.dorive.core.impl.binder.PropertyBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.gitee.dorive.core.util.ExampleUtils;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class CommonRepository extends AbstractProxyRepository implements Node {
+@Getter
+@Setter
+public class CommonRepository extends AbstractProxyRepository implements Matcher {
 
     private String accessPath;
     private boolean root;
@@ -43,39 +46,59 @@ public class CommonRepository extends AbstractProxyRepository implements Node {
     private PropChain anchorPoint;
     private BinderResolver binderResolver;
     private boolean boundEntity;
+    private Matcher matcher;
+
+    public String getName() {
+        return getEntityDef().getName();
+    }
+
+    public boolean isCollection() {
+        return getEntityEle().isCollection();
+    }
 
     public Object getPrimaryKey(Object entity) {
-        return getEntityEle().getPkProxy().getValue(entity);
+        return getEntityEle().getIdProxy().getValue(entity);
     }
 
     public boolean hasField(String field) {
         return getEntityEle().hasField(field);
     }
 
+    public JoinType getJoinType() {
+        return binderResolver.getJoinType();
+    }
+
+    public List<PropertyBinder> getRootBinders() {
+        return binderResolver.getMergedBindersMap().get("/");
+    }
+
     @Override
-    public String getName() {
-        return getEntityDef().getName();
+    public boolean matches(Context context) {
+        return matcher.matches(context);
     }
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
-        Selector selector = context.getSelector();
-        List<String> properties = selector.select(context, this);
-        if (properties != null && !properties.isEmpty()) {
-            if (query.getPrimaryKey() != null) {
-                Example example = new InnerExample().eq("id", query.getPrimaryKey());
-                query.setPrimaryKey(null);
-                query.setExample(example);
-            }
-            Example example = query.getExample();
-            if (example != null) {
-                example.select(properties);
+        Selector selector = (Selector) context.getOption(Selector.class);
+        if (selector != null) {
+            List<String> properties = selector.select(getName());
+            if (properties != null && !properties.isEmpty()) {
+                Object primaryKey = query.getPrimaryKey();
+                if (primaryKey != null) {
+                    Example example = new InnerExample().eq(getEntityEle().getIdName(), primaryKey);
+                    query.setPrimaryKey(null);
+                    query.setExample(example);
+                }
+                Example example = query.getExample();
+                if (example != null) {
+                    example.select(properties);
+                }
             }
         }
         Example example = query.getExample();
         if (example != null) {
             if (example.getOrderBy() == null && defaultOrderBy != null) {
-                example.setOrderBy(defaultOrderBy.tryClone());
+                example.setOrderBy(ExampleUtils.clone(defaultOrderBy));
             }
         }
         return super.executeQuery(context, query);

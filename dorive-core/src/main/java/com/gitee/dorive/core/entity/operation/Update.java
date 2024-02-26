@@ -17,20 +17,20 @@
 
 package com.gitee.dorive.core.entity.operation;
 
-import com.gitee.dorive.api.constant.OperationType;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Collections;
+import java.util.Set;
 
 @Getter
 @Setter
 public class Update extends Condition {
 
-    public Update(int type, Object entity) {
-        super(type, entity);
-    }
+    private Set<String> nullableProps = Collections.emptySet();
 
     public Update(Object entity) {
-        super(OperationType.UPDATE, entity);
+        super(entity);
     }
 
 }

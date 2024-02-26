@@ -17,18 +17,19 @@
 
 package com.gitee.dorive.core.entity.context;
 
-import com.gitee.dorive.core.api.context.Selector;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Options;
 import lombok.NoArgsConstructor;
 
-@Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class BoundedContext extends AbstractContext {
 
-    public BoundedContext(Selector selector) {
-        super(selector);
+    public BoundedContext(Options options) {
+        super(options);
+    }
+
+    public BoundedContext(Context anotherContext) {
+        super(anotherContext);
     }
 
 }

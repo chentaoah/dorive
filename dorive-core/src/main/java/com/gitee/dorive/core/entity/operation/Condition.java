@@ -28,8 +28,8 @@ public class Condition extends Operation {
     private Object primaryKey;
     private Example example;
 
-    public Condition(int type, Object entity) {
-        super(type, entity);
+    public Condition(Object entity) {
+        super(entity);
     }
 
 }
