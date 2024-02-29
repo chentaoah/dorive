@@ -52,7 +52,7 @@ public class SingleEntityJoiner extends AbstractEntityJoiner {
                 example.in(fieldName, boundValues);
             }
         }
-        appendContext(context, example);
+        appendFilterCriteria(context, example);
         return example;
     }
 

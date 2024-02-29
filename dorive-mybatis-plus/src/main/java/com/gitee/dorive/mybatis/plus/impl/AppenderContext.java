@@ -18,13 +18,13 @@
 package com.gitee.dorive.mybatis.plus.impl;
 
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
-import com.baomidou.mybatisplus.core.conditions.interfaces.Compare;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.mybatis.plus.api.CriterionAppender;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,44 +33,44 @@ public class AppenderContext {
     public final static Map<String, CriterionAppender> OPERATOR_CRITERION_APPENDER_MAP = new ConcurrentHashMap<>();
 
     static {
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.EQ, (abstractWrapper, property, value) -> {
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.EQ, (abstractWrapper, criteriaNum, property, value) -> {
             if (value instanceof Collection) {
                 abstractWrapper.in(property, (Collection<?>) value);
             } else {
                 abstractWrapper.eq(property, value);
             }
         });
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NE, (abstractWrapper, property, value) -> {
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NE, (abstractWrapper, criteriaNum, property, value) -> {
             if (value instanceof Collection) {
                 abstractWrapper.notIn(property, (Collection<?>) value);
             } else {
                 abstractWrapper.ne(property, value);
             }
         });
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.GT, Compare::gt);
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.GE, Compare::ge);
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LT, Compare::lt);
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LE, Compare::le);
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IN, (abstractWrapper, property, value) -> abstractWrapper.in(property, (Collection<?>) value));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_IN, (abstractWrapper, property, value) -> abstractWrapper.notIn(property, (Collection<?>) value));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LIKE, Compare::like);
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_LIKE, Compare::notLike);
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNull(property));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NOT_NULL, (abstractWrapper, property, value) -> abstractWrapper.isNotNull(property));
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.MULTI_IN, (abstractWrapper, property, value) -> {
-            String prefix = abstractWrapper.isEmptyOfWhere() ? " WHERE " : " AND ";
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.GT, (abstractWrapper, criteriaNum, property, value) -> abstractWrapper.gt(property, value));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.GE, (abstractWrapper, criteriaNum, property, value) -> abstractWrapper.ge(property, value));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LT, (abstractWrapper, criteriaNum, property, value) -> abstractWrapper.lt(property, value));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LE, (abstractWrapper, criteriaNum, property, value) -> abstractWrapper.le(property, value));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IN, (abstractWrapper, criteriaNum, property, value) -> abstractWrapper.in(property, (Collection<?>) value));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_IN, (abstractWrapper, criteriaNum, property, value) -> abstractWrapper.notIn(property, (Collection<?>) value));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.LIKE, (abstractWrapper, criteriaNum, property, value) -> abstractWrapper.like(property, value));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.NOT_LIKE, (abstractWrapper, criteriaNum, property, value) -> abstractWrapper.notLike(property, value));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NULL, (abstractWrapper, criteriaNum, property, value) -> abstractWrapper.isNull(property));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.IS_NOT_NULL, (abstractWrapper, criteriaNum, property, value) -> abstractWrapper.isNotNull(property));
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.MULTI_IN, (abstractWrapper, criteriaNum, property, value) -> {
+            String prefix = criteriaNum == 1 ? " WHERE " : " AND ";
             abstractWrapper.last(prefix + "(" + property + ") IN (" + value + ")");
         });
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.MULTI_NOT_IN, (abstractWrapper, property, value) -> {
-            String prefix = abstractWrapper.isEmptyOfWhere() ? " WHERE " : " AND ";
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.MULTI_NOT_IN, (abstractWrapper, criteriaNum, property, value) -> {
+            String prefix = criteriaNum == 1 ? " WHERE " : " AND ";
             abstractWrapper.last(prefix + "(" + property + ") NOT IN (" + value + ")");
         });
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.AND, (abstractWrapper, property, value) -> {
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.AND, (abstractWrapper, criteriaNum, property, value) -> {
             if (value instanceof Example) {
                 abstractWrapper.and(q -> appendCriterion(q, (Example) value));
             }
         });
-        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.OR, (abstractWrapper, property, value) -> {
+        OPERATOR_CRITERION_APPENDER_MAP.put(Operator.OR, (abstractWrapper, criteriaNum, property, value) -> {
             if (value instanceof Example) {
                 abstractWrapper.or(q -> appendCriterion(q, (Example) value));
             }
@@ -78,9 +78,11 @@ public class AppenderContext {
     }
 
     public static void appendCriterion(AbstractWrapper<?, String, ?> abstractWrapper, Example example) {
-        for (Criterion criterion : example.getCriteria()) {
+        List<Criterion> criteria = example.getCriteria();
+        int criteriaNum = criteria.size();
+        for (Criterion criterion : criteria) {
             CriterionAppender criterionAppender = OPERATOR_CRITERION_APPENDER_MAP.get(criterion.getOperator());
-            criterionAppender.appendCriterion(abstractWrapper, criterion.getProperty(), criterion.getValue());
+            criterionAppender.appendCriterion(abstractWrapper, criteriaNum, criterion.getProperty(), criterion.getValue());
         }
     }
 

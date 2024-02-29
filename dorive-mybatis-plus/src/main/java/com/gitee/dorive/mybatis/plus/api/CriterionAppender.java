@@ -21,6 +21,6 @@ import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 
 public interface CriterionAppender {
 
-    void appendCriterion(AbstractWrapper<?, String, ?> abstractWrapper, String property, Object value);
+    void appendCriterion(AbstractWrapper<?, String, ?> abstractWrapper, int criteriaNum, String property, Object value);
 
 }

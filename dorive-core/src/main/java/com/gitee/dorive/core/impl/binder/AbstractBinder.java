@@ -37,6 +37,7 @@ public abstract class AbstractBinder implements Binder, Processor {
     private PropChain fieldPropChain;
     private Processor processor;
 
+    @Override
     public String getFieldName() {
         return fieldPropChain.getEntityField().getName();
     }

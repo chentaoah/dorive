@@ -21,6 +21,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.element.EntityEle;
@@ -31,6 +32,7 @@ import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.entity.option.JoinType;
 import com.gitee.dorive.core.impl.binder.ContextBinder;
 import com.gitee.dorive.core.impl.binder.PropertyBinder;
+import com.gitee.dorive.core.impl.binder.ValueBinder;
 import com.gitee.dorive.core.impl.processor.DefaultProcessor;
 import com.gitee.dorive.core.impl.processor.PropertyProcessor;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
@@ -55,11 +57,10 @@ public class BinderResolver {
     private List<Binder> allBinders;
     private List<PropertyBinder> propertyBinders;
     private Map<String, List<PropertyBinder>> mergedBindersMap;
-    private JoinType joinType;
-    private List<String> selfFields;
-    private List<ContextBinder> contextBinders;
-    private List<Binder> boundValueBinders;
     private PropertyBinder boundIdBinder;
+    private List<String> selfFields;
+    private JoinType joinType;
+    private List<Binder> weakBinders;
 
     public BinderResolver(AbstractContextRepository<?, ?> repository, EntityEle entityEle) {
         this.repository = repository;
@@ -73,14 +74,14 @@ public class BinderResolver {
         String idName = entityEle.getIdName();
         List<BindingDef> bindingDefs = entityEle.getBindingDefs();
 
-        allBinders = new ArrayList<>(bindingDefs.size());
-        propertyBinders = new ArrayList<>(bindingDefs.size());
-        mergedBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
-        joinType = JoinType.UNKNOWN;
-        selfFields = new ArrayList<>(bindingDefs.size());
-        contextBinders = new ArrayList<>(bindingDefs.size());
-        boundValueBinders = new ArrayList<>(bindingDefs.size());
-        boundIdBinder = null;
+        this.allBinders = new ArrayList<>(bindingDefs.size());
+        this.propertyBinders = new ArrayList<>(bindingDefs.size());
+        this.mergedBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
+        this.boundIdBinder = null;
+        this.selfFields = new ArrayList<>(bindingDefs.size());
+        this.joinType = JoinType.UNKNOWN;
+        this.weakBinders = new ArrayList<>(bindingDefs.size());
+        String fieldErrorMsg = "The field configured for @Binding does not exist within the entity! type: {}, field: {}";
 
         for (BindingDef bindingDef : bindingDefs) {
             bindingDef = renewBindingDef(accessPath, bindingDef);
@@ -90,8 +91,7 @@ public class BinderResolver {
             String alias = entityEle.toAlias(field);
 
             PropChain fieldPropChain = propChainMap.get("/" + field);
-            Assert.notNull(fieldPropChain, "The field configured for @Binding does not exist within the entity! type: {}, field: {}",
-                    genericType.getName(), field);
+            Assert.notNull(fieldPropChain, fieldErrorMsg, genericType.getName(), field);
             fieldPropChain.newPropProxy();
 
             Processor processor = newProcessor(bindingDef);
@@ -105,26 +105,28 @@ public class BinderResolver {
                 List<PropertyBinder> propertyBinders = mergedBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
                 propertyBinders.add(propertyBinder);
 
+                if (propertyBinder.isSameType() && idName.equals(field)) {
+                    if (entityDef.getPriority() == 0) {
+                        entityDef.setPriority(-1);
+                    }
+                    boundIdBinder = propertyBinder;
+                }
+
                 selfFields.add(field);
 
-                if (propertyBinder.isSameType()) {
-                    if (!idName.equals(field)) {
-                        boundValueBinders.add(propertyBinder);
-                    } else {
-                        if (entityDef.getPriority() == 0) {
-                            entityDef.setPriority(-1);
-                        }
-                        boundIdBinder = propertyBinder;
-                    }
-                }
+            } else if (bindExp.startsWith("$")) {
+                ValueBinder valueBinder = new ValueBinder(bindingDef, alias, fieldPropChain, processor);
+                allBinders.add(valueBinder);
+                weakBinders.add(valueBinder);
 
             } else {
                 ContextBinder contextBinder = new ContextBinder(bindingDef, alias, fieldPropChain, processor);
                 allBinders.add(contextBinder);
-                contextBinders.add(contextBinder);
-                boundValueBinders.add(contextBinder);
+                weakBinders.add(contextBinder);
             }
         }
+
+        selfFields = Collections.unmodifiableList(selfFields);
 
         if (mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/")) {
             List<PropertyBinder> binders = mergedBindersMap.get("/");
@@ -136,16 +138,22 @@ public class BinderResolver {
         if (joinType == JoinType.UNKNOWN) {
             joinType = JoinType.UNION;
         }
-        selfFields = Collections.unmodifiableList(selfFields);
     }
 
     private BindingDef renewBindingDef(String accessPath, BindingDef bindingDef) {
         bindingDef = BeanUtil.copyProperties(bindingDef, BindingDef.class);
-        String bindExp = bindingDef.getBindExp();
+
+        String field = StrUtil.trim(bindingDef.getField());
+        Assert.notEmpty(field, "The field of @Binding cannot be empty!");
+        bindingDef.setField(field);
+
+        String bindExp = StrUtil.trim(bindingDef.getBindExp());
+        Assert.notEmpty(bindExp, "The bindExp of @Binding cannot be empty!");
         if (bindExp.startsWith(".")) {
             bindExp = PathUtils.getAbsolutePath(accessPath, bindExp);
-            bindingDef.setBindExp(bindExp);
         }
+        bindingDef.setBindExp(bindExp);
+
         return bindingDef;
     }
 

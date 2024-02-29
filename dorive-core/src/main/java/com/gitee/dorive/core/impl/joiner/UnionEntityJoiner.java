@@ -84,7 +84,7 @@ public class UnionEntityJoiner extends AbstractEntityJoiner {
                 break;
             }
         }
-        appendContext(context, example);
+        appendFilterCriteria(context, example);
         return example;
     }
 

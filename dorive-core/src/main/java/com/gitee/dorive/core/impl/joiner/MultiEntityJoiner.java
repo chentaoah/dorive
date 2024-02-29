@@ -49,7 +49,7 @@ public class MultiEntityJoiner extends AbstractEntityJoiner {
         if (!builder.isEmpty()) {
             example.getCriteria().add(builder.toCriterion());
         }
-        appendContext(context, example);
+        appendFilterCriteria(context, example);
         return example;
     }
 
