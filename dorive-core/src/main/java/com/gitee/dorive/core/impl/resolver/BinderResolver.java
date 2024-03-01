@@ -30,11 +30,9 @@ import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.entity.option.JoinType;
-import com.gitee.dorive.core.impl.binder.ContextBinder;
-import com.gitee.dorive.core.impl.binder.PropertyBinder;
-import com.gitee.dorive.core.impl.binder.ValueBinder;
-import com.gitee.dorive.core.impl.processor.DefaultProcessor;
-import com.gitee.dorive.core.impl.processor.PropertyProcessor;
+import com.gitee.dorive.core.impl.binder.StrongBinder;
+import com.gitee.dorive.core.impl.binder.SpELProcessor;
+import com.gitee.dorive.core.impl.binder.WeakBinder;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.PathUtils;
@@ -55,12 +53,12 @@ public class BinderResolver {
     private PropChainResolver propChainResolver;
 
     private List<Binder> allBinders;
-    private List<PropertyBinder> propertyBinders;
-    private Map<String, List<PropertyBinder>> mergedBindersMap;
-    private PropertyBinder boundIdBinder;
+    private List<StrongBinder> strongBinders;
+    private Map<String, List<StrongBinder>> mergedBindersMap;
+    private StrongBinder boundIdBinder;
     private List<String> selfFields;
     private JoinType joinType;
-    private List<Binder> weakBinders;
+    private List<WeakBinder> weakBinders;
 
     public BinderResolver(AbstractContextRepository<?, ?> repository, EntityEle entityEle) {
         this.repository = repository;
@@ -75,11 +73,11 @@ public class BinderResolver {
         List<BindingDef> bindingDefs = entityEle.getBindingDefs();
 
         this.allBinders = new ArrayList<>(bindingDefs.size());
-        this.propertyBinders = new ArrayList<>(bindingDefs.size());
+        this.strongBinders = new ArrayList<>(bindingDefs.size());
         this.mergedBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
         this.boundIdBinder = null;
         this.selfFields = new ArrayList<>(bindingDefs.size());
-        this.joinType = JoinType.UNKNOWN;
+        this.joinType = JoinType.UNION;
         this.weakBinders = new ArrayList<>(bindingDefs.size());
         String fieldErrorMsg = "The field configured for @Binding does not exist within the entity! type: {}, field: {}";
 
@@ -96,100 +94,96 @@ public class BinderResolver {
 
             Processor processor = newProcessor(bindingDef);
 
-            if (bindExp.startsWith("/")) {
-                PropertyBinder propertyBinder = newPropertyBinder(bindingDef, alias, fieldPropChain, processor);
-                allBinders.add(propertyBinder);
-                propertyBinders.add(propertyBinder);
+            if (StringUtils.isNotBlank(bindExp)) {
+                StrongBinder strongBinder = newStrongBinder(bindingDef, alias, fieldPropChain, processor);
+                allBinders.add(strongBinder);
+                strongBinders.add(strongBinder);
 
-                String belongAccessPath = propertyBinder.getBelongAccessPath();
-                List<PropertyBinder> propertyBinders = mergedBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
-                propertyBinders.add(propertyBinder);
+                String belongAccessPath = strongBinder.getBelongAccessPath();
+                List<StrongBinder> strongBinders = mergedBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
+                strongBinders.add(strongBinder);
 
-                if (propertyBinder.isSameType() && idName.equals(field)) {
+                if (strongBinder.isSameType() && idName.equals(field)) {
                     if (entityDef.getPriority() == 0) {
                         entityDef.setPriority(-1);
                     }
-                    boundIdBinder = propertyBinder;
+                    boundIdBinder = strongBinder;
                 }
 
                 selfFields.add(field);
 
-            } else if (bindExp.startsWith("$")) {
-                ValueBinder valueBinder = new ValueBinder(bindingDef, alias, fieldPropChain, processor);
-                allBinders.add(valueBinder);
-                weakBinders.add(valueBinder);
-
             } else {
-                ContextBinder contextBinder = new ContextBinder(bindingDef, alias, fieldPropChain, processor);
-                allBinders.add(contextBinder);
-                weakBinders.add(contextBinder);
+                WeakBinder weakBinder = new WeakBinder(bindingDef, alias, fieldPropChain, processor);
+                allBinders.add(weakBinder);
+                weakBinders.add(weakBinder);
             }
         }
 
         selfFields = Collections.unmodifiableList(selfFields);
 
         if (mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/")) {
-            List<PropertyBinder> binders = mergedBindersMap.get("/");
-            boolean hasCollection = CollUtil.findOne(binders, PropertyBinder::isCollection) != null;
+            List<StrongBinder> binders = mergedBindersMap.get("/");
+            boolean hasCollection = CollUtil.findOne(binders, StrongBinder::isCollection) != null;
             if (!hasCollection) {
                 joinType = binders.size() == 1 ? JoinType.SINGLE : JoinType.MULTI;
             }
-        }
-        if (joinType == JoinType.UNKNOWN) {
-            joinType = JoinType.UNION;
         }
     }
 
     private BindingDef renewBindingDef(String accessPath, BindingDef bindingDef) {
         bindingDef = BeanUtil.copyProperties(bindingDef, BindingDef.class);
-
         String field = StrUtil.trim(bindingDef.getField());
-        Assert.notEmpty(field, "The field of @Binding cannot be empty!");
-        bindingDef.setField(field);
-
         String bindExp = StrUtil.trim(bindingDef.getBindExp());
-        Assert.notEmpty(bindExp, "The bindExp of @Binding cannot be empty!");
+        String processExp = StrUtil.trim(bindingDef.getProcessExp());
+        String bindField = StrUtil.trim(bindingDef.getBindField());
+        Class<?> processor = bindingDef.getProcessor();
+        Assert.notEmpty(field, "The field of @Binding cannot be empty!");
+        Assert.notEmpty(bindExp + processExp, "The expression of @Binding cannot be empty!");
+
         if (bindExp.startsWith(".")) {
             bindExp = PathUtils.getAbsolutePath(accessPath, bindExp);
         }
-        bindingDef.setBindExp(bindExp);
+        if (StringUtils.isNotBlank(bindExp)) {
+            if (StringUtils.isBlank(processExp) && StringUtils.isBlank(bindField)) {
+                bindField = PathUtils.getLastName(bindExp);
+            }
+            Assert.notEmpty(bindField, "The bindField of @Binding cannot be empty!");
+        }
+        if (StringUtils.isNotBlank(processExp) && processor == Object.class) {
+            processor = SpELProcessor.class;
+        }
 
+        bindingDef.setField(field);
+        bindingDef.setBindExp(bindExp);
+        bindingDef.setProcessExp(processExp);
+        bindingDef.setBindField(bindField);
+        bindingDef.setProcessor(processor);
         return bindingDef;
     }
 
     private Processor newProcessor(BindingDef bindingDef) {
         Assert.notNull(bindingDef, "The bindingDef cannot be null!");
         Class<?> processorClass = bindingDef.getProcessor();
-        Processor processor = null;
         if (processorClass == Object.class) {
-            if (StringUtils.isBlank(bindingDef.getProperty())) {
-                processor = new DefaultProcessor();
-            } else {
-                processor = new PropertyProcessor();
-            }
+            return null;
+
+        } else if (processorClass == SpELProcessor.class) {
+            return new SpELProcessor(bindingDef);
+
         } else {
             ApplicationContext applicationContext = repository.getApplicationContext();
             String[] beanNamesForType = applicationContext.getBeanNamesForType(processorClass);
             if (beanNamesForType.length > 0) {
-                processor = (Processor) applicationContext.getBean(beanNamesForType[0]);
+                return (Processor) applicationContext.getBean(beanNamesForType[0]);
+            } else {
+                return (Processor) ReflectUtil.newInstance(processorClass);
             }
-            if (processor == null) {
-                processor = (Processor) ReflectUtil.newInstance(processorClass);
-            }
         }
-        if (processor instanceof DefaultProcessor) {
-            DefaultProcessor defaultProcessor = (DefaultProcessor) processor;
-            defaultProcessor.setBindingDef(bindingDef);
-        }
-        if (processor instanceof PropertyProcessor) {
-            Assert.notBlank(bindingDef.getProperty(), "The property of PropertyProcessor cannot be blank!");
-        }
-        return processor;
     }
 
-    private PropertyBinder newPropertyBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor) {
+    private StrongBinder newStrongBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor) {
         String bindExp = bindingDef.getBindExp();
-        String property = bindingDef.getProperty();
+        String bindField = bindingDef.getBindField();
 
         Map<String, CommonRepository> repositoryMap = repository.getRepositoryMap();
         String belongAccessPath = PathUtils.getBelongPath(repositoryMap.keySet(), bindExp);
@@ -204,10 +198,9 @@ public class BinderResolver {
         boundPropChain.newPropProxy();
 
         EntityEle entityEle = belongRepository.getEntityEle();
-        String boundName = StringUtils.isBlank(property) ? PathUtils.getLastName(bindExp) : property;
-        String bindAlias = entityEle.toAlias(boundName);
+        String bindAlias = entityEle.toAlias(bindField);
 
-        return new PropertyBinder(bindingDef, alias, fieldPropChain, processor,
+        return new StrongBinder(bindingDef, alias, fieldPropChain, processor,
                 belongAccessPath, belongRepository, boundPropChain, bindAlias);
     }
 

@@ -28,9 +28,11 @@ public @interface Binding {
 
     String field();
 
-    String bindExp();
+    String bindExp() default "";
 
-    String property() default "";
+    String processExp() default "";
+
+    String bindField() default "";
 
     Class<?> processor() default Object.class;
 

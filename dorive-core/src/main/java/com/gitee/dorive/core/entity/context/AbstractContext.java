@@ -20,7 +20,6 @@ package com.gitee.dorive.core.entity.context;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Options;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.LinkedHashMap;
@@ -28,19 +27,23 @@ import java.util.Map;
 
 @Getter
 @Setter
-@NoArgsConstructor
-public abstract class AbstractContext implements Context {
+public abstract class AbstractContext extends LinkedHashMap<String, Object> implements Context {
 
     protected Map<Class<?>, Object> options = new LinkedHashMap<>(4);
-    protected Map<String, Object> attachments = new LinkedHashMap<>(8);
+
+    public AbstractContext() {
+        super(8);
+    }
 
     public AbstractContext(Options options) {
+        this();
         this.options.putAll(options.getOptions());
     }
 
     public AbstractContext(Context anotherContext) {
+        this();
         this.options.putAll(anotherContext.getOptions());
-        this.attachments.putAll(anotherContext.getAttachments());
+        putAll(anotherContext.getAttachments());
     }
 
     @Override
@@ -59,18 +62,23 @@ public abstract class AbstractContext implements Context {
     }
 
     @Override
+    public Map<String, Object> getAttachments() {
+        return this;
+    }
+
+    @Override
     public void setAttachment(String name, Object value) {
-        attachments.put(name, value);
+        put(name, value);
     }
 
     @Override
     public Object getAttachment(String name) {
-        return attachments.get(name);
+        return get(name);
     }
 
     @Override
     public void removeAttachment(String name) {
-        attachments.remove(name);
+        remove(name);
     }
 
 }

@@ -24,7 +24,7 @@ import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
-import com.gitee.dorive.core.impl.binder.PropertyBinder;
+import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.executor.ExampleExecutor;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
@@ -95,12 +95,12 @@ public class SegmentBuilder {
         String lastAccessPath = mergedRepository.getLastAccessPath();
         CommonRepository definedRepository = mergedRepository.getDefinedRepository();
         BinderResolver binderResolver = definedRepository.getBinderResolver();
-        List<PropertyBinder> propertyBinders = binderResolver.getPropertyBinders();
+        List<StrongBinder> strongBinders = binderResolver.getStrongBinders();
         TableSegment tableSegment = node.getTableSegment();
 
-        List<OnSegment> onSegments = new ArrayList<>(propertyBinders.size());
-        for (PropertyBinder propertyBinder : propertyBinders) {
-            String relativeAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
+        List<OnSegment> onSegments = new ArrayList<>(strongBinders.size());
+        for (StrongBinder strongBinder : strongBinders) {
+            String relativeAccessPath = lastAccessPath + strongBinder.getBelongAccessPath();
             Node targetNode = nodeMap.get(relativeAccessPath);
             if (targetNode != null) {
                 TableSegment targetTableSegment = targetNode.getTableSegment();
@@ -108,8 +108,8 @@ public class SegmentBuilder {
                 if (!children.contains(node)) {
                     children.add(node);
                 }
-                OnSegment onSegment = new OnSegment(tableSegment.getTableAlias(), propertyBinder.getAlias(),
-                        targetTableSegment.getTableAlias(), propertyBinder.getBindAlias());
+                OnSegment onSegment = new OnSegment(tableSegment.getTableAlias(), strongBinder.getAlias(),
+                        targetTableSegment.getTableAlias(), strongBinder.getBindAlias());
                 onSegments.add(onSegment);
             }
         }

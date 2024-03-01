@@ -21,29 +21,49 @@ import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.repository.CommonRepository;
+import lombok.Getter;
+import lombok.Setter;
 
-public class ContextBinder extends AbstractBinder {
+@Getter
+@Setter
+public class StrongBinder extends AbstractBinder {
 
-    private final String name;
+    private String belongAccessPath;
+    private CommonRepository belongRepository;
+    private PropChain boundPropChain;
+    private String bindAlias;
 
-    public ContextBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor) {
+    public StrongBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor,
+                        String belongAccessPath, CommonRepository belongRepository, PropChain boundPropChain, String bindAlias) {
         super(bindingDef, alias, fieldPropChain, processor);
-        this.name = bindingDef.getBindExp();
+        this.belongAccessPath = belongAccessPath;
+        this.belongRepository = belongRepository;
+        this.boundPropChain = boundPropChain;
+        this.bindAlias = bindAlias;
     }
 
     @Override
     public String getBoundName() {
-        return name;
+        return boundPropChain.getEntityField().getName();
     }
 
     @Override
     public Object getBoundValue(Context context, Object rootEntity) {
-        return context.getAttachment(name);
+        return boundPropChain.getValue(rootEntity);
     }
 
     @Override
     public void setBoundValue(Context context, Object rootEntity, Object property) {
-        // ignore
+        boundPropChain.setValue(rootEntity, property);
+    }
+
+    public boolean isSameType() {
+        return getFieldPropChain().isSameType(boundPropChain);
+    }
+
+    public boolean isCollection() {
+        return boundPropChain.getEntityField().isCollection();
     }
 
 }

@@ -25,17 +25,14 @@ import com.gitee.dorive.core.api.context.Context;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 public abstract class AbstractBinder implements Binder, Processor {
 
-    private BindingDef bindingDef;
-    private String alias;
-    private PropChain fieldPropChain;
-    private Processor processor;
+    protected BindingDef bindingDef;
+    protected String alias;
+    protected PropChain fieldPropChain;
+    protected Processor processor;
 
     @Override
     public String getFieldName() {
@@ -54,24 +51,12 @@ public abstract class AbstractBinder implements Binder, Processor {
 
     @Override
     public Object input(Context context, Object value) {
-        return processor.input(context, value);
+        return value == null || processor == null ? value : processor.input(context, value);
     }
 
     @Override
     public Object output(Context context, Object value) {
-        return processor.output(context, value);
-    }
-
-    public List<Object> collectFieldValues(Context context, List<Object> entities) {
-        List<Object> fieldValues = new ArrayList<>(entities.size());
-        for (Object entity : entities) {
-            Object fieldValue = getFieldValue(context, entity);
-            if (fieldValue != null) {
-                fieldValue = output(context, fieldValue);
-                fieldValues.add(fieldValue);
-            }
-        }
-        return fieldValues;
+        return value == null || processor == null ? value : processor.output(context, value);
     }
 
 }

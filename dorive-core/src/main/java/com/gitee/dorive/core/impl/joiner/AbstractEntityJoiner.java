@@ -18,11 +18,11 @@
 package com.gitee.dorive.core.impl.joiner;
 
 import com.gitee.dorive.api.entity.element.PropChain;
-import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityJoiner;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.impl.binder.WeakBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -56,11 +56,11 @@ public abstract class AbstractEntityJoiner implements EntityJoiner {
             return;
         }
         BinderResolver binderResolver = repository.getBinderResolver();
-        List<Binder> weakBinders = binderResolver.getWeakBinders();
-        for (Binder binder : weakBinders) {
-            Object boundValue = binder.getBoundValue(context, null);
+        List<WeakBinder> weakBinders = binderResolver.getWeakBinders();
+        for (WeakBinder weakBinder : weakBinders) {
+            Object boundValue = weakBinder.input(context, null);
             if (boundValue != null) {
-                String fieldName = binder.getFieldName();
+                String fieldName = weakBinder.getFieldName();
                 example.eq(fieldName, boundValue);
             }
         }

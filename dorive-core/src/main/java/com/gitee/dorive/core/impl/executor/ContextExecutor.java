@@ -254,7 +254,7 @@ public class ContextExecutor extends AbstractExecutor {
     }
 
     private void getBoundValue(Context context, Object rootEntity, CommonRepository repository, Object entity) {
-        for (Binder binder : repository.getBinderResolver().getPropertyBinders()) {
+        for (Binder binder : repository.getBinderResolver().getStrongBinders()) {
             Object fieldValue = binder.getFieldValue(context, entity);
             if (fieldValue == null) {
                 Object boundValue = binder.getBoundValue(context, rootEntity);

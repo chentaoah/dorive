@@ -19,7 +19,7 @@ package com.gitee.dorive.query.impl.resolver;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.core.impl.binder.PropertyBinder;
+import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.AbstractRepository;
@@ -89,14 +89,14 @@ public class MergedRepositoryResolver {
         }
     }
 
-    private Map<String, List<PropertyBinder>> getMergedBindersMap(String lastAccessPath, CommonRepository repository) {
+    private Map<String, List<StrongBinder>> getMergedBindersMap(String lastAccessPath, CommonRepository repository) {
         BinderResolver binderResolver = repository.getBinderResolver();
-        List<PropertyBinder> propertyBinders = binderResolver.getPropertyBinders();
-        Map<String, List<PropertyBinder>> mergedBindersMap = new LinkedHashMap<>();
-        for (PropertyBinder propertyBinder : propertyBinders) {
-            String relativeAccessPath = lastAccessPath + propertyBinder.getBelongAccessPath();
-            List<PropertyBinder> existPropertyBinders = mergedBindersMap.computeIfAbsent(relativeAccessPath, key -> new ArrayList<>(4));
-            existPropertyBinders.add(propertyBinder);
+        List<StrongBinder> strongBinders = binderResolver.getStrongBinders();
+        Map<String, List<StrongBinder>> mergedBindersMap = new LinkedHashMap<>();
+        for (StrongBinder strongBinder : strongBinders) {
+            String relativeAccessPath = lastAccessPath + strongBinder.getBelongAccessPath();
+            List<StrongBinder> existStrongBinders = mergedBindersMap.computeIfAbsent(relativeAccessPath, key -> new ArrayList<>(4));
+            existStrongBinders.add(strongBinder);
         }
         return mergedBindersMap;
     }

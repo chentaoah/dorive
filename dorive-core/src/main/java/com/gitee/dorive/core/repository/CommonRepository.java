@@ -27,7 +27,7 @@ import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.option.JoinType;
-import com.gitee.dorive.core.impl.binder.PropertyBinder;
+import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.util.ExampleUtils;
 import lombok.Getter;
@@ -68,7 +68,7 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
         return binderResolver.getJoinType();
     }
 
-    public List<PropertyBinder> getRootBinders() {
+    public List<StrongBinder> getRootBinders() {
         return binderResolver.getMergedBindersMap().get("/");
     }
 

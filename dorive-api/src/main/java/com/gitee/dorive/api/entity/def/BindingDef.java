@@ -38,7 +38,8 @@ public class BindingDef {
 
     private String field;
     private String bindExp;
-    private String property;
+    private String processExp;
+    private String bindField;
     private Class<?> processor;
 
     public static List<BindingDef> fromElement(AnnotatedElement element) {

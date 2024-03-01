@@ -15,28 +15,42 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.processor;
+package com.gitee.dorive.core.impl.binder;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
+import com.gitee.dorive.api.entity.def.BindingDef;
+import com.gitee.dorive.api.entity.element.PropChain;
+import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import java.util.Collection;
+public class WeakBinder extends AbstractBinder {
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class PropertyProcessor extends DefaultProcessor {
+    public WeakBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor) {
+        super(bindingDef, alias, fieldPropChain, processor);
+    }
+
+    @Override
+    public String getBoundName() {
+        return null;
+    }
+
+    @Override
+    public Object getBoundValue(Context context, Object rootEntity) {
+        return null;
+    }
+
+    @Override
+    public void setBoundValue(Context context, Object rootEntity, Object property) {
+        // ignore
+    }
 
     @Override
     public Object input(Context context, Object value) {
-        String property = getBindingDef().getProperty();
-        if (value instanceof Collection) {
-            return CollUtil.map((Collection<?>) value, item -> BeanUtil.getFieldValue(item, property), true);
-        } else {
-            return BeanUtil.getFieldValue(value, property);
-        }
+        return processor.input(context, value);
+    }
+
+    @Override
+    public Object output(Context context, Object value) {
+        return processor.output(context, value);
     }
 
 }

@@ -17,36 +17,35 @@
 
 package com.gitee.dorive.core.impl.binder;
 
-import cn.hutool.core.convert.Convert;
 import com.gitee.dorive.api.entity.def.BindingDef;
-import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 
-public class ValueBinder extends AbstractBinder {
+public class SpELProcessor implements Processor {
 
-    private final Object value;
+    private final Expression expression;
 
-    public ValueBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor) {
-        super(bindingDef, alias, fieldPropChain, processor);
-        Class<?> genericType = fieldPropChain.getEntityField().getGenericType();
-        String valueStr = bindingDef.getBindExp().substring(1);
-        this.value = Convert.convert(genericType, valueStr);
+    public SpELProcessor(BindingDef bindingDef) {
+        ExpressionParser parser = new SpelExpressionParser();
+        this.expression = parser.parseExpression(bindingDef.getProcessExp());
     }
 
     @Override
-    public String getBoundName() {
-        return null;
+    public Object input(Context context, Object value) {
+        EvaluationContext evaluationContext = new StandardEvaluationContext();
+        evaluationContext.setVariable("ctx", context);
+        evaluationContext.setVariable("val", value);
+        return expression.getValue(evaluationContext);
     }
 
     @Override
-    public Object getBoundValue(Context context, Object rootEntity) {
+    public Object output(Context context, Object value) {
         return value;
-    }
-
-    @Override
-    public void setBoundValue(Context context, Object rootEntity, Object property) {
-        // ignore
     }
 
 }
