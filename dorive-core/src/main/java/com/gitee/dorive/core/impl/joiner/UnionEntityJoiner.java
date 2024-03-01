@@ -68,12 +68,12 @@ public class UnionEntityJoiner extends AbstractEntityJoiner {
         List<StrongBinder> binders = repository.getBinderResolver().getStrongBinders();
         for (StrongBinder binder : binders) {
             Object boundValue = binder.getBoundValue(context, entity);
+            boundValue = binder.input(context, boundValue);
             if (boundValue instanceof Collection) {
                 if (((Collection<?>) boundValue).isEmpty()) {
                     boundValue = null;
                 }
             }
-            boundValue = binder.input(context, boundValue);
             if (boundValue != null) {
                 String fieldName = binder.getFieldName();
                 example.eq(fieldName, boundValue);
