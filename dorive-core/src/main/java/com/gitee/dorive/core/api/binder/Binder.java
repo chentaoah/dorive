@@ -17,12 +17,9 @@
 
 package com.gitee.dorive.core.api.binder;
 
-import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.core.api.context.Context;
 
 public interface Binder {
-
-    BindingDef getBindingDef();
 
     String getFieldName();
 

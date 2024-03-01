@@ -24,13 +24,16 @@ import com.gitee.dorive.core.api.context.Context;
 
 public class ContextBinder extends AbstractBinder {
 
+    private final String name;
+
     public ContextBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor) {
         super(bindingDef, alias, fieldPropChain, processor);
+        this.name = bindingDef.getBindExp();
     }
 
     @Override
     public Object getBoundValue(Context context, Object rootEntity) {
-        return context.getAttachment(getBindingDef().getBindExp());
+        return context.getAttachment(name);
     }
 
     @Override
