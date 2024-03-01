@@ -58,6 +58,16 @@ public class StrongBinder extends AbstractBinder {
         boundPropChain.setValue(rootEntity, property);
     }
 
+    @Override
+    public Object input(Context context, Object value) {
+        return value == null || processor == null ? value : processor.input(context, value);
+    }
+
+    @Override
+    public Object output(Context context, Object value) {
+        return value == null || processor == null ? value : processor.output(context, value);
+    }
+
     public boolean isSameType() {
         return getFieldPropChain().isSameType(boundPropChain);
     }

@@ -49,14 +49,4 @@ public abstract class AbstractBinder implements Binder, Processor {
         fieldPropChain.setValue(entity, property);
     }
 
-    @Override
-    public Object input(Context context, Object value) {
-        return value == null || processor == null ? value : processor.input(context, value);
-    }
-
-    @Override
-    public Object output(Context context, Object value) {
-        return value == null || processor == null ? value : processor.output(context, value);
-    }
-
 }
