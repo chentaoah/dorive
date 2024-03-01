@@ -34,14 +34,8 @@ public class PropertyBinder extends AbstractBinder {
     private PropChain boundPropChain;
     private String bindAlias;
 
-    public PropertyBinder(BindingDef bindingDef,
-                          String alias,
-                          PropChain fieldPropChain,
-                          Processor processor,
-                          String belongAccessPath,
-                          CommonRepository belongRepository,
-                          PropChain boundPropChain,
-                          String bindAlias) {
+    public PropertyBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor,
+                          String belongAccessPath, CommonRepository belongRepository, PropChain boundPropChain, String bindAlias) {
         super(bindingDef, alias, fieldPropChain, processor);
         this.belongAccessPath = belongAccessPath;
         this.belongRepository = belongRepository;
@@ -49,16 +43,9 @@ public class PropertyBinder extends AbstractBinder {
         this.bindAlias = bindAlias;
     }
 
+    @Override
     public String getBoundName() {
         return boundPropChain.getEntityField().getName();
-    }
-
-    public boolean isSameType() {
-        return getFieldPropChain().isSameType(boundPropChain);
-    }
-
-    public boolean isCollection() {
-        return boundPropChain.getEntityField().isCollection();
     }
 
     @Override
@@ -69,6 +56,14 @@ public class PropertyBinder extends AbstractBinder {
     @Override
     public void setBoundValue(Context context, Object rootEntity, Object property) {
         boundPropChain.setValue(rootEntity, property);
+    }
+
+    public boolean isSameType() {
+        return getFieldPropChain().isSameType(boundPropChain);
+    }
+
+    public boolean isCollection() {
+        return boundPropChain.getEntityField().isCollection();
     }
 
 }

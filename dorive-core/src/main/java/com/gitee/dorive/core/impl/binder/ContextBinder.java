@@ -32,6 +32,11 @@ public class ContextBinder extends AbstractBinder {
     }
 
     @Override
+    public String getBoundName() {
+        return name;
+    }
+
+    @Override
     public Object getBoundValue(Context context, Object rootEntity) {
         return context.getAttachment(name);
     }

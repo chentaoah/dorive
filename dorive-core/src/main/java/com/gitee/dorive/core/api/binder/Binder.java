@@ -27,6 +27,8 @@ public interface Binder {
 
     void setFieldValue(Context context, Object entity, Object property);
 
+    String getBoundName();
+
     Object getBoundValue(Context context, Object rootEntity);
 
     void setBoundValue(Context context, Object rootEntity, Object property);

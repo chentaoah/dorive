@@ -35,6 +35,11 @@ public class ValueBinder extends AbstractBinder {
     }
 
     @Override
+    public String getBoundName() {
+        return null;
+    }
+
+    @Override
     public Object getBoundValue(Context context, Object rootEntity) {
         return value;
     }
