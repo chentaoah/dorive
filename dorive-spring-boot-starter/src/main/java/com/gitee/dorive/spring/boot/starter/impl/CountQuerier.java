@@ -25,6 +25,7 @@ import com.gitee.dorive.core.entity.context.BoundedContext;
 import com.gitee.dorive.spring.boot.starter.entity.segment.SegmentResult;
 import com.gitee.dorive.spring.boot.starter.entity.segment.SelectSegment;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -42,25 +43,31 @@ public class CountQuerier {
         this.segmentBuilder = new SegmentBuilder(repository);
     }
 
-    public Map<String, Long> selectCount(Context context, String groupField, boolean distinct, String countField, Object coating) {
+    public Map<String, Long> selectCount(Context context, String groupField, boolean distinct, String expression, String countField, Object coating) {
+        EntityEle entityEle = repository.getEntityEle();
         SegmentResult segmentResult = segmentBuilder.buildSegment(context, coating);
         SelectSegment selectSegment = segmentResult.getSelectSegment();
         List<Object> args = segmentResult.getArgs();
-
-        EntityEle entityEle = repository.getEntityEle();
-        String groupByColumn = entityEle.toAlias(groupField);
-        String countColumn = entityEle.toAlias(countField);
-
         String tableAlias = selectSegment.getTableAlias();
+
+        String groupByColumn = entityEle.toAlias(groupField);
         groupByColumn = tableAlias + "." + groupByColumn;
-        countColumn = tableAlias + "." + countColumn;
+
+        String countColumnExp;
+        if (StringUtils.isNotBlank(expression)) {
+            countColumnExp = expression;
+
+        } else {
+            String countColumn = entityEle.toAlias(countField);
+            countColumnExp = tableAlias + "." + countColumn;
+        }
 
         List<String> columns = new ArrayList<>(2);
         columns.add(groupByColumn + " AS recordId");
         if (distinct) {
-            columns.add("count(DISTINCT " + countColumn + ") AS totalCount");
+            columns.add("count(DISTINCT " + countColumnExp + ") AS totalCount");
         } else {
-            columns.add("count(" + countColumn + ") AS totalCount");
+            columns.add("count(" + countColumnExp + ") AS totalCount");
         }
         selectSegment.setColumns(columns);
         selectSegment.setGroupBy("GROUP BY " + groupByColumn);
@@ -72,11 +79,15 @@ public class CountQuerier {
     }
 
     public Map<String, Long> selectCount(Context context, String groupField, String countField, Object coating) {
-        return selectCount(context, groupField, true, countField, coating);
+        return selectCount(context, groupField, true, null, countField, coating);
     }
 
     public Map<String, Long> selectCount(String groupField, String countField, Object coating) {
-        return selectCount(new BoundedContext(), groupField, true, countField, coating);
+        return selectCount(new BoundedContext(), groupField, true, null, countField, coating);
+    }
+
+    public Map<String, Long> selectCountByExpression(String groupField, String expression, Object coating) {
+        return selectCount(new BoundedContext(), groupField, true, expression, null, coating);
     }
 
 }
