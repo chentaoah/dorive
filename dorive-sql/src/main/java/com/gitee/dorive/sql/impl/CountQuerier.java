@@ -17,11 +17,12 @@
 
 package com.gitee.dorive.sql.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.entity.QueryWrapper;
+import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.SelectSegment;
@@ -53,24 +54,45 @@ public class CountQuerier {
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<Object> args = selectSegment.getArgs();
         String tableAlias = tableSegment.getTableAlias();
+        String prefix = tableAlias + ".";
 
         EntityEle entityEle = repository.getEntityEle();
-        String countByColumn = tableAlias + "." + entityEle.toAlias(countQuery.getCountBy());
-        String groupByColumn = tableAlias + "." + entityEle.toAlias(countQuery.getGroupBy());
+        List<String> countBy = entityEle.toAliases(countQuery.getCountBy());
+        List<String> groupBy = entityEle.toAliases(countQuery.getGroupBy());
+        String countByColumns = CollUtil.join(countBy, ",", prefix, null);
+        String groupByColumns = CollUtil.join(groupBy, ",", prefix, null);
 
-        List<String> columns = new ArrayList<>(2);
-        columns.add(groupByColumn + " AS groupId");
+        StringBuilder countByExp = new StringBuilder();
+        if (countQuery.isDistinct()) {
+            countByExp.append("DISTINCT ");
+        }
+        if (countBy.size() == 1) {
+            countByExp.append(countByColumns);
 
-        String format = "COUNT(%s) AS total";
-        String countByColumnStr = String.format(format, countQuery.isDistinct() ? "DISTINCT " + countByColumn : countByColumn);
-        columns.add(countByColumnStr);
+        } else if (countBy.size() > 1) {
+            countByExp.append("CONCAT(").append(countByColumns).append(")");
+        }
 
-        selectSegment.setSelectColumns(columns);
-        selectSegment.setGroupBy("GROUP BY " + groupByColumn);
+        List<String> selectColumns = new ArrayList<>(2);
+        selectColumns.add(groupByColumns);
+        selectColumns.add(String.format("COUNT(%s) AS total", countByExp));
+        selectSegment.setSelectColumns(selectColumns);
+        selectSegment.setGroupBy("GROUP BY " + groupByColumns);
 
         List<Map<String, Object>> resultMaps = sqlRunner.selectList(selectSegment.toString(), args.toArray());
         Map<String, Long> countMap = new LinkedHashMap<>(resultMaps.size() * 4 / 3 + 1);
-        resultMaps.forEach(resultMap -> countMap.put(resultMap.get("groupId").toString(), (Long) resultMap.get("total")));
+        resultMaps.forEach(resultMap -> {
+            StringBuilder keyBuilder = new StringBuilder();
+            for (String groupByColumn : groupBy) {
+                String valueStr = String.valueOf(resultMap.get(groupByColumn)).trim();
+                keyBuilder.append(valueStr).append(", ");
+            }
+            int length = keyBuilder.length();
+            if (length > 0) {
+                keyBuilder.delete(length - 2, length);
+            }
+            countMap.put(keyBuilder.toString(), (Long) resultMap.get("total"));
+        });
         return countMap;
     }
 
@@ -81,8 +103,8 @@ public class CountQuerier {
     public static class CountQuery {
         private Object query;
         private boolean distinct = true;
-        private String countBy;
-        private String groupBy;
+        private List<String> countBy;
+        private List<String> groupBy;
     }
 
 }
