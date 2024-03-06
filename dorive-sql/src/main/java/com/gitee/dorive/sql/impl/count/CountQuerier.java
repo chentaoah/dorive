@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.impl;
+package com.gitee.dorive.sql.impl.count;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.element.EntityEle;
@@ -25,9 +25,10 @@ import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
-import com.gitee.dorive.sql.entity.CountQuery;
+import com.gitee.dorive.sql.entity.count.CountQuery;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableSegment;
+import com.gitee.dorive.sql.impl.segment.SegmentBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -80,19 +81,21 @@ public class CountQuerier {
 
         List<Map<String, Object>> resultMaps = sqlRunner.selectList(selectSegment.toString(), args.toArray());
         Map<String, Long> countMap = new LinkedHashMap<>(resultMaps.size() * 4 / 3 + 1);
-        resultMaps.forEach(resultMap -> {
-            StringBuilder keyBuilder = new StringBuilder();
-            for (String groupByColumn : groupBy) {
-                String valueStr = String.valueOf(resultMap.get(groupByColumn)).trim();
-                keyBuilder.append(valueStr).append(", ");
-            }
-            int length = keyBuilder.length();
-            if (length > 0) {
-                keyBuilder.delete(length - 2, length);
-            }
-            countMap.put(keyBuilder.toString(), (Long) resultMap.get("total"));
-        });
+        resultMaps.forEach(resultMap -> countMap.put(buildKey(resultMap, groupBy), (Long) resultMap.get("total")));
         return countMap;
+    }
+
+    private String buildKey(Map<String, Object> resultMap, List<String> groupBy) {
+        StringBuilder keyBuilder = new StringBuilder();
+        for (String column : groupBy) {
+            String valueStr = String.valueOf(resultMap.get(column)).trim();
+            keyBuilder.append(valueStr).append(", ");
+        }
+        int length = keyBuilder.length();
+        if (length > 0) {
+            keyBuilder.delete(length - 2, length);
+        }
+        return keyBuilder.toString();
     }
 
 }

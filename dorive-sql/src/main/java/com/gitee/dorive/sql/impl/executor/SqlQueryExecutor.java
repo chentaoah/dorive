@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.impl;
+package com.gitee.dorive.sql.impl.executor;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.element.EntityEle;
@@ -36,6 +36,7 @@ import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.segment.ArgSegment;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableSegment;
+import com.gitee.dorive.sql.impl.segment.SegmentBuilder;
 import lombok.Getter;
 import lombok.Setter;
 

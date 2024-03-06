@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.entity;
+package com.gitee.dorive.sql.entity.count;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

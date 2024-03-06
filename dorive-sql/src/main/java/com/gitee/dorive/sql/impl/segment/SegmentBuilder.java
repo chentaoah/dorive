@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.impl;
+package com.gitee.dorive.sql.impl.segment;
 
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.api.entity.element.EntityEle;
