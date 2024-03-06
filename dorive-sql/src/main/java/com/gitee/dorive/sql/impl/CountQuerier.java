@@ -25,12 +25,11 @@ import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
-import com.gitee.dorive.sql.entity.SelectSegment;
-import com.gitee.dorive.sql.entity.TableSegment;
+import com.gitee.dorive.sql.entity.CountQuery;
+import com.gitee.dorive.sql.entity.segment.SelectSegment;
+import com.gitee.dorive.sql.entity.segment.TableSegment;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -94,17 +93,6 @@ public class CountQuerier {
             countMap.put(keyBuilder.toString(), (Long) resultMap.get("total"));
         });
         return countMap;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CountQuery {
-        private Object query;
-        private boolean distinct = true;
-        private List<String> countBy;
-        private List<String> groupBy;
     }
 
 }

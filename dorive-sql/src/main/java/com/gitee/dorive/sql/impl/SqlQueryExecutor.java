@@ -33,9 +33,9 @@ import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.impl.executor.AbstractQueryExecutor;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
-import com.gitee.dorive.sql.entity.ArgSegment;
-import com.gitee.dorive.sql.entity.SelectSegment;
-import com.gitee.dorive.sql.entity.TableSegment;
+import com.gitee.dorive.sql.entity.segment.ArgSegment;
+import com.gitee.dorive.sql.entity.segment.SelectSegment;
+import com.gitee.dorive.sql.entity.segment.TableSegment;
 import lombok.Getter;
 import lombok.Setter;
 

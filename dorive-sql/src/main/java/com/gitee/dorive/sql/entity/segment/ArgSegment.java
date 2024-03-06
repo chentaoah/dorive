@@ -15,23 +15,27 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.entity;
+package com.gitee.dorive.sql.entity.segment;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class OnSegment {
+public class ArgSegment {
 
     private String tableAlias;
     private String column;
-    private String joinTableAlias;
-    private String joinColumn;
+    private String operator;
+    private String expr;
 
     @Override
     public String toString() {
-        return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
+        if (expr != null) {
+            return tableAlias + "." + column + " " + operator + " " + expr;
+        } else {
+            return tableAlias + "." + column + " " + operator;
+        }
     }
 
 }

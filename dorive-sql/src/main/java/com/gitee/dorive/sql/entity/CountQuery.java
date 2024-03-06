@@ -18,13 +18,28 @@
 package com.gitee.dorive.sql.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.Collections;
 import java.util.List;
 
 @Data
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
-public class JoinSegment {
-    private TableSegment tableSegment;
-    private List<OnSegment> onSegments;
+public class CountQuery {
+
+    private Object query;
+    private boolean distinct = true;
+    private List<String> countBy;
+    private List<String> groupBy;
+
+    public CountQuery(Object query, String countBy, String groupBy) {
+        this.query = query;
+        this.countBy = Collections.singletonList(countBy);
+        this.groupBy = Collections.singletonList(groupBy);
+    }
+
 }

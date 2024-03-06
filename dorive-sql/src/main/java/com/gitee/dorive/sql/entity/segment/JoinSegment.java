@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.entity;
+package com.gitee.dorive.sql.entity.segment;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,16 +24,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class TableSegment {
-
-    private String tableName;
-    private String tableAlias;
-    private boolean join;
-    private List<ArgSegment> argSegments;
-
-    @Override
-    public String toString() {
-        return tableName + " " + tableAlias;
-    }
-
+public class JoinSegment {
+    private TableSegment tableSegment;
+    private List<OnSegment> onSegments;
 }

@@ -33,7 +33,11 @@ import com.gitee.dorive.core.util.CriterionUtils;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.impl.resolver.QueryResolver;
-import com.gitee.dorive.sql.entity.*;
+import com.gitee.dorive.sql.entity.segment.ArgSegment;
+import com.gitee.dorive.sql.entity.segment.JoinSegment;
+import com.gitee.dorive.sql.entity.segment.OnSegment;
+import com.gitee.dorive.sql.entity.segment.SelectSegment;
+import com.gitee.dorive.sql.entity.segment.TableSegment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
