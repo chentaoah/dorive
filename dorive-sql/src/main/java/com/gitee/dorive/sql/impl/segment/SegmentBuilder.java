@@ -75,7 +75,7 @@ public class SegmentBuilder {
             exampleExecutor.convert(context, example);
 
             boolean isJoin = example.isNotEmpty() || segmentContext.isSelected(name);
-            segmentContext.put(name, new SegmentInfo(entityEle, tableName, tableAlias));
+            segmentContext.put(name, new SegmentInfo(tableAlias, entityEle));
 
             TableSegment tableSegment = new TableSegment(tableName, tableAlias, isJoin, new ArrayList<>(example.getCriteria().size()));
             Node node = new Node(tableSegment, new ArrayList<>(4));

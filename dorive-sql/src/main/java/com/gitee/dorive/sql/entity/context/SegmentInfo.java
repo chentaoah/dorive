@@ -24,7 +24,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class SegmentInfo {
-    private EntityEle entityEle;
-    private String tableName;
     private String tableAlias;
+    private EntityEle entityEle;
 }
