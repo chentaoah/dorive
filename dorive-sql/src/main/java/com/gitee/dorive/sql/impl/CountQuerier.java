@@ -59,23 +59,23 @@ public class CountQuerier {
         EntityEle entityEle = repository.getEntityEle();
         List<String> countBy = entityEle.toAliases(countQuery.getCountBy());
         List<String> groupBy = entityEle.toAliases(countQuery.getGroupBy());
-        String countByColumns = CollUtil.join(countBy, ",", prefix, null);
+        String countByExp = CollUtil.join(countBy, ",',',", prefix, null);
         String groupByColumns = CollUtil.join(groupBy, ",", prefix, null);
 
-        StringBuilder countByExp = new StringBuilder();
+        StringBuilder expression = new StringBuilder();
         if (countQuery.isDistinct()) {
-            countByExp.append("DISTINCT ");
+            expression.append("DISTINCT ");
         }
         if (countBy.size() == 1) {
-            countByExp.append(countByColumns);
+            expression.append(countByExp);
 
         } else if (countBy.size() > 1) {
-            countByExp.append("CONCAT(").append(countByColumns).append(")");
+            expression.append("CONCAT(").append(countByExp).append(")");
         }
 
         List<String> selectColumns = new ArrayList<>(2);
         selectColumns.add(groupByColumns);
-        selectColumns.add(String.format("COUNT(%s) AS total", countByExp));
+        selectColumns.add(String.format("COUNT(%s) AS total", expression));
         selectSegment.setSelectColumns(selectColumns);
         selectSegment.setGroupBy("GROUP BY " + groupByColumns);
 
