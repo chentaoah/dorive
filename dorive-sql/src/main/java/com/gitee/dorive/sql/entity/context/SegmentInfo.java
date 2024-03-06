@@ -15,39 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.entity.count;
+package com.gitee.dorive.sql.entity.context;
 
+import com.gitee.dorive.api.entity.element.EntityEle;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.Collections;
-import java.util.List;
 
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class CountQuery {
-
-    private Object query;
-    private boolean distinct = true;
-    private String name;
-    private List<String> countBy;
-    private List<String> groupBy;
-
-    public CountQuery(Object query, String countBy, String groupBy) {
-        this.query = query;
-        this.countBy = Collections.singletonList(countBy);
-        this.groupBy = Collections.singletonList(groupBy);
-    }
-
-    public CountQuery(Object query, String name, String countBy, String groupBy) {
-        this.query = query;
-        this.name = name;
-        this.countBy = Collections.singletonList(countBy);
-        this.groupBy = Collections.singletonList(groupBy);
-    }
-
+public class SegmentInfo {
+    private EntityEle entityEle;
+    private String tableName;
+    private String tableAlias;
 }

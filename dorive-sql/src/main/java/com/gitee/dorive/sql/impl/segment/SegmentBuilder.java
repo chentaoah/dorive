@@ -33,9 +33,11 @@ import com.gitee.dorive.core.util.CriterionUtils;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.impl.resolver.QueryResolver;
+import com.gitee.dorive.sql.entity.context.SegmentInfo;
 import com.gitee.dorive.sql.entity.segment.ArgSegment;
 import com.gitee.dorive.sql.entity.segment.JoinSegment;
 import com.gitee.dorive.sql.entity.segment.OnSegment;
+import com.gitee.dorive.sql.entity.context.SegmentContext;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableSegment;
 import lombok.AllArgsConstructor;
@@ -46,7 +48,7 @@ import java.util.*;
 @Data
 public class SegmentBuilder {
 
-    public SelectSegment buildSegment(QueryContext queryContext) {
+    public SelectSegment buildSegment(QueryContext queryContext, SegmentContext segmentContext) {
         Context context = queryContext.getContext();
         QueryResolver queryResolver = queryContext.getQueryResolver();
         Map<String, Example> exampleMap = queryContext.getExampleMap();
@@ -59,8 +61,10 @@ public class SegmentBuilder {
         for (MergedRepository mergedRepository : mergedRepositories) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             String relativeAccessPath = mergedRepository.getRelativeAccessPath();
+            CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
+            String name = definedRepository.getName();
             EntityEle entityEle = executedRepository.getEntityEle();
             EntityStoreInfo entityStoreInfo = AbstractContextRepository.getEntityStoreInfo(entityEle);
             ExampleExecutor exampleExecutor = AbstractContextRepository.getExampleExecutor(entityEle);
@@ -70,7 +74,10 @@ public class SegmentBuilder {
             Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample(Collections.emptyList()));
             exampleExecutor.convert(context, example);
 
-            TableSegment tableSegment = new TableSegment(tableName, tableAlias, example.isNotEmpty(), new ArrayList<>(example.getCriteria().size()));
+            boolean isJoin = example.isNotEmpty() || segmentContext.isSelected(name);
+            segmentContext.put(name, new SegmentInfo(entityEle, tableName, tableAlias));
+
+            TableSegment tableSegment = new TableSegment(tableName, tableAlias, isJoin, new ArrayList<>(example.getCriteria().size()));
             Node node = new Node(tableSegment, new ArrayList<>(4));
             nodeMap.put(relativeAccessPath, node);
 

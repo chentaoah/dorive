@@ -25,12 +25,15 @@ import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
+import com.gitee.dorive.sql.entity.context.SegmentInfo;
 import com.gitee.dorive.sql.entity.count.CountQuery;
+import com.gitee.dorive.sql.entity.context.SegmentContext;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableSegment;
 import com.gitee.dorive.sql.impl.segment.SegmentBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -50,32 +53,24 @@ public class CountQuerier {
         QueryWrapper queryWrapper = new QueryWrapper(countQuery.getQuery());
         repository.resolveQuery(queryContext, queryWrapper);
 
-        SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext);
+        SegmentContext segmentContext = new SegmentContext();
+        segmentContext.selectName(countQuery.getName());
+        SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext, segmentContext);
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<Object> args = selectSegment.getArgs();
+
         String tableAlias = tableSegment.getTableAlias();
-        String prefix = tableAlias + ".";
-
         EntityEle entityEle = repository.getEntityEle();
-        List<String> countBy = entityEle.toAliases(countQuery.getCountBy());
+
+        String countByExp = buildCountByExp(countQuery, segmentContext, tableAlias, entityEle);
+
+        String groupByPrefix = tableAlias + ".";
         List<String> groupBy = entityEle.toAliases(countQuery.getGroupBy());
-        String countByExp = CollUtil.join(countBy, ",',',", prefix, null);
-        String groupByColumns = CollUtil.join(groupBy, ",", prefix, null);
-
-        StringBuilder expression = new StringBuilder();
-        if (countQuery.isDistinct()) {
-            expression.append("DISTINCT ");
-        }
-        if (countBy.size() == 1) {
-            expression.append(countByExp);
-
-        } else if (countBy.size() > 1) {
-            expression.append("CONCAT(").append(countByExp).append(")");
-        }
+        String groupByColumns = CollUtil.join(groupBy, ",", groupByPrefix, null);
 
         List<String> selectColumns = new ArrayList<>(2);
         selectColumns.add(groupByColumns);
-        selectColumns.add(String.format("COUNT(%s) AS total", expression));
+        selectColumns.add(String.format("COUNT(%s) AS total", countByExp));
         selectSegment.setSelectColumns(selectColumns);
         selectSegment.setGroupBy("GROUP BY " + groupByColumns);
 
@@ -83,6 +78,30 @@ public class CountQuerier {
         Map<String, Long> countMap = new LinkedHashMap<>(resultMaps.size() * 4 / 3 + 1);
         resultMaps.forEach(resultMap -> countMap.put(buildKey(resultMap, groupBy), (Long) resultMap.get("total")));
         return countMap;
+    }
+
+    private String buildCountByExp(CountQuery countQuery, SegmentContext segmentContext, String tableAlias, EntityEle entityEle) {
+        String name = countQuery.getName();
+        if (StringUtils.isNotBlank(name)) {
+            SegmentInfo segmentInfo = segmentContext.get(name);
+            tableAlias = segmentInfo.getTableAlias();
+            entityEle = segmentInfo.getEntityEle();
+        }
+        String countByPrefix = tableAlias + ".";
+        List<String> countBy = entityEle.toAliases(countQuery.getCountBy());
+        String countByStr = CollUtil.join(countBy, ",',',", countByPrefix, null);
+
+        StringBuilder countByExp = new StringBuilder();
+        if (countQuery.isDistinct()) {
+            countByExp.append("DISTINCT ");
+        }
+        if (countBy.size() == 1) {
+            countByExp.append(countByStr);
+
+        } else if (countBy.size() > 1) {
+            countByExp.append("CONCAT(").append(countByStr).append(")");
+        }
+        return countByExp.toString();
     }
 
     private String buildKey(Map<String, Object> resultMap, List<String> groupBy) {

@@ -15,39 +15,39 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.entity.count;
+package com.gitee.dorive.sql.entity.context;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Data
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
-public class CountQuery {
+public class SegmentContext {
 
-    private Object query;
-    private boolean distinct = true;
-    private String name;
-    private List<String> countBy;
-    private List<String> groupBy;
+    private Set<String> selectNames = new LinkedHashSet<>(2);
+    private Map<String, SegmentInfo> nameSegmentInfoMap = new LinkedHashMap<>(8);
 
-    public CountQuery(Object query, String countBy, String groupBy) {
-        this.query = query;
-        this.countBy = Collections.singletonList(countBy);
-        this.groupBy = Collections.singletonList(groupBy);
+    public void selectName(String name) {
+        if (name != null) {
+            selectNames.add(name);
+        }
     }
 
-    public CountQuery(Object query, String name, String countBy, String groupBy) {
-        this.query = query;
-        this.name = name;
-        this.countBy = Collections.singletonList(countBy);
-        this.groupBy = Collections.singletonList(groupBy);
+    public boolean isSelected(String name) {
+        return selectNames.contains(name);
+    }
+
+    public void put(String name, SegmentInfo segmentInfo) {
+        nameSegmentInfoMap.put(name, segmentInfo);
+    }
+
+    public SegmentInfo get(String name) {
+        return nameSegmentInfoMap.get(name);
     }
 
 }

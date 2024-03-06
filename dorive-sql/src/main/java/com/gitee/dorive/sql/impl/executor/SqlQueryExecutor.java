@@ -34,6 +34,7 @@ import com.gitee.dorive.query.impl.executor.AbstractQueryExecutor;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.segment.ArgSegment;
+import com.gitee.dorive.sql.entity.context.SegmentContext;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableSegment;
 import com.gitee.dorive.sql.impl.segment.SegmentBuilder;
@@ -74,7 +75,7 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         boolean needCount = queryContext.isNeedCount();
         Result<Object> emptyResult = queryContext.newEmptyResult();
 
-        SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext);
+        SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext, new SegmentContext());
         char letter = selectSegment.getLetter();
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<ArgSegment> argSegments = selectSegment.getArgSegments();
