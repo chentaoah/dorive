@@ -72,8 +72,8 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         boolean needCount = queryContext.isNeedCount();
         Result<Object> emptyResult = queryContext.newEmptyResult();
 
-        SegmentBuilder segmentBuilder = new SegmentBuilder();
-        SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext);
+        SegmentBuilder segmentBuilder = new SegmentBuilder(queryContext);
+        SelectSegment selectSegment = segmentBuilder.buildSegment(context, null);
         char letter = selectSegment.getLetter();
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<ArgSegment> argSegments = selectSegment.getArgSegments();

@@ -20,6 +20,7 @@ package com.gitee.dorive.sql.impl.segment;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.api.entity.element.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -34,31 +35,28 @@ import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import com.gitee.dorive.sql.entity.context.SegmentInfo;
-import com.gitee.dorive.sql.entity.segment.ArgSegment;
-import com.gitee.dorive.sql.entity.segment.JoinSegment;
-import com.gitee.dorive.sql.entity.segment.OnSegment;
-import com.gitee.dorive.sql.entity.segment.SelectSegment;
-import com.gitee.dorive.sql.entity.segment.TableSegment;
+import com.gitee.dorive.sql.entity.segment.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 public class SegmentBuilder {
 
-    private SegmentInfo firstMatched;
-    private List<SegmentInfo> allMatched = new ArrayList<>(8);
+    private QueryResolver queryResolver;
+    private Map<String, Example> exampleMap;
+    private List<SegmentInfo> matchedSegmentInfos;
 
-    public SelectSegment buildSegment(QueryContext queryContext) {
-        Context context = queryContext.getContext();
-        QueryResolver queryResolver = queryContext.getQueryResolver();
-        Map<String, Example> exampleMap = queryContext.getExampleMap();
+    public SegmentBuilder(QueryContext queryContext) {
+        this.queryResolver = queryContext.getQueryResolver();
+        this.exampleMap = queryContext.getExampleMap();
+    }
 
+    public SelectSegment buildSegment(Context context, Selector selector) {
+        if (selector != null) {
+            this.matchedSegmentInfos = new ArrayList<>(8);
+        }
         List<MergedRepository> mergedRepositories = queryResolver.getMergedRepositories();
         Map<String, Node> nodeMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);
         SelectSegment selectSegment = new SelectSegment();
@@ -78,12 +76,9 @@ public class SegmentBuilder {
             String tableAlias = selectSegment.generateTableAlias();
 
             SegmentInfo segmentInfo = new SegmentInfo(tableAlias, entityEle);
-            boolean isMatch = definedRepository.matches(context);
+            boolean isMatch = selector != null && definedRepository.matches(selector);
             if (isMatch) {
-                if (firstMatched == null) {
-                    firstMatched = segmentInfo;
-                }
-                allMatched.add(segmentInfo);
+                matchedSegmentInfos.add(segmentInfo);
             }
 
             Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample(Collections.emptyList()));

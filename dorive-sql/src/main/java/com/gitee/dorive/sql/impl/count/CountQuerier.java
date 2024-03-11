@@ -50,8 +50,8 @@ public class CountQuerier {
         QueryWrapper queryWrapper = new QueryWrapper(countQuery.getQuery());
         repository.resolveQuery(queryContext, queryWrapper);
 
-        SegmentBuilder segmentBuilder = new SegmentBuilder();
-        SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext);
+        SegmentBuilder segmentBuilder = new SegmentBuilder(queryContext);
+        SelectSegment selectSegment = segmentBuilder.buildSegment(context, countQuery.getSelector());
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<Object> args = selectSegment.getArgs();
 
@@ -76,8 +76,9 @@ public class CountQuerier {
     }
 
     private String buildCountByExp(CountQuery countQuery, SegmentBuilder segmentBuilder, String tableAlias, EntityEle entityEle) {
-        SegmentInfo segmentInfo = segmentBuilder.getFirstMatched();
-        if (segmentInfo != null) {
+        List<SegmentInfo> segmentInfos = segmentBuilder.getMatchedSegmentInfos();
+        if (segmentInfos != null && !segmentInfos.isEmpty()) {
+            SegmentInfo segmentInfo = segmentInfos.get(0);
             tableAlias = segmentInfo.getTableAlias();
             entityEle = segmentInfo.getEntityEle();
         }

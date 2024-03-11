@@ -20,6 +20,7 @@ package com.gitee.dorive.core.repository;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Matcher;
+import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
@@ -73,8 +74,8 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
     }
 
     @Override
-    public boolean matches(Context context) {
-        return matcher.matches(context);
+    public boolean matches(Options options) {
+        return matcher.matches(options);
     }
 
     @Override

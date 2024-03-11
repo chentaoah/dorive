@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.sql.entity.count;
 
+import com.gitee.dorive.core.api.context.Selector;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,6 +34,7 @@ public class CountQuery {
 
     private Object query;
     private boolean distinct = true;
+    private Selector selector;
     private List<String> countBy;
     private List<String> groupBy;
 
