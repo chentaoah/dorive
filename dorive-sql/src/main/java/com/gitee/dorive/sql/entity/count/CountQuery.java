@@ -33,19 +33,11 @@ public class CountQuery {
 
     private Object query;
     private boolean distinct = true;
-    private String name;
     private List<String> countBy;
     private List<String> groupBy;
 
     public CountQuery(Object query, String countBy, String groupBy) {
         this.query = query;
-        this.countBy = Collections.singletonList(countBy);
-        this.groupBy = Collections.singletonList(groupBy);
-    }
-
-    public CountQuery(Object query, String name, String countBy, String groupBy) {
-        this.query = query;
-        this.name = name;
         this.countBy = Collections.singletonList(countBy);
         this.groupBy = Collections.singletonList(groupBy);
     }

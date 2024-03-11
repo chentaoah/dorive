@@ -27,13 +27,11 @@ import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.context.SegmentInfo;
 import com.gitee.dorive.sql.entity.count.CountQuery;
-import com.gitee.dorive.sql.entity.context.SegmentContext;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableSegment;
 import com.gitee.dorive.sql.impl.segment.SegmentBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -45,7 +43,6 @@ import java.util.Map;
 public class CountQuerier {
 
     private AbstractQueryRepository<?, ?> repository;
-    private SegmentBuilder segmentBuilder;
     private SqlRunner sqlRunner;
 
     public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
@@ -53,16 +50,14 @@ public class CountQuerier {
         QueryWrapper queryWrapper = new QueryWrapper(countQuery.getQuery());
         repository.resolveQuery(queryContext, queryWrapper);
 
-        SegmentContext segmentContext = new SegmentContext();
-        segmentContext.selectName(countQuery.getName());
-        SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext, segmentContext);
+        SegmentBuilder segmentBuilder = new SegmentBuilder();
+        SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext);
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<Object> args = selectSegment.getArgs();
 
         String tableAlias = tableSegment.getTableAlias();
         EntityEle entityEle = repository.getEntityEle();
-
-        String countByExp = buildCountByExp(countQuery, segmentContext, tableAlias, entityEle);
+        String countByExp = buildCountByExp(countQuery, segmentBuilder, tableAlias, entityEle);
 
         String groupByPrefix = tableAlias + ".";
         List<String> groupBy = entityEle.toAliases(countQuery.getGroupBy());
@@ -80,10 +75,9 @@ public class CountQuerier {
         return countMap;
     }
 
-    private String buildCountByExp(CountQuery countQuery, SegmentContext segmentContext, String tableAlias, EntityEle entityEle) {
-        String name = countQuery.getName();
-        if (StringUtils.isNotBlank(name)) {
-            SegmentInfo segmentInfo = segmentContext.get(name);
+    private String buildCountByExp(CountQuery countQuery, SegmentBuilder segmentBuilder, String tableAlias, EntityEle entityEle) {
+        SegmentInfo segmentInfo = segmentBuilder.getFirstMatched();
+        if (segmentInfo != null) {
             tableAlias = segmentInfo.getTableAlias();
             entityEle = segmentInfo.getEntityEle();
         }

@@ -37,18 +37,24 @@ import com.gitee.dorive.sql.entity.context.SegmentInfo;
 import com.gitee.dorive.sql.entity.segment.ArgSegment;
 import com.gitee.dorive.sql.entity.segment.JoinSegment;
 import com.gitee.dorive.sql.entity.segment.OnSegment;
-import com.gitee.dorive.sql.entity.context.SegmentContext;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableSegment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 public class SegmentBuilder {
 
-    public SelectSegment buildSegment(QueryContext queryContext, SegmentContext segmentContext) {
+    private SegmentInfo firstMatched;
+    private List<SegmentInfo> allMatched = new ArrayList<>(8);
+
+    public SelectSegment buildSegment(QueryContext queryContext) {
         Context context = queryContext.getContext();
         QueryResolver queryResolver = queryContext.getQueryResolver();
         Map<String, Example> exampleMap = queryContext.getExampleMap();
@@ -64,20 +70,26 @@ public class SegmentBuilder {
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
-            String name = definedRepository.getName();
             EntityEle entityEle = executedRepository.getEntityEle();
             EntityStoreInfo entityStoreInfo = AbstractContextRepository.getEntityStoreInfo(entityEle);
             ExampleExecutor exampleExecutor = AbstractContextRepository.getExampleExecutor(entityEle);
 
             String tableName = entityStoreInfo.getTableName();
             String tableAlias = selectSegment.generateTableAlias();
+
+            SegmentInfo segmentInfo = new SegmentInfo(tableAlias, entityEle);
+            boolean isMatch = definedRepository.matches(context);
+            if (isMatch) {
+                if (firstMatched == null) {
+                    firstMatched = segmentInfo;
+                }
+                allMatched.add(segmentInfo);
+            }
+
             Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample(Collections.emptyList()));
             exampleExecutor.convert(context, example);
 
-            boolean isJoin = example.isNotEmpty() || segmentContext.isSelected(name);
-            segmentContext.put(name, new SegmentInfo(tableAlias, entityEle));
-
-            TableSegment tableSegment = new TableSegment(tableName, tableAlias, isJoin, new ArrayList<>(example.getCriteria().size()));
+            TableSegment tableSegment = new TableSegment(tableName, tableAlias, example.isNotEmpty() || isMatch, new ArrayList<>(example.getCriteria().size()));
             Node node = new Node(tableSegment, new ArrayList<>(4));
             nodeMap.put(relativeAccessPath, node);
 
