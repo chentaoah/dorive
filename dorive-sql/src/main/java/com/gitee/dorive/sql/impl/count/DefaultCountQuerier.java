@@ -24,6 +24,7 @@ import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
+import com.gitee.dorive.sql.api.CountQuerier;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.common.SegmentInfo;
 import com.gitee.dorive.sql.entity.common.CountQuery;
@@ -40,11 +41,12 @@ import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class CountQuerier {
+public class DefaultCountQuerier implements CountQuerier {
 
     private AbstractQueryRepository<?, ?> repository;
     private SqlRunner sqlRunner;
 
+    @Override
     public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
         QueryContext queryContext = new QueryContext(context, ResultType.COUNT);
         QueryWrapper queryWrapper = new QueryWrapper(countQuery.getQuery());
