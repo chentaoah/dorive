@@ -20,10 +20,10 @@ package com.gitee.dorive.query.repository;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.annotation.Repository;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.event.repository.AbstractEventRepository;
 import com.gitee.dorive.query.api.QueryExecutor;
 import com.gitee.dorive.query.api.QueryRepository;
@@ -112,8 +112,8 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
         resolveQuery(queryContext, queryWrapper);
-        CommonRepository rootRepository = getRootRepository();
-        if (!rootRepository.matches(queryContext.getContext())) {
+        Matcher matcher = getRootRepository();
+        if (!matcher.matches(queryContext.getContext())) {
             return queryContext.newEmptyResult();
         }
         if (queryContext.isSimpleQuery()) {
