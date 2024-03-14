@@ -66,7 +66,7 @@ public class ContextExecutor extends AbstractExecutor {
             }
             return result;
         }
-        return new Result<>();
+        return Result.emptyResult(query);
     }
 
     public void populate(Context context, List<Object> entities) {

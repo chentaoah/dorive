@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.core.entity.executor;
 
+import com.gitee.dorive.core.entity.operation.Query;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -33,6 +34,17 @@ public class Result<E> {
     private List<E> records = Collections.emptyList();
     private E record;
     private long count = 0L;
+
+    public static Result<Object> emptyResult(Query query) {
+        Example example = query.getExample();
+        if (example != null) {
+            Page<Object> page = example.getPage();
+            if (page != null) {
+                return new Result<>(page);
+            }
+        }
+        return new Result<>();
+    }
 
     public Result(Page<E> page, List<Map<String, Object>> recordMaps) {
         this.page = page;
