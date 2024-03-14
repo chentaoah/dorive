@@ -20,6 +20,7 @@ package com.gitee.dorive.core.impl.resolver;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.entity.def.BindingDef;
@@ -29,6 +30,7 @@ import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.binder.Processor;
+import com.gitee.dorive.core.entity.option.BindingType;
 import com.gitee.dorive.core.entity.option.JoinType;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.SpELProcessor;
@@ -82,6 +84,7 @@ public class BinderResolver {
         String fieldErrorMsg = "The field configured for @Binding does not exist within the entity! type: {}, field: {}";
 
         for (BindingDef bindingDef : bindingDefs) {
+            BindingType bindingType = determineBindingType(bindingDef);
             bindingDef = renewBindingDef(accessPath, bindingDef);
             String field = bindingDef.getField();
             String bindExp = bindingDef.getBindExp();
@@ -130,6 +133,22 @@ public class BinderResolver {
         }
     }
 
+    private BindingType determineBindingType(BindingDef bindingDef) {
+        String field = StrUtil.trim(bindingDef.getField());
+        String bindExp = StrUtil.trim(bindingDef.getBindExp());
+        String processExp = StrUtil.trim(bindingDef.getProcessExp());
+        if (ObjectUtil.isAllNotEmpty(field, bindExp)) {
+            return BindingType.STRONG;
+
+        } else if (ObjectUtil.isAllNotEmpty(field, processExp)) {
+            return BindingType.WEAK;
+
+        } else if (ObjectUtil.isAllNotEmpty(bindExp, processExp)) {
+            return BindingType.VIRTUAL;
+        }
+        throw new RuntimeException("Unknown binding type!");
+    }
+
     private BindingDef renewBindingDef(String accessPath, BindingDef bindingDef) {
         bindingDef = BeanUtil.copyProperties(bindingDef, BindingDef.class);
         String field = StrUtil.trim(bindingDef.getField());
@@ -137,8 +156,6 @@ public class BinderResolver {
         String processExp = StrUtil.trim(bindingDef.getProcessExp());
         String bindField = StrUtil.trim(bindingDef.getBindField());
         Class<?> processor = bindingDef.getProcessor();
-        Assert.notEmpty(field, "The field of @Binding cannot be empty!");
-        Assert.notEmpty(bindExp + processExp, "The expression of @Binding cannot be empty!");
 
         if (bindExp.startsWith(".")) {
             bindExp = PathUtils.getAbsolutePath(accessPath, bindExp);

@@ -15,25 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.annotation;
+package com.gitee.dorive.core.entity.option;
 
-import java.lang.annotation.*;
-
-@Inherited
-@Documented
-@Repeatable(Bindings.class)
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
-public @interface Binding {
-
-    String field() default "";
-
-    String bindExp() default "";
-
-    String processExp() default "";
-
-    String bindField() default "";
-
-    Class<?> processor() default Object.class;
-
+public enum BindingType {
+    STRONG,
+    WEAK,
+    VIRTUAL
 }
