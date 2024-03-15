@@ -22,7 +22,7 @@ import lombok.Data;
 @Data
 public class Operation {
 
-    public enum RootControl {NONE, INCLUDE_ROOT, IGNORE_ROOT,}
+    public enum RootControl {NONE, INCLUDE_ROOT, IGNORE_ROOT}
 
     private RootControl rootControl = RootControl.NONE;
     private Object entity;

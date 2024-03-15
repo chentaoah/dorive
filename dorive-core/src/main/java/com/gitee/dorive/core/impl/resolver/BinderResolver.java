@@ -20,6 +20,7 @@ package com.gitee.dorive.core.impl.resolver;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.entity.def.BindingDef;
@@ -29,6 +30,7 @@ import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.api.impl.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.binder.Processor;
+import com.gitee.dorive.core.entity.option.BindingType;
 import com.gitee.dorive.core.entity.option.JoinType;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.SpELProcessor;
@@ -82,10 +84,10 @@ public class BinderResolver {
         String fieldErrorMsg = "The field configured for @Binding does not exist within the entity! type: {}, field: {}";
 
         for (BindingDef bindingDef : bindingDefs) {
+            BindingType bindingType = determineBindingType(bindingDef);
             bindingDef = renewBindingDef(accessPath, bindingDef);
-            String field = bindingDef.getField();
-            String bindExp = bindingDef.getBindExp();
 
+            String field = bindingDef.getField();
             String alias = entityEle.toAlias(field);
 
             PropChain fieldPropChain = propChainMap.get("/" + field);
@@ -94,7 +96,7 @@ public class BinderResolver {
 
             Processor processor = newProcessor(bindingDef);
 
-            if (StringUtils.isNotBlank(bindExp)) {
+            if (bindingType == BindingType.STRONG) {
                 StrongBinder strongBinder = newStrongBinder(bindingDef, alias, fieldPropChain, processor);
                 allBinders.add(strongBinder);
                 strongBinders.add(strongBinder);
@@ -109,10 +111,9 @@ public class BinderResolver {
                     }
                     boundIdBinder = strongBinder;
                 }
-
                 selfFields.add(field);
 
-            } else {
+            } else if (bindingType == BindingType.WEAK) {
                 WeakBinder weakBinder = new WeakBinder(bindingDef, alias, fieldPropChain, processor);
                 allBinders.add(weakBinder);
                 weakBinders.add(weakBinder);
@@ -130,6 +131,19 @@ public class BinderResolver {
         }
     }
 
+    private BindingType determineBindingType(BindingDef bindingDef) {
+        String field = StrUtil.trim(bindingDef.getField());
+        String bindExp = StrUtil.trim(bindingDef.getBindExp());
+        String processExp = StrUtil.trim(bindingDef.getProcessExp());
+        if (ObjectUtil.isAllNotEmpty(field, bindExp)) {
+            return BindingType.STRONG;
+
+        } else if (ObjectUtil.isAllNotEmpty(field, processExp)) {
+            return BindingType.WEAK;
+        }
+        throw new RuntimeException("Unknown binding type!");
+    }
+
     private BindingDef renewBindingDef(String accessPath, BindingDef bindingDef) {
         bindingDef = BeanUtil.copyProperties(bindingDef, BindingDef.class);
         String field = StrUtil.trim(bindingDef.getField());
@@ -137,8 +151,6 @@ public class BinderResolver {
         String processExp = StrUtil.trim(bindingDef.getProcessExp());
         String bindField = StrUtil.trim(bindingDef.getBindField());
         Class<?> processor = bindingDef.getProcessor();
-        Assert.notEmpty(field, "The field of @Binding cannot be empty!");
-        Assert.notEmpty(bindExp + processExp, "The expression of @Binding cannot be empty!");
 
         if (bindExp.startsWith(".")) {
             bindExp = PathUtils.getAbsolutePath(accessPath, bindExp);
