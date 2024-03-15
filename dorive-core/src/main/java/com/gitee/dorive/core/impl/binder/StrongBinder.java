@@ -21,59 +21,40 @@ import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class StrongBinder extends AbstractBinder {
+public class StrongBinder extends FieldBinder {
 
-    private String belongAccessPath;
-    private CommonRepository belongRepository;
-    private PropChain boundPropChain;
-    private String bindAlias;
+    private BoundBinder boundBinder;
 
-    public StrongBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor,
-                        String belongAccessPath, CommonRepository belongRepository, PropChain boundPropChain, String bindAlias) {
-        super(bindingDef, alias, fieldPropChain, processor);
-        this.belongAccessPath = belongAccessPath;
-        this.belongRepository = belongRepository;
-        this.boundPropChain = boundPropChain;
-        this.bindAlias = bindAlias;
+    public StrongBinder(BindingDef bindingDef, Processor processor, PropChain fieldPropChain, String alias) {
+        super(bindingDef, processor, fieldPropChain, alias);
     }
 
     @Override
     public String getBoundName() {
-        return boundPropChain.getEntityField().getName();
+        return boundBinder.getBoundName();
     }
 
     @Override
     public Object getBoundValue(Context context, Object rootEntity) {
-        return boundPropChain.getValue(rootEntity);
+        return boundBinder.getBoundValue(context, rootEntity);
     }
 
     @Override
     public void setBoundValue(Context context, Object rootEntity, Object property) {
-        boundPropChain.setValue(rootEntity, property);
-    }
-
-    @Override
-    public Object input(Context context, Object value) {
-        return value == null || processor == null ? value : processor.input(context, value);
-    }
-
-    @Override
-    public Object output(Context context, Object value) {
-        return value == null || processor == null ? value : processor.output(context, value);
+        boundBinder.setBoundValue(context, rootEntity, property);
     }
 
     public boolean isSameType() {
-        return getFieldPropChain().isSameType(boundPropChain);
+        return getFieldPropChain().isSameType(boundBinder.getBoundPropChain());
     }
 
     public boolean isCollection() {
-        return boundPropChain.getEntityField().isCollection();
+        return boundBinder.getBoundPropChain().getEntityField().isCollection();
     }
 
 }

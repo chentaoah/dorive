@@ -26,7 +26,9 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Binding {
 
-    String field();
+    String field() default "";
+
+    String value() default "";
 
     String bindExp() default "";
 

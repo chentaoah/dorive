@@ -22,25 +22,10 @@ import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
 
-public class WeakBinder extends AbstractBinder {
+public class WeakBinder extends FieldBinder {
 
-    public WeakBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor) {
-        super(bindingDef, alias, fieldPropChain, processor);
-    }
-
-    @Override
-    public String getBoundName() {
-        return null;
-    }
-
-    @Override
-    public Object getBoundValue(Context context, Object rootEntity) {
-        return null;
-    }
-
-    @Override
-    public void setBoundValue(Context context, Object rootEntity, Object property) {
-        // ignore
+    public WeakBinder(BindingDef bindingDef, Processor processor, PropChain fieldPropChain, String alias) {
+        super(bindingDef, processor, fieldPropChain, alias);
     }
 
     @Override

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.binder;
+package com.gitee.dorive.core.impl.processor;
 
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.core.api.binder.Processor;

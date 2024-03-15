@@ -19,5 +19,6 @@ package com.gitee.dorive.core.entity.option;
 
 public enum BindingType {
     STRONG,
-    WEAK
+    WEAK,
+    VALUE
 }

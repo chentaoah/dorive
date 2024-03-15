@@ -19,6 +19,7 @@ package com.gitee.dorive.sql.entity.segment;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 @AllArgsConstructor
@@ -31,7 +32,11 @@ public class OnSegment {
 
     @Override
     public String toString() {
-        return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
+        if (StringUtils.isNotBlank(tableAlias)) {
+            return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
+        } else {
+            return column + " = " + joinTableAlias + "." + joinColumn;
+        }
     }
 
 }

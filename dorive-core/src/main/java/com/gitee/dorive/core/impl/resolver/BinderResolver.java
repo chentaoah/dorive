@@ -32,9 +32,11 @@ import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.entity.option.BindingType;
 import com.gitee.dorive.core.entity.option.JoinType;
+import com.gitee.dorive.core.impl.binder.BoundBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.binder.SpELProcessor;
+import com.gitee.dorive.core.impl.binder.ValueBinder;
 import com.gitee.dorive.core.impl.binder.WeakBinder;
+import com.gitee.dorive.core.impl.processor.SpELProcessor;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.PathUtils;
@@ -56,11 +58,13 @@ public class BinderResolver {
 
     private List<Binder> allBinders;
     private List<StrongBinder> strongBinders;
+    // 决定了关联查询具体使用哪种实现
     private Map<String, List<StrongBinder>> mergedBindersMap;
     private StrongBinder boundIdBinder;
     private List<String> selfFields;
     private JoinType joinType;
     private List<WeakBinder> weakBinders;
+    private List<ValueBinder> valueBinders;
 
     public BinderResolver(AbstractContextRepository<?, ?> repository, EntityEle entityEle) {
         this.repository = repository;
@@ -81,11 +85,21 @@ public class BinderResolver {
         this.selfFields = new ArrayList<>(bindingDefs.size());
         this.joinType = JoinType.UNION;
         this.weakBinders = new ArrayList<>(bindingDefs.size());
+        this.valueBinders = new ArrayList<>(bindingDefs.size());
         String fieldErrorMsg = "The field configured for @Binding does not exist within the entity! type: {}, field: {}";
 
         for (BindingDef bindingDef : bindingDefs) {
             BindingType bindingType = determineBindingType(bindingDef);
             bindingDef = renewBindingDef(accessPath, bindingDef);
+            Processor processor = newProcessor(bindingDef);
+
+            if (bindingType == BindingType.VALUE) {
+                ValueBinder valueBinder = new ValueBinder(bindingDef, processor);
+                initBoundBinder(bindingDef, valueBinder);
+                allBinders.add(valueBinder);
+                valueBinders.add(valueBinder);
+                continue;
+            }
 
             String field = bindingDef.getField();
             String alias = entityEle.toAlias(field);
@@ -94,14 +108,14 @@ public class BinderResolver {
             Assert.notNull(fieldPropChain, fieldErrorMsg, genericType.getName(), field);
             fieldPropChain.newPropProxy();
 
-            Processor processor = newProcessor(bindingDef);
-
             if (bindingType == BindingType.STRONG) {
-                StrongBinder strongBinder = newStrongBinder(bindingDef, alias, fieldPropChain, processor);
+                StrongBinder strongBinder = new StrongBinder(bindingDef, processor, fieldPropChain, alias);
+                BoundBinder boundBinder = new BoundBinder(bindingDef, processor);
+                initBoundBinder(bindingDef, boundBinder);
                 allBinders.add(strongBinder);
                 strongBinders.add(strongBinder);
 
-                String belongAccessPath = strongBinder.getBelongAccessPath();
+                String belongAccessPath = boundBinder.getBelongAccessPath();
                 List<StrongBinder> strongBinders = mergedBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
                 strongBinders.add(strongBinder);
 
@@ -114,7 +128,7 @@ public class BinderResolver {
                 selfFields.add(field);
 
             } else if (bindingType == BindingType.WEAK) {
-                WeakBinder weakBinder = new WeakBinder(bindingDef, alias, fieldPropChain, processor);
+                WeakBinder weakBinder = new WeakBinder(bindingDef, processor, fieldPropChain, alias);
                 allBinders.add(weakBinder);
                 weakBinders.add(weakBinder);
             }
@@ -133,6 +147,7 @@ public class BinderResolver {
 
     private BindingType determineBindingType(BindingDef bindingDef) {
         String field = StrUtil.trim(bindingDef.getField());
+        String value = StrUtil.trim(bindingDef.getValue());
         String bindExp = StrUtil.trim(bindingDef.getBindExp());
         String processExp = StrUtil.trim(bindingDef.getProcessExp());
         if (ObjectUtil.isAllNotEmpty(field, bindExp)) {
@@ -140,6 +155,9 @@ public class BinderResolver {
 
         } else if (ObjectUtil.isAllNotEmpty(field, processExp)) {
             return BindingType.WEAK;
+
+        } else if (ObjectUtil.isAllNotEmpty(value, bindExp)) {
+            return BindingType.VALUE;
         }
         throw new RuntimeException("Unknown binding type!");
     }
@@ -193,7 +211,7 @@ public class BinderResolver {
         }
     }
 
-    private StrongBinder newStrongBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor) {
+    private void initBoundBinder(BindingDef bindingDef, BoundBinder boundBinder) {
         String bindExp = bindingDef.getBindExp();
         String bindField = bindingDef.getBindField();
 
@@ -212,8 +230,10 @@ public class BinderResolver {
         EntityEle entityEle = belongRepository.getEntityEle();
         String bindAlias = entityEle.toAlias(bindField);
 
-        return new StrongBinder(bindingDef, alias, fieldPropChain, processor,
-                belongAccessPath, belongRepository, boundPropChain, bindAlias);
+        boundBinder.setBelongAccessPath(belongAccessPath);
+        boundBinder.setBelongRepository(belongRepository);
+        boundBinder.setBoundPropChain(boundPropChain);
+        boundBinder.setBindAlias(bindAlias);
     }
 
 }

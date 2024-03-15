@@ -27,12 +27,12 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public abstract class AbstractBinder implements Binder, Processor {
+public class FieldBinder implements Binder {
 
     protected BindingDef bindingDef;
-    protected String alias;
-    protected PropChain fieldPropChain;
     protected Processor processor;
+    protected PropChain fieldPropChain;
+    protected String alias;
 
     @Override
     public String getFieldName() {
@@ -47,6 +47,31 @@ public abstract class AbstractBinder implements Binder, Processor {
     @Override
     public void setFieldValue(Context context, Object entity, Object property) {
         fieldPropChain.setValue(entity, property);
+    }
+
+    @Override
+    public String getBoundName() {
+        return null;
+    }
+
+    @Override
+    public Object getBoundValue(Context context, Object rootEntity) {
+        return null;
+    }
+
+    @Override
+    public void setBoundValue(Context context, Object rootEntity, Object property) {
+        // ignore
+    }
+
+    @Override
+    public Object input(Context context, Object value) {
+        return value == null || processor == null ? value : processor.input(context, value);
+    }
+
+    @Override
+    public Object output(Context context, Object value) {
+        return value == null || processor == null ? value : processor.output(context, value);
     }
 
 }

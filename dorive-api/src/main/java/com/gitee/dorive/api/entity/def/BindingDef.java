@@ -37,6 +37,7 @@ import java.util.Set;
 public class BindingDef {
 
     private String field;
+    private String value;
     private String bindExp;
     private String processExp;
     private String bindField;

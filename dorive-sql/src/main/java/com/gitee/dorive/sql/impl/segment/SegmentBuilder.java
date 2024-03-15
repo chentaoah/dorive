@@ -25,7 +25,9 @@ import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
+import com.gitee.dorive.core.impl.binder.BoundBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
+import com.gitee.dorive.core.impl.binder.ValueBinder;
 import com.gitee.dorive.core.impl.executor.ExampleExecutor;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
@@ -92,7 +94,7 @@ public class SegmentBuilder {
                 selectSegment.setTableSegment(tableSegment);
 
             } else {
-                List<OnSegment> onSegments = newOnSegments(nodeMap, mergedRepository, node);
+                List<OnSegment> onSegments = newOnSegments(context, nodeMap, mergedRepository, node);
                 if (onSegments.isEmpty()) {
                     nodeMap.remove(relativeAccessPath);
                     continue;
@@ -109,16 +111,18 @@ public class SegmentBuilder {
         return selectSegment;
     }
 
-    private List<OnSegment> newOnSegments(Map<String, Node> nodeMap, MergedRepository mergedRepository, Node node) {
+    private List<OnSegment> newOnSegments(Context context, Map<String, Node> nodeMap, MergedRepository mergedRepository, Node node) {
         String lastAccessPath = mergedRepository.getLastAccessPath();
         CommonRepository definedRepository = mergedRepository.getDefinedRepository();
         BinderResolver binderResolver = definedRepository.getBinderResolver();
         List<StrongBinder> strongBinders = binderResolver.getStrongBinders();
+        List<ValueBinder> valueBinders = binderResolver.getValueBinders();
         TableSegment tableSegment = node.getTableSegment();
 
         List<OnSegment> onSegments = new ArrayList<>(strongBinders.size());
         for (StrongBinder strongBinder : strongBinders) {
-            String relativeAccessPath = lastAccessPath + strongBinder.getBelongAccessPath();
+            BoundBinder boundBinder = strongBinder.getBoundBinder();
+            String relativeAccessPath = lastAccessPath + boundBinder.getBelongAccessPath();
             Node targetNode = nodeMap.get(relativeAccessPath);
             if (targetNode != null) {
                 TableSegment targetTableSegment = targetNode.getTableSegment();
@@ -126,8 +130,24 @@ public class SegmentBuilder {
                 if (!children.contains(node)) {
                     children.add(node);
                 }
-                OnSegment onSegment = new OnSegment(tableSegment.getTableAlias(), strongBinder.getAlias(),
-                        targetTableSegment.getTableAlias(), strongBinder.getBindAlias());
+                OnSegment onSegment = new OnSegment(
+                        tableSegment.getTableAlias(), strongBinder.getAlias(),
+                        targetTableSegment.getTableAlias(), boundBinder.getBindAlias());
+                onSegments.add(onSegment);
+            }
+        }
+        for (ValueBinder valueBinder : valueBinders) {
+            String relativeAccessPath = lastAccessPath + valueBinder.getBelongAccessPath();
+            Node targetNode = nodeMap.get(relativeAccessPath);
+            if (targetNode != null) {
+                TableSegment targetTableSegment = targetNode.getTableSegment();
+                List<Node> children = targetNode.getChildren();
+                if (!children.contains(node)) {
+                    children.add(node);
+                }
+                OnSegment onSegment = new OnSegment(
+                        "", String.valueOf(valueBinder.getFieldValue(context, null)),
+                        targetTableSegment.getTableAlias(), valueBinder.getBindAlias());
                 onSegments.add(onSegment);
             }
         }
