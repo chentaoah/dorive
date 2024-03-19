@@ -82,7 +82,7 @@ public class BatchEntityHandler implements EntityHandler {
                 Object fieldValue = valueBinder.getFieldValue(context, null);
                 Object boundValue = valueBinder.getBoundValue(context, entity);
                 boundValue = valueBinder.input(context, boundValue);
-                if (boundValue == null || !fieldValue.equals(boundValue.toString())) {
+                if (!fieldValue.equals(boundValue)) {
                     isValueEqual = false;
                     break;
                 }

@@ -32,10 +32,10 @@ public class BoundBinder implements Binder {
 
     protected BindingDef bindingDef;
     protected Processor processor;
-    private String belongAccessPath;
-    private CommonRepository belongRepository;
-    private PropChain boundPropChain;
-    private String bindAlias;
+    protected String belongAccessPath;
+    protected CommonRepository belongRepository;
+    protected PropChain boundPropChain;
+    protected String bindAlias;
 
     public BoundBinder(BindingDef bindingDef, Processor processor) {
         this.bindingDef = bindingDef;

@@ -17,7 +17,9 @@
 
 package com.gitee.dorive.core.impl.binder;
 
+import cn.hutool.core.convert.Convert;
 import com.gitee.dorive.api.entity.def.BindingDef;
+import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
 import lombok.Getter;
@@ -27,13 +29,22 @@ import lombok.Setter;
 @Setter
 public class ValueBinder extends BoundBinder {
 
+    private Object value;
+
     public ValueBinder(BindingDef bindingDef, Processor processor) {
         super(bindingDef, processor);
     }
 
     @Override
+    public void setBoundPropChain(PropChain boundPropChain) {
+        super.setBoundPropChain(boundPropChain);
+        Class<?> genericType = boundPropChain.getEntityField().getGenericType();
+        this.value = Convert.convert(genericType, bindingDef.getValue());
+    }
+
+    @Override
     public Object getFieldValue(Context context, Object entity) {
-        return bindingDef.getValue();
+        return value;
     }
 
 }
