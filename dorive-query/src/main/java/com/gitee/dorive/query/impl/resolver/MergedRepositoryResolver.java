@@ -18,15 +18,14 @@
 package com.gitee.dorive.query.impl.resolver;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.impl.binder.BoundBinder;
-import com.gitee.dorive.core.impl.binder.ValueBinder;
-import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
+import com.gitee.dorive.core.impl.binder.ValueBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.query.entity.MergedRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -79,7 +78,8 @@ public class MergedRepositoryResolver {
                     relativeAccessPath,
                     abstractContextRepository != null,
                     repository,
-                    getMergedBindersMap(lastAccessPath, repository),
+                    getRelativeValueBindersMap(lastAccessPath, repository),
+                    getRelativeStrongBindersMap(lastAccessPath, repository),
                     executedRepository,
                     mergedRepositoryMap.size() + 1);
             addMergedRepository(mergedRepository);
@@ -92,23 +92,29 @@ public class MergedRepositoryResolver {
         }
     }
 
-    private Map<String, List<Binder>> getMergedBindersMap(String lastAccessPath, CommonRepository repository) {
+    private Map<String, List<ValueBinder>> getRelativeValueBindersMap(String lastAccessPath, CommonRepository repository) {
+        BinderResolver binderResolver = repository.getBinderResolver();
+        List<ValueBinder> valueBinders = binderResolver.getValueBinders();
+        Map<String, List<ValueBinder>> relativeValueBindersMap = new LinkedHashMap<>();
+        for (ValueBinder valueBinder : valueBinders) {
+            String relativeAccessPath = lastAccessPath + valueBinder.getBelongAccessPath();
+            List<ValueBinder> existBinders = relativeValueBindersMap.computeIfAbsent(relativeAccessPath, key -> new ArrayList<>(4));
+            existBinders.add(valueBinder);
+        }
+        return relativeValueBindersMap;
+    }
+
+    private Map<String, List<StrongBinder>> getRelativeStrongBindersMap(String lastAccessPath, CommonRepository repository) {
         BinderResolver binderResolver = repository.getBinderResolver();
         List<StrongBinder> strongBinders = binderResolver.getStrongBinders();
-        List<ValueBinder> valueBinders = binderResolver.getValueBinders();
-        Map<String, List<Binder>> mergedBindersMap = new LinkedHashMap<>();
+        Map<String, List<StrongBinder>> relativeStrongBindersMap = new LinkedHashMap<>();
         for (StrongBinder strongBinder : strongBinders) {
             BoundBinder boundBinder = strongBinder.getBoundBinder();
             String relativeAccessPath = lastAccessPath + boundBinder.getBelongAccessPath();
-            List<Binder> existStrongBinders = mergedBindersMap.computeIfAbsent(relativeAccessPath, key -> new ArrayList<>(4));
-            existStrongBinders.add(strongBinder);
+            List<StrongBinder> existBinders = relativeStrongBindersMap.computeIfAbsent(relativeAccessPath, key -> new ArrayList<>(4));
+            existBinders.add(strongBinder);
         }
-        for (ValueBinder valueBinder : valueBinders) {
-            String relativeAccessPath = lastAccessPath + valueBinder.getBelongAccessPath();
-            List<Binder> existStrongBinders = mergedBindersMap.computeIfAbsent(relativeAccessPath, key -> new ArrayList<>(4));
-            existStrongBinders.add(valueBinder);
-        }
-        return mergedBindersMap;
+        return relativeStrongBindersMap;
     }
 
     private void addMergedRepository(MergedRepository mergedRepository) {

@@ -17,13 +17,12 @@
 
 package com.gitee.dorive.query.impl.executor;
 
-import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.impl.binder.BoundBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
+import com.gitee.dorive.core.impl.binder.ValueBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.MultiInBuilder;
@@ -40,6 +39,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class StepwiseQueryExecutor extends AbstractQueryExecutor {
@@ -84,19 +84,17 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
             boolean abandoned = exampleWrapper.isAbandoned();
 
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
-            Map<String, List<Binder>> mergedBindersMap = mergedRepository.getMergedBindersMap();
+            Map<String, List<ValueBinder>> relativeValueBindersMap = mergedRepository.getRelativeValueBindersMap();
+            Map<String, List<StrongBinder>> relativeStrongBindersMap = mergedRepository.getRelativeStrongBindersMap();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 
-            for (String relativeAccessPath : mergedBindersMap.keySet()) {
-                ExampleWrapper targetExampleWrapper = exampleWrapperMap.get(relativeAccessPath);
-                if (targetExampleWrapper != null) {
-                    if (targetExampleWrapper.isAbandoned()) {
-                        abandoned = true;
-                        break;
-                    }
-                }
+            if (!abandoned) {
+                abandoned = determineAbandon(exampleWrapperMap, relativeValueBindersMap.keySet());
+            }
+            if (!abandoned) {
+                abandoned = determineAbandon(exampleWrapperMap, relativeStrongBindersMap.keySet());
             }
 
             List<Object> entities;
@@ -111,9 +109,21 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
                 return;
             }
 
-            for (Map.Entry<String, List<Binder>> entry : mergedBindersMap.entrySet()) {
-                String relativeAccessPath = entry.getKey();
-                List<Binder> binders = entry.getValue();
+            relativeValueBindersMap.forEach((relativeAccessPath, valueBinders) -> {
+                ExampleWrapper targetExampleWrapper = exampleWrapperMap.get(relativeAccessPath);
+                if (targetExampleWrapper != null) {
+                    Example targetExample = targetExampleWrapper.getExample();
+                    for (ValueBinder valueBinder : valueBinders) {
+                        Object fieldValue = valueBinder.getFieldValue(context, null);
+                        if (fieldValue != null) {
+                            String boundName = valueBinder.getBoundName();
+                            targetExample.eq(boundName, fieldValue);
+                        }
+                    }
+                }
+            });
+
+            relativeStrongBindersMap.forEach((relativeAccessPath, strongBinders) -> {
                 ExampleWrapper targetExampleWrapper = exampleWrapperMap.get(relativeAccessPath);
                 if (targetExampleWrapper != null) {
                     if (entities.isEmpty()) {
@@ -121,11 +131,11 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
                         return;
                     }
                     Example targetExample = targetExampleWrapper.getExample();
-                    if (binders.size() == 1) {
-                        Binder binder = binders.get(0);
-                        List<Object> fieldValues = collectFieldValues(context, entities, binder);
+                    if (strongBinders.size() == 1) {
+                        StrongBinder strongBinder = strongBinders.get(0);
+                        List<Object> fieldValues = collectFieldValues(context, entities, strongBinder);
                         if (!fieldValues.isEmpty()) {
-                            String boundName = binder.getBoundName();
+                            String boundName = strongBinder.getBoundName();
                             if (fieldValues.size() == 1) {
                                 targetExample.eq(boundName, fieldValues.get(0));
                             } else {
@@ -136,18 +146,11 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
                         }
 
                     } else {
-                        List<String> aliases = binders.stream().map(binder -> {
-                            if (binder instanceof BoundBinder) {
-                                return ((BoundBinder) binder).getBindAlias();
-
-                            } else if (binder instanceof StrongBinder) {
-                                BoundBinder boundBinder = ((StrongBinder) binder).getBoundBinder();
-                                return boundBinder.getBindAlias();
-                            }
-                            return null;
-                        }).collect(Collectors.toList());
+                        List<String> aliases = strongBinders.stream()
+                                .map(binder -> binder.getBoundBinder().getBindAlias())
+                                .collect(Collectors.toList());
                         MultiInBuilder builder = new MultiInBuilder(aliases, entities.size());
-                        collectFieldValues(context, entities, binders, builder);
+                        collectFieldValues(context, entities, strongBinders, builder);
                         if (!builder.isEmpty()) {
                             targetExample.getCriteria().add(builder.toCriterion());
                         } else {
@@ -155,28 +158,40 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
                         }
                     }
                 }
-            }
+            });
         });
     }
 
-    private List<Object> collectFieldValues(Context context, List<Object> entities, Binder binder) {
+    private boolean determineAbandon(Map<String, ExampleWrapper> exampleWrapperMap, Set<String> relativeAccessPaths) {
+        for (String relativeAccessPath : relativeAccessPaths) {
+            ExampleWrapper targetExampleWrapper = exampleWrapperMap.get(relativeAccessPath);
+            if (targetExampleWrapper != null) {
+                if (targetExampleWrapper.isAbandoned()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private List<Object> collectFieldValues(Context context, List<Object> entities, StrongBinder strongBinder) {
         List<Object> fieldValues = new ArrayList<>(entities.size());
         for (Object entity : entities) {
-            Object fieldValue = binder.getFieldValue(context, entity);
+            Object fieldValue = strongBinder.getFieldValue(context, entity);
             if (fieldValue != null) {
-                fieldValue = binder.output(context, fieldValue);
+                fieldValue = strongBinder.output(context, fieldValue);
                 fieldValues.add(fieldValue);
             }
         }
         return fieldValues;
     }
 
-    private void collectFieldValues(Context context, List<Object> entities, List<Binder> binders, MultiInBuilder builder) {
+    private void collectFieldValues(Context context, List<Object> entities, List<StrongBinder> strongBinders, MultiInBuilder builder) {
         for (Object entity : entities) {
-            for (Binder binder : binders) {
-                Object fieldValue = binder.getFieldValue(context, entity);
+            for (StrongBinder strongBinder : strongBinders) {
+                Object fieldValue = strongBinder.getFieldValue(context, entity);
                 if (fieldValue != null) {
-                    fieldValue = binder.output(context, fieldValue);
+                    fieldValue = strongBinder.output(context, fieldValue);
                     builder.append(fieldValue);
                 } else {
                     builder.clearRemainder();
