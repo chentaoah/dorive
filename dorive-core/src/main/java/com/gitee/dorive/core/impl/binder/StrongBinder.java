@@ -32,6 +32,7 @@ public class StrongBinder extends FieldBinder {
 
     public StrongBinder(BindingDef bindingDef, Processor processor, PropChain fieldPropChain, String alias) {
         super(bindingDef, processor, fieldPropChain, alias);
+        this.boundBinder = new BoundBinder(bindingDef, processor);
     }
 
     @Override

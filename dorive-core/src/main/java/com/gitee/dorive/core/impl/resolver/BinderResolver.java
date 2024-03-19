@@ -57,6 +57,7 @@ public class BinderResolver {
     private PropChainResolver propChainResolver;
 
     private List<Binder> allBinders;
+    private List<ValueBinder> valueBinders;
     private List<StrongBinder> strongBinders;
     // 决定了关联查询具体使用哪种实现
     private Map<String, List<StrongBinder>> mergedBindersMap;
@@ -64,7 +65,6 @@ public class BinderResolver {
     private List<String> selfFields;
     private JoinType joinType;
     private List<WeakBinder> weakBinders;
-    private List<ValueBinder> valueBinders;
 
     public BinderResolver(AbstractContextRepository<?, ?> repository, EntityEle entityEle) {
         this.repository = repository;
@@ -79,13 +79,13 @@ public class BinderResolver {
         List<BindingDef> bindingDefs = entityEle.getBindingDefs();
 
         this.allBinders = new ArrayList<>(bindingDefs.size());
+        this.valueBinders = new ArrayList<>(bindingDefs.size());
         this.strongBinders = new ArrayList<>(bindingDefs.size());
         this.mergedBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
         this.boundIdBinder = null;
         this.selfFields = new ArrayList<>(bindingDefs.size());
         this.joinType = JoinType.UNION;
         this.weakBinders = new ArrayList<>(bindingDefs.size());
-        this.valueBinders = new ArrayList<>(bindingDefs.size());
         String fieldErrorMsg = "The field configured for @Binding does not exist within the entity! type: {}, field: {}";
 
         for (BindingDef bindingDef : bindingDefs) {
@@ -110,7 +110,7 @@ public class BinderResolver {
 
             if (bindingType == BindingType.STRONG) {
                 StrongBinder strongBinder = new StrongBinder(bindingDef, processor, fieldPropChain, alias);
-                BoundBinder boundBinder = new BoundBinder(bindingDef, processor);
+                BoundBinder boundBinder = strongBinder.getBoundBinder();
                 initBoundBinder(bindingDef, boundBinder);
                 allBinders.add(strongBinder);
                 strongBinders.add(strongBinder);

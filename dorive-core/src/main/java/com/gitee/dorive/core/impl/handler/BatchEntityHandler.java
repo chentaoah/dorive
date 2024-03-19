@@ -77,17 +77,17 @@ public class BatchEntityHandler implements EntityHandler {
         }
         List<Object> newEntities = new ArrayList<>(entities.size());
         for (Object entity : entities) {
-            boolean flag = true;
+            boolean isValueEqual = true;
             for (ValueBinder valueBinder : valueBinders) {
                 Object fieldValue = valueBinder.getFieldValue(context, null);
                 Object boundValue = valueBinder.getBoundValue(context, entity);
                 boundValue = valueBinder.input(context, boundValue);
                 if (boundValue == null || !fieldValue.equals(boundValue.toString())) {
-                    flag = false;
+                    isValueEqual = false;
                     break;
                 }
             }
-            if (flag) {
+            if (isValueEqual) {
                 newEntities.add(entity);
             }
         }
