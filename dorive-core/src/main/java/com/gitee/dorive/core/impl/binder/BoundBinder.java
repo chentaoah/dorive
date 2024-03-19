@@ -25,6 +25,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 @AllArgsConstructor
@@ -59,6 +60,10 @@ public class BoundBinder implements Binder {
 
     @Override
     public String getBoundName() {
+        String bindField = bindingDef.getBindField();
+        if (StringUtils.isNotBlank(bindField)) {
+            return bindField;
+        }
         return boundPropChain.getEntityField().getName();
     }
 
