@@ -50,6 +50,9 @@ public class BatchEntityHandler implements EntityHandler {
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (repository.matches(context)) {
                 entities = filterByValueBinders(context, entities, repository);
+                if (entities.isEmpty()) {
+                    continue;
+                }
                 EntityJoiner entityJoiner = newEntityJoiner(repository, entities.size());
                 if (entityJoiner == null) {
                     continue;
