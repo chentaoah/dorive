@@ -115,11 +115,26 @@ public class SegmentBuilder {
         String lastAccessPath = mergedRepository.getLastAccessPath();
         CommonRepository definedRepository = mergedRepository.getDefinedRepository();
         BinderResolver binderResolver = definedRepository.getBinderResolver();
-        List<StrongBinder> strongBinders = binderResolver.getStrongBinders();
         List<ValueBinder> valueBinders = binderResolver.getValueBinders();
+        List<StrongBinder> strongBinders = binderResolver.getStrongBinders();
         TableSegment tableSegment = node.getTableSegment();
 
         List<OnSegment> onSegments = new ArrayList<>(strongBinders.size());
+        for (ValueBinder valueBinder : valueBinders) {
+            String relativeAccessPath = lastAccessPath + valueBinder.getBelongAccessPath();
+            Node targetNode = nodeMap.get(relativeAccessPath);
+            if (targetNode != null) {
+                TableSegment targetTableSegment = targetNode.getTableSegment();
+                List<Node> children = targetNode.getChildren();
+                if (!children.contains(node)) {
+                    children.add(node);
+                }
+                OnSegment onSegment = new OnSegment(
+                        String.valueOf(valueBinder.getFieldValue(context, null)),
+                        targetTableSegment.getTableAlias(), valueBinder.getBindAlias());
+                onSegments.add(onSegment);
+            }
+        }
         for (StrongBinder strongBinder : strongBinders) {
             BoundBinder boundBinder = strongBinder.getBoundBinder();
             String relativeAccessPath = lastAccessPath + boundBinder.getBelongAccessPath();
@@ -133,21 +148,6 @@ public class SegmentBuilder {
                 OnSegment onSegment = new OnSegment(
                         tableSegment.getTableAlias(), strongBinder.getAlias(),
                         targetTableSegment.getTableAlias(), boundBinder.getBindAlias());
-                onSegments.add(onSegment);
-            }
-        }
-        for (ValueBinder valueBinder : valueBinders) {
-            String relativeAccessPath = lastAccessPath + valueBinder.getBelongAccessPath();
-            Node targetNode = nodeMap.get(relativeAccessPath);
-            if (targetNode != null) {
-                TableSegment targetTableSegment = targetNode.getTableSegment();
-                List<Node> children = targetNode.getChildren();
-                if (!children.contains(node)) {
-                    children.add(node);
-                }
-                OnSegment onSegment = new OnSegment(
-                        "", String.valueOf(valueBinder.getFieldValue(context, null)),
-                        targetTableSegment.getTableAlias(), valueBinder.getBindAlias());
                 onSegments.add(onSegment);
             }
         }

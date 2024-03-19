@@ -27,16 +27,29 @@ public class OnSegment {
 
     private String tableAlias;
     private String column;
+    private String literal;
     private String joinTableAlias;
     private String joinColumn;
 
+    public OnSegment(String tableAlias, String column, String joinTableAlias, String joinColumn) {
+        this.tableAlias = tableAlias;
+        this.column = column;
+        this.joinTableAlias = joinTableAlias;
+        this.joinColumn = joinColumn;
+    }
+
+    public OnSegment(String literal, String joinTableAlias, String joinColumn) {
+        this.literal = literal;
+        this.joinTableAlias = joinTableAlias;
+        this.joinColumn = joinColumn;
+    }
+
     @Override
     public String toString() {
-        if (StringUtils.isNotBlank(tableAlias)) {
-            return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
-        } else {
-            return column + " = " + joinTableAlias + "." + joinColumn;
+        if (StringUtils.isNotBlank(literal)) {
+            return literal + " = " + joinTableAlias + "." + joinColumn;
         }
+        return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
     }
 
 }
