@@ -49,15 +49,15 @@ public class BatchEntityHandler implements EntityHandler {
         long totalCount = 0L;
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (repository.matches(context)) {
-                entities = filterByValueBinders(context, entities, repository);
-                if (entities.isEmpty()) {
+                List<Object> newEntities = filterByValueBinders(context, entities, repository);
+                if (newEntities.isEmpty()) {
                     continue;
                 }
-                EntityJoiner entityJoiner = newEntityJoiner(repository, entities.size());
+                EntityJoiner entityJoiner = newEntityJoiner(repository, newEntities.size());
                 if (entityJoiner == null) {
                     continue;
                 }
-                Example example = entityJoiner.newExample(context, entities);
+                Example example = entityJoiner.newExample(context, newEntities);
                 if (example.isEmpty()) {
                     continue;
                 }
@@ -65,7 +65,7 @@ public class BatchEntityHandler implements EntityHandler {
                 Query query = operationFactory.buildQueryByExample(example);
                 query.includeRoot();
                 Result<Object> result = repository.executeQuery(context, query);
-                entityJoiner.join(context, entities, result);
+                entityJoiner.join(context, newEntities, result);
                 totalCount += result.getCount();
             }
         }
