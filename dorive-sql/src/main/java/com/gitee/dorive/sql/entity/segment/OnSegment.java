@@ -27,9 +27,9 @@ public class OnSegment {
 
     private String tableAlias;
     private String column;
-    private String literal;
     private String joinTableAlias;
     private String joinColumn;
+    private String literal;
 
     public OnSegment(String tableAlias, String column, String joinTableAlias, String joinColumn) {
         this.tableAlias = tableAlias;
@@ -38,16 +38,19 @@ public class OnSegment {
         this.joinColumn = joinColumn;
     }
 
-    public OnSegment(String literal, String joinTableAlias, String joinColumn) {
-        this.literal = literal;
+    public OnSegment(String joinTableAlias, String joinColumn, String literal) {
         this.joinTableAlias = joinTableAlias;
         this.joinColumn = joinColumn;
+        this.literal = literal;
     }
 
     @Override
     public String toString() {
-        if (StringUtils.isNotBlank(literal)) {
-            return literal + " = " + joinTableAlias + "." + joinColumn;
+        if (StringUtils.isNotBlank(tableAlias) && StringUtils.isNotBlank(column)) {
+            return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
+
+        } else if (StringUtils.isNotBlank(literal)) {
+            return joinTableAlias + "." + joinColumn + " = " + literal;
         }
         return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
     }

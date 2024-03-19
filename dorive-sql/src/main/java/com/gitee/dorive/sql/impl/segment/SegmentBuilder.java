@@ -130,8 +130,8 @@ public class SegmentBuilder {
                     children.add(node);
                 }
                 OnSegment onSegment = new OnSegment(
-                        CriterionUtils.sqlParam(valueBinder.getFieldValue(context, null)),
-                        targetTableSegment.getTableAlias(), valueBinder.getBindAlias());
+                        targetTableSegment.getTableAlias(), valueBinder.getBindAlias(),
+                        CriterionUtils.sqlParam(valueBinder.getFieldValue(context, null)));
                 onSegments.add(onSegment);
             }
         }
