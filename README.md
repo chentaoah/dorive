@@ -47,7 +47,7 @@
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.4.3.3</version>
+    <version>3.4.3.4</version>
 </dependency>
 ```
 
@@ -84,7 +84,7 @@ public class Tenant {
      * property 绑定对象内部属性
      */
     @Entity
-    @Binding(field = "deptId", bindExp = "./departments", property = "id")
+    @Binding(field = "deptId", bindExp = "./departments", processExp = "#val.![id]", bindField = "id")
     private List<User> users;
 }
 ```
