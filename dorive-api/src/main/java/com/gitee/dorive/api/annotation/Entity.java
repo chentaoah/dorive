@@ -56,7 +56,8 @@ public @interface Entity {
      * 1、假设实体为User，子类分别为User1、User2<br>
      * 2、新建UserFactory继承于DefaultEntityFactory<br>
      * 3、重写UserFactory的reconstitute方法<br>
-     * <pre>
+     * <pre>{@code
+     * @Override
      * public Object reconstitute(Context context, Object persistent) {
      *     User user = (User) super.reconstitute(context, persistent);
      *     if (user.getType() == 1) {
@@ -67,21 +68,21 @@ public @interface Entity {
      *     }
      *     return user;
      * }
-     * </pre>
-     * 4、修改User的@Entity注解
-     * <pre>
-     * <span>@Entity(......, factory = UserFactory.class)</span>
+     * }</pre>
+     * 4、修改User的@Entity注解<br>
+     * <pre>{@code
+     * @Entity(......, factory = UserFactory.class)
      * public class User {
      *     ......
      * }
-     * </pre>
+     * }</pre>
      * 5、在UserRepository中引入子类的仓储<br>
-     * <pre>
-     * public class UserRepository extends MybatisPlusRepository&lt;User, Integer&gt; {
+     * <pre>{@code
+     * public class UserRepository extends MybatisPlusRepository<User, Integer> {
      *     private final User1Repository user1Repository;
      *     private final User2Repository user2Repository;
      * }
-     * </pre>
+     * }</pre>
      */
     Class<?> factory() default Object.class;
 
