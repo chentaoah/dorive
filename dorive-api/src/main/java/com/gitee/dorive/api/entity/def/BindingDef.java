@@ -40,8 +40,8 @@ public class BindingDef {
     private String value;
     private String bindExp;
     private String processExp;
-    private String bindField;
     private Class<?> processor;
+    private String bindField;
 
     public static List<BindingDef> fromElement(AnnotatedElement element) {
         Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(element, Binding.class);

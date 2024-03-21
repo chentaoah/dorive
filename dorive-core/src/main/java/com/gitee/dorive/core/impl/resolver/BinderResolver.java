@@ -165,10 +165,11 @@ public class BinderResolver {
     private BindingDef renewBindingDef(String accessPath, BindingDef bindingDef) {
         bindingDef = BeanUtil.copyProperties(bindingDef, BindingDef.class);
         String field = StrUtil.trim(bindingDef.getField());
+        String value = StrUtil.trim(bindingDef.getValue());
         String bindExp = StrUtil.trim(bindingDef.getBindExp());
         String processExp = StrUtil.trim(bindingDef.getProcessExp());
-        String bindField = StrUtil.trim(bindingDef.getBindField());
         Class<?> processor = bindingDef.getProcessor();
+        String bindField = StrUtil.trim(bindingDef.getBindField());
 
         if (bindExp.startsWith(".")) {
             bindExp = PathUtils.getAbsolutePath(accessPath, bindExp);
@@ -184,10 +185,11 @@ public class BinderResolver {
         }
 
         bindingDef.setField(field);
+        bindingDef.setValue(value);
         bindingDef.setBindExp(bindExp);
         bindingDef.setProcessExp(processExp);
-        bindingDef.setBindField(bindField);
         bindingDef.setProcessor(processor);
+        bindingDef.setBindField(bindField);
         return bindingDef;
     }
 
