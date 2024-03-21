@@ -24,7 +24,7 @@
 
 ### 📊架构设计
 
-![avatar](https://gitee.com/digital-engine/dorive/raw/master/doc/img/framework.png)
+<img src="https://gitee.com/digital-engine/dorive/raw/master/doc/img/framework.png" alt="avatar" style="zoom: 50%;" />
 
 ###  🛠️模块说明
 
