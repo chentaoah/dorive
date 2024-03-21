@@ -67,9 +67,10 @@ import java.lang.annotation.*;
  *     private List<Role> roles;
  * }
  * }</pre>
- * </p>
  *
  * @author tao.chen
+ * @see Aggregate
+ * </p>
  */
 @Inherited
 @Documented
