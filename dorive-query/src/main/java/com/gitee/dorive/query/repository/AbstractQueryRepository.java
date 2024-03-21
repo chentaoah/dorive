@@ -20,6 +20,7 @@ package com.gitee.dorive.query.repository;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.annotation.Repository;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
@@ -37,6 +38,7 @@ import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
@@ -58,14 +60,26 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         super.afterPropertiesSet();
         Repository repository = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), Repository.class);
         this.queryScanDef = QueryScanDef.fromElement(this.getClass());
-        if (repository != null && this.queryScanDef != null) {
-            if (StringUtils.isBlank(this.queryScanDef.getRegex())) {
-                this.queryScanDef.setRegex("^" + getEntityClass().getSimpleName() + ".*");
-            }
+        if (repository != null && queryScanDef != null) {
+            renewQueryScanDef();
             this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
             this.queryTypeResolver = new QueryTypeResolver(this);
             this.simpleQueryExecutor = new SimpleQueryExecutor(this);
             this.stepwiseQueryExecutor = new StepwiseQueryExecutor(this);
+        }
+    }
+
+    private void renewQueryScanDef() {
+        String[] value = queryScanDef.getValue();
+        String regex = queryScanDef.getRegex();
+        Class<?>[] queries = queryScanDef.getQueries();
+        if (ArrayUtils.isEmpty(value) && ArrayUtils.isEmpty(queries)) {
+            String packageName = this.getClass().getPackage().getName();
+            String parentPackageName = packageName.substring(0, packageName.lastIndexOf("."));
+            queryScanDef.setValue(new String[]{parentPackageName + ".query"});
+        }
+        if (StringUtils.isBlank(regex)) {
+            queryScanDef.setRegex("^" + getEntityClass().getSimpleName() + ".*");
         }
     }
 
@@ -98,6 +112,10 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
         resolveQuery(queryContext, queryWrapper);
+        Matcher matcher = getRootRepository();
+        if (!matcher.matches(queryContext.getContext())) {
+            return queryContext.newEmptyResult();
+        }
         if (queryContext.isSimpleQuery()) {
             return simpleQueryExecutor.executeQuery(queryContext, queryWrapper);
         } else {

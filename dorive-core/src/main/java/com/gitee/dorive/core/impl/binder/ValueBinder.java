@@ -15,27 +15,35 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.processor;
+package com.gitee.dorive.core.impl.binder;
 
+import cn.hutool.core.convert.Convert;
 import com.gitee.dorive.api.entity.def.BindingDef;
+import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@NoArgsConstructor
-public class DefaultProcessor implements Processor {
+@Getter
+@Setter
+public class ValueBinder extends BoundBinder {
 
-    private BindingDef bindingDef;
+    private Object value;
 
-    @Override
-    public Object input(Context context, Object value) {
-        return value;
+    public ValueBinder(BindingDef bindingDef, Processor processor) {
+        super(bindingDef, processor);
     }
 
     @Override
-    public Object output(Context context, Object value) {
+    public void setBoundPropChain(PropChain boundPropChain) {
+        super.setBoundPropChain(boundPropChain);
+        Class<?> genericType = boundPropChain.getEntityField().getGenericType();
+        this.value = Convert.convert(genericType, bindingDef.getValue());
+    }
+
+    @Override
+    public Object getFieldValue(Context context, Object entity) {
         return value;
     }
 

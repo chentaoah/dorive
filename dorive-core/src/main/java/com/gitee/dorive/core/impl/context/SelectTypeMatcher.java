@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.core.impl.context;
 
-import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Matcher;
+import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.option.SelectType;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -41,19 +41,19 @@ public class SelectTypeMatcher implements Matcher {
 
     public SelectTypeMatcher(CommonRepository repository) {
         this.repository = repository;
-        this.matcherMap.put(SelectType.NONE, context -> false);
-        this.matcherMap.put(SelectType.ROOT, context -> repository.isRoot());
-        this.matcherMap.put(SelectType.ALL, context -> true);
+        this.matcherMap.put(SelectType.NONE, options -> false);
+        this.matcherMap.put(SelectType.ROOT, options -> repository.isRoot());
+        this.matcherMap.put(SelectType.ALL, options -> true);
         this.matcherMap.put(SelectType.SELECTOR, new SelectorMatcher());
     }
 
     @Override
-    public boolean matches(Context context) {
-        SelectType selectType = (SelectType) context.getOption(SelectType.class);
+    public boolean matches(Options options) {
+        SelectType selectType = (SelectType) options.getOption(SelectType.class);
         if (selectType != null) {
             Matcher matcher = matcherMap.get(selectType);
             if (matcher != null) {
-                return matcher.matches(context);
+                return matcher.matches(options);
             }
         }
         return false;
@@ -61,8 +61,8 @@ public class SelectTypeMatcher implements Matcher {
 
     private class SelectorMatcher implements Matcher {
         @Override
-        public boolean matches(Context context) {
-            Selector selector = (Selector) context.getOption(Selector.class);
+        public boolean matches(Options options) {
+            Selector selector = (Selector) options.getOption(Selector.class);
             if (selector != null) {
                 Set<String> names = selector.getNames();
                 String name = repository.getName();

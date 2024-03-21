@@ -15,22 +15,27 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.binder;
+package com.gitee.dorive.core.impl.binder;
 
+import com.gitee.dorive.api.entity.def.BindingDef;
+import com.gitee.dorive.api.entity.element.PropChain;
+import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
 
-public interface Binder extends Processor {
+public class WeakBinder extends FieldBinder {
 
-    String getFieldName();
+    public WeakBinder(BindingDef bindingDef, Processor processor, PropChain fieldPropChain, String alias) {
+        super(bindingDef, processor, fieldPropChain, alias);
+    }
 
-    Object getFieldValue(Context context, Object entity);
+    @Override
+    public Object input(Context context, Object value) {
+        return processor.input(context, value);
+    }
 
-    void setFieldValue(Context context, Object entity, Object property);
-
-    String getBoundName();
-
-    Object getBoundValue(Context context, Object rootEntity);
-
-    void setBoundValue(Context context, Object rootEntity, Object property);
+    @Override
+    public Object output(Context context, Object value) {
+        return processor.output(context, value);
+    }
 
 }

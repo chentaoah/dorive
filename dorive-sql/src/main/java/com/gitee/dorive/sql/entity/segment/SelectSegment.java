@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.entity;
+package com.gitee.dorive.sql.entity.segment;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlBuilder;

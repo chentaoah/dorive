@@ -15,27 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.entity;
+package com.gitee.dorive.core.entity.option;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-@Data
-@AllArgsConstructor
-public class ArgSegment {
-
-    private String tableAlias;
-    private String column;
-    private String operator;
-    private String expr;
-
-    @Override
-    public String toString() {
-        if (expr != null) {
-            return tableAlias + "." + column + " " + operator + " " + expr;
-        } else {
-            return tableAlias + "." + column + " " + operator;
-        }
-    }
-
+public enum BindingType {
+    STRONG,
+    WEAK,
+    VALUE
 }

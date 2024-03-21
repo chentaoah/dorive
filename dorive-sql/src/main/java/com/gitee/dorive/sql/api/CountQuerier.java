@@ -15,16 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.entity;
+package com.gitee.dorive.sql.api;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.sql.entity.common.CountQuery;
 
-import java.util.List;
+import java.util.Map;
 
-@Data
-@AllArgsConstructor
-public class JoinSegment {
-    private TableSegment tableSegment;
-    private List<OnSegment> onSegments;
+public interface CountQuerier {
+
+    Map<String, Long> selectCountMap(Context context, CountQuery countQuery);
+
 }

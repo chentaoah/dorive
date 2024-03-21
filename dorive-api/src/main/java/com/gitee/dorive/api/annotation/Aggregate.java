@@ -26,31 +26,81 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * 聚合注解<br>
+ * 作用：声明字段的类型为聚合<br>
+ *
+ * <p>
+ * 解释：聚合一般指多个实体组装后的集合<br>
+ * </p>
+ *
+ * <p>
+ * 使用说明：<br>
+ * 1、在使用上，聚合注解基本等效于实体注解<br>
+ * 2、在不指定仓储的情况下，框架会自动为实体匹配仓储<br>
+ * </p>
+ *
+ * <p>
+ * 例如：<br>
+ * <pre>{@code
+ * @Aggregate
+ * private List<User> users;
+ *
+ * 等效于：
+ *
+ * @Entity(repository = UserRepository.class)
+ * private List<User> users;
+ * }</pre>
+ * </p>
+ *
+ * @author tao.chen
+ */
 @Entity
 @Inherited
 @Documented
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Aggregate {
 
+    /**
+     * @see Entity
+     */
     @AliasFor(annotation = Entity.class)
     String name() default "";
 
+    /**
+     * @see Entity
+     */
     @AliasFor(annotation = Entity.class)
     Class<?> source() default Object.class;
 
+    /**
+     * @see Entity
+     */
     @AliasFor(annotation = Entity.class)
     Class<?> factory() default Object.class;
 
+    /**
+     * @see Entity
+     */
     @AliasFor(annotation = Entity.class)
     Class<?> repository() default Object.class;
 
+    /**
+     * @see Entity
+     */
     @AliasFor(annotation = Entity.class)
     int priority() default 0;
 
+    /**
+     * @see Entity
+     */
     @AliasFor(annotation = Entity.class)
     String sortBy() default "";
 
+    /**
+     * @see Entity
+     */
     @AliasFor(annotation = Entity.class)
     String order() default "";
 

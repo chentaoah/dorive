@@ -15,28 +15,33 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.processor;
+package com.gitee.dorive.sql.entity.common;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Selector;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class PropertyProcessor extends DefaultProcessor {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CountQuery {
 
-    @Override
-    public Object input(Context context, Object value) {
-        String property = getBindingDef().getProperty();
-        if (value instanceof Collection) {
-            return CollUtil.map((Collection<?>) value, item -> BeanUtil.getFieldValue(item, property), true);
-        } else {
-            return BeanUtil.getFieldValue(value, property);
-        }
+    private Object query;
+    private boolean distinct = true;
+    private Selector selector;
+    private List<String> countBy;
+    private List<String> groupBy;
+
+    public CountQuery(Object query, String countBy, String groupBy) {
+        this.query = query;
+        this.countBy = Collections.singletonList(countBy);
+        this.groupBy = Collections.singletonList(groupBy);
     }
 
 }

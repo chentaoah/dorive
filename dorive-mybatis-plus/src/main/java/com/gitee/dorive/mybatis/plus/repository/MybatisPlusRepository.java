@@ -34,11 +34,12 @@ import com.gitee.dorive.query.api.QueryExecutor;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
+import com.gitee.dorive.sql.api.CountQuerier;
 import com.gitee.dorive.sql.api.SqlRunner;
-import com.gitee.dorive.sql.impl.CountQuerier;
-import com.gitee.dorive.sql.impl.SegmentBuilder;
-import com.gitee.dorive.sql.impl.SqlQueryExecutor;
-import com.gitee.dorive.sql.impl.UnionExecutor;
+import com.gitee.dorive.sql.entity.common.CountQuery;
+import com.gitee.dorive.sql.impl.count.DefaultCountQuerier;
+import com.gitee.dorive.sql.impl.executor.SqlQueryExecutor;
+import com.gitee.dorive.sql.impl.executor.UnionExecutor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
@@ -52,19 +53,18 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
+public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> implements CountQuerier {
 
     private SqlRunner sqlRunner;
     private QueryExecutor sqlQueryExecutor;
-    private CountQuerier countQuerier;
+    private CountQuerier defaultCountQuerier;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
         this.sqlRunner = implFactory.getInstance(SqlRunner.class);
-        SegmentBuilder segmentBuilder = new SegmentBuilder();
-        this.sqlQueryExecutor = new SqlQueryExecutor(this, segmentBuilder, this.sqlRunner);
-        this.countQuerier = new CountQuerier(this, segmentBuilder, this.sqlRunner);
+        this.sqlQueryExecutor = new SqlQueryExecutor(this, this.sqlRunner);
+        this.defaultCountQuerier = new DefaultCountQuerier(this, this.sqlRunner);
         super.afterPropertiesSet();
     }
 
@@ -133,6 +133,11 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> {
             return sqlQueryExecutor;
         }
         return super.adaptiveQueryExecutor(queryContext, queryWrapper);
+    }
+
+    @Override
+    public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
+        return defaultCountQuerier.selectCountMap(context, countQuery);
     }
 
 }

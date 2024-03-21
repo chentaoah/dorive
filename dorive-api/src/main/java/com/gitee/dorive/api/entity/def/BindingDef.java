@@ -37,9 +37,11 @@ import java.util.Set;
 public class BindingDef {
 
     private String field;
+    private String value;
     private String bindExp;
-    private String property;
+    private String processExp;
     private Class<?> processor;
+    private String bindField;
 
     public static List<BindingDef> fromElement(AnnotatedElement element) {
         Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(element, Binding.class);

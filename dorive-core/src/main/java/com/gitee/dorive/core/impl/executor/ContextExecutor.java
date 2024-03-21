@@ -66,7 +66,7 @@ public class ContextExecutor extends AbstractExecutor {
             }
             return result;
         }
-        return new Result<>();
+        return Result.emptyResult(query);
     }
 
     public void populate(Context context, List<Object> entities) {
@@ -254,7 +254,7 @@ public class ContextExecutor extends AbstractExecutor {
     }
 
     private void getBoundValue(Context context, Object rootEntity, CommonRepository repository, Object entity) {
-        for (Binder binder : repository.getBinderResolver().getBoundValueBinders()) {
+        for (Binder binder : repository.getBinderResolver().getStrongBinders()) {
             Object fieldValue = binder.getFieldValue(context, entity);
             if (fieldValue == null) {
                 Object boundValue = binder.getBoundValue(context, rootEntity);

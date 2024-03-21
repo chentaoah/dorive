@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.impl;
+package com.gitee.dorive.sql.impl.executor;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.element.EntityEle;
@@ -33,9 +33,10 @@ import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.impl.executor.AbstractQueryExecutor;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
-import com.gitee.dorive.sql.entity.ArgSegment;
-import com.gitee.dorive.sql.entity.SelectSegment;
-import com.gitee.dorive.sql.entity.TableSegment;
+import com.gitee.dorive.sql.entity.segment.ArgSegment;
+import com.gitee.dorive.sql.entity.segment.SelectSegment;
+import com.gitee.dorive.sql.entity.segment.TableSegment;
+import com.gitee.dorive.sql.impl.segment.SegmentBuilder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -47,12 +48,10 @@ import java.util.Map;
 @Setter
 public class SqlQueryExecutor extends AbstractQueryExecutor {
 
-    private SegmentBuilder segmentBuilder;
     private SqlRunner sqlRunner;
 
-    public SqlQueryExecutor(AbstractQueryRepository<?, ?> repository, SegmentBuilder segmentBuilder, SqlRunner sqlRunner) {
+    public SqlQueryExecutor(AbstractQueryRepository<?, ?> repository, SqlRunner sqlRunner) {
         super(repository);
-        this.segmentBuilder = segmentBuilder;
         this.sqlRunner = sqlRunner;
     }
 
@@ -73,7 +72,8 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         boolean needCount = queryContext.isNeedCount();
         Result<Object> emptyResult = queryContext.newEmptyResult();
 
-        SelectSegment selectSegment = segmentBuilder.buildSegment(queryContext);
+        SegmentBuilder segmentBuilder = new SegmentBuilder(queryContext);
+        SelectSegment selectSegment = segmentBuilder.buildSegment(context, null);
         char letter = selectSegment.getLetter();
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<ArgSegment> argSegments = selectSegment.getArgSegments();

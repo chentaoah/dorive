@@ -22,55 +22,69 @@ import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 @AllArgsConstructor
-public abstract class AbstractBinder implements Binder, Processor {
+public class BoundBinder implements Binder {
 
-    private BindingDef bindingDef;
-    private String alias;
-    private PropChain fieldPropChain;
-    private Processor processor;
+    protected BindingDef bindingDef;
+    protected Processor processor;
+    protected String belongAccessPath;
+    protected CommonRepository belongRepository;
+    protected PropChain boundPropChain;
+    protected String bindAlias;
 
+    public BoundBinder(BindingDef bindingDef, Processor processor) {
+        this.bindingDef = bindingDef;
+        this.processor = processor;
+    }
+
+    @Override
     public String getFieldName() {
-        return fieldPropChain.getEntityField().getName();
+        return null;
     }
 
     @Override
     public Object getFieldValue(Context context, Object entity) {
-        return fieldPropChain.getValue(entity);
+        return null;
     }
 
     @Override
     public void setFieldValue(Context context, Object entity, Object property) {
-        fieldPropChain.setValue(entity, property);
+        // ignore
+    }
+
+    @Override
+    public String getBoundName() {
+        String bindField = bindingDef.getBindField();
+        if (StringUtils.isNotBlank(bindField)) {
+            return bindField;
+        }
+        return boundPropChain.getEntityField().getName();
+    }
+
+    @Override
+    public Object getBoundValue(Context context, Object rootEntity) {
+        return boundPropChain.getValue(rootEntity);
+    }
+
+    @Override
+    public void setBoundValue(Context context, Object rootEntity, Object property) {
+        boundPropChain.setValue(rootEntity, property);
     }
 
     @Override
     public Object input(Context context, Object value) {
-        return processor.input(context, value);
+        return value == null || processor == null ? value : processor.input(context, value);
     }
 
     @Override
     public Object output(Context context, Object value) {
-        return processor.output(context, value);
-    }
-
-    public List<Object> collectFieldValues(Context context, List<Object> entities) {
-        List<Object> fieldValues = new ArrayList<>(entities.size());
-        for (Object entity : entities) {
-            Object fieldValue = getFieldValue(context, entity);
-            if (fieldValue != null) {
-                fieldValue = output(context, fieldValue);
-                fieldValues.add(fieldValue);
-            }
-        }
-        return fieldValues;
+        return value == null || processor == null ? value : processor.output(context, value);
     }
 
 }

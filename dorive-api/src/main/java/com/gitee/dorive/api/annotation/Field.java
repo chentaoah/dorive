@@ -35,8 +35,8 @@ public @interface Field {
     @AliasFor("value")
     String alias() default "";
 
-    Class<?> converter() default Object.class;
-
     String mapExp() default "";
+
+    Class<?> converter() default Object.class;
 
 }

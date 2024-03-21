@@ -15,27 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.binder;
+package com.gitee.dorive.sql.entity.segment;
 
-import com.gitee.dorive.api.entity.def.BindingDef;
-import com.gitee.dorive.api.entity.element.PropChain;
-import com.gitee.dorive.core.api.binder.Processor;
-import com.gitee.dorive.core.api.context.Context;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-public class ContextBinder extends AbstractBinder {
+import java.util.List;
 
-    public ContextBinder(BindingDef bindingDef, String alias, PropChain fieldPropChain, Processor processor) {
-        super(bindingDef, alias, fieldPropChain, processor);
-    }
-
-    @Override
-    public Object getBoundValue(Context context, Object rootEntity) {
-        return context.getAttachment(getBindingDef().getBindExp());
-    }
-
-    @Override
-    public void setBoundValue(Context context, Object rootEntity, Object property) {
-        // ignore
-    }
-
+@Data
+@AllArgsConstructor
+public class JoinSegment {
+    private TableSegment tableSegment;
+    private List<OnSegment> onSegments;
 }

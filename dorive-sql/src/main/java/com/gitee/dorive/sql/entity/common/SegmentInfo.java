@@ -15,22 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.binder;
+package com.gitee.dorive.sql.entity.common;
 
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.api.entity.element.EntityEle;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-public interface Binder extends Processor {
-
-    String getFieldName();
-
-    Object getFieldValue(Context context, Object entity);
-
-    void setFieldValue(Context context, Object entity, Object property);
-
-    String getBoundName();
-
-    Object getBoundValue(Context context, Object rootEntity);
-
-    void setBoundValue(Context context, Object rootEntity, Object property);
-
+@Data
+@AllArgsConstructor
+public class SegmentInfo {
+    private String tableAlias;
+    private EntityEle entityEle;
 }

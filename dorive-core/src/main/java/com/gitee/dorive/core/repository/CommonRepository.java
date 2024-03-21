@@ -20,6 +20,7 @@ package com.gitee.dorive.core.repository;
 import com.gitee.dorive.api.entity.element.PropChain;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Matcher;
+import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
@@ -27,7 +28,7 @@ import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Query;
 import com.gitee.dorive.core.entity.option.JoinType;
-import com.gitee.dorive.core.impl.binder.PropertyBinder;
+import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.util.ExampleUtils;
 import lombok.Getter;
@@ -68,13 +69,13 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
         return binderResolver.getJoinType();
     }
 
-    public List<PropertyBinder> getRootBinders() {
+    public List<StrongBinder> getRootBinders() {
         return binderResolver.getMergedBindersMap().get("/");
     }
 
     @Override
-    public boolean matches(Context context) {
-        return matcher.matches(context);
+    public boolean matches(Options options) {
+        return matcher.matches(options);
     }
 
     @Override

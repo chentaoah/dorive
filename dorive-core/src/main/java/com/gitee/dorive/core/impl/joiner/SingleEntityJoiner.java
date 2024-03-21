@@ -21,7 +21,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.impl.binder.PropertyBinder;
+import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,7 +33,7 @@ import java.util.List;
 @Setter
 public class SingleEntityJoiner extends AbstractEntityJoiner {
 
-    private PropertyBinder binder;
+    private StrongBinder binder;
 
     public SingleEntityJoiner(CommonRepository repository, int entitiesSize) {
         super(repository, entitiesSize);
@@ -52,7 +52,7 @@ public class SingleEntityJoiner extends AbstractEntityJoiner {
                 example.in(fieldName, boundValues);
             }
         }
-        appendContext(context, example);
+        appendFilterCriteria(context, example);
         return example;
     }
 
@@ -60,9 +60,7 @@ public class SingleEntityJoiner extends AbstractEntityJoiner {
         List<Object> boundValues = new ArrayList<>(entities.size());
         for (Object entity : entities) {
             Object boundValue = binder.getBoundValue(context, entity);
-            if (boundValue != null) {
-                boundValue = binder.input(context, boundValue);
-            }
+            boundValue = binder.input(context, boundValue);
             if (boundValue != null) {
                 String key = boundValue.toString();
                 if (!keys.contains(key)) {

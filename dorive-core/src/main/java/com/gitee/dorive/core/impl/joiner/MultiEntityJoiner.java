@@ -21,8 +21,8 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.impl.binder.AbstractBinder;
-import com.gitee.dorive.core.impl.binder.PropertyBinder;
+import com.gitee.dorive.core.impl.binder.FieldBinder;
+import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.MultiInBuilder;
 import lombok.Getter;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Setter
 public class MultiEntityJoiner extends AbstractEntityJoiner {
 
-    private List<PropertyBinder> binders;
+    private List<StrongBinder> binders;
 
     public MultiEntityJoiner(CommonRepository repository, int entitiesSize) {
         super(repository, entitiesSize);
@@ -49,21 +49,19 @@ public class MultiEntityJoiner extends AbstractEntityJoiner {
         if (!builder.isEmpty()) {
             example.getCriteria().add(builder.toCriterion());
         }
-        appendContext(context, example);
+        appendFilterCriteria(context, example);
         return example;
     }
 
     private MultiInBuilder newMultiInBuilder(Context context, List<Object> entities) {
-        List<String> aliases = binders.stream().map(AbstractBinder::getAlias).collect(Collectors.toList());
+        List<String> aliases = binders.stream().map(FieldBinder::getAlias).collect(Collectors.toList());
         MultiInBuilder multiInBuilder = new MultiInBuilder(aliases, entities.size());
 
         for (Object entity : entities) {
             StringBuilder keyBuilder = new StringBuilder();
-            for (PropertyBinder binder : binders) {
+            for (StrongBinder binder : binders) {
                 Object boundValue = binder.getBoundValue(context, entity);
-                if (boundValue != null) {
-                    boundValue = binder.input(context, boundValue);
-                }
+                boundValue = binder.input(context, boundValue);
                 if (boundValue != null) {
                     multiInBuilder.append(boundValue);
                     String key = boundValue.toString();
@@ -92,7 +90,7 @@ public class MultiEntityJoiner extends AbstractEntityJoiner {
         List<Object> records = result.getRecords();
         for (Object entity : records) {
             StringBuilder keyBuilder = new StringBuilder();
-            for (PropertyBinder binder : binders) {
+            for (StrongBinder binder : binders) {
                 Object fieldValue = binder.getFieldValue(context, entity);
                 if (fieldValue != null) {
                     String key = fieldValue.toString();

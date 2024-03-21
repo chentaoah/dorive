@@ -22,7 +22,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityJoiner;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.impl.binder.ContextBinder;
+import com.gitee.dorive.core.impl.binder.WeakBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -51,16 +51,16 @@ public abstract class AbstractEntityJoiner implements EntityJoiner {
         this.recordIndex = new LinkedHashMap<>(size);
     }
 
-    protected void appendContext(Context context, Example example) {
+    protected void appendFilterCriteria(Context context, Example example) {
         if (example == null || example.isEmpty()) {
             return;
         }
         BinderResolver binderResolver = repository.getBinderResolver();
-        List<ContextBinder> contextBinders = binderResolver.getContextBinders();
-        for (ContextBinder contextBinder : contextBinders) {
-            Object boundValue = contextBinder.getBoundValue(context, null);
+        List<WeakBinder> weakBinders = binderResolver.getWeakBinders();
+        for (WeakBinder weakBinder : weakBinders) {
+            Object boundValue = weakBinder.input(context, null);
             if (boundValue != null) {
-                String fieldName = contextBinder.getFieldName();
+                String fieldName = weakBinder.getFieldName();
                 example.eq(fieldName, boundValue);
             }
         }

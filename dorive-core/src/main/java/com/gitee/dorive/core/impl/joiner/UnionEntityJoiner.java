@@ -23,7 +23,7 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
-import com.gitee.dorive.core.impl.binder.PropertyBinder;
+import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -65,16 +65,14 @@ public class UnionEntityJoiner extends AbstractEntityJoiner {
 
     private Example newExample(Context context, Object entity) {
         Example example = new InnerExample();
-        List<PropertyBinder> binders = repository.getBinderResolver().getPropertyBinders();
-        for (PropertyBinder binder : binders) {
+        List<StrongBinder> binders = repository.getBinderResolver().getStrongBinders();
+        for (StrongBinder binder : binders) {
             Object boundValue = binder.getBoundValue(context, entity);
+            boundValue = binder.input(context, boundValue);
             if (boundValue instanceof Collection) {
                 if (((Collection<?>) boundValue).isEmpty()) {
                     boundValue = null;
                 }
-            }
-            if (boundValue != null) {
-                boundValue = binder.input(context, boundValue);
             }
             if (boundValue != null) {
                 String fieldName = binder.getFieldName();
@@ -84,7 +82,7 @@ public class UnionEntityJoiner extends AbstractEntityJoiner {
                 break;
             }
         }
-        appendContext(context, example);
+        appendFilterCriteria(context, example);
         return example;
     }
 

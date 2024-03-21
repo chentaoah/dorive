@@ -34,8 +34,8 @@ public class FieldDef {
 
     private boolean isId;
     private String alias;
-    private Class<?> converter;
     private String mapExp;
+    private Class<?> converter;
 
     public static FieldDef fromElement(AnnotatedElement element) {
         Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Field.class);

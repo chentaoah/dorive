@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.entity;
+package com.gitee.dorive.sql.entity.segment;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 @AllArgsConstructor
@@ -28,9 +29,29 @@ public class OnSegment {
     private String column;
     private String joinTableAlias;
     private String joinColumn;
+    private String literal;
+
+    public OnSegment(String tableAlias, String column, String joinTableAlias, String joinColumn) {
+        this.tableAlias = tableAlias;
+        this.column = column;
+        this.joinTableAlias = joinTableAlias;
+        this.joinColumn = joinColumn;
+    }
+
+    public OnSegment(String joinTableAlias, String joinColumn, String literal) {
+        this.joinTableAlias = joinTableAlias;
+        this.joinColumn = joinColumn;
+        this.literal = literal;
+    }
 
     @Override
     public String toString() {
+        if (StringUtils.isNotBlank(tableAlias) && StringUtils.isNotBlank(column)) {
+            return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
+
+        } else if (StringUtils.isNotBlank(literal)) {
+            return joinTableAlias + "." + joinColumn + " = " + literal;
+        }
         return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
     }
 
