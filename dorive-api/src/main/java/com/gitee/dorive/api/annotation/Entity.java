@@ -21,7 +21,7 @@ import java.lang.annotation.*;
 
 /**
  * 实体注解<br>
- * 作用：声明一个类或字段的类型为实体<br>
+ * 说明：声明一个类或字段的类型为实体<br>
  * 解释：实体是一种数据结构的具体表现形式，具有以下特征：<br>
  * 1、描述了实体和其他实体之间的关系。（一对一、一对多、多对多）<br>
  * 2、描述了实体字段和持久化数据的映射关系。<br>
@@ -37,20 +37,20 @@ public @interface Entity {
 
     /**
      * 实体名称<br>
-     * 作用：可作为选取器的匹配条件<br>
+     * 说明：可作为选取器的匹配条件<br>
      */
     String name() default "";
 
     /**
      * 数据来源<br>
-     * 作用：声明持久化数据操作的具体实现<br>
+     * 说明：声明持久化数据操作的具体实现<br>
      * 注意：目前仅支持mybatis-plus框架中BaseMapper的子类<br>
      */
     Class<?> source() default Object.class;
 
     /**
      * 实体工厂<br>
-     * 作用：声明实体构造的具体实现<br>
+     * 说明：声明实体构造的具体实现<br>
      * 解释：实体工厂通过映射关系，实现了实体与持久化数据之间的相互转换<br>
      * 多态的实现方式：<br>
      * 1、假设实体为User，子类分别为User1、User2<br>
@@ -85,12 +85,31 @@ public @interface Entity {
      */
     Class<?> factory() default Object.class;
 
+    /**
+     * 指定仓储<br>
+     * 说明：指定一个特定的仓储，代替source操作数据<br>
+     * 注意：不能和source与factory同时使用，优先级更高<br>
+     */
     Class<?> repository() default Object.class;
 
+    /**
+     * 操作优先级<br>
+     * 说明：可以改变插入、更新、删除的操作顺序<br>
+     */
     int priority() default 0;
 
+    /**
+     * 默认排序字段<br>
+     * 说明：关联查询时，默认的排序字段<br>
+     */
     String sortBy() default "";
 
+    /**
+     * 默认排序方式<br>
+     * 说明：关联查询时，默认的排序方式。<br>
+     *
+     * @see com.gitee.dorive.api.constant.Order
+     */
     String order() default "";
 
 }
