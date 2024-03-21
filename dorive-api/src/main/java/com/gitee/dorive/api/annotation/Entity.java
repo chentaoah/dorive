@@ -22,10 +22,36 @@ import java.lang.annotation.*;
 /**
  * 实体注解<br>
  * 作用：声明一个类或字段的类型为实体<br>
+ * <p>
  * 解释：实体是一种数据结构的具体表现形式，具有以下特征：<br>
  * 1、描述了实体和其他实体之间的关系。（一对一、一对多、多对多）<br>
  * 2、描述了实体字段和持久化数据的映射关系。<br>
  * 3、包含方法，可通过方法重写进行拓展。<br>
+ * </p>
+ * <p>
+ * 额外说明：<br>
+ * 1、在类上声明的实体注解，代表该实体的默认配置<br>
+ * <pre>{@code
+ * @Entity(name = "user", source = UserMapper.class)
+ * public class User {
+ *     ......
+ * }
+ * }</pre>
+ * 2、在字段上声明的实体注解，代表在当前实体内的配置<br>
+ * <pre>{@code
+ * public class Dept {
+ *     @Entity(name = "user1", source = UserMapper1.class)
+ *     private List<User> users;
+ * }
+ * }</pre>
+ * 3、一般情况下，使用默认配置即可<br>
+ * <pre>{@code
+ * public class Dept {
+ *     @Entity
+ *     private List<User> users;
+ * }
+ * }</pre>
+ * </p>
  *
  * @author tao.chen
  */
