@@ -130,9 +130,7 @@ public @interface Entity {
     /**
      * 指定仓储<br>
      * 作用：指定一个特定的仓储，代替source操作数据<br>
-     * 注意：<br>
-     * 1、不能和source与factory同时使用，优先级更高<br>
-     * 2、一般在需要查询实体内部其他实体时，才指定仓储<br>
+     * 注意：不能和source与factory同时使用，优先级更高<br>
      */
     Class<?> repository() default Object.class;
 
