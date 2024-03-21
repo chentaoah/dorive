@@ -55,16 +55,16 @@ import java.lang.annotation.*;
  * <p>
  * 补充说明：如果想要在关联查询时，查询实体内部的其他实体，请指定仓储<br>
  * <pre>{@code
- * @Entity(name = "dept", source = DeptMapper.class)
- * public class Dept {
- *     @Entity(repository = UserRepository.class)
- *     private List<User> users;
- * }
- *
  * @Entity(name = "user", source = UserMapper.class)
  * public class User {
  *     @Entity
  *     private List<Role> roles;
+ * }
+ *
+ * @Entity(name = "dept", source = DeptMapper.class)
+ * public class Dept {
+ *     @Entity(repository = UserRepository.class)
+ *     private List<User> users;
  * }
  * }</pre>
  * </p>
