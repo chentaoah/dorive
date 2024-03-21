@@ -54,8 +54,7 @@ public @interface Entity {
      * 解释：实体工厂通过映射关系，实现了实体与持久化数据之间的相互转换<br>
      * 多态的实现方式：<br>
      * 1、假设实体为User，子类分别为User1、User2<br>
-     * 2、新建UserFactory继承于DefaultEntityFactory<br>
-     * 3、重写UserFactory的reconstitute方法<br>
+     * 2、新建UserFactory继承于DefaultEntityFactory，并重写reconstitute方法<br>
      * <pre>{@code
      * @Override
      * public Object reconstitute(Context context, Object persistent) {
@@ -69,14 +68,14 @@ public @interface Entity {
      *     return user;
      * }
      * }</pre>
-     * 4、修改User的@Entity注解<br>
+     * 3、修改User的@Entity注解，指定实体工厂为UserFactory<br>
      * <pre>{@code
      * @Entity(......, factory = UserFactory.class)
      * public class User {
      *     ......
      * }
      * }</pre>
-     * 5、在UserRepository中引入子类的仓储<br>
+     * 4、在UserRepository中引入子类的仓储<br>
      * <pre>{@code
      * public class UserRepository extends MybatisPlusRepository<User, Integer> {
      *     private final User1Repository user1Repository;
