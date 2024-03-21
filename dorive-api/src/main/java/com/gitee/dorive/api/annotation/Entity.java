@@ -37,7 +37,7 @@ public @interface Entity {
 
     /**
      * 实体名称<br>
-     * 作用：可作为选取器的筛选条件<br>
+     * 作用：可作为选取器的匹配条件<br>
      */
     String name() default "";
 
