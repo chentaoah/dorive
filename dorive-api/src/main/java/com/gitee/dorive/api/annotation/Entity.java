@@ -29,7 +29,7 @@ import java.lang.annotation.*;
  * 3、包含方法，可通过方法重写进行拓展。<br>
  * </p>
  * <p>
- * 额外说明：<br>
+ * 使用说明：<br>
  * 1、在类上声明的实体注解，代表该实体的默认配置<br>
  * <pre>{@code
  * @Entity(name = "user", source = UserMapper.class)
@@ -49,6 +49,22 @@ import java.lang.annotation.*;
  * public class Dept {
  *     @Entity
  *     private List<User> users;
+ * }
+ * }</pre>
+ * </p>
+ * <p>
+ * 补充说明：如果想要在关联查询时，查询实体内部的其他实体，请指定仓储<br>
+ * <pre>{@code
+ * @Entity(name = "dept", source = DeptMapper.class)
+ * public class Dept {
+ *     @Entity(repository = UserRepository.class)
+ *     private List<User> users;
+ * }
+ *
+ * @Entity(name = "user", source = UserMapper.class)
+ * public class User {
+ *     @Entity
+ *     private List<Role> roles;
  * }
  * }</pre>
  * </p>
