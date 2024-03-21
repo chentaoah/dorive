@@ -106,7 +106,7 @@ public @interface Entity {
 
     /**
      * 默认排序方式<br>
-     * 说明：关联查询时，默认的排序方式。<br>
+     * 说明：关联查询时，默认的排序方式<br>
      *
      * @see com.gitee.dorive.api.constant.Order
      */
