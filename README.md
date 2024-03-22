@@ -98,7 +98,7 @@ mvn install
 
 wiki地址：
 
-- [Gitee wiki](https://gitee.com/digital-engine/dorive.wiki.git)
+- [Gitee wiki](https://gitee.com/digital-engine/dorive/wikis/pages)
 
 ### 🐞bug反馈与建议
 
