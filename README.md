@@ -32,7 +32,7 @@
 
 ### 📊架构设计
 
-<img src="https://gitee.com/digital-engine/dorive/raw/master/doc/img/framework.png" alt="avatar" style="zoom: 40%;" />
+<img src="https://gitee.com/digital-engine/dorive/raw/master/doc/img/framework.png" alt="avatar" style="zoom: 35%;" />
 
 ###  🛠️模块说明
 
@@ -53,7 +53,7 @@
 
 ###  📦安装
 
-因项目尚未上传至Maven中央仓库，请访问Gitee主页：https://gitee.com/digital-engine/dorive/tree/master，下载源码至本地后，使用Maven命令安装。
+因项目尚未上传至Maven中央仓库，请访问Gitee主页：[dorive](https://gitee.com/digital-engine/dorive/tree/master)，下载源码至本地后，使用Maven命令安装。
 
 ```shell
 mvn install
