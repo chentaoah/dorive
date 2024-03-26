@@ -51,6 +51,16 @@
 | dorive-mybatis-plus        | 提供mybatis-plus底层实现                             |
 | dorive-spring-boot-starter | 依赖管理启动器                                       |
 
+### 🔗依赖说明
+
+| 依赖库                    | 版本            | 说明                |
+| ------------------------- | --------------- | ------------------- |
+| spring-boot-starter-web   | 2.7.8（可降级） | spring-boot web集成 |
+| spring-tx                 | 5.3.9           | spring事务管理      |
+| hutool-all                | 5.8.12          | 工具库              |
+| javassist                 | 3.29.2-GA       | 动态代理库          |
+| mybatis-plus-boot-starter | 3.5.3.1         | 数据库操作          |
+
 ###  📦安装
 
 因项目尚未上传至Maven中央仓库，请访问Gitee主页：[dorive](https://gitee.com/digital-engine/dorive/tree/master)，下载源码至本地后，使用Maven命令安装。
@@ -69,6 +79,18 @@ mvn install
 </dependency>
 ```
 
+### 📝文档
+
+wiki地址：
+
+- [Gitee wiki](https://gitee.com/digital-engine/dorive/wikis/pages)
+
+### 🐞bug反馈与建议
+
+提交问题反馈请说明正在使用的JDK版本、dorive版本，以及依赖库版本。
+
+- [Gitee issue](https://gitee.com/digital-engine/dorive/issues)
+
 ### 📘版本说明
 
 | 版本 | 说明                                                         |
@@ -84,29 +106,7 @@ mvn install
 | master | 主分支，release版本使用的分支，不接收任何pr或修改            |
 | 3.x    | 版本分支，分支名即版本号，版本号高于master的，为正在开发的分支 |
 
-### 🔗依赖说明
-
-| 依赖库                    | 版本            | 说明                |
-| ------------------------- | --------------- | ------------------- |
-| spring-boot-starter-web   | 2.7.8（可降级） | spring-boot web集成 |
-| spring-tx                 | 5.3.9           | spring事务管理      |
-| hutool-all                | 5.8.12          | 工具库              |
-| javassist                 | 3.29.2-GA       | 动态代理库          |
-| mybatis-plus-boot-starter | 3.5.3.1         | 数据库操作          |
-
-### 📝文档
-
-wiki地址：
-
-- [Gitee wiki](https://gitee.com/digital-engine/dorive/wikis/pages)
-
-### 🐞bug反馈与建议
-
-提交问题反馈请说明正在使用的JDK版本、dorive版本，以及依赖库版本。
-
-- [Gitee issue](https://gitee.com/digital-engine/dorive/issues)
-
-### 🧑‍🤝‍🧑与我（们）一起
+### 🤝与我（们）一起
 
 1. 请将个人联系方式，发送邮件至digital_engine@163.com
 2. 等待维护者向你发出邀请
