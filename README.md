@@ -32,7 +32,7 @@
 
 ### 📊架构设计
 
-<img src="https://gitee.com/digital-engine/dorive/raw/master/doc/img/framework.png" alt="avatar" style="zoom: 40%;" />
+<img src="https://gitee.com/digital-engine/dorive/raw/master/doc/img/entity.png" alt="avatar" style="zoom: 50%;" />
 
 ###  🛠️模块说明
 
