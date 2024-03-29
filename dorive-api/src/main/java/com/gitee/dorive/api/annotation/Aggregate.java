@@ -28,30 +28,7 @@ import java.lang.annotation.Target;
 
 /**
  * 聚合注解<br>
- * 作用：声明字段的类型为聚合<br>
- *
- * <p>
- * 解释：聚合一般指多个实体组装后的集合<br>
- * </p>
- *
- * <p>
- * 使用说明：<br>
- * 1、在使用上，聚合注解基本等效于实体注解<br>
- * 2、在不指定仓储的情况下，框架会自动为实体匹配仓储<br>
- * </p>
- *
- * <p>
- * 例如：<br>
- * <pre>{@code
- * @Aggregate
- * private List<User> users;
- *
- * 等效于：
- *
- * @Entity(repository = UserRepository.class)
- * private List<User> users;
- * }</pre>
- * </p>
+ * wiki：https://gitee.com/digital-engine/dorive/wikis/pages
  *
  * @author tao.chen
  */
