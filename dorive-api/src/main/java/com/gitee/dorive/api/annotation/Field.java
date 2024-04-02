@@ -21,22 +21,43 @@ import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
+/**
+ * 字段注解<br>
+ * wiki：https://gitee.com/digital-engine/dorive/wikis/pages
+ *
+ * @author tao.chen
+ */
 @Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
 public @interface Field {
 
+    /**
+     * 是否主键
+     */
     boolean isId() default false;
 
+    /**
+     * 别名
+     */
     @AliasFor("alias")
     String value() default "";
 
+    /**
+     * 别名
+     */
     @AliasFor("value")
     String alias() default "";
 
+    /**
+     * 映射表达式
+     */
     String mapExp() default "";
 
+    /**
+     * 指定转换器
+     */
     Class<?> converter() default Object.class;
 
 }
