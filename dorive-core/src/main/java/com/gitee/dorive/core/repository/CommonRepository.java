@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.repository;
 
-import com.gitee.dorive.api.entity.element.PropChain;
+import com.gitee.dorive.api.entity.PropChain;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Options;

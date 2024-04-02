@@ -17,39 +17,41 @@
 
 package com.gitee.dorive.api.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * 实体注解<br>
+ * 排序注解<br>
  * wiki：https://gitee.com/digital-engine/dorive/wikis/pages
  *
  * @author tao.chen
  */
 @Inherited
 @Documented
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
-public @interface Entity {
+public @interface Order {
 
     /**
-     * 实体名称
+     * 操作优先级
      */
-    String name() default "";
+    int priority() default 0;
 
     /**
-     * 数据来源
+     * 默认排序字段
      */
-    Class<?> source() default Object.class;
+    String sortBy() default "";
 
     /**
-     * 实体工厂
+     * 默认排序方式
+     *
+     * @see com.gitee.dorive.api.constant.Order
      */
-    Class<?> factory() default Object.class;
-
-    /**
-     * 指定仓储
-     */
-    Class<?> repository() default Object.class;
+    String order() default "";
 
 }
 

@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.executor;
 
 import com.gitee.dorive.api.constant.Operator;
-import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.converter.EntityMapper;
 import com.gitee.dorive.core.api.executor.Executor;

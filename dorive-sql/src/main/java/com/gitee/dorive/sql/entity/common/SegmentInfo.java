@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.sql.entity.common;
 
-import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.EntityEle;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

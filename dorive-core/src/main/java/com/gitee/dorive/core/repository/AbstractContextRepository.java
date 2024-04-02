@@ -21,11 +21,12 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.constant.Order;
-import com.gitee.dorive.api.entity.def.EntityDef;
-import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.api.entity.element.EntityType;
-import com.gitee.dorive.api.entity.element.PropChain;
-import com.gitee.dorive.api.impl.resolver.PropChainResolver;
+import com.gitee.dorive.api.def.EntityDef;
+import com.gitee.dorive.api.def.OrderDef;
+import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.entity.EntityType;
+import com.gitee.dorive.api.entity.PropChain;
+import com.gitee.dorive.api.resolver.PropChainResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.converter.EntityFactory;
 import com.gitee.dorive.core.api.converter.EntityMapper;
@@ -112,9 +113,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         });
 
-        orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityDef().getPriority()));
+        orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getOrderDef().getPriority()));
 
         setEntityDef(rootRepository.getEntityDef());
+        setOrderDef(rootRepository.getOrderDef());
         setEntityEle(rootRepository.getEntityEle());
         setOperationFactory(rootRepository.getOperationFactory());
 
@@ -127,6 +129,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     private CommonRepository newRepository(String accessPath, EntityEle entityEle) {
         EntityDef entityDef = renewEntityDef(entityEle);
+        OrderDef orderDef = renewOrderDef(entityEle);
         OperationFactory operationFactory = new OperationFactory(entityEle);
 
         AbstractRepository<Object, Object> actualRepository = doNewRepository(entityDef, entityEle, operationFactory);
@@ -134,16 +137,17 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         boolean isRoot = "/".equals(accessPath);
         boolean isAggregated = entityEle.isAggregated();
-        OrderBy defaultOrderBy = newDefaultOrderBy(entityDef);
+        OrderBy defaultOrderBy = newDefaultOrderBy(orderDef);
 
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
         PropChain anchorPoint = propChainMap.get(accessPath);
 
         BinderResolver binderResolver = new BinderResolver(this, entityEle);
-        binderResolver.resolve(accessPath, entityDef, entityEle);
+        binderResolver.resolve(accessPath, orderDef, entityEle);
 
         CommonRepository repository = new CommonRepository();
         repository.setEntityDef(entityDef);
+        repository.setOrderDef(orderDef);
         repository.setEntityEle(entityEle);
         repository.setOperationFactory(operationFactory);
         repository.setProxyRepository(proxyRepository);
@@ -170,6 +174,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             entityDef.setRepository(repositoryClass);
         }
         return entityDef;
+    }
+
+    private OrderDef renewOrderDef(EntityEle entityEle) {
+        OrderDef orderDef = entityEle.getOrderDef();
+        return orderDef == null ? new OrderDef(0, "", "") : BeanUtil.copyProperties(orderDef, OrderDef.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -219,9 +228,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return entityFactory;
     }
 
-    private OrderBy newDefaultOrderBy(EntityDef entityDef) {
-        String sortBy = entityDef.getSortBy();
-        String order = entityDef.getOrder().toUpperCase();
+    private OrderBy newDefaultOrderBy(OrderDef orderDef) {
+        String sortBy = orderDef.getSortBy();
+        String order = orderDef.getOrder().toUpperCase();
         if (StringUtils.isNotBlank(sortBy) && (Order.ASC.equals(order) || Order.DESC.equals(order))) {
             List<String> properties = StrUtil.splitTrim(sortBy, ",");
             return new OrderBy(properties, order);

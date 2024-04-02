@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity.def;
+package com.gitee.dorive.api.def;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.api.annotation.Entity;
+import com.gitee.dorive.api.annotation.Order;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.AnnotatedElement;
@@ -31,35 +30,15 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EntityDef {
+public class OrderDef {
 
-    private String name;
-    private Class<?> source;
-    private Class<?> factory;
-    private Class<?> repository;
     private int priority;
     private String sortBy;
     private String order;
 
-    public static EntityDef fromElement(AnnotatedElement element) {
-        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Entity.class);
-        return attributes != null ? BeanUtil.copyProperties(attributes, EntityDef.class) : null;
-    }
-
-    public void merge(EntityDef entityDef) {
-        if (StringUtils.isBlank(name)) {
-            name = entityDef.getName();
-        }
-        if (source == null || source == Object.class) {
-            source = entityDef.getSource();
-        }
-        if (factory == null || factory == Object.class) {
-            factory = entityDef.getFactory();
-        }
-    }
-
-    public boolean isRepositoryDef() {
-        return repository != Object.class;
+    public static OrderDef fromElement(AnnotatedElement element) {
+        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Order.class);
+        return attributes != null ? BeanUtil.copyProperties(attributes, OrderDef.class) : null;
     }
 
 }

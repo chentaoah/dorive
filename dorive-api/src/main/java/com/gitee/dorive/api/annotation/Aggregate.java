@@ -63,22 +63,4 @@ public @interface Aggregate {
     @AliasFor(annotation = Entity.class)
     Class<?> repository() default Object.class;
 
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    int priority() default 0;
-
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    String sortBy() default "";
-
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    String order() default "";
-
 }

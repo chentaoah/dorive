@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity.def;
+package com.gitee.dorive.api.def;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.api.annotation.Binding;

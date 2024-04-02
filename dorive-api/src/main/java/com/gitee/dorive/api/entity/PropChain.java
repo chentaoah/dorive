@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity.element;
+package com.gitee.dorive.api.entity;
 
 import com.gitee.dorive.api.api.PropProxy;
-import com.gitee.dorive.api.impl.factory.PropProxyFactory;
+import com.gitee.dorive.api.factory.PropProxyFactory;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

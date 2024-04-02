@@ -18,8 +18,9 @@
 package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.api.entity.def.EntityDef;
-import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.api.def.EntityDef;
+import com.gitee.dorive.api.def.OrderDef;
+import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.executor.Executor;
@@ -43,6 +44,7 @@ import java.util.List;
 public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Executor {
 
     private EntityDef entityDef;
+    private OrderDef orderDef;
     private EntityEle entityEle;
     private OperationFactory operationFactory;
     private Executor executor;

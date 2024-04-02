@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.converter;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
-import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.converter.EntityFactory;
 import com.gitee.dorive.core.api.converter.EntityMapper;

@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.impl.joiner;
 
-import com.gitee.dorive.api.entity.element.PropChain;
+import com.gitee.dorive.api.entity.PropChain;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityJoiner;
 import com.gitee.dorive.core.entity.executor.Example;

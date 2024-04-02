@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.event.impl;
 
-import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.operation.Operation;

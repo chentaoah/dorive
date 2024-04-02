@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity.element;
+package com.gitee.dorive.api.entity;
 
 import com.gitee.dorive.api.annotation.Aggregate;
 import com.gitee.dorive.api.api.PropProxy;
-import com.gitee.dorive.api.entity.def.BindingDef;
-import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.def.BindingDef;
+import com.gitee.dorive.api.def.EntityDef;
+import com.gitee.dorive.api.def.OrderDef;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -37,6 +38,7 @@ public abstract class EntityEle {
 
     private AnnotatedElement element;
     private EntityDef entityDef;
+    private OrderDef orderDef;
     private boolean aggregated;
     private List<BindingDef> bindingDefs;
     private PropProxy idProxy;
@@ -45,6 +47,7 @@ public abstract class EntityEle {
     public EntityEle(AnnotatedElement element) {
         this.element = element;
         this.entityDef = EntityDef.fromElement(element);
+        this.orderDef = OrderDef.fromElement(element);
         this.aggregated = (entityDef != null && entityDef.isRepositoryDef()) || isAggregateDef();
         this.bindingDefs = BindingDef.fromElement(element);
     }

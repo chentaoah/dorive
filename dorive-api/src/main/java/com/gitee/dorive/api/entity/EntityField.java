@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity.element;
+package com.gitee.dorive.api.entity;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.api.entity.def.EntityDef;
-import com.gitee.dorive.api.entity.def.FieldDef;
+import com.gitee.dorive.api.def.EntityDef;
+import com.gitee.dorive.api.def.FieldDef;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -18,7 +18,7 @@
 package com.gitee.dorive.sql.impl.count;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.api.entity.element.EntityEle;
+import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryWrapper;

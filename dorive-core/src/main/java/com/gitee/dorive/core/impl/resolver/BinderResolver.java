@@ -23,11 +23,11 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.api.entity.def.BindingDef;
-import com.gitee.dorive.api.entity.def.EntityDef;
-import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.api.entity.element.PropChain;
-import com.gitee.dorive.api.impl.resolver.PropChainResolver;
+import com.gitee.dorive.api.def.BindingDef;
+import com.gitee.dorive.api.def.OrderDef;
+import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.entity.PropChain;
+import com.gitee.dorive.api.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.entity.option.BindingType;
@@ -71,7 +71,7 @@ public class BinderResolver {
         this.propChainResolver = new PropChainResolver(entityEle.getEntityType());
     }
 
-    public void resolve(String accessPath, EntityDef entityDef, EntityEle entityEle) {
+    public void resolve(String accessPath, OrderDef orderDef, EntityEle entityEle) {
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
 
         Class<?> genericType = entityEle.getGenericType();
@@ -120,8 +120,8 @@ public class BinderResolver {
                 strongBinders.add(strongBinder);
 
                 if (strongBinder.isSameType() && idName.equals(field)) {
-                    if (entityDef.getPriority() == 0) {
-                        entityDef.setPriority(-1);
+                    if (orderDef.getPriority() == 0) {
+                        orderDef.setPriority(-1);
                     }
                     boundIdBinder = strongBinder;
                 }

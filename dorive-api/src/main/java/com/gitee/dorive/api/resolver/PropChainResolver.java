@@ -15,33 +15,33 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.impl.resolver;
+package com.gitee.dorive.api.resolver;
 
-import com.gitee.dorive.api.entity.element.EntityEle;
-import com.gitee.dorive.api.entity.element.EntityField;
-import com.gitee.dorive.api.entity.element.EntityType;
+import com.gitee.dorive.api.entity.EntityField;
+import com.gitee.dorive.api.entity.EntityType;
+import com.gitee.dorive.api.entity.PropChain;
 import lombok.Data;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
-public class ElementResolver {
+public class PropChainResolver {
 
-    private Map<String, EntityEle> entityEleMap = new LinkedHashMap<>();
+    private Map<String, PropChain> propChainMap = new LinkedHashMap<>();
 
-    public ElementResolver(EntityType entityType) {
-        this.entityEleMap.put("/", entityType);
+    public PropChainResolver(EntityType entityType) {
         resolve("", entityType);
     }
 
     private void resolve(String lastAccessPath, EntityType entityType) {
+        PropChain lastPropChain = propChainMap.get(lastAccessPath);
         for (EntityField entityField : entityType.getEntityFieldMap().values()) {
             String accessPath = lastAccessPath + "/" + entityField.getName();
-            entityEleMap.put(accessPath, entityField);
-            EntityType fieldEntityType = entityField.getEntityType();
-            if (fieldEntityType != null) {
-                resolve(accessPath, fieldEntityType);
+            PropChain propChain = new PropChain(lastPropChain, entityType, accessPath, entityField);
+            propChainMap.put(accessPath, propChain);
+            if (EntityField.isComplexType(entityField.getType()) && !entityField.isEntityDef()) {
+                resolve(accessPath, entityField.getEntityType());
             }
         }
     }
