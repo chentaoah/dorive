@@ -65,24 +65,28 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
             Class<?> listenerType = entityEventListener.getClass();
             Integer order = OrderUtils.getOrder(listenerType, LOWEST_PRECEDENCE);
             EntityListenerDef entityListenerDef = EntityListenerDef.fromElement(listenerType);
-            if (entityListenerDef == null) {
-                continue;
-            }
-            Class<?> entityClass = entityListenerDef.getValue();
-            if (entityClass == null) {
-                continue;
-            }
-            if (entityEventListener instanceof EntityEventListenerAdapter) {
-                EntityEventListenerAdapter entityEventListenerAdapter = (EntityEventListenerAdapter) entityEventListener;
-                entityEventListenerAdapter.setOrder(order);
-                entityEventListenerAdapter.setEntityListenerDef(entityListenerDef);
-
-            } else {
-                entityEventListener = new EntityEventListenerAdapter(order, entityListenerDef, entityEventListener);
-            }
-            List<EntityEventListener> existEntityEventListeners = classEntityEventListenersMap.computeIfAbsent(entityClass, key -> new ArrayList<>(4));
-            existEntityEventListeners.add(entityEventListener);
+            registry(order, entityListenerDef, entityEventListener);
         }
+    }
+
+    public void registry(Integer order, EntityListenerDef entityListenerDef, EntityEventListener entityEventListener) {
+        if (entityListenerDef == null) {
+            return;
+        }
+        Class<?> entityClass = entityListenerDef.getValue();
+        if (entityClass == null) {
+            return;
+        }
+        if (entityEventListener instanceof EntityEventListenerAdapter) {
+            EntityEventListenerAdapter entityEventListenerAdapter = (EntityEventListenerAdapter) entityEventListener;
+            entityEventListenerAdapter.setOrder(order);
+            entityEventListenerAdapter.setEntityListenerDef(entityListenerDef);
+
+        } else {
+            entityEventListener = new EntityEventListenerAdapter(order, entityListenerDef, entityEventListener);
+        }
+        List<EntityEventListener> existEntityEventListeners = classEntityEventListenersMap.computeIfAbsent(entityClass, key -> new ArrayList<>(4));
+        existEntityEventListeners.add(entityEventListener);
     }
 
     @Override
