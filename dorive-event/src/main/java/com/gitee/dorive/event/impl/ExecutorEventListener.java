@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.event.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.operation.Delete;
@@ -87,6 +88,25 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
         }
         List<EntityEventListener> existEntityEventListeners = classEntityEventListenersMap.computeIfAbsent(entityClass, key -> new ArrayList<>(4));
         existEntityEventListeners.add(entityEventListener);
+    }
+
+    public void cancel(Class<?> entityClass, EntityEventListener entityEventListener) {
+        List<EntityEventListener> existEntityEventListeners = classEntityEventListenersMap.get(entityClass);
+        if (existEntityEventListeners == null) {
+            return;
+        }
+        EntityEventListener existEntityEventListener = CollUtil.findOne(existEntityEventListeners,
+                listener -> entityEventListener == getRealListener(listener));
+        if (existEntityEventListener != null) {
+            existEntityEventListeners.remove(existEntityEventListener);
+        }
+    }
+
+    private EntityEventListener getRealListener(EntityEventListener entityEventListener) {
+        if (entityEventListener instanceof EntityEventListenerAdapter) {
+            return ((EntityEventListenerAdapter) entityEventListener).getEntityEventListener();
+        }
+        return entityEventListener;
     }
 
     @Override
