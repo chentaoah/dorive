@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.core.entity.operation.cop;
 
+import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.Condition;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,8 +28,13 @@ public class ConditionUpdate extends Condition {
 
     private Object entity;
 
-    public ConditionUpdate(Object entity, Condition condition) {
-        super(condition);
+    public ConditionUpdate(Object entity, Object primaryKey) {
+        super(primaryKey);
+        this.entity = entity;
+    }
+
+    public ConditionUpdate(Object entity, Example example) {
+        super(example);
         this.entity = entity;
     }
 

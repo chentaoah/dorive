@@ -19,11 +19,10 @@ package com.gitee.dorive.core.impl.factory;
 
 import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.operation.cop.ConditionDelete;
 import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
+import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.Update;
@@ -55,7 +54,7 @@ public class OperationFactory {
     }
 
     public Operation buildUpdateByExample(Object entity, Example example) {
-        return new ConditionUpdate(entity, new Condition(example));
+        return new ConditionUpdate(entity, example);
     }
 
     public Operation buildInsertOrUpdate(Object entity) {
@@ -72,11 +71,11 @@ public class OperationFactory {
     }
 
     public Operation buildDeleteByPK(Object primaryKey) {
-        return new ConditionDelete(new Condition(primaryKey));
+        return new ConditionDelete(primaryKey);
     }
 
     public Operation buildDeleteByExample(Example example) {
-        return new ConditionDelete(new Condition(example));
+        return new ConditionDelete(example);
     }
 
 }

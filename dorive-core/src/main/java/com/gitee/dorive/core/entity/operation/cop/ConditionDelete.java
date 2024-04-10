@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.core.entity.operation.cop;
 
+import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.Condition;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,8 +26,12 @@ import lombok.Setter;
 @Setter
 public class ConditionDelete extends Condition {
 
-    public ConditionDelete(Condition condition) {
-        super(condition);
+    public ConditionDelete(Object primaryKey) {
+        super(primaryKey);
+    }
+
+    public ConditionDelete(Example example) {
+        super(example);
     }
 
 }
