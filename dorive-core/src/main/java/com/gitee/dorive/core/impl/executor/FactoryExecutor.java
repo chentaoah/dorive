@@ -28,6 +28,7 @@ import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.EntityOp;
+import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.Query;
@@ -118,14 +119,14 @@ public class FactoryExecutor extends AbstractProxyExecutor {
             }
             return totalCount;
 
-        } else if (operation instanceof ConditionOp) {
-            ConditionOp conditionOp = (ConditionOp) operation;
-            Object entity = conditionOp.getEntity();
+        } else if (operation instanceof ConditionUpdate) {
+            ConditionUpdate conditionUpdate = (ConditionUpdate) operation;
+            Object entity = conditionUpdate.getEntity();
             if (entity != null) {
                 Object persistent = entityFactory.deconstruct(context, entity);
-                conditionOp.setEntity(persistent);
+                conditionUpdate.setEntity(persistent);
                 int totalCount = super.execute(context, operation);
-                conditionOp.setEntity(entity);
+                conditionUpdate.setEntity(entity);
                 return totalCount;
             }
         }
