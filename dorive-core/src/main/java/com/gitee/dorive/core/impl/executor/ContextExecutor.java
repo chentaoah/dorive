@@ -72,7 +72,7 @@ public class ContextExecutor extends AbstractExecutor {
         if (!derivedResolver.hasDerived()) {
             entityHandler.handle(context, entities);
         } else {
-            for (Pair<AbstractContextRepository<?, ?>, List<Object>> pair : repository.getDerivedResolver().distribute(entities)) {
+            for (Pair<AbstractContextRepository<?, ?>, List<Object>> pair : derivedResolver.distribute(entities)) {
                 if (pair.getKey() == this.repository) { // 避免自循环
                     entityHandler.handle(context, pair.getValue());
                 } else {

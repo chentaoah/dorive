@@ -27,9 +27,12 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
+import com.gitee.dorive.core.entity.operation.ConditionOp;
+import com.gitee.dorive.core.entity.operation.EntityOp;
 import com.gitee.dorive.core.entity.operation.ext.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.entity.operation.ext.InsertOrUpdate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -91,21 +94,43 @@ public class FactoryExecutor extends AbstractProxyExecutor {
 
     @Override
     public int execute(Context context, Operation operation) {
-        Object entity = operation.getEntity();
-        if (entity != null) {
-            Object persistent = entityFactory.deconstruct(context, entity);
-            operation.setEntity(persistent);
-        }
-        int totalCount = super.execute(context, operation);
-        if (operation instanceof Insert) {
-            Object persistent = operation.getEntity();
-            Object primaryKey = BeanUtil.getFieldValue(persistent, entityStoreInfo.getIdProperty());
-            if (primaryKey != null) {
-                entityEle.getIdProxy().setValue(entity, primaryKey);
+        if (operation instanceof EntityOp) {
+            EntityOp entityOp = (EntityOp) operation;
+            List<?> entities = entityOp.getEntities();
+            List<Object> newEntities = new ArrayList<>(entities.size());
+            for (Object entity : entities) {
+                Object persistent = entityFactory.deconstruct(context, entity);
+                newEntities.add(persistent);
+            }
+
+            entityOp.setEntities(newEntities);
+            int totalCount = super.execute(context, operation);
+            entityOp.setEntities(entities);
+
+            if (operation instanceof Insert || operation instanceof InsertOrUpdate) {
+                for (int index = 0; index < entities.size(); index++) {
+                    Object entity = entities.get(index);
+                    Object persistent = newEntities.get(index);
+                    Object primaryKey = BeanUtil.getFieldValue(persistent, entityStoreInfo.getIdProperty());
+                    if (primaryKey != null) {
+                        entityEle.getIdProxy().setValue(entity, primaryKey);
+                    }
+                }
+            }
+            return totalCount;
+
+        } else if (operation instanceof ConditionOp) {
+            ConditionOp conditionOp = (ConditionOp) operation;
+            Object entity = conditionOp.getEntity();
+            if (entity != null) {
+                Object persistent = entityFactory.deconstruct(context, entity);
+                conditionOp.setEntity(persistent);
+                int totalCount = super.execute(context, operation);
+                conditionOp.setEntity(entity);
+                return totalCount;
             }
         }
-        operation.setEntity(entity);
-        return totalCount;
+        return super.execute(context, operation);
     }
 
 }

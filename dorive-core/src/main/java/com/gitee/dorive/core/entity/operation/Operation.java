@@ -21,7 +21,7 @@ import com.gitee.dorive.core.entity.option.RootControl;
 import lombok.Data;
 
 /**
- * 操作 = 操作类型 + （实体 || 实体 + 主键 || 实体 + 条件 || 主键 || 条件）
+ * 操作
  */
 @Data
 public class Operation {
