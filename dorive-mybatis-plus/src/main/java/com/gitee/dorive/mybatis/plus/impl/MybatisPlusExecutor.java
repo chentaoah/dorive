@@ -18,6 +18,7 @@
 package com.gitee.dorive.mybatis.plus.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -31,6 +32,7 @@ import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.operation.EntityOp;
 import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
@@ -141,6 +143,31 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
     @Override
     public int execute(Context context, Operation operation) {
+        int totalCount = 0;
+        if (operation instanceof EntityOp) {
+            EntityOp entityOp = (EntityOp) operation;
+            List<?> persistentObjs = entityOp.getEntities();
+            if (entityOp instanceof Insert) {
+                for (Object persistent : persistentObjs) {
+                    totalCount += baseMapper.insert(persistent);
+                }
+
+            } else if (operation instanceof Update) {
+                Update update = (Update) operation;
+                Set<String> nullableProps = update.getNullableProps();
+                for (Object persistent : persistentObjs) {
+                    if (nullableProps != null && !nullableProps.isEmpty()) {
+                        Object primaryKey = ReflectUtil.getFieldValue(persistent, entityStoreInfo.getIdProperty());
+                        UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableProps, primaryKey, null);
+                        totalCount += baseMapper.update(null, updateWrapper);
+                    } else {
+                        totalCount += baseMapper.updateById(persistent);
+                    }
+                }
+            }
+        }
+        return totalCount;
+
         Object persistent = operation.getEntity();
 
         if (operation instanceof Insert) {
