@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.operation.ext;
+package com.gitee.dorive.core.entity.operation.eop;
 
 import com.gitee.dorive.core.entity.operation.EntityOp;
 import lombok.Getter;
@@ -25,9 +25,9 @@ import java.util.List;
 
 @Getter
 @Setter
-public class InsertOrUpdate extends EntityOp {
+public class Delete extends EntityOp {
 
-    public InsertOrUpdate(List<?> entities) {
+    public Delete(List<?> entities) {
         super(entities);
     }
 

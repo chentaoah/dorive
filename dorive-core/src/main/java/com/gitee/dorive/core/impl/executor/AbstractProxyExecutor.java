@@ -21,7 +21,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.entity.operation.cop.Query;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

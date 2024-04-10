@@ -15,19 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.operation.ext;
+package com.gitee.dorive.core.entity.operation.cop;
 
 import com.gitee.dorive.core.entity.operation.Condition;
-import com.gitee.dorive.core.entity.operation.ConditionOp;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ConditionUpdate extends ConditionOp {
+public class ConditionDelete extends Condition {
 
-    public ConditionUpdate(Object entity, Condition condition) {
-        super(entity, condition);
+    public ConditionDelete(Condition condition) {
+        super(condition);
     }
 
 }

@@ -21,12 +21,12 @@ import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.entity.operation.ext.ConditionDelete;
-import com.gitee.dorive.core.entity.operation.ext.ConditionUpdate;
-import com.gitee.dorive.core.entity.operation.ext.Delete;
-import com.gitee.dorive.core.entity.operation.ext.Insert;
-import com.gitee.dorive.core.entity.operation.ext.Update;
+import com.gitee.dorive.core.entity.operation.cop.Query;
+import com.gitee.dorive.core.entity.operation.cop.ConditionDelete;
+import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
+import com.gitee.dorive.core.entity.operation.eop.Delete;
+import com.gitee.dorive.core.entity.operation.eop.Insert;
+import com.gitee.dorive.core.entity.operation.eop.Update;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

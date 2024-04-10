@@ -22,7 +22,7 @@ import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.EntityJoiner;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.option.JoinType;
 import com.gitee.dorive.core.impl.binder.ValueBinder;
 import com.gitee.dorive.core.impl.factory.OperationFactory;

@@ -15,24 +15,23 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.operation.ext;
+package com.gitee.dorive.core.entity.operation.cop;
 
-import com.gitee.dorive.core.entity.operation.EntityOp;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.operation.Condition;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 @Getter
 @Setter
-public class Update extends EntityOp {
+public class Query extends Condition {
 
-    private Set<String> nullableProps = Collections.emptySet();
+    public Query(Object primaryKey) {
+        super(primaryKey);
+    }
 
-    public Update(List<?> entities) {
-        super(entities);
+    public Query(Example example) {
+        super(example);
     }
 
 }

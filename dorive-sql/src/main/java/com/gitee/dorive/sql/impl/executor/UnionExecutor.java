@@ -28,7 +28,7 @@ import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
-import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.impl.executor.AbstractProxyExecutor;
 import com.gitee.dorive.sql.api.SqlRunner;
 import lombok.Getter;
