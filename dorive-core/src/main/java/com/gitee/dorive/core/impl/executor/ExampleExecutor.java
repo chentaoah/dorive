@@ -30,7 +30,7 @@ import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.entity.operation.Update;
+import com.gitee.dorive.core.entity.operation.ext.Update;
 import lombok.Getter;
 import lombok.Setter;
 

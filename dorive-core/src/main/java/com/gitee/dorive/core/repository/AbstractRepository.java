@@ -28,11 +28,8 @@ import com.gitee.dorive.core.api.repository.Repository;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.operation.Delete;
-import com.gitee.dorive.core.entity.operation.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.entity.operation.Update;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import lombok.Getter;
 import lombok.Setter;
@@ -97,23 +94,23 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     @Override
     public int insert(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Insert insert = operationFactory.buildInsert(entity);
-        return execute((Context) options, insert);
+        Operation operation = operationFactory.buildInsert(entity);
+        return execute((Context) options, operation);
     }
 
     @Override
     public int update(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Update update = operationFactory.buildUpdate(entity);
-        return execute((Context) options, update);
+        Operation operation = operationFactory.buildUpdate(entity);
+        return execute((Context) options, operation);
     }
 
     @Override
     public int updateByExample(Options options, Object entity, Example example) {
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
-        Update update = operationFactory.buildUpdateByExample(entity, example);
-        return execute((Context) options, update);
+        Operation operation = operationFactory.buildUpdateByExample(entity, example);
+        return execute((Context) options, operation);
     }
 
     @Override
@@ -126,22 +123,22 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     @Override
     public int delete(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Delete delete = operationFactory.buildDelete(entity);
-        return execute((Context) options, delete);
+        Operation operation = operationFactory.buildDelete(entity);
+        return execute((Context) options, operation);
     }
 
     @Override
     public int deleteByPrimaryKey(Options options, PK primaryKey) {
         Assert.notNull(primaryKey, "The primary key cannot be null!");
-        Delete delete = operationFactory.buildDeleteByPK(primaryKey);
-        return execute((Context) options, delete);
+        Operation operation = operationFactory.buildDeleteByPK(primaryKey);
+        return execute((Context) options, operation);
     }
 
     @Override
     public int deleteByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        Delete delete = operationFactory.buildDeleteByExample(example);
-        return execute((Context) options, delete);
+        Operation operation = operationFactory.buildDeleteByExample(example);
+        return execute((Context) options, operation);
     }
 
     @Override

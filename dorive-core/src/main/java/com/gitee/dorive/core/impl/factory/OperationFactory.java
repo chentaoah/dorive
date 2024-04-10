@@ -19,9 +19,18 @@ package com.gitee.dorive.core.impl.factory;
 
 import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.operation.*;
+import com.gitee.dorive.core.entity.operation.Condition;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.Query;
+import com.gitee.dorive.core.entity.operation.ext.ConditionDelete;
+import com.gitee.dorive.core.entity.operation.ext.ConditionUpdate;
+import com.gitee.dorive.core.entity.operation.ext.Delete;
+import com.gitee.dorive.core.entity.operation.ext.Insert;
+import com.gitee.dorive.core.entity.operation.ext.Update;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.util.Collections;
 
 @Data
 @AllArgsConstructor
@@ -30,62 +39,44 @@ public class OperationFactory {
     private EntityEle entityEle;
 
     public Query buildQueryByPK(Object primaryKey) {
-        Query query = new Query(null);
-        query.setPrimaryKey(primaryKey);
-        return query;
+        return new Query(primaryKey);
     }
 
     public Query buildQueryByExample(Example example) {
-        Query query = new Query(null);
-        query.setExample(example);
-        return query;
+        return new Query(example);
     }
 
-    public Insert buildInsert(Object entity) {
-        return new Insert(entity);
+    public Operation buildInsert(Object entity) {
+        return new Insert(Collections.singletonList(entity));
     }
 
-    public Update buildUpdate(Object entity) {
-        Update update = new Update(entity);
-        Object primaryKey = entityEle.getIdProxy().getValue(entity);
-        update.setPrimaryKey(primaryKey);
-        return update;
+    public Operation buildUpdate(Object entity) {
+        return new Update(Collections.singletonList(entity));
     }
 
-    public Update buildUpdateByExample(Object entity, Example example) {
-        Update update = new Update(entity);
-        update.setExample(example);
-        return update;
+    public Operation buildUpdateByExample(Object entity, Example example) {
+        return new ConditionUpdate(entity, new Condition(example));
     }
 
     public Operation buildInsertOrUpdate(Object entity) {
         Object primaryKey = entityEle.getIdProxy().getValue(entity);
         if (primaryKey == null) {
-            return new Insert(entity);
+            return buildInsert(entity);
         } else {
-            Update update = new Update(entity);
-            update.setPrimaryKey(primaryKey);
-            return update;
+            return buildUpdate(entity);
         }
     }
 
-    public Delete buildDelete(Object entity) {
-        Delete delete = new Delete(entity);
-        Object primaryKey = entityEle.getIdProxy().getValue(entity);
-        delete.setPrimaryKey(primaryKey);
-        return delete;
+    public Operation buildDelete(Object entity) {
+        return new Delete(Collections.singletonList(entity));
     }
 
-    public Delete buildDeleteByPK(Object primaryKey) {
-        Delete delete = new Delete(null);
-        delete.setPrimaryKey(primaryKey);
-        return delete;
+    public Operation buildDeleteByPK(Object primaryKey) {
+        return new ConditionDelete(new Condition(primaryKey));
     }
 
-    public Delete buildDeleteByExample(Example example) {
-        Delete delete = new Delete(null);
-        delete.setExample(example);
-        return delete;
+    public Operation buildDeleteByExample(Example example) {
+        return new ConditionDelete(new Condition(example));
     }
 
 }

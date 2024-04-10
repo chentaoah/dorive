@@ -15,22 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.operation;
+package com.gitee.dorive.core.entity.operation.ext;
 
-import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.operation.EntityOp;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
-public class Query extends Condition {
+public class Delete extends EntityOp {
 
-    public Query(Object primaryKey) {
-        super(primaryKey);
-    }
-
-    public Query(Example example) {
-        super(example);
+    public Delete(List<?> entities) {
+        super(entities);
     }
 
 }

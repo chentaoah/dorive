@@ -17,20 +17,23 @@
 
 package com.gitee.dorive.core.entity.operation;
 
-import com.gitee.dorive.core.entity.executor.Example;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class Query extends Condition {
+public class ConditionOp extends Operation {
 
-    public Query(Object primaryKey) {
-        super(primaryKey);
+    private Object entity;
+    private Condition condition;
+
+    public ConditionOp(Condition condition) {
+        this.condition = condition;
     }
 
-    public Query(Example example) {
-        super(example);
+    public ConditionOp(Object entity, Condition condition) {
+        this.entity = entity;
+        this.condition = condition;
     }
 
 }

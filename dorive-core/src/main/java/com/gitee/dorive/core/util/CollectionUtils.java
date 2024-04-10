@@ -17,19 +17,23 @@
 
 package com.gitee.dorive.core.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class CollectionUtils {
 
-    public static Collection<?> toCollection(Object object) {
-        Collection<?> collection;
-        if (object instanceof Collection) {
-            collection = (Collection<?>) object;
+    public static List<?> toList(Object object) {
+        if (object instanceof List) {
+            return (List<?>) object;
+
+        } else if (object instanceof Collection) {
+            return new ArrayList<>((Collection<?>) object);
+
         } else {
-            collection = Collections.singletonList(object);
+            return Collections.singletonList(object);
         }
-        return collection;
     }
 
 }

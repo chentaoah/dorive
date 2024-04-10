@@ -18,6 +18,7 @@
 package com.gitee.dorive.core.repository;
 
 import com.gitee.dorive.api.entity.PropChain;
+import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Options;
@@ -34,6 +35,7 @@ import com.gitee.dorive.core.util.ExampleUtils;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -103,6 +105,33 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
             }
         }
         return super.executeQuery(context, query);
+    }
+
+    public void getBoundValue(Context context, Object rootEntity, Collection<?> entities) {
+        for (Object entity : entities) {
+            for (Binder binder : binderResolver.getStrongBinders()) {
+                Object fieldValue = binder.getFieldValue(context, entity);
+                if (fieldValue == null) {
+                    Object boundValue = binder.getBoundValue(context, rootEntity);
+                    if (boundValue != null) {
+                        binder.setFieldValue(context, entity, boundValue);
+                    }
+                }
+            }
+        }
+    }
+
+    public void setBoundId(Context context, Object rootEntity, Object entity) {
+        Binder binder = binderResolver.getBoundIdBinder();
+        if (binder != null) {
+            Object boundValue = binder.getBoundValue(context, rootEntity);
+            if (boundValue == null) {
+                Object primaryKey = binder.getFieldValue(context, entity);
+                if (primaryKey != null) {
+                    binder.setBoundValue(context, rootEntity, primaryKey);
+                }
+            }
+        }
     }
 
 }

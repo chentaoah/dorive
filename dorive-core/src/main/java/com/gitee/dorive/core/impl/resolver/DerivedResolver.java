@@ -17,12 +17,15 @@
 
 package com.gitee.dorive.core.impl.resolver;
 
+import cn.hutool.core.lang.Pair;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.ReflectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,19 +60,20 @@ public class DerivedResolver {
         return !classRepositoryMap.isEmpty();
     }
 
-    public AbstractContextRepository<?, ?> distribute(Object entity) {
-        return classRepositoryMap.getOrDefault(entity.getClass(), repository);
-    }
-
-    public Map<AbstractContextRepository<?, ?>, List<Object>> distribute(List<Object> entities) {
+    public Collection<Pair<AbstractContextRepository<?, ?>, List<Object>>> distribute(List<?> entities) {
         int size = classRepositoryMap.size() + 1;
-        Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = new LinkedHashMap<>(size * 4 / 3 + 1);
+        Map<Class<?>, Pair<AbstractContextRepository<?, ?>, List<Object>>> classRepoEntitiesPairMap = new HashMap<>(size * 4 / 3 + 1);
         for (Object entity : entities) {
-            AbstractContextRepository<?, ?> repository = distribute(entity);
-            List<Object> existEntities = repositoryEntitiesMap.computeIfAbsent(repository, key -> new ArrayList<>(entities.size()));
-            existEntities.add(entity);
+            Class<?> clazz = entity.getClass();
+            Pair<AbstractContextRepository<?, ?>, List<Object>> repoEntitiesPair = classRepoEntitiesPairMap.computeIfAbsent(clazz, key -> {
+                AbstractContextRepository<?, ?> repository = classRepositoryMap.getOrDefault(key, this.repository);
+                List<Object> partEntities = new ArrayList<>(entities.size());
+                return new Pair<>(repository, partEntities);
+            });
+            List<Object> partEntities = repoEntitiesPair.getValue();
+            partEntities.add(entity);
         }
-        return repositoryEntitiesMap;
+        return classRepoEntitiesPairMap.values();
     }
 
 }

@@ -28,8 +28,16 @@ public class Condition extends Operation {
     private Object primaryKey;
     private Example example;
 
-    public Condition(Object entity) {
-        super(entity);
+    public Condition(Object primaryKey) {
+        this.primaryKey = primaryKey;
+    }
+
+    public Condition(Example example) {
+        this.example = example;
+    }
+
+    public boolean isEmpty() {
+        return primaryKey == null && example == null;
     }
 
 }

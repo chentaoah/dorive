@@ -17,19 +17,16 @@
 
 package com.gitee.dorive.core.entity.operation;
 
+import com.gitee.dorive.core.entity.option.RootControl;
 import lombok.Data;
 
+/**
+ * 操作 = 操作类型 + （实体 || 实体 + 主键 || 实体 + 条件 || 主键 || 条件）
+ */
 @Data
 public class Operation {
 
-    public enum RootControl {NONE, INCLUDE_ROOT, IGNORE_ROOT}
-
     private RootControl rootControl = RootControl.NONE;
-    private Object entity;
-
-    public Operation(Object entity) {
-        this.entity = entity;
-    }
 
     public void includeRoot() {
         rootControl = RootControl.INCLUDE_ROOT;

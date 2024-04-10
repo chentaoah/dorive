@@ -15,17 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.operation;
+package com.gitee.dorive.core.entity.option;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class Insert extends Operation {
-
-    public Insert(Object entity) {
-        super(entity);
-    }
-
+public enum RootControl {
+    NONE,
+    INCLUDE_ROOT,
+    IGNORE_ROOT
 }

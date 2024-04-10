@@ -15,17 +15,24 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.operation;
+package com.gitee.dorive.core.entity.operation.ext;
 
+import com.gitee.dorive.core.entity.operation.EntityOp;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 @Getter
 @Setter
-public class Delete extends Condition {
+public class Update extends EntityOp {
 
-    public Delete(Object entity) {
-        super(entity);
+    private Set<String> nullableProps = Collections.emptySet();
+
+    public Update(List<?> entities) {
+        super(entities);
     }
 
 }

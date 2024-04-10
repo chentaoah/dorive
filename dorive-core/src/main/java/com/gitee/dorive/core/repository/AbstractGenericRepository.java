@@ -22,10 +22,11 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.repository.ListableRepository;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.operation.InsertOrUpdate;
+import com.gitee.dorive.core.entity.operation.ext.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.util.ExampleUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK> implements ListableRepository<E, PK> {
@@ -53,7 +54,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     @Override
     public int insertOrUpdate(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = new InsertOrUpdate(entity);
+        Operation operation = new InsertOrUpdate(Collections.singletonList(entity));
         return execute((Context) options, operation);
     }
 

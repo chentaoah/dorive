@@ -18,19 +18,19 @@
 package com.gitee.dorive.core.impl.executor;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Pair;
 import com.gitee.dorive.api.entity.PropChain;
-import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.operation.Delete;
-import com.gitee.dorive.core.entity.operation.Insert;
-import com.gitee.dorive.core.entity.operation.InsertOrUpdate;
+import com.gitee.dorive.core.entity.operation.EntityOp;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
-import com.gitee.dorive.core.entity.operation.Update;
-import com.gitee.dorive.core.impl.factory.OperationFactory;
+import com.gitee.dorive.core.entity.operation.ext.Delete;
+import com.gitee.dorive.core.entity.operation.ext.Insert;
+import com.gitee.dorive.core.entity.operation.ext.InsertOrUpdate;
+import com.gitee.dorive.core.entity.operation.ext.Update;
 import com.gitee.dorive.core.impl.resolver.DerivedResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -38,9 +38,7 @@ import com.gitee.dorive.core.util.CollectionUtils;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -74,18 +72,17 @@ public class ContextExecutor extends AbstractExecutor {
         if (!derivedResolver.hasDerived()) {
             entityHandler.handle(context, entities);
         } else {
-            Map<AbstractContextRepository<?, ?>, List<Object>> repositoryEntitiesMap = derivedResolver.distribute(entities);
-            repositoryEntitiesMap.forEach((repository, partEntities) -> {
-                if (repository == this.repository) { // 避免自循环
-                    entityHandler.handle(context, partEntities);
+            for (Pair<AbstractContextRepository<?, ?>, List<Object>> pair : repository.getDerivedResolver().distribute(entities)) {
+                if (pair.getKey() == this.repository) { // 避免自循环
+                    entityHandler.handle(context, pair.getValue());
                 } else {
                     Executor executor = repository.getExecutor();
                     if (executor instanceof ContextExecutor) {
                         ContextExecutor contextExecutor = (ContextExecutor) executor;
-                        contextExecutor.populate(context, partEntities);
+                        contextExecutor.populate(context, pair.getValue());
                     }
                 }
-            });
+            }
         }
     }
 
@@ -96,38 +93,40 @@ public class ContextExecutor extends AbstractExecutor {
 
     @Override
     public int execute(Context context, Operation operation) {
-        Object rootEntity = operation.getEntity();
-        Assert.notNull(rootEntity, "The root entity cannot be null!");
+        EntityOp entityOp = (EntityOp) operation;
+        List<?> entities = entityOp.getEntities();
+        Assert.notEmpty(entities, "The entities cannot be empty!");
 
-        DerivedResolver derivedResolver = repository.getDerivedResolver();
-        AbstractContextRepository<?, ?> repository = derivedResolver.distribute(rootEntity);
-
-        Executor executor = repository.getExecutor();
-        if (executor instanceof ContextExecutor) {
-            ContextExecutor contextExecutor = (ContextExecutor) executor;
+        int totalCount = 0;
+        for (Pair<AbstractContextRepository<?, ?>, List<Object>> pair : repository.getDerivedResolver().distribute(entities)) {
+            ContextExecutor contextExecutor = (ContextExecutor) pair.getKey().getExecutor();
             if (operation instanceof Insert) {
-                return contextExecutor.executeInsert(context, operation);
+                Insert insert = new Insert(pair.getValue());
+                totalCount += contextExecutor.executeInsert(context, insert);
 
-            } else if (operation instanceof Update || operation instanceof Delete) {
-                return contextExecutor.executeUpdateOrDelete(context, operation);
+            } else if (operation instanceof Update) {
+                Update update = new Update(pair.getValue());
+                totalCount += contextExecutor.executeUpdateOrDelete(context, update);
+
+            } else if (operation instanceof Delete) {
+                Delete delete = new Delete(pair.getValue());
+                totalCount += contextExecutor.executeUpdateOrDelete(context, delete);
 
             } else if (operation instanceof InsertOrUpdate) {
-                return contextExecutor.executeInsertOrUpdate(context, operation);
+                InsertOrUpdate insertOrUpdate = new InsertOrUpdate(pair.getValue());
+                totalCount += contextExecutor.executeInsertOrUpdate(context, insertOrUpdate);
             }
         }
-        return 0;
+        return totalCount;
     }
 
-    public int executeInsert(Context context, Operation operation) {
-        Object rootEntity = operation.getEntity();
+    public int executeInsert(Context context, Insert insert) {
         int totalCount = 0;
         for (CommonRepository repository : this.repository.getOrderedRepositories()) {
             if (repository.isRoot()) {
-                if (!operation.isIgnoreRoot()) {
-                    if (repository.matches(context) || operation.isIncludeRoot()) {
-                        getBoundValue(context, rootEntity, repository, rootEntity);
-                        totalCount += repository.execute(context, operation);
-                        setBoundId(context, rootEntity, repository, rootEntity);
+                if (!insert.isIgnoreRoot()) {
+                    if (repository.matches(context) || insert.isIncludeRoot()) {
+                        totalCount += repository.execute(context, insert);
                     }
                 }
             } else {
@@ -136,85 +135,66 @@ public class ContextExecutor extends AbstractExecutor {
                 if (!isMatch && !isAggregated) {
                     continue;
                 }
-                PropChain anchorPoint = repository.getAnchorPoint();
-                Object targetEntity = anchorPoint.getValue(rootEntity);
-                if (targetEntity == null) {
-                    continue;
-                }
-                OperationFactory operationFactory = repository.getOperationFactory();
-                Collection<?> collection = CollectionUtils.toCollection(targetEntity);
-                for (Object entity : collection) {
-                    if (isMatch) {
-                        getBoundValue(context, rootEntity, repository, entity);
+                List<?> rootEntities = insert.getEntities();
+                for (Object rootEntity : rootEntities) {
+                    PropChain anchorPoint = repository.getAnchorPoint();
+                    Object targetEntity = anchorPoint.getValue(rootEntity);
+                    if (targetEntity == null) {
+                        continue;
                     }
-                    Operation newOperation = operationFactory.buildInsert(entity);
-                    newOperation.switchRoot(isMatch);
-                    totalCount += repository.execute(context, newOperation);
-                }
-                if (collection.size() == 1) {
-                    setBoundId(context, rootEntity, repository, collection.iterator().next());
+                    List<?> entities = CollectionUtils.toList(targetEntity);
+                    if (isMatch) {
+                        repository.getBoundValue(context, rootEntity, entities);
+                    }
+                    Operation operation = new Insert(entities);
+                    operation.switchRoot(isMatch);
+                    totalCount += repository.execute(context, operation);
+                    if (entities.size() == 1) {
+                        repository.setBoundId(context, rootEntity, entities.iterator().next());
+                    }
                 }
             }
         }
         return totalCount;
     }
 
-    public int executeUpdateOrDelete(Context context, Operation operation) {
-        Object rootEntity = operation.getEntity();
+    public int executeUpdateOrDelete(Context context, EntityOp entityOp) {
         int totalCount = 0;
-        if (!operation.isIgnoreRoot()) {
-            CommonRepository rootRepository = this.repository.getRootRepository();
-            if (rootRepository.matches(context) || operation.isIncludeRoot()) {
-                Object primaryKey = rootRepository.getPrimaryKey(rootEntity);
-                if (primaryKey != null) {
-                    totalCount += rootRepository.execute(context, operation);
-                }
+        if (!entityOp.isIgnoreRoot()) {
+            CommonRepository repository = this.repository.getRootRepository();
+            if (repository.matches(context) || entityOp.isIncludeRoot()) {
+                totalCount += repository.execute(context, entityOp);
             }
         }
-        for (CommonRepository subRepository : this.repository.getSubRepositories()) {
-            boolean isMatch = subRepository.matches(context);
-            boolean isAggregated = subRepository.isAggregated();
+        for (CommonRepository repository : this.repository.getSubRepositories()) {
+            boolean isMatch = repository.matches(context);
+            boolean isAggregated = repository.isAggregated();
             if (!isMatch && !isAggregated) {
                 continue;
             }
-            PropChain anchorPoint = subRepository.getAnchorPoint();
-            Object targetEntity = anchorPoint.getValue(rootEntity);
-            if (targetEntity == null) {
-                continue;
-            }
-            OperationFactory operationFactory = subRepository.getOperationFactory();
-            Collection<?> collection = CollectionUtils.toCollection(targetEntity);
-            for (Object entity : collection) {
-                Object primaryKey = subRepository.getPrimaryKey(entity);
-                Operation newOperation = null;
-                if ((isMatch && primaryKey != null) || isAggregated) {
-                    newOperation = operation instanceof Update ? operationFactory.buildUpdate(entity) : operationFactory.buildDelete(entity);
+            List<?> rootEntities = entityOp.getEntities();
+            for (Object rootEntity : rootEntities) {
+                PropChain anchorPoint = repository.getAnchorPoint();
+                Object targetEntity = anchorPoint.getValue(rootEntity);
+                if (targetEntity == null) {
+                    continue;
                 }
-                if (newOperation != null) {
-                    newOperation.switchRoot(isMatch);
-                    totalCount += subRepository.execute(context, newOperation);
-                }
+                List<?> entities = CollectionUtils.toList(targetEntity);
+                Operation operation = entityOp instanceof Update ? new Update(entities) : new Delete(entities);
+                operation.switchRoot(isMatch);
+                totalCount += repository.execute(context, operation);
             }
         }
         return totalCount;
     }
 
-    public int executeInsertOrUpdate(Context context, Operation operation) {
-        Object rootEntity = operation.getEntity();
+    public int executeInsertOrUpdate(Context context, InsertOrUpdate insertOrUpdate) {
         int totalCount = 0;
         for (CommonRepository repository : this.repository.getOrderedRepositories()) {
-            OperationFactory operationFactory = repository.getOperationFactory();
             if (repository.isRoot()) {
-                if (!operation.isIgnoreRoot()) {
-                    if (repository.matches(context) || operation.isIncludeRoot()) {
-                        Operation newOperation = operationFactory.buildInsertOrUpdate(rootEntity);
-                        if (newOperation instanceof Insert) {
-                            getBoundValue(context, rootEntity, repository, rootEntity);
-                            totalCount += repository.execute(context, newOperation);
-                            setBoundId(context, rootEntity, repository, rootEntity);
-                        } else {
-                            totalCount += repository.execute(context, newOperation);
-                        }
+                if (!insertOrUpdate.isIgnoreRoot()) {
+                    if (repository.matches(context) || insertOrUpdate.isIncludeRoot()) {
+                        totalCount += repository.execute(context, insertOrUpdate);
                     }
                 }
             } else {
@@ -223,59 +203,27 @@ public class ContextExecutor extends AbstractExecutor {
                 if (!isMatch && !isAggregated) {
                     continue;
                 }
-                PropChain anchorPoint = repository.getAnchorPoint();
-                Object targetEntity = anchorPoint.getValue(rootEntity);
-                if (targetEntity == null) {
-                    continue;
-                }
-                Collection<?> collection = CollectionUtils.toCollection(targetEntity);
-                Object onlyOne = collection.size() == 1 ? collection.iterator().next() : null;
-                boolean isOnlyOneInsert = onlyOne != null && repository.getPrimaryKey(onlyOne) == null;
-                for (Object entity : collection) {
-                    Object primaryKey = repository.getPrimaryKey(entity);
-                    if (isMatch && primaryKey == null) {
-                        getBoundValue(context, rootEntity, repository, entity);
+                List<?> rootEntities = insertOrUpdate.getEntities();
+                for (Object rootEntity : rootEntities) {
+                    PropChain anchorPoint = repository.getAnchorPoint();
+                    Object targetEntity = anchorPoint.getValue(rootEntity);
+                    if (targetEntity == null) {
+                        continue;
                     }
-                    Operation newOperation;
-                    if (isAggregated) {
-                        newOperation = new InsertOrUpdate(entity);
-                    } else {
-                        newOperation = primaryKey == null ? operationFactory.buildInsert(entity) : operationFactory.buildUpdate(entity);
+                    List<?> entities = CollectionUtils.toList(targetEntity);
+                    if (isMatch) {
+                        repository.getBoundValue(context, rootEntity, entities);
                     }
-                    newOperation.switchRoot(isMatch);
-                    totalCount += repository.execute(context, newOperation);
-                }
-                if (isOnlyOneInsert) {
-                    setBoundId(context, rootEntity, repository, onlyOne);
+                    Operation operation = new InsertOrUpdate(entities);
+                    operation.switchRoot(isMatch);
+                    totalCount += repository.execute(context, operation);
+                    if (entities.size() == 1) {
+                        repository.setBoundId(context, rootEntity, entities.iterator().next());
+                    }
                 }
             }
         }
         return totalCount;
-    }
-
-    private void getBoundValue(Context context, Object rootEntity, CommonRepository repository, Object entity) {
-        for (Binder binder : repository.getBinderResolver().getStrongBinders()) {
-            Object fieldValue = binder.getFieldValue(context, entity);
-            if (fieldValue == null) {
-                Object boundValue = binder.getBoundValue(context, rootEntity);
-                if (boundValue != null) {
-                    binder.setFieldValue(context, entity, boundValue);
-                }
-            }
-        }
-    }
-
-    private void setBoundId(Context context, Object rootEntity, CommonRepository repository, Object entity) {
-        Binder binder = repository.getBinderResolver().getBoundIdBinder();
-        if (binder != null) {
-            Object boundValue = binder.getBoundValue(context, rootEntity);
-            if (boundValue == null) {
-                Object primaryKey = binder.getFieldValue(context, entity);
-                if (primaryKey != null) {
-                    binder.setBoundValue(context, rootEntity, primaryKey);
-                }
-            }
-        }
     }
 
 }

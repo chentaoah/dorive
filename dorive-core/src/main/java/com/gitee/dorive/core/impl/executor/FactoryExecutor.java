@@ -27,7 +27,7 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
-import com.gitee.dorive.core.entity.operation.Insert;
+import com.gitee.dorive.core.entity.operation.ext.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.Query;
 import lombok.Getter;
