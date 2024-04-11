@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.option;
+package com.gitee.dorive.core.entity.enums;
 
-public enum BindingType {
-    STRONG,
-    WEAK,
-    VALUE
+public enum QueryMethod {
+    DEFAULT,
+    SQL
 }

@@ -32,7 +32,7 @@ import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
-import com.gitee.dorive.core.entity.option.JoinType;
+import com.gitee.dorive.core.entity.enums.JoinType;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.util.ExampleUtils;

@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.context;
 import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.context.Selector;
-import com.gitee.dorive.core.entity.option.SelectType;
+import com.gitee.dorive.core.entity.enums.SelectType;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;

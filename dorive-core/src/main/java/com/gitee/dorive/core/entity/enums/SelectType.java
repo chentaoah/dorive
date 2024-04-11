@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.option;
+package com.gitee.dorive.core.entity.enums;
 
 public enum SelectType {
     NONE,

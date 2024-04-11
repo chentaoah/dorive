@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.option;
+package com.gitee.dorive.core.entity.enums;
 
-public enum JoinType {
-    UNKNOWN,
-    SINGLE,
-    MULTI,
-    UNION
+public enum BindingType {
+    STRONG,
+    WEAK,
+    VALUE
 }

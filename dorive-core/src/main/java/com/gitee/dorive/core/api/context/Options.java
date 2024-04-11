@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.api.context;
 
 import com.gitee.dorive.core.entity.context.EnumOptions;
-import com.gitee.dorive.core.entity.option.SelectType;
+import com.gitee.dorive.core.entity.enums.SelectType;
 
 import java.util.Map;
 

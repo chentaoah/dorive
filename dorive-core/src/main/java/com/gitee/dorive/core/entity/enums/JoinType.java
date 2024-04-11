@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.option;
+package com.gitee.dorive.core.entity.enums;
 
-public enum RootControl {
-    NONE,
-    INCLUDE_ROOT,
-    IGNORE_ROOT
+public enum JoinType {
+    UNKNOWN,
+    SINGLE,
+    MULTI,
+    UNION
 }

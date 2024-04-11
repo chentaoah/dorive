@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.context;
 
 import com.gitee.dorive.core.api.context.Selector;
-import com.gitee.dorive.core.entity.option.SelectType;
+import com.gitee.dorive.core.entity.enums.SelectType;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
