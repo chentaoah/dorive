@@ -25,6 +25,7 @@ import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
 import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
+import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -58,12 +59,7 @@ public class OperationFactory {
     }
 
     public Operation buildInsertOrUpdate(Object entity) {
-        Object primaryKey = entityEle.getIdProxy().getValue(entity);
-        if (primaryKey == null) {
-            return buildInsert(entity);
-        } else {
-            return buildUpdate(entity);
-        }
+        return new InsertOrUpdate(Collections.singletonList(entity));
     }
 
     public Operation buildDelete(Object entity) {
