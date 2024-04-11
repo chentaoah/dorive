@@ -97,20 +97,20 @@ public class FactoryExecutor extends AbstractProxyExecutor {
         if (operation instanceof EntityOp) {
             EntityOp entityOp = (EntityOp) operation;
             List<?> entities = entityOp.getEntities();
-            List<Object> newEntities = new ArrayList<>(entities.size());
+            List<Object> persistentObjs = new ArrayList<>(entities.size());
             for (Object entity : entities) {
                 Object persistent = entityFactory.deconstruct(context, entity);
-                newEntities.add(persistent);
+                persistentObjs.add(persistent);
             }
 
-            entityOp.setEntities(newEntities);
+            entityOp.setEntities(persistentObjs);
             int totalCount = super.execute(context, operation);
             entityOp.setEntities(entities);
 
             if (operation instanceof Insert || operation instanceof InsertOrUpdate) {
                 for (int index = 0; index < entities.size(); index++) {
                     Object entity = entities.get(index);
-                    Object persistent = newEntities.get(index);
+                    Object persistent = persistentObjs.get(index);
                     Object primaryKey = BeanUtil.getFieldValue(persistent, entityStoreInfo.getIdProperty());
                     if (primaryKey != null) {
                         entityEle.getIdProxy().setValue(entity, primaryKey);
