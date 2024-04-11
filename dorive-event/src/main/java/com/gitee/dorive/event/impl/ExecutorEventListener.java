@@ -129,6 +129,9 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
     }
 
     private List<EntityEvent> newEntityEvents(ExecutorEvent executorEvent) {
+        EventExecutor eventExecutor = (EventExecutor) executorEvent.getSource();
+        EntityEle entityEle = eventExecutor.getEntityEle();
+
         Context context = executorEvent.getContext();
         Operation operation = executorEvent.getOperation();
 
@@ -151,9 +154,18 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
 
             List<?> entities = entityOp.getEntities();
             List<EntityEvent> entityEvents = new ArrayList<>(entities.size());
-            for (Object entity : entities) {
-                EntityEvent entityEvent = new EntityEvent(executorEvent, context, operationType, entity);
-                entityEvents.add(entityEvent);
+            if (operationType == OperationType.INSERT_OR_UPDATE) {
+                for (Object entity : entities) {
+                    Object primaryKey = entityEle.getIdProxy().getValue(entity);
+                    OperationType newOperationType = primaryKey == null ? OperationType.INSERT : OperationType.UPDATE;
+                    EntityEvent entityEvent = new EntityEvent(executorEvent, context, newOperationType, entity);
+                    entityEvents.add(entityEvent);
+                }
+            } else {
+                for (Object entity : entities) {
+                    EntityEvent entityEvent = new EntityEvent(executorEvent, context, operationType, entity);
+                    entityEvents.add(entityEvent);
+                }
             }
             return entityEvents;
         }
