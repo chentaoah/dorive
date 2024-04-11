@@ -23,7 +23,7 @@ import java.util.List;
 
 public interface EntityEventListener {
 
-    default void onEntityEvents(List<EntityEvent> entityEvents) {
+    default void onEntityEvents(Class<?> entityClass, List<EntityEvent> entityEvents) {
         for (EntityEvent entityEvent : entityEvents) {
             onEntityEvent(entityEvent);
         }

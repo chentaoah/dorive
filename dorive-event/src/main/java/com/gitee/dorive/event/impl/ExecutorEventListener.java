@@ -121,7 +121,7 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
             List<EntityEvent> entityEvents = newEntityEvents(executorEvent);
             if (!entityEvents.isEmpty()) {
                 for (EntityEventListener entityEventListener : entityEventListeners) {
-                    entityEventListener.onEntityEvents(entityEvents);
+                    entityEventListener.onEntityEvents(entityClass, entityEvents);
                 }
             }
         }
