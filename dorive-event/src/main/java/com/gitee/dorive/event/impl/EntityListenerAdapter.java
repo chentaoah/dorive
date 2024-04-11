@@ -18,8 +18,7 @@
 package com.gitee.dorive.event.impl;
 
 import cn.hutool.core.util.ArrayUtil;
-import com.gitee.dorive.event.api.EntityEventListener;
-import com.gitee.dorive.event.entity.EntityEvent;
+import com.gitee.dorive.event.entity.CommonEvent;
 import com.gitee.dorive.event.entity.EntityListenerDef;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,32 +28,35 @@ import org.springframework.core.Ordered;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.function.Consumer;
+
 @Data
 @Slf4j
 @NoArgsConstructor
 @AllArgsConstructor
-public class EntityEventListenerAdapter implements EntityEventListener {
+public class EntityListenerAdapter {
 
     private Integer order;
     private EntityListenerDef entityListenerDef;
-    private EntityEventListener entityEventListener;
+    private Object bean;
+    private Consumer<CommonEvent> consumer;
 
-    @Override
-    public void onEntityEvent(EntityEvent entityEvent) {
-        boolean isSubscribe = ArrayUtil.contains(entityListenerDef.getSubscribeTo(), entityEvent.getOperationType());
+    public void onCommonEvent(CommonEvent commonEvent) {
+        boolean isSubscribe = ArrayUtil.contains(entityListenerDef.getSubscribeTo(), commonEvent.getOperationType());
         if (isSubscribe) {
             boolean isTxActive = entityListenerDef.isAfterCommit() && TransactionSynchronizationManager.isActualTransactionActive();
             if (!isTxActive) {
-                handleEntityEvent(entityEvent, true);
+                handleEntityEvent(commonEvent, true);
             } else {
-                handleEntityEventWhenTxActive(entityEvent);
+                handleEntityEventWhenTxActive(commonEvent);
             }
         }
     }
 
-    private void handleEntityEvent(EntityEvent entityEvent, boolean canRollback) {
+    private void handleEntityEvent(CommonEvent commonEvent, boolean canRollback) {
         try {
-            entityEventListener.onEntityEvent(entityEvent);
+            consumer.accept(commonEvent);
+
         } catch (Throwable throwable) {
             if (canRollback && matchRollbackFor(throwable)) {
                 throw throwable;
@@ -76,9 +78,9 @@ public class EntityEventListenerAdapter implements EntityEventListener {
         return false;
     }
 
-    private void handleEntityEventWhenTxActive(EntityEvent entityEvent) {
+    private void handleEntityEventWhenTxActive(CommonEvent commonEvent) {
         try {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionInvoker(entityEvent));
+            TransactionSynchronizationManager.registerSynchronization(new TransactionInvoker(commonEvent));
         } catch (Exception e) {
             log.error("Transaction registration failed: " + e.getMessage(), e);
         }
@@ -90,7 +92,7 @@ public class EntityEventListenerAdapter implements EntityEventListener {
     @AllArgsConstructor
     private class TransactionInvoker implements TransactionSynchronization, Ordered {
 
-        private final EntityEvent entityEvent;
+        private final CommonEvent commonEvent;
 
         @Override
         public int getOrder() {
@@ -99,7 +101,7 @@ public class EntityEventListenerAdapter implements EntityEventListener {
 
         @Override
         public void afterCommit() {
-            handleEntityEvent(entityEvent, false);
+            handleEntityEvent(commonEvent, false);
         }
 
     }

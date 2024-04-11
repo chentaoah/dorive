@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.event.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
@@ -25,7 +26,10 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.Update;
+import com.gitee.dorive.event.annotation.EntityListener;
+import com.gitee.dorive.event.api.EntityBatchEventListener;
 import com.gitee.dorive.event.api.EntityEventListener;
+import com.gitee.dorive.event.entity.CommonEvent;
 import com.gitee.dorive.event.entity.EntityBatchEvent;
 import com.gitee.dorive.event.entity.EntityEvent;
 import com.gitee.dorive.event.entity.EntityListenerDef;
@@ -41,6 +45,7 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.annotation.OrderUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,7 +56,7 @@ import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>, ApplicationContextAware, InitializingBean {
 
     private ApplicationContext applicationContext;
-    private final Map<Class<?>, List<EntityEventListener>> classEntityEventListenersMap = new ConcurrentHashMap<>();
+    private final Map<Class<?>, List<EntityListenerAdapter>> classEntityListenerAdaptersMap = new ConcurrentHashMap<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -60,19 +65,24 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
 
     @Override
     public void afterPropertiesSet() {
-        Map<String, EntityEventListener> entityEventListenerMap = applicationContext.getBeansOfType(EntityEventListener.class);
-        List<EntityEventListener> entityEventListeners = new ArrayList<>(entityEventListenerMap.values());
-        AnnotationAwareOrderComparator.sort(entityEventListeners);
-
-        for (EntityEventListener entityEventListener : entityEventListeners) {
-            Class<?> listenerType = entityEventListener.getClass();
-            Integer order = OrderUtils.getOrder(listenerType, LOWEST_PRECEDENCE);
-            EntityListenerDef entityListenerDef = EntityListenerDef.fromElement(listenerType);
-            registry(order, entityListenerDef, entityEventListener);
+        Map<String, Object> beanMap = applicationContext.getBeansWithAnnotation(EntityListener.class);
+        List<Object> beans = new ArrayList<>(beanMap.values());
+        AnnotationAwareOrderComparator.sort(beans);
+        for (Object bean : beans) {
+            if (checkBeanType(bean)) {
+                Class<?> listenerType = bean.getClass();
+                Integer order = OrderUtils.getOrder(listenerType, LOWEST_PRECEDENCE);
+                EntityListenerDef entityListenerDef = EntityListenerDef.fromElement(listenerType);
+                registry(order, entityListenerDef, bean);
+            }
         }
     }
 
-    public void registry(Integer order, EntityListenerDef entityListenerDef, EntityEventListener entityEventListener) {
+    private boolean checkBeanType(Object bean) {
+        return bean instanceof EntityBatchEventListener || bean instanceof EntityEventListener;
+    }
+
+    public void registry(Integer order, EntityListenerDef entityListenerDef, Object bean) {
         if (entityListenerDef == null) {
             return;
         }
@@ -80,35 +90,35 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
         if (entityClass == null) {
             return;
         }
-        if (entityEventListener instanceof EntityEventListenerAdapter) {
-            EntityEventListenerAdapter entityEventListenerAdapter = (EntityEventListenerAdapter) entityEventListener;
-            entityEventListenerAdapter.setOrder(order);
-            entityEventListenerAdapter.setEntityListenerDef(entityListenerDef);
-
-        } else {
-            entityEventListener = new EntityEventListenerAdapter(order, entityListenerDef, entityEventListener);
+        if (bean instanceof EntityBatchEventListener) {
+            EntityBatchEventListener listener = (EntityBatchEventListener) bean;
+            EntityListenerAdapter adapter = new EntityListenerAdapter(order, entityListenerDef, bean, event ->
+                    listener.onEntityBatchEvent(newEntityBatchEvent(event)));
+            List<EntityListenerAdapter> existAdapters = classEntityListenerAdaptersMap.computeIfAbsent(entityClass, key -> new ArrayList<>(4));
+            existAdapters.add(adapter);
         }
-        List<EntityEventListener> existEntityEventListeners = classEntityEventListenersMap.computeIfAbsent(entityClass, key -> new ArrayList<>(4));
-        existEntityEventListeners.add(entityEventListener);
+        if (bean instanceof EntityEventListener) {
+            EntityEventListener listener = (EntityEventListener) bean;
+            EntityListenerAdapter adapter = new EntityListenerAdapter(order, entityListenerDef, bean, event -> {
+                List<EntityEvent> entityEvents = newEntityEvents(event);
+                for (EntityEvent entityEvent : entityEvents) {
+                    listener.onEntityEvent(entityEvent);
+                }
+            });
+            List<EntityListenerAdapter> existAdapters = classEntityListenerAdaptersMap.computeIfAbsent(entityClass, key -> new ArrayList<>(4));
+            existAdapters.add(adapter);
+        }
     }
 
-    public void cancel(Class<?> entityClass, EntityEventListener entityEventListener) {
-        List<EntityEventListener> existEntityEventListeners = classEntityEventListenersMap.get(entityClass);
-        if (existEntityEventListeners == null) {
+    public void cancel(Class<?> entityClass, Object bean) {
+        List<EntityListenerAdapter> existAdapters = classEntityListenerAdaptersMap.get(entityClass);
+        if (existAdapters == null) {
             return;
         }
-        EntityEventListener existEntityEventListener = CollUtil.findOne(existEntityEventListeners,
-                listener -> entityEventListener == getRealListener(listener));
-        if (existEntityEventListener != null) {
-            existEntityEventListeners.remove(existEntityEventListener);
+        Collection<EntityListenerAdapter> filterAdapters = CollUtil.filterNew(existAdapters, adapter -> adapter.getBean() == bean);
+        if (filterAdapters != null && !filterAdapters.isEmpty()) {
+            existAdapters.removeAll(filterAdapters);
         }
-    }
-
-    private EntityEventListener getRealListener(EntityEventListener entityEventListener) {
-        if (entityEventListener instanceof EntityEventListenerAdapter) {
-            return ((EntityEventListenerAdapter) entityEventListener).getEntityEventListener();
-        }
-        return entityEventListener;
     }
 
     @Override
@@ -116,21 +126,20 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
         EventExecutor eventExecutor = (EventExecutor) executorEvent.getSource();
         EntityEle entityEle = eventExecutor.getEntityEle();
         Class<?> entityClass = entityEle.getGenericType();
-        List<EntityEventListener> entityEventListeners = classEntityEventListenersMap.get(entityClass);
-        if (entityEventListeners != null && !entityEventListeners.isEmpty()) {
-            EntityBatchEvent entityBatchEvent = newEntityBatchEvent(executorEvent, entityClass);
-            if (entityBatchEvent != null) {
-                for (EntityEventListener entityEventListener : entityEventListeners) {
-                    entityEventListener.onEntityBatchEvent(entityBatchEvent);
+        List<EntityListenerAdapter> existAdapters = classEntityListenerAdaptersMap.get(entityClass);
+        if (existAdapters != null && !existAdapters.isEmpty()) {
+            CommonEvent commonEvent = newCommonEvent(executorEvent);
+            if (commonEvent != null) {
+                for (EntityListenerAdapter adapter : existAdapters) {
+                    adapter.onCommonEvent(commonEvent);
                 }
             }
         }
     }
 
-    private EntityBatchEvent newEntityBatchEvent(ExecutorEvent executorEvent, Class<?> entityClass) {
+    private CommonEvent newCommonEvent(ExecutorEvent executorEvent) {
         Context context = executorEvent.getContext();
         Operation operation = executorEvent.getOperation();
-
         if (operation instanceof EntityOp) {
             OperationType operationType = OperationType.UNKNOWN;
             if (operation instanceof Insert) {
@@ -142,18 +151,42 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
             } else if (operation instanceof Delete) {
                 operationType = OperationType.DELETE;
             }
-
-            EntityOp entityOp = (EntityOp) operation;
-            List<?> entities = entityOp.getEntities();
-            List<EntityEvent> entityEvents = new ArrayList<>(entities.size());
-            for (Object entity : entities) {
-                EntityEvent entityEvent = new EntityEvent(executorEvent, context, operationType, entity);
-                entityEvents.add(entityEvent);
-            }
-            return new EntityBatchEvent(executorEvent, context, operationType, entityClass, entityEvents);
+            return new CommonEvent(executorEvent, context, operationType);
         }
-
         return null;
+    }
+
+    private EntityBatchEvent newEntityBatchEvent(CommonEvent commonEvent) {
+        ExecutorEvent executorEvent = commonEvent.getExecutorEvent();
+        EventExecutor eventExecutor = (EventExecutor) executorEvent.getSource();
+        Operation operation = executorEvent.getOperation();
+
+        EntityEle entityEle = eventExecutor.getEntityEle();
+        Class<?> entityClass = entityEle.getGenericType();
+
+        EntityOp entityOp = (EntityOp) operation;
+        List<?> entities = entityOp.getEntities();
+
+        EntityBatchEvent entityBatchEvent = BeanUtil.copyProperties(commonEvent, EntityBatchEvent.class);
+        entityBatchEvent.setEntityClass(entityClass);
+        entityBatchEvent.setEntities(entities);
+        return entityBatchEvent;
+    }
+
+    private List<EntityEvent> newEntityEvents(CommonEvent commonEvent) {
+        ExecutorEvent executorEvent = commonEvent.getExecutorEvent();
+        Operation operation = executorEvent.getOperation();
+
+        EntityOp entityOp = (EntityOp) operation;
+        List<?> entities = entityOp.getEntities();
+
+        List<EntityEvent> entityEvents = new ArrayList<>(entities.size());
+        for (Object entity : entities) {
+            EntityEvent entityEvent = BeanUtil.copyProperties(commonEvent, EntityEvent.class);
+            entityEvent.setEntity(entity);
+            entityEvents.add(entityEvent);
+        }
+        return entityEvents;
     }
 
 }

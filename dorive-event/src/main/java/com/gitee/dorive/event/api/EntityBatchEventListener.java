@@ -15,20 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.entity;
+package com.gitee.dorive.event.api;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.gitee.dorive.event.entity.EntityBatchEvent;
 
-import java.util.List;
+public interface EntityBatchEventListener {
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class EntityBatchEvent extends CommonEvent {
-    private Class<?> entityClass;
-    private List<?> entities;
+    void onEntityBatchEvent(EntityBatchEvent entityBatchEvent);
+
 }

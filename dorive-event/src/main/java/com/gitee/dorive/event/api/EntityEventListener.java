@@ -17,19 +17,9 @@
 
 package com.gitee.dorive.event.api;
 
-import com.gitee.dorive.event.entity.EntityBatchEvent;
 import com.gitee.dorive.event.entity.EntityEvent;
 
-import java.util.List;
-
 public interface EntityEventListener {
-
-    default void onEntityBatchEvent(EntityBatchEvent entityBatchEvent) {
-        List<EntityEvent> entityEvents = entityBatchEvent.getEntityEvents();
-        for (EntityEvent entityEvent : entityEvents) {
-            onEntityEvent(entityEvent);
-        }
-    }
 
     void onEntityEvent(EntityEvent entityEvent);
 

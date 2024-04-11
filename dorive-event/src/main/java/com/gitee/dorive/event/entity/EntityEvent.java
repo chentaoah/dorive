@@ -17,17 +17,15 @@
 
 package com.gitee.dorive.event.entity;
 
-import com.gitee.dorive.core.api.context.Context;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EntityEvent {
-    private ExecutorEvent executorEvent;
-    private Context context;
-    private OperationType operationType;
+public class EntityEvent extends CommonEvent {
     private Object entity;
 }
