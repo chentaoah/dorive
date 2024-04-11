@@ -22,6 +22,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.repository.ListableRepository;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
@@ -74,29 +75,29 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     @Override
     public int insertList(Options options, List<E> entities) {
         Assert.notEmpty(entities, "The entities cannot be empty!");
-        Insert insert = new Insert(entities);
-        return execute((Context) options, insert);
+        Operation operation = new Insert(entities);
+        return execute((Context) options, operation);
     }
 
     @Override
     public int updateList(Options options, List<E> entities) {
         Assert.notEmpty(entities, "The entities cannot be empty!");
-        Update update = new Update(entities);
-        return execute((Context) options, update);
+        Operation operation = new Update(entities);
+        return execute((Context) options, operation);
     }
 
     @Override
     public int insertOrUpdateList(Options options, List<E> entities) {
         Assert.notEmpty(entities, "The entities cannot be empty!");
-        InsertOrUpdate insertOrUpdate = new InsertOrUpdate(entities);
-        return execute((Context) options, insertOrUpdate);
+        Operation operation = new InsertOrUpdate(entities);
+        return execute((Context) options, operation);
     }
 
     @Override
     public int deleteList(Options options, List<E> entities) {
         Assert.notEmpty(entities, "The entities cannot be empty!");
-        Delete delete = new Delete(entities);
-        return execute((Context) options, delete);
+        Operation operation = new Delete(entities);
+        return execute((Context) options, operation);
     }
 
 }
