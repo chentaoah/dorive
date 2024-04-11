@@ -120,8 +120,10 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
         List<EntityEventListener> entityEventListeners = classEntityEventListenersMap.get(entityClass);
         if (entityEventListeners != null && !entityEventListeners.isEmpty()) {
             List<EntityEvent> entityEvents = newEntityEvents(executorEvent);
-            for (EntityEventListener entityEventListener : entityEventListeners) {
-                entityEventListener.onEntityEvents(entityEvents);
+            if (!entityEvents.isEmpty()) {
+                for (EntityEventListener entityEventListener : entityEventListeners) {
+                    entityEventListener.onEntityEvents(entityEvents);
+                }
             }
         }
     }
