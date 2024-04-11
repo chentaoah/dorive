@@ -132,8 +132,6 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
         Operation operation = executorEvent.getOperation();
 
         if (operation instanceof EntityOp) {
-            EntityOp entityOp = (EntityOp) operation;
-
             OperationType operationType = OperationType.UNKNOWN;
             if (operation instanceof Insert) {
                 operationType = OperationType.INSERT;
@@ -145,6 +143,7 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
                 operationType = OperationType.DELETE;
             }
 
+            EntityOp entityOp = (EntityOp) operation;
             List<?> entities = entityOp.getEntities();
             List<EntityEvent> entityEvents = new ArrayList<>(entities.size());
             for (Object entity : entities) {
