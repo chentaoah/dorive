@@ -22,7 +22,6 @@ import cn.hutool.core.lang.Pair;
 import com.gitee.dorive.api.entity.PropChain;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.EntityOp;
 import com.gitee.dorive.core.entity.operation.Operation;
@@ -76,11 +75,8 @@ public class ContextExecutor extends AbstractExecutor {
                 if (pair.getKey() == this.repository) { // 避免自循环
                     entityHandler.handle(context, pair.getValue());
                 } else {
-                    Executor executor = repository.getExecutor();
-                    if (executor instanceof ContextExecutor) {
-                        ContextExecutor contextExecutor = (ContextExecutor) executor;
-                        contextExecutor.populate(context, pair.getValue());
-                    }
+                    ContextExecutor contextExecutor = (ContextExecutor) pair.getKey().getExecutor();
+                    contextExecutor.populate(context, pair.getValue());
                 }
             }
         }
