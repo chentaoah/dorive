@@ -21,6 +21,5 @@ public enum OperationType {
     UNKNOWN,
     INSERT,
     UPDATE,
-    DELETE,
-    INSERT_OR_UPDATE
+    DELETE
 }

@@ -21,10 +21,9 @@ import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.operation.EntityOp;
+import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
-import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.event.api.EntityEventListener;
 import com.gitee.dorive.event.entity.EntityEvent;
@@ -129,9 +128,6 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
     }
 
     private List<EntityEvent> newEntityEvents(ExecutorEvent executorEvent) {
-        EventExecutor eventExecutor = (EventExecutor) executorEvent.getSource();
-        EntityEle entityEle = eventExecutor.getEntityEle();
-
         Context context = executorEvent.getContext();
         Operation operation = executorEvent.getOperation();
 
@@ -147,25 +143,13 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
 
             } else if (operation instanceof Delete) {
                 operationType = OperationType.DELETE;
-
-            } else if (operation instanceof InsertOrUpdate) {
-                operationType = OperationType.INSERT_OR_UPDATE;
             }
 
             List<?> entities = entityOp.getEntities();
             List<EntityEvent> entityEvents = new ArrayList<>(entities.size());
-            if (operationType == OperationType.INSERT_OR_UPDATE) {
-                for (Object entity : entities) {
-                    Object primaryKey = entityEle.getIdProxy().getValue(entity);
-                    OperationType newOperationType = primaryKey == null ? OperationType.INSERT : OperationType.UPDATE;
-                    EntityEvent entityEvent = new EntityEvent(executorEvent, context, newOperationType, entity);
-                    entityEvents.add(entityEvent);
-                }
-            } else {
-                for (Object entity : entities) {
-                    EntityEvent entityEvent = new EntityEvent(executorEvent, context, operationType, entity);
-                    entityEvents.add(entityEvent);
-                }
+            for (Object entity : entities) {
+                EntityEvent entityEvent = new EntityEvent(executorEvent, context, operationType, entity);
+                entityEvents.add(entityEvent);
             }
             return entityEvents;
         }

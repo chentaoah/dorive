@@ -28,11 +28,10 @@ import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.EntityOp;
-import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
-import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
 import com.gitee.dorive.core.entity.operation.cop.Query;
-import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
+import com.gitee.dorive.core.entity.operation.eop.Insert;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -107,7 +106,7 @@ public class FactoryExecutor extends AbstractProxyExecutor {
             int totalCount = super.execute(context, operation);
             entityOp.setEntities(entities);
 
-            if (operation instanceof Insert || operation instanceof InsertOrUpdate) {
+            if (operation instanceof Insert) {
                 for (int index = 0; index < entities.size(); index++) {
                     Object entity = entities.get(index);
                     Object persistent = persistentObjs.get(index);

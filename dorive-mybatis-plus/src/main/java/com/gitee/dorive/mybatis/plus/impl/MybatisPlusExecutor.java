@@ -39,7 +39,6 @@ import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
 import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
-import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import lombok.Getter;
@@ -173,12 +172,6 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             } else if (operation instanceof Delete) {
                 for (Object persistent : persistentObjs) {
                     totalCount += baseMapper.deleteById(persistent);
-                }
-
-            } else if (operation instanceof InsertOrUpdate) {
-                for (Object persistent : persistentObjs) {
-                    Object primaryKey = BeanUtil.getFieldValue(persistent, entityStoreInfo.getIdProperty());
-                    totalCount += primaryKey == null ? baseMapper.insert(persistent) : baseMapper.updateById(persistent);
                 }
             }
 
