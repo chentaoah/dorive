@@ -22,8 +22,11 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.repository.ListableRepository;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.operation.eop.Delete;
+import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.core.util.ExampleUtils;
 
 import java.util.Collections;
@@ -79,22 +82,30 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
 
     @Override
     public int insertList(Options options, List<E> entities) {
-        return entities.stream().mapToInt(entity -> insert(options, entity)).sum();
+        Assert.notEmpty(entities, "The entities cannot be empty!");
+        Insert insert = new Insert(entities);
+        return execute((Context) options, insert);
     }
 
     @Override
     public int updateList(Options options, List<E> entities) {
-        return entities.stream().mapToInt(entity -> update(options, entity)).sum();
+        Assert.notEmpty(entities, "The entities cannot be empty!");
+        Update update = new Update(entities);
+        return execute((Context) options, update);
     }
 
     @Override
     public int insertOrUpdateList(Options options, List<E> entities) {
-        return entities.stream().mapToInt(entity -> insertOrUpdate(options, entity)).sum();
+        Assert.notEmpty(entities, "The entities cannot be empty!");
+        InsertOrUpdate insertOrUpdate = new InsertOrUpdate(entities);
+        return execute((Context) options, insertOrUpdate);
     }
 
     @Override
     public int deleteList(Options options, List<E> entities) {
-        return entities.stream().mapToInt(entity -> delete(options, entity)).sum();
+        Assert.notEmpty(entities, "The entities cannot be empty!");
+        Delete delete = new Delete(entities);
+        return execute((Context) options, delete);
     }
 
 }
