@@ -18,7 +18,6 @@
 package com.gitee.dorive.mybatis.plus.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -32,11 +31,15 @@ import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.EntityOp;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.cop.ConditionDelete;
+import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
+import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
-import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.cop.Query;
+import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import lombok.Getter;
@@ -155,66 +158,60 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             } else if (operation instanceof Update) {
                 Update update = (Update) operation;
                 Set<String> nullableProps = update.getNullableProps();
-                for (Object persistent : persistentObjs) {
-                    if (nullableProps != null && !nullableProps.isEmpty()) {
-                        Object primaryKey = ReflectUtil.getFieldValue(persistent, entityStoreInfo.getIdProperty());
-                        UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableProps, primaryKey, null);
+                if (nullableProps != null && !nullableProps.isEmpty()) {
+                    for (Object persistent : persistentObjs) {
+                        Object primaryKey = BeanUtil.getFieldValue(persistent, entityStoreInfo.getIdProperty());
+                        UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableProps, primaryKey);
                         totalCount += baseMapper.update(null, updateWrapper);
-                    } else {
+                    }
+                } else {
+                    for (Object persistent : persistentObjs) {
                         totalCount += baseMapper.updateById(persistent);
                     }
+                }
+
+            } else if (operation instanceof Delete) {
+                for (Object persistent : persistentObjs) {
+                    totalCount += baseMapper.deleteById(persistent);
+                }
+
+            } else if (operation instanceof InsertOrUpdate) {
+                for (Object persistent : persistentObjs) {
+                    Object primaryKey = BeanUtil.getFieldValue(persistent, entityStoreInfo.getIdProperty());
+                    totalCount += primaryKey == null ? baseMapper.insert(persistent) : baseMapper.updateById(persistent);
+                }
+            }
+
+        } else if (operation instanceof Condition) {
+            if (operation instanceof ConditionUpdate) {
+                ConditionUpdate conditionUpdate = (ConditionUpdate) operation;
+                Object entity = conditionUpdate.getEntity();
+                Object primaryKey = conditionUpdate.getPrimaryKey();
+                Example example = conditionUpdate.getExample();
+                if (primaryKey != null) {
+                    totalCount += baseMapper.update(entity, buildUpdateWrapper(primaryKey));
+
+                } else if (example != null) {
+                    totalCount += baseMapper.update(entity, buildUpdateWrapper(example));
+                }
+
+            } else if (operation instanceof ConditionDelete) {
+                ConditionDelete conditionDelete = (ConditionDelete) operation;
+                Object primaryKey = conditionDelete.getPrimaryKey();
+                Example example = conditionDelete.getExample();
+                if (primaryKey != null) {
+                    totalCount += baseMapper.deleteById((Serializable) primaryKey);
+
+                } else if (example != null) {
+                    totalCount += baseMapper.delete(buildUpdateWrapper(example));
                 }
             }
         }
         return totalCount;
-
-        Object persistent = operation.getEntity();
-
-        if (operation instanceof Insert) {
-            return baseMapper.insert(persistent);
-
-        } else if (operation instanceof Update) {
-            Update update = (Update) operation;
-            Object primaryKey = update.getPrimaryKey();
-            Example example = update.getExample();
-
-            Set<String> nullableProps = update.getNullableProps();
-            if (nullableProps != null && !nullableProps.isEmpty()) {
-                UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableProps, primaryKey, example);
-                return baseMapper.update(null, updateWrapper);
-            }
-
-            if (primaryKey != null) {
-                return baseMapper.updateById(persistent);
-
-            } else if (example != null) {
-                return baseMapper.update(persistent, buildUpdateWrapper(example));
-            }
-
-        } else if (operation instanceof Delete) {
-            Delete delete = (Delete) operation;
-            Object primaryKey = delete.getPrimaryKey();
-            Example example = delete.getExample();
-
-            if (primaryKey != null) {
-                return baseMapper.deleteById((Serializable) primaryKey);
-
-            } else if (example != null) {
-                return baseMapper.delete(buildUpdateWrapper(example));
-            }
-        }
-        return 0;
     }
 
-    private UpdateWrapper<Object> buildUpdateWrapper(Example example) {
+    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableProps, Object primaryKey) {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
-        AppenderContext.appendCriterion(updateWrapper, example);
-        return updateWrapper;
-    }
-
-    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableProps, Object primaryKey, Example example) {
-        UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
-
         Map<String, String> propAliasMappingWithoutPk = entityStoreInfo.getPropAliasMappingWithoutPk();
         propAliasMappingWithoutPk.forEach((prop, alias) -> {
             Object value = BeanUtil.getFieldValue(persistent, prop);
@@ -222,13 +219,21 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                 updateWrapper.set(true, alias, value);
             }
         });
-
         if (primaryKey != null) {
             updateWrapper.eq(entityStoreInfo.getIdColumn(), primaryKey);
         }
-        if (example != null) {
-            AppenderContext.appendCriterion(updateWrapper, example);
-        }
+        return updateWrapper;
+    }
+
+    private UpdateWrapper<Object> buildUpdateWrapper(Object primaryKey) {
+        UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq(entityStoreInfo.getIdColumn(), primaryKey);
+        return updateWrapper;
+    }
+
+    private UpdateWrapper<Object> buildUpdateWrapper(Example example) {
+        UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
+        AppenderContext.appendCriterion(updateWrapper, example);
         return updateWrapper;
     }
 
