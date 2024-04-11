@@ -20,9 +20,11 @@ package com.gitee.dorive.event.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.operation.EntityOp;
 import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.event.api.EntityEventListener;
 import com.gitee.dorive.event.entity.EntityEvent;
@@ -39,6 +41,7 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.annotation.OrderUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -116,28 +119,44 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
         Class<?> entityClass = entityEle.getGenericType();
         List<EntityEventListener> entityEventListeners = classEntityEventListenersMap.get(entityClass);
         if (entityEventListeners != null && !entityEventListeners.isEmpty()) {
-            EntityEvent entityEvent = newEntityEvent(executorEvent);
+            List<EntityEvent> entityEvents = newEntityEvents(executorEvent);
             for (EntityEventListener entityEventListener : entityEventListeners) {
-                entityEventListener.onEntityEvent(entityEvent);
+                entityEventListener.onEntityEvents(entityEvents);
             }
         }
     }
 
-    private EntityEvent newEntityEvent(ExecutorEvent executorEvent) {
+    private List<EntityEvent> newEntityEvents(ExecutorEvent executorEvent) {
         Context context = executorEvent.getContext();
         Operation operation = executorEvent.getOperation();
-        OperationType operationType = OperationType.UNKNOWN;
-        if (operation instanceof Insert) {
-            operationType = OperationType.INSERT;
 
-        } else if (operation instanceof Update) {
-            operationType = OperationType.UPDATE;
+        if (operation instanceof EntityOp) {
+            EntityOp entityOp = (EntityOp) operation;
 
-        } else if (operation instanceof Delete) {
-            operationType = OperationType.DELETE;
+            OperationType operationType = OperationType.UNKNOWN;
+            if (operation instanceof Insert) {
+                operationType = OperationType.INSERT;
+
+            } else if (operation instanceof Update) {
+                operationType = OperationType.UPDATE;
+
+            } else if (operation instanceof Delete) {
+                operationType = OperationType.DELETE;
+
+            } else if (operation instanceof InsertOrUpdate) {
+                operationType = OperationType.INSERT_OR_UPDATE;
+            }
+
+            List<?> entities = entityOp.getEntities();
+            List<EntityEvent> entityEvents = new ArrayList<>(entities.size());
+            for (Object entity : entities) {
+                EntityEvent entityEvent = new EntityEvent(executorEvent, context, operationType, entity);
+                entityEvents.add(entityEvent);
+            }
+            return entityEvents;
         }
-        Object entity = operation.getEntity();
-        return new EntityEvent(executorEvent, context, operationType, entity);
+
+        return Collections.emptyList();
     }
 
 }

@@ -19,7 +19,15 @@ package com.gitee.dorive.event.api;
 
 import com.gitee.dorive.event.entity.EntityEvent;
 
+import java.util.List;
+
 public interface EntityEventListener {
+
+    default void onEntityEvents(List<EntityEvent> entityEvents) {
+        for (EntityEvent entityEvent : entityEvents) {
+            onEntityEvent(entityEvent);
+        }
+    }
 
     void onEntityEvent(EntityEvent entityEvent);
 
