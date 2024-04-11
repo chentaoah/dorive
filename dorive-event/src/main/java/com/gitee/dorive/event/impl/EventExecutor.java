@@ -42,14 +42,14 @@ public class EventExecutor extends AbstractProxyExecutor {
 
     @Override
     public int execute(Context context, Operation operation) {
-        int count = super.execute(context, operation);
-        if (count != 0) {
+        int totalCount = super.execute(context, operation);
+        if (totalCount != 0) {
             ExecutorEvent executorEvent = new ExecutorEvent(this);
             executorEvent.setContext(context);
             executorEvent.setOperation(operation);
             applicationContext.publishEvent(executorEvent);
         }
-        return count;
+        return totalCount;
     }
 
 }
