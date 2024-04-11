@@ -26,6 +26,7 @@ import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.event.api.EntityEventListener;
+import com.gitee.dorive.event.entity.EntityBatchEvent;
 import com.gitee.dorive.event.entity.EntityEvent;
 import com.gitee.dorive.event.entity.EntityListenerDef;
 import com.gitee.dorive.event.entity.ExecutorEvent;
@@ -40,7 +41,6 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.annotation.OrderUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -118,16 +118,16 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
         Class<?> entityClass = entityEle.getGenericType();
         List<EntityEventListener> entityEventListeners = classEntityEventListenersMap.get(entityClass);
         if (entityEventListeners != null && !entityEventListeners.isEmpty()) {
-            List<EntityEvent> entityEvents = newEntityEvents(executorEvent);
-            if (!entityEvents.isEmpty()) {
+            EntityBatchEvent entityBatchEvent = newEntityBatchEvent(executorEvent, entityClass);
+            if (entityBatchEvent != null) {
                 for (EntityEventListener entityEventListener : entityEventListeners) {
-                    entityEventListener.onEntityEvents(entityClass, entityEvents);
+                    entityEventListener.onEntityBatchEvent(entityBatchEvent);
                 }
             }
         }
     }
 
-    private List<EntityEvent> newEntityEvents(ExecutorEvent executorEvent) {
+    private EntityBatchEvent newEntityBatchEvent(ExecutorEvent executorEvent, Class<?> entityClass) {
         Context context = executorEvent.getContext();
         Operation operation = executorEvent.getOperation();
 
@@ -150,10 +150,10 @@ public class ExecutorEventListener implements ApplicationListener<ExecutorEvent>
                 EntityEvent entityEvent = new EntityEvent(executorEvent, context, operationType, entity);
                 entityEvents.add(entityEvent);
             }
-            return entityEvents;
+            return new EntityBatchEvent(executorEvent, context, operationType, entityClass, entityEvents);
         }
 
-        return Collections.emptyList();
+        return null;
     }
 
 }

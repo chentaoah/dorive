@@ -15,22 +15,22 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.api;
+package com.gitee.dorive.event.entity;
 
-import com.gitee.dorive.event.entity.EntityBatchEvent;
-import com.gitee.dorive.event.entity.EntityEvent;
+import com.gitee.dorive.core.api.context.Context;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-public interface EntityEventListener {
-
-    default void onEntityBatchEvent(EntityBatchEvent entityBatchEvent) {
-        List<EntityEvent> entityEvents = entityBatchEvent.getEntityEvents();
-        for (EntityEvent entityEvent : entityEvents) {
-            onEntityEvent(entityEvent);
-        }
-    }
-
-    void onEntityEvent(EntityEvent entityEvent);
-
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class EntityBatchEvent {
+    private ExecutorEvent executorEvent;
+    private Context context;
+    private OperationType operationType;
+    private Class<?> entityClass;
+    private List<EntityEvent> entityEvents;
 }
