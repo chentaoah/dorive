@@ -36,8 +36,8 @@ import com.gitee.dorive.query.impl.executor.StepwiseQueryExecutor;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -45,8 +45,8 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import java.util.List;
 import java.util.Map;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
+@Setter
 public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryRepository<E, PK>, QueryExecutor {
 
     private QueryScanDef queryScanDef;

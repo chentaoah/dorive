@@ -23,12 +23,12 @@ import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.impl.executor.AbstractProxyExecutor;
 import com.gitee.dorive.event.entity.ExecutorEvent;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.context.ApplicationContext;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
+@Setter
 public class EventExecutor extends AbstractProxyExecutor {
 
     private ApplicationContext applicationContext;

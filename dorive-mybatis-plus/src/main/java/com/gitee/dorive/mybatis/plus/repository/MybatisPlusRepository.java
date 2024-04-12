@@ -40,8 +40,8 @@ import com.gitee.dorive.sql.entity.common.CountQuery;
 import com.gitee.dorive.sql.impl.count.DefaultCountQuerier;
 import com.gitee.dorive.sql.impl.executor.SqlQueryExecutor;
 import com.gitee.dorive.sql.impl.executor.UnionExecutor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
@@ -51,8 +51,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
+@Setter
 public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> implements CountQuerier {
 
     private SqlRunner sqlRunner;
