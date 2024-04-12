@@ -15,10 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.enums;
+package com.gitee.dorive.event.entity;
 
-public enum RootControl {
-    UNCONTROLLED,
-    INCLUDE_ROOT,
-    IGNORE_ROOT
+import com.gitee.dorive.event.repository.AbstractEventRepository;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class AggregateRootEvent extends AggregateEvent {
+
+    public AggregateRootEvent(AbstractEventRepository<?, ?> repository) {
+        super(repository);
+    }
+
 }

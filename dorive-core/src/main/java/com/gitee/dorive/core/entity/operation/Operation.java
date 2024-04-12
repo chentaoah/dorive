@@ -26,7 +26,7 @@ import lombok.Data;
 @Data
 public class Operation {
 
-    private RootControl rootControl = RootControl.NONE;
+    private RootControl rootControl = RootControl.UNCONTROLLED;
 
     public void includeRoot() {
         rootControl = RootControl.INCLUDE_ROOT;
@@ -34,6 +34,10 @@ public class Operation {
 
     public void ignoreRoot() {
         rootControl = RootControl.IGNORE_ROOT;
+    }
+
+    public boolean isUncontrolled() {
+        return rootControl == RootControl.UNCONTROLLED;
     }
 
     public boolean isIncludeRoot() {

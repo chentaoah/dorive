@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.enums;
+package com.gitee.dorive.event.api;
 
-public enum RootControl {
-    UNCONTROLLED,
-    INCLUDE_ROOT,
-    IGNORE_ROOT
+import com.gitee.dorive.event.entity.AggregateRootEvent;
+
+public interface AggregateRootEventListener {
+
+    void onAggregateRootEvent(AggregateRootEvent aggregateRootEvent);
+
 }
