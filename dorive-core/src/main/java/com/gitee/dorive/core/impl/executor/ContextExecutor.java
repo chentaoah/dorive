@@ -156,29 +156,31 @@ public class ContextExecutor extends AbstractExecutor {
 
     public int executeUpdateOrDelete(Context context, EntityOp entityOp) {
         int totalCount = 0;
-        if (!entityOp.isIgnoreRoot()) {
-            CommonRepository repository = this.repository.getRootRepository();
-            if (repository.matches(context) || entityOp.isIncludeRoot()) {
-                totalCount += repository.execute(context, entityOp);
-            }
-        }
-        for (CommonRepository repository : this.repository.getSubRepositories()) {
-            boolean isMatch = repository.matches(context);
-            boolean isAggregated = repository.isAggregated();
-            if (!isMatch && !isAggregated) {
-                continue;
-            }
-            List<?> rootEntities = entityOp.getEntities();
-            for (Object rootEntity : rootEntities) {
-                PropChain anchorPoint = repository.getAnchorPoint();
-                Object targetEntity = anchorPoint.getValue(rootEntity);
-                if (targetEntity == null) {
+        for (CommonRepository repository : this.repository.getOrderedRepositories()) {
+            if (repository.isRoot()) {
+                if (!entityOp.isIgnoreRoot()) {
+                    if (repository.matches(context) || entityOp.isIncludeRoot()) {
+                        totalCount += repository.execute(context, entityOp);
+                    }
+                }
+            } else {
+                boolean isMatch = repository.matches(context);
+                boolean isAggregated = repository.isAggregated();
+                if (!isMatch && !isAggregated) {
                     continue;
                 }
-                List<?> entities = CollectionUtils.toList(targetEntity);
-                Operation operation = entityOp instanceof Update ? new Update(entities) : new Delete(entities);
-                operation.switchRoot(isMatch);
-                totalCount += repository.execute(context, operation);
+                List<?> rootEntities = entityOp.getEntities();
+                for (Object rootEntity : rootEntities) {
+                    PropChain anchorPoint = repository.getAnchorPoint();
+                    Object targetEntity = anchorPoint.getValue(rootEntity);
+                    if (targetEntity == null) {
+                        continue;
+                    }
+                    List<?> entities = CollectionUtils.toList(targetEntity);
+                    Operation operation = entityOp instanceof Update ? new Update(entities) : new Delete(entities);
+                    operation.switchRoot(isMatch);
+                    totalCount += repository.execute(context, operation);
+                }
             }
         }
         return totalCount;
