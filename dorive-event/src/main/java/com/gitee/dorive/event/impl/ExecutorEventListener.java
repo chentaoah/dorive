@@ -34,7 +34,7 @@ import com.gitee.dorive.event.entity.EntityBatchEvent;
 import com.gitee.dorive.event.entity.EntityEvent;
 import com.gitee.dorive.event.entity.EntityListenerDef;
 import com.gitee.dorive.event.entity.ExecutorEvent;
-import com.gitee.dorive.event.entity.OperationType;
+import com.gitee.dorive.event.enums.OperationType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;

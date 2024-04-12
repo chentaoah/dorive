@@ -18,6 +18,7 @@
 package com.gitee.dorive.event.entity;
 
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.event.enums.OperationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

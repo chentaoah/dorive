@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.entity;
+package com.gitee.dorive.event.enums;
 
 public enum OperationType {
     UNKNOWN,

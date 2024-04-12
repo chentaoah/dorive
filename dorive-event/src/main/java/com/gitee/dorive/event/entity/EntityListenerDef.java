@@ -19,6 +19,7 @@ package com.gitee.dorive.event.entity;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.event.annotation.EntityListener;
+import com.gitee.dorive.event.enums.OperationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

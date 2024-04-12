@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.event.annotation;
 
-import com.gitee.dorive.event.entity.OperationType;
+import com.gitee.dorive.event.enums.OperationType;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Documented;
@@ -27,9 +27,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static com.gitee.dorive.event.entity.OperationType.DELETE;
-import static com.gitee.dorive.event.entity.OperationType.INSERT;
-import static com.gitee.dorive.event.entity.OperationType.UPDATE;
+import static com.gitee.dorive.event.enums.OperationType.DELETE;
+import static com.gitee.dorive.event.enums.OperationType.INSERT;
+import static com.gitee.dorive.event.enums.OperationType.UPDATE;
 
 @Component
 @Inherited
