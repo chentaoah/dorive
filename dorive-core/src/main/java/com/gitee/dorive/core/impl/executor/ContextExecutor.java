@@ -146,7 +146,7 @@ public class ContextExecutor extends AbstractExecutor {
                     operation.switchRoot(isMatch);
                     totalCount += repository.execute(context, operation);
                     if (entities.size() == 1) {
-                        repository.setBoundId(context, rootEntity, entities.iterator().next());
+                        repository.setBoundId(context, rootEntity, entities.get(0));
                     }
                 }
             }
@@ -216,7 +216,7 @@ public class ContextExecutor extends AbstractExecutor {
                     operation.switchRoot(isMatch);
                     totalCount += repository.execute(context, operation);
                     if (entities.size() == 1) {
-                        repository.setBoundId(context, rootEntity, entities.iterator().next());
+                        repository.setBoundId(context, rootEntity, entities.get(0));
                     }
                 }
             }
