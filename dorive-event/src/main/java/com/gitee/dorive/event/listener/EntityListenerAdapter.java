@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.impl;
+package com.gitee.dorive.event.listener;
 
 import cn.hutool.core.util.ArrayUtil;
 import com.gitee.dorive.event.entity.CommonEvent;
-import com.gitee.dorive.event.entity.EntityListenerDef;
+import com.gitee.dorive.event.def.EntityListenerDef;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

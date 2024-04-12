@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.entity;
+package com.gitee.dorive.event.def;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.event.annotation.EntityListener;

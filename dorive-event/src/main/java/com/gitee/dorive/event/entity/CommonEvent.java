@@ -18,16 +18,49 @@
 package com.gitee.dorive.event.entity;
 
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.operation.EntityOp;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.eop.Delete;
+import com.gitee.dorive.core.entity.operation.eop.Insert;
+import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.event.enums.OperationType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.context.ApplicationEvent;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class CommonEvent {
-    private ExecutorEvent executorEvent;
+import java.util.List;
+
+@Getter
+@Setter
+public class CommonEvent extends ApplicationEvent {
+
     private Context context;
+    private Operation operation;
     private OperationType operationType;
+
+    public CommonEvent(Object source) {
+        super(source);
+    }
+
+    public void setOperation(Operation operation) {
+        this.operation = operation;
+        if (operation instanceof EntityOp) {
+            this.operationType = OperationType.UNKNOWN;
+            if (operation instanceof Insert) {
+                this.operationType = OperationType.INSERT;
+
+            } else if (operation instanceof Update) {
+                this.operationType = OperationType.UPDATE;
+
+            } else if (operation instanceof Delete) {
+                this.operationType = OperationType.DELETE;
+            }
+        }
+    }
+
+    public List<?> getEntities() {
+        EntityOp entityOp = (EntityOp) operation;
+        return entityOp.getEntities();
+    }
+
 }

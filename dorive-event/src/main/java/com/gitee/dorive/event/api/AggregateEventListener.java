@@ -15,20 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.entity;
+package com.gitee.dorive.event.api;
 
-import com.gitee.dorive.event.executor.EventExecutor;
-import lombok.Getter;
-import lombok.Setter;
+import com.gitee.dorive.event.entity.AggregateEvent;
 
-@Getter
-@Setter
-public class EntityEvent extends ExecutorEvent {
+public interface AggregateEventListener {
 
-    private Object entity;
-
-    public EntityEvent(EventExecutor eventExecutor) {
-        super(eventExecutor);
-    }
+    void onAggregateEvent(AggregateEvent aggregateEvent);
 
 }

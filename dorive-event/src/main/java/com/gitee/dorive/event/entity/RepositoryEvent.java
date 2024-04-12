@@ -17,18 +17,23 @@
 
 package com.gitee.dorive.event.entity;
 
-import com.gitee.dorive.event.executor.EventExecutor;
+import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.event.repository.AbstractEventRepository;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class EntityEvent extends ExecutorEvent {
+public class RepositoryEvent extends CommonEvent {
 
-    private Object entity;
+    public RepositoryEvent(AbstractEventRepository<?, ?> repository) {
+        super(repository);
+    }
 
-    public EntityEvent(EventExecutor eventExecutor) {
-        super(eventExecutor);
+    public Class<?> getEntityClass() {
+        AbstractEventRepository<?, ?> repository = (AbstractEventRepository<?, ?>) getSource();
+        EntityEle entityEle = repository.getEntityEle();
+        return entityEle.getGenericType();
     }
 
 }

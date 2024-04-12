@@ -17,18 +17,20 @@
 
 package com.gitee.dorive.event.entity;
 
-import lombok.AllArgsConstructor;
+import com.gitee.dorive.event.executor.EventExecutor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class EntityBatchEvent extends CommonEvent {
-    private Class<?> entityClass;
+public class EntityBatchEvent extends ExecutorEvent {
+
     private List<?> entities;
+
+    public EntityBatchEvent(EventExecutor eventExecutor) {
+        super(eventExecutor);
+    }
+
 }

@@ -18,13 +18,16 @@
 package com.gitee.dorive.event.repository;
 
 import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.repository.AbstractGenericRepository;
 import com.gitee.dorive.core.repository.AbstractProxyRepository;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.core.repository.DefaultRepository;
 import com.gitee.dorive.event.annotation.EnableEvent;
-import com.gitee.dorive.event.impl.EventExecutor;
+import com.gitee.dorive.event.entity.RepositoryEvent;
+import com.gitee.dorive.event.executor.EventExecutor;
 import org.springframework.core.annotation.AnnotationUtils;
 
 public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepository<E, PK> {
@@ -54,6 +57,18 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
             }
         }
         return repository;
+    }
+
+    @Override
+    public int execute(Context context, Operation operation) {
+        int totalCount = super.execute(context, operation);
+        if (enableEvent && totalCount != 0) {
+            RepositoryEvent repositoryEvent = new RepositoryEvent(this);
+            repositoryEvent.setContext(context);
+            repositoryEvent.setOperation(operation);
+            getApplicationContext().publishEvent(repositoryEvent);
+        }
+        return totalCount;
     }
 
 }

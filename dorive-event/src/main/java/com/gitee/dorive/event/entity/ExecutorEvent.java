@@ -17,22 +17,23 @@
 
 package com.gitee.dorive.event.entity;
 
-import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.event.impl.EventExecutor;
+import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.event.executor.EventExecutor;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.context.ApplicationEvent;
 
 @Getter
 @Setter
-public class ExecutorEvent extends ApplicationEvent {
-
-    private Context context;
-    private Operation operation;
+public class ExecutorEvent extends CommonEvent {
 
     public ExecutorEvent(EventExecutor eventExecutor) {
         super(eventExecutor);
+    }
+
+    public Class<?> getEntityClass() {
+        EventExecutor eventExecutor = (EventExecutor) getSource();
+        EntityEle entityEle = eventExecutor.getEntityEle();
+        return entityEle.getGenericType();
     }
 
 }
