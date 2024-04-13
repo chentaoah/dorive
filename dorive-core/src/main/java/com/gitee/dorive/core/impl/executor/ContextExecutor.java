@@ -30,6 +30,7 @@ import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
+import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.resolver.DerivedResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -109,7 +110,8 @@ public class ContextExecutor extends AbstractExecutor {
                 totalCount += contextExecutor.executeUpdateOrDelete(context, delete);
 
             } else if (operation instanceof InsertOrUpdate) {
-                InsertOrUpdate insertOrUpdate = new InsertOrUpdate(pair.getValue());
+                OperationFactory operationFactory = repository.getOperationFactory();
+                InsertOrUpdate insertOrUpdate = operationFactory.buildInsertOrUpdate(pair.getValue());
                 totalCount += contextExecutor.executeInsertOrUpdate(context, insertOrUpdate);
             }
         }
@@ -212,7 +214,8 @@ public class ContextExecutor extends AbstractExecutor {
                     if (isMatch) {
                         repository.getBoundValue(context, rootEntity, entities);
                     }
-                    Operation operation = new InsertOrUpdate(entities);
+                    OperationFactory operationFactory = repository.getOperationFactory();
+                    Operation operation = operationFactory.buildInsertOrUpdate(entities);
                     operation.switchRoot(isMatch);
                     totalCount += repository.execute(context, operation);
                     if (entities.size() == 1) {

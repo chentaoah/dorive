@@ -25,8 +25,8 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
-import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
+import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.util.ExampleUtils;
 
 import java.util.List;
@@ -89,7 +89,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     @Override
     public int insertOrUpdateList(Options options, List<E> entities) {
         Assert.notEmpty(entities, "The entities cannot be empty!");
-        Operation operation = new InsertOrUpdate(entities);
+        OperationFactory operationFactory = getOperationFactory();
+        Operation operation = operationFactory.buildInsertOrUpdate(entities);
         return execute((Context) options, operation);
     }
 

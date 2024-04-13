@@ -27,6 +27,9 @@ import java.util.List;
 @Setter
 public class InsertOrUpdate extends EntityOp {
 
+    private Insert insert;
+    private Update update;
+
     public InsertOrUpdate(List<?> entities) {
         super(entities);
     }

@@ -30,7 +30,9 @@ import com.gitee.dorive.core.entity.operation.eop.Update;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -59,7 +61,36 @@ public class OperationFactory {
     }
 
     public Operation buildInsertOrUpdate(Object entity) {
-        return new InsertOrUpdate(Collections.singletonList(entity));
+        List<Object> entities = Collections.singletonList(entity);
+        InsertOrUpdate insertOrUpdate = new InsertOrUpdate(entities);
+        Object primaryKey = entityEle.getIdProxy().getValue(entity);
+        if (primaryKey == null) {
+            insertOrUpdate.setInsert(new Insert(entities));
+        } else {
+            insertOrUpdate.setUpdate(new Update(entities));
+        }
+        return insertOrUpdate;
+    }
+
+    public InsertOrUpdate buildInsertOrUpdate(List<?> entities) {
+        InsertOrUpdate insertOrUpdate = new InsertOrUpdate(entities);
+        List<Object> insertList = new ArrayList<>(entities.size());
+        List<Object> updateList = new ArrayList<>(entities.size());
+        for (Object entity : entities) {
+            Object primaryKey = entityEle.getIdProxy().getValue(entity);
+            if (primaryKey == null) {
+                insertList.add(entity);
+            } else {
+                updateList.add(entity);
+            }
+        }
+        if (!insertList.isEmpty()) {
+            insertOrUpdate.setInsert(new Insert(insertList));
+        }
+        if (!updateList.isEmpty()) {
+            insertOrUpdate.setUpdate(new Update(updateList));
+        }
+        return insertOrUpdate;
     }
 
     public Operation buildDelete(Object entity) {

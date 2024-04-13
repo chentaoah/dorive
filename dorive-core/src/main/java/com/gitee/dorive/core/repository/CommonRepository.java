@@ -23,6 +23,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.context.Selector;
+import com.gitee.dorive.core.entity.enums.JoinType;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.OrderBy;
@@ -32,14 +33,12 @@ import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
-import com.gitee.dorive.core.entity.enums.JoinType;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.util.ExampleUtils;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -116,23 +115,14 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
     public int execute(Context context, Operation operation) {
         if (!isAggregated() && operation instanceof InsertOrUpdate) {
             InsertOrUpdate insertOrUpdate = (InsertOrUpdate) operation;
-            List<?> entities = insertOrUpdate.getEntities();
-            List<Object> insertList = new ArrayList<>(entities.size());
-            List<Object> updateList = new ArrayList<>(entities.size());
-            for (Object entity : entities) {
-                Object primaryKey = getPrimaryKey(entity);
-                if (primaryKey == null) {
-                    insertList.add(entity);
-                } else {
-                    updateList.add(entity);
-                }
-            }
+            Insert insert = insertOrUpdate.getInsert();
+            Update update = insertOrUpdate.getUpdate();
             int totalCount = 0;
-            if (!insertList.isEmpty()) {
-                totalCount += super.execute(context, new Insert(insertList));
+            if (insert != null) {
+                totalCount += super.execute(context, insert);
             }
-            if (!updateList.isEmpty()) {
-                totalCount += super.execute(context, new Update(updateList));
+            if (update != null) {
+                totalCount += super.execute(context, update);
             }
             return totalCount;
         }

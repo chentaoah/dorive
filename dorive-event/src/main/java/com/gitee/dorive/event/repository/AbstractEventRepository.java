@@ -21,6 +21,9 @@ import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.eop.Insert;
+import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
+import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.core.repository.AbstractGenericRepository;
 import com.gitee.dorive.core.repository.AbstractProxyRepository;
 import com.gitee.dorive.core.repository.AbstractRepository;
@@ -63,12 +66,28 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
     public int execute(Context context, Operation operation) {
         int totalCount = super.execute(context, operation);
         if (enableEvent && totalCount != 0) {
-            RepositoryEvent repositoryEvent = new RepositoryEvent(this);
-            repositoryEvent.setContext(context);
-            repositoryEvent.setOperation(operation);
-            getApplicationContext().publishEvent(repositoryEvent);
+            if (operation instanceof InsertOrUpdate) {
+                InsertOrUpdate insertOrUpdate = (InsertOrUpdate) operation;
+                Insert insert = insertOrUpdate.getInsert();
+                Update update = insertOrUpdate.getUpdate();
+                if (insert != null) {
+                    publishEvent(context, insert);
+                }
+                if (update != null) {
+                    publishEvent(context, update);
+                }
+            } else {
+                publishEvent(context, operation);
+            }
         }
         return totalCount;
+    }
+
+    private void publishEvent(Context context, Operation operation) {
+        RepositoryEvent repositoryEvent = new RepositoryEvent(this);
+        repositoryEvent.setContext(context);
+        repositoryEvent.setOperation(operation);
+        getApplicationContext().publishEvent(repositoryEvent);
     }
 
 }
