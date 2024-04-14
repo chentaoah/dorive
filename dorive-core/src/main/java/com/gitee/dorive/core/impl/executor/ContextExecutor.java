@@ -122,7 +122,7 @@ public class ContextExecutor extends AbstractExecutor {
         int totalCount = 0;
         for (CommonRepository repository : this.repository.getOrderedRepositories()) {
             if (repository.isRoot()) {
-                if (!insert.isIgnoreRoot()) {
+                if (insert.isNotIgnoreRoot()) {
                     if (repository.matches(context) || insert.isIncludeRoot()) {
                         totalCount += repository.execute(context, insert);
                     }
@@ -160,7 +160,7 @@ public class ContextExecutor extends AbstractExecutor {
         int totalCount = 0;
         for (CommonRepository repository : this.repository.getOrderedRepositories()) {
             if (repository.isRoot()) {
-                if (!entityOp.isIgnoreRoot()) {
+                if (entityOp.isNotIgnoreRoot()) {
                     if (repository.matches(context) || entityOp.isIncludeRoot()) {
                         totalCount += repository.execute(context, entityOp);
                     }
@@ -192,7 +192,7 @@ public class ContextExecutor extends AbstractExecutor {
         int totalCount = 0;
         for (CommonRepository repository : this.repository.getOrderedRepositories()) {
             if (repository.isRoot()) {
-                if (!insertOrUpdate.isIgnoreRoot()) {
+                if (insertOrUpdate.isNotIgnoreRoot()) {
                     if (repository.matches(context) || insertOrUpdate.isIncludeRoot()) {
                         totalCount += repository.execute(context, insertOrUpdate);
                     }

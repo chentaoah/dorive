@@ -34,4 +34,15 @@ public class InsertOrUpdate extends EntityOp {
         super(entities);
     }
 
+    @Override
+    public void switchRoot(boolean flag) {
+        super.switchRoot(flag);
+        if (insert != null) {
+            insert.switchRoot(flag);
+        }
+        if (update != null) {
+            update.switchRoot(flag);
+        }
+    }
+
 }

@@ -29,11 +29,11 @@ public class Operation {
     private RootControl rootControl = RootControl.UNCONTROLLED;
 
     public void includeRoot() {
-        rootControl = RootControl.INCLUDE_ROOT;
+        this.rootControl = RootControl.INCLUDE_ROOT;
     }
 
-    public void ignoreRoot() {
-        rootControl = RootControl.IGNORE_ROOT;
+    public void switchRoot(boolean flag) {
+        this.rootControl = flag ? RootControl.INCLUDE_ROOT : RootControl.IGNORE_ROOT;
     }
 
     public boolean isUncontrolled() {
@@ -44,16 +44,8 @@ public class Operation {
         return rootControl == RootControl.INCLUDE_ROOT;
     }
 
-    public boolean isIgnoreRoot() {
-        return rootControl == RootControl.IGNORE_ROOT;
-    }
-
-    public void switchRoot(boolean flag) {
-        if (flag) {
-            includeRoot();
-        } else {
-            ignoreRoot();
-        }
+    public boolean isNotIgnoreRoot() {
+        return rootControl != RootControl.IGNORE_ROOT;
     }
 
 }
