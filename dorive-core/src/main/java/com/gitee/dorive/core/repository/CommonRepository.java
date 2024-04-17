@@ -86,7 +86,7 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
-        Selector selector = (Selector) context.getOption(Selector.class);
+        Selector selector = context.getOption(Selector.class);
         if (selector != null) {
             List<String> properties = selector.select(getName());
             if (properties != null && !properties.isEmpty()) {

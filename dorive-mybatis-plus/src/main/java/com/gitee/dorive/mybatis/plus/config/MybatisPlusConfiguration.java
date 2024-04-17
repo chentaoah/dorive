@@ -23,16 +23,18 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import com.gitee.dorive.env.annotation.Key;
 import com.gitee.dorive.env.annotation.Value;
 import com.gitee.dorive.env.spring.DynamicConfiguration;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.gitee.dorive.mybatis.plus.injector.EasySqlInjector;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
-@Data
+@Getter
+@Setter
 @Order(-100)
 @Configuration
-@EqualsAndHashCode(callSuper = false)
 public class MybatisPlusConfiguration extends DynamicConfiguration {
 
     @Key("mybatis-plus.global-config.enable-sql-runner")
@@ -40,10 +42,17 @@ public class MybatisPlusConfiguration extends DynamicConfiguration {
     private Boolean enableSqlRunner;
 
     @Bean
+    @ConditionalOnMissingBean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
         return interceptor;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public EasySqlInjector easySqlInjector() {
+        return new EasySqlInjector();
     }
 
 }

@@ -47,13 +47,14 @@ public abstract class AbstractContext extends LinkedHashMap<String, Object> impl
     }
 
     @Override
-    public void setOption(Class<?> type, Object value) {
+    public <T> void setOption(Class<T> type, T value) {
         options.put(type, value);
     }
 
     @Override
-    public Object getOption(Class<?> type) {
-        return options.get(type);
+    @SuppressWarnings("unchecked")
+    public <T> T getOption(Class<T> type) {
+        return (T) options.get(type);
     }
 
     @Override

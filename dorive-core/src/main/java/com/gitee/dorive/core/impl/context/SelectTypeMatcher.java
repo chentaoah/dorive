@@ -49,7 +49,7 @@ public class SelectTypeMatcher implements Matcher {
 
     @Override
     public boolean matches(Options options) {
-        SelectType selectType = (SelectType) options.getOption(SelectType.class);
+        SelectType selectType = options.getOption(SelectType.class);
         if (selectType != null) {
             Matcher matcher = matcherMap.get(selectType);
             if (matcher != null) {
@@ -62,7 +62,7 @@ public class SelectTypeMatcher implements Matcher {
     private class SelectorMatcher implements Matcher {
         @Override
         public boolean matches(Options options) {
-            Selector selector = (Selector) options.getOption(Selector.class);
+            Selector selector = options.getOption(Selector.class);
             if (selector != null) {
                 Set<String> names = selector.getNames();
                 String name = repository.getName();

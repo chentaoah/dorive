@@ -15,24 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.context;
+package com.gitee.dorive.mybatis.plus.api;
 
-import com.gitee.dorive.core.entity.context.EnumOptions;
-import com.gitee.dorive.core.entity.enums.SelectType;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-import java.util.Map;
+import java.util.Collection;
 
-public interface Options {
+public interface EasyBaseMapper<T> extends BaseMapper<T> {
 
-    Options ROOT = new EnumOptions(SelectType.class, SelectType.ROOT);
-    Options ALL = new EnumOptions(SelectType.class, SelectType.ALL);
-
-    Map<Class<?>, Object> getOptions();
-
-    <T> void setOption(Class<T> type, T value);
-
-    <T> T getOption(Class<T> type);
-
-    void removeOption(Class<?> type);
+    Integer insertBatchSomeColumn(Collection<T> entityList);
 
 }

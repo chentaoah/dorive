@@ -36,13 +36,14 @@ public class EnumOptions implements Options {
     }
 
     @Override
-    public void setOption(Class<?> type, Object value) {
+    public <T> void setOption(Class<T> type, T value) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Object getOption(Class<?> type) {
-        return options.get(type);
+    @SuppressWarnings("unchecked")
+    public <T> T getOption(Class<T> type) {
+        return (T) options.get(type);
     }
 
     @Override

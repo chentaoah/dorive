@@ -15,24 +15,8 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.context;
+package com.gitee.dorive.mybatis.plus.enums;
 
-import com.gitee.dorive.core.entity.context.EnumOptions;
-import com.gitee.dorive.core.entity.enums.SelectType;
-
-import java.util.Map;
-
-public interface Options {
-
-    Options ROOT = new EnumOptions(SelectType.class, SelectType.ROOT);
-    Options ALL = new EnumOptions(SelectType.class, SelectType.ALL);
-
-    Map<Class<?>, Object> getOptions();
-
-    <T> void setOption(Class<T> type, T value);
-
-    <T> T getOption(Class<T> type);
-
-    void removeOption(Class<?> type);
-
+public enum InsertMethod {
+    BATCH
 }

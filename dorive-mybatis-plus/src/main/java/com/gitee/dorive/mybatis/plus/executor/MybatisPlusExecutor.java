@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.plus.impl;
+package com.gitee.dorive.mybatis.plus.executor;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -41,12 +41,16 @@ import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.core.impl.executor.AbstractExecutor;
+import com.gitee.dorive.mybatis.plus.api.EasyBaseMapper;
+import com.gitee.dorive.mybatis.plus.enums.InsertMethod;
+import com.gitee.dorive.mybatis.plus.impl.AppenderContext;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +66,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     private EntityStoreInfo entityStoreInfo;
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;
+    private boolean canInsertBatch;
 
     @SuppressWarnings("unchecked")
     public MybatisPlusExecutor(EntityDef entityDef, EntityEle entityEle, EntityStoreInfo entityStoreInfo) {
@@ -70,6 +75,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         this.entityStoreInfo = entityStoreInfo;
         this.baseMapper = (BaseMapper<Object>) entityStoreInfo.getMapper();
         this.pojoClass = (Class<Object>) entityStoreInfo.getPojoClass();
+        this.canInsertBatch = baseMapper instanceof EasyBaseMapper;
     }
 
     @Override
@@ -144,14 +150,21 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public int execute(Context context, Operation operation) {
         int totalCount = 0;
         if (operation instanceof EntityOp) {
             EntityOp entityOp = (EntityOp) operation;
             List<?> persistentObjs = entityOp.getEntities();
             if (entityOp instanceof Insert) {
-                for (Object persistent : persistentObjs) {
-                    totalCount += baseMapper.insert(persistent);
+                InsertMethod insertMethod = context.getOption(InsertMethod.class);
+                boolean isBatch = insertMethod == null ? persistentObjs.size() >= 100 : insertMethod == InsertMethod.BATCH;
+                if (canInsertBatch && isBatch) {
+                    totalCount += ((EasyBaseMapper<Object>) baseMapper).insertBatchSomeColumn((Collection<Object>) persistentObjs);
+                } else {
+                    for (Object persistent : persistentObjs) {
+                        totalCount += baseMapper.insert(persistent);
+                    }
                 }
 
             } else if (operation instanceof Update) {
