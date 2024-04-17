@@ -28,7 +28,7 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
-import com.gitee.dorive.core.entity.factory.FieldInfo;
+import com.gitee.dorive.core.entity.factory.FieldConverter;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.Query;
@@ -138,13 +138,13 @@ public class ExampleExecutor extends AbstractProxyExecutor {
         String property = criterion.getProperty();
         Object value = criterion.getValue();
 
-        FieldInfo fieldInfo = entityMapper.findField(Domain.ENTITY.name(), property);
-        if (fieldInfo == null) {
-            fieldInfo = entityMapper.findField(Domain.DATABASE.name(), property);
+        FieldConverter fieldConverter = entityMapper.getConverter(Domain.ENTITY.name(), property);
+        if (fieldConverter == null) {
+            fieldConverter = entityMapper.getConverter(Domain.DATABASE.name(), property);
         }
-        if (fieldInfo != null) {
-            property = fieldInfo.getAlias(Domain.DATABASE.name());
-            value = fieldInfo.deconstruct(Domain.DATABASE.name(), value);
+        if (fieldConverter != null) {
+            property = fieldConverter.getName(Domain.DATABASE.name());
+            value = fieldConverter.deconstruct(value);
             criterion.setProperty(property);
             criterion.setValue(value);
         }

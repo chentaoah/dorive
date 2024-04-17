@@ -17,10 +17,10 @@
 
 package com.gitee.dorive.core.api.factory;
 
-import com.gitee.dorive.core.entity.factory.FieldInfo;
+import com.gitee.dorive.core.entity.factory.FieldConverter;
 
 public interface EntityMapper {
 
-    FieldInfo findField(String domain, String name);
+    FieldConverter getConverter(String domain, String name);
 
 }

@@ -27,37 +27,25 @@ import java.util.Map;
 @Getter
 @Setter
 @AllArgsConstructor
-public class FieldInfo {
+public class FieldConverter implements Converter {
 
     private String domain;
     private String name;
-    private Map<String, AliasInfo> aliasInfoMap;
+    private Map<String, String> names;
+    private Converter converter;
 
-    public void addAliasInfo(AliasInfo aliasInfo) {
-        aliasInfoMap.put(aliasInfo.getDomain(), aliasInfo);
+    public String getName(String domain) {
+        return names.get(domain);
     }
 
-    public String getAlias(String domain) {
-        AliasInfo aliasInfo = aliasInfoMap.get(domain);
-        return aliasInfo.getName();
+    @Override
+    public Object reconstitute(Object value) {
+        return converter == null ? value : converter.reconstitute(value);
     }
 
-    public Object reconstitute(String domain, Object value) {
-        AliasInfo aliasInfo = aliasInfoMap.get(domain);
-        Converter converter = aliasInfo.getConverter();
-        if (converter != null) {
-            return converter.reconstitute(value);
-        }
-        return value;
-    }
-
-    public Object deconstruct(String domain, Object value) {
-        AliasInfo aliasInfo = aliasInfoMap.get(domain);
-        Converter converter = aliasInfo.getConverter();
-        if (converter != null) {
-            return converter.deconstruct(value);
-        }
-        return value;
+    @Override
+    public Object deconstruct(Object value) {
+        return converter == null ? value : converter.deconstruct(value);
     }
 
 }

@@ -25,7 +25,7 @@ import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.enums.Domain;
-import com.gitee.dorive.core.entity.factory.FieldInfo;
+import com.gitee.dorive.core.entity.factory.FieldConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -49,23 +49,23 @@ public class DefaultEntityFactory implements EntityFactory {
 
     private void initReCopyOptions() {
         this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(name -> {
-            FieldInfo fieldInfo = entityMapper.findField(Domain.DATABASE.name(), name);
-            return fieldInfo != null ? fieldInfo.getName() : name;
+            FieldConverter fieldConverter = entityMapper.getConverter(Domain.DATABASE.name(), name);
+            return fieldConverter != null ? fieldConverter.getName() : name;
 
         }).setFieldValueEditor((name, value) -> {
-            FieldInfo fieldInfo = entityMapper.findField(Domain.ENTITY.name(), name);
-            return fieldInfo != null ? fieldInfo.reconstitute(Domain.DATABASE.name(), value) : value;
+            FieldConverter fieldConverter = entityMapper.getConverter(Domain.ENTITY.name(), name);
+            return fieldConverter != null ? fieldConverter.reconstitute(value) : value;
         });
     }
 
     private void initDeCopyOptions() {
         this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(name -> {
-            FieldInfo fieldInfo = entityMapper.findField(Domain.ENTITY.name(), name);
-            return fieldInfo != null ? fieldInfo.getAlias(Domain.POJO.name()) : name;
+            FieldConverter fieldConverter = entityMapper.getConverter(Domain.ENTITY.name(), name);
+            return fieldConverter != null ? fieldConverter.getName(Domain.POJO.name()) : name;
 
         }).setFieldValueEditor((name, value) -> {
-            FieldInfo fieldInfo = entityMapper.findField(Domain.POJO.name(), name);
-            return fieldInfo != null ? fieldInfo.deconstruct(Domain.POJO.name(), value) : value;
+            FieldConverter fieldConverter = entityMapper.getConverter(Domain.POJO.name(), name);
+            return fieldConverter != null ? fieldConverter.deconstruct(value) : value;
         });
     }
 
