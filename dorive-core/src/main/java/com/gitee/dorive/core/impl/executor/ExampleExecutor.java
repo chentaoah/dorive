@@ -22,11 +22,13 @@ import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.entity.enums.Domain;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
+import com.gitee.dorive.core.entity.factory.FieldInfo;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.Query;
@@ -134,15 +136,16 @@ public class ExampleExecutor extends AbstractProxyExecutor {
 
     private void doConvertCriteria(Criterion criterion) {
         String property = criterion.getProperty();
-        String alias = entityMapper.fieldToAlias(property);
-        if (alias != null) {
-            criterion.setProperty(alias);
-        } else {
-            alias = property;
+        Object value = criterion.getValue();
+
+        FieldInfo fieldInfo = entityMapper.findField(Domain.ENTITY.name(), property);
+        if (fieldInfo == null) {
+            fieldInfo = entityMapper.findField(Domain.DATABASE.name(), property);
         }
-        if (entityMapper.hasConverter()) {
-            Object value = criterion.getValue();
-            value = entityMapper.fieldToAlias(alias, value);
+        if (fieldInfo != null) {
+            property = fieldInfo.getAlias(Domain.DATABASE.name());
+            value = fieldInfo.deconstruct(Domain.DATABASE.name(), value);
+            criterion.setProperty(property);
             criterion.setValue(value);
         }
     }

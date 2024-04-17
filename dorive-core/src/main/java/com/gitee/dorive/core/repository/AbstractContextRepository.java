@@ -199,7 +199,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityStoreInfo entityStoreInfo = resolveEntityStoreInfo(entityDef, entityEle);
             ENTITY_STORE_INFO_MAP.put(entityEle, entityStoreInfo);
 
-            EntityMapper entityMapper = new EntityMapperResolver(entityEle, entityStoreInfo).resolve();
+            EntityMapper entityMapper = new EntityMapperResolver(entityEle, entityStoreInfo).newEntityMapper();
             EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, entityStoreInfo, entityMapper);
 
             Executor executor = newExecutor(entityDef, entityEle, entityStoreInfo);

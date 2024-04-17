@@ -15,12 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.factory;
+package com.gitee.dorive.core.entity.factory;
 
-import com.gitee.dorive.core.entity.factory.FieldInfo;
+import com.gitee.dorive.core.api.factory.Converter;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-public interface EntityMapper {
-
-    FieldInfo findField(String domain, String name);
-
+@Getter
+@Setter
+@AllArgsConstructor
+public class AliasInfo {
+    private String domain;
+    private String name;
+    private Converter converter;
 }

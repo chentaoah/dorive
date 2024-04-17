@@ -33,5 +33,6 @@ public class EntityStoreInfo {
     private String idColumn;
     private Map<String, String> propAliasMappingWithoutPk;
     private Map<String, String> propAliasMapping;
+    private Map<String, String> aliasPropMapping;
     private String selectColumns;
 }

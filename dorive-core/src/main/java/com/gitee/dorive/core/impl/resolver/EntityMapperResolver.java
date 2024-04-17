@@ -24,8 +24,10 @@ import com.gitee.dorive.api.entity.EntityField;
 import com.gitee.dorive.core.api.factory.Converter;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
+import com.gitee.dorive.core.entity.enums.Domain;
+import com.gitee.dorive.core.entity.factory.AliasInfo;
+import com.gitee.dorive.core.entity.factory.FieldInfo;
 import com.gitee.dorive.core.impl.factory.DefaultConverter;
-import com.gitee.dorive.core.impl.factory.DefaultEntityMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -40,78 +42,60 @@ public class EntityMapperResolver {
     private EntityEle entityEle;
     private EntityStoreInfo entityStoreInfo;
 
-    public EntityMapper resolve() {
-        Map<String, String> fieldAliasMapping = entityEle.getFieldAliasMapping();
-        Map<String, String> aliasFieldMapping = newAliasFieldMapping(fieldAliasMapping);
-        Map<String, String> fieldPropMapping = newFieldPropMapping(aliasFieldMapping);
-
-        Map<String, Converter> fieldConverterMap = newFieldConverterMap();
-        Map<String, Converter> aliasConverterMap = newAliasConverterMap(fieldAliasMapping, fieldConverterMap);
-        Map<String, Converter> propConverterMap = newPropConverterMap(fieldPropMapping, fieldConverterMap);
-
-        return new DefaultEntityMapper(fieldAliasMapping, aliasFieldMapping, fieldPropMapping,
-                fieldConverterMap, aliasConverterMap, propConverterMap);
-    }
-
-    private Map<String, String> newAliasFieldMapping(Map<String, String> fieldAliasMapping) {
-        Map<String, String> aliasFieldMapping = new LinkedHashMap<>();
-        fieldAliasMapping.forEach((field, alias) -> aliasFieldMapping.put(alias, field));
-        return aliasFieldMapping;
-    }
-
-    private Map<String, String> newFieldPropMapping(Map<String, String> aliasFieldMapping) {
-        Map<String, String> fieldPropMapping = new LinkedHashMap<>();
-        Map<String, String> propAliasMapping = entityStoreInfo.getPropAliasMapping();
-        propAliasMapping.forEach((prop, alias) -> {
-            String field = aliasFieldMapping.get(alias);
-            if (field != null) {
-                fieldPropMapping.put(field, prop);
-            }
-        });
-        return fieldPropMapping;
-    }
-
-    private Map<String, Converter> newFieldConverterMap() {
-        Map<String, Converter> fieldConverterMap = new LinkedHashMap<>(8);
+    public EntityMapper newEntityMapper() {
         Map<String, EntityField> entityFieldMap = entityEle.getEntityFieldMap();
-        if (entityFieldMap != null) {
-            entityFieldMap.forEach((field, entityField) -> {
-                FieldDef fieldDef = entityField.getFieldDef();
-                if (fieldDef != null) {
-                    Class<?> converterClass = fieldDef.getConverter();
-                    String mapExp = fieldDef.getMapExp();
-                    Converter converter = null;
-                    if (converterClass != Object.class) {
-                        converter = (Converter) ReflectUtil.newInstance(converterClass);
+        Map<String, String> fieldAliasMapping = entityEle.getFieldAliasMapping();
+        Map<String, String> aliasPropMapping = entityStoreInfo.getAliasPropMapping();
 
-                    } else if (StringUtils.isNotBlank(mapExp)) {
-                        converter = new DefaultConverter(entityField);
-                    }
-                    if (converter != null) {
-                        fieldConverterMap.put(field, converter);
-                    }
-                }
-            });
+        Map<String, FieldInfo> fieldInfoMap = new LinkedHashMap<>(entityFieldMap.size() * 4 / 3 + 1);
+        entityFieldMap.forEach((name, field) -> {
+            FieldInfo fieldInfo = new FieldInfo(Domain.ENTITY.name(), name, new LinkedHashMap<>(3));
+            Converter converter = newConverter(field);
+
+            String alias = fieldAliasMapping.get(name);
+            AliasInfo databaseAliasInfo = new AliasInfo(Domain.DATABASE.name(), alias, converter);
+            fieldInfo.addAliasInfo(databaseAliasInfo);
+
+            String prop = aliasPropMapping.get(alias);
+            AliasInfo pojoAliasInfo = new AliasInfo(Domain.POJO.name(), prop, converter);
+            fieldInfo.addAliasInfo(pojoAliasInfo);
+
+            fieldInfoMap.put(getKey(fieldInfo.getDomain(), fieldInfo.getName()), fieldInfo);
+            fieldInfoMap.put(getKey(databaseAliasInfo.getDomain(), databaseAliasInfo.getName()), fieldInfo);
+            fieldInfoMap.put(getKey(pojoAliasInfo.getDomain(), pojoAliasInfo.getName()), fieldInfo);
+        });
+
+        return new DefaultEntityMapper(fieldInfoMap);
+    }
+
+    private Converter newConverter(EntityField entityField) {
+        FieldDef fieldDef = entityField.getFieldDef();
+        if (fieldDef != null) {
+            Class<?> converterClass = fieldDef.getConverter();
+            if (converterClass != Object.class) {
+                return (Converter) ReflectUtil.newInstance(converterClass);
+
+            } else if (StringUtils.isNotBlank(fieldDef.getMapExp())) {
+                return new DefaultConverter(entityField);
+            }
         }
-        return fieldConverterMap;
+        return null;
     }
 
-    private Map<String, Converter> newAliasConverterMap(Map<String, String> fieldAliasMapping, Map<String, Converter> fieldConverterMap) {
-        Map<String, Converter> aliasConverterMap = new LinkedHashMap<>(fieldConverterMap.size());
-        fieldConverterMap.forEach((field, converter) -> {
-            String alias = fieldAliasMapping.get(field);
-            aliasConverterMap.put(alias, converter);
-        });
-        return aliasConverterMap;
+    private String getKey(String domain, String name) {
+        return domain + ":" + name;
     }
 
-    private Map<String, Converter> newPropConverterMap(Map<String, String> fieldPropMapping, Map<String, Converter> fieldConverterMap) {
-        Map<String, Converter> propConverterMap = new LinkedHashMap<>(fieldConverterMap.size());
-        fieldConverterMap.forEach((field, converter) -> {
-            String prop = fieldPropMapping.get(field);
-            propConverterMap.put(prop, converter);
-        });
-        return propConverterMap;
+    @AllArgsConstructor
+    private class DefaultEntityMapper implements EntityMapper {
+
+        private final Map<String, FieldInfo> fieldInfoMap;
+
+        @Override
+        public FieldInfo findField(String domain, String name) {
+            return fieldInfoMap.get(getKey(domain, name));
+        }
+
     }
 
 }

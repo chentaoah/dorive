@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.factory;
+package com.gitee.dorive.core.entity.enums;
 
-import com.gitee.dorive.core.entity.factory.FieldInfo;
-
-public interface EntityMapper {
-
-    FieldInfo findField(String domain, String name);
-
+public enum Domain {
+    ENTITY,
+    DATABASE,
+    POJO
 }

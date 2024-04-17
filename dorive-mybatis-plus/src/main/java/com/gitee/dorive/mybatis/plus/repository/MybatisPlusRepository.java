@@ -18,6 +18,7 @@
 package com.gitee.dorive.mybatis.plus.repository;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
@@ -112,11 +113,13 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         }
         propAliasMapping.putAll(propAliasMappingWithoutPk);
 
+        Map<String, String> aliasPropMapping = MapUtil.reverse(propAliasMapping);
+
         List<String> columns = new ArrayList<>(propAliasMapping.values());
         String selectColumns = StrUtil.join(",", columns);
 
-        return new EntityStoreInfo(mapperClass, mapper, pojoClass,
-                tableName, keyProperty, keyColumn, propAliasMappingWithoutPk, propAliasMapping, selectColumns);
+        return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn,
+                propAliasMappingWithoutPk, propAliasMapping, aliasPropMapping, selectColumns);
     }
 
     private String clearColumn(String column) {
