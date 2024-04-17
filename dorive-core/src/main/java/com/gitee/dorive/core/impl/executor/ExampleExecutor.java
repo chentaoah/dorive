@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.executor;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.api.entity.EntityEle;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.converter.EntityMapper;
+import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;

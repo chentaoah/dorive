@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.converter;
+package com.gitee.dorive.core.impl.factory;
 
-import com.gitee.dorive.core.api.converter.Converter;
-import com.gitee.dorive.core.api.converter.EntityMapper;
+import com.gitee.dorive.core.api.factory.Converter;
+import com.gitee.dorive.core.api.factory.EntityMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

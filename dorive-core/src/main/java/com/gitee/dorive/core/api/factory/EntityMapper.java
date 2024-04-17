@@ -15,14 +15,22 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.converter;
+package com.gitee.dorive.core.api.factory;
 
-import com.gitee.dorive.core.api.context.Context;
+public interface EntityMapper {
 
-public interface EntityFactory {
+    String fieldToAlias(String field);
 
-    Object reconstitute(Context context, Object persistent);
+    String aliasToField(String alias);
 
-    Object deconstruct(Context context, Object entity);
+    String fieldToProp(String field);
+
+    boolean hasConverter();
+
+    Object fieldToAlias(String alias, Object value);
+
+    Object aliasToField(String field, Object value);
+
+    Object fieldToProp(String prop, Object value);
 
 }

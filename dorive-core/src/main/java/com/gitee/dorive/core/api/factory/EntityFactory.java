@@ -15,12 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.converter;
+package com.gitee.dorive.core.api.factory;
 
-public interface Converter {
+import com.gitee.dorive.core.api.context.Context;
 
-    Object reconstitute(Object value);
+public interface EntityFactory {
 
-    Object deconstruct(Object value);
+    Object reconstitute(Context context, Object persistent);
+
+    Object deconstruct(Context context, Object entity);
 
 }
