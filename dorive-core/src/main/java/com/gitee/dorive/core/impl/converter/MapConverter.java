@@ -18,40 +18,26 @@
 package com.gitee.dorive.core.impl.converter;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.json.JSONUtil;
 import com.gitee.dorive.core.api.factory.Converter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Map;
-
 @Getter
 @Setter
 @AllArgsConstructor
-public class ValueObjConverter implements Converter {
+public class MapConverter implements Converter {
 
     private Class<?> entityClass;
-    private boolean isJson;
 
     @Override
     public Object reconstitute(Object value) {
-        if (value instanceof String) {
-            return JSONUtil.toBean((String) value, entityClass);
-
-        } else if (value instanceof Map) {
-            return BeanUtil.toBean(value, entityClass);
-        }
-        return value;
+        return BeanUtil.toBean(value, entityClass);
     }
 
     @Override
     public Object deconstruct(Object value) {
-        if (isJson) {
-            return JSONUtil.toJsonStr(value);
-        } else {
-            return BeanUtil.beanToMap(value);
-        }
+        return BeanUtil.beanToMap(value);
     }
 
 }

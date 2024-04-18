@@ -26,8 +26,9 @@ import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.enums.Domain;
 import com.gitee.dorive.core.entity.factory.FieldConverter;
+import com.gitee.dorive.core.impl.converter.JsonConverter;
+import com.gitee.dorive.core.impl.converter.MapConverter;
 import com.gitee.dorive.core.impl.converter.MapExpConverter;
-import com.gitee.dorive.core.impl.converter.ValueObjConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -47,25 +48,30 @@ public class EntityMapperResolver {
 
     public EntityMapper newEntityMapper() {
         Map<String, EntityField> entityFieldMap = entityEle.getEntityFieldMap();
-        Map<String, String> fieldAliasMapping = entityEle.getFieldAliasMapping();
         Map<String, String> aliasPropMapping = entityStoreInfo.getAliasPropMapping();
 
         Map<String, FieldConverter> fieldConverterMap = new LinkedHashMap<>(entityFieldMap.size() * 4 / 3 + 1);
         List<FieldConverter> valueObjFields = new ArrayList<>(4);
         entityFieldMap.forEach((name, field) -> {
-            String alias = fieldAliasMapping.get(name);
-            String prop = aliasPropMapping.get(alias);
+            String expected = entityEle.toAlias(name);
+            boolean isMatch = aliasPropMapping.containsKey(expected);
+            String alias = isMatch ? expected : null;
+            String prop = isMatch ? aliasPropMapping.get(alias) : null;
 
             Map<String, String> names = new LinkedHashMap<>(5);
             names.put(Domain.ENTITY.name(), name);
-            names.put(Domain.DATABASE.name(), alias);
-            names.put(Domain.POJO.name(), prop);
+            if (alias != null) {
+                names.put(Domain.DATABASE.name(), alias);
+            }
+            if (prop != null) {
+                names.put(Domain.POJO.name(), prop);
+            }
 
             FieldDef fieldDef = field.getFieldDef();
             boolean isValueObj = fieldDef != null && fieldDef.isValueObj();
-
-            Converter converter = newConverter(field, names, isValueObj);
+            Converter converter = newConverter(field, isMatch, isValueObj);
             FieldConverter fieldConverter = new FieldConverter(Domain.ENTITY.name(), name, names, converter);
+
             names.forEach((domain, eachName) -> fieldConverterMap.put(getKey(domain, eachName), fieldConverter));
             if (isValueObj) {
                 valueObjFields.add(fieldConverter);
@@ -75,7 +81,7 @@ public class EntityMapperResolver {
         return new DefaultEntityMapper(fieldConverterMap, valueObjFields);
     }
 
-    private Converter newConverter(EntityField entityField, Map<String, String> names, boolean isValueObj) {
+    private Converter newConverter(EntityField entityField, boolean isMatch, boolean isValueObj) {
         FieldDef fieldDef = entityField.getFieldDef();
         if (fieldDef != null) {
             Class<?> converterClass = fieldDef.getConverter();
@@ -83,8 +89,8 @@ public class EntityMapperResolver {
                 return (Converter) ReflectUtil.newInstance(converterClass);
 
             } else if (isValueObj) {
-                String name = names.get(Domain.POJO.name());
-                return new ValueObjConverter(entityField.getGenericType(), name != null);
+                Class<?> genericType = entityField.getGenericType();
+                return isMatch ? new JsonConverter(genericType) : new MapConverter(genericType);
 
             } else if (StringUtils.isNotBlank(fieldDef.getMapExp())) {
                 return new MapExpConverter(entityField);
