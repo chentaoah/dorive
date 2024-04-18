@@ -34,13 +34,11 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
         Object entity = super.reconstitute(context, persistent);
         Map<String, Object> resultMap = (Map<String, Object>) persistent;
         EntityMapper entityMapper = getEntityMapper();
-        List<FieldConverter> fieldConverters = entityMapper.getValueObjFields();
+        List<FieldConverter> fieldConverters = entityMapper.getUnmatchedValueObjFields();
         for (FieldConverter fieldConverter : fieldConverters) {
-            if (!fieldConverter.isMatch()) {
-                Object valueObj = fieldConverter.reconstitute(resultMap);
-                if (valueObj != null) {
-                    BeanUtil.setFieldValue(entity, fieldConverter.getName(), valueObj);
-                }
+            Object valueObj = fieldConverter.reconstitute(resultMap);
+            if (valueObj != null) {
+                BeanUtil.setFieldValue(entity, fieldConverter.getName(), valueObj);
             }
         }
         return entity;
@@ -50,14 +48,12 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     public Object deconstruct(Context context, Object entity) {
         Object pojo = super.deconstruct(context, entity);
         EntityMapper entityMapper = getEntityMapper();
-        List<FieldConverter> fieldConverters = entityMapper.getValueObjFields();
+        List<FieldConverter> fieldConverters = entityMapper.getUnmatchedValueObjFields();
         for (FieldConverter fieldConverter : fieldConverters) {
-            if (!fieldConverter.isMatch()) {
-                Object valueObj = BeanUtil.getFieldValue(entity, fieldConverter.getName());
-                valueObj = valueObj != null ? fieldConverter.deconstruct(valueObj) : null;
-                if (valueObj != null) {
-                    BeanUtil.copyProperties(valueObj, pojo, CopyOptions.create().ignoreNullValue());
-                }
+            Object valueObj = BeanUtil.getFieldValue(entity, fieldConverter.getName());
+            valueObj = valueObj != null ? fieldConverter.deconstruct(valueObj) : null;
+            if (valueObj != null) {
+                BeanUtil.copyProperties(valueObj, pojo, CopyOptions.create().ignoreNullValue());
             }
         }
         return pojo;

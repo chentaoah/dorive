@@ -27,4 +27,6 @@ public interface EntityMapper {
 
     List<FieldConverter> getValueObjFields();
 
+    List<FieldConverter> getUnmatchedValueObjFields();
+
 }

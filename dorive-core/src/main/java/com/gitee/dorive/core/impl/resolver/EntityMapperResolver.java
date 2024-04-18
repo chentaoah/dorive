@@ -52,6 +52,7 @@ public class EntityMapperResolver {
 
         Map<String, FieldConverter> fieldConverterMap = new LinkedHashMap<>(entityFieldMap.size() * 4 / 3 + 1);
         List<FieldConverter> valueObjFields = new ArrayList<>(4);
+        List<FieldConverter> unmatchedValueObjFields = new ArrayList<>(4);
         entityFieldMap.forEach((name, field) -> {
             String expected = entityEle.toAlias(name);
             boolean isMatch = aliasPropMapping.containsKey(expected);
@@ -75,10 +76,12 @@ public class EntityMapperResolver {
             names.forEach((domain, eachName) -> fieldConverterMap.put(getKey(domain, eachName), fieldConverter));
             if (isValueObj) {
                 valueObjFields.add(fieldConverter);
+                if (!isMatch) {
+                    unmatchedValueObjFields.add(fieldConverter);
+                }
             }
         });
-
-        return new DefaultEntityMapper(fieldConverterMap, valueObjFields);
+        return new DefaultEntityMapper(fieldConverterMap, valueObjFields, unmatchedValueObjFields);
     }
 
     private Converter newConverter(EntityField entityField, boolean isMatch, boolean isValueObj) {
@@ -109,6 +112,7 @@ public class EntityMapperResolver {
 
         private final Map<String, FieldConverter> fieldConverterMap;
         private final List<FieldConverter> valueObjFields;
+        private final List<FieldConverter> unmatchedValueObjFields;
 
         @Override
         public FieldConverter getField(String domain, String name) {

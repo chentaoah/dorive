@@ -35,12 +35,14 @@ import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.config.RepositoryContext;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.factory.FieldConverter;
 import com.gitee.dorive.core.impl.context.SelectTypeMatcher;
 import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.core.impl.executor.ContextExecutor;
 import com.gitee.dorive.core.impl.executor.ExampleExecutor;
 import com.gitee.dorive.core.impl.executor.FactoryExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
+import com.gitee.dorive.core.impl.factory.ValueObjEntityFactory;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DerivedResolver;
@@ -216,7 +218,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Class<?> factoryClass = entityDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
-            entityFactory = new DefaultEntityFactory();
+            List<FieldConverter> unmatchedValueObjFields = entityMapper.getUnmatchedValueObjFields();
+            entityFactory = unmatchedValueObjFields.isEmpty() ? new DefaultEntityFactory() : new ValueObjEntityFactory();
         } else {
             entityFactory = (EntityFactory) applicationContext.getBean(factoryClass);
         }
