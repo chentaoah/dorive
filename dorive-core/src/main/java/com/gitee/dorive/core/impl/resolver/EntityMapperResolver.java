@@ -70,7 +70,7 @@ public class EntityMapperResolver {
             FieldDef fieldDef = field.getFieldDef();
             boolean isValueObj = fieldDef != null && fieldDef.isValueObj();
             Converter converter = newConverter(field, isMatch, isValueObj);
-            FieldConverter fieldConverter = new FieldConverter(Domain.ENTITY.name(), name, names, converter);
+            FieldConverter fieldConverter = new FieldConverter(Domain.ENTITY.name(), name, isMatch, names, converter);
 
             names.forEach((domain, eachName) -> fieldConverterMap.put(getKey(domain, eachName), fieldConverter));
             if (isValueObj) {

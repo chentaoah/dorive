@@ -21,10 +21,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.factory.EntityMapper;
-import com.gitee.dorive.core.entity.enums.Domain;
 import com.gitee.dorive.core.entity.factory.FieldConverter;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,16 +31,19 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     @Override
     @SuppressWarnings("unchecked")
     public Object reconstitute(Context context, Object persistent) {
+        Object entity = super.reconstitute(context, persistent);
         Map<String, Object> resultMap = (Map<String, Object>) persistent;
         EntityMapper entityMapper = getEntityMapper();
         List<FieldConverter> fieldConverters = entityMapper.getValueObjFields();
         for (FieldConverter fieldConverter : fieldConverters) {
-            String name = fieldConverter.getName(Domain.DATABASE.name());
-            if (!resultMap.containsKey(name)) {
-                resultMap.put(name, new HashMap<>(resultMap));
+            if (!fieldConverter.isMatch()) {
+                Object valueObj = fieldConverter.reconstitute(resultMap);
+                if (valueObj != null) {
+                    BeanUtil.setFieldValue(entity, fieldConverter.getName(), valueObj);
+                }
             }
         }
-        return super.reconstitute(context, persistent);
+        return entity;
     }
 
     @Override
@@ -51,11 +52,10 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
         EntityMapper entityMapper = getEntityMapper();
         List<FieldConverter> fieldConverters = entityMapper.getValueObjFields();
         for (FieldConverter fieldConverter : fieldConverters) {
-            String name = fieldConverter.getName(Domain.POJO.name());
-            if (name == null) {
+            if (!fieldConverter.isMatch()) {
                 Object valueObj = BeanUtil.getFieldValue(entity, fieldConverter.getName());
+                valueObj = valueObj != null ? fieldConverter.deconstruct(valueObj) : null;
                 if (valueObj != null) {
-                    valueObj = fieldConverter.deconstruct(valueObj);
                     BeanUtil.copyProperties(valueObj, pojo, CopyOptions.create().ignoreNullValue());
                 }
             }

@@ -31,6 +31,7 @@ public class FieldConverter implements Converter {
 
     private String domain;
     private String name;
+    private boolean match;
     private Map<String, String> names;
     private Converter converter;
 
