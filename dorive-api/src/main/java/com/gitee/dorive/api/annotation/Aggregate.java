@@ -61,6 +61,12 @@ public @interface Aggregate {
      * @see Entity
      */
     @AliasFor(annotation = Entity.class)
+    boolean aggregate() default true;
+
+    /**
+     * @see Entity
+     */
+    @AliasFor(annotation = Entity.class)
     Class<?> repository() default Object.class;
 
 }

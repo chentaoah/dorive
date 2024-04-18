@@ -69,7 +69,7 @@ public class EntityField extends EntityEle {
         if (entityDef != null) {
             EntityDef genericEntityDef = EntityDef.fromElement(genericType);
             if (genericEntityDef != null) {
-                entityDef.merge(genericEntityDef);
+                entityDef.mergeDef(genericEntityDef);
             }
         }
         if (isComplexType(genericType)) {

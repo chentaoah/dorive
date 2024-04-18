@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.api.entity;
 
-import com.gitee.dorive.api.annotation.Aggregate;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.def.BindingDef;
 import com.gitee.dorive.api.def.EntityDef;
@@ -39,7 +38,6 @@ public abstract class EntityEle {
     private AnnotatedElement element;
     private EntityDef entityDef;
     private OrderDef orderDef;
-    private boolean aggregated;
     private List<BindingDef> bindingDefs;
     private PropProxy idProxy;
     private Map<String, String> fieldAliasMapping;
@@ -48,16 +46,11 @@ public abstract class EntityEle {
         this.element = element;
         this.entityDef = EntityDef.fromElement(element);
         this.orderDef = OrderDef.fromElement(element);
-        this.aggregated = (entityDef != null && entityDef.isRepositoryDef()) || isAggregateDef();
         this.bindingDefs = BindingDef.fromElement(element);
     }
 
     public boolean isEntityDef() {
         return entityDef != null;
-    }
-
-    public boolean isAggregateDef() {
-        return element.isAnnotationPresent(Aggregate.class);
     }
 
     public void initialize() {

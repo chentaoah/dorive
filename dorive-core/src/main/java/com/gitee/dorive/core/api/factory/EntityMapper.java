@@ -19,8 +19,12 @@ package com.gitee.dorive.core.api.factory;
 
 import com.gitee.dorive.core.entity.factory.FieldConverter;
 
+import java.util.List;
+
 public interface EntityMapper {
 
-    FieldConverter getConverter(String domain, String name);
+    FieldConverter getField(String domain, String name);
+
+    List<FieldConverter> getValueObjFields();
 
 }

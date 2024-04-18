@@ -138,9 +138,9 @@ public class ExampleExecutor extends AbstractProxyExecutor {
         String property = criterion.getProperty();
         Object value = criterion.getValue();
 
-        FieldConverter fieldConverter = entityMapper.getConverter(Domain.ENTITY.name(), property);
+        FieldConverter fieldConverter = entityMapper.getField(Domain.ENTITY.name(), property);
         if (fieldConverter == null) {
-            fieldConverter = entityMapper.getConverter(Domain.DATABASE.name(), property);
+            fieldConverter = entityMapper.getField(Domain.DATABASE.name(), property);
         }
         if (fieldConverter != null) {
             property = fieldConverter.getName(Domain.DATABASE.name());

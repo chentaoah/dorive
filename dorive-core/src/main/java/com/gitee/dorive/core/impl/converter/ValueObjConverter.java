@@ -15,32 +15,43 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.def;
+package com.gitee.dorive.core.impl.converter;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.api.annotation.Field;
+import cn.hutool.json.JSONUtil;
+import com.gitee.dorive.core.api.factory.Converter;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.lang.reflect.AnnotatedElement;
 import java.util.Map;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
-public class FieldDef {
+public class ValueObjConverter implements Converter {
 
-    private boolean id;
-    private String alias;
-    private String mapExp;
-    private boolean valueObj;
-    private Class<?> converter;
+    private Class<?> entityClass;
+    private boolean isJson;
 
-    public static FieldDef fromElement(AnnotatedElement element) {
-        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Field.class);
-        return attributes != null ? BeanUtil.copyProperties(attributes, FieldDef.class) : null;
+    @Override
+    public Object reconstitute(Object value) {
+        if (value instanceof String) {
+            return JSONUtil.toBean((String) value, entityClass);
+
+        } else if (value instanceof Map) {
+            return BeanUtil.toBean(value, entityClass);
+        }
+        return value;
+    }
+
+    @Override
+    public Object deconstruct(Object value) {
+        if (isJson) {
+            return JSONUtil.toJsonStr(value);
+        } else {
+            return BeanUtil.beanToMap(value);
+        }
     }
 
 }

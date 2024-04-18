@@ -26,12 +26,16 @@ import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.enums.Domain;
 import com.gitee.dorive.core.entity.factory.FieldConverter;
-import com.gitee.dorive.core.impl.factory.DefaultConverter;
+import com.gitee.dorive.core.impl.converter.MapExpConverter;
+import com.gitee.dorive.core.impl.converter.ValueObjConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -47,31 +51,43 @@ public class EntityMapperResolver {
         Map<String, String> aliasPropMapping = entityStoreInfo.getAliasPropMapping();
 
         Map<String, FieldConverter> fieldConverterMap = new LinkedHashMap<>(entityFieldMap.size() * 4 / 3 + 1);
+        List<FieldConverter> valueObjFields = new ArrayList<>(4);
         entityFieldMap.forEach((name, field) -> {
             String alias = fieldAliasMapping.get(name);
             String prop = aliasPropMapping.get(alias);
 
-            Converter converter = newConverter(field);
-            FieldConverter fieldConverter = new FieldConverter(Domain.ENTITY.name(), name, new LinkedHashMap<>(5), converter);
-            Map<String, String> names = fieldConverter.getNames();
+            Map<String, String> names = new LinkedHashMap<>(5);
             names.put(Domain.ENTITY.name(), name);
             names.put(Domain.DATABASE.name(), alias);
             names.put(Domain.POJO.name(), prop);
+
+            FieldDef fieldDef = field.getFieldDef();
+            boolean isValueObj = fieldDef != null && fieldDef.isValueObj();
+
+            Converter converter = newConverter(field, names, isValueObj);
+            FieldConverter fieldConverter = new FieldConverter(Domain.ENTITY.name(), name, names, converter);
             names.forEach((domain, eachName) -> fieldConverterMap.put(getKey(domain, eachName), fieldConverter));
+            if (isValueObj) {
+                valueObjFields.add(fieldConverter);
+            }
         });
 
-        return new DefaultEntityMapper(fieldConverterMap);
+        return new DefaultEntityMapper(fieldConverterMap, valueObjFields);
     }
 
-    private Converter newConverter(EntityField entityField) {
+    private Converter newConverter(EntityField entityField, Map<String, String> names, boolean isValueObj) {
         FieldDef fieldDef = entityField.getFieldDef();
         if (fieldDef != null) {
             Class<?> converterClass = fieldDef.getConverter();
             if (converterClass != Object.class) {
                 return (Converter) ReflectUtil.newInstance(converterClass);
 
+            } else if (isValueObj) {
+                String name = names.get(Domain.POJO.name());
+                return new ValueObjConverter(entityField.getGenericType(), name != null);
+
             } else if (StringUtils.isNotBlank(fieldDef.getMapExp())) {
-                return new DefaultConverter(entityField);
+                return new MapExpConverter(entityField);
             }
         }
         return null;
@@ -81,13 +97,15 @@ public class EntityMapperResolver {
         return domain + ":" + name;
     }
 
+    @Getter
     @AllArgsConstructor
     private class DefaultEntityMapper implements EntityMapper {
 
         private final Map<String, FieldConverter> fieldConverterMap;
+        private final List<FieldConverter> valueObjFields;
 
         @Override
-        public FieldConverter getConverter(String domain, String name) {
+        public FieldConverter getField(String domain, String name) {
             return fieldConverterMap.get(getKey(domain, name));
         }
 

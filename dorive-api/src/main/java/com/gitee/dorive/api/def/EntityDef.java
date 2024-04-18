@@ -36,6 +36,7 @@ public class EntityDef {
     private String name;
     private Class<?> source;
     private Class<?> factory;
+    private boolean aggregate;
     private Class<?> repository;
 
     public static EntityDef fromElement(AnnotatedElement element) {
@@ -43,7 +44,7 @@ public class EntityDef {
         return attributes != null ? BeanUtil.copyProperties(attributes, EntityDef.class) : null;
     }
 
-    public void merge(EntityDef entityDef) {
+    public void mergeDef(EntityDef entityDef) {
         if (StringUtils.isBlank(name)) {
             name = entityDef.getName();
         }
@@ -53,10 +54,6 @@ public class EntityDef {
         if (factory == null || factory == Object.class) {
             factory = entityDef.getFactory();
         }
-    }
-
-    public boolean isRepositoryDef() {
-        return repository != Object.class;
     }
 
 }

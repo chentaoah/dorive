@@ -17,44 +17,26 @@
 
 package com.gitee.dorive.api.annotation;
 
-import java.lang.annotation.*;
+import org.springframework.core.annotation.AliasFor;
 
-/**
- * 实体注解<br>
- * wiki：https://gitee.com/digital-engine/dorive/wikis/pages
- *
- * @author tao.chen
- */
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Field
 @Inherited
 @Documented
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
-public @interface Entity {
+public @interface ValueObj {
 
-    /**
-     * 实体名称
-     */
-    String name() default "";
+    @AliasFor(annotation = Field.class)
+    String value() default "";
 
-    /**
-     * 数据来源
-     */
-    Class<?> source() default Object.class;
-
-    /**
-     * 实体工厂
-     */
-    Class<?> factory() default Object.class;
-
-    /**
-     * 是否聚合
-     */
-    boolean aggregate() default false;
-
-    /**
-     * 指定仓储
-     */
-    Class<?> repository() default Object.class;
+    @AliasFor(annotation = Field.class)
+    boolean valueObj() default true;
 
 }
-

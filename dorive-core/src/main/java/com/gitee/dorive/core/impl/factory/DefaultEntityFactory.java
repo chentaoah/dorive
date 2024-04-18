@@ -27,10 +27,12 @@ import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.enums.Domain;
 import com.gitee.dorive.core.entity.factory.FieldConverter;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class DefaultEntityFactory implements EntityFactory {
@@ -49,22 +51,22 @@ public class DefaultEntityFactory implements EntityFactory {
 
     private void initReCopyOptions() {
         this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(name -> {
-            FieldConverter fieldConverter = entityMapper.getConverter(Domain.DATABASE.name(), name);
+            FieldConverter fieldConverter = entityMapper.getField(Domain.DATABASE.name(), name);
             return fieldConverter != null ? fieldConverter.getName() : name;
 
         }).setFieldValueEditor((name, value) -> {
-            FieldConverter fieldConverter = entityMapper.getConverter(Domain.ENTITY.name(), name);
+            FieldConverter fieldConverter = entityMapper.getField(Domain.ENTITY.name(), name);
             return fieldConverter != null ? fieldConverter.reconstitute(value) : value;
         });
     }
 
     private void initDeCopyOptions() {
         this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(name -> {
-            FieldConverter fieldConverter = entityMapper.getConverter(Domain.ENTITY.name(), name);
+            FieldConverter fieldConverter = entityMapper.getField(Domain.ENTITY.name(), name);
             return fieldConverter != null ? fieldConverter.getName(Domain.POJO.name()) : name;
 
         }).setFieldValueEditor((name, value) -> {
-            FieldConverter fieldConverter = entityMapper.getConverter(Domain.POJO.name(), name);
+            FieldConverter fieldConverter = entityMapper.getField(Domain.POJO.name(), name);
             return fieldConverter != null ? fieldConverter.deconstruct(value) : value;
         });
     }

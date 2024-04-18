@@ -36,7 +36,7 @@ public @interface Field {
     /**
      * 是否主键
      */
-    boolean isId() default false;
+    boolean id() default false;
 
     /**
      * 别名
@@ -54,6 +54,11 @@ public @interface Field {
      * 映射表达式
      */
     String mapExp() default "";
+
+    /**
+     * 是否值对象
+     */
+    boolean valueObj() default false;
 
     /**
      * 指定转换器

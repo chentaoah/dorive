@@ -136,7 +136,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         AbstractRepository<Object, Object> proxyRepository = processRepository(actualRepository);
 
         boolean isRoot = "/".equals(accessPath);
-        boolean isAggregated = entityEle.isAggregated();
+        boolean isAggregated = entityDef.getRepository() != Object.class;
         OrderBy defaultOrderBy = newDefaultOrderBy(orderDef);
 
         Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
@@ -167,7 +167,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     private EntityDef renewEntityDef(EntityEle entityEle) {
         EntityDef entityDef = entityEle.getEntityDef();
         entityDef = BeanUtil.copyProperties(entityDef, EntityDef.class);
-        if (entityEle.isAggregateDef()) {
+        if (entityDef.isAggregate()) {
             Class<?> entityClass = entityEle.getGenericType();
             Class<?> repositoryClass = RepositoryContext.findRepositoryClass(entityClass);
             Assert.notNull(repositoryClass, "No type of repository found! type: {}", entityClass.getName());
@@ -199,7 +199,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             EntityStoreInfo entityStoreInfo = resolveEntityStoreInfo(entityDef, entityEle);
             ENTITY_STORE_INFO_MAP.put(entityEle, entityStoreInfo);
 
-            EntityMapper entityMapper = new EntityMapperResolver(entityEle, entityStoreInfo).newEntityMapper();
+            EntityMapperResolver entityMapperResolver = new EntityMapperResolver(entityEle, entityStoreInfo);
+            EntityMapper entityMapper = entityMapperResolver.newEntityMapper();
             EntityFactory entityFactory = newEntityFactory(entityDef, entityEle, entityStoreInfo, entityMapper);
 
             Executor executor = newExecutor(entityDef, entityEle, entityStoreInfo);

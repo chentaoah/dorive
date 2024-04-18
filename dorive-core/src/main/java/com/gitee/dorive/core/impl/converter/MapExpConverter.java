@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.factory;
+package com.gitee.dorive.core.impl.converter;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.def.FieldDef;
 import com.gitee.dorive.api.entity.EntityField;
 import com.gitee.dorive.core.api.factory.Converter;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
@@ -29,14 +30,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@Data
-public class DefaultConverter implements Converter {
+@Getter
+@Setter
+public class MapExpConverter implements Converter {
 
     private EntityField entityField;
     private Map<Object, Object> reMapping = Collections.emptyMap();
     private Map<Object, Object> deMapping = Collections.emptyMap();
 
-    public DefaultConverter(EntityField entityField) {
+    public MapExpConverter(EntityField entityField) {
         this.entityField = entityField;
         FieldDef fieldDef = entityField.getFieldDef();
         Class<?> genericType = entityField.getGenericType();
