@@ -19,6 +19,11 @@ package com.gitee.dorive.core.impl.factory;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.convert.TypeConverter;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.entity.factory.FieldConverter;
@@ -26,7 +31,37 @@ import com.gitee.dorive.core.entity.factory.FieldConverter;
 import java.util.List;
 import java.util.Map;
 
-public class UnmatchedValueObjEntityFactory extends DefaultEntityFactory {
+public class ValueObjEntityFactory extends DefaultEntityFactory {
+
+    // 从hutool源码中拷贝
+    protected TypeConverter converter = (type, value) -> {
+        if (null == value) {
+            return null;
+        }
+        final String name = value.getClass().getName();
+        if (ArrayUtil.contains(new String[]{"cn.hutool.json.JSONObject", "cn.hutool.json.JSONArray"}, name)) {
+            return ReflectUtil.invoke(value, "toBean", ObjectUtil.defaultIfNull(type, Object.class));
+        }
+        return Convert.convertWithCheck(type, value, null, true);
+    };
+
+    @Override
+    public void setEntityMapper(EntityMapper entityMapper) {
+        super.setEntityMapper(entityMapper);
+        // 如果是值对象，则跳过hutool的类型转换
+        getReCopyOptions().setConverter(((targetType, value) -> {
+            if (value == null || entityMapper.isValueObjType(targetType)) {
+                return value;
+            }
+            return converter.convert(targetType, value);
+        }));
+        getDeCopyOptions().setConverter(((targetType, value) -> {
+            if (value == null || entityMapper.isValueObjType(value.getClass())) {
+                return value;
+            }
+            return converter.convert(targetType, value);
+        }));
+    }
 
     @Override
     @SuppressWarnings("unchecked")

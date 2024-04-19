@@ -34,10 +34,13 @@ import lombok.Data;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -53,6 +56,8 @@ public class EntityMapperResolver {
         Map<String, FieldConverter> fieldConverterMap = new LinkedHashMap<>(entityFieldMap.size() * 4 / 3 + 1);
         List<FieldConverter> valueObjFields = new ArrayList<>(4);
         List<FieldConverter> unmatchedValueObjFields = new ArrayList<>(4);
+        Set<Type> valueObjTypes = new HashSet<>(6);
+
         entityFieldMap.forEach((name, field) -> {
             String expected = entityEle.toAlias(name);
             boolean isMatch = aliasPropMapping.containsKey(expected);
@@ -79,9 +84,11 @@ public class EntityMapperResolver {
                 if (!isMatch) {
                     unmatchedValueObjFields.add(fieldConverter);
                 }
+                valueObjTypes.add(field.getGenericType());
             }
         });
-        return new DefaultEntityMapper(fieldConverterMap, valueObjFields, unmatchedValueObjFields);
+
+        return new DefaultEntityMapper(fieldConverterMap, valueObjFields, unmatchedValueObjFields, valueObjTypes);
     }
 
     private Converter newConverter(EntityField entityField, boolean isMatch, boolean isValueObj) {
@@ -113,10 +120,16 @@ public class EntityMapperResolver {
         private final Map<String, FieldConverter> fieldConverterMap;
         private final List<FieldConverter> valueObjFields;
         private final List<FieldConverter> unmatchedValueObjFields;
+        private final Set<Type> valueObjTypes;
 
         @Override
         public FieldConverter getField(String domain, String name) {
             return fieldConverterMap.get(getKey(domain, name));
+        }
+
+        @Override
+        public boolean isValueObjType(Type type) {
+            return valueObjTypes.contains(type);
         }
 
     }

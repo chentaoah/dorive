@@ -42,7 +42,7 @@ import com.gitee.dorive.core.impl.executor.ContextExecutor;
 import com.gitee.dorive.core.impl.executor.ExampleExecutor;
 import com.gitee.dorive.core.impl.executor.FactoryExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
-import com.gitee.dorive.core.impl.factory.UnmatchedValueObjEntityFactory;
+import com.gitee.dorive.core.impl.factory.ValueObjEntityFactory;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DerivedResolver;
@@ -218,8 +218,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Class<?> factoryClass = entityDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
-            List<FieldConverter> unmatchedValueObjFields = entityMapper.getUnmatchedValueObjFields();
-            entityFactory = unmatchedValueObjFields.isEmpty() ? new DefaultEntityFactory() : new UnmatchedValueObjEntityFactory();
+            List<FieldConverter> valueObjFields = entityMapper.getValueObjFields();
+            entityFactory = valueObjFields.isEmpty() ? new DefaultEntityFactory() : new ValueObjEntityFactory();
         } else {
             entityFactory = (EntityFactory) applicationContext.getBean(factoryClass);
         }

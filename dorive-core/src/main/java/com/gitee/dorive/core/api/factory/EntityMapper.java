@@ -19,6 +19,7 @@ package com.gitee.dorive.core.api.factory;
 
 import com.gitee.dorive.core.entity.factory.FieldConverter;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 public interface EntityMapper {
@@ -28,5 +29,7 @@ public interface EntityMapper {
     List<FieldConverter> getValueObjFields();
 
     List<FieldConverter> getUnmatchedValueObjFields();
+
+    boolean isValueObjType(Type type);
 
 }
