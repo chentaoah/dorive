@@ -26,7 +26,7 @@ import com.gitee.dorive.core.entity.factory.FieldConverter;
 import java.util.List;
 import java.util.Map;
 
-public class ValueObjEntityFactory extends DefaultEntityFactory {
+public class UnmatchedValueObjEntityFactory extends DefaultEntityFactory {
 
     @Override
     @SuppressWarnings("unchecked")
