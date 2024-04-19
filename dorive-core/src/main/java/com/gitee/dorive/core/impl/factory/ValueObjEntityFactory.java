@@ -24,10 +24,13 @@ import cn.hutool.core.convert.TypeConverter;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.json.JSONUtil;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.entity.factory.FieldConverter;
 
+import java.lang.reflect.ParameterizedType;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -48,16 +51,36 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     @Override
     public void setEntityMapper(EntityMapper entityMapper) {
         super.setEntityMapper(entityMapper);
+
         // 如果是值对象，则跳过hutool的类型转换
         getReCopyOptions().setConverter(((targetType, value) -> {
-            if (value == null || entityMapper.isValueObjType(targetType)) {
-                return value;
+            if (value == null) {
+                return null;
+            }
+            if (value instanceof String) {
+                if (targetType instanceof ParameterizedType) {
+                    targetType = ((ParameterizedType) targetType).getActualTypeArguments()[0];
+                }
+                if (entityMapper.isValueObjType(targetType)) {
+                    return value;
+                }
             }
             return converter.convert(targetType, value);
         }));
+
+        // 如果是值对象，则跳过hutool的类型转换
         getDeCopyOptions().setConverter(((targetType, value) -> {
-            if (value == null || entityMapper.isValueObjType(value.getClass())) {
-                return value;
+            if (value == null) {
+                return null;
+            }
+            if (targetType == String.class) {
+                // 运行时类型擦除，若优化需重写hutool逻辑
+                if (value instanceof Collection) {
+                    return JSONUtil.toJsonStr(value);
+                }
+                if (entityMapper.isValueObjType(value.getClass())) {
+                    return value;
+                }
             }
             return converter.convert(targetType, value);
         }));

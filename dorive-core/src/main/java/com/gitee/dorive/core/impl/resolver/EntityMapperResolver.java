@@ -26,6 +26,7 @@ import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.enums.Domain;
 import com.gitee.dorive.core.entity.factory.FieldConverter;
+import com.gitee.dorive.core.impl.converter.JsonArrayConverter;
 import com.gitee.dorive.core.impl.converter.JsonConverter;
 import com.gitee.dorive.core.impl.converter.MapConverter;
 import com.gitee.dorive.core.impl.converter.MapExpConverter;
@@ -100,7 +101,11 @@ public class EntityMapperResolver {
 
             } else if (isValueObj) {
                 Class<?> genericType = entityField.getGenericType();
-                return isMatch ? new JsonConverter(genericType) : new MapConverter(genericType);
+                if (isMatch) {
+                    return !entityField.isCollection() ? new JsonConverter(genericType) : new JsonArrayConverter(genericType);
+                } else {
+                    return new MapConverter(genericType);
+                }
 
             } else if (StringUtils.isNotBlank(fieldDef.getMapExp())) {
                 return new MapExpConverter(entityField);
