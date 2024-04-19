@@ -51,40 +51,50 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     @Override
     public void setEntityMapper(EntityMapper entityMapper) {
         super.setEntityMapper(entityMapper);
-
-        // 如果是值对象，则跳过hutool的类型转换
         List<FieldConverter> matchedValueObjFields = entityMapper.getMatchedValueObjFields();
         if (!matchedValueObjFields.isEmpty()) {
-            getReCopyOptions().setConverter(((targetType, value) -> {
-                if (value == null) {
-                    return null;
-                }
-                if (value instanceof String) {
-                    if (targetType instanceof ParameterizedType) {
-                        targetType = ((ParameterizedType) targetType).getActualTypeArguments()[0];
-                    }
-                    if (entityMapper.isValueObjType(targetType)) {
-                        return value;
-                    }
-                }
-                return converter.convert(targetType, value);
-            }));
-            getDeCopyOptions().setConverter(((targetType, value) -> {
-                if (value == null) {
-                    return null;
-                }
-                if (targetType == String.class) {
-                    // 运行时类型擦除，若优化需重写hutool逻辑
-                    if (value instanceof Collection) {
-                        return JSONUtil.toJsonStr(value);
-                    }
-                    if (entityMapper.isValueObjType(value.getClass())) {
-                        return value;
-                    }
-                }
-                return converter.convert(targetType, value);
-            }));
+            setReCopyOptions();
+            setDeCopyOptions();
         }
+    }
+
+    private void setReCopyOptions() {
+        // 如果是值对象，则跳过hutool的类型转换
+        EntityMapper entityMapper = getEntityMapper();
+        getReCopyOptions().setConverter(((targetType, value) -> {
+            if (value == null) {
+                return null;
+            }
+            if (value instanceof String) {
+                if (targetType instanceof ParameterizedType) {
+                    targetType = ((ParameterizedType) targetType).getActualTypeArguments()[0];
+                }
+                if (entityMapper.isValueObjType(targetType)) {
+                    return value;
+                }
+            }
+            return converter.convert(targetType, value);
+        }));
+    }
+
+    private void setDeCopyOptions() {
+        // 如果是值对象，则跳过hutool的类型转换
+        EntityMapper entityMapper = getEntityMapper();
+        getDeCopyOptions().setConverter(((targetType, value) -> {
+            if (value == null) {
+                return null;
+            }
+            if (targetType == String.class) {
+                // 运行时类型擦除，若优化需重写hutool逻辑
+                if (value instanceof Collection) {
+                    return JSONUtil.toJsonStr(value);
+                }
+                if (entityMapper.isValueObjType(value.getClass())) {
+                    return value;
+                }
+            }
+            return converter.convert(targetType, value);
+        }));
     }
 
     @Override
