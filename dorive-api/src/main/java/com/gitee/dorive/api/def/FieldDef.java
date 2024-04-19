@@ -34,8 +34,8 @@ public class FieldDef {
 
     private boolean id;
     private String alias;
-    private String mapExp;
     private boolean valueObj;
+    private String mapExp;
     private Class<?> converter;
 
     public static FieldDef fromElement(AnnotatedElement element) {

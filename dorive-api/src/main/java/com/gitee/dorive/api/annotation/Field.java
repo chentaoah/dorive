@@ -51,14 +51,14 @@ public @interface Field {
     String alias() default "";
 
     /**
-     * 映射表达式
-     */
-    String mapExp() default "";
-
-    /**
      * 是否值对象
      */
     boolean valueObj() default false;
+
+    /**
+     * 映射表达式
+     */
+    String mapExp() default "";
 
     /**
      * 指定转换器
