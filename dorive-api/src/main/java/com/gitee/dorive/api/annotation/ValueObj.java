@@ -39,4 +39,7 @@ public @interface ValueObj {
     @AliasFor(annotation = Field.class)
     boolean valueObj() default true;
 
+    @AliasFor(annotation = Field.class)
+    Class<?> converter() default Object.class;
+
 }
