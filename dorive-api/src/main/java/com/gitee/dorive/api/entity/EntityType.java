@@ -28,6 +28,7 @@ import com.gitee.dorive.api.util.ReflectUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -100,10 +101,16 @@ public class EntityType extends EntityEle {
 
         Map<String, String> fieldAliasMapping = new LinkedHashMap<>(entityFieldMap.size() * 4 / 3 + 1);
         for (EntityField entityField : entityFieldMap.values()) {
-            String fieldName = entityField.getName();
+            String name = entityField.getName();
+            String alias = StrUtil.toUnderlineCase(name);
             FieldDef fieldDef = entityField.getFieldDef();
-            String alias = fieldDef != null ? fieldDef.getAlias() : StrUtil.toUnderlineCase(fieldName);
-            fieldAliasMapping.put(fieldName, alias);
+            if (fieldDef != null) {
+                String aliasDef = fieldDef.getAlias();
+                if (StringUtils.isNotBlank(aliasDef)) {
+                    alias = aliasDef;
+                }
+            }
+            fieldAliasMapping.put(name, alias);
         }
         setFieldAliasMapping(fieldAliasMapping);
     }
