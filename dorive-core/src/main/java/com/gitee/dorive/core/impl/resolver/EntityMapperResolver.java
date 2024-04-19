@@ -56,6 +56,7 @@ public class EntityMapperResolver {
 
         Map<String, FieldConverter> fieldConverterMap = new LinkedHashMap<>(entityFieldMap.size() * 4 / 3 + 1);
         List<FieldConverter> valueObjFields = new ArrayList<>(4);
+        List<FieldConverter> matchedValueObjFields = new ArrayList<>(4);
         List<FieldConverter> unmatchedValueObjFields = new ArrayList<>(4);
         Set<Type> valueObjTypes = new HashSet<>(6);
 
@@ -82,14 +83,16 @@ public class EntityMapperResolver {
             names.forEach((domain, eachName) -> fieldConverterMap.put(getKey(domain, eachName), fieldConverter));
             if (isValueObj) {
                 valueObjFields.add(fieldConverter);
-                if (!isMatch) {
+                if (isMatch) {
+                    matchedValueObjFields.add(fieldConverter);
+                } else {
                     unmatchedValueObjFields.add(fieldConverter);
                 }
                 valueObjTypes.add(field.getGenericType());
             }
         });
 
-        return new DefaultEntityMapper(fieldConverterMap, valueObjFields, unmatchedValueObjFields, valueObjTypes);
+        return new DefaultEntityMapper(fieldConverterMap, valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes);
     }
 
     private Converter newConverter(EntityField entityField, boolean isMatch, boolean isValueObj) {
@@ -124,6 +127,7 @@ public class EntityMapperResolver {
 
         private final Map<String, FieldConverter> fieldConverterMap;
         private final List<FieldConverter> valueObjFields;
+        private final List<FieldConverter> matchedValueObjFields;
         private final List<FieldConverter> unmatchedValueObjFields;
         private final Set<Type> valueObjTypes;
 

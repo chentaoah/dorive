@@ -53,37 +53,38 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
         super.setEntityMapper(entityMapper);
 
         // 如果是值对象，则跳过hutool的类型转换
-        getReCopyOptions().setConverter(((targetType, value) -> {
-            if (value == null) {
-                return null;
-            }
-            if (value instanceof String) {
-                if (targetType instanceof ParameterizedType) {
-                    targetType = ((ParameterizedType) targetType).getActualTypeArguments()[0];
+        List<FieldConverter> matchedValueObjFields = entityMapper.getMatchedValueObjFields();
+        if (!matchedValueObjFields.isEmpty()) {
+            getReCopyOptions().setConverter(((targetType, value) -> {
+                if (value == null) {
+                    return null;
                 }
-                if (entityMapper.isValueObjType(targetType)) {
-                    return value;
+                if (value instanceof String) {
+                    if (targetType instanceof ParameterizedType) {
+                        targetType = ((ParameterizedType) targetType).getActualTypeArguments()[0];
+                    }
+                    if (entityMapper.isValueObjType(targetType)) {
+                        return value;
+                    }
                 }
-            }
-            return converter.convert(targetType, value);
-        }));
-
-        // 如果是值对象，则跳过hutool的类型转换
-        getDeCopyOptions().setConverter(((targetType, value) -> {
-            if (value == null) {
-                return null;
-            }
-            if (targetType == String.class) {
-                // 运行时类型擦除，若优化需重写hutool逻辑
-                if (value instanceof Collection) {
-                    return JSONUtil.toJsonStr(value);
+                return converter.convert(targetType, value);
+            }));
+            getDeCopyOptions().setConverter(((targetType, value) -> {
+                if (value == null) {
+                    return null;
                 }
-                if (entityMapper.isValueObjType(value.getClass())) {
-                    return value;
+                if (targetType == String.class) {
+                    // 运行时类型擦除，若优化需重写hutool逻辑
+                    if (value instanceof Collection) {
+                        return JSONUtil.toJsonStr(value);
+                    }
+                    if (entityMapper.isValueObjType(value.getClass())) {
+                        return value;
+                    }
                 }
-            }
-            return converter.convert(targetType, value);
-        }));
+                return converter.convert(targetType, value);
+            }));
+        }
     }
 
     @Override
@@ -92,8 +93,8 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
         Object entity = super.reconstitute(context, persistent);
         Map<String, Object> resultMap = (Map<String, Object>) persistent;
         EntityMapper entityMapper = getEntityMapper();
-        List<FieldConverter> fieldConverters = entityMapper.getUnmatchedValueObjFields();
-        for (FieldConverter fieldConverter : fieldConverters) {
+        List<FieldConverter> unmatchedValueObjFields = entityMapper.getUnmatchedValueObjFields();
+        for (FieldConverter fieldConverter : unmatchedValueObjFields) {
             Object valueObj = fieldConverter.reconstitute(resultMap);
             if (valueObj != null) {
                 BeanUtil.setFieldValue(entity, fieldConverter.getName(), valueObj);
@@ -106,8 +107,8 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     public Object deconstruct(Context context, Object entity) {
         Object pojo = super.deconstruct(context, entity);
         EntityMapper entityMapper = getEntityMapper();
-        List<FieldConverter> fieldConverters = entityMapper.getUnmatchedValueObjFields();
-        for (FieldConverter fieldConverter : fieldConverters) {
+        List<FieldConverter> unmatchedValueObjFields = entityMapper.getUnmatchedValueObjFields();
+        for (FieldConverter fieldConverter : unmatchedValueObjFields) {
             Object valueObj = BeanUtil.getFieldValue(entity, fieldConverter.getName());
             valueObj = valueObj != null ? fieldConverter.deconstruct(valueObj) : null;
             if (valueObj != null) {

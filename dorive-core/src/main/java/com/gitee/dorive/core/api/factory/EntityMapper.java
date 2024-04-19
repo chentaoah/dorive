@@ -28,6 +28,8 @@ public interface EntityMapper {
 
     List<FieldConverter> getValueObjFields();
 
+    List<FieldConverter> getMatchedValueObjFields();
+
     List<FieldConverter> getUnmatchedValueObjFields();
 
     boolean isValueObjType(Type type);
