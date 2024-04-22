@@ -75,7 +75,7 @@ mvn install
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.4.3.4</version>
+    <version>3.4.3.5</version>
 </dependency>
 ```
 
