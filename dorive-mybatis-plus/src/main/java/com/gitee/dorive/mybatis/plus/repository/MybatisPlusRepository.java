@@ -98,13 +98,13 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
     private EntityStoreInfo newEntityStoreInfo(Class<?> mapperClass, Object mapper, Class<?> pojoClass, TableInfo tableInfo) {
         String tableName = tableInfo.getTableName();
         String keyProperty = tableInfo.getKeyProperty();
-        String keyColumn = clearColumn(tableInfo.getKeyColumn());
+        String keyColumn = tableInfo.getKeyColumn();
         List<TableFieldInfo> tableFieldInfos = tableInfo.getFieldList();
         int size = tableFieldInfos.size() + 1;
 
         Map<String, String> propAliasMappingWithoutPk = new LinkedHashMap<>(size * 4 / 3 + 1);
         for (TableFieldInfo tableFieldInfo : tableFieldInfos) {
-            propAliasMappingWithoutPk.put(tableFieldInfo.getProperty(), clearColumn(tableFieldInfo.getColumn()));
+            propAliasMappingWithoutPk.put(tableFieldInfo.getProperty(), tableFieldInfo.getColumn());
         }
 
         Map<String, String> propAliasMapping = new LinkedHashMap<>(size * 4 / 3 + 1);
@@ -120,10 +120,6 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
 
         return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn,
                 propAliasMappingWithoutPk, propAliasMapping, aliasPropMapping, selectColumns);
-    }
-
-    private String clearColumn(String column) {
-        return StrUtil.removeAll(column, "`").trim();
     }
 
     @Override
