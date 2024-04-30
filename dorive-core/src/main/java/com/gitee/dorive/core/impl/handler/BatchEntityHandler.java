@@ -24,7 +24,7 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.enums.JoinType;
-import com.gitee.dorive.core.impl.binder.ValueBinder;
+import com.gitee.dorive.core.impl.binder.RouteBinder;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.joiner.MultiEntityJoiner;
 import com.gitee.dorive.core.impl.joiner.SingleEntityJoiner;
@@ -49,7 +49,7 @@ public class BatchEntityHandler implements EntityHandler {
         long totalCount = 0L;
         for (CommonRepository repository : this.repository.getSubRepositories()) {
             if (repository.matches(context)) {
-                List<Object> newEntities = filterByValueBinders(context, entities, repository);
+                List<Object> newEntities = filterByRouteBinders(context, entities, repository);
                 if (newEntities.isEmpty()) {
                     continue;
                 }
@@ -72,19 +72,19 @@ public class BatchEntityHandler implements EntityHandler {
         return totalCount;
     }
 
-    private List<Object> filterByValueBinders(Context context, List<Object> entities, CommonRepository repository) {
+    private List<Object> filterByRouteBinders(Context context, List<Object> entities, CommonRepository repository) {
         BinderResolver binderResolver = repository.getBinderResolver();
-        List<ValueBinder> valueBinders = binderResolver.getValueBinders();
-        if (valueBinders.isEmpty()) {
+        List<RouteBinder> routeBinders = binderResolver.getRouteBinders();
+        if (routeBinders.isEmpty()) {
             return entities;
         }
         List<Object> newEntities = new ArrayList<>(entities.size());
         for (Object entity : entities) {
             boolean isValueEqual = true;
-            for (ValueBinder valueBinder : valueBinders) {
-                Object fieldValue = valueBinder.getFieldValue(context, null);
-                Object boundValue = valueBinder.getBoundValue(context, entity);
-                boundValue = valueBinder.input(context, boundValue);
+            for (RouteBinder routeBinder : routeBinders) {
+                Object fieldValue = routeBinder.getFieldValue(context, null);
+                Object boundValue = routeBinder.getBoundValue(context, entity);
+                boundValue = routeBinder.input(context, boundValue);
                 if (!fieldValue.equals(boundValue)) {
                     isValueEqual = false;
                     break;

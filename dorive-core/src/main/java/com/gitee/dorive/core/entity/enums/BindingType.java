@@ -20,5 +20,6 @@ package com.gitee.dorive.core.entity.enums;
 public enum BindingType {
     STRONG,
     WEAK,
-    VALUE
+    ROUTE,
+    FILTER
 }
