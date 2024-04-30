@@ -145,10 +145,6 @@ public class SegmentBuilder {
             Node targetNode = nodeMap.get(relativeAccessPath);
             if (targetNode != null) {
                 TableSegment targetTableSegment = targetNode.getTableSegment();
-                List<Node> children = targetNode.getChildren();
-                if (!children.contains(node)) {
-                    children.add(node);
-                }
                 OnValueSegment onValueSegment = new OnValueSegment(
                         targetTableSegment.getTableAlias(), valueRouteBinder.getBindAlias(),
                         CriterionUtils.sqlParam(valueRouteBinder.getFieldValue(context, null)));
