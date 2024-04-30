@@ -27,7 +27,7 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.impl.binder.BoundBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.binder.ValueBinder;
+import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.executor.ExampleExecutor;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
@@ -115,13 +115,13 @@ public class SegmentBuilder {
         String lastAccessPath = mergedRepository.getLastAccessPath();
         CommonRepository definedRepository = mergedRepository.getDefinedRepository();
         BinderResolver binderResolver = definedRepository.getBinderResolver();
-        List<ValueBinder> valueBinders = binderResolver.getValueBinders();
+        List<ValueRouteBinder> valueRouteBinders = binderResolver.getValueRouteBinders();
         List<StrongBinder> strongBinders = binderResolver.getStrongBinders();
         TableSegment tableSegment = node.getTableSegment();
 
         List<OnSegment> onSegments = new ArrayList<>(strongBinders.size());
-        for (ValueBinder valueBinder : valueBinders) {
-            String relativeAccessPath = lastAccessPath + valueBinder.getBelongAccessPath();
+        for (ValueRouteBinder valueRouteBinder : valueRouteBinders) {
+            String relativeAccessPath = lastAccessPath + valueRouteBinder.getBelongAccessPath();
             Node targetNode = nodeMap.get(relativeAccessPath);
             if (targetNode != null) {
                 TableSegment targetTableSegment = targetNode.getTableSegment();
@@ -130,8 +130,8 @@ public class SegmentBuilder {
                     children.add(node);
                 }
                 OnSegment onSegment = new OnSegment(
-                        targetTableSegment.getTableAlias(), valueBinder.getBindAlias(),
-                        CriterionUtils.sqlParam(valueBinder.getFieldValue(context, null)));
+                        targetTableSegment.getTableAlias(), valueRouteBinder.getBindAlias(),
+                        CriterionUtils.sqlParam(valueRouteBinder.getFieldValue(context, null)));
                 onSegments.add(onSegment);
             }
         }

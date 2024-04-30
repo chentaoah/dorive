@@ -22,7 +22,7 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.binder.ValueBinder;
+import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.MultiInBuilder;
@@ -84,14 +84,14 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
             boolean abandoned = exampleWrapper.isAbandoned();
 
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
-            Map<String, List<ValueBinder>> relativeValueBindersMap = mergedRepository.getRelativeValueBindersMap();
+            Map<String, List<ValueRouteBinder>> relativeValueRouteBindersMap = mergedRepository.getRelativeValueRouteBindersMap();
             Map<String, List<StrongBinder>> relativeStrongBindersMap = mergedRepository.getRelativeStrongBindersMap();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 
             if (!abandoned) {
-                abandoned = determineAbandon(exampleWrapperMap, relativeValueBindersMap.keySet());
+                abandoned = determineAbandon(exampleWrapperMap, relativeValueRouteBindersMap.keySet());
             }
             if (!abandoned) {
                 abandoned = determineAbandon(exampleWrapperMap, relativeStrongBindersMap.keySet());
@@ -109,14 +109,14 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
                 return;
             }
 
-            relativeValueBindersMap.forEach((relativeAccessPath, valueBinders) -> {
+            relativeValueRouteBindersMap.forEach((relativeAccessPath, valueRouteBinders) -> {
                 ExampleWrapper targetExampleWrapper = exampleWrapperMap.get(relativeAccessPath);
                 if (targetExampleWrapper != null) {
                     Example targetExample = targetExampleWrapper.getExample();
-                    for (ValueBinder valueBinder : valueBinders) {
-                        Object fieldValue = valueBinder.getFieldValue(context, null);
+                    for (ValueRouteBinder valueRouteBinder : valueRouteBinders) {
+                        Object fieldValue = valueRouteBinder.getFieldValue(context, null);
                         if (fieldValue != null) {
-                            String boundName = valueBinder.getBoundName();
+                            String boundName = valueRouteBinder.getBoundName();
                             targetExample.eq(boundName, fieldValue);
                         }
                     }

@@ -34,7 +34,7 @@ import com.gitee.dorive.core.entity.enums.BindingType;
 import com.gitee.dorive.core.entity.enums.JoinType;
 import com.gitee.dorive.core.impl.binder.BoundBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.binder.ValueBinder;
+import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.binder.WeakBinder;
 import com.gitee.dorive.core.impl.processor.SpELProcessor;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
@@ -57,7 +57,7 @@ public class BinderResolver {
     private PropChainResolver propChainResolver;
 
     private List<Binder> allBinders;
-    private List<ValueBinder> valueBinders;
+    private List<ValueRouteBinder> valueRouteBinders;
     private List<StrongBinder> strongBinders;
     // 决定了关联查询具体使用哪种实现
     private Map<String, List<StrongBinder>> mergedBindersMap;
@@ -79,7 +79,7 @@ public class BinderResolver {
         List<BindingDef> bindingDefs = entityEle.getBindingDefs();
 
         this.allBinders = new ArrayList<>(bindingDefs.size());
-        this.valueBinders = new ArrayList<>(bindingDefs.size());
+        this.valueRouteBinders = new ArrayList<>(bindingDefs.size());
         this.strongBinders = new ArrayList<>(bindingDefs.size());
         this.mergedBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
         this.boundIdBinder = null;
@@ -93,11 +93,11 @@ public class BinderResolver {
             bindingDef = renewBindingDef(accessPath, bindingDef);
             Processor processor = newProcessor(bindingDef);
 
-            if (bindingType == BindingType.VALUE) {
-                ValueBinder valueBinder = new ValueBinder(bindingDef, processor);
-                initBoundBinder(bindingDef, valueBinder);
-                allBinders.add(valueBinder);
-                valueBinders.add(valueBinder);
+            if (bindingType == BindingType.VALUE_ROUTE) {
+                ValueRouteBinder valueRouteBinder = new ValueRouteBinder(bindingDef, processor);
+                initBoundBinder(bindingDef, valueRouteBinder);
+                allBinders.add(valueRouteBinder);
+                valueRouteBinders.add(valueRouteBinder);
                 continue;
             }
 
@@ -157,7 +157,10 @@ public class BinderResolver {
             return BindingType.WEAK;
 
         } else if (ObjectUtil.isAllNotEmpty(value, bindExp)) {
-            return BindingType.VALUE;
+            return BindingType.VALUE_ROUTE;
+
+        } else if (ObjectUtil.isAllNotEmpty(field, value)) {
+            return BindingType.VALUE_FILTER;
         }
         throw new RuntimeException("Unknown binding type!");
     }

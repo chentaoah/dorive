@@ -18,7 +18,7 @@
 package com.gitee.dorive.query.entity;
 
 import com.gitee.dorive.core.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.binder.ValueBinder;
+import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,7 +35,7 @@ public class MergedRepository {
     private String relativeAccessPath;
     private boolean merged;
     private CommonRepository definedRepository;
-    private Map<String, List<ValueBinder>> relativeValueBindersMap;
+    private Map<String, List<ValueRouteBinder>> relativeValueRouteBindersMap;
     private Map<String, List<StrongBinder>> relativeStrongBindersMap;
     private CommonRepository executedRepository;
     private Integer order;

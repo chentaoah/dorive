@@ -27,11 +27,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ValueBinder extends BoundBinder {
+public class ValueRouteBinder extends BoundBinder {
 
     private Object value;
 
-    public ValueBinder(BindingDef bindingDef, Processor processor) {
+    public ValueRouteBinder(BindingDef bindingDef, Processor processor) {
         super(bindingDef, processor);
     }
 
