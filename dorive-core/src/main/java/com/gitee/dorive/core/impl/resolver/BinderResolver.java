@@ -30,10 +30,13 @@ import com.gitee.dorive.api.entity.PropChain;
 import com.gitee.dorive.api.resolver.PropChainResolver;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.binder.Processor;
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.enums.BindingType;
 import com.gitee.dorive.core.entity.enums.JoinType;
+import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.BoundBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
+import com.gitee.dorive.core.impl.binder.ValueFilterBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.binder.WeakBinder;
 import com.gitee.dorive.core.impl.processor.SpELProcessor;
@@ -57,14 +60,15 @@ public class BinderResolver {
     private PropChainResolver propChainResolver;
 
     private List<Binder> allBinders;
-    private List<ValueRouteBinder> valueRouteBinders;
     private List<StrongBinder> strongBinders;
+    private List<WeakBinder> weakBinders;
+    private List<ValueRouteBinder> valueRouteBinders;
+    private List<ValueFilterBinder> valueFilterBinders;
     // 决定了关联查询具体使用哪种实现
     private Map<String, List<StrongBinder>> mergedBindersMap;
     private StrongBinder boundIdBinder;
     private List<String> selfFields;
     private JoinType joinType;
-    private List<WeakBinder> weakBinders;
 
     public BinderResolver(AbstractContextRepository<?, ?> repository, EntityEle entityEle) {
         this.repository = repository;
@@ -79,13 +83,14 @@ public class BinderResolver {
         List<BindingDef> bindingDefs = entityEle.getBindingDefs();
 
         this.allBinders = new ArrayList<>(bindingDefs.size());
-        this.valueRouteBinders = new ArrayList<>(bindingDefs.size());
         this.strongBinders = new ArrayList<>(bindingDefs.size());
+        this.weakBinders = new ArrayList<>(bindingDefs.size());
+        this.valueRouteBinders = new ArrayList<>(bindingDefs.size());
+        this.valueFilterBinders = new ArrayList<>(bindingDefs.size());
         this.mergedBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
         this.boundIdBinder = null;
         this.selfFields = new ArrayList<>(bindingDefs.size());
         this.joinType = JoinType.UNION;
-        this.weakBinders = new ArrayList<>(bindingDefs.size());
         String fieldErrorMsg = "The field configured for @Binding does not exist within the entity! type: {}, field: {}";
 
         for (BindingDef bindingDef : bindingDefs) {
@@ -131,6 +136,11 @@ public class BinderResolver {
                 WeakBinder weakBinder = new WeakBinder(bindingDef, processor, fieldPropChain, alias);
                 allBinders.add(weakBinder);
                 weakBinders.add(weakBinder);
+
+            } else if (bindingType == BindingType.VALUE_FILTER) {
+                ValueFilterBinder valueFilterBinder = new ValueFilterBinder(bindingDef, processor, fieldPropChain, alias);
+                allBinders.add(valueFilterBinder);
+                valueFilterBinders.add(valueFilterBinder);
             }
         }
 
@@ -239,6 +249,17 @@ public class BinderResolver {
         boundBinder.setBelongRepository(belongRepository);
         boundBinder.setBoundPropChain(boundPropChain);
         boundBinder.setBindAlias(bindAlias);
+    }
+
+    public void appendFilterValue(Context context, Example example) {
+        for (ValueFilterBinder valueFilterBinder : valueFilterBinders) {
+            Object boundValue = valueFilterBinder.getBoundValue(context, null);
+            boundValue = valueFilterBinder.input(context, boundValue);
+            if (boundValue != null) {
+                String fieldName = valueFilterBinder.getFieldName();
+                example.eq(fieldName, boundValue);
+            }
+        }
     }
 
 }

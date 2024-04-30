@@ -25,16 +25,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class OnSegment implements Segment {
+public class OnValueSegment implements Segment {
 
     private String tableAlias;
     private String column;
-    private String joinTableAlias;
-    private String joinColumn;
+    private String literal;
 
     @Override
     public String toString() {
-        return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
+        return tableAlias + "." + column + " = " + literal;
     }
 
 }

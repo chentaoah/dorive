@@ -78,8 +78,8 @@ public class MergedRepositoryResolver {
                     relativeAccessPath,
                     abstractContextRepository != null,
                     repository,
-                    getRelativeValueRouteBindersMap(lastAccessPath, repository),
                     getRelativeStrongBindersMap(lastAccessPath, repository),
+                    getRelativeValueRouteBindersMap(lastAccessPath, repository),
                     executedRepository,
                     mergedRepositoryMap.size() + 1);
             addMergedRepository(mergedRepository);
@@ -90,18 +90,6 @@ public class MergedRepositoryResolver {
                 resolve(newMultiAccessPath, true, abstractContextRepository);
             }
         }
-    }
-
-    private Map<String, List<ValueRouteBinder>> getRelativeValueRouteBindersMap(String lastAccessPath, CommonRepository repository) {
-        BinderResolver binderResolver = repository.getBinderResolver();
-        List<ValueRouteBinder> valueRouteBinders = binderResolver.getValueRouteBinders();
-        Map<String, List<ValueRouteBinder>> relativeValueRouteBindersMap = new LinkedHashMap<>();
-        for (ValueRouteBinder valueRouteBinder : valueRouteBinders) {
-            String relativeAccessPath = lastAccessPath + valueRouteBinder.getBelongAccessPath();
-            List<ValueRouteBinder> existBinders = relativeValueRouteBindersMap.computeIfAbsent(relativeAccessPath, key -> new ArrayList<>(4));
-            existBinders.add(valueRouteBinder);
-        }
-        return relativeValueRouteBindersMap;
     }
 
     private Map<String, List<StrongBinder>> getRelativeStrongBindersMap(String lastAccessPath, CommonRepository repository) {
@@ -115,6 +103,18 @@ public class MergedRepositoryResolver {
             existBinders.add(strongBinder);
         }
         return relativeStrongBindersMap;
+    }
+
+    private Map<String, List<ValueRouteBinder>> getRelativeValueRouteBindersMap(String lastAccessPath, CommonRepository repository) {
+        BinderResolver binderResolver = repository.getBinderResolver();
+        List<ValueRouteBinder> valueRouteBinders = binderResolver.getValueRouteBinders();
+        Map<String, List<ValueRouteBinder>> relativeValueRouteBindersMap = new LinkedHashMap<>();
+        for (ValueRouteBinder valueRouteBinder : valueRouteBinders) {
+            String relativeAccessPath = lastAccessPath + valueRouteBinder.getBelongAccessPath();
+            List<ValueRouteBinder> existBinders = relativeValueRouteBindersMap.computeIfAbsent(relativeAccessPath, key -> new ArrayList<>(4));
+            existBinders.add(valueRouteBinder);
+        }
+        return relativeValueRouteBindersMap;
     }
 
     private void addMergedRepository(MergedRepository mergedRepository) {

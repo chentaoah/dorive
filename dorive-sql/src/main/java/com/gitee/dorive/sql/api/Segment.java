@@ -15,26 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.entity.segment;
+package com.gitee.dorive.sql.api;
 
-import com.gitee.dorive.sql.api.Segment;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+public interface Segment {
 
-@Getter
-@Setter
-@AllArgsConstructor
-public class OnSegment implements Segment {
-
-    private String tableAlias;
-    private String column;
-    private String joinTableAlias;
-    private String joinColumn;
-
-    @Override
-    public String toString() {
-        return tableAlias + "." + column + " = " + joinTableAlias + "." + joinColumn;
-    }
+    String toString();
 
 }

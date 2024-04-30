@@ -27,6 +27,7 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.impl.binder.BoundBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
+import com.gitee.dorive.core.impl.binder.ValueFilterBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.executor.ExampleExecutor;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
@@ -36,6 +37,7 @@ import com.gitee.dorive.core.util.CriterionUtils;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.impl.resolver.QueryResolver;
+import com.gitee.dorive.sql.api.Segment;
 import com.gitee.dorive.sql.entity.common.SegmentInfo;
 import com.gitee.dorive.sql.entity.segment.*;
 import lombok.AllArgsConstructor;
@@ -94,7 +96,7 @@ public class SegmentBuilder {
                 selectSegment.setTableSegment(tableSegment);
 
             } else {
-                List<OnSegment> onSegments = newOnSegments(context, nodeMap, mergedRepository, node);
+                List<Segment> onSegments = newOnSegments(context, nodeMap, mergedRepository, node);
                 if (onSegments.isEmpty()) {
                     nodeMap.remove(relativeAccessPath);
                     continue;
@@ -111,30 +113,17 @@ public class SegmentBuilder {
         return selectSegment;
     }
 
-    private List<OnSegment> newOnSegments(Context context, Map<String, Node> nodeMap, MergedRepository mergedRepository, Node node) {
+    private List<Segment> newOnSegments(Context context, Map<String, Node> nodeMap, MergedRepository mergedRepository, Node node) {
         String lastAccessPath = mergedRepository.getLastAccessPath();
         CommonRepository definedRepository = mergedRepository.getDefinedRepository();
         BinderResolver binderResolver = definedRepository.getBinderResolver();
-        List<ValueRouteBinder> valueRouteBinders = binderResolver.getValueRouteBinders();
         List<StrongBinder> strongBinders = binderResolver.getStrongBinders();
+        List<ValueRouteBinder> valueRouteBinders = binderResolver.getValueRouteBinders();
+        List<ValueFilterBinder> valueFilterBinders = binderResolver.getValueFilterBinders();
+
         TableSegment tableSegment = node.getTableSegment();
 
-        List<OnSegment> onSegments = new ArrayList<>(strongBinders.size());
-        for (ValueRouteBinder valueRouteBinder : valueRouteBinders) {
-            String relativeAccessPath = lastAccessPath + valueRouteBinder.getBelongAccessPath();
-            Node targetNode = nodeMap.get(relativeAccessPath);
-            if (targetNode != null) {
-                TableSegment targetTableSegment = targetNode.getTableSegment();
-                List<Node> children = targetNode.getChildren();
-                if (!children.contains(node)) {
-                    children.add(node);
-                }
-                OnSegment onSegment = new OnSegment(
-                        targetTableSegment.getTableAlias(), valueRouteBinder.getBindAlias(),
-                        CriterionUtils.sqlParam(valueRouteBinder.getFieldValue(context, null)));
-                onSegments.add(onSegment);
-            }
-        }
+        List<Segment> onSegments = new ArrayList<>(strongBinders.size());
         for (StrongBinder strongBinder : strongBinders) {
             BoundBinder boundBinder = strongBinder.getBoundBinder();
             String relativeAccessPath = lastAccessPath + boundBinder.getBelongAccessPath();
@@ -150,6 +139,27 @@ public class SegmentBuilder {
                         targetTableSegment.getTableAlias(), boundBinder.getBindAlias());
                 onSegments.add(onSegment);
             }
+        }
+        for (ValueRouteBinder valueRouteBinder : valueRouteBinders) {
+            String relativeAccessPath = lastAccessPath + valueRouteBinder.getBelongAccessPath();
+            Node targetNode = nodeMap.get(relativeAccessPath);
+            if (targetNode != null) {
+                TableSegment targetTableSegment = targetNode.getTableSegment();
+                List<Node> children = targetNode.getChildren();
+                if (!children.contains(node)) {
+                    children.add(node);
+                }
+                OnValueSegment onValueSegment = new OnValueSegment(
+                        targetTableSegment.getTableAlias(), valueRouteBinder.getBindAlias(),
+                        CriterionUtils.sqlParam(valueRouteBinder.getFieldValue(context, null)));
+                onSegments.add(onValueSegment);
+            }
+        }
+        for (ValueFilterBinder valueFilterBinder : valueFilterBinders) {
+            OnValueSegment onValueSegment = new OnValueSegment(
+                    tableSegment.getTableAlias(), valueFilterBinder.getAlias(),
+                    CriterionUtils.sqlParam(valueFilterBinder.getBoundValue(context, null)));
+            onSegments.add(onValueSegment);
         }
         return onSegments;
     }

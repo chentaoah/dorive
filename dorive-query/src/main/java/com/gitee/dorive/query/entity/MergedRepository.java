@@ -35,8 +35,8 @@ public class MergedRepository {
     private String relativeAccessPath;
     private boolean merged;
     private CommonRepository definedRepository;
-    private Map<String, List<ValueRouteBinder>> relativeValueRouteBindersMap;
     private Map<String, List<StrongBinder>> relativeStrongBindersMap;
+    private Map<String, List<ValueRouteBinder>> relativeValueRouteBindersMap;
     private CommonRepository executedRepository;
     private Integer order;
 

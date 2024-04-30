@@ -84,8 +84,8 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
             boolean abandoned = exampleWrapper.isAbandoned();
 
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
-            Map<String, List<ValueRouteBinder>> relativeValueRouteBindersMap = mergedRepository.getRelativeValueRouteBindersMap();
             Map<String, List<StrongBinder>> relativeStrongBindersMap = mergedRepository.getRelativeStrongBindersMap();
+            Map<String, List<ValueRouteBinder>> relativeValueRouteBindersMap = mergedRepository.getRelativeValueRouteBindersMap();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
             BinderResolver binderResolver = definedRepository.getBinderResolver();
@@ -103,6 +103,7 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
 
             } else if (example.isNotEmpty()) {
                 example.select(binderResolver.getSelfFields());
+                binderResolver.appendFilterValue(context, example);
                 entities = executedRepository.selectByExample(context, example);
 
             } else {

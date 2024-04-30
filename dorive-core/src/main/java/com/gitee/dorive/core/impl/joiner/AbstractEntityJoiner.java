@@ -64,6 +64,7 @@ public abstract class AbstractEntityJoiner implements EntityJoiner {
                 example.eq(fieldName, boundValue);
             }
         }
+        binderResolver.appendFilterValue(context, example);
     }
 
     protected void addToRootIndex(Object entity, String key) {
