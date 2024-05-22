@@ -74,21 +74,30 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
 
     @Override
     public int insertList(Options options, List<E> entities) {
-        Assert.notEmpty(entities, "The entities cannot be empty!");
+        Assert.notNull(entities, "The entities cannot be null!");
+        if (entities.isEmpty()) {
+            return 0;
+        }
         Operation operation = new Insert(entities);
         return execute((Context) options, operation);
     }
 
     @Override
     public int updateList(Options options, List<E> entities) {
-        Assert.notEmpty(entities, "The entities cannot be empty!");
+        Assert.notNull(entities, "The entities cannot be null!");
+        if (entities.isEmpty()) {
+            return 0;
+        }
         Operation operation = new Update(entities);
         return execute((Context) options, operation);
     }
 
     @Override
     public int insertOrUpdateList(Options options, List<E> entities) {
-        Assert.notEmpty(entities, "The entities cannot be empty!");
+        Assert.notNull(entities, "The entities cannot be null!");
+        if (entities.isEmpty()) {
+            return 0;
+        }
         OperationFactory operationFactory = getOperationFactory();
         Operation operation = operationFactory.buildInsertOrUpdate(entities);
         return execute((Context) options, operation);
@@ -96,7 +105,10 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
 
     @Override
     public int deleteList(Options options, List<E> entities) {
-        Assert.notEmpty(entities, "The entities cannot be empty!");
+        Assert.notNull(entities, "The entities cannot be null!");
+        if (entities.isEmpty()) {
+            return 0;
+        }
         Operation operation = new Delete(entities);
         return execute((Context) options, operation);
     }
