@@ -141,6 +141,9 @@ public class ContextExecutor extends AbstractExecutor {
                         continue;
                     }
                     List<?> entities = CollectionUtils.toList(targetEntity);
+                    if (entities.isEmpty()) {
+                        continue;
+                    }
                     if (isMatch) {
                         repository.getBoundValue(context, rootEntity, entities);
                     }
@@ -179,6 +182,9 @@ public class ContextExecutor extends AbstractExecutor {
                         continue;
                     }
                     List<?> entities = CollectionUtils.toList(targetEntity);
+                    if (entities.isEmpty()) {
+                        continue;
+                    }
                     Operation operation = entityOp instanceof Update ? new Update(entities) : new Delete(entities);
                     operation.switchRoot(isMatch);
                     totalCount += repository.execute(context, operation);
@@ -211,6 +217,9 @@ public class ContextExecutor extends AbstractExecutor {
                         continue;
                     }
                     List<?> entities = CollectionUtils.toList(targetEntity);
+                    if (entities.isEmpty()) {
+                        continue;
+                    }
                     if (isMatch) {
                         repository.getBoundValue(context, rootEntity, entities);
                     }
