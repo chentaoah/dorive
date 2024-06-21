@@ -23,7 +23,6 @@ import java.util.List;
 
 @Data
 public class EntityDefinition {
-    private String accessPath;
     private String name;
     private String sourceName;
     private String factoryName;
