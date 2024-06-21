@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.gitee.dorive.def.impl;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -65,7 +82,7 @@ public class EntityDefinitionReader {
                 Entity entity = AnnotationUtils.getAnnotation(field, Entity.class);
                 if (entity == null) {
                     FieldDefinition fieldDefinition = readField(field);
-                    if (fieldDefinition.isPrimaryKey()) {
+                    if (fieldDefinition.isPrimary()) {
                         entityDefinition.setPrimaryKey(fieldDefinition.getName());
                     }
                     fieldDefinitions.add(fieldDefinition);
@@ -79,7 +96,7 @@ public class EntityDefinitionReader {
     }
 
     private FieldDefinition readField(Field field) {
-        com.gitee.dorive.api.annotation.Field fieldAnno = AnnotationUtils.getAnnotation(field, com.gitee.dorive.api.annotation.Field.class);
+        com.gitee.dorive.api.annotation.Field fieldAnnotation = AnnotationUtils.getAnnotation(field, com.gitee.dorive.api.annotation.Field.class);
         Class<?> type = field.getType();
         boolean collection = false;
         Class<?> genericType = field.getType();
@@ -92,21 +109,21 @@ public class EntityDefinitionReader {
         }
 
         FieldDefinition fieldDefinition = new FieldDefinition();
-        if (fieldAnno != null) {
-            fieldDefinition.setPrimaryKey(fieldAnno.id());
-            fieldDefinition.setAlias(fieldAnno.alias());
-            fieldDefinition.setValueObj(fieldAnno.valueObj());
-            fieldDefinition.setMapExp(fieldAnno.mapExp());
-            fieldDefinition.setConverterName(fieldAnno.converter().getName());
+        if (fieldAnnotation != null) {
+            fieldDefinition.setPrimary(fieldAnnotation.id());
+            fieldDefinition.setAlias(fieldAnnotation.alias());
+            fieldDefinition.setValueObj(fieldAnnotation.valueObj());
+            fieldDefinition.setMapExp(fieldAnnotation.mapExp());
+            fieldDefinition.setConverterName(fieldAnnotation.converter().getName());
         } else {
-            fieldDefinition.setPrimaryKey(false);
+            fieldDefinition.setPrimary(false);
             fieldDefinition.setAlias(StrUtil.toUnderlineCase(name));
             fieldDefinition.setValueObj(false);
             fieldDefinition.setMapExp("");
             fieldDefinition.setConverterName(Object.class.getName());
         }
         if ("id".equals(name)) {
-            fieldDefinition.setPrimaryKey(true);
+            fieldDefinition.setPrimary(true);
         }
         fieldDefinition.setType(type.getName());
         fieldDefinition.setCollection(collection);
