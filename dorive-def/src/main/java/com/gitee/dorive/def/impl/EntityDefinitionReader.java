@@ -166,11 +166,11 @@ public class EntityDefinitionReader {
             fieldEntityDefinition.setName(entityName);
         }
         Class<?> source = entity.source();
-        if (source != null && source != Object.class) {
+        if (source != Object.class) {
             fieldEntityDefinition.setSourceName(source.getName());
         }
         Class<?> factory = entity.factory();
-        if (factory != null && factory != Object.class) {
+        if (factory != Object.class) {
             fieldEntityDefinition.setFactoryName(factory.getName());
         }
 
