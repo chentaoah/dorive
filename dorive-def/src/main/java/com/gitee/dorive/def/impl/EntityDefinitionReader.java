@@ -66,7 +66,7 @@ public class EntityDefinitionReader {
         entityDefinition.setFactoryName(factory.getName());
         entityDefinition.setRepositoryName(repository.getName());
         entityDefinition.setPriority(0);
-        entityDefinition.setClassName(typeName);
+        entityDefinition.setGenericTypeName(typeName);
         readFields(type, entityDefinition);
         entityDefinitionMap.put(typeName, entityDefinition);
 
@@ -125,9 +125,9 @@ public class EntityDefinitionReader {
         if ("id".equals(name)) {
             fieldDefinition.setPrimary(true);
         }
-        fieldDefinition.setType(type.getName());
+        fieldDefinition.setTypeName(type.getName());
         fieldDefinition.setCollection(collection);
-        fieldDefinition.setGenericType(genericType.getName());
+        fieldDefinition.setGenericTypeName(genericType.getName());
         fieldDefinition.setName(name);
         return fieldDefinition;
     }
@@ -156,7 +156,7 @@ public class EntityDefinitionReader {
             fieldEntityDefinition.setSortBy(order.sortBy());
             fieldEntityDefinition.setOrder(order.order());
         }
-        fieldEntityDefinition.setType(type.getName());
+        fieldEntityDefinition.setTypeName(type.getName());
         fieldEntityDefinition.setCollection(collection);
         fieldEntityDefinition.setName(name);
 

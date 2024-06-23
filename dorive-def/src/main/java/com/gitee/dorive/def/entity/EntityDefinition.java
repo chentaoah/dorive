@@ -19,6 +19,7 @@ package com.gitee.dorive.def.entity;
 
 import lombok.Data;
 
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -28,8 +29,16 @@ public class EntityDefinition {
     private String factoryName;
     private String repositoryName;
     private int priority;
-    private String className;
+    private String genericTypeName;
     private String primaryKey;
     private List<FieldDefinition> fieldDefinitions;
     private List<FieldEntityDefinition> fieldEntityDefinitions;
+
+    public boolean isAggregate() {
+        return false;
+    }
+
+    public List<BindingDefinition> getBindingDefinitions() {
+        return Collections.emptyList();
+    }
 }

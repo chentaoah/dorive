@@ -15,21 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.def.entity;
+package com.gitee.dorive.def.util;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import cn.hutool.core.util.ClassUtil;
 
-import java.util.List;
+public class ReflectUtils {
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class FieldEntityDefinition extends EntityDefinition {
-    private boolean aggregate;
-    private List<BindingDefinition> bindingDefinitions;
-    private String sortBy;
-    private String order;
-    private String typeName;
-    private boolean collection;
-    private String name;
+    public static Class<?> getClass(String className) {
+        return ClassUtil.loadClass(className);
+    }
+
 }

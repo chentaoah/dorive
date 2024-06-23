@@ -26,8 +26,8 @@ public class FieldDefinition {
     private boolean valueObj;
     private String mapExp;
     private String converterName;
-    private String type;
+    private String typeName;
     private boolean collection;
-    private String genericType;
+    private String genericTypeName;
     private String name;
 }
