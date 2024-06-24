@@ -46,20 +46,8 @@ public class EntityElement implements PropProxy {
         return entityDefinition.getPrimaryKey();
     }
 
-    public Object getPrimaryKey(Object entity) {
-        return ReflectUtil.getFieldValue(entity, getPrimaryKey());
-    }
-
-    public void setPrimaryKey(Object entity, Object value) {
-        ReflectUtil.setFieldValue(entity, getPrimaryKey(), value);
-    }
-
     public boolean isCollection() {
         return entityDefinition.isCollection();
-    }
-
-    public boolean hasField(String field) {
-        return ReflectUtil.hasField(genericType, field);
     }
 
     @Override
@@ -70,6 +58,18 @@ public class EntityElement implements PropProxy {
     @Override
     public void setValue(Object entity, Object value) {
         ReflectUtil.setFieldValue(entity, entityDefinition.getFieldName(), value);
+    }
+
+    public Object getPrimaryKey(Object entity) {
+        return ReflectUtil.getFieldValue(entity, getPrimaryKey());
+    }
+
+    public void setPrimaryKey(Object entity, Object value) {
+        ReflectUtil.setFieldValue(entity, getPrimaryKey(), value);
+    }
+
+    public boolean hasField(String field) {
+        return ReflectUtil.hasField(genericType, field);
     }
 
     public FieldElement getFieldElement(String fieldName) {
