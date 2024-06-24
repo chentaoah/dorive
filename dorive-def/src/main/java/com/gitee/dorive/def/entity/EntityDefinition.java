@@ -41,4 +41,8 @@ public class EntityDefinition {
     public List<BindingDefinition> getBindingDefinitions() {
         return Collections.emptyList();
     }
+
+    public boolean isCollection() {
+        return false;
+    }
 }

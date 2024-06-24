@@ -18,6 +18,7 @@
 package com.gitee.dorive.def.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.annotation.Binding;
@@ -43,15 +44,27 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class EntityDefinitionReader {
 
-    private static final Map<String, EntityDefinition> entityDefinitionMap = new ConcurrentHashMap<>();
+    private static final Map<String, EntityDefinition> CACHE = new ConcurrentHashMap<>();
+    private static final Set<String> LOCK = new ConcurrentHashSet<>();
 
     public EntityDefinition read(Class<?> type) {
-        String typeName = type.getName();
-        EntityDefinition entityDefinition = entityDefinitionMap.get(typeName);
-        if (entityDefinition != null) {
+        synchronized (CACHE) {
+            String typeName = type.getName();
+            EntityDefinition entityDefinition = CACHE.get(typeName);
+            if (entityDefinition == null) {
+                if (LOCK.add(typeName)) {
+                    entityDefinition = doRead(type);
+                    CACHE.put(typeName, entityDefinition);
+                    LOCK.remove(typeName);
+                } else {
+                    log.info("The entity nested itself! type: " + type.getName());
+                }
+            }
             return entityDefinition;
         }
+    }
 
+    private EntityDefinition doRead(Class<?> type) {
         Entity entity = AnnotationUtils.getAnnotation(type, Entity.class);
         Assert.notNull(entity, "The @Entity does not exist!");
         assert entity != null;
@@ -60,16 +73,14 @@ public class EntityDefinitionReader {
         Class<?> factory = entity.factory();
         Class<?> repository = entity.repository();
 
-        entityDefinition = new EntityDefinition();
+        EntityDefinition entityDefinition = new EntityDefinition();
         entityDefinition.setName(StringUtils.isNotBlank(name) ? name : type.getSimpleName());
         entityDefinition.setSourceName(source.getName());
         entityDefinition.setFactoryName(factory.getName());
         entityDefinition.setRepositoryName(repository.getName());
         entityDefinition.setPriority(0);
-        entityDefinition.setGenericTypeName(typeName);
+        entityDefinition.setGenericTypeName(type.getName());
         readFields(type, entityDefinition);
-        entityDefinitionMap.put(typeName, entityDefinition);
-
         return entityDefinition;
     }
 
@@ -87,7 +98,10 @@ public class EntityDefinitionReader {
                     }
                     fieldDefinitions.add(fieldDefinition);
                 } else {
-                    fieldEntityDefinitions.add(readFieldEntity(entity, field));
+                    FieldEntityDefinition fieldEntityDefinition = readFieldEntity(entity, field);
+                    if (fieldEntityDefinition != null) {
+                        fieldEntityDefinitions.add(fieldEntityDefinition);
+                    }
                 }
             }
         }
@@ -147,6 +161,9 @@ public class EntityDefinitionReader {
         }
 
         EntityDefinition entityDefinition = read(genericType);
+        if (entityDefinition == null) {
+            return null;
+        }
         FieldEntityDefinition fieldEntityDefinition = BeanUtil.copyProperties(entityDefinition, FieldEntityDefinition.class);
 
         fieldEntityDefinition.setAggregate(aggregate);
