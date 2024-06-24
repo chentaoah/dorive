@@ -25,8 +25,8 @@ import lombok.Data;
 public class FieldElement {
 
     private FieldDefinition fieldDefinition;
-    private Class<?> genericType;
     private FieldDef fieldDef;
+    private Class<?> genericType;
 
     public boolean isCollection() {
         return fieldDefinition.isCollection();
