@@ -90,7 +90,6 @@ public class EntityElementResolver {
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
             FieldElement fieldElement = new FieldElement();
             fieldElement.setFieldDefinition(fieldDefinition);
-            fieldElement.setGenericType(ClassUtil.loadClass(fieldDefinition.getGenericTypeName()));
 
             FieldDef fieldDef = new FieldDef();
             fieldDef.setId(fieldDefinition.isPrimary());
@@ -100,6 +99,7 @@ public class EntityElementResolver {
             fieldDef.setConverter(ClassUtil.loadClass(fieldDefinition.getConverterName()));
             fieldElement.setFieldDef(fieldDef);
 
+            fieldElement.setGenericType(ClassUtil.loadClass(fieldDefinition.getGenericTypeName()));
             fieldElements.add(fieldElement);
         }
 
@@ -113,7 +113,7 @@ public class EntityElementResolver {
             fieldAliasMapping.put(fieldName, alias);
         }
 
-        return new EntityElement(entityDefinition, accessPath, genericType, entityDef, bindingDefs, orderDef, fieldElements, fieldAliasMapping);
+        return new EntityElement(entityDefinition, accessPath, entityDef, bindingDefs, orderDef, genericType, fieldElements, fieldAliasMapping);
     }
 
 }
