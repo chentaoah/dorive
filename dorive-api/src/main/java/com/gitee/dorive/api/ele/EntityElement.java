@@ -35,10 +35,10 @@ public class EntityElement implements PropProxy {
 
     private EntityDefinition entityDefinition;
     private String accessPath;
-    private Class<?> genericType;
     private EntityDef entityDef;
     private List<BindingDef> bindingDefs;
     private OrderDef orderDef;
+    private Class<?> genericType;
     private List<FieldElement> fieldElements;
     private Map<String, String> fieldAliasMapping;
 
