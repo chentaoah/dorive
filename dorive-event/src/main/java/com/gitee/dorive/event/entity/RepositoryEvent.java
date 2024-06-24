@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.event.entity;
 
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.ele.EntityElement;
 import com.gitee.dorive.event.repository.AbstractEventRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,8 +32,8 @@ public class RepositoryEvent extends CommonEvent {
 
     public Class<?> getEntityClass() {
         AbstractEventRepository<?, ?> repository = (AbstractEventRepository<?, ?>) getSource();
-        EntityEle entityEle = repository.getEntityEle();
-        return entityEle.getGenericType();
+        EntityElement entityElement = repository.getEntityElement();
+        return entityElement.getGenericType();
     }
 
 }

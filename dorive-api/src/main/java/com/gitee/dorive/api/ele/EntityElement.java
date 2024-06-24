@@ -15,52 +15,65 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity;
+package com.gitee.dorive.api.ele;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.def.BindingDef;
 import com.gitee.dorive.api.def.EntityDef;
 import com.gitee.dorive.api.def.OrderDef;
+import com.gitee.dorive.api.entity.EntityDefinition;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.lang.reflect.AnnotatedElement;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Data
-@NoArgsConstructor
-public abstract class EntityEle {
+@AllArgsConstructor
+public class EntityElement implements PropProxy {
 
-    private AnnotatedElement element;
+    private EntityDefinition entityDefinition;
+    private String accessPath;
+    private Class<?> genericType;
     private EntityDef entityDef;
-    private OrderDef orderDef;
     private List<BindingDef> bindingDefs;
-    private PropProxy idProxy;
+    private OrderDef orderDef;
+    private List<FieldElement> fieldElements;
     private Map<String, String> fieldAliasMapping;
 
-    public EntityEle(AnnotatedElement element) {
-        this.element = element;
-        this.entityDef = EntityDef.fromElement(element);
-        this.orderDef = OrderDef.fromElement(element);
-        this.bindingDefs = BindingDef.fromElement(element);
+    public String getPrimaryKey() {
+        return entityDefinition.getPrimaryKey();
     }
 
-    public boolean isEntityDef() {
-        return entityDef != null;
+    public Object getPrimaryKey(Object entity) {
+        return ReflectUtil.getFieldValue(entity, getPrimaryKey());
     }
 
-    public void initialize() {
-        if (entityDef != null && idProxy == null) {
-            doInitialize();
-        }
+    public void setPrimaryKey(Object entity, Object value) {
+        ReflectUtil.setFieldValue(entity, getPrimaryKey(), value);
+    }
+
+    public boolean isCollection() {
+        return entityDefinition.isCollection();
     }
 
     public boolean hasField(String field) {
-        return fieldAliasMapping.containsKey(field);
+        return ReflectUtil.hasField(genericType, field);
+    }
+
+    @Override
+    public Object getValue(Object entity) {
+        return ReflectUtil.getFieldValue(entity, entityDefinition.getFieldName());
+    }
+
+    @Override
+    public void setValue(Object entity, Object value) {
+        ReflectUtil.setFieldValue(entity, entityDefinition.getFieldName(), value);
+    }
+
+    public FieldElement getFieldElement(String fieldName) {
+        return CollUtil.findOne(fieldElements, fieldElement -> fieldName.equals(fieldElement.getFieldName()));
     }
 
     public String toAlias(String field) {
@@ -90,17 +103,5 @@ public abstract class EntityEle {
         }
         return fields;
     }
-
-    protected abstract void doInitialize();
-
-    public abstract boolean isCollection();
-
-    public abstract Class<?> getGenericType();
-
-    public abstract EntityType getEntityType();
-
-    public abstract Map<String, EntityField> getEntityFieldMap();
-
-    public abstract String getIdName();
 
 }

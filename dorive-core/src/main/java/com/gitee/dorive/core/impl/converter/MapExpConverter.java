@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.converter;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.def.FieldDef;
-import com.gitee.dorive.api.entity.EntityField;
+import com.gitee.dorive.api.ele.FieldElement;
 import com.gitee.dorive.core.api.factory.Converter;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,14 +34,14 @@ import java.util.Map;
 @Setter
 public class MapExpConverter implements Converter {
 
-    private EntityField entityField;
+    private FieldElement fieldElement;
     private Map<Object, Object> reMapping = Collections.emptyMap();
     private Map<Object, Object> deMapping = Collections.emptyMap();
 
-    public MapExpConverter(EntityField entityField) {
-        this.entityField = entityField;
-        FieldDef fieldDef = entityField.getFieldDef();
-        Class<?> genericType = entityField.getGenericType();
+    public MapExpConverter(FieldElement fieldElement) {
+        this.fieldElement = fieldElement;
+        FieldDef fieldDef = fieldElement.getFieldDef();
+        Class<?> genericType = fieldElement.getGenericType();
         String mapExp = fieldDef.getMapExp();
         if (StringUtils.isNotBlank(mapExp)) {
             this.reMapping = new LinkedHashMap<>(8);

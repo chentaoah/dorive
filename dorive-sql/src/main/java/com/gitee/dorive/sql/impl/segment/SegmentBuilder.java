@@ -18,7 +18,7 @@
 package com.gitee.dorive.sql.impl.segment;
 
 import com.gitee.dorive.api.constant.Operator;
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
@@ -72,14 +72,14 @@ public class SegmentBuilder {
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
-            EntityEle entityEle = executedRepository.getEntityEle();
-            EntityStoreInfo entityStoreInfo = AbstractContextRepository.getEntityStoreInfo(entityEle);
-            ExampleExecutor exampleExecutor = AbstractContextRepository.getExampleExecutor(entityEle);
+            EntityElement entityElement = executedRepository.getEntityElement();
+            EntityStoreInfo entityStoreInfo = AbstractContextRepository.getEntityStoreInfo(entityElement);
+            ExampleExecutor exampleExecutor = AbstractContextRepository.getExampleExecutor(entityElement);
 
             String tableName = entityStoreInfo.getTableName();
             String tableAlias = selectSegment.generateTableAlias();
 
-            SegmentInfo segmentInfo = new SegmentInfo(tableAlias, entityEle);
+            SegmentInfo segmentInfo = new SegmentInfo(tableAlias, entityElement);
             boolean isMatch = selector != null && definedRepository.matches(selector);
             if (isMatch) {
                 matchedSegmentInfos.add(segmentInfo);

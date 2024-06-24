@@ -18,7 +18,7 @@
 package com.gitee.dorive.sql.impl.executor;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -62,8 +62,8 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         ResultType resultType = queryContext.getResultType();
         Example example = queryContext.getExample();
 
-        EntityEle entityEle = repository.getEntityEle();
-        EntityStoreInfo entityStoreInfo = AbstractContextRepository.getEntityStoreInfo(entityEle);
+        EntityElement entityElement = repository.getEntityElement();
+        EntityStoreInfo entityStoreInfo = AbstractContextRepository.getEntityStoreInfo(entityElement);
         String idColumn = entityStoreInfo.getIdColumn();
 
         OrderBy orderBy = example.getOrderBy();
@@ -126,7 +126,7 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         List<Map<String, Object>> resultMaps = sqlRunner.selectList(sql, args.toArray());
         List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get(idColumn), true);
         if (!primaryKeys.isEmpty()) {
-            Example newExample = new InnerExample().in(entityEle.getIdName(), primaryKeys);
+            Example newExample = new InnerExample().in(entityElement.getPrimaryKey(), primaryKeys);
             List<Object> entities = (List<Object>) repository.selectByExample(context, newExample);
             if (page != null) {
                 page.setRecords(entities);

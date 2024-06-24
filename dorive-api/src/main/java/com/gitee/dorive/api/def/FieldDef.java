@@ -17,30 +17,17 @@
 
 package com.gitee.dorive.api.def;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.api.annotation.Field;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.core.annotation.AnnotatedElementUtils;
-
-import java.lang.reflect.AnnotatedElement;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class FieldDef {
-
     private boolean id;
     private String alias;
     private boolean valueObj;
     private String mapExp;
     private Class<?> converter;
-
-    public static FieldDef fromElement(AnnotatedElement element) {
-        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Field.class);
-        return attributes != null ? BeanUtil.copyProperties(attributes, FieldDef.class) : null;
-    }
-
 }

@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.core.repository;
 
-import com.gitee.dorive.api.entity.PropChain;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Matcher;
@@ -50,7 +49,6 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
     private boolean root;
     private boolean aggregated;
     private OrderBy defaultOrderBy;
-    private PropChain anchorPoint;
     private BinderResolver binderResolver;
     private boolean boundEntity;
     private Matcher matcher;
@@ -60,15 +58,15 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
     }
 
     public boolean isCollection() {
-        return getEntityEle().isCollection();
+        return getEntityElement().isCollection();
     }
 
     public Object getPrimaryKey(Object entity) {
-        return getEntityEle().getIdProxy().getValue(entity);
+        return getEntityElement().getPrimaryKey(entity);
     }
 
     public boolean hasField(String field) {
-        return getEntityEle().hasField(field);
+        return getEntityElement().hasField(field);
     }
 
     public JoinType getJoinType() {
@@ -92,7 +90,7 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
             if (properties != null && !properties.isEmpty()) {
                 Object primaryKey = query.getPrimaryKey();
                 if (primaryKey != null) {
-                    Example example = new InnerExample().eq(getEntityEle().getIdName(), primaryKey);
+                    Example example = new InnerExample().eq(getEntityElement().getPrimaryKey(), primaryKey);
                     query.setPrimaryKey(null);
                     query.setExample(example);
                 }

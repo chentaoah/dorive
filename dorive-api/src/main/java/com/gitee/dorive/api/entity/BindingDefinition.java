@@ -15,17 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.exception;
+package com.gitee.dorive.api.entity;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class DefineEntityException extends RuntimeException {
-
-    public DefineEntityException(String message) {
-        super(message);
-    }
-
+public class BindingDefinition {
+    private String field;
+    private String value;
+    private String bindExp;
+    private String processExp;
+    private String processorName;
+    private String bindField;
 }

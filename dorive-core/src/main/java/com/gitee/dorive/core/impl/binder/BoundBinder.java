@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.binder;
 
 import com.gitee.dorive.api.def.BindingDef;
-import com.gitee.dorive.api.entity.PropChain;
+import com.gitee.dorive.api.impl.PropChain;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
@@ -64,7 +64,7 @@ public class BoundBinder implements Binder {
         if (StringUtils.isNotBlank(bindField)) {
             return bindField;
         }
-        return boundPropChain.getEntityField().getName();
+        return boundPropChain.getFieldElement().getFieldName();
     }
 
     @Override

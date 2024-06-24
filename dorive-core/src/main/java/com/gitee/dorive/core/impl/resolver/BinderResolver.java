@@ -23,22 +23,19 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.def.BindingDef;
-import com.gitee.dorive.api.def.OrderDef;
-import com.gitee.dorive.api.entity.EntityEle;
-import com.gitee.dorive.api.entity.PropChain;
-import com.gitee.dorive.api.resolver.PropChainResolver;
+import com.gitee.dorive.api.def.EntityDef;
+import com.gitee.dorive.api.ele.EntityElement;
+import com.gitee.dorive.api.impl.PropChain;
+import com.gitee.dorive.api.impl.SpELPropProxy;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.enums.BindingType;
 import com.gitee.dorive.core.entity.enums.JoinType;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.impl.binder.BoundBinder;
-import com.gitee.dorive.core.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.binder.ValueFilterBinder;
-import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.core.impl.binder.WeakBinder;
+import com.gitee.dorive.core.impl.binder.*;
 import com.gitee.dorive.core.impl.processor.SpELProcessor;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -47,17 +44,12 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 public class BinderResolver {
 
     private AbstractContextRepository<?, ?> repository;
-    private PropChainResolver propChainResolver;
 
     private List<Binder> allBinders;
     private List<StrongBinder> strongBinders;
@@ -70,17 +62,15 @@ public class BinderResolver {
     private List<String> selfFields;
     private JoinType joinType;
 
-    public BinderResolver(AbstractContextRepository<?, ?> repository, EntityEle entityEle) {
+    public BinderResolver(AbstractContextRepository<?, ?> repository, EntityElement entityElement) {
         this.repository = repository;
-        this.propChainResolver = new PropChainResolver(entityEle.getEntityType());
     }
 
-    public void resolve(String accessPath, OrderDef orderDef, EntityEle entityEle) {
-        Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
-
-        Class<?> genericType = entityEle.getGenericType();
-        String idName = entityEle.getIdName();
-        List<BindingDef> bindingDefs = entityEle.getBindingDefs();
+    public void resolve(String accessPath, EntityElement entityElement) {
+        Class<?> genericType = entityElement.getGenericType();
+        String primaryKey = entityElement.getPrimaryKey();
+        EntityDef entityDef = entityElement.getEntityDef();
+        List<BindingDef> bindingDefs = entityElement.getBindingDefs();
 
         this.allBinders = new ArrayList<>(bindingDefs.size());
         this.strongBinders = new ArrayList<>(bindingDefs.size());
@@ -107,11 +97,11 @@ public class BinderResolver {
             }
 
             String field = bindingDef.getField();
-            String alias = entityEle.toAlias(field);
+            String alias = entityElement.toAlias(field);
 
-            PropChain fieldPropChain = propChainMap.get("/" + field);
+            PropProxy propProxy = SpELPropProxy.newPropProxy("#root." + field);
+            PropChain fieldPropChain = new PropChain(entityElement.getFieldElement(field), propProxy);
             Assert.notNull(fieldPropChain, fieldErrorMsg, genericType.getName(), field);
-            fieldPropChain.newPropProxy();
 
             if (bindingType == BindingType.STRONG) {
                 StrongBinder strongBinder = new StrongBinder(bindingDef, processor, fieldPropChain, alias);
@@ -124,9 +114,9 @@ public class BinderResolver {
                 List<StrongBinder> strongBinders = mergedBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
                 strongBinders.add(strongBinder);
 
-                if (strongBinder.isSameType() && idName.equals(field)) {
-                    if (orderDef.getPriority() == 0) {
-                        orderDef.setPriority(-1);
+                if (strongBinder.isSameType() && primaryKey.equals(field)) {
+                    if (entityDef.getPriority() == 0) {
+                        entityDef.setPriority(-1);
                     }
                     boundIdBinder = strongBinder;
                 }
@@ -236,14 +226,17 @@ public class BinderResolver {
         Assert.notNull(belongRepository, "The belong repository cannot be null! bindExp: {}", bindExp);
         belongRepository.setBoundEntity(true);
 
-        PropChainResolver propChainResolver = repository.getPropChainResolver();
-        Map<String, PropChain> propChainMap = propChainResolver.getPropChainMap();
-        PropChain boundPropChain = propChainMap.get(bindExp);
-        Assert.notNull(boundPropChain, "The bound property chain cannot be null! bindExp: {}", bindExp);
-        boundPropChain.newPropProxy();
+        EntityElement entityElement = belongRepository.getEntityElement();
 
-        EntityEle entityEle = belongRepository.getEntityEle();
-        String bindAlias = entityEle.toAlias(bindField);
+        if (bindExp.startsWith("./")) {
+            bindExp = StrUtil.removePrefix(bindExp, "./");
+            bindExp = "#root." + bindExp;
+        }
+        PropProxy propProxy = SpELPropProxy.newPropProxy(bindExp);
+        PropChain boundPropChain = new PropChain(entityElement.getFieldElement(bindField), propProxy);
+        Assert.notNull(boundPropChain, "The bound property chain cannot be null! bindExp: {}", bindExp);
+
+        String bindAlias = entityElement.toAlias(bindField);
 
         boundBinder.setBelongAccessPath(belongAccessPath);
         boundBinder.setBelongRepository(belongRepository);

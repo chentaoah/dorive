@@ -17,28 +17,14 @@
 
 package com.gitee.dorive.api.def;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.api.annotation.Order;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.core.annotation.AnnotatedElementUtils;
-
-import java.lang.reflect.AnnotatedElement;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDef {
-
-    private int priority;
     private String sortBy;
     private String order;
-
-    public static OrderDef fromElement(AnnotatedElement element) {
-        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Order.class);
-        return attributes != null ? BeanUtil.copyProperties(attributes, OrderDef.class) : null;
-    }
-
 }

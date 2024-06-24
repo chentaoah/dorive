@@ -15,51 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.annotation;
+package com.gitee.dorive.api.entity;
 
-import java.lang.annotation.*;
+import lombok.Data;
 
-/**
- * 实体注解<br>
- * wiki：https://gitee.com/digital-engine/dorive/wikis/pages
- *
- * @author tao.chen
- */
-@Inherited
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
-public @interface Entity {
-
-    /**
-     * 实体名称
-     */
-    String name() default "";
-
-    /**
-     * 数据来源
-     */
-    Class<?> source() default Object.class;
-
-    /**
-     * 实体工厂
-     */
-    Class<?> factory() default Object.class;
-
-    /**
-     * 指定仓储
-     */
-    Class<?> repository() default Object.class;
-
-    /**
-     * 操作优先级
-     */
-    int priority() default 0;
-
-    /**
-     * 是否聚合
-     */
-    boolean aggregate() default false;
-
+@Data
+public class FieldDefinition {
+    private boolean primary;
+    private String alias;
+    private boolean valueObj;
+    private String mapExp;
+    private String converterName;
+    private String typeName;
+    private boolean collection;
+    private String genericTypeName;
+    private String fieldName;
 }
-

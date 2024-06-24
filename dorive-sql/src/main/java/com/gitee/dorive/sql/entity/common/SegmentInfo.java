@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.sql.entity.common;
 
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.ele.EntityElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -25,5 +25,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class SegmentInfo {
     private String tableAlias;
-    private EntityEle entityEle;
+    private EntityElement entityElement;
 }

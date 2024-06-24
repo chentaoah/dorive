@@ -18,7 +18,7 @@
 package com.gitee.dorive.sql.impl.count;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryWrapper;
@@ -58,11 +58,11 @@ public class DefaultCountQuerier implements CountQuerier {
         List<Object> args = selectSegment.getArgs();
 
         String tableAlias = tableSegment.getTableAlias();
-        EntityEle entityEle = repository.getEntityEle();
-        String countByExp = buildCountByExp(countQuery, segmentBuilder, tableAlias, entityEle);
+        EntityElement entityElement = repository.getEntityElement();
+        String countByExp = buildCountByExp(countQuery, segmentBuilder, tableAlias, entityElement);
 
         String groupByPrefix = tableAlias + ".";
-        List<String> groupBy = entityEle.toAliases(countQuery.getGroupBy());
+        List<String> groupBy = entityElement.toAliases(countQuery.getGroupBy());
         String groupByColumns = CollUtil.join(groupBy, ",", groupByPrefix, null);
 
         List<String> selectColumns = new ArrayList<>(2);
@@ -77,15 +77,15 @@ public class DefaultCountQuerier implements CountQuerier {
         return countMap;
     }
 
-    private String buildCountByExp(CountQuery countQuery, SegmentBuilder segmentBuilder, String tableAlias, EntityEle entityEle) {
+    private String buildCountByExp(CountQuery countQuery, SegmentBuilder segmentBuilder, String tableAlias, EntityElement entityElement) {
         List<SegmentInfo> segmentInfos = segmentBuilder.getMatchedSegmentInfos();
         if (segmentInfos != null && !segmentInfos.isEmpty()) {
             SegmentInfo segmentInfo = segmentInfos.get(0);
             tableAlias = segmentInfo.getTableAlias();
-            entityEle = segmentInfo.getEntityEle();
+            entityElement = segmentInfo.getEntityElement();
         }
         String countByPrefix = tableAlias + ".";
-        List<String> countBy = entityEle.toAliases(countQuery.getCountBy());
+        List<String> countBy = entityElement.toAliases(countQuery.getCountBy());
         String countByStr = CollUtil.join(countBy, ",',',", countByPrefix, null);
 
         StringBuilder countByExp = new StringBuilder();

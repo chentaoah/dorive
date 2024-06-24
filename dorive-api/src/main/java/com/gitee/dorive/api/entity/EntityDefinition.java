@@ -15,20 +15,46 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.def;
+package com.gitee.dorive.api.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.util.Collections;
+import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class EntityDef {
+public class EntityDefinition {
     private String name;
-    private Class<?> source;
-    private Class<?> factory;
-    private Class<?> repository;
+    private String sourceName;
+    private String factoryName;
+    private String repositoryName;
     private int priority;
-    private boolean aggregate;
+    private String genericTypeName;
+    private String primaryKey;
+    private List<FieldDefinition> fieldDefinitions;
+    private List<FieldEntityDefinition> fieldEntityDefinitions;
+
+    public boolean isAggregate() {
+        return false;
+    }
+
+    public List<BindingDefinition> getBindingDefinitions() {
+        return Collections.emptyList();
+    }
+
+    public String getSortBy() {
+        return null;
+    }
+
+    public String getOrder() {
+        return null;
+    }
+
+    public boolean isCollection() {
+        return false;
+    }
+
+    public String getFieldName() {
+        return null;
+    }
 }

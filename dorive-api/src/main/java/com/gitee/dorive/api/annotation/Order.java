@@ -37,11 +37,6 @@ import java.lang.annotation.Target;
 public @interface Order {
 
     /**
-     * 操作优先级
-     */
-    int priority() default 0;
-
-    /**
      * 默认排序字段
      */
     String sortBy() default "";

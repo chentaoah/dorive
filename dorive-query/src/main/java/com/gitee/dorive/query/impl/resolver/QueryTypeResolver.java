@@ -132,7 +132,7 @@ public class QueryTypeResolver {
             CommonRepository repository = mergedRepository.getExecutedRepository();
             Assert.isTrue(repository.hasField(field),
                     "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",
-                    queryField.getField(), repository.getEntityEle().getElement(), field);
+                    queryField.getField(), repository.getEntityElement().getGenericType(), field);
 
             mergedRepositorySet.add(mergedRepository);
         }

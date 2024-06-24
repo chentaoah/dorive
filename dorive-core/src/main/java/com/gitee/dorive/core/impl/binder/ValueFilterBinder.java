@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.binder;
 
 import cn.hutool.core.convert.Convert;
 import com.gitee.dorive.api.def.BindingDef;
-import com.gitee.dorive.api.entity.PropChain;
+import com.gitee.dorive.api.impl.PropChain;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
 import lombok.Getter;
@@ -33,7 +33,7 @@ public class ValueFilterBinder extends FieldBinder {
 
     public ValueFilterBinder(BindingDef bindingDef, Processor processor, PropChain fieldPropChain, String alias) {
         super(bindingDef, processor, fieldPropChain, alias);
-        Class<?> genericType = fieldPropChain.getEntityField().getGenericType();
+        Class<?> genericType = fieldPropChain.getFieldElement().getGenericType();
         this.value = Convert.convert(genericType, bindingDef.getValue());
     }
 

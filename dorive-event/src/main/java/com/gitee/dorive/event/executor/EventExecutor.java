@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.event.executor;
 
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.operation.Operation;
@@ -32,12 +32,12 @@ import org.springframework.context.ApplicationContext;
 public class EventExecutor extends AbstractProxyExecutor {
 
     private ApplicationContext applicationContext;
-    private EntityEle entityEle;
+    private EntityElement entityElement;
 
-    public EventExecutor(Executor executor, ApplicationContext applicationContext, EntityEle entityEle) {
+    public EventExecutor(Executor executor, ApplicationContext applicationContext, EntityElement entityElement) {
         super(executor);
         this.applicationContext = applicationContext;
-        this.entityEle = entityEle;
+        this.entityElement = entityElement;
     }
 
     @Override

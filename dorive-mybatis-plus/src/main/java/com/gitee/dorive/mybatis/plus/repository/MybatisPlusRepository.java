@@ -25,7 +25,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.api.api.ImplFactory;
 import com.gitee.dorive.api.def.EntityDef;
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
@@ -70,7 +70,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
     }
 
     @Override
-    protected EntityStoreInfo resolveEntityStoreInfo(EntityDef entityDef, EntityEle entityEle) {
+    protected EntityStoreInfo resolveEntityStoreInfo(EntityDef entityDef, EntityElement entityElement) {
         Class<?> mapperClass = entityDef.getSource();
         Object mapper = null;
         Class<?> pojoClass = null;
@@ -123,8 +123,8 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
     }
 
     @Override
-    protected Executor newExecutor(EntityDef entityDef, EntityEle entityEle, EntityStoreInfo entityStoreInfo) {
-        Executor executor = new MybatisPlusExecutor(entityDef, entityEle, entityStoreInfo);
+    protected Executor newExecutor(EntityDef entityDef, EntityElement entityElement, EntityStoreInfo entityStoreInfo) {
+        Executor executor = new MybatisPlusExecutor(entityDef, entityElement, entityStoreInfo);
         return new UnionExecutor(executor, sqlRunner, entityStoreInfo);
     }
 

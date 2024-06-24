@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.executor;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Pair;
-import com.gitee.dorive.api.entity.PropChain;
+import com.gitee.dorive.api.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.executor.Result;
@@ -135,8 +135,8 @@ public class ContextExecutor extends AbstractExecutor {
                 }
                 List<?> rootEntities = insert.getEntities();
                 for (Object rootEntity : rootEntities) {
-                    PropChain anchorPoint = repository.getAnchorPoint();
-                    Object targetEntity = anchorPoint.getValue(rootEntity);
+                    EntityElement entityElement = repository.getEntityElement();
+                    Object targetEntity = entityElement.getValue(rootEntity);
                     if (targetEntity == null) {
                         continue;
                     }
@@ -176,8 +176,8 @@ public class ContextExecutor extends AbstractExecutor {
                 }
                 List<?> rootEntities = entityOp.getEntities();
                 for (Object rootEntity : rootEntities) {
-                    PropChain anchorPoint = repository.getAnchorPoint();
-                    Object targetEntity = anchorPoint.getValue(rootEntity);
+                    EntityElement entityElement = repository.getEntityElement();
+                    Object targetEntity = entityElement.getValue(rootEntity);
                     if (targetEntity == null) {
                         continue;
                     }
@@ -211,8 +211,8 @@ public class ContextExecutor extends AbstractExecutor {
                 }
                 List<?> rootEntities = insertOrUpdate.getEntities();
                 for (Object rootEntity : rootEntities) {
-                    PropChain anchorPoint = repository.getAnchorPoint();
-                    Object targetEntity = anchorPoint.getValue(rootEntity);
+                    EntityElement entityElement = repository.getEntityElement();
+                    Object targetEntity = entityElement.getValue(rootEntity);
                     if (targetEntity == null) {
                         continue;
                     }

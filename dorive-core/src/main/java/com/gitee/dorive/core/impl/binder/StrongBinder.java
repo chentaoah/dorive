@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.binder;
 
 import com.gitee.dorive.api.def.BindingDef;
-import com.gitee.dorive.api.entity.PropChain;
+import com.gitee.dorive.api.impl.PropChain;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
 import lombok.Getter;
@@ -55,7 +55,7 @@ public class StrongBinder extends FieldBinder {
     }
 
     public boolean isCollection() {
-        return boundBinder.getBoundPropChain().getEntityField().isCollection();
+        return boundBinder.getBoundPropChain().getFieldElement().isCollection();
     }
 
 }
