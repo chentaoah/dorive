@@ -47,14 +47,14 @@ public @interface Entity {
     Class<?> factory() default Object.class;
 
     /**
-     * 是否聚合
-     */
-    boolean aggregate() default false;
-
-    /**
      * 指定仓储
      */
     Class<?> repository() default Object.class;
+
+    /**
+     * 是否聚合
+     */
+    boolean aggregate() default false;
 
 }
 

@@ -36,8 +36,8 @@ public class EntityDef {
     private String name;
     private Class<?> source;
     private Class<?> factory;
-    private boolean aggregate;
     private Class<?> repository;
+    private boolean aggregate;
 
     public static EntityDef fromElement(AnnotatedElement element) {
         Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Entity.class);
