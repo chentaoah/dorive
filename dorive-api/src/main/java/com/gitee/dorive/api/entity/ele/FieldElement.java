@@ -37,8 +37,9 @@ public class FieldElement {
     }
 
     public boolean isSameType(FieldElement fieldElement) {
-        return fieldDefinition.getTypeName().equals(fieldElement.getFieldDefinition().getTypeName())
-                && fieldDefinition.getGenericTypeName().equals(fieldElement.getFieldDefinition().getGenericTypeName());
+        FieldDefinition targetFieldDefinition = fieldElement.getFieldDefinition();
+        return fieldDefinition.getTypeName().equals(targetFieldDefinition.getTypeName())
+                && fieldDefinition.getGenericTypeName().equals(targetFieldDefinition.getGenericTypeName());
     }
 
 }

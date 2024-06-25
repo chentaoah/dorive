@@ -224,9 +224,8 @@ public class BinderResolver {
         belongRepository.setBoundEntity(true);
         EntityElement entityElement = belongRepository.getEntityElement();
 
-        if (bindExp.startsWith("./")) {
-            bindExp = StrUtil.removePrefix(bindExp, "./");
-            bindExp = "#root." + bindExp;
+        if (bindExp.startsWith("/")) {
+            bindExp = "#root" + StrUtil.replace(bindExp, "/", ".");
         }
         PropProxy propProxy = SpELPropProxy.newPropProxy(bindExp);
         PropChain boundPropChain = new PropChain(entityElement.getFieldElement(bindField), propProxy);
