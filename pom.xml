@@ -32,7 +32,6 @@
         <module>dorive-inject</module>
         <module>dorive-env</module>
         <module>dorive-web</module>
-        <module>dorive-proxy</module>
         <module>dorive-api</module>
         <module>dorive-core</module>
         <module>dorive-event</module>
@@ -82,11 +81,6 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>5.8.25</version>
-            </dependency>
-            <dependency>
-                <groupId>org.javassist</groupId>
-                <artifactId>javassist</artifactId>
-                <version>3.29.2-GA</version>
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
