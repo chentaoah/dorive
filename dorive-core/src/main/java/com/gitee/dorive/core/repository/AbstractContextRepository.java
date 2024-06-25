@@ -183,7 +183,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
             EntityMapperResolver entityMapperResolver = new EntityMapperResolver(entityElement, entityStoreInfo);
             EntityMapper entityMapper = entityMapperResolver.newEntityMapper();
-            EntityFactory entityFactory = newEntityFactory(entityDef, entityElement, entityStoreInfo, entityMapper);
+            EntityFactory entityFactory = newEntityFactory(entityElement, entityStoreInfo, entityMapper);
 
             Executor executor = newExecutor(entityElement, entityStoreInfo);
             executor = new FactoryExecutor(executor, entityElement, entityStoreInfo, entityFactory);
@@ -194,7 +194,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return (AbstractRepository<Object, Object>) repository;
     }
 
-    private EntityFactory newEntityFactory(EntityDef entityDef, EntityElement entityElement, EntityStoreInfo entityStoreInfo, EntityMapper entityMapper) {
+    private EntityFactory newEntityFactory(EntityElement entityElement, EntityStoreInfo entityStoreInfo, EntityMapper entityMapper) {
+        EntityDef entityDef = entityElement.getEntityDef();
         Class<?> factoryClass = entityDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
