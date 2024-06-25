@@ -32,10 +32,7 @@ import com.gitee.dorive.api.entity.FieldEntityDefinition;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class EntityElementResolver {
@@ -112,7 +109,17 @@ public class EntityElementResolver {
             fieldAliasMapping.put(fieldName, alias);
         }
 
-        return new EntityElement(entityDefinition, accessPath, entityDef, bindingDefs, orderDef, genericType, fieldElements, fieldAliasMapping);
+        EntityElement entityElement = new EntityElement();
+        entityElement.setEntityDefinition(entityDefinition);
+        entityElement.setAccessPath(accessPath);
+        entityElement.setEntityDef(entityDef);
+        entityElement.setBindingDefs(bindingDefs);
+        entityElement.setOrderDef(orderDef);
+        entityElement.setGenericType(genericType);
+        entityElement.setFieldElements(fieldElements);
+        entityElement.setFieldAliasMapping(fieldAliasMapping);
+        entityElement.setAttributes(new HashMap<>(4));
+        return entityElement;
     }
 
 }

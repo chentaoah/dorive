@@ -21,12 +21,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.InnerExample;
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Page;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.repository.AbstractContextRepository;
+import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.entity.enums.ResultType;
@@ -63,7 +58,8 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         Example example = queryContext.getExample();
 
         EntityElement entityElement = repository.getEntityElement();
-        EntityStoreInfo entityStoreInfo = AbstractContextRepository.getEntityStoreInfo(entityElement);
+        Map<String, Object> attributes = entityElement.getAttributes();
+        EntityStoreInfo entityStoreInfo = (EntityStoreInfo) attributes.get(EntityStoreInfo.class.getName());
         String idColumn = entityStoreInfo.getIdColumn();
 
         OrderBy orderBy = example.getOrderBy();

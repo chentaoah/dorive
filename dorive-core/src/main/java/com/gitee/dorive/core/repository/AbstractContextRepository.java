@@ -20,10 +20,10 @@ package com.gitee.dorive.core.repository;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.constant.Order;
+import com.gitee.dorive.api.entity.EntityDefinition;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.def.OrderDef;
 import com.gitee.dorive.api.entity.ele.EntityElement;
-import com.gitee.dorive.api.entity.EntityDefinition;
 import com.gitee.dorive.api.impl.EntityDefinitionReader;
 import com.gitee.dorive.api.impl.EntityElementResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
@@ -55,31 +55,17 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Setter
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, InitializingBean {
 
-    private static final Map<EntityElement, EntityStoreInfo> ENTITY_STORE_INFO_MAP = new ConcurrentHashMap<>();
-    private static final Map<EntityElement, ExampleExecutor> EXAMPLE_EXECUTOR_MAP = new ConcurrentHashMap<>();
-
     private ApplicationContext applicationContext;
-
     private DerivedResolver derivedResolver;
-
     private Map<String, CommonRepository> repositoryMap = new LinkedHashMap<>();
     private CommonRepository rootRepository;
     private List<CommonRepository> subRepositories = new ArrayList<>();
     private List<CommonRepository> orderedRepositories = new ArrayList<>();
-
-    public static EntityStoreInfo getEntityStoreInfo(EntityElement entityElement) {
-        return ENTITY_STORE_INFO_MAP.get(entityElement);
-    }
-
-    public static ExampleExecutor getExampleExecutor(EntityElement entityElement) {
-        return EXAMPLE_EXECUTOR_MAP.get(entityElement);
-    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -178,8 +164,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultRepository.setEntityElement(entityElement);
             defaultRepository.setOperationFactory(operationFactory);
 
+            Map<String, Object> attributes = entityElement.getAttributes();
+
             EntityStoreInfo entityStoreInfo = resolveEntityStoreInfo(entityElement);
-            ENTITY_STORE_INFO_MAP.put(entityElement, entityStoreInfo);
+            attributes.put(EntityStoreInfo.class.getName(), entityStoreInfo);
 
             EntityMapperResolver entityMapperResolver = new EntityMapperResolver(entityElement, entityStoreInfo);
             EntityMapper entityMapper = entityMapperResolver.newEntityMapper();
@@ -188,7 +176,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             Executor executor = newExecutor(entityElement, entityStoreInfo);
             executor = new FactoryExecutor(executor, entityElement, entityStoreInfo, entityFactory);
             executor = new ExampleExecutor(executor, entityElement, entityMapper);
-            EXAMPLE_EXECUTOR_MAP.put(entityElement, (ExampleExecutor) executor);
+            attributes.put(ExampleExecutor.class.getName(), executor);
             defaultRepository.setExecutor(executor);
         }
         return (AbstractRepository<Object, Object>) repository;

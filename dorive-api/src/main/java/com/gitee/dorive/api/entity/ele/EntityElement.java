@@ -26,12 +26,14 @@ import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.def.OrderDef;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class EntityElement implements PropProxy {
 
@@ -43,6 +45,7 @@ public class EntityElement implements PropProxy {
     private Class<?> genericType;
     private List<FieldElement> fieldElements;
     private Map<String, String> fieldAliasMapping;
+    private Map<String, Object> attributes;
 
     public String getPrimaryKey() {
         return entityDefinition.getPrimaryKey();
