@@ -24,15 +24,14 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.annotation.Binding;
 import com.gitee.dorive.api.annotation.Entity;
 import com.gitee.dorive.api.annotation.Order;
-import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.api.entity.BindingDefinition;
 import com.gitee.dorive.api.entity.EntityDefinition;
 import com.gitee.dorive.api.entity.FieldDefinition;
 import com.gitee.dorive.api.entity.FieldEntityDefinition;
+import com.gitee.dorive.api.util.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.AnnotationUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -65,7 +64,7 @@ public class EntityDefinitionReader {
     }
 
     private EntityDefinition doRead(Class<?> type) {
-        Entity entity = AnnotationUtils.getAnnotation(type, Entity.class);
+        Entity entity = AnnotatedElementUtils.getMergedAnnotation(type, Entity.class);
         Assert.notNull(entity, "The @Entity does not exist!");
         assert entity != null;
         String name = entity.name();
@@ -96,7 +95,7 @@ public class EntityDefinitionReader {
         }
         for (Field field : fieldMap.values()) {
             if (!Modifier.isStatic(field.getModifiers())) {
-                Entity entity = AnnotationUtils.getAnnotation(field, Entity.class);
+                Entity entity = AnnotatedElementUtils.getMergedAnnotation(field, Entity.class);
                 if (entity == null) {
                     FieldDefinition fieldDefinition = readField(field);
                     if (fieldDefinition.isPrimary()) {
@@ -116,7 +115,7 @@ public class EntityDefinitionReader {
     }
 
     private FieldDefinition readField(Field field) {
-        com.gitee.dorive.api.annotation.Field fieldAnnotation = AnnotationUtils.getAnnotation(field, com.gitee.dorive.api.annotation.Field.class);
+        com.gitee.dorive.api.annotation.Field fieldAnnotation = AnnotatedElementUtils.getMergedAnnotation(field, com.gitee.dorive.api.annotation.Field.class);
         Class<?> type = field.getType();
         boolean collection = false;
         Class<?> genericType = field.getType();
@@ -157,7 +156,7 @@ public class EntityDefinitionReader {
 
     private FieldEntityDefinition readFieldEntity(Entity entity, Field field) {
         boolean aggregate = entity.aggregate();
-        Order order = AnnotationUtils.getAnnotation(field, Order.class);
+        Order order = AnnotatedElementUtils.getMergedAnnotation(field, Order.class);
         Class<?> type = field.getType();
         boolean collection = false;
         Class<?> genericType = field.getType();
