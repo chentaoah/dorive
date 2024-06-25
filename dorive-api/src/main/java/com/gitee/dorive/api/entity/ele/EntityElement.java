@@ -20,16 +20,18 @@ package com.gitee.dorive.api.entity.ele;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.api.api.PropProxy;
+import com.gitee.dorive.api.entity.EntityDefinition;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.def.OrderDef;
-import com.gitee.dorive.api.entity.EntityDefinition;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 public class EntityElement implements PropProxy {
 
