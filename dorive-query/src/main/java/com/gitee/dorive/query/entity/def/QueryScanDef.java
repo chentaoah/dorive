@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.query.entity.def;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.query.annotation.QueryScan;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,7 +24,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.AnnotatedElement;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -37,8 +35,15 @@ public class QueryScanDef {
     private Class<?>[] queries;
 
     public static QueryScanDef fromElement(AnnotatedElement element) {
-        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, QueryScan.class);
-        return attributes != null ? BeanUtil.copyProperties(attributes, QueryScanDef.class) : null;
+        QueryScan queryScan = AnnotatedElementUtils.getMergedAnnotation(element, QueryScan.class);
+        if (queryScan != null) {
+            QueryScanDef queryScanDef = new QueryScanDef();
+            queryScanDef.setValue(queryScan.value());
+            queryScanDef.setRegex(queryScan.regex());
+            queryScanDef.setQueries(queryScan.queries());
+            return queryScanDef;
+        }
+        return null;
     }
 
 }

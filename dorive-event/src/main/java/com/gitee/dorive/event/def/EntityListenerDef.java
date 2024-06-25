@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.event.def;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.event.annotation.EntityListener;
 import com.gitee.dorive.event.enums.OperationType;
 import lombok.AllArgsConstructor;
@@ -26,7 +25,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.AnnotatedElement;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -39,8 +37,16 @@ public class EntityListenerDef {
     private Class<? extends Throwable>[] rollbackFor;
 
     public static EntityListenerDef fromElement(AnnotatedElement element) {
-        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, EntityListener.class);
-        return attributes != null ? BeanUtil.copyProperties(attributes, EntityListenerDef.class) : null;
+        EntityListener entityListener = AnnotatedElementUtils.getMergedAnnotation(element, EntityListener.class);
+        if (entityListener != null) {
+            EntityListenerDef entityListenerDef = new EntityListenerDef();
+            entityListenerDef.setValue(entityListener.value());
+            entityListenerDef.setSubscribeTo(entityListener.subscribeTo());
+            entityListenerDef.setAfterCommit(entityListener.afterCommit());
+            entityListenerDef.setRollbackFor(entityListener.rollbackFor());
+            return entityListenerDef;
+        }
+        return null;
     }
 
 }
