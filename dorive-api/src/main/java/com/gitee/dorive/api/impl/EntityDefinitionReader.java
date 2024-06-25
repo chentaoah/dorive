@@ -125,7 +125,7 @@ public class EntityDefinitionReader {
 
         FieldDefinition fieldDefinition = new FieldDefinition();
         if (fieldAnnotation != null) {
-            fieldDefinition.setPrimary(fieldAnnotation.id());
+            fieldDefinition.setPrimary(fieldAnnotation.primary());
             fieldDefinition.setAlias(fieldAnnotation.alias());
             fieldDefinition.setValueObj(fieldAnnotation.valueObj());
             fieldDefinition.setMapExp(fieldAnnotation.mapExp());

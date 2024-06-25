@@ -19,12 +19,12 @@ package com.gitee.dorive.api.impl;
 
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.api.def.BindingDef;
-import com.gitee.dorive.api.def.EntityDef;
-import com.gitee.dorive.api.def.FieldDef;
-import com.gitee.dorive.api.def.OrderDef;
-import com.gitee.dorive.api.ele.EntityElement;
-import com.gitee.dorive.api.ele.FieldElement;
+import com.gitee.dorive.api.entity.def.BindingDef;
+import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.def.FieldDef;
+import com.gitee.dorive.api.entity.def.OrderDef;
+import com.gitee.dorive.api.entity.ele.EntityElement;
+import com.gitee.dorive.api.entity.ele.FieldElement;
 import com.gitee.dorive.api.entity.BindingDefinition;
 import com.gitee.dorive.api.entity.EntityDefinition;
 import com.gitee.dorive.api.entity.FieldDefinition;
@@ -40,21 +40,21 @@ import java.util.Map;
 @Slf4j
 public class EntityElementResolver {
 
-    public Map<String, EntityElement> resolve(EntityDefinition entityDefinition) {
-        Map<String, EntityElement> entityElementMap = new LinkedHashMap<>();
+    public List<EntityElement> resolve(EntityDefinition entityDefinition) {
+        List<EntityElement> entityElements = new ArrayList<>();
 
         String accessPath = "/";
         EntityElement entityElement = resolveElement(accessPath, entityDefinition);
-        entityElementMap.put(accessPath, entityElement);
+        entityElements.add(entityElement);
 
         List<FieldEntityDefinition> fieldEntityDefinitions = entityDefinition.getFieldEntityDefinitions();
         for (FieldEntityDefinition fieldEntityDefinition : fieldEntityDefinitions) {
             String fieldAccessPath = "/" + fieldEntityDefinition.getFieldName();
             EntityElement fieldEntityElement = resolveElement(fieldAccessPath, fieldEntityDefinition);
-            entityElementMap.put(fieldAccessPath, fieldEntityElement);
+            entityElements.add(fieldEntityElement);
         }
 
-        return entityElementMap;
+        return entityElements;
     }
 
     private EntityElement resolveElement(String accessPath, EntityDefinition entityDefinition) {
@@ -92,7 +92,7 @@ public class EntityElementResolver {
             fieldElement.setFieldDefinition(fieldDefinition);
 
             FieldDef fieldDef = new FieldDef();
-            fieldDef.setId(fieldDefinition.isPrimary());
+            fieldDef.setPrimary(fieldDefinition.isPrimary());
             fieldDef.setAlias(fieldDefinition.getAlias());
             fieldDef.setValueObj(fieldDefinition.isValueObj());
             fieldDef.setMapExp(fieldDefinition.getMapExp());

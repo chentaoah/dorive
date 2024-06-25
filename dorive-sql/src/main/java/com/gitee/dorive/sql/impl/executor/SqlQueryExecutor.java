@@ -18,7 +18,7 @@
 package com.gitee.dorive.sql.impl.executor;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.api.ele.EntityElement;
+import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;

@@ -24,8 +24,8 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.api.api.ImplFactory;
-import com.gitee.dorive.api.def.EntityDef;
-import com.gitee.dorive.api.ele.EntityElement;
+import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
@@ -70,7 +70,8 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
     }
 
     @Override
-    protected EntityStoreInfo resolveEntityStoreInfo(EntityDef entityDef, EntityElement entityElement) {
+    protected EntityStoreInfo resolveEntityStoreInfo(EntityElement entityElement) {
+        EntityDef entityDef = entityElement.getEntityDef();
         Class<?> mapperClass = entityDef.getSource();
         Object mapper = null;
         Class<?> pojoClass = null;
@@ -118,13 +119,12 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         List<String> columns = new ArrayList<>(propAliasMapping.values());
         String selectColumns = StrUtil.join(",", columns);
 
-        return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn,
-                propAliasMappingWithoutPk, propAliasMapping, aliasPropMapping, selectColumns);
+        return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn, propAliasMappingWithoutPk, propAliasMapping, aliasPropMapping, selectColumns);
     }
 
     @Override
-    protected Executor newExecutor(EntityDef entityDef, EntityElement entityElement, EntityStoreInfo entityStoreInfo) {
-        Executor executor = new MybatisPlusExecutor(entityDef, entityElement, entityStoreInfo);
+    protected Executor newExecutor(EntityElement entityElement, EntityStoreInfo entityStoreInfo) {
+        Executor executor = new MybatisPlusExecutor(entityElement.getEntityDef(), entityElement, entityStoreInfo);
         return new UnionExecutor(executor, sqlRunner, entityStoreInfo);
     }
 

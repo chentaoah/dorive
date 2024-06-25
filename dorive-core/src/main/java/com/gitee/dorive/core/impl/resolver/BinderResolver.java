@@ -17,16 +17,15 @@
 
 package com.gitee.dorive.core.impl.resolver;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.api.PropProxy;
-import com.gitee.dorive.api.def.BindingDef;
-import com.gitee.dorive.api.def.EntityDef;
-import com.gitee.dorive.api.ele.EntityElement;
+import com.gitee.dorive.api.entity.def.BindingDef;
+import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.api.impl.PropChain;
 import com.gitee.dorive.api.impl.SpELPropProxy;
 import com.gitee.dorive.core.api.binder.Binder;
@@ -62,15 +61,15 @@ public class BinderResolver {
     private List<String> selfFields;
     private JoinType joinType;
 
-    public BinderResolver(AbstractContextRepository<?, ?> repository, EntityElement entityElement) {
+    public BinderResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
     }
 
     public void resolve(String accessPath, EntityElement entityElement) {
-        Class<?> genericType = entityElement.getGenericType();
-        String primaryKey = entityElement.getPrimaryKey();
         EntityDef entityDef = entityElement.getEntityDef();
         List<BindingDef> bindingDefs = entityElement.getBindingDefs();
+        Class<?> genericType = entityElement.getGenericType();
+        String primaryKey = entityElement.getPrimaryKey();
 
         this.allBinders = new ArrayList<>(bindingDefs.size());
         this.strongBinders = new ArrayList<>(bindingDefs.size());
@@ -85,7 +84,7 @@ public class BinderResolver {
 
         for (BindingDef bindingDef : bindingDefs) {
             BindingType bindingType = determineBindingType(bindingDef);
-            bindingDef = renewBindingDef(accessPath, bindingDef);
+            resetBindingDef(accessPath, bindingDef);
             Processor processor = newProcessor(bindingDef);
 
             if (bindingType == BindingType.VALUE_ROUTE) {
@@ -165,8 +164,7 @@ public class BinderResolver {
         throw new RuntimeException("Unknown binding type!");
     }
 
-    private BindingDef renewBindingDef(String accessPath, BindingDef bindingDef) {
-        bindingDef = BeanUtil.copyProperties(bindingDef, BindingDef.class);
+    private void resetBindingDef(String accessPath, BindingDef bindingDef) {
         String field = StrUtil.trim(bindingDef.getField());
         String value = StrUtil.trim(bindingDef.getValue());
         String bindExp = StrUtil.trim(bindingDef.getBindExp());
@@ -193,7 +191,6 @@ public class BinderResolver {
         bindingDef.setProcessExp(processExp);
         bindingDef.setProcessor(processor);
         bindingDef.setBindField(bindField);
-        return bindingDef;
     }
 
     private Processor newProcessor(BindingDef bindingDef) {
@@ -225,7 +222,6 @@ public class BinderResolver {
         CommonRepository belongRepository = repositoryMap.get(belongAccessPath);
         Assert.notNull(belongRepository, "The belong repository cannot be null! bindExp: {}", bindExp);
         belongRepository.setBoundEntity(true);
-
         EntityElement entityElement = belongRepository.getEntityElement();
 
         if (bindExp.startsWith("./")) {

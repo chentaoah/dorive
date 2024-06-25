@@ -15,20 +15,30 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.def;
+package com.gitee.dorive.api.entity.ele;
 
-import lombok.AllArgsConstructor;
+import com.gitee.dorive.api.entity.def.FieldDef;
+import com.gitee.dorive.api.entity.FieldDefinition;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class BindingDef {
-    private String field;
-    private String value;
-    private String bindExp;
-    private String processExp;
-    private Class<?> processor;
-    private String bindField;
+public class FieldElement {
+
+    private FieldDefinition fieldDefinition;
+    private FieldDef fieldDef;
+    private Class<?> genericType;
+
+    public boolean isCollection() {
+        return fieldDefinition.isCollection();
+    }
+
+    public String getFieldName() {
+        return fieldDefinition.getFieldName();
+    }
+
+    public boolean isSameType(FieldElement fieldElement) {
+        return fieldDefinition.getTypeName().equals(fieldElement.getFieldDefinition().getTypeName())
+                && fieldDefinition.getGenericTypeName().equals(fieldElement.getFieldDefinition().getGenericTypeName());
+    }
+
 }

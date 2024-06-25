@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.ele;
+package com.gitee.dorive.api.entity.ele;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.api.api.PropProxy;
-import com.gitee.dorive.api.def.BindingDef;
-import com.gitee.dorive.api.def.EntityDef;
-import com.gitee.dorive.api.def.OrderDef;
+import com.gitee.dorive.api.entity.def.BindingDef;
+import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.def.OrderDef;
 import com.gitee.dorive.api.entity.EntityDefinition;
 import lombok.AllArgsConstructor;
 import lombok.Data;

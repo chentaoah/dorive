@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.def;
+package com.gitee.dorive.api.entity.def;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,11 +24,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EntityDef {
-    private String name;
-    private Class<?> source;
-    private Class<?> factory;
-    private Class<?> repository;
-    private int priority;
-    private boolean aggregate;
+public class BindingDef {
+    private String field;
+    private String value;
+    private String bindExp;
+    private String processExp;
+    private Class<?> processor;
+    private String bindField;
 }

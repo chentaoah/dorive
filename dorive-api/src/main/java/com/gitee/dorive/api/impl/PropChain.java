@@ -18,7 +18,7 @@
 package com.gitee.dorive.api.impl;
 
 import com.gitee.dorive.api.api.PropProxy;
-import com.gitee.dorive.api.ele.FieldElement;
+import com.gitee.dorive.api.entity.ele.FieldElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

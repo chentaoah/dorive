@@ -54,7 +54,7 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
     private Matcher matcher;
 
     public String getName() {
-        return getEntityDef().getName();
+        return getEntityElement().getEntityDef().getName();
     }
 
     public boolean isCollection() {

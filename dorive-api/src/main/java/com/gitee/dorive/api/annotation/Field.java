@@ -36,7 +36,7 @@ public @interface Field {
     /**
      * 是否主键
      */
-    boolean id() default false;
+    boolean primary() default false;
 
     /**
      * 别名

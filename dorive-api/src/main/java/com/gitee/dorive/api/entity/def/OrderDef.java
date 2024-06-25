@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.def;
+package com.gitee.dorive.api.entity.def;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,10 +24,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FieldDef {
-    private boolean id;
-    private String alias;
-    private boolean valueObj;
-    private String mapExp;
-    private Class<?> converter;
+public class OrderDef {
+    private String sortBy;
+    private String order;
 }

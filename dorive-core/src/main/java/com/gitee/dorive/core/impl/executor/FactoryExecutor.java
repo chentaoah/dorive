@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.executor;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.api.ele.EntityElement;
+import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;

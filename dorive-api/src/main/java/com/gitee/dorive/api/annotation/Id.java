@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
 public @interface Id {
 
     @AliasFor(annotation = Field.class)
-    boolean id() default true;
+    boolean primary() default true;
 
     @AliasFor(annotation = Field.class)
     String value() default "id";
