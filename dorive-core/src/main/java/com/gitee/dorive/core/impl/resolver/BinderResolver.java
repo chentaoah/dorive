@@ -26,6 +26,7 @@ import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.ele.EntityElement;
+import com.gitee.dorive.api.entity.ele.FieldElement;
 import com.gitee.dorive.api.impl.PropChain;
 import com.gitee.dorive.api.impl.SpELPropProxy;
 import com.gitee.dorive.core.api.binder.Binder;
@@ -222,16 +223,20 @@ public class BinderResolver {
         CommonRepository belongRepository = repositoryMap.get(belongAccessPath);
         Assert.notNull(belongRepository, "The belong repository cannot be null! bindExp: {}", bindExp);
         belongRepository.setBoundEntity(true);
-        EntityElement entityElement = belongRepository.getEntityElement();
 
+        CommonRepository rootRepository = repository.getRootRepository();
+        EntityElement entityElement = rootRepository.getEntityElement();
+        String field = PathUtils.getLastName(bindExp);
+        FieldElement fieldElement = entityElement.getFieldElement(field);
         if (bindExp.startsWith("/")) {
             bindExp = "#entity" + StrUtil.replace(bindExp, "/", ".");
         }
         PropProxy propProxy = SpELPropProxy.newPropProxy(bindExp);
-        PropChain boundPropChain = new PropChain(entityElement.getFieldElement(bindField), propProxy);
+        PropChain boundPropChain = new PropChain(fieldElement, propProxy);
         Assert.notNull(boundPropChain, "The bound property chain cannot be null! bindExp: {}", bindExp);
 
-        String bindAlias = entityElement.toAlias(bindField);
+        EntityElement belongEntityElement = belongRepository.getEntityElement();
+        String bindAlias = belongEntityElement.toAlias(bindField);
 
         boundBinder.setBelongAccessPath(belongAccessPath);
         boundBinder.setBelongRepository(belongRepository);

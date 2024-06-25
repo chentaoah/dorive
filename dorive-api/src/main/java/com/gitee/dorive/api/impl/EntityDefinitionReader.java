@@ -95,14 +95,15 @@ public class EntityDefinitionReader {
         }
         for (Field field : fieldMap.values()) {
             if (!Modifier.isStatic(field.getModifiers())) {
+                // 所有字段
+                FieldDefinition fieldDefinition = readField(field);
+                if (fieldDefinition.isPrimary()) {
+                    entityDefinition.setPrimaryKey(fieldDefinition.getFieldName());
+                }
+                fieldDefinitions.add(fieldDefinition);
+                // 实体字段
                 Entity entity = AnnotatedElementUtils.getMergedAnnotation(field, Entity.class);
-                if (entity == null) {
-                    FieldDefinition fieldDefinition = readField(field);
-                    if (fieldDefinition.isPrimary()) {
-                        entityDefinition.setPrimaryKey(fieldDefinition.getFieldName());
-                    }
-                    fieldDefinitions.add(fieldDefinition);
-                } else {
+                if (entity != null) {
                     FieldEntityDefinition fieldEntityDefinition = readFieldEntity(entity, field);
                     if (fieldEntityDefinition != null) {
                         fieldEntityDefinitions.add(fieldEntityDefinition);

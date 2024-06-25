@@ -107,14 +107,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
             orderedRepositories.add(repository);
         }
-
         orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityElement().getEntityDef().getPriority()));
 
         setEntityElement(rootRepository.getEntityElement());
         setOperationFactory(rootRepository.getOperationFactory());
 
         derivedResolver = new DerivedResolver(this);
-
         EntityHandler entityHandler = processEntityHandler(new BatchEntityHandler(this));
         Executor executor = new ContextExecutor(this, entityHandler);
         setExecutor(executor);
