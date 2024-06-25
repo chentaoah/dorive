@@ -25,10 +25,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 排序注解<br>
- * wiki：https://gitee.com/digital-engine/dorive/wikis/pages
- *
- * @author tao.chen
+ * 排序
  */
 @Inherited
 @Documented

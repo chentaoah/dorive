@@ -22,10 +22,7 @@ import org.springframework.core.annotation.AliasFor;
 import java.lang.annotation.*;
 
 /**
- * 字段注解<br>
- * wiki：https://gitee.com/digital-engine/dorive/wikis/pages
- *
- * @author tao.chen
+ * 字段
  */
 @Inherited
 @Documented

@@ -19,6 +19,9 @@ package com.gitee.dorive.api.annotation;
 
 import java.lang.annotation.*;
 
+/**
+ * 绑定
+ */
 @Inherited
 @Documented
 @Target(ElementType.FIELD)

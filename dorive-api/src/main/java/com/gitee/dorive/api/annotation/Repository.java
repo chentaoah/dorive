@@ -22,6 +22,9 @@ import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
 
+/**
+ * 仓储
+ */
 @Component
 @Inherited
 @Documented

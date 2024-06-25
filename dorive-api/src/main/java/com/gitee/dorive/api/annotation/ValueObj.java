@@ -26,6 +26,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * 值对象
+ */
 @Field
 @Inherited
 @Documented
