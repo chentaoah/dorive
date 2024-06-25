@@ -27,7 +27,7 @@ import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.api.entity.ele.FieldElement;
-import com.gitee.dorive.api.impl.PropChain;
+import com.gitee.dorive.api.entity.ele.PropChain;
 import com.gitee.dorive.api.impl.SpELPropProxy;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.binder.Processor;
