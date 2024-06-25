@@ -98,7 +98,7 @@ public class BinderResolver {
             String field = bindingDef.getField();
             String alias = entityElement.toAlias(field);
 
-            PropProxy propProxy = SpELPropProxy.newPropProxy("#root." + field);
+            PropProxy propProxy = SpELPropProxy.newPropProxy("#entity." + field);
             PropChain fieldPropChain = new PropChain(entityElement.getFieldElement(field), propProxy);
             Assert.notNull(fieldPropChain, fieldErrorMsg, genericType.getName(), field);
 
@@ -225,7 +225,7 @@ public class BinderResolver {
         EntityElement entityElement = belongRepository.getEntityElement();
 
         if (bindExp.startsWith("/")) {
-            bindExp = "#root" + StrUtil.replace(bindExp, "/", ".");
+            bindExp = "#entity" + StrUtil.replace(bindExp, "/", ".");
         }
         PropProxy propProxy = SpELPropProxy.newPropProxy(bindExp);
         PropChain boundPropChain = new PropChain(entityElement.getFieldElement(bindField), propProxy);

@@ -40,14 +40,14 @@ public class SpELPropProxy implements PropProxy {
     @Override
     public Object getValue(Object entity) {
         EvaluationContext context = new StandardEvaluationContext();
-        context.setVariable("root", entity);
-        return expression.getValue(context);
+        context.setVariable("entity", entity);
+        return expression.getValue(context, Object.class);
     }
 
     @Override
     public void setValue(Object entity, Object value) {
         EvaluationContext context = new StandardEvaluationContext();
-        context.setVariable("root", entity);
+        context.setVariable("entity", entity);
         expression.setValue(context, value);
     }
 
