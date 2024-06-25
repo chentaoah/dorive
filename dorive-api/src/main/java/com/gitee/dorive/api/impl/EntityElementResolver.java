@@ -43,14 +43,13 @@ public class EntityElementResolver {
     public List<EntityElement> resolve(EntityDefinition entityDefinition) {
         List<EntityElement> entityElements = new ArrayList<>();
 
-        String accessPath = "/";
-        EntityElement entityElement = resolveElement(accessPath, entityDefinition);
+        EntityElement entityElement = resolveElement("/", entityDefinition);
         entityElements.add(entityElement);
 
         List<FieldEntityDefinition> fieldEntityDefinitions = entityDefinition.getFieldEntityDefinitions();
         for (FieldEntityDefinition fieldEntityDefinition : fieldEntityDefinitions) {
-            String fieldAccessPath = "/" + fieldEntityDefinition.getFieldName();
-            EntityElement fieldEntityElement = resolveElement(fieldAccessPath, fieldEntityDefinition);
+            String fieldName = fieldEntityDefinition.getFieldName();
+            EntityElement fieldEntityElement = resolveElement("/" + fieldName, fieldEntityDefinition);
             entityElements.add(fieldEntityElement);
         }
 
@@ -58,8 +57,6 @@ public class EntityElementResolver {
     }
 
     private EntityElement resolveElement(String accessPath, EntityDefinition entityDefinition) {
-        Class<?> genericType = ClassUtil.loadClass(entityDefinition.getGenericTypeName());
-
         EntityDef entityDef = new EntityDef();
         entityDef.setName(entityDefinition.getName());
         entityDef.setSource(ClassUtil.loadClass(entityDefinition.getSourceName()));
@@ -85,6 +82,8 @@ public class EntityElementResolver {
         orderDef.setSortBy(entityDefinition.getSortBy());
         orderDef.setOrder(entityDefinition.getOrder());
 
+        Class<?> genericType = ClassUtil.loadClass(entityDefinition.getGenericTypeName());
+
         List<FieldDefinition> fieldDefinitions = entityDefinition.getFieldDefinitions();
         List<FieldElement> fieldElements = new ArrayList<>(fieldDefinitions.size());
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
@@ -105,8 +104,8 @@ public class EntityElementResolver {
 
         Map<String, String> fieldAliasMapping = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
-            String alias = fieldDefinition.getAlias();
             String fieldName = fieldDefinition.getFieldName();
+            String alias = fieldDefinition.getAlias();
             if (StringUtils.isBlank(alias)) {
                 alias = StrUtil.toUnderlineCase(fieldName);
             }
