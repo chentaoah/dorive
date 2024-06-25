@@ -89,7 +89,12 @@ public class EntityDefinitionReader {
         List<FieldDefinition> fieldDefinitions = new ArrayList<>();
         List<FieldEntityDefinition> fieldEntityDefinitions = new ArrayList<>();
         List<Field> fields = ReflectUtils.getAllFields(type);
+        // 去重
+        Map<String, Field> fieldMap = new LinkedHashMap<>();
         for (Field field : fields) {
+            fieldMap.put(field.getName(), field);
+        }
+        for (Field field : fieldMap.values()) {
             if (!Modifier.isStatic(field.getModifiers())) {
                 Entity entity = AnnotationUtils.getAnnotation(field, Entity.class);
                 if (entity == null) {

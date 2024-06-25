@@ -61,7 +61,6 @@ public class RefInjector {
     @SuppressWarnings("unchecked")
     private Ref<Object> newRefImpl() {
         RefImpl refImpl = new RefImpl((AbstractRefRepository<Object, Object>) repository, entityHandler);
-        refImpl.setEntityDef(repository.getEntityDef());
         refImpl.setEntityElement(repository.getEntityElement());
         refImpl.setOperationFactory(repository.getOperationFactory());
         refImpl.setExecutor(repository.getExecutor());

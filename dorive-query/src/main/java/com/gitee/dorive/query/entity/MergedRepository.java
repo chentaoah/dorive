@@ -41,7 +41,7 @@ public class MergedRepository {
     private Integer order;
 
     public String getName() {
-        return definedRepository.getEntityDef().getName();
+        return definedRepository.getEntityElement().getEntityDef().getName();
     }
 
 }
