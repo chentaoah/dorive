@@ -145,6 +145,9 @@ public class EntityDefinitionReader {
         if ("id".equals(fieldName)) {
             fieldDefinition.setPrimary(true);
         }
+        if (StringUtils.isBlank(fieldDefinition.getAlias())) {
+            fieldDefinition.setAlias(StrUtil.toUnderlineCase(fieldName));
+        }
         fieldDefinition.setTypeName(type.getName());
         fieldDefinition.setCollection(collection);
         fieldDefinition.setGenericTypeName(genericType.getName());
