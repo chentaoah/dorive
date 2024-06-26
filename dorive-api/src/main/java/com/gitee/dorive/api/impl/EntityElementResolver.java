@@ -91,7 +91,7 @@ public class EntityElementResolver {
             fieldDef.setPrimary(fieldDefinition.isPrimary());
             fieldDef.setAlias(fieldDefinition.getAlias());
             fieldDef.setValueObj(fieldDefinition.isValueObj());
-            fieldDef.setMapExp(fieldDefinition.getMapExp());
+            fieldDef.setExpression(fieldDefinition.getExpression());
             fieldDef.setConverter(ClassUtil.loadClass(fieldDefinition.getConverterName()));
             fieldElement.setFieldDef(fieldDef);
 

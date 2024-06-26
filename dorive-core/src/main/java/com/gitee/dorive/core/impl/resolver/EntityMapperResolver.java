@@ -114,7 +114,7 @@ public class EntityMapperResolver {
                     return new MapConverter(genericType);
                 }
 
-            } else if (StringUtils.isNotBlank(fieldDef.getMapExp())) {
+            } else if (StringUtils.isNotBlank(fieldDef.getExpression())) {
                 return new MapExpConverter(fieldElement);
             }
         }

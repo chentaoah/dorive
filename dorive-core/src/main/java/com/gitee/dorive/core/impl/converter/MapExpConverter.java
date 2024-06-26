@@ -42,11 +42,11 @@ public class MapExpConverter implements Converter {
         this.fieldElement = fieldElement;
         FieldDef fieldDef = fieldElement.getFieldDef();
         Class<?> genericType = fieldElement.getGenericType();
-        String mapExp = fieldDef.getMapExp();
-        if (StringUtils.isNotBlank(mapExp)) {
+        String expression = fieldDef.getExpression();
+        if (StringUtils.isNotBlank(expression)) {
             this.reMapping = new LinkedHashMap<>(8);
             this.deMapping = new LinkedHashMap<>(8);
-            List<String> items = StrUtil.splitTrim(mapExp, ",");
+            List<String> items = StrUtil.splitTrim(expression, ",");
             for (String item : items) {
                 if (StringUtils.isNotBlank(item)) {
                     List<String> valueValuePair = StrUtil.splitTrim(item, "=");

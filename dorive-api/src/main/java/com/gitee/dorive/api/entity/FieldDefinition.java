@@ -24,7 +24,7 @@ public class FieldDefinition {
     private boolean primary;
     private String alias;
     private boolean valueObj;
-    private String mapExp;
+    private String expression;
     private String converterName;
     private String typeName;
     private boolean collection;

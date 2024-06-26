@@ -28,6 +28,6 @@ public class FieldDef {
     private boolean primary;
     private String alias;
     private boolean valueObj;
-    private String mapExp;
+    private String expression;
     private Class<?> converter;
 }

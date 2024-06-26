@@ -55,7 +55,7 @@ public @interface Field {
     /**
      * 映射表达式
      */
-    String mapExp() default "";
+    String expression() default "";
 
     /**
      * 指定转换器

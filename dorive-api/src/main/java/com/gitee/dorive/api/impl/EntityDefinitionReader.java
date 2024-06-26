@@ -133,13 +133,13 @@ public class EntityDefinitionReader {
             fieldDefinition.setPrimary(fieldAnnotation.primary());
             fieldDefinition.setAlias(fieldAnnotation.alias());
             fieldDefinition.setValueObj(fieldAnnotation.valueObj());
-            fieldDefinition.setMapExp(fieldAnnotation.mapExp());
+            fieldDefinition.setExpression(fieldAnnotation.expression());
             fieldDefinition.setConverterName(fieldAnnotation.converter().getName());
         } else {
             fieldDefinition.setPrimary(false);
             fieldDefinition.setAlias(StrUtil.toUnderlineCase(fieldName));
             fieldDefinition.setValueObj(false);
-            fieldDefinition.setMapExp("");
+            fieldDefinition.setExpression("");
             fieldDefinition.setConverterName(Object.class.getName());
         }
         if ("id".equals(fieldName)) {
