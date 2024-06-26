@@ -61,11 +61,11 @@ import java.util.*;
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, InitializingBean {
 
     private ApplicationContext applicationContext;
-    private DerivedResolver derivedResolver;
     private Map<String, CommonRepository> repositoryMap = new LinkedHashMap<>();
     private CommonRepository rootRepository;
     private List<CommonRepository> subRepositories = new ArrayList<>();
     private List<CommonRepository> orderedRepositories = new ArrayList<>();
+    private DerivedResolver derivedResolver;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

@@ -61,10 +61,6 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
         return getEntityElement().isCollection();
     }
 
-    public Object getPrimaryKey(Object entity) {
-        return getEntityElement().getPrimaryKey(entity);
-    }
-
     public boolean hasField(String field) {
         return getEntityElement().hasField(field);
     }

@@ -47,10 +47,6 @@ public class EntityElement implements PropProxy {
     private Map<String, String> fieldAliasMapping;
     private Map<String, Object> attributes;
 
-    public String getPrimaryKey() {
-        return entityDefinition.getPrimaryKey();
-    }
-
     public boolean isCollection() {
         return entityDefinition.isCollection();
     }
@@ -63,6 +59,10 @@ public class EntityElement implements PropProxy {
     @Override
     public void setValue(Object entity, Object value) {
         ReflectUtil.setFieldValue(entity, entityDefinition.getFieldName(), value);
+    }
+
+    public String getPrimaryKey() {
+        return entityDefinition.getPrimaryKey();
     }
 
     public Object getPrimaryKey(Object entity) {
