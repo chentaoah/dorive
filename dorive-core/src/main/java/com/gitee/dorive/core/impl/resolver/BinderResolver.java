@@ -148,15 +148,15 @@ public class BinderResolver {
     private BindingType determineBindingType(BindingDef bindingDef) {
         String field = StrUtil.trim(bindingDef.getField());
         String value = StrUtil.trim(bindingDef.getValue());
-        String bindExp = StrUtil.trim(bindingDef.getBindExp());
+        String bind = StrUtil.trim(bindingDef.getBind());
         String processExp = StrUtil.trim(bindingDef.getProcessExp());
-        if (ObjectUtil.isAllNotEmpty(field, bindExp)) {
+        if (ObjectUtil.isAllNotEmpty(field, bind)) {
             return BindingType.STRONG;
 
         } else if (ObjectUtil.isAllNotEmpty(field, processExp)) {
             return BindingType.WEAK;
 
-        } else if (ObjectUtil.isAllNotEmpty(value, bindExp)) {
+        } else if (ObjectUtil.isAllNotEmpty(value, bind)) {
             return BindingType.VALUE_ROUTE;
 
         } else if (ObjectUtil.isAllNotEmpty(field, value)) {
@@ -168,23 +168,23 @@ public class BinderResolver {
     private void resetBindingDef(BindingDef bindingDef) {
         String field = StrUtil.trim(bindingDef.getField());
         String value = StrUtil.trim(bindingDef.getValue());
-        String bindExp = StrUtil.trim(bindingDef.getBindExp());
+        String bind = StrUtil.trim(bindingDef.getBind());
         String processExp = StrUtil.trim(bindingDef.getProcessExp());
         Class<?> processor = bindingDef.getProcessor();
         String bindField = StrUtil.trim(bindingDef.getBindField());
 
         // 兼容以往版本
-        if (bindExp.startsWith("/")) {
-            bindExp = StrUtil.removePrefix(bindExp, "/");
+        if (bind.startsWith("/")) {
+            bind = StrUtil.removePrefix(bind, "/");
         }
-        if (bindExp.startsWith("./")) {
-            bindExp = StrUtil.removePrefix(bindExp, "./");
+        if (bind.startsWith("./")) {
+            bind = StrUtil.removePrefix(bind, "./");
         }
-        if (StringUtils.isNotBlank(bindExp) && StringUtils.isNotBlank(processExp)) {
+        if (StringUtils.isNotBlank(bind) && StringUtils.isNotBlank(processExp)) {
             Assert.notEmpty(bindField, "The bindField of @Binding cannot be empty!");
         }
-        if (StringUtils.isNotBlank(bindExp) && StringUtils.isBlank(bindField)) {
-            bindField = bindExp;
+        if (StringUtils.isNotBlank(bind) && StringUtils.isBlank(bindField)) {
+            bindField = bind;
         }
         if (StringUtils.isNotBlank(processExp) && processor == Object.class) {
             processor = SpELProcessor.class;
@@ -192,7 +192,7 @@ public class BinderResolver {
 
         bindingDef.setField(field);
         bindingDef.setValue(value);
-        bindingDef.setBindExp(bindExp);
+        bindingDef.setBind(bind);
         bindingDef.setProcessExp(processExp);
         bindingDef.setProcessor(processor);
         bindingDef.setBindField(bindField);
@@ -219,18 +219,18 @@ public class BinderResolver {
     }
 
     private void initBoundBinder(BindingDef bindingDef, BoundBinder boundBinder) {
-        String bindExp = bindingDef.getBindExp();
+        String bind = bindingDef.getBind();
         String bindField = bindingDef.getBindField();
 
         CommonRepository rootRepository = repository.getRootRepository();
         EntityElement entityElement = rootRepository.getEntityElement();
-        FieldElement fieldElement = entityElement.getFieldElement(bindExp);
-        PropProxy propProxy = SpELPropProxy.newPropProxy("#entity." + bindExp);
+        FieldElement fieldElement = entityElement.getFieldElement(bind);
+        PropProxy propProxy = SpELPropProxy.newPropProxy("#entity." + bind);
         PropChain boundPropChain = new PropChain(fieldElement, propProxy);
-        Assert.notNull(boundPropChain, "The bound property chain cannot be null! bindExp: {}", bindExp);
+        Assert.notNull(boundPropChain, "The bound property chain cannot be null! bind: {}", bind);
 
         Map<String, CommonRepository> repositoryMap = repository.getRepositoryMap();
-        CommonRepository belongRepository = repositoryMap.getOrDefault("/" + bindExp, rootRepository);
+        CommonRepository belongRepository = repositoryMap.getOrDefault("/" + bind, rootRepository);
         belongRepository.setBound(true);
         EntityElement belongEntityElement = belongRepository.getEntityElement();
         String bindAlias = belongEntityElement.toAlias(bindField);

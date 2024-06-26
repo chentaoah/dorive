@@ -209,7 +209,7 @@ public class EntityDefinitionReader {
             BindingDefinition bindingDefinition = new BindingDefinition();
             bindingDefinition.setField(binding.field());
             bindingDefinition.setValue(binding.value());
-            bindingDefinition.setBindExp(binding.bindExp());
+            bindingDefinition.setBind(binding.bind());
             bindingDefinition.setProcessExp(binding.processExp());
             bindingDefinition.setProcessorName(binding.processor().getName());
             bindingDefinition.setBindField(binding.bindField());

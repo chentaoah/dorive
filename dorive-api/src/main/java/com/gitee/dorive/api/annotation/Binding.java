@@ -42,12 +42,10 @@ public @interface Binding {
     /**
      * 绑定表达式
      */
-    String bindExp() default "";
+    String bind() default "";
 
     /**
      * 加工表达式
-     *
-     * @see org.springframework.expression
      */
     String processExp() default "";
 

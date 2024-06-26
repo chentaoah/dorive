@@ -68,7 +68,7 @@ public class EntityElementResolver {
             BindingDef bindingDef = new BindingDef();
             bindingDef.setField(bindingDefinition.getField());
             bindingDef.setValue(bindingDefinition.getValue());
-            bindingDef.setBindExp(bindingDefinition.getBindExp());
+            bindingDef.setBind(bindingDefinition.getBind());
             bindingDef.setProcessExp(bindingDefinition.getProcessExp());
             bindingDef.setProcessor(ClassUtil.loadClass(bindingDefinition.getProcessorName()));
             bindingDef.setBindField(bindingDefinition.getBindField());

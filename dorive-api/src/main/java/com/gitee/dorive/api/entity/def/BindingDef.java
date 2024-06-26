@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 public class BindingDef {
     private String field;
     private String value;
-    private String bindExp;
+    private String bind;
     private String processExp;
     private Class<?> processor;
     private String bindField;
