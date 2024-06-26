@@ -58,12 +58,18 @@ public @interface Aggregate {
      * @see Entity
      */
     @AliasFor(annotation = Entity.class)
-    boolean aggregate() default true;
+    Class<?> repository() default Object.class;
+
+    /**
+     * 操作优先级
+     */
+    @AliasFor(annotation = Entity.class)
+    int priority() default 0;
 
     /**
      * @see Entity
      */
     @AliasFor(annotation = Entity.class)
-    Class<?> repository() default Object.class;
+    boolean aggregate() default true;
 
 }
