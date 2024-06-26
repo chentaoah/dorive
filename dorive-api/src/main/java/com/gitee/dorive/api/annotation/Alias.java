@@ -36,6 +36,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Alias {
 
+    /**
+     * @see Field
+     */
     @AliasFor(annotation = Field.class)
     String value() default "";
 

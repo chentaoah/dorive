@@ -34,12 +34,12 @@ import java.lang.annotation.Target;
 public @interface Order {
 
     /**
-     * 默认排序字段
+     * 排序字段
      */
     String sortBy() default "";
 
     /**
-     * 默认排序方式
+     * 排序方式
      */
     String order() default "";
 

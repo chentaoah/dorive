@@ -54,9 +54,9 @@ public @interface Entity {
     int priority() default 0;
 
     /**
-     * 是否聚合
+     * 是否自动发现
      */
-    boolean aggregate() default false;
+    boolean discovery() default false;
 
 }
 

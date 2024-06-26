@@ -36,12 +36,21 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValueObj {
 
+    /**
+     * @see Field
+     */
     @AliasFor(annotation = Field.class)
     String value() default "";
 
+    /**
+     * @see Field
+     */
     @AliasFor(annotation = Field.class)
     boolean valueObj() default true;
 
+    /**
+     * @see Field
+     */
     @AliasFor(annotation = Field.class)
     Class<?> converter() default Object.class;
 

@@ -61,7 +61,7 @@ public @interface Aggregate {
     Class<?> repository() default Object.class;
 
     /**
-     * 操作优先级
+     * @see Entity
      */
     @AliasFor(annotation = Entity.class)
     int priority() default 0;
@@ -70,6 +70,6 @@ public @interface Aggregate {
      * @see Entity
      */
     @AliasFor(annotation = Entity.class)
-    boolean aggregate() default true;
+    boolean discovery() default true;
 
 }

@@ -36,9 +36,15 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Id {
 
+    /**
+     * @see Field
+     */
     @AliasFor(annotation = Field.class)
     boolean primary() default true;
 
+    /**
+     * @see Field
+     */
     @AliasFor(annotation = Field.class)
     String value() default "id";
 

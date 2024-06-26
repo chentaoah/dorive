@@ -34,7 +34,7 @@ public class EntityDefinition {
     private List<FieldDefinition> fieldDefinitions;
     private List<FieldEntityDefinition> fieldEntityDefinitions;
 
-    public boolean isAggregate() {
+    public boolean isDiscovery() {
         return false;
     }
 
