@@ -40,7 +40,7 @@ public @interface Binding {
     String value() default "";
 
     /**
-     * 绑定的字段
+     * 绑定的上下文字段
      */
     String bind() default "";
 
@@ -55,7 +55,7 @@ public @interface Binding {
     Class<?> processor() default Object.class;
 
     /**
-     * 绑定的字段名称
+     * 绑定的真实字段
      */
     String bindField() default "";
 
