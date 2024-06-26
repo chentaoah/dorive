@@ -40,8 +40,6 @@ public @interface Order {
 
     /**
      * 默认排序方式
-     *
-     * @see com.gitee.dorive.api.constant.Order
      */
     String order() default "";
 
