@@ -50,7 +50,7 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
     private boolean aggregated;
     private OrderBy defaultOrderBy;
     private BinderResolver binderResolver;
-    private boolean boundEntity;
+    private boolean bound;
     private Matcher matcher;
 
     public String getName() {

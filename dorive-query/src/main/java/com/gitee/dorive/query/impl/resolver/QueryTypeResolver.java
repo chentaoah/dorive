@@ -139,7 +139,7 @@ public class QueryTypeResolver {
 
         for (MergedRepository mergedRepository : mergedRepositoryMap.values()) {
             CommonRepository repository = mergedRepository.getExecutedRepository();
-            if (repository.isBoundEntity()) {
+            if (repository.isBound()) {
                 mergedRepositorySet.add(mergedRepository);
             }
         }

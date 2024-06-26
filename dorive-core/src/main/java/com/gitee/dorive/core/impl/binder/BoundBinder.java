@@ -33,9 +33,9 @@ public class BoundBinder implements Binder {
 
     protected BindingDef bindingDef;
     protected Processor processor;
+    protected PropChain boundPropChain;
     protected String belongAccessPath;
     protected CommonRepository belongRepository;
-    protected PropChain boundPropChain;
     protected String bindAlias;
 
     public BoundBinder(BindingDef bindingDef, Processor processor) {

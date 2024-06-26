@@ -134,7 +134,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         repository.setDefaultOrderBy(defaultOrderBy);
 
         repository.setBinderResolver(binderResolver);
-        repository.setBoundEntity(false);
+        repository.setBound(false);
         repository.setMatcher(new SelectTypeMatcher(repository));
         return repository;
     }

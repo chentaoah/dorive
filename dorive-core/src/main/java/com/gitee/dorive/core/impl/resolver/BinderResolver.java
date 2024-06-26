@@ -39,7 +39,6 @@ import com.gitee.dorive.core.impl.binder.*;
 import com.gitee.dorive.core.impl.processor.SpELProcessor;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.core.util.PathUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
@@ -85,7 +84,7 @@ public class BinderResolver {
 
         for (BindingDef bindingDef : bindingDefs) {
             BindingType bindingType = determineBindingType(bindingDef);
-            resetBindingDef(accessPath, bindingDef);
+            resetBindingDef(bindingDef);
             Processor processor = newProcessor(bindingDef);
 
             if (bindingType == BindingType.VALUE_ROUTE) {
@@ -99,8 +98,9 @@ public class BinderResolver {
             String field = bindingDef.getField();
             String alias = entityElement.toAlias(field);
 
+            FieldElement fieldElement = entityElement.getFieldElement(field);
             PropProxy propProxy = SpELPropProxy.newPropProxy("#entity." + field);
-            PropChain fieldPropChain = new PropChain(entityElement.getFieldElement(field), propProxy);
+            PropChain fieldPropChain = new PropChain(fieldElement, propProxy);
             Assert.notNull(fieldPropChain, fieldErrorMsg, genericType.getName(), field);
 
             if (bindingType == BindingType.STRONG) {
@@ -165,7 +165,7 @@ public class BinderResolver {
         throw new RuntimeException("Unknown binding type!");
     }
 
-    private void resetBindingDef(String accessPath, BindingDef bindingDef) {
+    private void resetBindingDef(BindingDef bindingDef) {
         String field = StrUtil.trim(bindingDef.getField());
         String value = StrUtil.trim(bindingDef.getValue());
         String bindExp = StrUtil.trim(bindingDef.getBindExp());
@@ -173,14 +173,18 @@ public class BinderResolver {
         Class<?> processor = bindingDef.getProcessor();
         String bindField = StrUtil.trim(bindingDef.getBindField());
 
-        if (bindExp.startsWith(".")) {
-            bindExp = PathUtils.getAbsolutePath(accessPath, bindExp);
+        // 兼容以往版本
+        if (bindExp.startsWith("/")) {
+            bindExp = StrUtil.removePrefix(bindExp, "/");
         }
-        if (StringUtils.isNotBlank(bindExp)) {
-            if (StringUtils.isBlank(processExp) && StringUtils.isBlank(bindField)) {
-                bindField = PathUtils.getLastName(bindExp);
-            }
+        if (bindExp.startsWith("./")) {
+            bindExp = StrUtil.removePrefix(bindExp, "./");
+        }
+        if (StringUtils.isNotBlank(bindExp) && StringUtils.isNotBlank(processExp)) {
             Assert.notEmpty(bindField, "The bindField of @Binding cannot be empty!");
+        }
+        if (StringUtils.isNotBlank(bindExp) && StringUtils.isBlank(bindField)) {
+            bindField = bindExp;
         }
         if (StringUtils.isNotBlank(processExp) && processor == Object.class) {
             processor = SpELProcessor.class;
@@ -218,29 +222,22 @@ public class BinderResolver {
         String bindExp = bindingDef.getBindExp();
         String bindField = bindingDef.getBindField();
 
-        Map<String, CommonRepository> repositoryMap = repository.getRepositoryMap();
-        String belongAccessPath = PathUtils.getBelongPath(repositoryMap.keySet(), bindExp);
-        CommonRepository belongRepository = repositoryMap.get(belongAccessPath);
-        Assert.notNull(belongRepository, "The belong repository cannot be null! bindExp: {}", bindExp);
-        belongRepository.setBoundEntity(true);
-
         CommonRepository rootRepository = repository.getRootRepository();
         EntityElement entityElement = rootRepository.getEntityElement();
-        String field = PathUtils.getLastName(bindExp);
-        FieldElement fieldElement = entityElement.getFieldElement(field);
-        if (bindExp.startsWith("/")) {
-            bindExp = "#entity" + StrUtil.replace(bindExp, "/", ".");
-        }
-        PropProxy propProxy = SpELPropProxy.newPropProxy(bindExp);
+        FieldElement fieldElement = entityElement.getFieldElement(bindExp);
+        PropProxy propProxy = SpELPropProxy.newPropProxy("#entity." + bindExp);
         PropChain boundPropChain = new PropChain(fieldElement, propProxy);
         Assert.notNull(boundPropChain, "The bound property chain cannot be null! bindExp: {}", bindExp);
 
+        Map<String, CommonRepository> repositoryMap = repository.getRepositoryMap();
+        CommonRepository belongRepository = repositoryMap.getOrDefault("/" + bindExp, rootRepository);
+        belongRepository.setBound(true);
         EntityElement belongEntityElement = belongRepository.getEntityElement();
         String bindAlias = belongEntityElement.toAlias(bindField);
 
-        boundBinder.setBelongAccessPath(belongAccessPath);
-        boundBinder.setBelongRepository(belongRepository);
         boundBinder.setBoundPropChain(boundPropChain);
+        boundBinder.setBelongAccessPath(belongRepository.getAccessPath());
+        boundBinder.setBelongRepository(belongRepository);
         boundBinder.setBindAlias(bindAlias);
     }
 
