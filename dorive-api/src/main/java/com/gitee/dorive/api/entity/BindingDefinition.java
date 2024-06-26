@@ -24,7 +24,7 @@ public class BindingDefinition {
     private String field;
     private String value;
     private String bind;
-    private String processExp;
+    private String expression;
     private String processorName;
     private String bindField;
 }

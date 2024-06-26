@@ -28,7 +28,7 @@ public class BindingDef {
     private String field;
     private String value;
     private String bind;
-    private String processExp;
+    private String expression;
     private Class<?> processor;
     private String bindField;
 }

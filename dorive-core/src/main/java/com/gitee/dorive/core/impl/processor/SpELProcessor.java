@@ -32,7 +32,7 @@ public class SpELProcessor implements Processor {
 
     public SpELProcessor(BindingDef bindingDef) {
         ExpressionParser parser = new SpelExpressionParser();
-        this.expression = parser.parseExpression(bindingDef.getProcessExp());
+        this.expression = parser.parseExpression(bindingDef.getExpression());
     }
 
     @Override

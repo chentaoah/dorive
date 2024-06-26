@@ -149,11 +149,11 @@ public class BinderResolver {
         String field = StrUtil.trim(bindingDef.getField());
         String value = StrUtil.trim(bindingDef.getValue());
         String bind = StrUtil.trim(bindingDef.getBind());
-        String processExp = StrUtil.trim(bindingDef.getProcessExp());
+        String expression = StrUtil.trim(bindingDef.getExpression());
         if (ObjectUtil.isAllNotEmpty(field, bind)) {
             return BindingType.STRONG;
 
-        } else if (ObjectUtil.isAllNotEmpty(field, processExp)) {
+        } else if (ObjectUtil.isAllNotEmpty(field, expression)) {
             return BindingType.WEAK;
 
         } else if (ObjectUtil.isAllNotEmpty(value, bind)) {
@@ -169,7 +169,7 @@ public class BinderResolver {
         String field = StrUtil.trim(bindingDef.getField());
         String value = StrUtil.trim(bindingDef.getValue());
         String bind = StrUtil.trim(bindingDef.getBind());
-        String processExp = StrUtil.trim(bindingDef.getProcessExp());
+        String expression = StrUtil.trim(bindingDef.getExpression());
         Class<?> processor = bindingDef.getProcessor();
         String bindField = StrUtil.trim(bindingDef.getBindField());
 
@@ -180,20 +180,20 @@ public class BinderResolver {
         if (bind.startsWith("./")) {
             bind = StrUtil.removePrefix(bind, "./");
         }
-        if (StringUtils.isNotBlank(bind) && StringUtils.isNotBlank(processExp)) {
+        if (StringUtils.isNotBlank(bind) && StringUtils.isNotBlank(expression)) {
             Assert.notEmpty(bindField, "The bindField of @Binding cannot be empty!");
         }
         if (StringUtils.isNotBlank(bind) && StringUtils.isBlank(bindField)) {
             bindField = bind;
         }
-        if (StringUtils.isNotBlank(processExp) && processor == Object.class) {
+        if (StringUtils.isNotBlank(expression) && processor == Object.class) {
             processor = SpELProcessor.class;
         }
 
         bindingDef.setField(field);
         bindingDef.setValue(value);
         bindingDef.setBind(bind);
-        bindingDef.setProcessExp(processExp);
+        bindingDef.setExpression(expression);
         bindingDef.setProcessor(processor);
         bindingDef.setBindField(bindField);
     }

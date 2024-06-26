@@ -40,14 +40,14 @@ public @interface Binding {
     String value() default "";
 
     /**
-     * 绑定表达式
+     * 绑定的字段
      */
     String bind() default "";
 
     /**
      * 加工表达式
      */
-    String processExp() default "";
+    String expression() default "";
 
     /**
      * 指定加工器
