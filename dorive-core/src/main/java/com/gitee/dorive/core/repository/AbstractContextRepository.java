@@ -121,7 +121,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         OrderBy defaultOrderBy = newDefaultOrderBy(orderDef);
 
         BinderResolver binderResolver = new BinderResolver(this);
-        binderResolver.resolve(accessPath, entityElement);
+        binderResolver.resolve(entityElement);
 
         CommonRepository repository = new CommonRepository();
         repository.setEntityElement(entityElement);

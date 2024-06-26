@@ -65,7 +65,7 @@ public class BinderResolver {
         this.repository = repository;
     }
 
-    public void resolve(String accessPath, EntityElement entityElement) {
+    public void resolve(EntityElement entityElement) {
         EntityDef entityDef = entityElement.getEntityDef();
         List<BindingDef> bindingDefs = entityElement.getBindingDefs();
         Class<?> genericType = entityElement.getGenericType();
