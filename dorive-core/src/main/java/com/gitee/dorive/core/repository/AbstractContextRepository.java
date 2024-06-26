@@ -86,7 +86,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             String accessPath = entityElement.getAccessPath();
             CommonRepository repository = newRepository(entityElement);
             repositoryMap.put(accessPath, repository);
-            if ("/".equals(accessPath)) {
+            if (repository.isRoot()) {
                 rootRepository = repository;
             } else {
                 subRepositories.add(repository);
