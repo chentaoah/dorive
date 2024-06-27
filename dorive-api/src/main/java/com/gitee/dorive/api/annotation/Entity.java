@@ -56,7 +56,7 @@ public @interface Entity {
     /**
      * 是否自动发现
      */
-    boolean discovery() default false;
+    boolean autoDiscovery() default false;
 
 }
 

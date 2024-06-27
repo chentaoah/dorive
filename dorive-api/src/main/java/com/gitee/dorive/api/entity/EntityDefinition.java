@@ -34,7 +34,7 @@ public class EntityDefinition {
     private List<FieldDefinition> fieldDefinitions;
     private List<FieldEntityDefinition> fieldEntityDefinitions;
 
-    public boolean isDiscovery() {
+    public boolean isAutoDiscovery() {
         return false;
     }
 

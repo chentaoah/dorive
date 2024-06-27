@@ -30,5 +30,5 @@ public class EntityDef {
     private Class<?> factory;
     private Class<?> repository;
     private int priority;
-    private boolean discovery;
+    private boolean autoDiscovery;
 }

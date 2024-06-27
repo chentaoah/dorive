@@ -25,7 +25,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class FieldEntityDefinition extends EntityDefinition {
-    private boolean discovery;
+    private boolean autoDiscovery;
     private List<BindingDefinition> bindingDefinitions;
     private String sortBy;
     private String order;

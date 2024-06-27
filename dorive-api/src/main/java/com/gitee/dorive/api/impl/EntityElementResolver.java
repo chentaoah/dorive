@@ -60,7 +60,7 @@ public class EntityElementResolver {
         entityDef.setFactory(ClassUtil.loadClass(entityDefinition.getFactoryName()));
         entityDef.setRepository(ClassUtil.loadClass(entityDefinition.getRepositoryName()));
         entityDef.setPriority(entityDefinition.getPriority());
-        entityDef.setDiscovery(entityDefinition.isDiscovery());
+        entityDef.setAutoDiscovery(entityDefinition.isAutoDiscovery());
 
         List<BindingDefinition> bindingDefinitions = entityDefinition.getBindingDefinitions();
         List<BindingDef> bindingDefs = new ArrayList<>(bindingDefinitions.size());

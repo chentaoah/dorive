@@ -156,7 +156,7 @@ public class EntityDefinitionReader {
     }
 
     private FieldEntityDefinition readFieldEntity(Entity entity, Field field) {
-        boolean discovery = entity.discovery();
+        boolean autoDiscovery = entity.autoDiscovery();
         Order order = AnnotatedElementUtils.getMergedAnnotation(field, Order.class);
         Class<?> type = field.getType();
         boolean collection = false;
@@ -175,7 +175,7 @@ public class EntityDefinitionReader {
         }
         FieldEntityDefinition fieldEntityDefinition = BeanUtil.copyProperties(entityDefinition, FieldEntityDefinition.class);
 
-        fieldEntityDefinition.setDiscovery(discovery);
+        fieldEntityDefinition.setAutoDiscovery(autoDiscovery);
         fieldEntityDefinition.setBindingDefinitions(readBindingDefinitions(field));
         if (order != null) {
             fieldEntityDefinition.setSortBy(order.sortBy());
