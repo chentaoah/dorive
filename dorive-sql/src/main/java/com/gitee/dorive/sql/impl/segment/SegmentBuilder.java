@@ -25,7 +25,6 @@ import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
-import com.gitee.dorive.core.impl.binder.BoundBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.ValueFilterBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
@@ -125,8 +124,7 @@ public class SegmentBuilder {
 
         List<Segment> onSegments = new ArrayList<>(strongBinders.size());
         for (StrongBinder strongBinder : strongBinders) {
-            BoundBinder boundBinder = strongBinder.getBoundBinder();
-            String relativeAccessPath = lastAccessPath + boundBinder.getBelongAccessPath();
+            String relativeAccessPath = lastAccessPath + strongBinder.getBelongAccessPath();
             Node targetNode = nodeMap.get(relativeAccessPath);
             if (targetNode != null) {
                 TableSegment targetTableSegment = targetNode.getTableSegment();
@@ -134,7 +132,7 @@ public class SegmentBuilder {
                 if (!children.contains(node)) {
                     children.add(node);
                 }
-                OnSegment onSegment = new OnSegment(tableSegment.getTableAlias(), strongBinder.getAlias(), targetTableSegment.getTableAlias(), boundBinder.getBindAlias());
+                OnSegment onSegment = new OnSegment(tableSegment.getTableAlias(), strongBinder.getAlias(), targetTableSegment.getTableAlias(), strongBinder.getBindAlias());
                 onSegments.add(onSegment);
             }
         }

@@ -18,7 +18,6 @@
 package com.gitee.dorive.query.impl.resolver;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.core.impl.binder.BoundBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
@@ -97,8 +96,7 @@ public class MergedRepositoryResolver {
         List<StrongBinder> strongBinders = binderResolver.getStrongBinders();
         Map<String, List<StrongBinder>> relativeStrongBindersMap = new LinkedHashMap<>();
         for (StrongBinder strongBinder : strongBinders) {
-            BoundBinder boundBinder = strongBinder.getBoundBinder();
-            String relativeAccessPath = lastAccessPath + boundBinder.getBelongAccessPath();
+            String relativeAccessPath = lastAccessPath + strongBinder.getBelongAccessPath();
             List<StrongBinder> existBinders = relativeStrongBindersMap.computeIfAbsent(relativeAccessPath, key -> new ArrayList<>(4));
             existBinders.add(strongBinder);
         }

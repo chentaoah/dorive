@@ -17,20 +17,13 @@
 
 package com.gitee.dorive.core.api.binder;
 
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.impl.endpoint.BindEndpoint;
+import com.gitee.dorive.core.impl.endpoint.FieldEndpoint;
 
 public interface Binder extends Processor {
 
-    String getFieldName();
+    FieldEndpoint getFieldEndpoint();
 
-    Object getFieldValue(Context context, Object entity);
-
-    void setFieldValue(Context context, Object entity, Object property);
-
-    String getBoundName();
-
-    Object getBoundValue(Context context, Object rootEntity);
-
-    void setBoundValue(Context context, Object rootEntity, Object property);
+    BindEndpoint getBindEndpoint();
 
 }

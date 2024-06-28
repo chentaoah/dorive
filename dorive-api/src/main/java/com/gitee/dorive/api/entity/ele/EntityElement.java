@@ -19,7 +19,6 @@ package com.gitee.dorive.api.entity.ele;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.EntityDefinition;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
@@ -35,7 +34,7 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EntityElement implements PropProxy {
+public class EntityElement {
 
     private EntityDefinition entityDefinition;
     private String accessPath;
@@ -51,12 +50,10 @@ public class EntityElement implements PropProxy {
         return entityDefinition.isCollection();
     }
 
-    @Override
     public Object getValue(Object entity) {
         return ReflectUtil.getFieldValue(entity, entityDefinition.getFieldName());
     }
 
-    @Override
     public void setValue(Object entity, Object value) {
         ReflectUtil.setFieldValue(entity, entityDefinition.getFieldName(), value);
     }

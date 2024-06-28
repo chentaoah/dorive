@@ -15,12 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.api;
+package com.gitee.dorive.core.api.binder;
 
-public interface PropProxy {
+import com.gitee.dorive.api.entity.ele.FieldElement;
+
+public interface Endpoint {
+
+    FieldElement getFieldElement();
 
     Object getValue(Object entity);
 
     void setValue(Object entity, Object value);
+
+    boolean isSameType(Endpoint endpoint);
 
 }

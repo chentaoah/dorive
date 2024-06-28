@@ -15,26 +15,21 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.impl;
+package com.gitee.dorive.core.impl.endpoint;
 
-import com.gitee.dorive.api.api.PropProxy;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.gitee.dorive.api.entity.ele.FieldElement;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
-@Data
-@AllArgsConstructor
-public class SpELPropProxy implements PropProxy {
+public class SpELEndpoint extends AbstractEndpoint {
 
     private final Expression expression;
 
-    public static PropProxy newPropProxy(String expression) {
-        ExpressionParser parser = new SpelExpressionParser();
-        return new SpELPropProxy(parser.parseExpression(expression));
+    public SpELEndpoint(FieldElement fieldElement, String expression) {
+        super(fieldElement);
+        this.expression = new SpelExpressionParser().parseExpression(expression);
     }
 
     @Override

@@ -19,32 +19,38 @@ package com.gitee.dorive.core.impl.binder;
 
 import cn.hutool.core.convert.Convert;
 import com.gitee.dorive.api.entity.def.BindingDef;
-import com.gitee.dorive.api.entity.ele.PropChain;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.impl.endpoint.BindEndpoint;
+import com.gitee.dorive.core.impl.endpoint.FieldEndpoint;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ValueRouteBinder extends BoundBinder {
+public class ValueRouteBinder extends AbstractBinder {
 
     private Object value;
 
-    public ValueRouteBinder(BindingDef bindingDef, Processor processor) {
-        super(bindingDef, processor);
+    public ValueRouteBinder(BindingDef bindingDef, FieldEndpoint fieldEndpoint, BindEndpoint bindEndpoint, Processor processor) {
+        super(bindingDef, fieldEndpoint, bindEndpoint, processor);
+        Class<?> genericType = bindEndpoint.getFieldElement().getGenericType();
+        this.value = Convert.convert(genericType, bindingDef.getValue());
     }
 
     @Override
-    public void setBoundPropChain(PropChain boundPropChain) {
-        super.setBoundPropChain(boundPropChain);
-        Class<?> genericType = boundPropChain.getFieldElement().getGenericType();
-        this.value = Convert.convert(genericType, bindingDef.getValue());
+    public String getFieldName() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Object getFieldValue(Context context, Object entity) {
         return value;
+    }
+
+    @Override
+    public void setFieldValue(Context context, Object entity, Object value) {
+        throw new UnsupportedOperationException();
     }
 
 }

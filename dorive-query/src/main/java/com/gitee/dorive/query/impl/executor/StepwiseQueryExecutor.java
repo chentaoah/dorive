@@ -21,6 +21,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.impl.binder.AbstractBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
@@ -117,7 +118,7 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
                     for (ValueRouteBinder valueRouteBinder : valueRouteBinders) {
                         Object fieldValue = valueRouteBinder.getFieldValue(context, null);
                         if (fieldValue != null) {
-                            String boundName = valueRouteBinder.getBoundName();
+                            String boundName = valueRouteBinder.getBindField();
                             targetExample.eq(boundName, fieldValue);
                         }
                     }
@@ -136,7 +137,7 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
                         StrongBinder strongBinder = strongBinders.get(0);
                         List<Object> fieldValues = collectFieldValues(context, entities, strongBinder);
                         if (!fieldValues.isEmpty()) {
-                            String boundName = strongBinder.getBoundName();
+                            String boundName = strongBinder.getBindField();
                             if (fieldValues.size() == 1) {
                                 targetExample.eq(boundName, fieldValues.get(0));
                             } else {
@@ -147,9 +148,7 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
                         }
 
                     } else {
-                        List<String> aliases = strongBinders.stream()
-                                .map(binder -> binder.getBoundBinder().getBindAlias())
-                                .collect(Collectors.toList());
+                        List<String> aliases = strongBinders.stream().map(AbstractBinder::getBindAlias).collect(Collectors.toList());
                         MultiInBuilder builder = new MultiInBuilder(aliases, entities.size());
                         collectFieldValues(context, entities, strongBinders, builder);
                         if (!builder.isEmpty()) {

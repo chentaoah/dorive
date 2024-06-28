@@ -22,20 +22,22 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.api.api.PropProxy;
 import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.api.entity.def.EntityDef;
 import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.api.entity.ele.FieldElement;
-import com.gitee.dorive.api.entity.ele.PropChain;
-import com.gitee.dorive.api.impl.SpELPropProxy;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.enums.BindingType;
 import com.gitee.dorive.core.entity.enums.JoinType;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.impl.binder.*;
+import com.gitee.dorive.core.impl.binder.StrongBinder;
+import com.gitee.dorive.core.impl.binder.ValueFilterBinder;
+import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
+import com.gitee.dorive.core.impl.binder.WeakBinder;
+import com.gitee.dorive.core.impl.endpoint.BindEndpoint;
+import com.gitee.dorive.core.impl.endpoint.FieldEndpoint;
 import com.gitee.dorive.core.impl.processor.SpELProcessor;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
@@ -88,8 +90,8 @@ public class BinderResolver {
             Processor processor = newProcessor(bindingDef);
 
             if (bindingType == BindingType.VALUE_ROUTE) {
-                ValueRouteBinder valueRouteBinder = new ValueRouteBinder(bindingDef, processor);
-                initBoundBinder(bindingDef, valueRouteBinder);
+                BindEndpoint bindEndpoint = newBindEndpoint(bindingDef);
+                ValueRouteBinder valueRouteBinder = new ValueRouteBinder(bindingDef, null, bindEndpoint, processor);
                 allBinders.add(valueRouteBinder);
                 valueRouteBinders.add(valueRouteBinder);
                 continue;
@@ -99,18 +101,17 @@ public class BinderResolver {
             String alias = entityElement.toAlias(field);
 
             FieldElement fieldElement = entityElement.getFieldElement(field);
-            PropProxy propProxy = SpELPropProxy.newPropProxy("#entity." + field);
-            PropChain fieldPropChain = new PropChain(fieldElement, propProxy);
-            Assert.notNull(fieldPropChain, fieldErrorMsg, genericType.getName(), field);
+            Assert.notNull(fieldElement, fieldErrorMsg, genericType.getName(), field);
+            FieldEndpoint fieldEndpoint = new FieldEndpoint(fieldElement, "#entity." + field);
+            fieldEndpoint.setAlias(alias);
 
             if (bindingType == BindingType.STRONG) {
-                StrongBinder strongBinder = new StrongBinder(bindingDef, processor, fieldPropChain, alias);
-                BoundBinder boundBinder = strongBinder.getBoundBinder();
-                initBoundBinder(bindingDef, boundBinder);
+                BindEndpoint bindEndpoint = newBindEndpoint(bindingDef);
+                StrongBinder strongBinder = new StrongBinder(bindingDef, fieldEndpoint, bindEndpoint, processor);
                 allBinders.add(strongBinder);
                 strongBinders.add(strongBinder);
 
-                String belongAccessPath = boundBinder.getBelongAccessPath();
+                String belongAccessPath = bindEndpoint.getBelongAccessPath();
                 List<StrongBinder> strongBinders = mergedBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
                 strongBinders.add(strongBinder);
 
@@ -123,12 +124,12 @@ public class BinderResolver {
                 selfFields.add(field);
 
             } else if (bindingType == BindingType.WEAK) {
-                WeakBinder weakBinder = new WeakBinder(bindingDef, processor, fieldPropChain, alias);
+                WeakBinder weakBinder = new WeakBinder(bindingDef, fieldEndpoint, null, processor);
                 allBinders.add(weakBinder);
                 weakBinders.add(weakBinder);
 
             } else if (bindingType == BindingType.VALUE_FILTER) {
-                ValueFilterBinder valueFilterBinder = new ValueFilterBinder(bindingDef, processor, fieldPropChain, alias);
+                ValueFilterBinder valueFilterBinder = new ValueFilterBinder(bindingDef, fieldEndpoint, null, processor);
                 allBinders.add(valueFilterBinder);
                 valueFilterBinders.add(valueFilterBinder);
             }
@@ -218,16 +219,15 @@ public class BinderResolver {
         }
     }
 
-    private void initBoundBinder(BindingDef bindingDef, BoundBinder boundBinder) {
+    private BindEndpoint newBindEndpoint(BindingDef bindingDef) {
         String bind = bindingDef.getBind();
         String bindField = bindingDef.getBindField();
 
         CommonRepository rootRepository = repository.getRootRepository();
         EntityElement entityElement = rootRepository.getEntityElement();
         FieldElement fieldElement = entityElement.getFieldElement(bind);
-        PropProxy propProxy = SpELPropProxy.newPropProxy("#entity." + bind);
-        PropChain boundPropChain = new PropChain(fieldElement, propProxy);
-        Assert.notNull(boundPropChain, "The bound property chain cannot be null! bind: {}", bind);
+        Assert.notNull(fieldElement, "The bound property chain cannot be null! bind: {}", bind);
+        BindEndpoint bindEndpoint = new BindEndpoint(fieldElement, "#entity." + bind);
 
         Map<String, CommonRepository> repositoryMap = repository.getRepositoryMap();
         CommonRepository belongRepository = repositoryMap.getOrDefault("/" + bind, rootRepository);
@@ -235,10 +235,10 @@ public class BinderResolver {
         EntityElement belongEntityElement = belongRepository.getEntityElement();
         String bindAlias = belongEntityElement.toAlias(bindField);
 
-        boundBinder.setBoundPropChain(boundPropChain);
-        boundBinder.setBelongAccessPath(belongRepository.getAccessPath());
-        boundBinder.setBelongRepository(belongRepository);
-        boundBinder.setBindAlias(bindAlias);
+        bindEndpoint.setBelongAccessPath(belongRepository.getAccessPath());
+        bindEndpoint.setBelongRepository(belongRepository);
+        bindEndpoint.setBindAlias(bindAlias);
+        return bindEndpoint;
     }
 
     public void appendFilterValue(Context context, Example example) {
