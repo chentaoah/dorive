@@ -83,8 +83,8 @@ public class BinderResolver {
         String fieldErrorMsg = "The field configured for @Binding does not exist within the entity! type: {}, field: {}";
 
         for (BindingDef bindingDef : bindingDefs) {
-            BindingType bindingType = determineBindingType(bindingDef);
             resetBindingDef(bindingDef);
+            BindingType bindingType = determineBindingType(bindingDef);
             Processor processor = newProcessor(bindingDef);
 
             if (bindingType == BindingType.VALUE_ROUTE) {
@@ -146,10 +146,10 @@ public class BinderResolver {
     }
 
     private BindingType determineBindingType(BindingDef bindingDef) {
-        String field = StrUtil.trim(bindingDef.getField());
-        String value = StrUtil.trim(bindingDef.getValue());
-        String bind = StrUtil.trim(bindingDef.getBind());
-        String expression = StrUtil.trim(bindingDef.getExpression());
+        String field = bindingDef.getField();
+        String value = bindingDef.getValue();
+        String bind = bindingDef.getBind();
+        String expression = bindingDef.getExpression();
         if (ObjectUtil.isAllNotEmpty(field, bind)) {
             return BindingType.STRONG;
 
