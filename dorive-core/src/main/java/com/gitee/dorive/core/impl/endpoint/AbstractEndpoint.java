@@ -17,9 +17,4 @@ public abstract class AbstractEndpoint implements Endpoint {
         return fieldElement.getAlias();
     }
 
-    @Override
-    public boolean isSameType(Endpoint endpoint) {
-        return fieldElement.isSameType(endpoint.getFieldElement());
-    }
-
 }

@@ -27,6 +27,4 @@ public interface Endpoint {
 
     void setValue(Object entity, Object value);
 
-    boolean isSameType(Endpoint endpoint);
-
 }

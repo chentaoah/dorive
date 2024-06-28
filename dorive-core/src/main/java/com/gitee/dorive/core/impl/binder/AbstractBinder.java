@@ -75,7 +75,7 @@ public abstract class AbstractBinder implements Binder {
     }
 
     public boolean isSameType() {
-        return fieldEndpoint.isSameType(bindEndpoint);
+        return fieldEndpoint.getFieldElement().isSameType(bindEndpoint.getFieldElement());
     }
 
 }
