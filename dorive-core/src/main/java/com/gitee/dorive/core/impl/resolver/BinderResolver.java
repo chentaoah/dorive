@@ -32,10 +32,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.enums.BindingType;
 import com.gitee.dorive.core.entity.enums.JoinType;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.binder.ValueFilterBinder;
-import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.core.impl.binder.WeakBinder;
+import com.gitee.dorive.core.impl.binder.*;
 import com.gitee.dorive.core.impl.endpoint.BindEndpoint;
 import com.gitee.dorive.core.impl.endpoint.FieldEndpoint;
 import com.gitee.dorive.core.impl.processor.SpELProcessor;
@@ -136,7 +133,7 @@ public class BinderResolver {
 
         if (mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/")) {
             List<StrongBinder> binders = mergedBindersMap.get("/");
-            boolean hasCollection = CollUtil.findOne(binders, StrongBinder::isBindCollection) != null;
+            boolean hasCollection = CollUtil.findOne(binders, AbstractBinder::isBindCollection) != null;
             if (!hasCollection) {
                 joinType = binders.size() == 1 ? JoinType.SINGLE : JoinType.MULTI;
             }
