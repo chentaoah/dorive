@@ -30,4 +30,8 @@ public class FieldDefinition {
     private boolean collection;
     private String genericTypeName;
     private String fieldName;
+
+    public boolean isSameType(FieldDefinition fieldDefinition) {
+        return typeName.equals(fieldDefinition.getTypeName()) && genericTypeName.equals(fieldDefinition.getGenericTypeName());
+    }
 }

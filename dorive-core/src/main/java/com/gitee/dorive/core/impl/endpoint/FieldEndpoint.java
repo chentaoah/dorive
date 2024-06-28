@@ -8,8 +8,6 @@ import lombok.Setter;
 @Setter
 public class FieldEndpoint extends SpELEndpoint {
 
-    private String alias;
-
     public FieldEndpoint(FieldElement fieldElement, String expression) {
         super(fieldElement, expression);
     }

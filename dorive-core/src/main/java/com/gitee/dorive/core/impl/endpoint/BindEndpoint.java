@@ -11,7 +11,7 @@ public class BindEndpoint extends SpELEndpoint {
 
     private String belongAccessPath;
     private CommonRepository belongRepository;
-    private String bindAlias;
+    private String bindFieldAlias;
 
     public BindEndpoint(FieldElement fieldElement, String expression) {
         super(fieldElement, expression);

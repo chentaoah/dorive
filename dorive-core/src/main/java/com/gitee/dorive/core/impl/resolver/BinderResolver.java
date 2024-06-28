@@ -98,12 +98,9 @@ public class BinderResolver {
             }
 
             String field = bindingDef.getField();
-            String alias = entityElement.toAlias(field);
-
             FieldElement fieldElement = entityElement.getFieldElement(field);
             Assert.notNull(fieldElement, fieldErrorMsg, genericType.getName(), field);
             FieldEndpoint fieldEndpoint = new FieldEndpoint(fieldElement, "#entity." + field);
-            fieldEndpoint.setAlias(alias);
 
             if (bindingType == BindingType.STRONG) {
                 BindEndpoint bindEndpoint = newBindEndpoint(bindingDef);
@@ -111,7 +108,7 @@ public class BinderResolver {
                 allBinders.add(strongBinder);
                 strongBinders.add(strongBinder);
 
-                String belongAccessPath = bindEndpoint.getBelongAccessPath();
+                String belongAccessPath = strongBinder.getBelongAccessPath();
                 List<StrongBinder> strongBinders = mergedBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
                 strongBinders.add(strongBinder);
 
@@ -139,7 +136,7 @@ public class BinderResolver {
 
         if (mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/")) {
             List<StrongBinder> binders = mergedBindersMap.get("/");
-            boolean hasCollection = CollUtil.findOne(binders, StrongBinder::isCollection) != null;
+            boolean hasCollection = CollUtil.findOne(binders, StrongBinder::isBindCollection) != null;
             if (!hasCollection) {
                 joinType = binders.size() == 1 ? JoinType.SINGLE : JoinType.MULTI;
             }
@@ -233,11 +230,11 @@ public class BinderResolver {
         CommonRepository belongRepository = repositoryMap.getOrDefault("/" + bind, rootRepository);
         belongRepository.setBound(true);
         EntityElement belongEntityElement = belongRepository.getEntityElement();
-        String bindAlias = belongEntityElement.toAlias(bindField);
+        String bindFieldAlias = belongEntityElement.toAlias(bindField);
 
         bindEndpoint.setBelongAccessPath(belongRepository.getAccessPath());
         bindEndpoint.setBelongRepository(belongRepository);
-        bindEndpoint.setBindAlias(bindAlias);
+        bindEndpoint.setBindFieldAlias(bindFieldAlias);
         return bindEndpoint;
     }
 

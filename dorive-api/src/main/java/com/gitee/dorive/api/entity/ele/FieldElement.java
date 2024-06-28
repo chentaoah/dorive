@@ -28,6 +28,10 @@ public class FieldElement {
     private FieldDef fieldDef;
     private Class<?> genericType;
 
+    public String getAlias() {
+        return fieldDefinition.getAlias();
+    }
+
     public boolean isCollection() {
         return fieldDefinition.isCollection();
     }
@@ -37,9 +41,7 @@ public class FieldElement {
     }
 
     public boolean isSameType(FieldElement fieldElement) {
-        FieldDefinition targetFieldDefinition = fieldElement.getFieldDefinition();
-        return fieldDefinition.getTypeName().equals(targetFieldDefinition.getTypeName())
-                && fieldDefinition.getGenericTypeName().equals(targetFieldDefinition.getGenericTypeName());
+        return fieldDefinition.isSameType(fieldElement.getFieldDefinition());
     }
 
 }

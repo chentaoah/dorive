@@ -132,7 +132,7 @@ public class SegmentBuilder {
                 if (!children.contains(node)) {
                     children.add(node);
                 }
-                OnSegment onSegment = new OnSegment(tableSegment.getTableAlias(), strongBinder.getAlias(), targetTableSegment.getTableAlias(), strongBinder.getBindAlias());
+                OnSegment onSegment = new OnSegment(tableSegment.getTableAlias(), strongBinder.getFieldAlias(), targetTableSegment.getTableAlias(), strongBinder.getBindFieldAlias());
                 onSegments.add(onSegment);
             }
         }
@@ -141,12 +141,12 @@ public class SegmentBuilder {
             Node targetNode = nodeMap.get(relativeAccessPath);
             if (targetNode != null) {
                 TableSegment targetTableSegment = targetNode.getTableSegment();
-                OnValueSegment onValueSegment = new OnValueSegment(targetTableSegment.getTableAlias(), valueRouteBinder.getBindAlias(), CriterionUtils.sqlParam(valueRouteBinder.getFieldValue(context, null)));
+                OnValueSegment onValueSegment = new OnValueSegment(targetTableSegment.getTableAlias(), valueRouteBinder.getBindFieldAlias(), CriterionUtils.sqlParam(valueRouteBinder.getFieldValue(context, null)));
                 onSegments.add(onValueSegment);
             }
         }
         for (ValueFilterBinder valueFilterBinder : valueFilterBinders) {
-            OnValueSegment onValueSegment = new OnValueSegment(tableSegment.getTableAlias(), valueFilterBinder.getAlias(), CriterionUtils.sqlParam(valueFilterBinder.getBoundValue(context, null)));
+            OnValueSegment onValueSegment = new OnValueSegment(tableSegment.getTableAlias(), valueFilterBinder.getFieldAlias(), CriterionUtils.sqlParam(valueFilterBinder.getBoundValue(context, null)));
             onSegments.add(onValueSegment);
         }
         return onSegments;

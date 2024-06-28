@@ -148,7 +148,7 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
                         }
 
                     } else {
-                        List<String> aliases = strongBinders.stream().map(AbstractBinder::getBindAlias).collect(Collectors.toList());
+                        List<String> aliases = strongBinders.stream().map(AbstractBinder::getBindFieldAlias).collect(Collectors.toList());
                         MultiInBuilder builder = new MultiInBuilder(aliases, entities.size());
                         collectFieldValues(context, entities, strongBinders, builder);
                         if (!builder.isEmpty()) {

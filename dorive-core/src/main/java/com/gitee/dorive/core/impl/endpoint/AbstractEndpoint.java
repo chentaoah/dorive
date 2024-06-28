@@ -13,6 +13,10 @@ public abstract class AbstractEndpoint implements Endpoint {
 
     private FieldElement fieldElement;
 
+    public String getAlias() {
+        return fieldElement.getAlias();
+    }
+
     @Override
     public boolean isSameType(Endpoint endpoint) {
         return fieldElement.isSameType(endpoint.getFieldElement());
