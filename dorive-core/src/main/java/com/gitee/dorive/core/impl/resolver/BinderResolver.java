@@ -145,26 +145,6 @@ public class BinderResolver {
         }
     }
 
-    private BindingType determineBindingType(BindingDef bindingDef) {
-        String field = bindingDef.getField();
-        String value = bindingDef.getValue();
-        String bind = bindingDef.getBind();
-        String expression = bindingDef.getExpression();
-        if (ObjectUtil.isAllNotEmpty(field, bind)) {
-            return BindingType.STRONG;
-
-        } else if (ObjectUtil.isAllNotEmpty(field, expression)) {
-            return BindingType.WEAK;
-
-        } else if (ObjectUtil.isAllNotEmpty(value, bind)) {
-            return BindingType.VALUE_ROUTE;
-
-        } else if (ObjectUtil.isAllNotEmpty(field, value)) {
-            return BindingType.VALUE_FILTER;
-        }
-        throw new RuntimeException("Unknown binding type!");
-    }
-
     private void resetBindingDef(BindingDef bindingDef) {
         String field = StrUtil.trim(bindingDef.getField());
         String value = StrUtil.trim(bindingDef.getValue());
@@ -196,6 +176,26 @@ public class BinderResolver {
         bindingDef.setExpression(expression);
         bindingDef.setProcessor(processor);
         bindingDef.setBindField(bindField);
+    }
+
+    private BindingType determineBindingType(BindingDef bindingDef) {
+        String field = bindingDef.getField();
+        String value = bindingDef.getValue();
+        String bind = bindingDef.getBind();
+        String expression = bindingDef.getExpression();
+        if (ObjectUtil.isAllNotEmpty(field, bind)) {
+            return BindingType.STRONG;
+
+        } else if (ObjectUtil.isAllNotEmpty(field, expression)) {
+            return BindingType.WEAK;
+
+        } else if (ObjectUtil.isAllNotEmpty(value, bind)) {
+            return BindingType.VALUE_ROUTE;
+
+        } else if (ObjectUtil.isAllNotEmpty(field, value)) {
+            return BindingType.VALUE_FILTER;
+        }
+        throw new RuntimeException("Unknown binding type!");
     }
 
     private Processor newProcessor(BindingDef bindingDef) {
