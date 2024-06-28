@@ -18,7 +18,7 @@
 package com.gitee.dorive.mybatis.plus.config;
 
 import com.gitee.dorive.mybatis.plus.impl.DefaultImplFactory;
-import com.gitee.dorive.api.api.ImplFactory;
+import com.gitee.dorive.core.api.common.ImplFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;

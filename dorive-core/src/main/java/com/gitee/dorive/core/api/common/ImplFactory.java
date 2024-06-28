@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.api;
+package com.gitee.dorive.core.api.common;
 
 public interface ImplFactory {
 
