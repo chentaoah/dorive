@@ -118,22 +118,19 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         boolean isRoot = "/".equals(accessPath);
         boolean isAggregated = entityDef.getRepository() != Object.class;
-        OrderBy defaultOrderBy = newDefaultOrderBy(orderDef);
-
         BinderResolver binderResolver = new BinderResolver(this);
         binderResolver.resolve(entityElement);
+        OrderBy defaultOrderBy = newDefaultOrderBy(orderDef);
 
         CommonRepository repository = new CommonRepository();
         repository.setEntityElement(entityElement);
         repository.setOperationFactory(operationFactory);
         repository.setProxyRepository(proxyRepository);
-
         repository.setAccessPath(accessPath);
         repository.setRoot(isRoot);
         repository.setAggregated(isAggregated);
-        repository.setDefaultOrderBy(defaultOrderBy);
-
         repository.setBinderResolver(binderResolver);
+        repository.setDefaultOrderBy(defaultOrderBy);
         repository.setBound(false);
         repository.setMatcher(new SelectTypeMatcher(repository));
         return repository;

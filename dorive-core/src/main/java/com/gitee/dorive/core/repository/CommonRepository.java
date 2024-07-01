@@ -47,8 +47,8 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
     private String accessPath;
     private boolean root;
     private boolean aggregated;
-    private OrderBy defaultOrderBy;
     private BinderResolver binderResolver;
+    private OrderBy defaultOrderBy;
     private boolean bound;
     private Matcher matcher;
 
