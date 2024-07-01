@@ -38,8 +38,6 @@ import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.util.List;
@@ -61,25 +59,10 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         Repository repository = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), Repository.class);
         this.queryScanDef = QueryScanDef.fromElement(this.getClass());
         if (repository != null && queryScanDef != null) {
-            renewQueryScanDef();
             this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
             this.queryTypeResolver = new QueryTypeResolver(this);
             this.simpleQueryExecutor = new SimpleQueryExecutor(this);
             this.stepwiseQueryExecutor = new StepwiseQueryExecutor(this);
-        }
-    }
-
-    private void renewQueryScanDef() {
-        String[] value = queryScanDef.getValue();
-        String regex = queryScanDef.getRegex();
-        Class<?>[] queries = queryScanDef.getQueries();
-        if (ArrayUtils.isEmpty(value) && ArrayUtils.isEmpty(queries)) {
-            String packageName = this.getClass().getPackage().getName();
-            String parentPackageName = packageName.substring(0, packageName.lastIndexOf("."));
-            queryScanDef.setValue(new String[]{parentPackageName + ".query"});
-        }
-        if (StringUtils.isBlank(regex)) {
-            queryScanDef.setRegex("^" + getEntityClass().getSimpleName() + ".*");
         }
     }
 

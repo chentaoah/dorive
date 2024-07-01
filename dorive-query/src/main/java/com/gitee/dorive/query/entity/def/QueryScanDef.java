@@ -30,16 +30,12 @@ import java.lang.reflect.AnnotatedElement;
 @AllArgsConstructor
 public class QueryScanDef {
 
-    private String[] value;
-    private String regex;
     private Class<?>[] queries;
 
     public static QueryScanDef fromElement(AnnotatedElement element) {
         QueryScan queryScan = AnnotatedElementUtils.getMergedAnnotation(element, QueryScan.class);
         if (queryScan != null) {
             QueryScanDef queryScanDef = new QueryScanDef();
-            queryScanDef.setValue(queryScan.value());
-            queryScanDef.setRegex(queryScan.regex());
             queryScanDef.setQueries(queryScan.queries());
             return queryScanDef;
         }

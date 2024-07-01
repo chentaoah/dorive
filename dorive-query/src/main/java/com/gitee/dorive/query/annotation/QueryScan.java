@@ -30,10 +30,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface QueryScan {
 
-    String[] value() default {};
-
-    String regex() default "";
-
-    Class<?>[] queries() default {};
+    Class<?>[] queries();
 
 }

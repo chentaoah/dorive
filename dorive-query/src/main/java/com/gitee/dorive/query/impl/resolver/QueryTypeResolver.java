@@ -18,63 +18,35 @@
 package com.gitee.dorive.query.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.query.entity.QueryField;
+import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
+import com.gitee.dorive.query.entity.QueryField;
 import com.gitee.dorive.query.entity.SpecificFields;
-import com.gitee.dorive.query.entity.def.QueryScanDef;
 import com.gitee.dorive.query.entity.def.CriterionDef;
 import com.gitee.dorive.query.entity.def.ExampleDef;
+import com.gitee.dorive.query.entity.def.QueryScanDef;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
-import com.gitee.dorive.query.util.ResourceUtils;
-import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
 import org.springframework.util.ReflectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
 
 @Data
 public class QueryTypeResolver {
-
-    private static Map<String, List<Class<?>>> scannedClasses = new ConcurrentHashMap<>();
 
     private AbstractQueryRepository<?, ?> repository;
     private Map<Class<?>, QueryResolver> classQueryResolverMap = new ConcurrentHashMap<>();
     private Map<String, QueryResolver> nameQueryResolverMap = new ConcurrentHashMap<>();
 
-    public QueryTypeResolver(AbstractQueryRepository<?, ?> repository) throws Exception {
+    public QueryTypeResolver(AbstractQueryRepository<?, ?> repository) {
         this.repository = repository;
         resolve();
     }
 
-    public void resolve() throws Exception {
+    public void resolve() {
         QueryScanDef queryScanDef = repository.getQueryScanDef();
-        String[] scanPackages = queryScanDef.getValue();
-        String regex = queryScanDef.getRegex();
         Class<?>[] queries = queryScanDef.getQueries();
-
-        Pattern pattern = Pattern.compile(regex);
-        for (String scanPackage : scanPackages) {
-            List<Class<?>> classes = scannedClasses.get(scanPackage);
-            if (classes == null) {
-                classes = ResourceUtils.resolveClasses(scanPackage);
-                scannedClasses.put(scanPackage, classes);
-            }
-            for (Class<?> queryClass : classes) {
-                String simpleName = queryClass.getSimpleName();
-                if (pattern.matcher(simpleName).matches()) {
-                    resolveQueryClass(queryClass);
-                }
-            }
-        }
-
         for (Class<?> queryClass : queries) {
             resolveQueryClass(queryClass);
         }
@@ -130,9 +102,7 @@ public class QueryTypeResolver {
             Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
 
             CommonRepository repository = mergedRepository.getExecutedRepository();
-            Assert.isTrue(repository.hasField(field),
-                    "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",
-                    queryField.getField(), repository.getEntityElement().getGenericType(), field);
+            Assert.isTrue(repository.hasField(field), "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}", queryField.getField(), repository.getEntityElement().getGenericType(), field);
 
             mergedRepositorySet.add(mergedRepository);
         }
