@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.query.repository;
 
-import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.annotation.Repository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Matcher;
@@ -28,20 +27,17 @@ import com.gitee.dorive.event.repository.AbstractEventRepository;
 import com.gitee.dorive.query.api.QueryExecutor;
 import com.gitee.dorive.query.api.QueryRepository;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.entity.def.QueryScanDef;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.impl.executor.SimpleQueryExecutor;
 import com.gitee.dorive.query.impl.executor.StepwiseQueryExecutor;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
-import com.gitee.dorive.query.impl.resolver.QueryResolver;
-import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
+import com.gitee.dorive.query.impl.resolver.QueryRepositoryResolver;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -49,7 +45,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
     private QueryScanDef queryScanDef;
     private MergedRepositoryResolver mergedRepositoryResolver;
-    private QueryTypeResolver queryTypeResolver;
+    private QueryRepositoryResolver queryRepositoryResolver;
     private QueryExecutor simpleQueryExecutor;
     private QueryExecutor stepwiseQueryExecutor;
 
@@ -63,7 +59,8 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
             mergedRepositoryResolver.resolve();
         }
         if (repository != null && queryScanDef != null) {
-            this.queryTypeResolver = new QueryTypeResolver(this);
+            this.queryRepositoryResolver = new QueryRepositoryResolver(this);
+            queryRepositoryResolver.resolve();
             this.simpleQueryExecutor = new SimpleQueryExecutor(this);
             this.stepwiseQueryExecutor = new StepwiseQueryExecutor(this);
         }
@@ -72,53 +69,44 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     @SuppressWarnings("unchecked")
     public List<E> selectByQuery(Options options, Object query) {
-        QueryContext queryContext = new QueryContext((Context) options, ResultType.DATA);
-        QueryWrapper queryWrapper = new QueryWrapper(query);
-        Result<Object> result = executeQuery(queryContext, queryWrapper);
+        QueryContext queryContext = new QueryContext((Context) options, query, ResultType.DATA);
+        Result<Object> result = executeQuery(queryContext);
         return (List<E>) result.getRecords();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByQuery(Options options, Object query) {
-        QueryContext queryContext = new QueryContext((Context) options, ResultType.COUNT_AND_DATA);
-        QueryWrapper queryWrapper = new QueryWrapper(query);
-        Result<Object> result = executeQuery(queryContext, queryWrapper);
+        QueryContext queryContext = new QueryContext((Context) options, query, ResultType.COUNT_AND_DATA);
+        Result<Object> result = executeQuery(queryContext);
         return (Page<E>) result.getPage();
     }
 
     @Override
     public long selectCountByQuery(Options options, Object query) {
-        QueryContext queryContext = new QueryContext((Context) options, ResultType.COUNT);
-        QueryWrapper queryWrapper = new QueryWrapper(query);
-        Result<Object> result = executeQuery(queryContext, queryWrapper);
+        QueryContext queryContext = new QueryContext((Context) options, query, ResultType.COUNT);
+        Result<Object> result = executeQuery(queryContext);
         return result.getCount();
     }
 
     @Override
-    public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
-        resolveQuery(queryContext, queryWrapper);
+    public Result<Object> executeQuery(QueryContext queryContext) {
+
+
         Matcher matcher = getRootRepository();
         if (!matcher.matches(queryContext.getContext())) {
             return queryContext.newEmptyResult();
         }
         if (queryContext.isSimpleQuery()) {
-            return simpleQueryExecutor.executeQuery(queryContext, queryWrapper);
+            return simpleQueryExecutor.executeQuery(queryContext, query);
         } else {
-            QueryExecutor queryExecutor = adaptiveQueryExecutor(queryContext, queryWrapper);
-            return queryExecutor.executeQuery(queryContext, queryWrapper);
+            QueryExecutor queryExecutor = adaptiveQueryExecutor(queryContext, query);
+            return queryExecutor.executeQuery(queryContext, query);
         }
     }
 
-    public void resolveQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
-        Map<Class<?>, QueryResolver> classQueryResolverMap = queryTypeResolver.getClassQueryResolverMap();
-        QueryResolver queryResolver = classQueryResolverMap.get(queryWrapper.getQuery().getClass());
-        Assert.notNull(queryResolver, "No query resolver found!");
-        queryContext.setQueryResolver(queryResolver);
-        queryResolver.resolve(queryContext, queryWrapper);
-    }
 
-    protected QueryExecutor adaptiveQueryExecutor(QueryContext queryContext, QueryWrapper queryWrapper) {
+    protected QueryExecutor adaptiveQueryExecutor(QueryContext queryContext, Object query) {
         return stepwiseQueryExecutor;
     }
 

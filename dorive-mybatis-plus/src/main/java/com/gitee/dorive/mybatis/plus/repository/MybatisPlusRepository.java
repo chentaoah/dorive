@@ -33,7 +33,6 @@ import com.gitee.dorive.core.entity.enums.QueryMethod;
 import com.gitee.dorive.mybatis.plus.executor.MybatisPlusExecutor;
 import com.gitee.dorive.query.api.QueryExecutor;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.sql.api.CountQuerier;
 import com.gitee.dorive.sql.api.SqlRunner;

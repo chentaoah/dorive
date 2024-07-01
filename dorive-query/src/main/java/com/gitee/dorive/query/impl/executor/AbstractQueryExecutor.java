@@ -17,17 +17,24 @@
 
 package com.gitee.dorive.query.impl.executor;
 
+import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.query.api.QueryExecutor;
+import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.QueryWrapper;
+import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.entity.enums.ResultType;
+import com.gitee.dorive.query.impl.resolver.QueryRepositoryResolver;
+import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractQueryExecutor implements QueryExecutor {
 
@@ -38,8 +45,42 @@ public abstract class AbstractQueryExecutor implements QueryExecutor {
     }
 
     @Override
+    public Result<Object> executeQuery(QueryContext queryContext) {
+        Object query = queryContext.getQuery();
+
+        Map<String, Example> exampleMap = resolveQuery(query);
+        queryContext.setExampleMap(exampleMap);
+        queryContext.setExample(exampleMap.get("/"));
+
+        return doExecuteQuery(queryContext);
+    }
+
+    protected Map<String, Example> resolveQuery(Object query) {
+        QueryRepositoryResolver queryRepositoryResolver = repository.getQueryRepositoryResolver();
+        Map<Class<?>, QueryResolver> classQueryResolverMap = queryRepositoryResolver.getClassQueryResolverMap();
+        QueryResolver queryResolver = classQueryResolverMap.get(query.getClass());
+        Assert.notNull(queryResolver, "No query resolver found!");
+        return queryResolver.resolve(query);
+    }
+
+    private Map<String, QueryUnit> newQueryUnitMap(QueryContext queryContext) {
+        QueryRepositoryResolver queryRepositoryResolver = repository.getQueryRepositoryResolver();
+        Map<Class<?>, List<MergedRepository>> classMergedRepositoriesMap = queryRepositoryResolver.getClassMergedRepositoriesMap();
+
+        Map<String, Example> exampleMap = queryContext.getExampleMap();
+        Map<String, QueryUnit> exampleWrapperMap = new LinkedHashMap<>();
+        for (MergedRepository mergedRepository : queryResolver.getReversedMergedRepositories()) {
+            String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
+            String relativeAccessPath = mergedRepository.getRelativeAccessPath();
+            Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample());
+            QueryUnit queryUnit = new QueryUnit(mergedRepository, example, false);
+            exampleWrapperMap.put(relativeAccessPath, queryUnit);
+        }
+        return exampleWrapperMap;
+    }
+
     @SuppressWarnings("unchecked")
-    public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
+    protected Result<Object> doExecuteQuery(QueryContext queryContext) {
         Context context = queryContext.getContext();
         ResultType resultType = queryContext.getResultType();
         Example example = queryContext.getExample();

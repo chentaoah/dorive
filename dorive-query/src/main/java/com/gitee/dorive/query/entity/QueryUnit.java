@@ -17,11 +17,14 @@
 
 package com.gitee.dorive.query.entity;
 
+import com.gitee.dorive.core.entity.executor.Example;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class QueryWrapper {
-    private Object query;
+public class QueryUnit {
+    private MergedRepository mergedRepository;
+    private Example example;
+    private boolean abandoned;
 }

@@ -22,10 +22,7 @@ import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.query.constant.OperatorV2;
-import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryField;
-import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.query.entity.SpecificFields;
 import com.gitee.dorive.query.entity.def.CriterionDef;
 import com.gitee.dorive.query.entity.def.ExampleDef;
@@ -43,17 +40,13 @@ public class QueryResolver {
     private ExampleDef exampleDef;
     private List<QueryField> queryFields;
     private SpecificFields specificFields;
-    private List<MergedRepository> mergedRepositories;
-    private List<MergedRepository> reversedMergedRepositories;
 
-    public void resolve(QueryContext queryContext, QueryWrapper queryWrapper) {
-        Object query = queryWrapper.getQuery();
+    public Map<String, Example> resolve(Object query) {
         Map<String, Example> exampleMap = newExampleMap(query);
         Example example = exampleMap.computeIfAbsent("/", key -> new InnerExample());
         example.setOrderBy(specificFields.newOrderBy(query));
         example.setPage(specificFields.newPage(query));
-        queryContext.setExampleMap(exampleMap);
-        queryContext.setExample(example);
+        return exampleMap;
     }
 
     private Map<String, Example> newExampleMap(Object query) {
