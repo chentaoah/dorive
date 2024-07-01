@@ -39,7 +39,7 @@ public class MultiEntityJoiner extends AbstractEntityJoiner {
 
     public MultiEntityJoiner(CommonRepository repository, int entitiesSize) {
         super(repository, entitiesSize);
-        this.binders = repository.getRootBinders();
+        this.binders = repository.getRootStrongBinders();
     }
 
     @Override

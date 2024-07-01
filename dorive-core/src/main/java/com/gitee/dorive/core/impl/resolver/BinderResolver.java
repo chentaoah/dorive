@@ -55,7 +55,8 @@ public class BinderResolver {
     private List<ValueRouteBinder> valueRouteBinders;
     private List<ValueFilterBinder> valueFilterBinders;
     // 决定了关联查询具体使用哪种实现
-    private Map<String, List<StrongBinder>> mergedBindersMap;
+    private Map<String, List<StrongBinder>> mergedStrongBindersMap;
+    private Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap;
     private StrongBinder boundIdBinder;
     private List<String> selfFields;
     private JoinType joinType;
@@ -75,7 +76,8 @@ public class BinderResolver {
         this.weakBinders = new ArrayList<>(bindingDefs.size());
         this.valueRouteBinders = new ArrayList<>(bindingDefs.size());
         this.valueFilterBinders = new ArrayList<>(bindingDefs.size());
-        this.mergedBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
+        this.mergedStrongBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
+        this.mergedValueRouteBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
         this.boundIdBinder = null;
         this.selfFields = new ArrayList<>(bindingDefs.size());
         this.joinType = JoinType.UNION;
@@ -90,6 +92,10 @@ public class BinderResolver {
                 BindEndpoint bindEndpoint = newBindEndpoint(bindingDef);
                 ValueRouteBinder valueRouteBinder = new ValueRouteBinder(bindingDef, null, bindEndpoint, processor);
                 allBinders.add(valueRouteBinder);
+                valueRouteBinders.add(valueRouteBinder);
+
+                String belongAccessPath = valueRouteBinder.getBelongAccessPath();
+                List<ValueRouteBinder> valueRouteBinders = mergedValueRouteBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
                 valueRouteBinders.add(valueRouteBinder);
                 continue;
             }
@@ -106,7 +112,7 @@ public class BinderResolver {
                 strongBinders.add(strongBinder);
 
                 String belongAccessPath = strongBinder.getBelongAccessPath();
-                List<StrongBinder> strongBinders = mergedBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
+                List<StrongBinder> strongBinders = mergedStrongBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
                 strongBinders.add(strongBinder);
 
                 if (strongBinder.isSameType() && primaryKey.equals(field)) {
@@ -131,8 +137,8 @@ public class BinderResolver {
 
         selfFields = Collections.unmodifiableList(selfFields);
 
-        if (mergedBindersMap.size() == 1 && mergedBindersMap.containsKey("/")) {
-            List<StrongBinder> binders = mergedBindersMap.get("/");
+        if (mergedStrongBindersMap.size() == 1 && mergedStrongBindersMap.containsKey("/")) {
+            List<StrongBinder> binders = mergedStrongBindersMap.get("/");
             boolean hasCollection = CollUtil.findOne(binders, AbstractBinder::isBindCollection) != null;
             if (!hasCollection) {
                 joinType = binders.size() == 1 ? JoinType.SINGLE : JoinType.MULTI;

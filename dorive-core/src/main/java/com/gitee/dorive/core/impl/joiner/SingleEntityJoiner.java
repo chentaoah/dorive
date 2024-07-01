@@ -37,7 +37,7 @@ public class SingleEntityJoiner extends AbstractEntityJoiner {
 
     public SingleEntityJoiner(CommonRepository repository, int entitiesSize) {
         super(repository, entitiesSize);
-        this.binder = repository.getRootBinders().get(0);
+        this.binder = repository.getRootStrongBinders().get(0);
     }
 
     @Override

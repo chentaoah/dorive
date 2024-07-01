@@ -68,8 +68,8 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
         return binderResolver.getJoinType();
     }
 
-    public List<StrongBinder> getRootBinders() {
-        return binderResolver.getMergedBindersMap().get("/");
+    public List<StrongBinder> getRootStrongBinders() {
+        return binderResolver.getMergedStrongBindersMap().get("/");
     }
 
     @Override
