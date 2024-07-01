@@ -22,11 +22,13 @@ import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class MergedRepository {
 

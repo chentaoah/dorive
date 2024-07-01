@@ -58,8 +58,11 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         super.afterPropertiesSet();
         Repository repository = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), Repository.class);
         this.queryScanDef = QueryScanDef.fromElement(this.getClass());
-        if (repository != null && queryScanDef != null) {
+        if (repository != null) {
             this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
+            mergedRepositoryResolver.resolve();
+        }
+        if (repository != null && queryScanDef != null) {
             this.queryTypeResolver = new QueryTypeResolver(this);
             this.simpleQueryExecutor = new SimpleQueryExecutor(this);
             this.stepwiseQueryExecutor = new StepwiseQueryExecutor(this);

@@ -134,7 +134,9 @@ public class BinderResolver {
                 valueFilterBinders.add(valueFilterBinder);
             }
         }
-
+        
+        mergedStrongBindersMap = Collections.unmodifiableMap(mergedStrongBindersMap);
+        mergedValueRouteBindersMap = Collections.unmodifiableMap(mergedValueRouteBindersMap);
         selfFields = Collections.unmodifiableList(selfFields);
 
         if (mergedStrongBindersMap.size() == 1 && mergedStrongBindersMap.containsKey("/")) {
