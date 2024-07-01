@@ -37,7 +37,6 @@ public class QueryTypeResolver {
 
     private AbstractQueryRepository<?, ?> repository;
     private Map<Class<?>, QueryResolver> classQueryResolverMap = new ConcurrentHashMap<>();
-    private Map<String, QueryResolver> nameQueryResolverMap = new ConcurrentHashMap<>();
 
     public QueryTypeResolver(AbstractQueryRepository<?, ?> repository) {
         this.repository = repository;
@@ -77,7 +76,6 @@ public class QueryTypeResolver {
 
         QueryResolver queryResolver = new QueryResolver(exampleDef, queryFields, specificFields, mergedRepositories, reversedMergedRepositories);
         classQueryResolverMap.put(queryClass, queryResolver);
-        nameQueryResolverMap.put(queryClass.getName(), queryResolver);
     }
 
     private List<MergedRepository> matchMergedRepositories(List<QueryField> queryFields) {

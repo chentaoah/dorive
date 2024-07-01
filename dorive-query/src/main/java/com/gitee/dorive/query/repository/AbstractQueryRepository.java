@@ -108,8 +108,8 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     }
 
     public void resolveQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
-        Map<String, QueryResolver> nameQueryResolverMap = queryTypeResolver.getNameQueryResolverMap();
-        QueryResolver queryResolver = nameQueryResolverMap.get(queryWrapper.getQuery().getClass().getName());
+        Map<Class<?>, QueryResolver> classQueryResolverMap = queryTypeResolver.getClassQueryResolverMap();
+        QueryResolver queryResolver = classQueryResolverMap.get(queryWrapper.getQuery().getClass());
         Assert.notNull(queryResolver, "No query resolver found!");
         queryContext.setQueryResolver(queryResolver);
         queryResolver.resolve(queryContext, queryWrapper);
