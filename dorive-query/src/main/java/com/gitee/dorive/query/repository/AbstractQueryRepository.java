@@ -19,7 +19,6 @@ package com.gitee.dorive.query.repository;
 
 import com.gitee.dorive.api.annotation.Repository;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
@@ -88,10 +87,6 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
     @Override
     public Result<Object> executeQuery(QueryContext queryContext) {
-        Matcher matcher = getRootRepository();
-        if (!matcher.matches(queryContext.getContext())) {
-            return queryContext.newEmptyResult();
-        }
         QueryExecutor queryExecutor = adaptiveQueryExecutor(queryContext);
         return queryExecutor.executeQuery(queryContext);
     }

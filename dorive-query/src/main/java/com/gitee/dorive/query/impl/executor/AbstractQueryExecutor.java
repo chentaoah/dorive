@@ -19,6 +19,7 @@ package com.gitee.dorive.query.impl.executor;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -47,6 +48,10 @@ public abstract class AbstractQueryExecutor implements QueryExecutor {
     @Override
     public Result<Object> executeQuery(QueryContext queryContext) {
         resolve(queryContext);
+        Matcher matcher = repository.getRootRepository();
+        if (!matcher.matches(queryContext.getContext())) {
+            return queryContext.newEmptyResult();
+        }
         if (queryContext.isSimpleQuery()) {
             return executeRootQuery(queryContext);
         }
