@@ -91,7 +91,7 @@ public class QueryRepositoryResolver {
         QueryResolver queryResolver = new QueryResolver(exampleDef, queryFields, specificFields);
         classQueryResolverMap.put(queryClass, queryResolver);
         classMergedRepositoriesMap.put(queryClass, mergedRepositories);
-        classMergedRepositoriesMap.put(queryClass, reversedMergedRepositories);
+        classReversedMergedRepositoriesMap.put(queryClass, reversedMergedRepositories);
     }
 
     private MergedRepository resetQueryField(QueryField queryField) {
@@ -114,8 +114,7 @@ public class QueryRepositoryResolver {
         Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
 
         CommonRepository repository = mergedRepository.getExecutedRepository();
-        Assert.isTrue(repository.hasField(field), "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",
-                queryField.getField(), repository.getEntityClass(), field);
+        Assert.isTrue(repository.hasField(field), "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}", queryField.getField(), repository.getEntityClass(), field);
 
         return mergedRepository;
     }
