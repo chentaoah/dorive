@@ -29,7 +29,7 @@ import com.gitee.dorive.core.util.MultiInBuilder;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
-import com.gitee.dorive.query.impl.resolver.QueryRepositoryResolver;
+import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 
 import java.util.*;
@@ -43,8 +43,8 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
 
     @Override
     protected List<MergedRepository> getMergedRepositories(Class<?> queryType) {
-        QueryRepositoryResolver queryRepositoryResolver = repository.getQueryRepositoryResolver();
-        Map<Class<?>, List<MergedRepository>> classReversedMergedRepositoriesMap = queryRepositoryResolver.getClassReversedMergedRepositoriesMap();
+        QueryTypeResolver queryTypeResolver = repository.getQueryTypeResolver();
+        Map<Class<?>, List<MergedRepository>> classReversedMergedRepositoriesMap = queryTypeResolver.getClassReversedMergedRepositoriesMap();
         return classReversedMergedRepositoriesMap.get(queryType);
     }
 

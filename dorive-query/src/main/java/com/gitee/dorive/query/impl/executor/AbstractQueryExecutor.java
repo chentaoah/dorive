@@ -29,8 +29,8 @@ import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.entity.enums.ResultType;
-import com.gitee.dorive.query.impl.resolver.QueryRepositoryResolver;
-import com.gitee.dorive.query.impl.resolver.QueryResolver;
+import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
+import com.gitee.dorive.query.impl.resolver.QueryExampleResolver;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 
 import java.util.LinkedHashMap;
@@ -60,11 +60,11 @@ public abstract class AbstractQueryExecutor implements QueryExecutor {
 
     protected void resolve(QueryContext queryContext) {
         Class<?> queryType = queryContext.getQueryType();
-        QueryResolver queryResolver = getQueryResolver(queryType);
+        QueryExampleResolver queryExampleResolver = getQueryExampleResolver(queryType);
         List<MergedRepository> mergedRepositories = getMergedRepositories(queryType);
-        Assert.notNull(queryResolver, "No query resolver found!");
+        Assert.notNull(queryExampleResolver, "No query resolver found!");
         Assert.notEmpty(mergedRepositories, "The merged repositories cannot be empty!");
-        queryContext.setQueryResolver(queryResolver);
+        queryContext.setQueryExampleResolver(queryExampleResolver);
         queryContext.setMergedRepositories(mergedRepositories);
 
         Map<String, Example> exampleMap = newExampleMap(queryContext);
@@ -76,22 +76,22 @@ public abstract class AbstractQueryExecutor implements QueryExecutor {
         queryContext.setQueryUnit(queryUnitMap.get("/"));
     }
 
-    protected QueryResolver getQueryResolver(Class<?> queryType) {
-        QueryRepositoryResolver queryRepositoryResolver = repository.getQueryRepositoryResolver();
-        Map<Class<?>, QueryResolver> classQueryResolverMap = queryRepositoryResolver.getClassQueryResolverMap();
-        return classQueryResolverMap.get(queryType);
+    protected QueryExampleResolver getQueryExampleResolver(Class<?> queryType) {
+        QueryTypeResolver queryTypeResolver = repository.getQueryTypeResolver();
+        Map<Class<?>, QueryExampleResolver> classQueryExampleResolverMap = queryTypeResolver.getClassQueryExampleResolverMap();
+        return classQueryExampleResolverMap.get(queryType);
     }
 
     protected List<MergedRepository> getMergedRepositories(Class<?> queryType) {
-        QueryRepositoryResolver queryRepositoryResolver = repository.getQueryRepositoryResolver();
-        Map<Class<?>, List<MergedRepository>> classMergedRepositoriesMap = queryRepositoryResolver.getClassMergedRepositoriesMap();
+        QueryTypeResolver queryTypeResolver = repository.getQueryTypeResolver();
+        Map<Class<?>, List<MergedRepository>> classMergedRepositoriesMap = queryTypeResolver.getClassMergedRepositoriesMap();
         return classMergedRepositoriesMap.get(queryType);
     }
 
     protected Map<String, Example> newExampleMap(QueryContext queryContext) {
         Object query = queryContext.getQuery();
-        QueryResolver queryResolver = queryContext.getQueryResolver();
-        return queryResolver.resolve(query);
+        QueryExampleResolver queryExampleResolver = queryContext.getQueryExampleResolver();
+        return queryExampleResolver.resolve(query);
     }
 
     protected Map<String, QueryUnit> newQueryUnitMap(QueryContext queryContext) {

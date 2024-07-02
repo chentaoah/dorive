@@ -30,7 +30,7 @@ import com.gitee.dorive.query.entity.def.QueryScanDef;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.impl.executor.StepwiseQueryExecutor;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
-import com.gitee.dorive.query.impl.resolver.QueryRepositoryResolver;
+import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -43,7 +43,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
     private QueryScanDef queryScanDef;
     private MergedRepositoryResolver mergedRepositoryResolver;
-    private QueryRepositoryResolver queryRepositoryResolver;
+    private QueryTypeResolver queryTypeResolver;
     private QueryExecutor stepwiseQueryExecutor;
 
     @Override
@@ -56,8 +56,8 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
             mergedRepositoryResolver.resolve();
         }
         if (repository != null && queryScanDef != null) {
-            this.queryRepositoryResolver = new QueryRepositoryResolver(this);
-            queryRepositoryResolver.resolve();
+            this.queryTypeResolver = new QueryTypeResolver(this);
+            queryTypeResolver.resolve();
             this.stepwiseQueryExecutor = new StepwiseQueryExecutor(this);
         }
     }

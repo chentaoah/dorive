@@ -33,14 +33,14 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Data
-public class QueryRepositoryResolver {
+public class QueryTypeResolver {
 
     private AbstractQueryRepository<?, ?> repository;
-    private Map<Class<?>, QueryResolver> classQueryResolverMap = new ConcurrentHashMap<>();
+    private Map<Class<?>, QueryExampleResolver> classQueryExampleResolverMap = new ConcurrentHashMap<>();
     private Map<Class<?>, List<MergedRepository>> classMergedRepositoriesMap = new ConcurrentHashMap<>();
     private Map<Class<?>, List<MergedRepository>> classReversedMergedRepositoriesMap = new ConcurrentHashMap<>();
 
-    public QueryRepositoryResolver(AbstractQueryRepository<?, ?> repository) {
+    public QueryTypeResolver(AbstractQueryRepository<?, ?> repository) {
         this.repository = repository;
     }
 
@@ -88,8 +88,8 @@ public class QueryRepositoryResolver {
         List<MergedRepository> reversedMergedRepositories = new ArrayList<>(mergedRepositories);
         Collections.reverse(reversedMergedRepositories);
 
-        QueryResolver queryResolver = new QueryResolver(exampleDef, queryFields, specificFields);
-        classQueryResolverMap.put(queryClass, queryResolver);
+        QueryExampleResolver queryExampleResolver = new QueryExampleResolver(exampleDef, queryFields, specificFields);
+        classQueryExampleResolverMap.put(queryClass, queryExampleResolver);
         classMergedRepositoriesMap.put(queryClass, mergedRepositories);
         classReversedMergedRepositoriesMap.put(queryClass, reversedMergedRepositories);
     }
