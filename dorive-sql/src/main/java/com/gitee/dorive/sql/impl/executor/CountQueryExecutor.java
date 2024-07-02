@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.impl.count;
+package com.gitee.dorive.sql.impl.executor;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.ele.EntityElement;
@@ -42,11 +42,11 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class DefaultCountQuerier extends AbstractQueryExecutor implements CountQuerier {
+public class CountQueryExecutor extends AbstractQueryExecutor implements CountQuerier {
 
     private SqlRunner sqlRunner;
 
-    public DefaultCountQuerier(AbstractQueryRepository<?, ?> repository, SqlRunner sqlRunner) {
+    public CountQueryExecutor(AbstractQueryRepository<?, ?> repository, SqlRunner sqlRunner) {
         super(repository);
         this.sqlRunner = sqlRunner;
     }

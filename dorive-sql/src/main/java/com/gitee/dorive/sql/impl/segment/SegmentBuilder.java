@@ -24,7 +24,6 @@ import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.ValueFilterBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
@@ -34,13 +33,17 @@ import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.CriterionUtils;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.sql.api.Segment;
 import com.gitee.dorive.sql.entity.common.SegmentInfo;
 import com.gitee.dorive.sql.entity.segment.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 public class SegmentBuilder {
@@ -57,15 +60,15 @@ public class SegmentBuilder {
             this.matchedSegmentInfos = new ArrayList<>(8);
         }
 
-        List<MergedRepository> mergedRepositories = queryContext.getMergedRepositories();
-        Map<String, Example> exampleMap = queryContext.getExampleMap();
-
-        Map<String, Node> nodeMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);
+        Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
+        Map<String, Node> nodeMap = new LinkedHashMap<>(queryUnitMap.size() * 4 / 3 + 1);
         SelectSegment selectSegment = new SelectSegment();
         List<JoinSegment> joinSegments = selectSegment.getJoinSegments();
 
-        for (MergedRepository mergedRepository : mergedRepositories) {
-            String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
+        for (QueryUnit queryUnit : queryUnitMap.values()) {
+            MergedRepository mergedRepository = queryUnit.getMergedRepository();
+            Example example = queryUnit.getExample();
+
             String relativeAccessPath = mergedRepository.getRelativeAccessPath();
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
@@ -77,15 +80,13 @@ public class SegmentBuilder {
 
             String tableName = entityStoreInfo.getTableName();
             String tableAlias = selectSegment.generateTableAlias();
+            exampleExecutor.convert(context, example);
 
             SegmentInfo segmentInfo = new SegmentInfo(tableAlias, entityElement);
             boolean isMatch = selector != null && definedRepository.matches(selector);
             if (isMatch) {
                 matchedSegmentInfos.add(segmentInfo);
             }
-
-            Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample(Collections.emptyList()));
-            exampleExecutor.convert(context, example);
 
             TableSegment tableSegment = new TableSegment(tableName, tableAlias, example.isNotEmpty() || isMatch, new ArrayList<>(example.getCriteria().size()));
             Node node = new Node(tableSegment, new ArrayList<>(4));
