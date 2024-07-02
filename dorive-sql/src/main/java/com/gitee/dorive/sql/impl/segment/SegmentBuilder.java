@@ -34,7 +34,6 @@ import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.CriterionUtils;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import com.gitee.dorive.sql.api.Segment;
 import com.gitee.dorive.sql.entity.common.SegmentInfo;
 import com.gitee.dorive.sql.entity.segment.*;
@@ -46,20 +45,21 @@ import java.util.*;
 @Data
 public class SegmentBuilder {
 
-    private QueryResolver queryResolver;
-    private Map<String, Example> exampleMap;
+    private QueryContext queryContext;
     private List<SegmentInfo> matchedSegmentInfos;
 
     public SegmentBuilder(QueryContext queryContext) {
-        this.queryResolver = queryContext.getQueryResolver();
-        this.exampleMap = queryContext.getExampleMap();
+        this.queryContext = queryContext;
     }
 
     public SelectSegment buildSegment(Context context, Selector selector) {
         if (selector != null) {
             this.matchedSegmentInfos = new ArrayList<>(8);
         }
-        List<MergedRepository> mergedRepositories = queryResolver.getMergedRepositories();
+
+        List<MergedRepository> mergedRepositories = queryContext.getMergedRepositories();
+        Map<String, Example> exampleMap = queryContext.getExampleMap();
+
         Map<String, Node> nodeMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);
         SelectSegment selectSegment = new SelectSegment();
         List<JoinSegment> joinSegments = selectSegment.getJoinSegments();

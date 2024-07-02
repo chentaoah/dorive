@@ -21,9 +21,11 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.query.entity.enums.ResultType;
+import com.gitee.dorive.query.impl.resolver.QueryResolver;
 import lombok.Data;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -32,13 +34,19 @@ public class QueryContext {
     private Context context;
     private Object query;
     private ResultType resultType;
+    private Class<?> queryType;
+    private QueryResolver queryResolver;
+    private List<MergedRepository> mergedRepositories;
     private Map<String, Example> exampleMap;
     private Example example;
+    private Map<String, QueryUnit> queryUnitMap;
+    private QueryUnit queryUnit;
 
     public QueryContext(Context context, Object query, ResultType resultType) {
         this.context = context;
         this.query = query;
         this.resultType = resultType;
+        this.queryType = query.getClass();
     }
 
     public boolean isSimpleQuery() {

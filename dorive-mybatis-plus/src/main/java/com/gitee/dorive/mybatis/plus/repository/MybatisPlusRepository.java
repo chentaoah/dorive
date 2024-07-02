@@ -128,13 +128,13 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
     }
 
     @Override
-    protected QueryExecutor adaptiveQueryExecutor(QueryContext queryContext, QueryWrapper queryWrapper) {
+    protected QueryExecutor adaptiveQueryExecutor(QueryContext queryContext) {
         Context context = queryContext.getContext();
         QueryMethod queryMethod = context.getOption(QueryMethod.class);
         if (queryMethod == null || queryMethod == QueryMethod.SQL) {
             return sqlQueryExecutor;
         }
-        return super.adaptiveQueryExecutor(queryContext, queryWrapper);
+        return super.adaptiveQueryExecutor(queryContext);
     }
 
     @Override

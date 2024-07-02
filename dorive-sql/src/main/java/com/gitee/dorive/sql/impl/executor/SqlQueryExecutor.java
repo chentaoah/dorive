@@ -51,7 +51,7 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
+    public Result<Object> doExecuteQuery(QueryContext queryContext) {
         Context context = queryContext.getContext();
         ResultType resultType = queryContext.getResultType();
         Example example = queryContext.getExample();
@@ -74,7 +74,7 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         List<ArgSegment> argSegments = selectSegment.getArgSegments();
         List<Object> args = selectSegment.getArgs();
         if (!tableSegment.isJoin() || argSegments.isEmpty()) {
-            return super.executeQuery(queryContext, queryWrapper);
+            return super.doExecuteQuery(queryContext);
         }
 
         String tableAlias = tableSegment.getTableAlias();

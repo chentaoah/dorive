@@ -46,37 +46,58 @@ public abstract class AbstractQueryExecutor implements QueryExecutor {
 
     @Override
     public Result<Object> executeQuery(QueryContext queryContext) {
-        Object query = queryContext.getQuery();
-
-        Map<String, Example> exampleMap = resolveQuery(query);
-        queryContext.setExampleMap(exampleMap);
-        queryContext.setExample(exampleMap.get("/"));
-
+        resolve(queryContext);
         return doExecuteQuery(queryContext);
     }
 
-    protected Map<String, Example> resolveQuery(Object query) {
+    protected void resolve(QueryContext queryContext) {
+        Class<?> queryType = queryContext.getQueryType();
+        QueryResolver queryResolver = getQueryResolver(queryType);
+        List<MergedRepository> mergedRepositories = getMergedRepositories(queryType);
+        Assert.notNull(queryResolver, "No query resolver found!");
+        Assert.notEmpty(mergedRepositories, "The merged repositories cannot be empty!");
+        queryContext.setQueryResolver(queryResolver);
+        queryContext.setMergedRepositories(mergedRepositories);
+
+        Map<String, Example> exampleMap = newExampleMap(queryContext);
+        queryContext.setExampleMap(exampleMap);
+        queryContext.setExample(exampleMap.get("/"));
+
+        Map<String, QueryUnit> queryUnitMap = newQueryUnitMap(queryContext);
+        queryContext.setQueryUnitMap(queryUnitMap);
+        queryContext.setQueryUnit(queryUnitMap.get("/"));
+    }
+
+    protected QueryResolver getQueryResolver(Class<?> queryType) {
         QueryRepositoryResolver queryRepositoryResolver = repository.getQueryRepositoryResolver();
         Map<Class<?>, QueryResolver> classQueryResolverMap = queryRepositoryResolver.getClassQueryResolverMap();
-        QueryResolver queryResolver = classQueryResolverMap.get(query.getClass());
-        Assert.notNull(queryResolver, "No query resolver found!");
+        return classQueryResolverMap.get(queryType);
+    }
+
+    protected List<MergedRepository> getMergedRepositories(Class<?> queryType) {
+        QueryRepositoryResolver queryRepositoryResolver = repository.getQueryRepositoryResolver();
+        Map<Class<?>, List<MergedRepository>> classMergedRepositoriesMap = queryRepositoryResolver.getClassMergedRepositoriesMap();
+        return classMergedRepositoriesMap.get(queryType);
+    }
+
+    protected Map<String, Example> newExampleMap(QueryContext queryContext) {
+        Object query = queryContext.getQuery();
+        QueryResolver queryResolver = queryContext.getQueryResolver();
         return queryResolver.resolve(query);
     }
 
-    private Map<String, QueryUnit> newQueryUnitMap(QueryContext queryContext) {
-        QueryRepositoryResolver queryRepositoryResolver = repository.getQueryRepositoryResolver();
-        Map<Class<?>, List<MergedRepository>> classMergedRepositoriesMap = queryRepositoryResolver.getClassMergedRepositoriesMap();
-
+    protected Map<String, QueryUnit> newQueryUnitMap(QueryContext queryContext) {
+        List<MergedRepository> mergedRepositories = queryContext.getMergedRepositories();
         Map<String, Example> exampleMap = queryContext.getExampleMap();
-        Map<String, QueryUnit> exampleWrapperMap = new LinkedHashMap<>();
-        for (MergedRepository mergedRepository : queryResolver.getReversedMergedRepositories()) {
+        Map<String, QueryUnit> queryUnitMap = new LinkedHashMap<>();
+        for (MergedRepository mergedRepository : mergedRepositories) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             String relativeAccessPath = mergedRepository.getRelativeAccessPath();
             Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample());
             QueryUnit queryUnit = new QueryUnit(mergedRepository, example, false);
-            exampleWrapperMap.put(relativeAccessPath, queryUnit);
+            queryUnitMap.put(relativeAccessPath, queryUnit);
         }
-        return exampleWrapperMap;
+        return queryUnitMap;
     }
 
     @SuppressWarnings("unchecked")

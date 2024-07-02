@@ -22,34 +22,38 @@ import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.enums.ResultType;
+import com.gitee.dorive.query.impl.executor.AbstractQueryExecutor;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.CountQuerier;
 import com.gitee.dorive.sql.api.SqlRunner;
-import com.gitee.dorive.sql.entity.common.SegmentInfo;
 import com.gitee.dorive.sql.entity.common.CountQuery;
+import com.gitee.dorive.sql.entity.common.SegmentInfo;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableSegment;
 import com.gitee.dorive.sql.impl.segment.SegmentBuilder;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@Data
-@AllArgsConstructor
-public class DefaultCountQuerier implements CountQuerier {
+@Getter
+@Setter
+public class DefaultCountQuerier extends AbstractQueryExecutor implements CountQuerier {
 
-    private AbstractQueryRepository<?, ?> repository;
     private SqlRunner sqlRunner;
+
+    public DefaultCountQuerier(AbstractQueryRepository<?, ?> repository, SqlRunner sqlRunner) {
+        super(repository);
+        this.sqlRunner = sqlRunner;
+    }
 
     @Override
     public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
-        QueryContext queryContext = new QueryContext(context, ResultType.COUNT);
-        QueryWrapper queryWrapper = new QueryWrapper(countQuery.getQuery());
-        repository.resolveQuery(queryContext, queryWrapper);
+        QueryContext queryContext = new QueryContext(context, countQuery.getQuery(), ResultType.COUNT);
+        resolve(queryContext);
 
         SegmentBuilder segmentBuilder = new SegmentBuilder(queryContext);
         SelectSegment selectSegment = segmentBuilder.buildSegment(context, countQuery.getSelector());

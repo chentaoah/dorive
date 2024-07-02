@@ -91,22 +91,19 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
     @Override
     public Result<Object> executeQuery(QueryContext queryContext) {
-
-
         Matcher matcher = getRootRepository();
         if (!matcher.matches(queryContext.getContext())) {
             return queryContext.newEmptyResult();
         }
         if (queryContext.isSimpleQuery()) {
-            return simpleQueryExecutor.executeQuery(queryContext, query);
+            return simpleQueryExecutor.executeQuery(queryContext);
         } else {
-            QueryExecutor queryExecutor = adaptiveQueryExecutor(queryContext, query);
-            return queryExecutor.executeQuery(queryContext, query);
+            QueryExecutor queryExecutor = adaptiveQueryExecutor(queryContext);
+            return queryExecutor.executeQuery(queryContext);
         }
     }
 
-
-    protected QueryExecutor adaptiveQueryExecutor(QueryContext queryContext, Object query) {
+    protected QueryExecutor adaptiveQueryExecutor(QueryContext queryContext) {
         return stepwiseQueryExecutor;
     }
 
