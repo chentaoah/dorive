@@ -74,7 +74,7 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         List<ArgSegment> argSegments = selectSegment.getArgSegments();
         List<Object> args = selectSegment.getArgs();
         if (!tableSegment.isJoin() || argSegments.isEmpty()) {
-            return super.doExecuteQuery(queryContext);
+            return super.executeRootQuery(queryContext);
         }
 
         String tableAlias = tableSegment.getTableAlias();

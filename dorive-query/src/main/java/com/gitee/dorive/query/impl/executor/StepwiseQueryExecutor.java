@@ -55,7 +55,7 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
         if (queryUnit.isAbandoned()) {
             return queryContext.newEmptyResult();
         }
-        return super.doExecuteQuery(queryContext);
+        return super.executeRootQuery(queryContext);
     }
 
     private void executeReversedQuery(QueryContext queryContext) {

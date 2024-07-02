@@ -29,7 +29,6 @@ import com.gitee.dorive.query.api.QueryRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.def.QueryScanDef;
 import com.gitee.dorive.query.entity.enums.ResultType;
-import com.gitee.dorive.query.impl.executor.SimpleQueryExecutor;
 import com.gitee.dorive.query.impl.executor.StepwiseQueryExecutor;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.impl.resolver.QueryRepositoryResolver;
@@ -46,7 +45,6 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     private QueryScanDef queryScanDef;
     private MergedRepositoryResolver mergedRepositoryResolver;
     private QueryRepositoryResolver queryRepositoryResolver;
-    private QueryExecutor simpleQueryExecutor;
     private QueryExecutor stepwiseQueryExecutor;
 
     @Override
@@ -61,7 +59,6 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         if (repository != null && queryScanDef != null) {
             this.queryRepositoryResolver = new QueryRepositoryResolver(this);
             queryRepositoryResolver.resolve();
-            this.simpleQueryExecutor = new SimpleQueryExecutor(this);
             this.stepwiseQueryExecutor = new StepwiseQueryExecutor(this);
         }
     }
@@ -95,12 +92,8 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         if (!matcher.matches(queryContext.getContext())) {
             return queryContext.newEmptyResult();
         }
-        if (queryContext.isSimpleQuery()) {
-            return simpleQueryExecutor.executeQuery(queryContext);
-        } else {
-            QueryExecutor queryExecutor = adaptiveQueryExecutor(queryContext);
-            return queryExecutor.executeQuery(queryContext);
-        }
+        QueryExecutor queryExecutor = adaptiveQueryExecutor(queryContext);
+        return queryExecutor.executeQuery(queryContext);
     }
 
     protected QueryExecutor adaptiveQueryExecutor(QueryContext queryContext) {

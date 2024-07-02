@@ -20,6 +20,7 @@ package com.gitee.dorive.sql.impl.count;
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.impl.executor.AbstractQueryExecutor;
@@ -48,6 +49,11 @@ public class DefaultCountQuerier extends AbstractQueryExecutor implements CountQ
     public DefaultCountQuerier(AbstractQueryRepository<?, ?> repository, SqlRunner sqlRunner) {
         super(repository);
         this.sqlRunner = sqlRunner;
+    }
+
+    @Override
+    protected Result<Object> doExecuteQuery(QueryContext queryContext) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

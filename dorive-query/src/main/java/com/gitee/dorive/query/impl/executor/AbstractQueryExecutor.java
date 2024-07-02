@@ -47,6 +47,9 @@ public abstract class AbstractQueryExecutor implements QueryExecutor {
     @Override
     public Result<Object> executeQuery(QueryContext queryContext) {
         resolve(queryContext);
+        if (queryContext.isSimpleQuery()) {
+            return executeRootQuery(queryContext);
+        }
         return doExecuteQuery(queryContext);
     }
 
@@ -101,7 +104,7 @@ public abstract class AbstractQueryExecutor implements QueryExecutor {
     }
 
     @SuppressWarnings("unchecked")
-    protected Result<Object> doExecuteQuery(QueryContext queryContext) {
+    protected Result<Object> executeRootQuery(QueryContext queryContext) {
         Context context = queryContext.getContext();
         ResultType resultType = queryContext.getResultType();
         Example example = queryContext.getExample();
@@ -119,5 +122,7 @@ public abstract class AbstractQueryExecutor implements QueryExecutor {
         }
         return queryContext.newEmptyResult();
     }
+
+    protected abstract Result<Object> doExecuteQuery(QueryContext queryContext);
 
 }
