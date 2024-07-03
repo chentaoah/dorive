@@ -36,14 +36,14 @@ public class MergedRepository {
     private String lastAccessPath;
     // 绝对路径
     private String absoluteAccessPath;
-    // 血缘路径
-    private Set<String> bloodAccessPaths;
+    // 定义仓储
+    private CommonRepository definedRepository;
     // absoluteAccessPath ==> StrongBinder
     private Map<String, List<StrongBinder>> mergedStrongBindersMap;
     // absoluteAccessPath ==> ValueRouteBinder
     private Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap;
-    // 定义仓储
-    private CommonRepository definedRepository;
+    // 血缘路径
+    private Set<String> bloodAccessPaths;
     // 执行仓储
     private CommonRepository executedRepository;
     // 序列号

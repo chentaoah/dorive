@@ -117,6 +117,11 @@ public class MergedRepositoryResolver {
             mergedValueRouteBindersMap.forEach((k, v) -> newMergedValueRouteBindersMap.put(mergeAccessPath(accessPath, k), v));
             newMergedRepository.setMergedValueRouteBindersMap(newMergedValueRouteBindersMap);
 
+            Set<String> bloodAccessPaths = mergedRepository.getBloodAccessPaths();
+            Set<String> newBloodAccessPaths = new LinkedHashSet<>(bloodAccessPaths.size() * 4 / 3 + 1);
+            bloodAccessPaths.forEach(k -> newBloodAccessPaths.add(mergeAccessPath(accessPath, k)));
+            newMergedRepository.setBloodAccessPaths(newBloodAccessPaths);
+
             newMergedRepository.setExecutedRepository(mergedRepository.getExecutedRepository());
             addMergedRepository(newMergedRepository);
         }
