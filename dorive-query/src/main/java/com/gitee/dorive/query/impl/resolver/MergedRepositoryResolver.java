@@ -28,9 +28,7 @@ import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 public class MergedRepositoryResolver {
@@ -50,26 +48,32 @@ public class MergedRepositoryResolver {
             String accessPath = repository.getAccessPath();
             BinderResolver binderResolver = repository.getBinderResolver();
 
-            String relativeAccessPath = accessPath;
             CommonRepository executedRepository = repository;
             AbstractRepository<Object, Object> abstractRepository = repository.getProxyRepository();
             AbstractQueryRepository<?, ?> abstractQueryRepository = null;
             if (abstractRepository instanceof AbstractQueryRepository) {
                 abstractQueryRepository = (AbstractQueryRepository<?, ?>) abstractRepository;
-                relativeAccessPath = relativeAccessPath + "/";
                 executedRepository = abstractQueryRepository.getRootRepository();
             }
 
             MergedRepository mergedRepository = new MergedRepository();
             mergedRepository.setLastAccessPath("");
             mergedRepository.setAbsoluteAccessPath(accessPath);
-            mergedRepository.setRelativeAccessPath(relativeAccessPath);
-            mergedRepository.setMerged(abstractQueryRepository != null);
             mergedRepository.setDefinedRepository(repository);
-            mergedRepository.setRelativeStrongBindersMap(new LinkedHashMap<>(binderResolver.getMergedStrongBindersMap()));
-            mergedRepository.setRelativeValueRouteBindersMap(new LinkedHashMap<>(binderResolver.getMergedValueRouteBindersMap()));
+            mergedRepository.setMergedStrongBindersMap(new LinkedHashMap<>(binderResolver.getMergedStrongBindersMap()));
+            mergedRepository.setMergedValueRouteBindersMap(new LinkedHashMap<>(binderResolver.getMergedValueRouteBindersMap()));
+
+            // 血缘分析
+            Set<String> bloodAccessPaths = new LinkedHashSet<>(8);
+            bloodAccessPaths.addAll(mergedRepository.getMergedStrongBindersMap().keySet());
+            bloodAccessPaths.addAll(mergedRepository.getMergedValueRouteBindersMap().keySet());
+            for (String bloodAccessPath : bloodAccessPaths) {
+                MergedRepository bloodMergedRepository = mergedRepositoryMap.get(bloodAccessPath);
+                bloodAccessPaths.addAll(bloodMergedRepository.getBloodAccessPaths());
+            }
+            mergedRepository.setBloodAccessPaths(bloodAccessPaths);
+
             mergedRepository.setExecutedRepository(executedRepository);
-            mergedRepository.setOrder(mergedRepositoryMap.size() + 1);
             addMergedRepository(mergedRepository);
 
             if (abstractQueryRepository != null) {
@@ -79,8 +83,12 @@ public class MergedRepositoryResolver {
     }
 
     private void addMergedRepository(MergedRepository mergedRepository) {
+        mergedRepository.setOrder(mergedRepositoryMap.size() + 1);
+        mergedRepository.setAlias("t" + mergedRepository.getOrder());
+
         String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
         mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);
+
         String name = mergedRepository.getName();
         if (StringUtils.isNotBlank(name)) {
             nameMergedRepositoryMap.putIfAbsent(name, mergedRepository);
@@ -97,24 +105,25 @@ public class MergedRepositoryResolver {
             MergedRepository newMergedRepository = new MergedRepository();
             newMergedRepository.setLastAccessPath(accessPath + mergedRepository.getLastAccessPath());
             newMergedRepository.setAbsoluteAccessPath(accessPath + mergedRepository.getAbsoluteAccessPath());
-            newMergedRepository.setRelativeAccessPath(accessPath + mergedRepository.getRelativeAccessPath());
-            newMergedRepository.setMerged(mergedRepository.isMerged());
             newMergedRepository.setDefinedRepository(mergedRepository.getDefinedRepository());
 
-            Map<String, List<StrongBinder>> relativeStrongBindersMap = mergedRepository.getRelativeStrongBindersMap();
-            Map<String, List<StrongBinder>> newRelativeStrongBindersMap = new LinkedHashMap<>(relativeStrongBindersMap.size() * 4 / 3 + 1);
-            relativeStrongBindersMap.forEach((k, v) -> newRelativeStrongBindersMap.put(accessPath + k, v));
-            newMergedRepository.setRelativeStrongBindersMap(newRelativeStrongBindersMap);
+            Map<String, List<StrongBinder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
+            Map<String, List<StrongBinder>> newMergedStrongBindersMap = new LinkedHashMap<>(mergedStrongBindersMap.size() * 4 / 3 + 1);
+            mergedStrongBindersMap.forEach((k, v) -> newMergedStrongBindersMap.put(mergeAccessPath(accessPath, k), v));
+            newMergedRepository.setMergedStrongBindersMap(newMergedStrongBindersMap);
 
-            Map<String, List<ValueRouteBinder>> relativeValueRouteBindersMap = mergedRepository.getRelativeValueRouteBindersMap();
-            Map<String, List<ValueRouteBinder>> newRelativeValueRouteBindersMap = new LinkedHashMap<>(relativeValueRouteBindersMap.size() * 4 / 3 + 1);
-            relativeValueRouteBindersMap.forEach((k, v) -> newRelativeValueRouteBindersMap.put(accessPath + k, v));
-            newMergedRepository.setRelativeValueRouteBindersMap(newRelativeValueRouteBindersMap);
+            Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
+            Map<String, List<ValueRouteBinder>> newMergedValueRouteBindersMap = new LinkedHashMap<>(mergedValueRouteBindersMap.size() * 4 / 3 + 1);
+            mergedValueRouteBindersMap.forEach((k, v) -> newMergedValueRouteBindersMap.put(mergeAccessPath(accessPath, k), v));
+            newMergedRepository.setMergedValueRouteBindersMap(newMergedValueRouteBindersMap);
 
             newMergedRepository.setExecutedRepository(mergedRepository.getExecutedRepository());
-            newMergedRepository.setOrder(mergedRepositoryMap.size() + 1);
             addMergedRepository(newMergedRepository);
         }
+    }
+
+    private String mergeAccessPath(String lastAccessPath, String accessPath) {
+        return "/".equals(accessPath) ? lastAccessPath : lastAccessPath + accessPath;
     }
 
 }

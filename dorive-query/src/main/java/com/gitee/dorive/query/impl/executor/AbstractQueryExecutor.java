@@ -100,12 +100,15 @@ public abstract class AbstractQueryExecutor implements QueryExecutor {
         Map<String, QueryUnit> queryUnitMap = new LinkedHashMap<>();
         for (MergedRepository mergedRepository : mergedRepositories) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-            String relativeAccessPath = mergedRepository.getRelativeAccessPath();
             Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample());
-            QueryUnit queryUnit = new QueryUnit(mergedRepository, example, false);
-            queryUnitMap.put(relativeAccessPath, queryUnit);
+            QueryUnit queryUnit = newQueryUnit(queryContext, mergedRepository, example);
+            queryUnitMap.put(absoluteAccessPath, queryUnit);
         }
         return queryUnitMap;
+    }
+
+    protected QueryUnit newQueryUnit(QueryContext queryContext, MergedRepository mergedRepository, Example example) {
+        return new QueryUnit(mergedRepository, example, false);
     }
 
     @SuppressWarnings("unchecked")

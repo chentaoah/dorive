@@ -20,10 +20,8 @@ package com.gitee.dorive.sql.impl.executor;
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.enums.ResultType;
-import com.gitee.dorive.query.impl.executor.AbstractQueryExecutor;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.CountQuerier;
 import com.gitee.dorive.sql.api.SqlRunner;
@@ -31,7 +29,7 @@ import com.gitee.dorive.sql.entity.common.CountQuery;
 import com.gitee.dorive.sql.entity.common.SegmentInfo;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableSegment;
-import com.gitee.dorive.sql.impl.segment.SegmentBuilder;
+import com.gitee.dorive.sql.impl.segment.SelectSegmentBuilder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,18 +40,10 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class CountQueryExecutor extends AbstractQueryExecutor implements CountQuerier {
+public class CountSqlQueryExecutor extends SqlQueryExecutor implements CountQuerier {
 
-    private SqlRunner sqlRunner;
-
-    public CountQueryExecutor(AbstractQueryRepository<?, ?> repository, SqlRunner sqlRunner) {
-        super(repository);
-        this.sqlRunner = sqlRunner;
-    }
-
-    @Override
-    protected Result<Object> doExecuteQuery(QueryContext queryContext) {
-        throw new UnsupportedOperationException();
+    public CountSqlQueryExecutor(AbstractQueryRepository<?, ?> repository, SqlRunner sqlRunner) {
+        super(repository, sqlRunner);
     }
 
     @Override
@@ -61,14 +51,14 @@ public class CountQueryExecutor extends AbstractQueryExecutor implements CountQu
         QueryContext queryContext = new QueryContext(context, countQuery.getQuery(), ResultType.COUNT);
         resolve(queryContext);
 
-        SegmentBuilder segmentBuilder = new SegmentBuilder(queryContext);
-        SelectSegment selectSegment = segmentBuilder.buildSegment(context, countQuery.getSelector());
+        SelectSegmentBuilder selectSegmentBuilder = new SelectSegmentBuilder(queryContext);
+        SelectSegment selectSegment = selectSegmentBuilder.build(countQuery.getSelector());
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<Object> args = selectSegment.getArgs();
 
         String tableAlias = tableSegment.getTableAlias();
         EntityElement entityElement = repository.getEntityElement();
-        String countByExp = buildCountByExp(countQuery, segmentBuilder, tableAlias, entityElement);
+        String countByExp = buildCountByExp(countQuery, selectSegmentBuilder, tableAlias, entityElement);
 
         String groupByPrefix = tableAlias + ".";
         List<String> groupBy = entityElement.toAliases(countQuery.getGroupBy());
@@ -86,8 +76,8 @@ public class CountQueryExecutor extends AbstractQueryExecutor implements CountQu
         return countMap;
     }
 
-    private String buildCountByExp(CountQuery countQuery, SegmentBuilder segmentBuilder, String tableAlias, EntityElement entityElement) {
-        List<SegmentInfo> segmentInfos = segmentBuilder.getMatchedSegmentInfos();
+    private String buildCountByExp(CountQuery countQuery, SelectSegmentBuilder selectSegmentBuilder, String tableAlias, EntityElement entityElement) {
+        List<SegmentInfo> segmentInfos = selectSegmentBuilder.getMatchedSegmentInfos();
         if (segmentInfos != null && !segmentInfos.isEmpty()) {
             SegmentInfo segmentInfo = segmentInfos.get(0);
             tableAlias = segmentInfo.getTableAlias();

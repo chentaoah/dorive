@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -34,13 +35,16 @@ public class MergedRepository {
 
     private String lastAccessPath;
     private String absoluteAccessPath;
-    private String relativeAccessPath;
-    private boolean merged;
     private CommonRepository definedRepository;
-    private Map<String, List<StrongBinder>> relativeStrongBindersMap;
-    private Map<String, List<ValueRouteBinder>> relativeValueRouteBindersMap;
+    // absoluteAccessPath ==> StrongBinder
+    private Map<String, List<StrongBinder>> mergedStrongBindersMap;
+    // absoluteAccessPath ==> ValueRouteBinder
+    private Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap;
+    // 血缘路径
+    private Set<String> bloodAccessPaths;
     private CommonRepository executedRepository;
     private Integer order;
+    private String alias;
 
     public String getName() {
         return definedRepository.getEntityElement().getEntityDef().getName();

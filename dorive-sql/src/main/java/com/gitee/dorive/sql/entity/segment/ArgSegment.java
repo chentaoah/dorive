@@ -17,12 +17,13 @@
 
 package com.gitee.dorive.sql.entity.segment;
 
+import com.gitee.dorive.sql.api.Segment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ArgSegment {
+public class ArgSegment implements Segment {
 
     private String tableAlias;
     private String column;

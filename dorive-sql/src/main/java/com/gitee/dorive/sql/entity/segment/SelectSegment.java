@@ -19,6 +19,7 @@ package com.gitee.dorive.sql.entity.segment;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlBuilder;
+import com.gitee.dorive.sql.api.Segment;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -26,38 +27,30 @@ import java.util.Collections;
 import java.util.List;
 
 @Data
-public class SelectSegment {
+public class SelectSegment implements Segment {
 
-    private char letter = 'a';
     private boolean distinct;
     private List<String> selectColumns = Collections.emptyList();
     private TableSegment tableSegment;
-    private List<JoinSegment> joinSegments = new ArrayList<>();
+    private List<TableJoinSegment> tableJoinSegments = new ArrayList<>();
     private List<ArgSegment> argSegments = new ArrayList<>();
     private List<Object> args = new ArrayList<>();
     private String groupBy;
     private String orderBy;
     private String limit;
 
-    public String generateTableAlias() {
-        String tableAlias = String.valueOf(letter);
-        letter = (char) (letter + 1);
-        return tableAlias;
-    }
-
     public void filterTableSegments() {
         if (tableSegment.isJoin()) {
             argSegments.addAll(tableSegment.getArgSegments());
         }
-        List<JoinSegment> newJoinSegments = new ArrayList<>(joinSegments.size());
-        for (JoinSegment joinSegment : joinSegments) {
-            TableSegment tableSegment = joinSegment.getTableSegment();
-            if (tableSegment.isJoin()) {
-                newJoinSegments.add(joinSegment);
-                argSegments.addAll(tableSegment.getArgSegments());
+        List<TableJoinSegment> newTableJoinSegments = new ArrayList<>(tableJoinSegments.size());
+        for (TableJoinSegment tableJoinSegment : tableJoinSegments) {
+            if (tableJoinSegment.isJoin()) {
+                argSegments.addAll(tableJoinSegment.getArgSegments());
+                newTableJoinSegments.add(tableJoinSegment);
             }
         }
-        joinSegments = newJoinSegments;
+        tableJoinSegments = newTableJoinSegments;
     }
 
     public String selectSql() {
@@ -69,10 +62,9 @@ public class SelectSegment {
     public String fromWhereSql() {
         SqlBuilder sqlBuilder = SqlBuilder.create();
         sqlBuilder.from(tableSegment.toString());
-        for (JoinSegment joinSegment : joinSegments) {
-            TableSegment tableSegment = joinSegment.getTableSegment();
-            sqlBuilder.join(tableSegment.toString(), SqlBuilder.Join.LEFT);
-            sqlBuilder.on(StrUtil.join(" AND ", joinSegment.getOnSegments()));
+        for (TableJoinSegment tableJoinSegment : tableJoinSegments) {
+            sqlBuilder.join(tableJoinSegment.toString(), SqlBuilder.Join.LEFT);
+            sqlBuilder.on(StrUtil.join(" AND ", tableJoinSegment.getOnSegments()));
         }
         sqlBuilder.where(StrUtil.join(" AND ", argSegments));
         return sqlBuilder.toString();

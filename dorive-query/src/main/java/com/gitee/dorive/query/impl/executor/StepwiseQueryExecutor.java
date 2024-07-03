@@ -70,17 +70,17 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
             boolean abandoned = queryUnit.isAbandoned();
 
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
-            Map<String, List<StrongBinder>> relativeStrongBindersMap = mergedRepository.getRelativeStrongBindersMap();
-            Map<String, List<ValueRouteBinder>> relativeValueRouteBindersMap = mergedRepository.getRelativeValueRouteBindersMap();
+            Map<String, List<StrongBinder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
+            Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 
             if (!abandoned) {
-                abandoned = determineAbandon(queryUnitMap, relativeValueRouteBindersMap.keySet());
+                abandoned = determineAbandon(queryUnitMap, mergedValueRouteBindersMap.keySet());
             }
             if (!abandoned) {
-                abandoned = determineAbandon(queryUnitMap, relativeStrongBindersMap.keySet());
+                abandoned = determineAbandon(queryUnitMap, mergedStrongBindersMap.keySet());
             }
 
             List<Object> entities;
@@ -96,8 +96,8 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
                 return;
             }
 
-            relativeValueRouteBindersMap.forEach((relativeAccessPath, valueRouteBinders) -> {
-                QueryUnit targetQueryUnit = queryUnitMap.get(relativeAccessPath);
+            mergedValueRouteBindersMap.forEach((absoluteAccessPath, valueRouteBinders) -> {
+                QueryUnit targetQueryUnit = queryUnitMap.get(absoluteAccessPath);
                 if (targetQueryUnit != null) {
                     Example targetExample = targetQueryUnit.getExample();
                     for (ValueRouteBinder valueRouteBinder : valueRouteBinders) {
@@ -110,8 +110,8 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
                 }
             });
 
-            relativeStrongBindersMap.forEach((relativeAccessPath, strongBinders) -> {
-                QueryUnit targetQueryUnit = queryUnitMap.get(relativeAccessPath);
+            mergedStrongBindersMap.forEach((absoluteAccessPath, strongBinders) -> {
+                QueryUnit targetQueryUnit = queryUnitMap.get(absoluteAccessPath);
                 if (targetQueryUnit != null) {
                     if (entities.isEmpty()) {
                         targetQueryUnit.setAbandoned(true);
@@ -147,9 +147,9 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
         });
     }
 
-    private boolean determineAbandon(Map<String, QueryUnit> exampleWrapperMap, Set<String> relativeAccessPaths) {
-        for (String relativeAccessPath : relativeAccessPaths) {
-            QueryUnit targetQueryUnit = exampleWrapperMap.get(relativeAccessPath);
+    private boolean determineAbandon(Map<String, QueryUnit> queryUnitMap, Set<String> absoluteAccessPaths) {
+        for (String absoluteAccessPath : absoluteAccessPaths) {
+            QueryUnit targetQueryUnit = queryUnitMap.get(absoluteAccessPath);
             if (targetQueryUnit != null) {
                 if (targetQueryUnit.isAbandoned()) {
                     return true;

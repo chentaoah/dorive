@@ -24,9 +24,7 @@ import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.impl.resolver.QueryExampleResolver;
 import lombok.Data;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 public class QueryContext {
@@ -41,6 +39,7 @@ public class QueryContext {
     private Example example;
     private Map<String, QueryUnit> queryUnitMap;
     private QueryUnit queryUnit;
+    private List<Object> args = new ArrayList<>(8);
 
     public QueryContext(Context context, Object query, ResultType resultType) {
         this.context = context;

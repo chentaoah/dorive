@@ -22,7 +22,9 @@ import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.*;
+import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.impl.executor.AbstractQueryExecutor;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
@@ -30,7 +32,8 @@ import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.segment.ArgSegment;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableSegment;
-import com.gitee.dorive.sql.impl.segment.SegmentBuilder;
+import com.gitee.dorive.sql.impl.segment.SelectSegmentBuilder;
+import com.gitee.dorive.sql.impl.segment.SegmentUnitResolver;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,11 +45,17 @@ import java.util.Map;
 @Setter
 public class SqlQueryExecutor extends AbstractQueryExecutor {
 
-    private SqlRunner sqlRunner;
+    protected SqlRunner sqlRunner;
 
     public SqlQueryExecutor(AbstractQueryRepository<?, ?> repository, SqlRunner sqlRunner) {
         super(repository);
         this.sqlRunner = sqlRunner;
+    }
+
+    @Override
+    protected QueryUnit newQueryUnit(QueryContext queryContext, MergedRepository mergedRepository, Example example) {
+        SegmentUnitResolver segmentUnitResolver = new SegmentUnitResolver(repository, queryContext, mergedRepository, example);
+        return segmentUnitResolver.resolve();
     }
 
     @Override
@@ -67,9 +76,8 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         boolean needCount = queryContext.isNeedCount();
         Result<Object> emptyResult = queryContext.newEmptyResult();
 
-        SegmentBuilder segmentBuilder = new SegmentBuilder(queryContext);
-        SelectSegment selectSegment = segmentBuilder.buildSegment(context, null);
-        char letter = selectSegment.getLetter();
+        SelectSegmentBuilder selectSegmentBuilder = new SelectSegmentBuilder(queryContext);
+        SelectSegment selectSegment = selectSegmentBuilder.build(null);
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<ArgSegment> argSegments = selectSegment.getArgSegments();
         List<Object> args = selectSegment.getArgs();
@@ -88,7 +96,7 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
 
         if (needCount) {
             String countSql = selectSql + fromWhereSql;
-            long count = sqlRunner.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") " + letter, args.toArray());
+            long count = sqlRunner.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") c", args.toArray());
             if (count == 0L) {
                 return emptyResult;
             }

@@ -20,10 +20,12 @@ package com.gitee.dorive.sql.entity.segment;
 import com.gitee.dorive.sql.api.Segment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class OnSegment implements Segment {
 

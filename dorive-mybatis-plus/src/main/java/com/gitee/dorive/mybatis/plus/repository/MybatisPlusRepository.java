@@ -37,7 +37,7 @@ import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.sql.api.CountQuerier;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.common.CountQuery;
-import com.gitee.dorive.sql.impl.executor.CountQueryExecutor;
+import com.gitee.dorive.sql.impl.executor.CountSqlQueryExecutor;
 import com.gitee.dorive.sql.impl.executor.SqlQueryExecutor;
 import com.gitee.dorive.sql.impl.executor.UnionExecutor;
 import lombok.Getter;
@@ -64,7 +64,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
         this.sqlRunner = implFactory.getInstance(SqlRunner.class);
         this.sqlQueryExecutor = new SqlQueryExecutor(this, this.sqlRunner);
-        this.countQuerier = new CountQueryExecutor(this, this.sqlRunner);
+        this.countQuerier = new CountSqlQueryExecutor(this, this.sqlRunner);
         super.afterPropertiesSet();
     }
 
