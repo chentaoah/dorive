@@ -32,22 +32,26 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MergedRepository {
-
+    // 上一路径
     private String lastAccessPath;
+    // 绝对路径
     private String absoluteAccessPath;
-    private CommonRepository definedRepository;
+    // 血缘路径
+    private Set<String> bloodAccessPaths;
     // absoluteAccessPath ==> StrongBinder
     private Map<String, List<StrongBinder>> mergedStrongBindersMap;
     // absoluteAccessPath ==> ValueRouteBinder
     private Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap;
-    // 血缘路径
-    private Set<String> bloodAccessPaths;
+    // 定义仓储
+    private CommonRepository definedRepository;
+    // 执行仓储
     private CommonRepository executedRepository;
+    // 序列号
     private Integer order;
+    // 别名
     private String alias;
 
     public String getName() {
         return definedRepository.getEntityElement().getEntityDef().getName();
     }
-
 }
