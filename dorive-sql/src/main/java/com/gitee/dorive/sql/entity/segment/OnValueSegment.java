@@ -17,25 +17,15 @@
 
 package com.gitee.dorive.sql.entity.segment;
 
-import com.gitee.dorive.sql.api.Segment;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class OnValueSegment implements Segment {
+public class OnValueSegment extends OnSegment {
 
-    private String tableAlias;
-    private String column;
-    private String literal;
-
-    @Override
-    public String toString() {
-        return tableAlias + "." + column + " = " + literal;
+    public OnValueSegment(String leftExpr, String operator, String rightExpr) {
+        super(leftExpr, operator, rightExpr);
     }
 
 }

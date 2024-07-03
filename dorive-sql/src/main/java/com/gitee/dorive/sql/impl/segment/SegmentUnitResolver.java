@@ -18,14 +18,16 @@ import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
-import com.gitee.dorive.sql.api.Segment;
 import com.gitee.dorive.sql.entity.common.SegmentUnit;
 import com.gitee.dorive.sql.entity.segment.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -77,7 +79,7 @@ public class SegmentUnitResolver {
         return tableSegment;
     }
 
-    private List<Segment> newOnSegments() {
+    private List<OnSegment> newOnSegments() {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
 
@@ -90,33 +92,32 @@ public class SegmentUnitResolver {
         BinderResolver binderResolver = definedRepository.getBinderResolver();
         List<ValueFilterBinder> valueFilterBinders = binderResolver.getValueFilterBinders();
 
-        List<Segment> onSegments = new ArrayList<>(mergedStrongBindersMap.size() + mergedValueRouteBindersMap.size() + valueFilterBinders.size());
+        List<OnSegment> onSegments = new ArrayList<>(mergedStrongBindersMap.size() + mergedValueRouteBindersMap.size() + valueFilterBinders.size());
         mergedStrongBindersMap.forEach((absoluteAccessPath, strongBinders) -> {
             MergedRepository targetMergedRepository = mergedRepositoryMap.get(absoluteAccessPath);
             for (StrongBinder strongBinder : strongBinders) {
-                OnSegment onSegment = new OnSegment();
-                onSegment.setTableAlias(mergedRepository.getAlias());
-                onSegment.setColumn(strongBinder.getFieldAlias());
-                onSegment.setJoinTableAlias(targetMergedRepository.getAlias());
-                onSegment.setJoinColumn(strongBinder.getBindFieldAlias());
+                String leftExpr = mergedRepository.getAlias() + "." + strongBinder.getFieldAlias();
+                String operator = "=";
+                String rightExpr = targetMergedRepository.getAlias() + "." + strongBinder.getBindFieldAlias();
+                OnSegment onSegment = new OnSegment(leftExpr, operator, rightExpr);
                 onSegments.add(onSegment);
             }
         });
         mergedValueRouteBindersMap.forEach((absoluteAccessPath, valueRouteBinders) -> {
             MergedRepository targetMergedRepository = mergedRepositoryMap.get(absoluteAccessPath);
             for (ValueRouteBinder valueRouteBinder : valueRouteBinders) {
-                OnValueSegment onValueSegment = new OnValueSegment();
-                onValueSegment.setTableAlias(targetMergedRepository.getAlias());
-                onValueSegment.setColumn(valueRouteBinder.getBindFieldAlias());
-                onValueSegment.setLiteral(CriterionUtils.sqlParam(valueRouteBinder.getFieldValue(context, null)));
+                String leftExpr = targetMergedRepository.getAlias() + "." + valueRouteBinder.getBindFieldAlias();
+                String operator = "=";
+                String rightExpr = CriterionUtils.sqlParam(valueRouteBinder.getFieldValue(context, null));
+                OnValueSegment onValueSegment = new OnValueSegment(leftExpr, operator, rightExpr);
                 onSegments.add(onValueSegment);
             }
         });
         for (ValueFilterBinder valueFilterBinder : valueFilterBinders) {
-            OnValueSegment onValueSegment = new OnValueSegment();
-            onValueSegment.setTableAlias(mergedRepository.getAlias());
-            onValueSegment.setColumn(valueFilterBinder.getFieldAlias());
-            onValueSegment.setLiteral(CriterionUtils.sqlParam(valueFilterBinder.getBoundValue(context, null)));
+            String leftExpr = mergedRepository.getAlias() + "." + valueFilterBinder.getFieldAlias();
+            String operator = "=";
+            String rightExpr = CriterionUtils.sqlParam(valueFilterBinder.getBoundValue(context, null));
+            OnValueSegment onValueSegment = new OnValueSegment(leftExpr, operator, rightExpr);
             onSegments.add(onValueSegment);
         }
         return onSegments;
@@ -130,14 +131,14 @@ public class SegmentUnitResolver {
             String property = criterion.getProperty();
             String operator = CriterionUtils.getOperator(criterion);
             if (Operator.IS_NULL.equals(operator) || Operator.IS_NOT_NULL.equals(operator)) {
-                ArgSegment argSegment = new ArgSegment(tableAlias, property, operator, null);
+                ArgSegment argSegment = new ArgSegment(tableAlias + "." + property, operator, null);
                 argSegments.add(argSegment);
 
             } else {
                 Object value = criterion.getValue();
                 args.add(CriterionUtils.format(operator, value));
                 int index = args.size() - 1;
-                ArgSegment argSegment = new ArgSegment(tableAlias, property, operator, "{" + index + "}");
+                ArgSegment argSegment = new ArgSegment(tableAlias + "." + property, operator, "{" + index + "}");
                 argSegments.add(argSegment);
             }
         }

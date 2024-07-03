@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.sql.entity.segment;
 
-import com.gitee.dorive.sql.api.Segment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,5 +29,5 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TableJoinSegment extends TableSegment {
-    private List<Segment> onSegments;
+    private List<OnSegment> onSegments;
 }
