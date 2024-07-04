@@ -72,7 +72,6 @@ public abstract class AbstractQueryExecutor implements QueryExecutor {
         queryContext.setExample(exampleMap.get("/"));
 
         Map<String, QueryUnit> queryUnitMap = newQueryUnitMap(queryContext);
-        queryContext.setQueryUnitMap(queryUnitMap);
         queryContext.setQueryUnit(queryUnitMap.get("/"));
     }
 
@@ -98,6 +97,7 @@ public abstract class AbstractQueryExecutor implements QueryExecutor {
         List<MergedRepository> mergedRepositories = queryContext.getMergedRepositories();
         Map<String, Example> exampleMap = queryContext.getExampleMap();
         Map<String, QueryUnit> queryUnitMap = new LinkedHashMap<>();
+        queryContext.setQueryUnitMap(queryUnitMap);
         for (MergedRepository mergedRepository : mergedRepositories) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample());
