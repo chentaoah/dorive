@@ -46,11 +46,11 @@ public class SelectSegmentBuilder {
         List<SegmentUnit> segmentUnits = new ArrayList<>(4);
         Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
         for (QueryUnit queryUnit : queryUnitMap.values()) {
-            SegmentUnit segmentUnit = (SegmentUnit) queryUnit;
             MergedRepository mergedRepository = queryUnit.getMergedRepository();
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             boolean isMatch = definedRepository.matches(selector);
             if (isMatch) {
+                SegmentUnit segmentUnit = (SegmentUnit) queryUnit;
                 TableSegment tableSegment = segmentUnit.getTableSegment();
                 tableSegment.setJoin(true);
                 segmentUnits.add(segmentUnit);
