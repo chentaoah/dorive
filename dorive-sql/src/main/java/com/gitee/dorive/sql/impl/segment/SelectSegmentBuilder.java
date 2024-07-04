@@ -65,19 +65,19 @@ public class SelectSegmentBuilder {
         List<ArgSegment> argSegments = selectSegment.getArgSegments();
 
         Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
-        queryUnitMap.forEach((absoluteAccessPath, queryUnit) -> {
+        for (QueryUnit queryUnit : queryUnitMap.values()) {
             SegmentUnit segmentUnit = (SegmentUnit) queryUnit;
             TableSegment tableSegment = segmentUnit.getTableSegment();
-            if ("/".equals(absoluteAccessPath)) {
+            if (segmentUnit.isRoot()) {
                 selectSegment.setTableSegment(tableSegment);
-                argSegments.addAll(tableSegment.getArgSegments());
-            } else {
-                if (tableSegment.isJoin()) {
-                    tableJoinSegments.add((TableJoinSegment) tableSegment);
-                    argSegments.addAll(tableSegment.getArgSegments());
-                }
+
+            } else if (tableSegment.isJoin()) {
+                tableJoinSegments.add((TableJoinSegment) tableSegment);
             }
-        });
+            if (tableSegment.isJoin()) {
+                argSegments.addAll(tableSegment.getArgSegments());
+            }
+        }
         selectSegment.setArgs(queryContext.getArgs());
 
         return selectSegment;

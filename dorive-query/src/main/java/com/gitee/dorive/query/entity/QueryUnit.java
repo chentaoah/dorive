@@ -32,6 +32,10 @@ public class QueryUnit {
     protected Example example;
     protected boolean abandoned;
 
+    public boolean isRoot() {
+        return "/".equals(mergedRepository.getAbsoluteAccessPath());
+    }
+
     public EntityElement getEntityElement() {
         return mergedRepository.getExecutedRepository().getEntityElement();
     }
