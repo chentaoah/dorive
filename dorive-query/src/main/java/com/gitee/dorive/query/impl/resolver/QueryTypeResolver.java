@@ -84,7 +84,7 @@ public class QueryTypeResolver {
             }
         }
 
-        mergedRepositories.sort(Comparator.comparing(MergedRepository::getOrder));
+        mergedRepositories.sort(Comparator.comparing(MergedRepository::getSequence));
         List<MergedRepository> reversedMergedRepositories = new ArrayList<>(mergedRepositories);
         Collections.reverse(reversedMergedRepositories);
 

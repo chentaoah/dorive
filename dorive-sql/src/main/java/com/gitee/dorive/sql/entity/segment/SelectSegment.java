@@ -39,20 +39,6 @@ public class SelectSegment implements Segment {
     private String orderBy;
     private String limit;
 
-    public void filterTableSegments() {
-        if (tableSegment.isJoin()) {
-            argSegments.addAll(tableSegment.getArgSegments());
-        }
-        List<TableJoinSegment> newTableJoinSegments = new ArrayList<>(tableJoinSegments.size());
-        for (TableJoinSegment tableJoinSegment : tableJoinSegments) {
-            if (tableJoinSegment.isJoin()) {
-                argSegments.addAll(tableJoinSegment.getArgSegments());
-                newTableJoinSegments.add(tableJoinSegment);
-            }
-        }
-        tableJoinSegments = newTableJoinSegments;
-    }
-
     public String selectSql() {
         SqlBuilder sqlBuilder = SqlBuilder.create();
         sqlBuilder.select(distinct, selectColumns);

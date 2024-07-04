@@ -17,13 +17,11 @@
 
 package com.gitee.dorive.sql.impl.segment;
 
-import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
-import com.gitee.dorive.sql.entity.common.SegmentInfo;
 import com.gitee.dorive.sql.entity.common.SegmentUnit;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableJoinSegment;
@@ -32,48 +30,56 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class SelectSegmentBuilder {
 
     private QueryContext queryContext;
-    private List<SegmentInfo> matchedSegmentInfos;
 
     public SelectSegmentBuilder(QueryContext queryContext) {
         this.queryContext = queryContext;
     }
 
-    public SelectSegment build(Selector selector) {
-        if (selector != null) {
-            this.matchedSegmentInfos = new ArrayList<>(8);
-        }
-        SelectSegment selectSegment = new SelectSegment();
-        for (QueryUnit queryUnit : queryContext.getQueryUnitMap().values()) {
+    public List<SegmentUnit> select(Selector selector) {
+        List<SegmentUnit> segmentUnits = new ArrayList<>(4);
+        Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
+        for (QueryUnit queryUnit : queryUnitMap.values()) {
             SegmentUnit segmentUnit = (SegmentUnit) queryUnit;
             MergedRepository mergedRepository = queryUnit.getMergedRepository();
-            TableSegment tableSegment = segmentUnit.getTableSegment();
-
-            String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
-            CommonRepository executedRepository = mergedRepository.getExecutedRepository();
-            EntityElement entityElement = executedRepository.getEntityElement();
-
-            SegmentInfo segmentInfo = new SegmentInfo(tableSegment.getTableAlias(), entityElement);
-            boolean isMatch = selector != null && definedRepository.matches(selector);
+            boolean isMatch = definedRepository.matches(selector);
             if (isMatch) {
-                matchedSegmentInfos.add(segmentInfo);
-            }
-            tableSegment.setJoin(tableSegment.isJoin() || isMatch);
-
-            if ("/".equals(absoluteAccessPath)) {
-                selectSegment.setTableSegment(tableSegment);
-            } else {
-                TableJoinSegment tableJoinSegment = (TableJoinSegment) tableSegment;
-                selectSegment.getTableJoinSegments().add(tableJoinSegment);
+                TableSegment tableSegment = segmentUnit.getTableSegment();
+                tableSegment.setJoin(true);
+                segmentUnits.add(segmentUnit);
             }
         }
-        selectSegment.filterTableSegments();
+        return segmentUnits;
+    }
+
+    public SelectSegment build() {
+        SelectSegment selectSegment = new SelectSegment();
+
+        SegmentUnit segmentUnit = (SegmentUnit) queryContext.getQueryUnit();
+        TableSegment tableSegment = segmentUnit.getTableSegment();
+        if (tableSegment.isJoin()) {
+            selectSegment.setTableSegment(tableSegment);
+        }
+
+        Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
+        queryUnitMap.forEach((absoluteAccessPath, queryUnit) -> {
+            if (!"/".equals(absoluteAccessPath)) {
+                SegmentUnit subSegmentUnit = (SegmentUnit) queryUnit;
+                TableJoinSegment tableJoinSegment = (TableJoinSegment) subSegmentUnit.getTableSegment();
+                if (tableJoinSegment.isJoin()) {
+                    selectSegment.getTableJoinSegments().add(tableJoinSegment);
+                }
+            }
+        });
+
         selectSegment.setArgs(queryContext.getArgs());
+
         return selectSegment;
     }
 

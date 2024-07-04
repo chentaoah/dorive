@@ -83,8 +83,8 @@ public class MergedRepositoryResolver {
     }
 
     private void addMergedRepository(MergedRepository mergedRepository) {
-        mergedRepository.setOrder(mergedRepositoryMap.size() + 1);
-        mergedRepository.setAlias("t" + mergedRepository.getOrder());
+        mergedRepository.setSequence(mergedRepositoryMap.size() + 1);
+        mergedRepository.setAlias("t" + mergedRepository.getSequence());
 
         String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
         mergedRepositoryMap.put(absoluteAccessPath, mergedRepository);

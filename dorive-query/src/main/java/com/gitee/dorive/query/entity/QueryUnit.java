@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.query.entity;
 
+import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.entity.executor.Example;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,7 +27,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QueryUnit {
+
     protected MergedRepository mergedRepository;
     protected Example example;
     protected boolean abandoned;
+
+    public EntityElement getEntityElement() {
+        return mergedRepository.getExecutedRepository().getEntityElement();
+    }
+
 }

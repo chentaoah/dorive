@@ -26,7 +26,7 @@ import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.CountQuerier;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.common.CountQuery;
-import com.gitee.dorive.sql.entity.common.SegmentInfo;
+import com.gitee.dorive.sql.entity.common.SegmentUnit;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableSegment;
 import com.gitee.dorive.sql.impl.segment.SelectSegmentBuilder;
@@ -52,13 +52,14 @@ public class CountSqlQueryExecutor extends SqlQueryExecutor implements CountQuer
         resolve(queryContext);
 
         SelectSegmentBuilder selectSegmentBuilder = new SelectSegmentBuilder(queryContext);
-        SelectSegment selectSegment = selectSegmentBuilder.build(countQuery.getSelector());
+        List<SegmentUnit> segmentUnits = selectSegmentBuilder.select(countQuery.getSelector());
+        SelectSegment selectSegment = selectSegmentBuilder.build();
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<Object> args = selectSegment.getArgs();
 
         String tableAlias = tableSegment.getTableAlias();
         EntityElement entityElement = repository.getEntityElement();
-        String countByExp = buildCountByExp(countQuery, selectSegmentBuilder, tableAlias, entityElement);
+        String countByExp = buildCountByExp(countQuery, segmentUnits, tableAlias, entityElement);
 
         String groupByPrefix = tableAlias + ".";
         List<String> groupBy = entityElement.toAliases(countQuery.getGroupBy());
@@ -76,12 +77,11 @@ public class CountSqlQueryExecutor extends SqlQueryExecutor implements CountQuer
         return countMap;
     }
 
-    private String buildCountByExp(CountQuery countQuery, SelectSegmentBuilder selectSegmentBuilder, String tableAlias, EntityElement entityElement) {
-        List<SegmentInfo> segmentInfos = selectSegmentBuilder.getMatchedSegmentInfos();
-        if (segmentInfos != null && !segmentInfos.isEmpty()) {
-            SegmentInfo segmentInfo = segmentInfos.get(0);
-            tableAlias = segmentInfo.getTableAlias();
-            entityElement = segmentInfo.getEntityElement();
+    private String buildCountByExp(CountQuery countQuery, List<SegmentUnit> segmentUnits, String tableAlias, EntityElement entityElement) {
+        if (segmentUnits != null && !segmentUnits.isEmpty()) {
+            SegmentUnit segmentUnit = segmentUnits.get(0);
+            tableAlias = segmentUnit.getTableAlias();
+            entityElement = segmentUnit.getEntityElement();
         }
         String countByPrefix = tableAlias + ".";
         List<String> countBy = entityElement.toAliases(countQuery.getCountBy());

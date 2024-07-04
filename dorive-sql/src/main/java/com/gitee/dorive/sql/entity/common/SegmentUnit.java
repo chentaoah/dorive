@@ -8,5 +8,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SegmentUnit extends QueryUnit {
+
     private TableSegment tableSegment;
+
+    public String getTableAlias() {
+        return tableSegment.getTableAlias();
+    }
+
 }

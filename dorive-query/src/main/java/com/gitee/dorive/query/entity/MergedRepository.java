@@ -47,7 +47,7 @@ public class MergedRepository {
     // 执行仓储
     private CommonRepository executedRepository;
     // 序列号
-    private Integer order;
+    private Integer sequence;
     // 别名
     private String alias;
 
