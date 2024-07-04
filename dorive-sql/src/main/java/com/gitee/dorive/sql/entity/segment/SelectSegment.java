@@ -32,9 +32,9 @@ public class SelectSegment implements Segment {
     private boolean distinct;
     private List<String> selectColumns = Collections.emptyList();
     private TableSegment tableSegment;
-    private List<TableJoinSegment> tableJoinSegments = new ArrayList<>();
-    private List<ArgSegment> argSegments = new ArrayList<>();
-    private List<Object> args = new ArrayList<>();
+    private List<TableJoinSegment> tableJoinSegments = new ArrayList<>(6);
+    private List<ArgSegment> argSegments = new ArrayList<>(8);
+    private List<Object> args = new ArrayList<>(8);
     private String groupBy;
     private String orderBy;
     private String limit;

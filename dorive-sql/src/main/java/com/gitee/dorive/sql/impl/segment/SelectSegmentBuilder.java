@@ -23,6 +23,7 @@ import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.sql.entity.common.SegmentUnit;
+import com.gitee.dorive.sql.entity.segment.ArgSegment;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableJoinSegment;
 import com.gitee.dorive.sql.entity.segment.TableSegment;
@@ -60,24 +61,23 @@ public class SelectSegmentBuilder {
 
     public SelectSegment build() {
         SelectSegment selectSegment = new SelectSegment();
-
-        SegmentUnit segmentUnit = (SegmentUnit) queryContext.getQueryUnit();
-        TableSegment tableSegment = segmentUnit.getTableSegment();
-        if (tableSegment.isJoin()) {
-            selectSegment.setTableSegment(tableSegment);
-        }
+        List<TableJoinSegment> tableJoinSegments = selectSegment.getTableJoinSegments();
+        List<ArgSegment> argSegments = selectSegment.getArgSegments();
 
         Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
         queryUnitMap.forEach((absoluteAccessPath, queryUnit) -> {
-            if (!"/".equals(absoluteAccessPath)) {
-                SegmentUnit subSegmentUnit = (SegmentUnit) queryUnit;
-                TableJoinSegment tableJoinSegment = (TableJoinSegment) subSegmentUnit.getTableSegment();
-                if (tableJoinSegment.isJoin()) {
-                    selectSegment.getTableJoinSegments().add(tableJoinSegment);
+            SegmentUnit segmentUnit = (SegmentUnit) queryUnit;
+            TableSegment tableSegment = segmentUnit.getTableSegment();
+            if ("/".equals(absoluteAccessPath)) {
+                selectSegment.setTableSegment(tableSegment);
+                argSegments.addAll(tableSegment.getArgSegments());
+            } else {
+                if (tableSegment.isJoin()) {
+                    tableJoinSegments.add((TableJoinSegment) tableSegment);
+                    argSegments.addAll(tableSegment.getArgSegments());
                 }
             }
         });
-
         selectSegment.setArgs(queryContext.getArgs());
 
         return selectSegment;
