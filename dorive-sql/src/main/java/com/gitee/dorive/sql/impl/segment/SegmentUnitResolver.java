@@ -66,15 +66,8 @@ public class SegmentUnitResolver {
         tableSegment.setTableAlias(mergedRepository.getAlias());
         tableSegment.setJoin(example.isNotEmpty());
         tableSegment.setArgSegments(newArgSegments());
-
         if (tableSegment.isJoin()) {
-            Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
-            Set<String> bloodAccessPaths = mergedRepository.getBloodAccessPaths();
-            for (String bloodAccessPath : bloodAccessPaths) {
-                SegmentUnit segmentUnit = (SegmentUnit) queryUnitMap.get(bloodAccessPath);
-                TableSegment targetTableSegment = segmentUnit.getTableSegment();
-                targetTableSegment.setJoin(true);
-            }
+            setJoinForBound(mergedRepository);
         }
         return tableSegment;
     }
@@ -143,6 +136,17 @@ public class SegmentUnitResolver {
             }
         }
         return argSegments;
+    }
+
+    private void setJoinForBound(MergedRepository mergedRepository) {
+        Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
+        Set<String> boundAccessPaths = mergedRepository.getBoundAccessPaths();
+        for (String boundAccessPath : boundAccessPaths) {
+            SegmentUnit segmentUnit = (SegmentUnit) queryUnitMap.get(boundAccessPath);
+            TableSegment targetTableSegment = segmentUnit.getTableSegment();
+            targetTableSegment.setJoin(true);
+            setJoinForBound(segmentUnit.getMergedRepository());
+        }
     }
 
 }

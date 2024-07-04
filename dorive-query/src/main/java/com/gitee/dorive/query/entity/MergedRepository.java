@@ -42,8 +42,8 @@ public class MergedRepository {
     private Map<String, List<StrongBinder>> mergedStrongBindersMap;
     // absoluteAccessPath ==> ValueRouteBinder
     private Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap;
-    // 血缘路径
-    private Set<String> bloodAccessPaths;
+    // 绑定路径
+    private Set<String> boundAccessPaths;
     // 执行仓储
     private CommonRepository executedRepository;
     // 序列号

@@ -63,15 +63,10 @@ public class MergedRepositoryResolver {
             mergedRepository.setMergedStrongBindersMap(new LinkedHashMap<>(binderResolver.getMergedStrongBindersMap()));
             mergedRepository.setMergedValueRouteBindersMap(new LinkedHashMap<>(binderResolver.getMergedValueRouteBindersMap()));
 
-            // 血缘分析
-            Set<String> bloodAccessPaths = new LinkedHashSet<>(8);
-            bloodAccessPaths.addAll(mergedRepository.getMergedStrongBindersMap().keySet());
-            bloodAccessPaths.addAll(mergedRepository.getMergedValueRouteBindersMap().keySet());
-            for (String bloodAccessPath : bloodAccessPaths) {
-                MergedRepository bloodMergedRepository = mergedRepositoryMap.get(bloodAccessPath);
-                bloodAccessPaths.addAll(bloodMergedRepository.getBloodAccessPaths());
-            }
-            mergedRepository.setBloodAccessPaths(bloodAccessPaths);
+            Set<String> boundAccessPaths = new LinkedHashSet<>(8);
+            boundAccessPaths.addAll(mergedRepository.getMergedStrongBindersMap().keySet());
+            boundAccessPaths.addAll(mergedRepository.getMergedValueRouteBindersMap().keySet());
+            mergedRepository.setBoundAccessPaths(boundAccessPaths);
 
             mergedRepository.setExecutedRepository(executedRepository);
             addMergedRepository(mergedRepository);
@@ -117,10 +112,10 @@ public class MergedRepositoryResolver {
             mergedValueRouteBindersMap.forEach((k, v) -> newMergedValueRouteBindersMap.put(mergeAccessPath(accessPath, k), v));
             newMergedRepository.setMergedValueRouteBindersMap(newMergedValueRouteBindersMap);
 
-            Set<String> bloodAccessPaths = mergedRepository.getBloodAccessPaths();
-            Set<String> newBloodAccessPaths = new LinkedHashSet<>(bloodAccessPaths.size() * 4 / 3 + 1);
-            bloodAccessPaths.forEach(k -> newBloodAccessPaths.add(mergeAccessPath(accessPath, k)));
-            newMergedRepository.setBloodAccessPaths(newBloodAccessPaths);
+            Set<String> boundAccessPaths = mergedRepository.getBoundAccessPaths();
+            Set<String> newBoundAccessPaths = new LinkedHashSet<>(boundAccessPaths.size() * 4 / 3 + 1);
+            boundAccessPaths.forEach(k -> newBoundAccessPaths.add(mergeAccessPath(accessPath, k)));
+            newMergedRepository.setBoundAccessPaths(newBoundAccessPaths);
 
             newMergedRepository.setExecutedRepository(mergedRepository.getExecutedRepository());
             addMergedRepository(newMergedRepository);
