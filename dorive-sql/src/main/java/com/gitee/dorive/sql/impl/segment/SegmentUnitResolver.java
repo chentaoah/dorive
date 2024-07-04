@@ -143,8 +143,8 @@ public class SegmentUnitResolver {
         Set<String> boundAccessPaths = mergedRepository.getBoundAccessPaths();
         for (String boundAccessPath : boundAccessPaths) {
             SegmentUnit segmentUnit = (SegmentUnit) queryUnitMap.get(boundAccessPath);
-            TableSegment targetTableSegment = segmentUnit.getTableSegment();
-            targetTableSegment.setJoin(true);
+            TableSegment tableSegment = segmentUnit.getTableSegment();
+            tableSegment.setJoin(true);
             setJoinForBound(segmentUnit.getMergedRepository());
         }
     }
