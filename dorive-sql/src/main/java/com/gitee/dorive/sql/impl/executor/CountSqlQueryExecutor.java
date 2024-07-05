@@ -21,6 +21,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.CountQuerier;
@@ -50,26 +51,27 @@ public class CountSqlQueryExecutor extends SqlQueryExecutor implements CountQuer
     public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
         QueryContext queryContext = new QueryContext(context, countQuery.getQuery(), ResultType.COUNT);
         resolve(queryContext);
+        QueryUnit queryUnit = queryContext.getQueryUnit();
+        EntityElement entityElement = queryUnit.getEntityElement();
 
         SelectSegmentBuilder selectSegmentBuilder = new SelectSegmentBuilder(queryContext);
         List<SegmentUnit> segmentUnits = selectSegmentBuilder.select(countQuery.getSelector());
         SelectSegment selectSegment = selectSegmentBuilder.build();
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<Object> args = selectSegment.getArgs();
-
         String tableAlias = tableSegment.getTableAlias();
-        EntityElement entityElement = repository.getEntityElement();
-        String countByExp = buildCountByExp(countQuery, segmentUnits, tableAlias, entityElement);
 
-        String groupByPrefix = tableAlias + ".";
+        // group by
         List<String> groupBy = entityElement.toAliases(countQuery.getGroupBy());
-        String groupByColumns = CollUtil.join(groupBy, ",", groupByPrefix, null);
+        String groupByColumns = CollUtil.join(groupBy, ",", tableAlias + ".", null);
+        selectSegment.setGroupBy("GROUP BY " + groupByColumns);
 
+        // select columns
+        String countByExp = buildCountByExp(countQuery, segmentUnits, tableAlias, entityElement);
         List<String> selectColumns = new ArrayList<>(2);
         selectColumns.add(groupByColumns);
         selectColumns.add(String.format("COUNT(%s) AS total", countByExp));
         selectSegment.setSelectColumns(selectColumns);
-        selectSegment.setGroupBy("GROUP BY " + groupByColumns);
 
         List<Map<String, Object>> resultMaps = sqlRunner.selectList(selectSegment.toString(), args.toArray());
         Map<String, Long> countMap = new LinkedHashMap<>(resultMaps.size() * 4 / 3 + 1);
