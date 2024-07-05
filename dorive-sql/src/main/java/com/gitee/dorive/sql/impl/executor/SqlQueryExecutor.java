@@ -18,9 +18,7 @@
 package com.gitee.dorive.sql.impl.executor;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
@@ -64,23 +62,23 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         Context context = queryContext.getContext();
         ResultType resultType = queryContext.getResultType();
         Example example = queryContext.getExample();
-
-        EntityElement entityElement = repository.getEntityElement();
-        Map<String, Object> attributes = entityElement.getAttributes();
-        EntityStoreInfo entityStoreInfo = (EntityStoreInfo) attributes.get(EntityStoreInfo.class.getName());
-        String idColumn = entityStoreInfo.getIdColumn();
+        QueryUnit queryUnit = queryContext.getQueryUnit();
 
         OrderBy orderBy = example.getOrderBy();
         Page<Object> page = example.getPage();
+        String primaryKey = queryUnit.getPrimaryKey();
+        String primaryKeyAlias = queryUnit.getPrimaryKeyAlias();
 
         boolean needCount = queryContext.isNeedCount();
         Result<Object> emptyResult = queryContext.newEmptyResult();
 
         SelectSegmentBuilder selectSegmentBuilder = new SelectSegmentBuilder(queryContext);
         SelectSegment selectSegment = selectSegmentBuilder.build();
+
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<ArgSegment> argSegments = selectSegment.getArgSegments();
         List<Object> args = selectSegment.getArgs();
+
         if (!tableSegment.isJoin() || argSegments.isEmpty()) {
             return super.executeRootQuery(queryContext);
         }
@@ -88,7 +86,7 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         String tableAlias = tableSegment.getTableAlias();
         selectSegment.setDistinct(true);
         List<String> selectColumns = new ArrayList<>(2);
-        selectColumns.add(tableAlias + "." + idColumn);
+        selectColumns.add(tableAlias + "." + primaryKeyAlias);
         selectSegment.setSelectColumns(selectColumns);
 
         String selectSql = selectSegment.selectSql();
@@ -111,7 +109,7 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         boolean rebuildSql = false;
         if (orderBy != null) {
             for (String property : orderBy.getProperties()) {
-                if (!idColumn.equals(property)) {
+                if (!primaryKeyAlias.equals(property)) {
                     selectColumns.add(tableAlias + "." + property);
                     rebuildSql = true;
                 }
@@ -127,9 +125,9 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
 
         String sql = selectSql + fromWhereSql + selectSegment.lastSql();
         List<Map<String, Object>> resultMaps = sqlRunner.selectList(sql, args.toArray());
-        List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get(idColumn), true);
+        List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get(primaryKeyAlias), true);
         if (!primaryKeys.isEmpty()) {
-            Example newExample = new InnerExample().in(entityElement.getPrimaryKey(), primaryKeys);
+            Example newExample = new InnerExample().in(primaryKey, primaryKeys);
             List<Object> entities = (List<Object>) repository.selectByExample(context, newExample);
             if (page != null) {
                 page.setRecords(entities);
