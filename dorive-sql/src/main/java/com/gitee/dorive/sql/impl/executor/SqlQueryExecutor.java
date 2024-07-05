@@ -64,13 +64,14 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         Example example = queryContext.getExample();
         QueryUnit queryUnit = queryContext.getQueryUnit();
 
-        OrderBy orderBy = example.getOrderBy();
-        Page<Object> page = example.getPage();
-        String primaryKey = queryUnit.getPrimaryKey();
-        String primaryKeyAlias = queryUnit.getPrimaryKeyAlias();
-
         boolean needCount = queryContext.isNeedCount();
         Result<Object> emptyResult = queryContext.newEmptyResult();
+
+        OrderBy orderBy = example.getOrderBy();
+        Page<Object> page = example.getPage();
+
+        String primaryKey = queryUnit.getPrimaryKey();
+        String primaryKeyAlias = queryUnit.getPrimaryKeyAlias();
 
         SelectSegmentBuilder selectSegmentBuilder = new SelectSegmentBuilder(queryContext);
         SelectSegment selectSegment = selectSegmentBuilder.build();
