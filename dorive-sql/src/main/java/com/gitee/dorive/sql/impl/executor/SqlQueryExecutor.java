@@ -101,8 +101,8 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
             }
             if (resultType == ResultType.COUNT) {
                 return new Result<>(count);
-
-            } else if (page != null) {
+            }
+            if (page != null) {
                 page.setTotal(count);
             }
         }
