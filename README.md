@@ -10,19 +10,19 @@
 
 ###  📚简介
 
-​		dorive是一个轻量的以领域驱动为核心的业务框架，它提供了诸多开箱即用的功能，旨在帮助开发者，在项目中快速、便捷地应用领域驱动。
+​	dorive是一个轻量的以领域驱动为核心的业务框架，它提供了诸多开箱即用的功能，旨在帮助开发者，在项目中快速、便捷地应用领域驱动。
 
-​		这些功能涵盖了依赖注入校验、依赖即用配置、实体定义与映射、级联查询与操作、实体多态、实体事件通知、复杂推导查询、ref引用、复杂计数统计、表结构生成、数据库逆向生成、接口代码生成等，可以满足大部分开发场景。
+​	这些功能涵盖了依赖注入校验、依赖即用配置、实体定义与映射、级联查询与操作、实体多态、实体事件通知、复杂推导查询、ref引用、复杂计数统计、表结构生成、数据库逆向生成、接口代码生成等，可以满足大部分开发场景。
 
 ###  🎁名称由来
 
-​		dorive = domain + driven 或 do + driven ，是原公司项目沉淀后的开源库。“do”表明了一种态度，只有付诸行动，才能有所收获。
+​	dorive = domain + driven 或 do + driven ，是原公司项目沉淀后的开源库。“do”表明了一种态度，只有付诸行动，才能有所收获。
 
 ###  🍺设计理念
 
-​		dorive是Mybatis-Plus的拓展，易于集成，开发者无需添加任何配置与代码。
+​	dorive是Mybatis-Plus的拓展，易于集成，开发者无需添加任何配置与代码。
 
-​		dorive的优势：
+​	dorive的优势：
 
 - 极少的sql编写（与数据存储方式解耦）
 - 一次建模，任意查询（代码的通用性强，开发成本低）
@@ -41,7 +41,6 @@
 | dorive-inject              | 实现了依赖注入校验                                   |
 | dorive-env                 | 实现了依赖即用配置                                   |
 | dorive-web                 | 提供web开发工具类                                    |
-| dorive-proxy               | 动态代理工具包                                       |
 | dorive-api                 | 内含实体定义规范                                     |
 | dorive-core                | 核心实现（实体定义与映射、级联查询与操作、实体多态） |
 | dorive-event               | 实现了实体事件通知                                   |
@@ -53,13 +52,12 @@
 
 ### 🔗依赖说明
 
-| 依赖库                    | 版本            | 说明                |
-| ------------------------- | --------------- | ------------------- |
-| spring-boot-starter-web   | 2.7.8（可降级） | spring-boot web集成 |
-| spring-tx                 | 5.3.9           | spring事务管理      |
-| hutool-all                | 5.8.12          | 工具库              |
-| javassist                 | 3.29.2-GA       | 动态代理库          |
-| mybatis-plus-boot-starter | 3.5.3.1         | 数据库操作          |
+| 依赖库                    | 版本   | 说明                |
+| ------------------------- | ------ | ------------------- |
+| spring-boot-starter-web   | 2.7.18 | spring-boot web集成 |
+| spring-tx                 | 5.3.31 | spring事务管理      |
+| hutool-all                | 5.8.25 | 工具库              |
+| mybatis-plus-boot-starter | 3.5.7  | 数据库操作          |
 
 ###  📦安装
 
@@ -75,7 +73,7 @@ mvn install
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.4.3.5</version>
+    <version>3.5.0.2</version>
 </dependency>
 ```
 
