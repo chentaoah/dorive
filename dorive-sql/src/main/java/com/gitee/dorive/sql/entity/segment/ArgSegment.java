@@ -17,25 +17,15 @@
 
 package com.gitee.dorive.sql.entity.segment;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
-public class ArgSegment {
+@Getter
+@Setter
+public class ArgSegment extends ExprSegment {
 
-    private String tableAlias;
-    private String column;
-    private String operator;
-    private String expr;
-
-    @Override
-    public String toString() {
-        if (expr != null) {
-            return tableAlias + "." + column + " " + operator + " " + expr;
-        } else {
-            return tableAlias + "." + column + " " + operator;
-        }
+    public ArgSegment(String leftExpr, String operator, String rightExpr) {
+        super(leftExpr, operator, rightExpr);
     }
 
 }

@@ -20,10 +20,7 @@ package com.gitee.dorive.api.annotation;
 import java.lang.annotation.*;
 
 /**
- * 实体注解<br>
- * wiki：https://gitee.com/digital-engine/dorive/wikis/pages
- *
- * @author tao.chen
+ * 实体
  */
 @Inherited
 @Documented
@@ -47,14 +44,19 @@ public @interface Entity {
     Class<?> factory() default Object.class;
 
     /**
-     * 是否聚合
-     */
-    boolean aggregate() default false;
-
-    /**
      * 指定仓储
      */
     Class<?> repository() default Object.class;
+
+    /**
+     * 操作优先级
+     */
+    int priority() default 0;
+
+    /**
+     * 是否自动发现
+     */
+    boolean autoDiscovery() default false;
 
 }
 

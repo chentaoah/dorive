@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.factory;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.factory.EntityMapper;
@@ -37,7 +37,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class DefaultEntityFactory implements EntityFactory {
 
-    private EntityEle entityEle;
+    private EntityElement entityElement;
     private EntityStoreInfo entityStoreInfo;
     private EntityMapper entityMapper;
     private CopyOptions reCopyOptions;
@@ -73,7 +73,7 @@ public class DefaultEntityFactory implements EntityFactory {
 
     @Override
     public Object reconstitute(Context context, Object persistent) {
-        return BeanUtil.toBean(persistent, entityEle.getGenericType(), reCopyOptions);
+        return BeanUtil.toBean(persistent, entityElement.getGenericType(), reCopyOptions);
     }
 
     @Override

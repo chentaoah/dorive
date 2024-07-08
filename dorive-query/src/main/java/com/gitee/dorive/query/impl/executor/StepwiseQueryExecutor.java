@@ -19,8 +19,8 @@ package com.gitee.dorive.query.impl.executor;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.core.impl.binder.AbstractBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
@@ -28,18 +28,11 @@ import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.MultiInBuilder;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.QueryWrapper;
-import com.gitee.dorive.query.impl.resolver.QueryResolver;
+import com.gitee.dorive.query.entity.QueryUnit;
+import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class StepwiseQueryExecutor extends AbstractQueryExecutor {
@@ -49,52 +42,45 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
     }
 
     @Override
-    public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
-        Map<String, ExampleWrapper> exampleWrapperMap = buildExampleWrapperMap(queryContext);
-        executeQuery(queryContext, exampleWrapperMap);
-        ExampleWrapper exampleWrapper = exampleWrapperMap.get("/");
-        boolean abandoned = exampleWrapper.isAbandoned();
-        if (abandoned) {
+    protected List<MergedRepository> getMergedRepositories(Class<?> queryType) {
+        QueryTypeResolver queryTypeResolver = repository.getQueryTypeResolver();
+        Map<Class<?>, List<MergedRepository>> classReversedMergedRepositoriesMap = queryTypeResolver.getClassReversedMergedRepositoriesMap();
+        return classReversedMergedRepositoriesMap.get(queryType);
+    }
+
+    @Override
+    protected Result<Object> doExecuteQuery(QueryContext queryContext) {
+        executeReversedQuery(queryContext);
+        QueryUnit queryUnit = queryContext.getQueryUnit();
+        if (queryUnit.isAbandoned()) {
             return queryContext.newEmptyResult();
         }
-        return super.executeQuery(queryContext, queryWrapper);
+        return super.executeRootQuery(queryContext);
     }
 
-    private Map<String, ExampleWrapper> buildExampleWrapperMap(QueryContext queryContext) {
-        QueryResolver queryResolver = queryContext.getQueryResolver();
-        Map<String, Example> exampleMap = queryContext.getExampleMap();
-        Map<String, ExampleWrapper> exampleWrapperMap = new LinkedHashMap<>();
-        for (MergedRepository mergedRepository : queryResolver.getReversedMergedRepositories()) {
-            String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
-            String relativeAccessPath = mergedRepository.getRelativeAccessPath();
-            Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample());
-            ExampleWrapper exampleWrapper = new ExampleWrapper(mergedRepository, example, false);
-            exampleWrapperMap.put(relativeAccessPath, exampleWrapper);
-        }
-        return exampleWrapperMap;
-    }
-
-    private void executeQuery(QueryContext queryContext, Map<String, ExampleWrapper> exampleWrapperMap) {
+    private void executeReversedQuery(QueryContext queryContext) {
         Context context = queryContext.getContext();
-        exampleWrapperMap.forEach((accessPath, exampleWrapper) -> {
+        Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
+
+        queryUnitMap.forEach((accessPath, queryUnit) -> {
             if ("/".equals(accessPath)) return;
 
-            MergedRepository mergedRepository = exampleWrapper.getMergedRepository();
-            Example example = exampleWrapper.getExample();
-            boolean abandoned = exampleWrapper.isAbandoned();
+            MergedRepository mergedRepository = queryUnit.getMergedRepository();
+            Example example = queryUnit.getExample();
+            boolean abandoned = queryUnit.isAbandoned();
 
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
-            Map<String, List<StrongBinder>> relativeStrongBindersMap = mergedRepository.getRelativeStrongBindersMap();
-            Map<String, List<ValueRouteBinder>> relativeValueRouteBindersMap = mergedRepository.getRelativeValueRouteBindersMap();
+            Map<String, List<StrongBinder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
+            Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
             CommonRepository executedRepository = mergedRepository.getExecutedRepository();
 
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 
             if (!abandoned) {
-                abandoned = determineAbandon(exampleWrapperMap, relativeValueRouteBindersMap.keySet());
+                abandoned = determineAbandon(queryUnitMap, mergedValueRouteBindersMap.keySet());
             }
             if (!abandoned) {
-                abandoned = determineAbandon(exampleWrapperMap, relativeStrongBindersMap.keySet());
+                abandoned = determineAbandon(queryUnitMap, mergedStrongBindersMap.keySet());
             }
 
             List<Object> entities;
@@ -110,52 +96,50 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
                 return;
             }
 
-            relativeValueRouteBindersMap.forEach((relativeAccessPath, valueRouteBinders) -> {
-                ExampleWrapper targetExampleWrapper = exampleWrapperMap.get(relativeAccessPath);
-                if (targetExampleWrapper != null) {
-                    Example targetExample = targetExampleWrapper.getExample();
+            mergedValueRouteBindersMap.forEach((absoluteAccessPath, valueRouteBinders) -> {
+                QueryUnit targetQueryUnit = queryUnitMap.get(absoluteAccessPath);
+                if (targetQueryUnit != null) {
+                    Example targetExample = targetQueryUnit.getExample();
                     for (ValueRouteBinder valueRouteBinder : valueRouteBinders) {
                         Object fieldValue = valueRouteBinder.getFieldValue(context, null);
                         if (fieldValue != null) {
-                            String boundName = valueRouteBinder.getBoundName();
+                            String boundName = valueRouteBinder.getBindField();
                             targetExample.eq(boundName, fieldValue);
                         }
                     }
                 }
             });
 
-            relativeStrongBindersMap.forEach((relativeAccessPath, strongBinders) -> {
-                ExampleWrapper targetExampleWrapper = exampleWrapperMap.get(relativeAccessPath);
-                if (targetExampleWrapper != null) {
+            mergedStrongBindersMap.forEach((absoluteAccessPath, strongBinders) -> {
+                QueryUnit targetQueryUnit = queryUnitMap.get(absoluteAccessPath);
+                if (targetQueryUnit != null) {
                     if (entities.isEmpty()) {
-                        targetExampleWrapper.setAbandoned(true);
+                        targetQueryUnit.setAbandoned(true);
                         return;
                     }
-                    Example targetExample = targetExampleWrapper.getExample();
+                    Example targetExample = targetQueryUnit.getExample();
                     if (strongBinders.size() == 1) {
                         StrongBinder strongBinder = strongBinders.get(0);
                         List<Object> fieldValues = collectFieldValues(context, entities, strongBinder);
                         if (!fieldValues.isEmpty()) {
-                            String boundName = strongBinder.getBoundName();
+                            String boundName = strongBinder.getBindField();
                             if (fieldValues.size() == 1) {
                                 targetExample.eq(boundName, fieldValues.get(0));
                             } else {
                                 targetExample.in(boundName, fieldValues);
                             }
                         } else {
-                            targetExampleWrapper.setAbandoned(true);
+                            targetQueryUnit.setAbandoned(true);
                         }
 
                     } else {
-                        List<String> aliases = strongBinders.stream()
-                                .map(binder -> binder.getBoundBinder().getBindAlias())
-                                .collect(Collectors.toList());
+                        List<String> aliases = strongBinders.stream().map(AbstractBinder::getBindFieldAlias).collect(Collectors.toList());
                         MultiInBuilder builder = new MultiInBuilder(aliases, entities.size());
                         collectFieldValues(context, entities, strongBinders, builder);
                         if (!builder.isEmpty()) {
                             targetExample.getCriteria().add(builder.toCriterion());
                         } else {
-                            targetExampleWrapper.setAbandoned(true);
+                            targetQueryUnit.setAbandoned(true);
                         }
                     }
                 }
@@ -163,11 +147,11 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
         });
     }
 
-    private boolean determineAbandon(Map<String, ExampleWrapper> exampleWrapperMap, Set<String> relativeAccessPaths) {
-        for (String relativeAccessPath : relativeAccessPaths) {
-            ExampleWrapper targetExampleWrapper = exampleWrapperMap.get(relativeAccessPath);
-            if (targetExampleWrapper != null) {
-                if (targetExampleWrapper.isAbandoned()) {
+    private boolean determineAbandon(Map<String, QueryUnit> queryUnitMap, Set<String> absoluteAccessPaths) {
+        for (String absoluteAccessPath : absoluteAccessPaths) {
+            QueryUnit targetQueryUnit = queryUnitMap.get(absoluteAccessPath);
+            if (targetQueryUnit != null) {
+                if (targetQueryUnit.isAbandoned()) {
                     return true;
                 }
             }
@@ -200,14 +184,6 @@ public class StepwiseQueryExecutor extends AbstractQueryExecutor {
                 }
             }
         }
-    }
-
-    @Data
-    @AllArgsConstructor
-    public static class ExampleWrapper {
-        private MergedRepository mergedRepository;
-        private Example example;
-        private boolean abandoned;
     }
 
 }

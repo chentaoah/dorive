@@ -25,10 +25,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 排序注解<br>
- * wiki：https://gitee.com/digital-engine/dorive/wikis/pages
- *
- * @author tao.chen
+ * 排序
  */
 @Inherited
 @Documented
@@ -37,19 +34,12 @@ import java.lang.annotation.Target;
 public @interface Order {
 
     /**
-     * 操作优先级
-     */
-    int priority() default 0;
-
-    /**
-     * 默认排序字段
+     * 排序字段
      */
     String sortBy() default "";
 
     /**
-     * 默认排序方式
-     *
-     * @see com.gitee.dorive.api.constant.Order
+     * 排序方式
      */
     String order() default "";
 

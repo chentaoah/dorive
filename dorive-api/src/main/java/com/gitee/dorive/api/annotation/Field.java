@@ -22,10 +22,7 @@ import org.springframework.core.annotation.AliasFor;
 import java.lang.annotation.*;
 
 /**
- * 字段注解<br>
- * wiki：https://gitee.com/digital-engine/dorive/wikis/pages
- *
- * @author tao.chen
+ * 字段
  */
 @Inherited
 @Documented
@@ -36,7 +33,7 @@ public @interface Field {
     /**
      * 是否主键
      */
-    boolean id() default false;
+    boolean primary() default false;
 
     /**
      * 别名
@@ -58,7 +55,7 @@ public @interface Field {
     /**
      * 映射表达式
      */
-    String mapExp() default "";
+    String expression() default "";
 
     /**
      * 指定转换器

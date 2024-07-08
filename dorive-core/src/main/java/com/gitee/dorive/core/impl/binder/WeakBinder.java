@@ -17,15 +17,20 @@
 
 package com.gitee.dorive.core.impl.binder;
 
-import com.gitee.dorive.api.def.BindingDef;
-import com.gitee.dorive.api.entity.PropChain;
+import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.impl.endpoint.BindEndpoint;
+import com.gitee.dorive.core.impl.endpoint.FieldEndpoint;
+import lombok.Getter;
+import lombok.Setter;
 
-public class WeakBinder extends FieldBinder {
+@Getter
+@Setter
+public class WeakBinder extends AbstractBinder {
 
-    public WeakBinder(BindingDef bindingDef, Processor processor, PropChain fieldPropChain, String alias) {
-        super(bindingDef, processor, fieldPropChain, alias);
+    public WeakBinder(BindingDef bindingDef, FieldEndpoint fieldEndpoint, BindEndpoint bindEndpoint, Processor processor) {
+        super(bindingDef, fieldEndpoint, bindEndpoint, processor);
     }
 
     @Override

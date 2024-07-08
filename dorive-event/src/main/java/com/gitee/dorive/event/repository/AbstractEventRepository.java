@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.event.repository;
 
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.operation.Operation;
@@ -53,9 +53,9 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
             }
             if (actualRepository instanceof DefaultRepository) {
                 DefaultRepository defaultRepository = (DefaultRepository) actualRepository;
-                EntityEle entityEle = defaultRepository.getEntityEle();
+                EntityElement entityElement = defaultRepository.getEntityElement();
                 Executor executor = defaultRepository.getExecutor();
-                executor = new EventExecutor(executor, getApplicationContext(), entityEle);
+                executor = new EventExecutor(executor, getApplicationContext(), entityElement);
                 defaultRepository.setExecutor(executor);
             }
         }

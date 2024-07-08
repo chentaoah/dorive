@@ -22,26 +22,36 @@ import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class MergedRepository {
-
+    // 上一路径
     private String lastAccessPath;
+    // 绝对路径
     private String absoluteAccessPath;
-    private String relativeAccessPath;
-    private boolean merged;
+    // 定义仓储
     private CommonRepository definedRepository;
-    private Map<String, List<StrongBinder>> relativeStrongBindersMap;
-    private Map<String, List<ValueRouteBinder>> relativeValueRouteBindersMap;
+    // absoluteAccessPath ==> StrongBinder
+    private Map<String, List<StrongBinder>> mergedStrongBindersMap;
+    // absoluteAccessPath ==> ValueRouteBinder
+    private Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap;
+    // 绑定路径
+    private Set<String> boundAccessPaths;
+    // 执行仓储
     private CommonRepository executedRepository;
-    private Integer order;
+    // 序列号
+    private Integer sequence;
+    // 别名
+    private String alias;
 
     public String getName() {
-        return definedRepository.getEntityDef().getName();
+        return definedRepository.getEntityElement().getEntityDef().getName();
     }
-
 }

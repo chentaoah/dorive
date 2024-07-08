@@ -27,10 +27,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 聚合注解<br>
- * wiki：https://gitee.com/digital-engine/dorive/wikis/pages
- *
- * @author tao.chen
+ * 聚合
  */
 @Entity
 @Inherited
@@ -61,12 +58,18 @@ public @interface Aggregate {
      * @see Entity
      */
     @AliasFor(annotation = Entity.class)
-    boolean aggregate() default true;
+    Class<?> repository() default Object.class;
 
     /**
      * @see Entity
      */
     @AliasFor(annotation = Entity.class)
-    Class<?> repository() default Object.class;
+    int priority() default 0;
+
+    /**
+     * @see Entity
+     */
+    @AliasFor(annotation = Entity.class)
+    boolean autoDiscovery() default true;
 
 }

@@ -19,10 +19,9 @@ package com.gitee.dorive.query.api;
 
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.QueryWrapper;
 
 public interface QueryExecutor {
 
-    Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper);
+    Result<Object> executeQuery(QueryContext queryContext);
 
 }

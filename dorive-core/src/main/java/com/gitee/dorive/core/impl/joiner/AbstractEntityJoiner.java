@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.impl.joiner;
 
-import com.gitee.dorive.api.entity.PropChain;
+import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityJoiner;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -110,10 +110,10 @@ public abstract class AbstractEntityJoiner implements EntityJoiner {
         if (entity == null || object == null) {
             return;
         }
-        PropChain anchorPoint = repository.getAnchorPoint();
-        Object value = anchorPoint.getValue(entity);
+        EntityElement entityElement = repository.getEntityElement();
+        Object value = entityElement.getValue(entity);
         if (value == null) {
-            anchorPoint.setValue(entity, object);
+            entityElement.setValue(entity, object);
         }
     }
 

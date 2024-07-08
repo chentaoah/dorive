@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.core.impl.joiner;
 
-import com.gitee.dorive.api.entity.PropChain;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
@@ -42,15 +41,9 @@ public class UnionEntityJoiner extends AbstractEntityJoiner {
 
     @Override
     public Example newExample(Context context, List<Object> entities) {
-        PropChain anchorPoint = repository.getAnchorPoint();
-        PropChain lastPropChain = anchorPoint.getLastPropChain();
         UnionExample unionExample = new UnionExample();
         for (int index = 0; index < entities.size(); index++) {
             Object entity = entities.get(index);
-            Object lastEntity = lastPropChain == null ? entity : lastPropChain.getValue(entity);
-            if (lastEntity == null) {
-                continue;
-            }
             Example example = newExample(context, entity);
             if (example.isEmpty()) {
                 continue;

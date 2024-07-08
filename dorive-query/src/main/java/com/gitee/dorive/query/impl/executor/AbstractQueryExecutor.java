@@ -17,17 +17,25 @@
 
 package com.gitee.dorive.query.impl.executor;
 
+import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.query.api.QueryExecutor;
+import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.QueryWrapper;
+import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.entity.enums.ResultType;
+import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
+import com.gitee.dorive.query.impl.resolver.QueryExampleResolver;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractQueryExecutor implements QueryExecutor {
 
@@ -38,8 +46,73 @@ public abstract class AbstractQueryExecutor implements QueryExecutor {
     }
 
     @Override
+    public Result<Object> executeQuery(QueryContext queryContext) {
+        resolve(queryContext);
+        Matcher matcher = repository.getRootRepository();
+        if (!matcher.matches(queryContext.getContext())) {
+            return queryContext.newEmptyResult();
+        }
+        if (queryContext.isSimpleQuery()) {
+            return executeRootQuery(queryContext);
+        }
+        return doExecuteQuery(queryContext);
+    }
+
+    protected void resolve(QueryContext queryContext) {
+        Class<?> queryType = queryContext.getQueryType();
+        QueryExampleResolver queryExampleResolver = getQueryExampleResolver(queryType);
+        List<MergedRepository> mergedRepositories = getMergedRepositories(queryType);
+        Assert.notNull(queryExampleResolver, "No query resolver found!");
+        Assert.notEmpty(mergedRepositories, "The merged repositories cannot be empty!");
+        queryContext.setQueryExampleResolver(queryExampleResolver);
+        queryContext.setMergedRepositories(mergedRepositories);
+
+        Map<String, Example> exampleMap = newExampleMap(queryContext);
+        queryContext.setExampleMap(exampleMap);
+        queryContext.setExample(exampleMap.get("/"));
+
+        Map<String, QueryUnit> queryUnitMap = newQueryUnitMap(queryContext);
+        queryContext.setQueryUnit(queryUnitMap.get("/"));
+    }
+
+    protected QueryExampleResolver getQueryExampleResolver(Class<?> queryType) {
+        QueryTypeResolver queryTypeResolver = repository.getQueryTypeResolver();
+        Map<Class<?>, QueryExampleResolver> classQueryExampleResolverMap = queryTypeResolver.getClassQueryExampleResolverMap();
+        return classQueryExampleResolverMap.get(queryType);
+    }
+
+    protected List<MergedRepository> getMergedRepositories(Class<?> queryType) {
+        QueryTypeResolver queryTypeResolver = repository.getQueryTypeResolver();
+        Map<Class<?>, List<MergedRepository>> classMergedRepositoriesMap = queryTypeResolver.getClassMergedRepositoriesMap();
+        return classMergedRepositoriesMap.get(queryType);
+    }
+
+    protected Map<String, Example> newExampleMap(QueryContext queryContext) {
+        Object query = queryContext.getQuery();
+        QueryExampleResolver queryExampleResolver = queryContext.getQueryExampleResolver();
+        return queryExampleResolver.resolve(query);
+    }
+
+    protected Map<String, QueryUnit> newQueryUnitMap(QueryContext queryContext) {
+        List<MergedRepository> mergedRepositories = queryContext.getMergedRepositories();
+        Map<String, Example> exampleMap = queryContext.getExampleMap();
+        Map<String, QueryUnit> queryUnitMap = new LinkedHashMap<>();
+        queryContext.setQueryUnitMap(queryUnitMap);
+        for (MergedRepository mergedRepository : mergedRepositories) {
+            String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
+            Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample());
+            QueryUnit queryUnit = newQueryUnit(queryContext, mergedRepository, example);
+            queryUnitMap.put(absoluteAccessPath, queryUnit);
+        }
+        return queryUnitMap;
+    }
+
+    protected QueryUnit newQueryUnit(QueryContext queryContext, MergedRepository mergedRepository, Example example) {
+        return new QueryUnit(mergedRepository, example, false);
+    }
+
     @SuppressWarnings("unchecked")
-    public Result<Object> executeQuery(QueryContext queryContext, QueryWrapper queryWrapper) {
+    protected Result<Object> executeRootQuery(QueryContext queryContext) {
         Context context = queryContext.getContext();
         ResultType resultType = queryContext.getResultType();
         Example example = queryContext.getExample();
@@ -57,5 +130,7 @@ public abstract class AbstractQueryExecutor implements QueryExecutor {
         }
         return queryContext.newEmptyResult();
     }
+
+    protected abstract Result<Object> doExecuteQuery(QueryContext queryContext);
 
 }

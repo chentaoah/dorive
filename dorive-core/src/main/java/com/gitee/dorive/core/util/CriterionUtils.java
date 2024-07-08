@@ -19,7 +19,7 @@ package com.gitee.dorive.core.util;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import com.gitee.dorive.api.api.ImplFactory;
+import com.gitee.dorive.core.api.common.ImplFactory;
 import com.gitee.dorive.api.constant.Operator;
 import com.gitee.dorive.core.api.format.SqlFormat;
 import com.gitee.dorive.core.entity.executor.Criterion;

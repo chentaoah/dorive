@@ -18,63 +18,35 @@
 package com.gitee.dorive.query.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.query.entity.QueryField;
+import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
+import com.gitee.dorive.query.entity.QueryField;
 import com.gitee.dorive.query.entity.SpecificFields;
-import com.gitee.dorive.query.entity.def.QueryScanDef;
 import com.gitee.dorive.query.entity.def.CriterionDef;
 import com.gitee.dorive.query.entity.def.ExampleDef;
+import com.gitee.dorive.query.entity.def.QueryScanDef;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
-import com.gitee.dorive.query.util.ResourceUtils;
-import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
 import org.springframework.util.ReflectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
 
 @Data
 public class QueryTypeResolver {
 
-    private static Map<String, List<Class<?>>> scannedClasses = new ConcurrentHashMap<>();
-
     private AbstractQueryRepository<?, ?> repository;
-    private Map<Class<?>, QueryResolver> classQueryResolverMap = new ConcurrentHashMap<>();
-    private Map<String, QueryResolver> nameQueryResolverMap = new ConcurrentHashMap<>();
+    private Map<Class<?>, QueryExampleResolver> classQueryExampleResolverMap = new ConcurrentHashMap<>();
+    private Map<Class<?>, List<MergedRepository>> classMergedRepositoriesMap = new ConcurrentHashMap<>();
+    private Map<Class<?>, List<MergedRepository>> classReversedMergedRepositoriesMap = new ConcurrentHashMap<>();
 
-    public QueryTypeResolver(AbstractQueryRepository<?, ?> repository) throws Exception {
+    public QueryTypeResolver(AbstractQueryRepository<?, ?> repository) {
         this.repository = repository;
-        resolve();
     }
 
-    public void resolve() throws Exception {
+    public void resolve() {
         QueryScanDef queryScanDef = repository.getQueryScanDef();
-        String[] scanPackages = queryScanDef.getValue();
-        String regex = queryScanDef.getRegex();
         Class<?>[] queries = queryScanDef.getQueries();
-
-        Pattern pattern = Pattern.compile(regex);
-        for (String scanPackage : scanPackages) {
-            List<Class<?>> classes = scannedClasses.get(scanPackage);
-            if (classes == null) {
-                classes = ResourceUtils.resolveClasses(scanPackage);
-                scannedClasses.put(scanPackage, classes);
-            }
-            for (Class<?> queryClass : classes) {
-                String simpleName = queryClass.getSimpleName();
-                if (pattern.matcher(simpleName).matches()) {
-                    resolveQueryClass(queryClass);
-                }
-            }
-        }
-
         for (Class<?> queryClass : queries) {
             resolveQueryClass(queryClass);
         }
@@ -88,65 +60,63 @@ public class QueryTypeResolver {
 
         List<QueryField> queryFields = new ArrayList<>();
         SpecificFields specificFields = new SpecificFields();
+        Set<String> accessPaths = new HashSet<>();
+        List<MergedRepository> mergedRepositories = new ArrayList<>();
 
         ReflectionUtils.doWithLocalFields(queryClass, declaredField -> {
             QueryField queryField = new QueryField(declaredField);
-            if (queryField.isIgnore()) {
+            if (queryField.isIgnore() || specificFields.tryAddField(queryField)) {
                 return;
             }
-            if (!specificFields.tryAddField(queryField)) {
-                queryFields.add(queryField);
+            MergedRepository mergedRepository = resetQueryField(queryField);
+            queryFields.add(queryField);
+            if (accessPaths.add(mergedRepository.getAbsoluteAccessPath())) {
+                mergedRepositories.add(mergedRepository);
             }
         });
 
-        List<MergedRepository> mergedRepositories = matchMergedRepositories(queryFields);
+        MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
+        Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
+        for (MergedRepository mergedRepository : mergedRepositoryMap.values()) {
+            CommonRepository repository = mergedRepository.getExecutedRepository();
+            if (repository.isBound() && accessPaths.add(mergedRepository.getAbsoluteAccessPath())) {
+                mergedRepositories.add(mergedRepository);
+            }
+        }
+
+        mergedRepositories.sort(Comparator.comparing(MergedRepository::getSequence));
         List<MergedRepository> reversedMergedRepositories = new ArrayList<>(mergedRepositories);
         Collections.reverse(reversedMergedRepositories);
 
-        QueryResolver queryResolver = new QueryResolver(exampleDef, queryFields, specificFields, mergedRepositories, reversedMergedRepositories);
-        classQueryResolverMap.put(queryClass, queryResolver);
-        nameQueryResolverMap.put(queryClass.getName(), queryResolver);
+        QueryExampleResolver queryExampleResolver = new QueryExampleResolver(exampleDef, queryFields, specificFields);
+        classQueryExampleResolverMap.put(queryClass, queryExampleResolver);
+        classMergedRepositoriesMap.put(queryClass, mergedRepositories);
+        classReversedMergedRepositoriesMap.put(queryClass, reversedMergedRepositories);
     }
 
-    private List<MergedRepository> matchMergedRepositories(List<QueryField> queryFields) {
+    private MergedRepository resetQueryField(QueryField queryField) {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
         Map<String, MergedRepository> nameMergedRepositoryMap = mergedRepositoryResolver.getNameMergedRepositoryMap();
 
-        Set<MergedRepository> mergedRepositorySet = new LinkedHashSet<>();
+        CriterionDef criterionDef = queryField.getCriterionDef();
+        String belongTo = criterionDef.getBelongTo();
+        String field = criterionDef.getField();
 
-        for (QueryField queryField : queryFields) {
-            CriterionDef criterionDef = queryField.getCriterionDef();
-            String belongTo = criterionDef.getBelongTo();
-            String field = criterionDef.getField();
-
-            if (!belongTo.startsWith("/")) {
-                MergedRepository mergedRepository = nameMergedRepositoryMap.get(belongTo);
-                Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
-                belongTo = mergedRepository.getAbsoluteAccessPath();
-                criterionDef.setBelongTo(belongTo);
-            }
-            MergedRepository mergedRepository = mergedRepositoryMap.get(belongTo);
+        if (!belongTo.startsWith("/")) {
+            MergedRepository mergedRepository = nameMergedRepositoryMap.get(belongTo);
             Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
-
-            CommonRepository repository = mergedRepository.getExecutedRepository();
-            Assert.isTrue(repository.hasField(field),
-                    "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",
-                    queryField.getField(), repository.getEntityEle().getElement(), field);
-
-            mergedRepositorySet.add(mergedRepository);
+            belongTo = mergedRepository.getAbsoluteAccessPath();
+            criterionDef.setBelongTo(belongTo);
         }
 
-        for (MergedRepository mergedRepository : mergedRepositoryMap.values()) {
-            CommonRepository repository = mergedRepository.getExecutedRepository();
-            if (repository.isBoundEntity()) {
-                mergedRepositorySet.add(mergedRepository);
-            }
-        }
+        MergedRepository mergedRepository = mergedRepositoryMap.get(belongTo);
+        Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
 
-        List<MergedRepository> mergedRepositories = new ArrayList<>(mergedRepositorySet);
-        mergedRepositories.sort(Comparator.comparing(MergedRepository::getOrder));
-        return mergedRepositories;
+        CommonRepository repository = mergedRepository.getExecutedRepository();
+        Assert.isTrue(repository.hasField(field), "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}", queryField.getField(), repository.getEntityClass(), field);
+
+        return mergedRepository;
     }
 
 }

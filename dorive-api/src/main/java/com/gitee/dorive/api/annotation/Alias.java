@@ -26,6 +26,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * 别名
+ */
 @Field
 @Inherited
 @Documented
@@ -33,6 +36,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Alias {
 
+    /**
+     * @see Field
+     */
     @AliasFor(annotation = Field.class)
     String value() default "";
 

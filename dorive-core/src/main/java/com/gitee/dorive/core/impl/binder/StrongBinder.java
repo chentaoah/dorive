@@ -17,45 +17,19 @@
 
 package com.gitee.dorive.core.impl.binder;
 
-import com.gitee.dorive.api.def.BindingDef;
-import com.gitee.dorive.api.entity.PropChain;
+import com.gitee.dorive.api.entity.def.BindingDef;
 import com.gitee.dorive.core.api.binder.Processor;
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.impl.endpoint.BindEndpoint;
+import com.gitee.dorive.core.impl.endpoint.FieldEndpoint;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class StrongBinder extends FieldBinder {
+public class StrongBinder extends AbstractBinder {
 
-    private BoundBinder boundBinder;
-
-    public StrongBinder(BindingDef bindingDef, Processor processor, PropChain fieldPropChain, String alias) {
-        super(bindingDef, processor, fieldPropChain, alias);
-        this.boundBinder = new BoundBinder(bindingDef, processor);
-    }
-
-    @Override
-    public String getBoundName() {
-        return boundBinder.getBoundName();
-    }
-
-    @Override
-    public Object getBoundValue(Context context, Object rootEntity) {
-        return boundBinder.getBoundValue(context, rootEntity);
-    }
-
-    @Override
-    public void setBoundValue(Context context, Object rootEntity, Object property) {
-        boundBinder.setBoundValue(context, rootEntity, property);
-    }
-
-    public boolean isSameType() {
-        return getFieldPropChain().isSameType(boundBinder.getBoundPropChain());
-    }
-
-    public boolean isCollection() {
-        return boundBinder.getBoundPropChain().getEntityField().isCollection();
+    public StrongBinder(BindingDef bindingDef, FieldEndpoint fieldEndpoint, BindEndpoint bindEndpoint, Processor processor) {
+        super(bindingDef, fieldEndpoint, bindEndpoint, processor);
     }
 
 }

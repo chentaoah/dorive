@@ -18,7 +18,4 @@
 package com.gitee.dorive.sql.api;
 
 public interface Segment {
-
-    String toString();
-
 }

@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.executor;
 
 import com.gitee.dorive.api.constant.Operator;
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.api.executor.Executor;
@@ -43,12 +43,12 @@ import java.util.Set;
 @Setter
 public class ExampleExecutor extends AbstractProxyExecutor {
 
-    private EntityEle entityEle;
+    private EntityElement entityElement;
     private EntityMapper entityMapper;
 
-    public ExampleExecutor(Executor executor, EntityEle entityEle, EntityMapper entityMapper) {
+    public ExampleExecutor(Executor executor, EntityElement entityElement, EntityMapper entityMapper) {
         super(executor);
-        this.entityEle = entityEle;
+        this.entityElement = entityElement;
         this.entityMapper = entityMapper;
     }
 
@@ -104,7 +104,7 @@ public class ExampleExecutor extends AbstractProxyExecutor {
     private void convertUpdate(Update update) {
         Set<String> nullableProps = update.getNullableProps();
         if (nullableProps != null && !nullableProps.isEmpty()) {
-            nullableProps = entityEle.toAliases(nullableProps);
+            nullableProps = entityElement.toAliases(nullableProps);
             update.setNullableProps(nullableProps);
         }
     }
@@ -112,7 +112,7 @@ public class ExampleExecutor extends AbstractProxyExecutor {
     private void convertSelectProps(Example example) {
         List<String> properties = example.getSelectProps();
         if (properties != null && !properties.isEmpty()) {
-            properties = entityEle.toAliases(properties);
+            properties = entityElement.toAliases(properties);
             example.setSelectProps(properties);
         }
     }
@@ -154,7 +154,7 @@ public class ExampleExecutor extends AbstractProxyExecutor {
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
             List<String> properties = orderBy.getProperties();
-            properties = entityEle.toAliases(properties);
+            properties = entityElement.toAliases(properties);
             orderBy.setProperties(properties);
         }
     }

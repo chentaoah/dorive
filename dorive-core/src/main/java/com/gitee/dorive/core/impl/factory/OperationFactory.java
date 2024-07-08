@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.impl.factory;
 
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.ConditionDelete;
@@ -38,7 +38,7 @@ import java.util.List;
 @AllArgsConstructor
 public class OperationFactory {
 
-    private EntityEle entityEle;
+    private EntityElement entityElement;
 
     public Query buildQueryByPK(Object primaryKey) {
         return new Query(primaryKey);
@@ -63,7 +63,7 @@ public class OperationFactory {
     public Operation buildInsertOrUpdate(Object entity) {
         List<Object> entities = Collections.singletonList(entity);
         InsertOrUpdate insertOrUpdate = new InsertOrUpdate(entities);
-        Object primaryKey = entityEle.getIdProxy().getValue(entity);
+        Object primaryKey = entityElement.getPrimaryKey(entity);
         if (primaryKey == null) {
             insertOrUpdate.setInsert(new Insert(entities));
         } else {
@@ -77,7 +77,7 @@ public class OperationFactory {
         List<Object> insertList = new ArrayList<>(entities.size());
         List<Object> updateList = new ArrayList<>(entities.size());
         for (Object entity : entities) {
-            Object primaryKey = entityEle.getIdProxy().getValue(entity);
+            Object primaryKey = entityElement.getPrimaryKey(entity);
             if (primaryKey == null) {
                 insertList.add(entity);
             } else {

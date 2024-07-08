@@ -21,7 +21,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.impl.binder.FieldBinder;
+import com.gitee.dorive.core.impl.binder.AbstractBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.MultiInBuilder;
@@ -39,7 +39,7 @@ public class MultiEntityJoiner extends AbstractEntityJoiner {
 
     public MultiEntityJoiner(CommonRepository repository, int entitiesSize) {
         super(repository, entitiesSize);
-        this.binders = repository.getRootBinders();
+        this.binders = repository.getRootStrongBinders();
     }
 
     @Override
@@ -54,7 +54,7 @@ public class MultiEntityJoiner extends AbstractEntityJoiner {
     }
 
     private MultiInBuilder newMultiInBuilder(Context context, List<Object> entities) {
-        List<String> aliases = binders.stream().map(FieldBinder::getAlias).collect(Collectors.toList());
+        List<String> aliases = binders.stream().map(AbstractBinder::getFieldAlias).collect(Collectors.toList());
         MultiInBuilder multiInBuilder = new MultiInBuilder(aliases, entities.size());
 
         for (Object entity : entities) {

@@ -24,8 +24,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitee.dorive.api.constant.Order;
-import com.gitee.dorive.api.def.EntityDef;
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -62,16 +62,16 @@ import java.util.Set;
 public class MybatisPlusExecutor extends AbstractExecutor {
 
     private EntityDef entityDef;
-    private EntityEle entityEle;
+    private EntityElement entityElement;
     private EntityStoreInfo entityStoreInfo;
     private BaseMapper<Object> baseMapper;
     private Class<Object> pojoClass;
     private boolean canInsertBatch;
 
     @SuppressWarnings("unchecked")
-    public MybatisPlusExecutor(EntityDef entityDef, EntityEle entityEle, EntityStoreInfo entityStoreInfo) {
+    public MybatisPlusExecutor(EntityDef entityDef, EntityElement entityElement, EntityStoreInfo entityStoreInfo) {
         this.entityDef = entityDef;
-        this.entityEle = entityEle;
+        this.entityElement = entityElement;
         this.entityStoreInfo = entityStoreInfo;
         this.baseMapper = (BaseMapper<Object>) entityStoreInfo.getMapper();
         this.pojoClass = (Class<Object>) entityStoreInfo.getPojoClass();

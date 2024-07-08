@@ -21,24 +21,31 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.query.entity.enums.ResultType;
-import com.gitee.dorive.query.impl.resolver.QueryResolver;
+import com.gitee.dorive.query.impl.resolver.QueryExampleResolver;
 import lombok.Data;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 @Data
 public class QueryContext {
 
     private Context context;
+    private Object query;
     private ResultType resultType;
-    private QueryResolver queryResolver;
+    private Class<?> queryType;
+    private QueryExampleResolver queryExampleResolver;
+    private List<MergedRepository> mergedRepositories;
     private Map<String, Example> exampleMap;
     private Example example;
+    private Map<String, QueryUnit> queryUnitMap;
+    private QueryUnit queryUnit;
+    private List<Object> args = new ArrayList<>(8);
 
-    public QueryContext(Context context, ResultType resultType) {
+    public QueryContext(Context context, Object query, ResultType resultType) {
         this.context = context;
+        this.query = query;
         this.resultType = resultType;
+        this.queryType = query.getClass();
     }
 
     public boolean isSimpleQuery() {

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive</artifactId>
-    <version>3.4.3.6</version>
+    <version>3.5.0.2</version>
     <packaging>pom</packaging>
 
     <licenses>
@@ -32,7 +32,6 @@
         <module>dorive-inject</module>
         <module>dorive-env</module>
         <module>dorive-web</module>
-        <module>dorive-proxy</module>
         <module>dorive-api</module>
         <module>dorive-core</module>
         <module>dorive-event</module>
@@ -55,17 +54,17 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter</artifactId>
-                <version>2.7.8</version>
+                <version>2.7.18</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
-                <version>2.7.8</version>
+                <version>2.7.18</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-tx</artifactId>
-                <version>5.3.9</version>
+                <version>5.3.31</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
@@ -81,17 +80,12 @@
             <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
-                <version>5.8.12</version>
-            </dependency>
-            <dependency>
-                <groupId>org.javassist</groupId>
-                <artifactId>javassist</artifactId>
-                <version>3.29.2-GA</version>
+                <version>5.8.25</version>
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
-                <version>3.5.3.1</version>
+                <version>3.5.7</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

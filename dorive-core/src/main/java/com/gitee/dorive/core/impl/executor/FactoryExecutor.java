@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.executor;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
@@ -44,13 +44,13 @@ import java.util.Map;
 @Setter
 public class FactoryExecutor extends AbstractProxyExecutor {
 
-    private EntityEle entityEle;
+    private EntityElement entityElement;
     private EntityStoreInfo entityStoreInfo;
     private EntityFactory entityFactory;
 
-    public FactoryExecutor(Executor executor, EntityEle entityEle, EntityStoreInfo entityStoreInfo, EntityFactory entityFactory) {
+    public FactoryExecutor(Executor executor, EntityElement entityElement, EntityStoreInfo entityStoreInfo, EntityFactory entityFactory) {
         super(executor);
-        this.entityEle = entityEle;
+        this.entityElement = entityElement;
         this.entityStoreInfo = entityStoreInfo;
         this.entityFactory = entityFactory;
     }
@@ -112,7 +112,7 @@ public class FactoryExecutor extends AbstractProxyExecutor {
                     Object persistent = persistentObjs.get(index);
                     Object primaryKey = BeanUtil.getFieldValue(persistent, entityStoreInfo.getIdProperty());
                     if (primaryKey != null) {
-                        entityEle.getIdProxy().setValue(entity, primaryKey);
+                        entityElement.setPrimaryKey(entity, primaryKey);
                     }
                 }
             }

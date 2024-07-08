@@ -20,10 +20,7 @@ package com.gitee.dorive.api.annotation;
 import java.lang.annotation.*;
 
 /**
- * 绑定注解<br>
- * wiki：https://gitee.com/digital-engine/dorive/wikis/pages
- *
- * @author tao.chen
+ * 绑定
  */
 @Inherited
 @Documented
@@ -43,16 +40,14 @@ public @interface Binding {
     String value() default "";
 
     /**
-     * 绑定表达式
+     * 绑定的上下文字段
      */
-    String bindExp() default "";
+    String bind() default "";
 
     /**
      * 加工表达式
-     *
-     * @see org.springframework.expression
      */
-    String processExp() default "";
+    String expression() default "";
 
     /**
      * 指定加工器
@@ -60,7 +55,7 @@ public @interface Binding {
     Class<?> processor() default Object.class;
 
     /**
-     * 绑定的字段名称
+     * 绑定的真实字段
      */
     String bindField() default "";
 

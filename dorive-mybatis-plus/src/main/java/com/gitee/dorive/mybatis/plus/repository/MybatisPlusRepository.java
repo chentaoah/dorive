@@ -23,9 +23,9 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.gitee.dorive.api.api.ImplFactory;
-import com.gitee.dorive.api.def.EntityDef;
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.core.api.common.ImplFactory;
+import com.gitee.dorive.api.entity.def.EntityDef;
+import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
@@ -33,12 +33,11 @@ import com.gitee.dorive.core.entity.enums.QueryMethod;
 import com.gitee.dorive.mybatis.plus.executor.MybatisPlusExecutor;
 import com.gitee.dorive.query.api.QueryExecutor;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.QueryWrapper;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.sql.api.CountQuerier;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.common.CountQuery;
-import com.gitee.dorive.sql.impl.count.DefaultCountQuerier;
+import com.gitee.dorive.sql.impl.executor.CountSqlQueryExecutor;
 import com.gitee.dorive.sql.impl.executor.SqlQueryExecutor;
 import com.gitee.dorive.sql.impl.executor.UnionExecutor;
 import lombok.Getter;
@@ -58,19 +57,20 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
 
     private SqlRunner sqlRunner;
     private QueryExecutor sqlQueryExecutor;
-    private CountQuerier defaultCountQuerier;
+    private CountQuerier countQuerier;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
         this.sqlRunner = implFactory.getInstance(SqlRunner.class);
         this.sqlQueryExecutor = new SqlQueryExecutor(this, this.sqlRunner);
-        this.defaultCountQuerier = new DefaultCountQuerier(this, this.sqlRunner);
+        this.countQuerier = new CountSqlQueryExecutor(this, this.sqlRunner);
         super.afterPropertiesSet();
     }
 
     @Override
-    protected EntityStoreInfo resolveEntityStoreInfo(EntityDef entityDef, EntityEle entityEle) {
+    protected EntityStoreInfo resolveEntityStoreInfo(EntityElement entityElement) {
+        EntityDef entityDef = entityElement.getEntityDef();
         Class<?> mapperClass = entityDef.getSource();
         Object mapper = null;
         Class<?> pojoClass = null;
@@ -118,29 +118,28 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         List<String> columns = new ArrayList<>(propAliasMapping.values());
         String selectColumns = StrUtil.join(",", columns);
 
-        return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn,
-                propAliasMappingWithoutPk, propAliasMapping, aliasPropMapping, selectColumns);
+        return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn, propAliasMappingWithoutPk, propAliasMapping, aliasPropMapping, selectColumns);
     }
 
     @Override
-    protected Executor newExecutor(EntityDef entityDef, EntityEle entityEle, EntityStoreInfo entityStoreInfo) {
-        Executor executor = new MybatisPlusExecutor(entityDef, entityEle, entityStoreInfo);
+    protected Executor newExecutor(EntityElement entityElement, EntityStoreInfo entityStoreInfo) {
+        Executor executor = new MybatisPlusExecutor(entityElement.getEntityDef(), entityElement, entityStoreInfo);
         return new UnionExecutor(executor, sqlRunner, entityStoreInfo);
     }
 
     @Override
-    protected QueryExecutor adaptiveQueryExecutor(QueryContext queryContext, QueryWrapper queryWrapper) {
+    protected QueryExecutor adaptiveQueryExecutor(QueryContext queryContext) {
         Context context = queryContext.getContext();
         QueryMethod queryMethod = context.getOption(QueryMethod.class);
         if (queryMethod == null || queryMethod == QueryMethod.SQL) {
             return sqlQueryExecutor;
         }
-        return super.adaptiveQueryExecutor(queryContext, queryWrapper);
+        return super.adaptiveQueryExecutor(queryContext);
     }
 
     @Override
     public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
-        return defaultCountQuerier.selectCountMap(context, countQuery);
+        return countQuerier.selectCountMap(context, countQuery);
     }
 
 }

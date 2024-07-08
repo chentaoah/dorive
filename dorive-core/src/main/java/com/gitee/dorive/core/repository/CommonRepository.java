@@ -17,8 +17,6 @@
 
 package com.gitee.dorive.core.repository;
 
-import com.gitee.dorive.api.entity.PropChain;
-import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Options;
@@ -49,34 +47,29 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
     private String accessPath;
     private boolean root;
     private boolean aggregated;
-    private OrderBy defaultOrderBy;
-    private PropChain anchorPoint;
     private BinderResolver binderResolver;
-    private boolean boundEntity;
+    private OrderBy defaultOrderBy;
+    private boolean bound;
     private Matcher matcher;
 
     public String getName() {
-        return getEntityDef().getName();
+        return getEntityElement().getEntityDef().getName();
     }
 
     public boolean isCollection() {
-        return getEntityEle().isCollection();
-    }
-
-    public Object getPrimaryKey(Object entity) {
-        return getEntityEle().getIdProxy().getValue(entity);
+        return getEntityElement().isCollection();
     }
 
     public boolean hasField(String field) {
-        return getEntityEle().hasField(field);
+        return getEntityElement().hasField(field);
     }
 
     public JoinType getJoinType() {
         return binderResolver.getJoinType();
     }
 
-    public List<StrongBinder> getRootBinders() {
-        return binderResolver.getMergedBindersMap().get("/");
+    public List<StrongBinder> getRootStrongBinders() {
+        return binderResolver.getMergedStrongBindersMap().get("/");
     }
 
     @Override
@@ -92,7 +85,7 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
             if (properties != null && !properties.isEmpty()) {
                 Object primaryKey = query.getPrimaryKey();
                 if (primaryKey != null) {
-                    Example example = new InnerExample().eq(getEntityEle().getIdName(), primaryKey);
+                    Example example = new InnerExample().eq(getEntityElement().getPrimaryKey(), primaryKey);
                     query.setPrimaryKey(null);
                     query.setExample(example);
                 }
@@ -131,12 +124,12 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
 
     public void getBoundValue(Context context, Object rootEntity, Collection<?> entities) {
         for (Object entity : entities) {
-            for (Binder binder : binderResolver.getStrongBinders()) {
-                Object fieldValue = binder.getFieldValue(context, entity);
+            for (StrongBinder strongBinder : binderResolver.getStrongBinders()) {
+                Object fieldValue = strongBinder.getFieldValue(context, entity);
                 if (fieldValue == null) {
-                    Object boundValue = binder.getBoundValue(context, rootEntity);
+                    Object boundValue = strongBinder.getBoundValue(context, rootEntity);
                     if (boundValue != null) {
-                        binder.setFieldValue(context, entity, boundValue);
+                        strongBinder.setFieldValue(context, entity, boundValue);
                     }
                 }
             }
@@ -144,13 +137,13 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
     }
 
     public void setBoundId(Context context, Object rootEntity, Object entity) {
-        Binder binder = binderResolver.getBoundIdBinder();
-        if (binder != null) {
-            Object boundValue = binder.getBoundValue(context, rootEntity);
+        StrongBinder boundIdBinder = binderResolver.getBoundIdBinder();
+        if (boundIdBinder != null) {
+            Object boundValue = boundIdBinder.getBoundValue(context, rootEntity);
             if (boundValue == null) {
-                Object primaryKey = binder.getFieldValue(context, entity);
+                Object primaryKey = boundIdBinder.getFieldValue(context, entity);
                 if (primaryKey != null) {
-                    binder.setBoundValue(context, rootEntity, primaryKey);
+                    boundIdBinder.setBoundValue(context, rootEntity, primaryKey);
                 }
             }
         }

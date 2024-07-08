@@ -26,6 +26,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * 主键
+ */
 @Field
 @Inherited
 @Documented
@@ -33,9 +36,15 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Id {
 
+    /**
+     * @see Field
+     */
     @AliasFor(annotation = Field.class)
-    boolean id() default true;
+    boolean primary() default true;
 
+    /**
+     * @see Field
+     */
     @AliasFor(annotation = Field.class)
     String value() default "id";
 

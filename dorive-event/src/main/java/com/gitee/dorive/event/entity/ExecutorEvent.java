@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.event.entity;
 
-import com.gitee.dorive.api.entity.EntityEle;
+import com.gitee.dorive.api.entity.ele.EntityElement;
 import com.gitee.dorive.event.executor.EventExecutor;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,8 +32,8 @@ public class ExecutorEvent extends CommonEvent {
 
     public Class<?> getEntityClass() {
         EventExecutor eventExecutor = (EventExecutor) getSource();
-        EntityEle entityEle = eventExecutor.getEntityEle();
-        return entityEle.getGenericType();
+        EntityElement entityElement = eventExecutor.getEntityElement();
+        return entityElement.getGenericType();
     }
 
 }
