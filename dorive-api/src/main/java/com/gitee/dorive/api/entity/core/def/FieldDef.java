@@ -15,16 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.binder;
+package com.gitee.dorive.api.entity.core.def;
 
-import com.gitee.dorive.api.entity.core.ele.FieldElement;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public interface Endpoint {
-
-    FieldElement getFieldElement();
-
-    Object getValue(Object entity);
-
-    void setValue(Object entity, Object value);
-
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class FieldDef {
+    private boolean primary;
+    private String alias;
+    private boolean valueObj;
+    private String expression;
+    private Class<?> converter;
 }

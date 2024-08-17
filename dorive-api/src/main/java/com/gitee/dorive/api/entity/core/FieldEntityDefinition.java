@@ -15,16 +15,21 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.binder;
+package com.gitee.dorive.api.entity.core;
 
-import com.gitee.dorive.api.entity.core.ele.FieldElement;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-public interface Endpoint {
+import java.util.List;
 
-    FieldElement getFieldElement();
-
-    Object getValue(Object entity);
-
-    void setValue(Object entity, Object value);
-
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class FieldEntityDefinition extends EntityDefinition {
+    private boolean autoDiscovery;
+    private List<BindingDefinition> bindingDefinitions;
+    private String sortBy;
+    private String order;
+    private String typeName;
+    private boolean collection;
+    private String fieldName;
 }

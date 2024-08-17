@@ -15,23 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity;
+package com.gitee.dorive.api.entity.event;
 
 import lombok.Data;
 
-@Data
-public class FieldDefinition {
-    private boolean primary;
-    private String alias;
-    private boolean valueObj;
-    private String expression;
-    private String converterName;
-    private String typeName;
-    private boolean collection;
-    private String genericTypeName;
-    private String fieldName;
+import java.util.List;
 
-    public boolean isSameType(FieldDefinition fieldDefinition) {
-        return typeName.equals(fieldDefinition.getTypeName()) && genericTypeName.equals(fieldDefinition.getGenericTypeName());
-    }
+@Data
+public class ListenerDefinition {
+    private List<EventDefinition> eventDefinitions;
+    private boolean afterCommit;
+    private List<String> throwExceptionNames;
+    private String genericTypeName;
 }

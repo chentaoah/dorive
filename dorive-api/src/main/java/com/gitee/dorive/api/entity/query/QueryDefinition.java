@@ -15,21 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity;
+package com.gitee.dorive.api.entity.query;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class FieldEntityDefinition extends EntityDefinition {
-    private boolean autoDiscovery;
-    private List<BindingDefinition> bindingDefinitions;
-    private String sortBy;
-    private String order;
-    private String typeName;
-    private boolean collection;
-    private String fieldName;
+public class QueryDefinition {
+    private String entityTypeName;
+    private String genericTypeName;
+    private List<QueryFieldDefinition> queryFieldDefinitions;
+    private FieldDefinition sortByField;
+    private FieldDefinition orderField;
+    private FieldDefinition pageField;
+    private FieldDefinition limitField;
 }

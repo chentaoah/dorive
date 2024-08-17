@@ -15,16 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity;
+package com.gitee.dorive.api.entity.event;
 
 import lombok.Data;
 
 @Data
-public class BindingDefinition {
-    private String field;
-    private String value;
-    private String bind;
-    private String expression;
-    private String processorName;
-    private String bindField;
+public class EventDefinition {
+    private String entityTypeName;
+    private String name;
+    private String genericTypeName;
 }

@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.query.entity;
 
-import com.gitee.dorive.api.entity.ele.EntityElement;
+import com.gitee.dorive.api.entity.core.ele.EntityElement;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
 import lombok.AllArgsConstructor;

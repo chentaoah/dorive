@@ -15,16 +15,33 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.binder;
+package com.gitee.dorive.api.entity.core.ele;
 
-import com.gitee.dorive.api.entity.core.ele.FieldElement;
+import com.gitee.dorive.api.entity.core.def.FieldDef;
+import com.gitee.dorive.api.entity.core.FieldDefinition;
+import lombok.Data;
 
-public interface Endpoint {
+@Data
+public class FieldElement {
 
-    FieldElement getFieldElement();
+    private FieldDefinition fieldDefinition;
+    private FieldDef fieldDef;
+    private Class<?> genericType;
 
-    Object getValue(Object entity);
+    public String getAlias() {
+        return fieldDefinition.getAlias();
+    }
 
-    void setValue(Object entity, Object value);
+    public boolean isCollection() {
+        return fieldDefinition.isCollection();
+    }
+
+    public String getFieldName() {
+        return fieldDefinition.getFieldName();
+    }
+
+    public boolean isSameType(FieldElement fieldElement) {
+        return fieldDefinition.isSameType(fieldElement.getFieldDefinition());
+    }
 
 }

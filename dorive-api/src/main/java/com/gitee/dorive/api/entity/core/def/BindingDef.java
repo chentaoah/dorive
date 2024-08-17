@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity.def;
+package com.gitee.dorive.api.entity.core.def;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,7 +24,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderDef {
-    private String sortBy;
-    private String order;
+public class BindingDef {
+    private String field;
+    private String value;
+    private String bind;
+    private String expression;
+    private Class<?> processor;
+    private String bindField;
 }

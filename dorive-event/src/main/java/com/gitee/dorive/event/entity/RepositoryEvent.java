@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.event.entity;
 
-import com.gitee.dorive.api.entity.ele.EntityElement;
+import com.gitee.dorive.api.entity.core.ele.EntityElement;
 import com.gitee.dorive.event.repository.AbstractEventRepository;
 import lombok.Getter;
 import lombok.Setter;

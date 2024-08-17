@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.impl;
+package com.gitee.dorive.api.impl.core;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
@@ -24,10 +24,10 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.annotation.Binding;
 import com.gitee.dorive.api.annotation.Entity;
 import com.gitee.dorive.api.annotation.Order;
-import com.gitee.dorive.api.entity.BindingDefinition;
-import com.gitee.dorive.api.entity.EntityDefinition;
-import com.gitee.dorive.api.entity.FieldDefinition;
-import com.gitee.dorive.api.entity.FieldEntityDefinition;
+import com.gitee.dorive.api.entity.core.BindingDefinition;
+import com.gitee.dorive.api.entity.core.EntityDefinition;
+import com.gitee.dorive.api.entity.core.FieldDefinition;
+import com.gitee.dorive.api.entity.core.FieldEntityDefinition;
 import com.gitee.dorive.api.util.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

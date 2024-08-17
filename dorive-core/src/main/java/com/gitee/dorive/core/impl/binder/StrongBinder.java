@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.impl.binder;
 
-import com.gitee.dorive.api.entity.def.BindingDef;
+import com.gitee.dorive.api.entity.core.def.BindingDef;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.impl.endpoint.BindEndpoint;
 import com.gitee.dorive.core.impl.endpoint.FieldEndpoint;

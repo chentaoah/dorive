@@ -15,46 +15,23 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity;
+package com.gitee.dorive.api.entity.core;
 
 import lombok.Data;
 
-import java.util.Collections;
-import java.util.List;
-
 @Data
-public class EntityDefinition {
-    private String name;
-    private String sourceName;
-    private String factoryName;
-    private String repositoryName;
-    private int priority;
+public class FieldDefinition {
+    private boolean primary;
+    private String alias;
+    private boolean valueObj;
+    private String expression;
+    private String converterName;
+    private String typeName;
+    private boolean collection;
     private String genericTypeName;
-    private String primaryKey;
-    private List<FieldDefinition> fieldDefinitions;
-    private List<FieldEntityDefinition> fieldEntityDefinitions;
+    private String fieldName;
 
-    public boolean isAutoDiscovery() {
-        return false;
-    }
-
-    public List<BindingDefinition> getBindingDefinitions() {
-        return Collections.emptyList();
-    }
-
-    public String getSortBy() {
-        return null;
-    }
-
-    public String getOrder() {
-        return null;
-    }
-
-    public boolean isCollection() {
-        return false;
-    }
-
-    public String getFieldName() {
-        return null;
+    public boolean isSameType(FieldDefinition fieldDefinition) {
+        return typeName.equals(fieldDefinition.getTypeName()) && genericTypeName.equals(fieldDefinition.getGenericTypeName());
     }
 }

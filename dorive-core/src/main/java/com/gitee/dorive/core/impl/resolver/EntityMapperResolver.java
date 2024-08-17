@@ -18,10 +18,10 @@
 package com.gitee.dorive.core.impl.resolver;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.api.entity.def.FieldDef;
-import com.gitee.dorive.api.entity.ele.EntityElement;
-import com.gitee.dorive.api.entity.ele.FieldElement;
-import com.gitee.dorive.api.entity.FieldDefinition;
+import com.gitee.dorive.api.entity.core.def.FieldDef;
+import com.gitee.dorive.api.entity.core.ele.EntityElement;
+import com.gitee.dorive.api.entity.core.ele.FieldElement;
+import com.gitee.dorive.api.entity.core.FieldDefinition;
 import com.gitee.dorive.core.api.factory.Converter;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
