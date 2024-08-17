@@ -20,7 +20,7 @@ package com.gitee.dorive.event.listener;
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.event.api.AggregateRootEventListener;
-import com.gitee.dorive.event.def.EntityListenerDef;
+import com.gitee.dorive.api.entity.event.def.EntityListenerDef;
 import com.gitee.dorive.event.entity.AggregateRootEvent;
 import com.gitee.dorive.event.entity.CommonEvent;
 import com.gitee.dorive.event.entity.RepositoryEvent;

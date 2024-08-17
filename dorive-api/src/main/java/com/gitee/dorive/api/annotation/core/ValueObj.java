@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.annotation;
+package com.gitee.dorive.api.annotation.core;
+
+import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -25,23 +27,31 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 排序
+ * 值对象
  */
+@Field
 @Inherited
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Order {
+public @interface ValueObj {
 
     /**
-     * 排序字段
+     * @see Field
      */
-    String sortBy() default "";
+    @AliasFor(annotation = Field.class)
+    String value() default "";
 
     /**
-     * 排序方式
+     * @see Field
      */
-    String order() default "";
+    @AliasFor(annotation = Field.class)
+    boolean valueObj() default true;
+
+    /**
+     * @see Field
+     */
+    @AliasFor(annotation = Field.class)
+    Class<?> converter() default Object.class;
 
 }
-

@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.spring.boot.starter.annotation;
 
-import com.gitee.dorive.api.annotation.Repository;
+import com.gitee.dorive.api.annotation.core.Repository;
 import com.gitee.dorive.inject.annotation.Root;
 import org.springframework.core.annotation.AliasFor;
 

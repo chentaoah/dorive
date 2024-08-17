@@ -21,9 +21,9 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.api.annotation.Binding;
-import com.gitee.dorive.api.annotation.Entity;
-import com.gitee.dorive.api.annotation.Order;
+import com.gitee.dorive.api.annotation.core.Binding;
+import com.gitee.dorive.api.annotation.core.Entity;
+import com.gitee.dorive.api.annotation.core.Order;
 import com.gitee.dorive.api.entity.core.BindingDefinition;
 import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.FieldDefinition;
@@ -116,7 +116,7 @@ public class EntityDefinitionReader {
     }
 
     private FieldDefinition readField(Field field) {
-        com.gitee.dorive.api.annotation.Field fieldAnnotation = AnnotatedElementUtils.getMergedAnnotation(field, com.gitee.dorive.api.annotation.Field.class);
+        com.gitee.dorive.api.annotation.core.Field fieldAnnotation = AnnotatedElementUtils.getMergedAnnotation(field, com.gitee.dorive.api.annotation.core.Field.class);
         Class<?> type = field.getType();
         boolean collection = false;
         Class<?> genericType = field.getType();

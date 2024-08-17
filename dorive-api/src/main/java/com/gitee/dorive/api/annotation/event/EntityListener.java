@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.annotation;
+package com.gitee.dorive.api.annotation.event;
 
-import com.gitee.dorive.event.enums.OperationType;
+import com.gitee.dorive.api.constant.enums.OperationType;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Documented;
@@ -27,9 +27,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static com.gitee.dorive.event.enums.OperationType.DELETE;
-import static com.gitee.dorive.event.enums.OperationType.INSERT;
-import static com.gitee.dorive.event.enums.OperationType.UPDATE;
+import static com.gitee.dorive.api.constant.enums.OperationType.DELETE;
+import static com.gitee.dorive.api.constant.enums.OperationType.INSERT;
+import static com.gitee.dorive.api.constant.enums.OperationType.UPDATE;
 
 @Component
 @Inherited

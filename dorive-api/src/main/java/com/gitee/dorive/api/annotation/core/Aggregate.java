@@ -15,48 +15,61 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.annotation;
+package com.gitee.dorive.api.annotation.core;
 
-import java.lang.annotation.*;
+import org.springframework.core.annotation.AliasFor;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * 绑定
+ * 聚合
  */
+@Entity
 @Inherited
 @Documented
 @Target(ElementType.FIELD)
-@Repeatable(Bindings.class)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Binding {
+public @interface Aggregate {
 
     /**
-     * 字段名称
+     * @see Entity
      */
-    String field() default "";
+    @AliasFor(annotation = Entity.class)
+    String name() default "";
 
     /**
-     * 字面值
+     * @see Entity
      */
-    String value() default "";
+    @AliasFor(annotation = Entity.class)
+    Class<?> source() default Object.class;
 
     /**
-     * 绑定的上下文字段
+     * @see Entity
      */
-    String bind() default "";
+    @AliasFor(annotation = Entity.class)
+    Class<?> factory() default Object.class;
 
     /**
-     * 加工表达式
+     * @see Entity
      */
-    String expression() default "";
+    @AliasFor(annotation = Entity.class)
+    Class<?> repository() default Object.class;
 
     /**
-     * 指定加工器
+     * @see Entity
      */
-    Class<?> processor() default Object.class;
+    @AliasFor(annotation = Entity.class)
+    int priority() default 0;
 
     /**
-     * 绑定的真实字段
+     * @see Entity
      */
-    String bindField() default "";
+    @AliasFor(annotation = Entity.class)
+    boolean autoDiscovery() default true;
 
 }

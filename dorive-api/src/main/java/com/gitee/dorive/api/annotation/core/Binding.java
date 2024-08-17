@@ -15,11 +15,48 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.enums;
+package com.gitee.dorive.api.annotation.core;
 
-public enum OperationType {
-    UNKNOWN,
-    INSERT,
-    UPDATE,
-    DELETE
+import java.lang.annotation.*;
+
+/**
+ * 绑定
+ */
+@Inherited
+@Documented
+@Target(ElementType.FIELD)
+@Repeatable(Bindings.class)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Binding {
+
+    /**
+     * 字段名称
+     */
+    String field() default "";
+
+    /**
+     * 字面值
+     */
+    String value() default "";
+
+    /**
+     * 绑定的上下文字段
+     */
+    String bind() default "";
+
+    /**
+     * 加工表达式
+     */
+    String expression() default "";
+
+    /**
+     * 指定加工器
+     */
+    Class<?> processor() default Object.class;
+
+    /**
+     * 绑定的真实字段
+     */
+    String bindField() default "";
+
 }

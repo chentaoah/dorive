@@ -15,43 +15,51 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.annotation;
+package com.gitee.dorive.api.annotation.core;
 
 import org.springframework.core.annotation.AliasFor;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
- * 值对象
+ * 字段
  */
-@Field
 @Inherited
 @Documented
-@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValueObj {
+@Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+public @interface Field {
 
     /**
-     * @see Field
+     * 是否主键
      */
-    @AliasFor(annotation = Field.class)
+    boolean primary() default false;
+
+    /**
+     * 别名
+     */
+    @AliasFor("alias")
     String value() default "";
 
     /**
-     * @see Field
+     * 别名
      */
-    @AliasFor(annotation = Field.class)
-    boolean valueObj() default true;
+    @AliasFor("value")
+    String alias() default "";
 
     /**
-     * @see Field
+     * 是否值对象
      */
-    @AliasFor(annotation = Field.class)
+    boolean valueObj() default false;
+
+    /**
+     * 映射表达式
+     */
+    String expression() default "";
+
+    /**
+     * 指定转换器
+     */
     Class<?> converter() default Object.class;
 
 }

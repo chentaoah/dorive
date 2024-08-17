@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.annotation;
+package com.gitee.dorive.api.annotation.core;
+
+import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -24,9 +26,26 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * 主键
+ */
+@Field
 @Inherited
 @Documented
-@Target(ElementType.TYPE)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EnableEvent {
+public @interface Id {
+
+    /**
+     * @see Field
+     */
+    @AliasFor(annotation = Field.class)
+    boolean primary() default true;
+
+    /**
+     * @see Field
+     */
+    @AliasFor(annotation = Field.class)
+    String value() default "id";
+
 }

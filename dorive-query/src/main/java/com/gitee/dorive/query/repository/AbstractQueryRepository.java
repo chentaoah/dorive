@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.query.repository;
 
-import com.gitee.dorive.api.annotation.Repository;
+import com.gitee.dorive.api.annotation.core.Repository;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.entity.executor.Page;

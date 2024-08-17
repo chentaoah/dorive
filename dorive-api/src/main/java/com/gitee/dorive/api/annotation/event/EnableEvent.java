@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.annotation;
-
-import org.springframework.core.annotation.AliasFor;
+package com.gitee.dorive.api.annotation.event;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -26,50 +24,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * 聚合
- */
-@Entity
 @Inherited
 @Documented
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Aggregate {
-
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    String name() default "";
-
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    Class<?> source() default Object.class;
-
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    Class<?> factory() default Object.class;
-
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    Class<?> repository() default Object.class;
-
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    int priority() default 0;
-
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    boolean autoDiscovery() default true;
-
+public @interface EnableEvent {
 }

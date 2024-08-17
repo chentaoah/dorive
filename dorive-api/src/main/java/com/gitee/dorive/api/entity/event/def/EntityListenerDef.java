@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.def;
+package com.gitee.dorive.api.entity.event.def;
 
-import com.gitee.dorive.event.annotation.EntityListener;
-import com.gitee.dorive.event.enums.OperationType;
+import com.gitee.dorive.api.annotation.event.EntityListener;
+import com.gitee.dorive.api.constant.enums.OperationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

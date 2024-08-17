@@ -15,31 +15,48 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.annotation;
+package com.gitee.dorive.api.annotation.core;
 
-import org.springframework.core.annotation.AliasFor;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
- * 别名
+ * 实体
  */
-@Field
 @Inherited
 @Documented
-@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Alias {
+@Target({ElementType.TYPE, ElementType.FIELD})
+public @interface Entity {
 
     /**
-     * @see Field
+     * 实体名称
      */
-    @AliasFor(annotation = Field.class)
-    String value() default "";
+    String name() default "";
+
+    /**
+     * 数据来源
+     */
+    Class<?> source() default Object.class;
+
+    /**
+     * 实体工厂
+     */
+    Class<?> factory() default Object.class;
+
+    /**
+     * 指定仓储
+     */
+    Class<?> repository() default Object.class;
+
+    /**
+     * 操作优先级
+     */
+    int priority() default 0;
+
+    /**
+     * 是否自动发现
+     */
+    boolean autoDiscovery() default false;
 
 }
+

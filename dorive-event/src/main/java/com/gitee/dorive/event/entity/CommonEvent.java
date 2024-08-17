@@ -23,7 +23,7 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.Update;
-import com.gitee.dorive.event.enums.OperationType;
+import com.gitee.dorive.api.constant.enums.OperationType;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;

@@ -15,24 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.annotation;
-
-import org.springframework.core.annotation.AliasFor;
-import org.springframework.stereotype.Component;
+package com.gitee.dorive.api.annotation.core;
 
 import java.lang.annotation.*;
 
 /**
- * 仓储
+ * 绑定
  */
-@Component
 @Inherited
 @Documented
-@Target(ElementType.TYPE)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Repository {
-
-    @AliasFor(annotation = Component.class)
-    String value() default "";
-
+public @interface Bindings {
+    Binding[] value();
 }

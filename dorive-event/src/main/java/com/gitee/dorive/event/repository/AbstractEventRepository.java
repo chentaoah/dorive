@@ -28,7 +28,7 @@ import com.gitee.dorive.core.repository.AbstractGenericRepository;
 import com.gitee.dorive.core.repository.AbstractProxyRepository;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.core.repository.DefaultRepository;
-import com.gitee.dorive.event.annotation.EnableEvent;
+import com.gitee.dorive.api.annotation.event.EnableEvent;
 import com.gitee.dorive.event.entity.RepositoryEvent;
 import com.gitee.dorive.event.executor.EventExecutor;
 import org.springframework.core.annotation.AnnotationUtils;

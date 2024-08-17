@@ -20,7 +20,7 @@ package com.gitee.dorive.event.listener;
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.core.entity.operation.EntityOp;
 import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.event.def.EntityListenerDef;
+import com.gitee.dorive.api.entity.event.def.EntityListenerDef;
 import com.gitee.dorive.event.entity.CommonEvent;
 import lombok.Data;
 import org.springframework.beans.BeansException;
