@@ -15,18 +15,21 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.entity;
+package com.gitee.dorive.event.entity.executor;
 
-import com.gitee.dorive.event.repository.AbstractEventRepository;
+import com.gitee.dorive.event.entity.ExecutorEvent;
+import com.gitee.dorive.event.impl.executor.EventExecutor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class AggregateRootEvent extends AggregateEvent {
+public class EntityEvent extends ExecutorEvent {
 
-    public AggregateRootEvent(AbstractEventRepository<?, ?> repository) {
-        super(repository);
+    private Object entity;
+
+    public EntityEvent(EventExecutor eventExecutor) {
+        super(eventExecutor);
     }
 
 }

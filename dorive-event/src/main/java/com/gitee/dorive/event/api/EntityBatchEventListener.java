@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.event.api;
 
-import com.gitee.dorive.event.entity.EntityBatchEvent;
+import com.gitee.dorive.event.entity.executor.EntityBatchEvent;
 
 public interface EntityBatchEventListener {
 

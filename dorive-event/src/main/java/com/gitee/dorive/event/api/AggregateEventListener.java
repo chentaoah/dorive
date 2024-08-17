@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.event.api;
 
-import com.gitee.dorive.event.entity.AggregateEvent;
+import com.gitee.dorive.event.entity.repository.AggregateEvent;
 
 public interface AggregateEventListener {
 

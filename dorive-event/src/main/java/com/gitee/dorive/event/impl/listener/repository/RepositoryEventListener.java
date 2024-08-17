@@ -15,39 +15,41 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.listener;
+package com.gitee.dorive.event.impl.listener.repository;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.event.api.EntityBatchEventListener;
+import com.gitee.dorive.event.api.AggregateEventListener;
 import com.gitee.dorive.api.entity.event.def.EntityListenerDef;
+import com.gitee.dorive.event.entity.repository.AggregateEvent;
 import com.gitee.dorive.event.entity.CommonEvent;
-import com.gitee.dorive.event.entity.EntityBatchEvent;
-import com.gitee.dorive.event.entity.ExecutorEvent;
-import com.gitee.dorive.event.executor.EventExecutor;
+import com.gitee.dorive.event.entity.RepositoryEvent;
+import com.gitee.dorive.event.impl.listener.AbstractEventListener;
+import com.gitee.dorive.event.impl.listener.EntityListenerAdapter;
+import com.gitee.dorive.event.repository.AbstractEventRepository;
 import org.springframework.context.ApplicationListener;
 
 import java.util.List;
 
-public class ExecutorBatchEventListener extends AbstractEventListener implements ApplicationListener<ExecutorEvent> {
+public class RepositoryEventListener extends AbstractEventListener implements ApplicationListener<RepositoryEvent> {
 
     @Override
     protected Class<?> getBeanType() {
-        return EntityBatchEventListener.class;
+        return AggregateEventListener.class;
     }
 
     @Override
     protected EntityListenerAdapter newAdapter(Integer order, EntityListenerDef entityListenerDef, Object bean) {
-        EntityBatchEventListener listener = (EntityBatchEventListener) bean;
-        return new EntityListenerAdapter(order, entityListenerDef, bean, event -> listener.onEntityBatchEvent((EntityBatchEvent) event));
+        AggregateEventListener listener = (AggregateEventListener) bean;
+        return new EntityListenerAdapter(order, entityListenerDef, bean, event -> listener.onAggregateEvent((AggregateEvent) event));
     }
 
     @Override
-    public void onApplicationEvent(ExecutorEvent executorEvent) {
-        if (isHandle(executorEvent)) {
-            Class<?> entityClass = executorEvent.getEntityClass();
+    public void onApplicationEvent(RepositoryEvent repositoryEvent) {
+        if (isHandle(repositoryEvent)) {
+            Class<?> entityClass = repositoryEvent.getEntityClass();
             List<EntityListenerAdapter> existAdapters = getClassEntityListenerAdaptersMap().get(entityClass);
             if (existAdapters != null && !existAdapters.isEmpty()) {
-                CommonEvent commonEvent = convert(executorEvent);
+                CommonEvent commonEvent = convert(repositoryEvent);
                 for (EntityListenerAdapter adapter : existAdapters) {
                     adapter.onCommonEvent(commonEvent);
                 }
@@ -55,11 +57,11 @@ public class ExecutorBatchEventListener extends AbstractEventListener implements
         }
     }
 
-    private CommonEvent convert(ExecutorEvent executorEvent) {
-        EntityBatchEvent entityBatchEvent = new EntityBatchEvent((EventExecutor) executorEvent.getSource());
-        BeanUtil.copyProperties(executorEvent, entityBatchEvent);
-        entityBatchEvent.setEntities(executorEvent.getEntities());
-        return entityBatchEvent;
+    private CommonEvent convert(RepositoryEvent repositoryEvent) {
+        AggregateEvent aggregateEvent = new AggregateEvent((AbstractEventRepository<?, ?>) repositoryEvent.getSource());
+        BeanUtil.copyProperties(repositoryEvent, aggregateEvent);
+        aggregateEvent.setEntities(repositoryEvent.getEntities());
+        return aggregateEvent;
     }
 
 }

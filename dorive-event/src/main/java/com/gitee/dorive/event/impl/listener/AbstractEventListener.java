@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.listener;
+package com.gitee.dorive.event.impl.listener;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.core.entity.operation.EntityOp;

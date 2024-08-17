@@ -15,30 +15,33 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.listener;
+package com.gitee.dorive.event.impl.listener.repository;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.event.api.AggregateEventListener;
+import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.event.api.AggregateRootEventListener;
 import com.gitee.dorive.api.entity.event.def.EntityListenerDef;
-import com.gitee.dorive.event.entity.AggregateEvent;
+import com.gitee.dorive.event.entity.repository.AggregateRootEvent;
 import com.gitee.dorive.event.entity.CommonEvent;
 import com.gitee.dorive.event.entity.RepositoryEvent;
+import com.gitee.dorive.event.impl.listener.AbstractEventListener;
+import com.gitee.dorive.event.impl.listener.EntityListenerAdapter;
 import com.gitee.dorive.event.repository.AbstractEventRepository;
 import org.springframework.context.ApplicationListener;
 
 import java.util.List;
 
-public class RepositoryEventListener extends AbstractEventListener implements ApplicationListener<RepositoryEvent> {
+public class RepositoryRootEventListener extends AbstractEventListener implements ApplicationListener<RepositoryEvent> {
 
     @Override
     protected Class<?> getBeanType() {
-        return AggregateEventListener.class;
+        return AggregateRootEventListener.class;
     }
 
     @Override
     protected EntityListenerAdapter newAdapter(Integer order, EntityListenerDef entityListenerDef, Object bean) {
-        AggregateEventListener listener = (AggregateEventListener) bean;
-        return new EntityListenerAdapter(order, entityListenerDef, bean, event -> listener.onAggregateEvent((AggregateEvent) event));
+        AggregateRootEventListener listener = (AggregateRootEventListener) bean;
+        return new EntityListenerAdapter(order, entityListenerDef, bean, event -> listener.onAggregateRootEvent((AggregateRootEvent) event));
     }
 
     @Override
@@ -55,11 +58,17 @@ public class RepositoryEventListener extends AbstractEventListener implements Ap
         }
     }
 
+    @Override
+    public boolean isHandle(CommonEvent commonEvent) {
+        Operation operation = commonEvent.getOperation();
+        return super.isHandle(commonEvent) && operation.isUncontrolled();
+    }
+
     private CommonEvent convert(RepositoryEvent repositoryEvent) {
-        AggregateEvent aggregateEvent = new AggregateEvent((AbstractEventRepository<?, ?>) repositoryEvent.getSource());
-        BeanUtil.copyProperties(repositoryEvent, aggregateEvent);
-        aggregateEvent.setEntities(repositoryEvent.getEntities());
-        return aggregateEvent;
+        AggregateRootEvent aggregateRootEvent = new AggregateRootEvent((AbstractEventRepository<?, ?>) repositoryEvent.getSource());
+        BeanUtil.copyProperties(repositoryEvent, aggregateRootEvent);
+        aggregateRootEvent.setEntities(repositoryEvent.getEntities());
+        return aggregateRootEvent;
     }
 
 }

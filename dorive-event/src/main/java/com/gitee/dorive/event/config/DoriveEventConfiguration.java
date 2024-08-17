@@ -17,10 +17,10 @@
 
 package com.gitee.dorive.event.config;
 
-import com.gitee.dorive.event.listener.ExecutorBatchEventListener;
-import com.gitee.dorive.event.listener.ExecutorEventListener;
-import com.gitee.dorive.event.listener.RepositoryEventListener;
-import com.gitee.dorive.event.listener.RepositoryRootEventListener;
+import com.gitee.dorive.event.impl.listener.executor.ExecutorBatchEventListener;
+import com.gitee.dorive.event.impl.listener.executor.ExecutorEventListener;
+import com.gitee.dorive.event.impl.listener.repository.RepositoryEventListener;
+import com.gitee.dorive.event.impl.listener.repository.RepositoryRootEventListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
