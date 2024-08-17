@@ -36,7 +36,7 @@ import static com.gitee.dorive.api.constant.enums.OperationType.UPDATE;
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EntityListener {
+public @interface EventListener {
 
     Class<?> value();
 
