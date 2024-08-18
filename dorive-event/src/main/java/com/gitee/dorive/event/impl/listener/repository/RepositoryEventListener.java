@@ -19,7 +19,7 @@ package com.gitee.dorive.event.impl.listener.repository;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.event.api.AggregateEventListener;
-import com.gitee.dorive.api.entity.event.def.EventListenerDef;
+import com.gitee.dorive.api.entity.event.def.ListenerDef;
 import com.gitee.dorive.event.entity.repository.AggregateEvent;
 import com.gitee.dorive.event.entity.CommonEvent;
 import com.gitee.dorive.event.entity.RepositoryEvent;
@@ -38,9 +38,9 @@ public class RepositoryEventListener extends AbstractEventListener implements Ap
     }
 
     @Override
-    protected EntityListenerAdapter newAdapter(Integer order, EventListenerDef eventListenerDef, Object bean) {
+    protected EntityListenerAdapter newAdapter(Integer order, ListenerDef listenerDef, Object bean) {
         AggregateEventListener listener = (AggregateEventListener) bean;
-        return new EntityListenerAdapter(order, eventListenerDef, bean, event -> listener.onAggregateEvent((AggregateEvent) event));
+        return new EntityListenerAdapter(order, listenerDef, bean, event -> listener.onAggregateEvent((AggregateEvent) event));
     }
 
     @Override

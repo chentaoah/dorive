@@ -19,7 +19,7 @@ package com.gitee.dorive.event.impl.listener.executor;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.event.api.EntityBatchEventListener;
-import com.gitee.dorive.api.entity.event.def.EventListenerDef;
+import com.gitee.dorive.api.entity.event.def.ListenerDef;
 import com.gitee.dorive.event.entity.CommonEvent;
 import com.gitee.dorive.event.entity.executor.EntityBatchEvent;
 import com.gitee.dorive.event.entity.ExecutorEvent;
@@ -38,9 +38,9 @@ public class ExecutorBatchEventListener extends AbstractEventListener implements
     }
 
     @Override
-    protected EntityListenerAdapter newAdapter(Integer order, EventListenerDef eventListenerDef, Object bean) {
+    protected EntityListenerAdapter newAdapter(Integer order, ListenerDef listenerDef, Object bean) {
         EntityBatchEventListener listener = (EntityBatchEventListener) bean;
-        return new EntityListenerAdapter(order, eventListenerDef, bean, event -> listener.onEntityBatchEvent((EntityBatchEvent) event));
+        return new EntityListenerAdapter(order, listenerDef, bean, event -> listener.onEntityBatchEvent((EntityBatchEvent) event));
     }
 
     @Override

@@ -19,7 +19,7 @@ package com.gitee.dorive.event.impl.listener;
 
 import cn.hutool.core.util.ArrayUtil;
 import com.gitee.dorive.event.entity.CommonEvent;
-import com.gitee.dorive.api.entity.event.def.EventListenerDef;
+import com.gitee.dorive.api.entity.event.def.ListenerDef;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,14 +37,14 @@ import java.util.function.Consumer;
 public class EntityListenerAdapter {
 
     private Integer order;
-    private EventListenerDef eventListenerDef;
+    private ListenerDef listenerDef;
     private Object bean;
     private Consumer<CommonEvent> consumer;
 
     public void onCommonEvent(CommonEvent commonEvent) {
-        boolean isSubscribe = ArrayUtil.contains(eventListenerDef.getSubscribeTo(), commonEvent.getOperationType());
+        boolean isSubscribe = ArrayUtil.contains(listenerDef.getSubscribeTo(), commonEvent.getOperationType());
         if (isSubscribe) {
-            boolean isTxActive = eventListenerDef.isAfterCommit() && TransactionSynchronizationManager.isActualTransactionActive();
+            boolean isTxActive = listenerDef.isAfterCommit() && TransactionSynchronizationManager.isActualTransactionActive();
             if (!isTxActive) {
                 handleEntityEvent(commonEvent, true);
             } else {
@@ -66,7 +66,7 @@ public class EntityListenerAdapter {
     }
 
     private boolean matchRollbackFor(Throwable throwable) {
-        Class<? extends Throwable>[] rollbackFor = eventListenerDef.getRollbackFor();
+        Class<? extends Throwable>[] rollbackFor = listenerDef.getRollbackFor();
         if (rollbackFor != null && rollbackFor.length > 0) {
             Class<? extends Throwable> throwableType = throwable.getClass();
             for (Class<? extends Throwable> rollbackType : rollbackFor) {

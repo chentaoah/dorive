@@ -20,7 +20,7 @@ package com.gitee.dorive.event.impl.listener;
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.core.entity.operation.EntityOp;
 import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.api.entity.event.def.EventListenerDef;
+import com.gitee.dorive.api.entity.event.def.ListenerDef;
 import com.gitee.dorive.event.entity.CommonEvent;
 import lombok.Data;
 import org.springframework.beans.BeansException;
@@ -56,20 +56,20 @@ public abstract class AbstractEventListener implements ApplicationContextAware, 
         for (Object bean : beans) {
             Class<?> listenerType = bean.getClass();
             Integer order = OrderUtils.getOrder(listenerType, LOWEST_PRECEDENCE);
-            EventListenerDef eventListenerDef = EventListenerDef.fromElement(listenerType);
-            registry(order, eventListenerDef, bean);
+            ListenerDef listenerDef = ListenerDef.fromElement(listenerType);
+            registry(order, listenerDef, bean);
         }
     }
 
-    public void registry(Integer order, EventListenerDef eventListenerDef, Object bean) {
-        if (eventListenerDef == null) {
+    public void registry(Integer order, ListenerDef listenerDef, Object bean) {
+        if (listenerDef == null) {
             return;
         }
-        Class<?> entityClass = eventListenerDef.getValue();
+        Class<?> entityClass = listenerDef.getValue();
         if (entityClass == null) {
             return;
         }
-        EntityListenerAdapter adapter = newAdapter(order, eventListenerDef, bean);
+        EntityListenerAdapter adapter = newAdapter(order, listenerDef, bean);
         List<EntityListenerAdapter> existAdapters = classEntityListenerAdaptersMap.computeIfAbsent(entityClass, key -> new ArrayList<>(4));
         existAdapters.add(adapter);
     }
@@ -92,6 +92,6 @@ public abstract class AbstractEventListener implements ApplicationContextAware, 
 
     protected abstract Class<?> getBeanType();
 
-    protected abstract EntityListenerAdapter newAdapter(Integer order, EventListenerDef eventListenerDef, Object bean);
+    protected abstract EntityListenerAdapter newAdapter(Integer order, ListenerDef listenerDef, Object bean);
 
 }

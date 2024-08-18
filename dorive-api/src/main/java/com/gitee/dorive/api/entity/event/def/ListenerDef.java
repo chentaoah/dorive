@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.api.entity.event.def;
 
-import com.gitee.dorive.api.annotation.event.EventListener;
+import com.gitee.dorive.api.annotation.event.Listener;
 import com.gitee.dorive.api.constant.enums.OperationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,22 +29,22 @@ import java.lang.reflect.AnnotatedElement;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventListenerDef {
+public class ListenerDef {
 
     private Class<?> value;
     private OperationType[] subscribeTo;
     private boolean afterCommit;
     private Class<? extends Throwable>[] rollbackFor;
 
-    public static EventListenerDef fromElement(AnnotatedElement element) {
-        EventListener eventListener = AnnotatedElementUtils.getMergedAnnotation(element, EventListener.class);
-        if (eventListener != null) {
-            EventListenerDef eventListenerDef = new EventListenerDef();
-            eventListenerDef.setValue(eventListener.value());
-            eventListenerDef.setSubscribeTo(eventListener.subscribeTo());
-            eventListenerDef.setAfterCommit(eventListener.afterCommit());
-            eventListenerDef.setRollbackFor(eventListener.rollbackFor());
-            return eventListenerDef;
+    public static ListenerDef fromElement(AnnotatedElement element) {
+        Listener listener = AnnotatedElementUtils.getMergedAnnotation(element, Listener.class);
+        if (listener != null) {
+            ListenerDef listenerDef = new ListenerDef();
+            listenerDef.setValue(listener.value());
+            listenerDef.setSubscribeTo(listener.subscribeTo());
+            listenerDef.setAfterCommit(listener.afterCommit());
+            listenerDef.setRollbackFor(listener.rollbackFor());
+            return listenerDef;
         }
         return null;
     }
