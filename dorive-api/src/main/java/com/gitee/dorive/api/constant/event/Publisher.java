@@ -15,23 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.entity.repository;
+package com.gitee.dorive.api.constant.event;
 
-import com.gitee.dorive.event.entity.RepositoryEvent;
-import com.gitee.dorive.event.repository.AbstractEventRepository;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.List;
-
-@Getter
-@Setter
-public class AggregateEvent extends RepositoryEvent {
-
-    private List<?> entities;
-
-    public AggregateEvent(AbstractEventRepository<?, ?> repository) {
-        super(repository);
-    }
-
+public interface Publisher {
+    String EXECUTOR = "EXECUTOR";
+    String REPOSITORY = "REPOSITORY";
 }

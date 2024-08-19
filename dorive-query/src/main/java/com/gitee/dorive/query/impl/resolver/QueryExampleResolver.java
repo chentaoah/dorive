@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.query.impl.resolver;
 
-import com.gitee.dorive.api.constant.Operator;
+import com.gitee.dorive.api.constant.core.Operator;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;

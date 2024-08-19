@@ -19,7 +19,7 @@ package com.gitee.dorive.mybatis.plus.impl;
 
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.gitee.dorive.api.constant.Operator;
+import com.gitee.dorive.api.constant.core.Operator;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;

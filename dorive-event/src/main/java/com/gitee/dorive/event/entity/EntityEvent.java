@@ -17,13 +17,12 @@
 
 package com.gitee.dorive.event.entity;
 
+import com.gitee.dorive.api.constant.event.Event;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.operation.EntityOp;
-import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.Update;
-import com.gitee.dorive.api.constant.enums.OperationType;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
@@ -32,35 +31,28 @@ import java.util.List;
 
 @Getter
 @Setter
-public class CommonEvent extends ApplicationEvent {
-
+public class EntityEvent extends ApplicationEvent {
+    private String publisher;
+    private Class<?> entityClass;
+    private String name;
     private Context context;
-    private Operation operation;
-    private OperationType operationType;
+    private boolean root;
+    private List<?> entities;
 
-    public CommonEvent(Object source) {
+    public static String getEventName(EntityOp entityOp) {
+        if (entityOp instanceof Insert) {
+            return Event.INSERT;
+
+        } else if (entityOp instanceof Update) {
+            return Event.UPDATE;
+
+        } else if (entityOp instanceof Delete) {
+            return Event.DELETE;
+        }
+        return null;
+    }
+
+    public EntityEvent(Object source) {
         super(source);
     }
-
-    public void setOperation(Operation operation) {
-        this.operation = operation;
-        if (operation instanceof EntityOp) {
-            this.operationType = OperationType.UNKNOWN;
-            if (operation instanceof Insert) {
-                this.operationType = OperationType.INSERT;
-
-            } else if (operation instanceof Update) {
-                this.operationType = OperationType.UPDATE;
-
-            } else if (operation instanceof Delete) {
-                this.operationType = OperationType.DELETE;
-            }
-        }
-    }
-
-    public List<?> getEntities() {
-        EntityOp entityOp = (EntityOp) operation;
-        return entityOp.getEntities();
-    }
-
 }

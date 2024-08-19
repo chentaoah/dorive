@@ -23,7 +23,10 @@ import java.util.List;
 
 @Data
 public class ListenerDefinition {
-    private List<EventDefinition> eventDefinitions;
+    private List<String> publisherNames;
+    private String entityTypeName;
+    private List<String> eventNames;
+    private boolean onlyRoot;
     private boolean afterCommit;
     private List<String> throwExceptionNames;
     private String genericTypeName;

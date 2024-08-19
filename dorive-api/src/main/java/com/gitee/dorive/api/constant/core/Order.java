@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.constant;
+package com.gitee.dorive.api.constant.core;
 
 public interface Order {
     String ASC = "ASC";

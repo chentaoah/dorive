@@ -18,7 +18,6 @@
 package com.gitee.dorive.api.entity.event.def;
 
 import com.gitee.dorive.api.annotation.event.Listener;
-import com.gitee.dorive.api.constant.enums.OperationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,19 +30,23 @@ import java.lang.reflect.AnnotatedElement;
 @AllArgsConstructor
 public class ListenerDef {
 
+    private String[] publishers;
     private Class<?> value;
-    private OperationType[] subscribeTo;
+    private String[] events;
+    private boolean onlyRoot;
     private boolean afterCommit;
-    private Class<? extends Throwable>[] rollbackFor;
+    private Class<? extends Throwable>[] throwExceptions;
 
     public static ListenerDef fromElement(AnnotatedElement element) {
         Listener listener = AnnotatedElementUtils.getMergedAnnotation(element, Listener.class);
         if (listener != null) {
             ListenerDef listenerDef = new ListenerDef();
+            listenerDef.setPublishers(listener.publishers());
             listenerDef.setValue(listener.value());
-            listenerDef.setSubscribeTo(listener.subscribeTo());
+            listenerDef.setEvents(listener.events());
+            listenerDef.setOnlyRoot(listener.onlyRoot());
             listenerDef.setAfterCommit(listener.afterCommit());
-            listenerDef.setRollbackFor(listener.rollbackFor());
+            listenerDef.setThrowExceptions(listener.throwExceptions());
             return listenerDef;
         }
         return null;

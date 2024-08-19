@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.event.api;
 
-import com.gitee.dorive.event.entity.executor.EntityEvent;
+import com.gitee.dorive.event.entity.EntityEvent;
 
 public interface EntityEventListener {
 

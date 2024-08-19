@@ -17,11 +17,8 @@
 
 package com.gitee.dorive.event.impl.listener;
 
-import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.core.entity.operation.EntityOp;
-import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.api.entity.event.def.ListenerDef;
-import com.gitee.dorive.event.entity.CommonEvent;
+import com.gitee.dorive.event.api.EntityEventListener;
 import lombok.Data;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
@@ -41,7 +38,7 @@ import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 public abstract class AbstractEventListener implements ApplicationContextAware, InitializingBean {
 
     private ApplicationContext applicationContext;
-    private final Map<Class<?>, List<EntityListenerAdapter>> classEntityListenerAdaptersMap = new ConcurrentHashMap<>();
+    private final Map<Class<?>, List<EntityEventListener>> classAdaptersMap = new ConcurrentHashMap<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -69,29 +66,13 @@ public abstract class AbstractEventListener implements ApplicationContextAware, 
         if (entityClass == null) {
             return;
         }
-        EntityListenerAdapter adapter = newAdapter(order, listenerDef, bean);
-        List<EntityListenerAdapter> existAdapters = classEntityListenerAdaptersMap.computeIfAbsent(entityClass, key -> new ArrayList<>(4));
+        EntityEventListener adapter = newAdapter(order, listenerDef, bean);
+        List<EntityEventListener> existAdapters = classAdaptersMap.computeIfAbsent(entityClass, key -> new ArrayList<>(4));
         existAdapters.add(adapter);
-    }
-
-    public void cancel(Class<?> entityClass, Object bean) {
-        List<EntityListenerAdapter> existAdapters = classEntityListenerAdaptersMap.get(entityClass);
-        if (existAdapters == null) {
-            return;
-        }
-        EntityListenerAdapter adapter = CollUtil.findOne(existAdapters, a -> a.getBean() == bean);
-        if (adapter != null) {
-            existAdapters.remove(adapter);
-        }
-    }
-
-    public boolean isHandle(CommonEvent commonEvent) {
-        Operation operation = commonEvent.getOperation();
-        return operation instanceof EntityOp;
     }
 
     protected abstract Class<?> getBeanType();
 
-    protected abstract EntityListenerAdapter newAdapter(Integer order, ListenerDef listenerDef, Object bean);
+    protected abstract EntityEventListener newAdapter(Integer order, ListenerDef listenerDef, Object bean);
 
 }

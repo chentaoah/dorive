@@ -19,7 +19,7 @@ package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.api.constant.Order;
+import com.gitee.dorive.api.constant.core.Order;
 import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.def.EntityDef;
 import com.gitee.dorive.api.entity.core.def.OrderDef;

@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.constant.enums;
+package com.gitee.dorive.api.constant.event;
 
-public enum OperationType {
-    UNKNOWN,
-    INSERT,
-    UPDATE,
-    DELETE
+public interface Event {
+    String INSERT = "INSERT";
+    String UPDATE = "UPDATE";
+    String DELETE = "DELETE";
 }

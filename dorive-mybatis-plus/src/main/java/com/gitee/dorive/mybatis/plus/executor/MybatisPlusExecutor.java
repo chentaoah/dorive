@@ -23,7 +23,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gitee.dorive.api.constant.Order;
+import com.gitee.dorive.api.constant.core.Order;
 import com.gitee.dorive.api.entity.core.def.EntityDef;
 import com.gitee.dorive.api.entity.core.ele.EntityElement;
 import com.gitee.dorive.core.api.context.Context;

@@ -15,23 +15,23 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.entity.executor;
+package com.gitee.dorive.api.constant.core;
 
-import com.gitee.dorive.event.entity.ExecutorEvent;
-import com.gitee.dorive.event.impl.executor.EventExecutor;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.List;
-
-@Getter
-@Setter
-public class EntityBatchEvent extends ExecutorEvent {
-
-    private List<?> entities;
-
-    public EntityBatchEvent(EventExecutor eventExecutor) {
-        super(eventExecutor);
-    }
-
+public interface Operator {
+    String EQ = "=";
+    String NE = "<>";
+    String GT = ">";
+    String GE = ">=";
+    String LT = "<";
+    String LE = "<=";
+    String IN = "IN";
+    String NOT_IN = "NOT IN";
+    String LIKE = "LIKE";
+    String NOT_LIKE = "NOT LIKE";
+    String IS_NULL = "IS NULL";
+    String IS_NOT_NULL = "IS NOT NULL";
+    String MULTI_IN = "MULTI_IN";
+    String MULTI_NOT_IN = "MULTI_NOT_IN";
+    String AND = "AND";
+    String OR = "OR";
 }

@@ -17,19 +17,11 @@
 
 package com.gitee.dorive.api.annotation.event;
 
-import com.gitee.dorive.api.constant.enums.OperationType;
+import com.gitee.dorive.api.constant.event.Event;
+import com.gitee.dorive.api.constant.event.Publisher;
 import org.springframework.stereotype.Component;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-import static com.gitee.dorive.api.constant.enums.OperationType.DELETE;
-import static com.gitee.dorive.api.constant.enums.OperationType.INSERT;
-import static com.gitee.dorive.api.constant.enums.OperationType.UPDATE;
+import java.lang.annotation.*;
 
 @Component
 @Inherited
@@ -38,12 +30,16 @@ import static com.gitee.dorive.api.constant.enums.OperationType.UPDATE;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Listener {
 
+    String[] publishers() default {Publisher.EXECUTOR};
+
     Class<?> value();
 
-    OperationType[] subscribeTo() default {INSERT, UPDATE, DELETE};
+    String[] events() default {Event.INSERT, Event.UPDATE, Event.DELETE};
+
+    boolean onlyRoot() default false;
 
     boolean afterCommit() default false;
 
-    Class<? extends Throwable>[] rollbackFor() default {};
+    Class<? extends Throwable>[] throwExceptions() default {};
 
 }

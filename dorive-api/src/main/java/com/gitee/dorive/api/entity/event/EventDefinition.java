@@ -23,5 +23,4 @@ import lombok.Data;
 public class EventDefinition {
     private String entityTypeName;
     private String name;
-    private String genericTypeName;
 }
