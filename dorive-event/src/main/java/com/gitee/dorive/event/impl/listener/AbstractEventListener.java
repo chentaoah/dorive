@@ -62,7 +62,7 @@ public abstract class AbstractEventListener implements ApplicationContextAware, 
         if (listenerDef == null) {
             return;
         }
-        Class<?> entityClass = listenerDef.getValue();
+        Class<?> entityClass = listenerDef.getEntityClass();
         if (entityClass == null) {
             return;
         }

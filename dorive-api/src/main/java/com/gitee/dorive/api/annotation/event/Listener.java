@@ -32,7 +32,7 @@ public @interface Listener {
 
     String[] publishers() default {Publisher.EXECUTOR};
 
-    Class<?> value();
+    Class<?> entityClass();
 
     String[] events() default {Event.INSERT, Event.UPDATE, Event.DELETE};
 

@@ -35,7 +35,7 @@ import java.util.List;
 public class ListenerDef {
 
     private List<String> publishers;
-    private Class<?> value;
+    private Class<?> entityClass;
     private List<String> events;
     private boolean onlyRoot;
     private boolean afterCommit;
@@ -46,7 +46,7 @@ public class ListenerDef {
         if (listener != null) {
             ListenerDefinition listenerDefinition = new ListenerDefinition();
             listenerDefinition.setPublisherNames(Arrays.asList(listener.publishers()));
-            listenerDefinition.setEntityTypeName(listener.value().getName());
+            listenerDefinition.setEntityTypeName(listener.entityClass().getName());
             listenerDefinition.setEventNames(Arrays.asList(listener.events()));
             listenerDefinition.setOnlyRoot(listener.onlyRoot());
             listenerDefinition.setAfterCommit(listener.afterCommit());
@@ -59,7 +59,7 @@ public class ListenerDef {
 
             ListenerDef listenerDef = new ListenerDef();
             listenerDef.setPublishers(listenerDefinition.getPublisherNames());
-            listenerDef.setValue(listener.value());
+            listenerDef.setEntityClass(listener.entityClass());
             listenerDef.setEvents(listenerDefinition.getEventNames());
             listenerDef.setOnlyRoot(listenerDefinition.isOnlyRoot());
             listenerDef.setAfterCommit(listenerDefinition.isAfterCommit());
