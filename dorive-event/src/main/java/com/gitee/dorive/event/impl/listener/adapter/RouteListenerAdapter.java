@@ -37,13 +37,9 @@ public class RouteListenerAdapter implements EntityEventListener {
 
     @Override
     public void onEntityEvent(EntityEvent entityEvent) {
-        String[] publishers = listenerDef.getPublishers();
-        String[] events = listenerDef.getEvents();
-        boolean onlyRoot = listenerDef.isOnlyRoot();
-
-        boolean matchPublisher = ArrayUtil.contains(publishers, entityEvent.getPublisher());
-        boolean matchEvent = ArrayUtil.contains(events, entityEvent.getName());
-        boolean matchOnlyRoot = !onlyRoot || entityEvent.isRoot();
+        boolean matchPublisher = ArrayUtil.contains(listenerDef.getPublishers(), entityEvent.getPublisher());
+        boolean matchEvent = ArrayUtil.contains(listenerDef.getEvents(), entityEvent.getName());
+        boolean matchOnlyRoot = !listenerDef.isOnlyRoot() || entityEvent.isRoot();
 
         if (matchPublisher && matchEvent && matchOnlyRoot) {
             entityEventListener.onEntityEvent(entityEvent);
