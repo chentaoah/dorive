@@ -28,6 +28,8 @@ import org.springframework.core.Ordered;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.List;
+
 @Data
 @Slf4j
 @NoArgsConstructor
@@ -61,8 +63,8 @@ public class TransactionListenerAdapter implements EntityEventListener {
     }
 
     private boolean matchThrowExceptions(Throwable throwable) {
-        Class<? extends Throwable>[] throwExceptions = listenerDef.getThrowExceptions();
-        if (throwExceptions != null && throwExceptions.length > 0) {
+        List<Class<? extends Throwable>> throwExceptions = listenerDef.getThrowExceptions();
+        if (throwExceptions != null && !throwExceptions.isEmpty()) {
             Class<? extends Throwable> throwableType = throwable.getClass();
             for (Class<? extends Throwable> throwExceptionType : throwExceptions) {
                 if (throwExceptionType.isAssignableFrom(throwableType)) {
