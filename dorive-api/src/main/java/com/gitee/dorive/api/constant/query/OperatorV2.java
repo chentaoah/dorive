@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.constant;
+package com.gitee.dorive.api.constant.query;
 
 public interface OperatorV2 {
     String NULL_SWITCH = "NULL_SWITCH";

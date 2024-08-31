@@ -15,47 +15,27 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.entity;
+package com.gitee.dorive.api.entity.query.ele;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.query.entity.def.CriterionDef;
+import com.gitee.dorive.api.entity.query.FieldDefinition;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Collection;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
-public class QueryField {
+public class FieldElement {
 
+    private FieldDefinition fieldDefinition;
     private Field field;
     private Class<?> type;
-    private boolean collection;
     private Class<?> genericType;
-    private String name;
-    private CriterionDef criterionDef;
-
-    public QueryField(Field field) {
-        this.field = field;
-        this.type = field.getType();
-        this.collection = false;
-        this.genericType = field.getType();
-        this.name = field.getName();
-        if (Collection.class.isAssignableFrom(field.getType())) {
-            this.collection = true;
-            ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-            Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-            this.genericType = (Class<?>) actualTypeArgument;
-        }
-        criterionDef = CriterionDef.fromField(field);
-    }
-
-    public boolean isIgnore() {
-        return criterionDef.isIgnore();
-    }
 
     public Object getFieldValue(Object object) {
         return ReflectUtil.getFieldValue(object, field);

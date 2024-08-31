@@ -15,20 +15,21 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.entity.def;
+package com.gitee.dorive.api.entity.query.def;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.query.annotation.Example;
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.lang.reflect.AnnotatedElement;
-import java.util.Map;
+import java.util.List;
 
-public class ExampleDef {
-
-    public static ExampleDef fromElement(AnnotatedElement element) {
-        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Example.class);
-        return attributes != null ? BeanUtil.copyProperties(attributes, ExampleDef.class) : null;
-    }
-
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class QueryDef {
+    private List<String> ignoreFields;
+    private String sortByField;
+    private String orderField;
+    private String pageField;
+    private String limitField;
 }

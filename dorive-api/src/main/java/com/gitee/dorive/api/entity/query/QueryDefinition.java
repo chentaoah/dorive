@@ -26,6 +26,7 @@ public class QueryDefinition {
     private String entityTypeName;
     private String genericTypeName;
     private List<QueryFieldDefinition> queryFieldDefinitions;
+    private List<FieldDefinition> ignoreFieldDefinitions;
     private FieldDefinition sortByField;
     private FieldDefinition orderField;
     private FieldDefinition pageField;

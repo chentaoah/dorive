@@ -15,18 +15,24 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.annotation;
+package com.gitee.dorive.api.annotation.query;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 @Inherited
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Example {
+public @interface Query {
+
+    String[] ignoreFields() default {};
+
+    String sortByField() default "sortBy";
+
+    String orderField() default "order";
+
+    String pageField() default "page";
+
+    String limitField() default "limit";
+
 }

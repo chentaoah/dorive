@@ -15,31 +15,28 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.entity.def;
+package com.gitee.dorive.api.entity.query.ele;
 
-import com.gitee.dorive.query.annotation.QueryScan;
+import com.gitee.dorive.api.entity.query.QueryDefinition;
+import com.gitee.dorive.api.entity.query.def.QueryDef;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import lombok.Setter;
 
-import java.lang.reflect.AnnotatedElement;
+import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class QueryScanDef {
-
-    private Class<?>[] queries;
-
-    public static QueryScanDef fromElement(AnnotatedElement element) {
-        QueryScan queryScan = AnnotatedElementUtils.getMergedAnnotation(element, QueryScan.class);
-        if (queryScan != null) {
-            QueryScanDef queryScanDef = new QueryScanDef();
-            queryScanDef.setQueries(queryScan.queries());
-            return queryScanDef;
-        }
-        return null;
-    }
-
+public class QueryElement {
+    private QueryDefinition queryDefinition;
+    private QueryDef queryDef;
+    private Class<?> genericType;
+    private List<QueryFieldElement> queryFieldElements;
+    private FieldElement sortByField;
+    private FieldElement orderField;
+    private FieldElement pageField;
+    private FieldElement limitField;
 }

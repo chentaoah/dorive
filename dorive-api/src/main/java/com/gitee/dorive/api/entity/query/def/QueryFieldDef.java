@@ -15,14 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity.query;
+package com.gitee.dorive.api.entity.query.def;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class QueryFieldDefinition extends FieldDefinition {
+@NoArgsConstructor
+@AllArgsConstructor
+public class QueryFieldDef {
     private String belongTo;
     private String field;
     private String operator;

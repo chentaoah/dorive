@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.annotation;
+package com.gitee.dorive.api.annotation.query;
 
 import org.springframework.core.annotation.AliasFor;
 
@@ -30,18 +30,16 @@ import java.lang.annotation.Target;
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Criterion {
+public @interface QueryField {
 
     @AliasFor("belongTo")
     String value() default "/";
-    
+
     @AliasFor("value")
     String belongTo() default "/";
 
     String field() default "";
 
     String operator() default "=";
-
-    boolean ignore() default false;
 
 }

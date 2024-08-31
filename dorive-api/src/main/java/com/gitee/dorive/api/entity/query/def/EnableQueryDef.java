@@ -15,39 +15,33 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.entity.def;
+package com.gitee.dorive.api.entity.query.def;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.query.annotation.Criterion;
+import com.gitee.dorive.api.annotation.query.EnableQuery;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
-import java.lang.reflect.Field;
-import java.util.Map;
+import java.lang.reflect.AnnotatedElement;
+import java.util.Arrays;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CriterionDef {
+public class EnableQueryDef {
 
-    private String belongTo;
-    private String field;
-    private String operator;
-    private boolean ignore;
+    private List<Class<?>> queries;
 
-    public static CriterionDef fromField(Field field) {
-        if (field.isAnnotationPresent(Criterion.class)) {
-            Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(field, Criterion.class);
-            CriterionDef criterionDef = BeanUtil.copyProperties(attributes, CriterionDef.class);
-            if (StringUtils.isBlank(criterionDef.getField())) {
-                criterionDef.setField(field.getName());
-            }
-            return criterionDef;
+    public static EnableQueryDef fromElement(AnnotatedElement element) {
+        EnableQuery enableQuery = AnnotatedElementUtils.getMergedAnnotation(element, EnableQuery.class);
+        if (enableQuery != null) {
+            EnableQueryDef enableQueryDef = new EnableQueryDef();
+            enableQueryDef.setQueries(Arrays.asList(enableQuery.queries()));
+            return enableQueryDef;
         }
-        return new CriterionDef("/", field.getName(), "=", false);
+        return null;
     }
 
 }
