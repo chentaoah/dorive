@@ -38,17 +38,17 @@ import java.util.*;
 public class QueryDefinitionReader {
 
     public QueryDefinition read(Class<?> entityType, Class<?> queryType) {
-        Query query = AnnotatedElementUtils.getMergedAnnotation(queryType, Query.class);
-        Assert.notNull(query, "The @Query does not exist!");
-        assert query != null;
         QueryDefinition queryDefinition = new QueryDefinition();
         queryDefinition.setEntityTypeName(entityType.getName());
         queryDefinition.setGenericTypeName(queryType.getName());
-        readFields(queryType, query, queryDefinition);
+        readFields(queryType, queryDefinition);
         return queryDefinition;
     }
 
-    private void readFields(Class<?> queryType, Query query, QueryDefinition queryDefinition) {
+    private void readFields(Class<?> queryType, QueryDefinition queryDefinition) {
+        Query query = AnnotatedElementUtils.getMergedAnnotation(queryType, Query.class);
+        Assert.notNull(query, "The @Query does not exist!");
+        assert query != null;
         String[] ignoreFields = query.ignoreFields();
         String sortByField = query.sortByField();
         String orderField = query.orderField();
@@ -97,7 +97,7 @@ public class QueryDefinitionReader {
         boolean collection = false;
         Class<?> genericType = field.getType();
         String fieldName = field.getName();
-        if (Collection.class.isAssignableFrom(field.getType())) {
+        if (Collection.class.isAssignableFrom(type)) {
             collection = true;
             ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
             Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
