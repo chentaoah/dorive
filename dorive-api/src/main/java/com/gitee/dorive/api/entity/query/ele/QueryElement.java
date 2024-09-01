@@ -18,7 +18,6 @@
 package com.gitee.dorive.api.entity.query.ele;
 
 import com.gitee.dorive.api.entity.query.QueryDefinition;
-import com.gitee.dorive.api.entity.query.def.QueryDef;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +31,6 @@ import java.util.List;
 @AllArgsConstructor
 public class QueryElement {
     private QueryDefinition queryDefinition;
-    private QueryDef queryDef;
     private Class<?> genericType;
     private List<QueryFieldElement> queryFieldElements;
     private FieldElement sortByField;

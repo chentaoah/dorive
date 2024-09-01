@@ -21,7 +21,7 @@ import cn.hutool.core.convert.Convert;
 import com.gitee.dorive.api.constant.core.Operator;
 import com.gitee.dorive.api.constant.core.Order;
 import com.gitee.dorive.api.constant.query.OperatorV2;
-import com.gitee.dorive.api.entity.query.def.QueryFieldDef;
+import com.gitee.dorive.api.entity.query.QueryFieldDefinition;
 import com.gitee.dorive.api.entity.query.ele.FieldElement;
 import com.gitee.dorive.api.entity.query.ele.QueryElement;
 import com.gitee.dorive.api.entity.query.ele.QueryFieldElement;
@@ -53,10 +53,10 @@ public class QueryExampleResolver {
         for (QueryFieldElement queryFieldElement : queryElement.getQueryFieldElements()) {
             Object fieldValue = queryFieldElement.getFieldValue(query);
             if (fieldValue != null) {
-                QueryFieldDef queryFieldDef = queryFieldElement.getQueryFieldDef();
-                String belongTo = queryFieldDef.getBelongTo();
-                String fieldName = queryFieldDef.getField();
-                String operator = queryFieldDef.getOperator();
+                QueryFieldDefinition queryFieldDefinition = queryFieldElement.getQueryFieldDefinition();
+                String belongTo = queryFieldDefinition.getBelongTo();
+                String fieldName = queryFieldDefinition.getField();
+                String operator = queryFieldDefinition.getOperator();
                 if (OperatorV2.NULL_SWITCH.equals(operator) && fieldValue instanceof Boolean) {
                     operator = (Boolean) fieldValue ? Operator.IS_NULL : Operator.IS_NOT_NULL;
                     fieldValue = null;

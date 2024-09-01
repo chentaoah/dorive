@@ -21,7 +21,6 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.entity.query.QueryDefinition;
 import com.gitee.dorive.api.entity.query.QueryFieldDefinition;
 import com.gitee.dorive.api.entity.query.def.EnableQueryDef;
-import com.gitee.dorive.api.entity.query.def.QueryFieldDef;
 import com.gitee.dorive.api.entity.query.ele.QueryElement;
 import com.gitee.dorive.api.entity.query.ele.QueryFieldElement;
 import com.gitee.dorive.api.impl.query.QueryDefinitionReader;
@@ -99,16 +98,14 @@ public class QueryTypeResolver {
         Map<String, MergedRepository> nameMergedRepositoryMap = mergedRepositoryResolver.getNameMergedRepositoryMap();
 
         QueryFieldDefinition queryFieldDefinition = queryFieldElement.getQueryFieldDefinition();
-        QueryFieldDef queryFieldDef = queryFieldElement.getQueryFieldDef();
-        String belongTo = queryFieldDef.getBelongTo();
-        String field = queryFieldDef.getField();
+        String belongTo = queryFieldDefinition.getBelongTo();
+        String field = queryFieldDefinition.getField();
 
         if (!belongTo.startsWith("/")) {
             MergedRepository mergedRepository = nameMergedRepositoryMap.get(belongTo);
             Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
             belongTo = mergedRepository.getAbsoluteAccessPath();
             queryFieldDefinition.setBelongTo(belongTo);
-            queryFieldDef.setBelongTo(belongTo);
         }
 
         MergedRepository mergedRepository = mergedRepositoryMap.get(belongTo);

@@ -18,7 +18,6 @@
 package com.gitee.dorive.api.entity.query.ele;
 
 import com.gitee.dorive.api.entity.query.QueryFieldDefinition;
-import com.gitee.dorive.api.entity.query.def.QueryFieldDef;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,5 +29,4 @@ import lombok.Setter;
 @AllArgsConstructor
 public class QueryFieldElement extends FieldElement {
     private QueryFieldDefinition queryFieldDefinition;
-    private QueryFieldDef queryFieldDef;
 }
