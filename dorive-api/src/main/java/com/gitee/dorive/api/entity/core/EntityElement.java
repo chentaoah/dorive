@@ -15,51 +15,28 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity.core.ele;
+package com.gitee.dorive.api.entity.core;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.api.entity.core.def.BindingDef;
-import com.gitee.dorive.api.entity.core.def.EntityDef;
-import com.gitee.dorive.api.entity.core.EntityDefinition;
-import com.gitee.dorive.api.entity.core.def.OrderDef;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EntityElement {
-
-    private EntityDefinition entityDefinition;
+@EqualsAndHashCode(callSuper = true)
+public class EntityElement extends FieldEntityDefinition {
     private String accessPath;
-    private EntityDef entityDef;
-    private List<BindingDef> bindingDefs;
-    private OrderDef orderDef;
-    private Class<?> genericType;
-    private List<FieldElement> fieldElements;
     private Map<String, String> fieldAliasMapping;
     private Map<String, Object> attributes;
 
-    public boolean isCollection() {
-        return entityDefinition.isCollection();
-    }
-
     public Object getValue(Object entity) {
-        return ReflectUtil.getFieldValue(entity, entityDefinition.getFieldName());
+        return ReflectUtil.getFieldValue(entity, getFieldName());
     }
 
     public void setValue(Object entity, Object value) {
-        ReflectUtil.setFieldValue(entity, entityDefinition.getFieldName(), value);
-    }
-
-    public String getPrimaryKey() {
-        return entityDefinition.getPrimaryKey();
+        ReflectUtil.setFieldValue(entity, getFieldName(), value);
     }
 
     public Object getPrimaryKey(Object entity) {
@@ -71,11 +48,7 @@ public class EntityElement {
     }
 
     public boolean hasField(String field) {
-        return ReflectUtil.hasField(genericType, field);
-    }
-
-    public FieldElement getFieldElement(String fieldName) {
-        return CollUtil.findOne(fieldElements, fieldElement -> fieldName.equals(fieldElement.getFieldName()));
+        return ReflectUtil.hasField(getGenericType(), field);
     }
 
     public String toAlias(String field) {
@@ -105,5 +78,4 @@ public class EntityElement {
         }
         return fields;
     }
-
 }

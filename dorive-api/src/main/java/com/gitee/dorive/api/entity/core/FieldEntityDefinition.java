@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.api.entity.core;
 
+import com.gitee.dorive.api.entity.core.def.BindingDef;
+import com.gitee.dorive.api.entity.core.def.OrderDef;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -25,11 +27,15 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class FieldEntityDefinition extends EntityDefinition {
-    private boolean autoDiscovery;
-    private List<BindingDefinition> bindingDefinitions;
-    private String sortBy;
-    private String order;
-    private String typeName;
-    private boolean collection;
-    private String fieldName;
+    private Field field;
+    private List<BindingDef> bindingDefs;
+    private OrderDef orderDef;
+
+    public boolean isCollection() {
+        return field != null && field.isCollection();
+    }
+
+    public String getFieldName() {
+        return field != null ? field.getFieldName() : null;
+    }
 }

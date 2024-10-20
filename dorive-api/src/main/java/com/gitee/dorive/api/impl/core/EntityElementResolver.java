@@ -23,9 +23,7 @@ import com.gitee.dorive.api.entity.core.def.BindingDef;
 import com.gitee.dorive.api.entity.core.def.EntityDef;
 import com.gitee.dorive.api.entity.core.def.FieldDef;
 import com.gitee.dorive.api.entity.core.def.OrderDef;
-import com.gitee.dorive.api.entity.core.ele.EntityElement;
-import com.gitee.dorive.api.entity.core.ele.FieldElement;
-import com.gitee.dorive.api.entity.core.BindingDefinition;
+import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.FieldDefinition;
 import com.gitee.dorive.api.entity.core.FieldEntityDefinition;
@@ -62,7 +60,7 @@ public class EntityElementResolver {
         entityDef.setPriority(entityDefinition.getPriority());
         entityDef.setAutoDiscovery(entityDefinition.isAutoDiscovery());
 
-        List<BindingDefinition> bindingDefinitions = entityDefinition.getBindingDefinitions();
+        List<BindingDefinition> bindingDefinitions = entityDefinition.getBindingDefs();
         List<BindingDef> bindingDefs = new ArrayList<>(bindingDefinitions.size());
         for (BindingDefinition bindingDefinition : bindingDefinitions) {
             BindingDef bindingDef = new BindingDef();

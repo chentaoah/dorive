@@ -18,7 +18,7 @@
 package com.gitee.dorive.sql.impl.segment;
 
 import com.gitee.dorive.api.constant.core.Operator;
-import com.gitee.dorive.api.entity.core.ele.EntityElement;
+import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Criterion;

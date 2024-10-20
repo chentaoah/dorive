@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.core.impl.endpoint;
 
-import com.gitee.dorive.api.entity.core.ele.FieldElement;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;

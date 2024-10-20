@@ -17,21 +17,12 @@
 
 package com.gitee.dorive.api.entity.core;
 
+import com.gitee.dorive.api.entity.core.def.FieldDef;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class FieldDefinition {
-    private boolean primary;
-    private String alias;
-    private boolean valueObj;
-    private String expression;
-    private String converterName;
-    private String typeName;
-    private boolean collection;
-    private String genericTypeName;
-    private String fieldName;
-
-    public boolean isSameType(FieldDefinition fieldDefinition) {
-        return typeName.equals(fieldDefinition.getTypeName()) && genericTypeName.equals(fieldDefinition.getGenericTypeName());
-    }
+@EqualsAndHashCode(callSuper = true)
+public class FieldDefinition extends Field {
+    private FieldDef fieldDef;
 }

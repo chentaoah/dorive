@@ -23,7 +23,7 @@ import com.gitee.dorive.api.constant.core.Order;
 import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.def.EntityDef;
 import com.gitee.dorive.api.entity.core.def.OrderDef;
-import com.gitee.dorive.api.entity.core.ele.EntityElement;
+import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.impl.core.EntityDefinitionReader;
 import com.gitee.dorive.api.impl.core.EntityElementResolver;
 import com.gitee.dorive.api.util.ReflectUtils;

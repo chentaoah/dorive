@@ -17,18 +17,25 @@
 
 package com.gitee.dorive.api.entity.core.def;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.gitee.dorive.api.annotation.core.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+
+import java.lang.reflect.AnnotatedElement;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class EntityDef {
     private String name;
-    private Class<?> source;
-    private Class<?> factory;
-    private Class<?> repository;
-    private int priority;
     private boolean autoDiscovery;
+
+    public static EntityDef fromElement(AnnotatedElement element) {
+        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Entity.class);
+        return attributes != null ? BeanUtil.copyProperties(attributes, EntityDef.class) : null;
+    }
 }

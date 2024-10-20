@@ -18,7 +18,6 @@
 package com.gitee.dorive.core.impl.endpoint;
 
 import com.gitee.dorive.core.api.binder.Endpoint;
-import com.gitee.dorive.api.entity.core.ele.FieldElement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

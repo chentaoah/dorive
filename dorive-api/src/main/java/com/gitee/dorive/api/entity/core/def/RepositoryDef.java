@@ -15,28 +15,21 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.spring.boot.starter.annotation;
+package com.gitee.dorive.api.entity.core.def;
 
-import com.gitee.dorive.api.annotation.core.Repository;
-import com.gitee.dorive.inject.annotation.Root;
-import org.springframework.core.annotation.AliasFor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.reflect.AnnotatedElement;
 
-@Root
-@Repository
-@Inherited
-@Documented
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface RootRepository {
-
-    @AliasFor(annotation = Repository.class)
-    String value() default "";
-
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class RepositoryDef {
+    private AnnotatedElement element;
+    private Class<?> source;
+    private Class<?> factory;
+    private Class<?> repository;
+    private int priority;
 }

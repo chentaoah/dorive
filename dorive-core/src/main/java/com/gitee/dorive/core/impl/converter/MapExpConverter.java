@@ -19,7 +19,6 @@ package com.gitee.dorive.core.impl.converter;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.entity.core.def.FieldDef;
-import com.gitee.dorive.api.entity.core.ele.FieldElement;
 import com.gitee.dorive.core.api.factory.Converter;
 import lombok.Getter;
 import lombok.Setter;

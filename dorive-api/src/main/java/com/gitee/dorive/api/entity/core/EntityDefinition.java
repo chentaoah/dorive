@@ -17,44 +17,18 @@
 
 package com.gitee.dorive.api.entity.core;
 
+import com.gitee.dorive.api.entity.core.def.EntityDef;
+import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import lombok.Data;
 
-import java.util.Collections;
 import java.util.List;
 
 @Data
 public class EntityDefinition {
-    private String name;
-    private String sourceName;
-    private String factoryName;
-    private String repositoryName;
-    private int priority;
-    private String genericTypeName;
+    private EntityDef entityDef;
+    private RepositoryDef repositoryDef;
+    private Class<?> genericType;
     private String primaryKey;
     private List<FieldDefinition> fieldDefinitions;
     private List<FieldEntityDefinition> fieldEntityDefinitions;
-
-    public boolean isAutoDiscovery() {
-        return false;
-    }
-
-    public List<BindingDefinition> getBindingDefinitions() {
-        return Collections.emptyList();
-    }
-
-    public String getSortBy() {
-        return null;
-    }
-
-    public String getOrder() {
-        return null;
-    }
-
-    public boolean isCollection() {
-        return false;
-    }
-
-    public String getFieldName() {
-        return null;
-    }
 }

@@ -20,11 +20,14 @@ package com.gitee.dorive.api.entity.core;
 import lombok.Data;
 
 @Data
-public class BindingDefinition {
-    private String field;
-    private String value;
-    private String bind;
-    private String expression;
-    private String processorName;
-    private String bindField;
+public class Field {
+    private java.lang.reflect.Field field;
+    private Class<?> type;
+    private boolean collection;
+    private Class<?> genericType;
+    private String fieldName;
+
+    public boolean isSameType(Field field) {
+        return type == field.getType() && genericType == field.getGenericType();
+    }
 }

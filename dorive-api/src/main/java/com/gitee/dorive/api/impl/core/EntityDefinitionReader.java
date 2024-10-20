@@ -17,6 +17,11 @@
 
 package com.gitee.dorive.api.impl.core;
 
+import com.gitee.dorive.api.entity.core.def.RepositoryDef;
+import com.gitee.dorive.api.entity.core.def.EntityDef;
+import ?;
+import java.util.ArrayList;
+
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.lang.Assert;
@@ -24,7 +29,6 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.annotation.core.Binding;
 import com.gitee.dorive.api.annotation.core.Entity;
 import com.gitee.dorive.api.annotation.core.Order;
-import com.gitee.dorive.api.entity.core.BindingDefinition;
 import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.FieldDefinition;
 import com.gitee.dorive.api.entity.core.FieldEntityDefinition;
@@ -64,22 +68,24 @@ public class EntityDefinitionReader {
     }
 
     private EntityDefinition doRead(Class<?> type) {
-        Entity entity = AnnotatedElementUtils.getMergedAnnotation(type, Entity.class);
-        Assert.notNull(entity, "The @Entity does not exist!");
-        assert entity != null;
-        String name = entity.name();
-        Class<?> source = entity.source();
-        Class<?> factory = entity.factory();
-        Class<?> repository = entity.repository();
-        int priority = entity.priority();
+        EntityDef entityDef = EntityDef.fromElement(type);
+        Assert.notNull(entityDef, "The @Entity does not exist!");
+
+        if (entityDef != null) {
+            String name = entityDef.getName();
+            if (StringUtils.isBlank(name)) {
+                entityDef.setName(type.getSimpleName());
+            }
+        }
 
         EntityDefinition entityDefinition = new EntityDefinition();
+        entityDefinition.setEntityDef(entityDef);
+//        entityDefinition.setRepositoryDef(new RepositoryDef());
+        entityDefinition.setGenericType(type);
+
         entityDefinition.setName(StringUtils.isNotBlank(name) ? name : type.getSimpleName());
-        entityDefinition.setSourceName(source.getName());
-        entityDefinition.setFactoryName(factory.getName());
-        entityDefinition.setRepositoryName(repository.getName());
-        entityDefinition.setPriority(priority);
         entityDefinition.setGenericTypeName(type.getName());
+
         readFields(type, entityDefinition);
         return entityDefinition;
     }
@@ -176,7 +182,7 @@ public class EntityDefinitionReader {
         FieldEntityDefinition fieldEntityDefinition = BeanUtil.copyProperties(entityDefinition, FieldEntityDefinition.class);
 
         fieldEntityDefinition.setAutoDiscovery(autoDiscovery);
-        fieldEntityDefinition.setBindingDefinitions(readBindingDefinitions(field));
+        fieldEntityDefinition.setBindingDefs(readBindingDefinitions(field));
         if (order != null) {
             fieldEntityDefinition.setSortBy(order.sortBy());
             fieldEntityDefinition.setOrder(order.order());
@@ -189,14 +195,6 @@ public class EntityDefinitionReader {
         String name = entity.name();
         if (StringUtils.isNotBlank(name)) {
             fieldEntityDefinition.setName(name);
-        }
-        Class<?> source = entity.source();
-        if (source != Object.class) {
-            fieldEntityDefinition.setSourceName(source.getName());
-        }
-        Class<?> factory = entity.factory();
-        if (factory != Object.class) {
-            fieldEntityDefinition.setFactoryName(factory.getName());
         }
 
         return fieldEntityDefinition;
