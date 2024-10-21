@@ -18,11 +18,23 @@
 package com.gitee.dorive.api.entity.core;
 
 import com.gitee.dorive.api.entity.core.def.FieldDef;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
 public class FieldDefinition extends Field {
     private FieldDef fieldDef;
+
+    public FieldDefinition(java.lang.reflect.Field field) {
+        super(field);
+    }
+
+    public boolean isPrimary() {
+        return fieldDef.isPrimary();
+    }
+
+    public String getAlias() {
+        return fieldDef.getAlias();
+    }
 }

@@ -17,14 +17,10 @@
 
 package com.gitee.dorive.api.impl.core;
 
-import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.api.entity.core.def.BindingDef;
-import com.gitee.dorive.api.entity.core.def.EntityDef;
-import com.gitee.dorive.api.entity.core.def.FieldDef;
-import com.gitee.dorive.api.entity.core.def.OrderDef;
-import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.EntityDefinition;
+import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.FieldDefinition;
 import com.gitee.dorive.api.entity.core.FieldEntityDefinition;
 import lombok.extern.slf4j.Slf4j;
@@ -52,50 +48,8 @@ public class EntityElementResolver {
     }
 
     private EntityElement resolveElement(String accessPath, EntityDefinition entityDefinition) {
-        EntityDef entityDef = new EntityDef();
-        entityDef.setName(entityDefinition.getName());
-        entityDef.setSource(ClassUtil.loadClass(entityDefinition.getSourceName()));
-        entityDef.setFactory(ClassUtil.loadClass(entityDefinition.getFactoryName()));
-        entityDef.setRepository(ClassUtil.loadClass(entityDefinition.getRepositoryName()));
-        entityDef.setPriority(entityDefinition.getPriority());
-        entityDef.setAutoDiscovery(entityDefinition.isAutoDiscovery());
-
-        List<BindingDefinition> bindingDefinitions = entityDefinition.getBindingDefs();
-        List<BindingDef> bindingDefs = new ArrayList<>(bindingDefinitions.size());
-        for (BindingDefinition bindingDefinition : bindingDefinitions) {
-            BindingDef bindingDef = new BindingDef();
-            bindingDef.setField(bindingDefinition.getField());
-            bindingDef.setValue(bindingDefinition.getValue());
-            bindingDef.setBind(bindingDefinition.getBind());
-            bindingDef.setExpression(bindingDefinition.getExpression());
-            bindingDef.setProcessor(ClassUtil.loadClass(bindingDefinition.getProcessorName()));
-            bindingDef.setBindField(bindingDefinition.getBindField());
-            bindingDefs.add(bindingDef);
-        }
-
-        OrderDef orderDef = new OrderDef();
-        orderDef.setSortBy(entityDefinition.getSortBy());
-        orderDef.setOrder(entityDefinition.getOrder());
-
-        Class<?> genericType = ClassUtil.loadClass(entityDefinition.getGenericTypeName());
-
-        List<FieldDefinition> fieldDefinitions = entityDefinition.getFieldDefinitions();
-        List<FieldElement> fieldElements = new ArrayList<>(fieldDefinitions.size());
-        for (FieldDefinition fieldDefinition : fieldDefinitions) {
-            FieldElement fieldElement = new FieldElement();
-            fieldElement.setFieldDefinition(fieldDefinition);
-
-            FieldDef fieldDef = new FieldDef();
-            fieldDef.setPrimary(fieldDefinition.isPrimary());
-            fieldDef.setAlias(fieldDefinition.getAlias());
-            fieldDef.setValueObj(fieldDefinition.isValueObj());
-            fieldDef.setExpression(fieldDefinition.getExpression());
-            fieldDef.setConverter(ClassUtil.loadClass(fieldDefinition.getConverterName()));
-            fieldElement.setFieldDef(fieldDef);
-
-            fieldElement.setGenericType(ClassUtil.loadClass(fieldDefinition.getGenericTypeName()));
-            fieldElements.add(fieldElement);
-        }
+        EntityElement entityElement = BeanUtil.copyProperties(entityDefinition, EntityElement.class);
+        List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
 
         Map<String, String> fieldAliasMapping = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
@@ -107,14 +61,7 @@ public class EntityElementResolver {
             fieldAliasMapping.put(fieldName, alias);
         }
 
-        EntityElement entityElement = new EntityElement();
-        entityElement.setEntityDefinition(entityDefinition);
         entityElement.setAccessPath(accessPath);
-        entityElement.setEntityDef(entityDef);
-        entityElement.setBindingDefs(bindingDefs);
-        entityElement.setOrderDef(orderDef);
-        entityElement.setGenericType(genericType);
-        entityElement.setFieldElements(fieldElements);
         entityElement.setFieldAliasMapping(fieldAliasMapping);
         entityElement.setAttributes(new HashMap<>(4));
         return entityElement;

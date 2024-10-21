@@ -17,9 +17,15 @@
 
 package com.gitee.dorive.api.entity.core.def;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.gitee.dorive.api.annotation.core.Field;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+
+import java.lang.reflect.AnnotatedElement;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -30,4 +36,9 @@ public class FieldDef {
     private boolean valueObj;
     private String expression;
     private Class<?> converter;
+
+    public static FieldDef fromElement(AnnotatedElement element) {
+        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Field.class);
+        return attributes != null ? BeanUtil.copyProperties(attributes, FieldDef.class) : null;
+    }
 }

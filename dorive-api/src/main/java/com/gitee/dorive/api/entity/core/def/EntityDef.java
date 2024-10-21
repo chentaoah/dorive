@@ -32,6 +32,10 @@ import java.util.Map;
 @AllArgsConstructor
 public class EntityDef {
     private String name;
+    private Class<?> source;
+    private Class<?> factory;
+    private Class<?> repository;
+    private int priority;
     private boolean autoDiscovery;
 
     public static EntityDef fromElement(AnnotatedElement element) {

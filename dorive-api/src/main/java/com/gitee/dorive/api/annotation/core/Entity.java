@@ -34,6 +34,26 @@ public @interface Entity {
     String name() default "";
 
     /**
+     * 数据来源
+     */
+    Class<?> source() default Object.class;
+
+    /**
+     * 实体工厂
+     */
+    Class<?> factory() default Object.class;
+
+    /**
+     * 指定仓储
+     */
+    Class<?> repository() default Object.class;
+
+    /**
+     * 操作优先级
+     */
+    int priority() default 0;
+
+    /**
      * 是否自动发现
      */
     boolean autoDiscovery() default false;

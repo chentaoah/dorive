@@ -18,7 +18,6 @@
 package com.gitee.dorive.api.entity.core;
 
 import com.gitee.dorive.api.entity.core.def.EntityDef;
-import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import lombok.Data;
 
 import java.util.List;
@@ -26,7 +25,6 @@ import java.util.List;
 @Data
 public class EntityDefinition {
     private EntityDef entityDef;
-    private RepositoryDef repositoryDef;
     private Class<?> genericType;
     private String primaryKey;
     private List<FieldDefinition> fieldDefinitions;

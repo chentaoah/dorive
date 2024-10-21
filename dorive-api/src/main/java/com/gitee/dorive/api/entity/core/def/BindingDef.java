@@ -17,9 +17,19 @@
 
 package com.gitee.dorive.api.entity.core.def;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.gitee.dorive.api.annotation.core.Binding;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationUtils;
+
+import java.lang.reflect.AnnotatedElement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -31,4 +41,14 @@ public class BindingDef {
     private String expression;
     private Class<?> processor;
     private String bindField;
+
+    public static List<BindingDef> fromElement(AnnotatedElement element) {
+        Set<Binding> bindingAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(element, Binding.class);
+        List<BindingDef> bindingDefs = new ArrayList<>(bindingAnnotations.size());
+        for (Binding bindingAnnotation : bindingAnnotations) {
+            Map<String, Object> attributes = AnnotationUtils.getAnnotationAttributes(bindingAnnotation);
+            bindingDefs.add(BeanUtil.copyProperties(attributes, BindingDef.class));
+        }
+        return bindingDefs;
+    }
 }

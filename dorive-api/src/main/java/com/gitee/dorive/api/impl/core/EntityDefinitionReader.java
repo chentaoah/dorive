@@ -17,21 +17,18 @@
 
 package com.gitee.dorive.api.impl.core;
 
-import com.gitee.dorive.api.entity.core.def.RepositoryDef;
-import com.gitee.dorive.api.entity.core.def.EntityDef;
-import ?;
-import java.util.ArrayList;
-
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.api.annotation.core.Binding;
 import com.gitee.dorive.api.annotation.core.Entity;
-import com.gitee.dorive.api.annotation.core.Order;
 import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.FieldDefinition;
 import com.gitee.dorive.api.entity.core.FieldEntityDefinition;
+import com.gitee.dorive.api.entity.core.def.BindingDef;
+import com.gitee.dorive.api.entity.core.def.EntityDef;
+import com.gitee.dorive.api.entity.core.def.FieldDef;
+import com.gitee.dorive.api.entity.core.def.OrderDef;
 import com.gitee.dorive.api.util.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -39,8 +36,6 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -80,12 +75,8 @@ public class EntityDefinitionReader {
 
         EntityDefinition entityDefinition = new EntityDefinition();
         entityDefinition.setEntityDef(entityDef);
-//        entityDefinition.setRepositoryDef(new RepositoryDef());
         entityDefinition.setGenericType(type);
-
-        entityDefinition.setName(StringUtils.isNotBlank(name) ? name : type.getSimpleName());
-        entityDefinition.setGenericTypeName(type.getName());
-
+        // 解析字段
         readFields(type, entityDefinition);
         return entityDefinition;
     }
@@ -108,9 +99,9 @@ public class EntityDefinitionReader {
                 }
                 fieldDefinitions.add(fieldDefinition);
                 // 实体字段
-                Entity entity = AnnotatedElementUtils.getMergedAnnotation(field, Entity.class);
-                if (entity != null) {
-                    FieldEntityDefinition fieldEntityDefinition = readFieldEntity(entity, field);
+                Entity entityAnnotation = AnnotatedElementUtils.getMergedAnnotation(field, Entity.class);
+                if (entityAnnotation != null) {
+                    FieldEntityDefinition fieldEntityDefinition = readFieldEntity(entityAnnotation, field);
                     if (fieldEntityDefinition != null) {
                         fieldEntityDefinitions.add(fieldEntityDefinition);
                     }
@@ -122,98 +113,52 @@ public class EntityDefinitionReader {
     }
 
     private FieldDefinition readField(Field field) {
-        com.gitee.dorive.api.annotation.core.Field fieldAnnotation = AnnotatedElementUtils.getMergedAnnotation(field, com.gitee.dorive.api.annotation.core.Field.class);
-        Class<?> type = field.getType();
-        boolean collection = false;
-        Class<?> genericType = field.getType();
-        String fieldName = field.getName();
-        if (Collection.class.isAssignableFrom(field.getType())) {
-            collection = true;
-            ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-            Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-            genericType = (Class<?>) actualTypeArgument;
-        }
+        FieldDefinition fieldDefinition = new FieldDefinition(field);
+        String fieldName = fieldDefinition.getFieldName();
 
-        FieldDefinition fieldDefinition = new FieldDefinition();
-        if (fieldAnnotation != null) {
-            fieldDefinition.setPrimary(fieldAnnotation.primary());
-            fieldDefinition.setAlias(fieldAnnotation.alias());
-            fieldDefinition.setValueObj(fieldAnnotation.valueObj());
-            fieldDefinition.setExpression(fieldAnnotation.expression());
-            fieldDefinition.setConverterName(fieldAnnotation.converter().getName());
-        } else {
-            fieldDefinition.setPrimary(false);
-            fieldDefinition.setAlias(StrUtil.toUnderlineCase(fieldName));
-            fieldDefinition.setValueObj(false);
-            fieldDefinition.setExpression("");
-            fieldDefinition.setConverterName(Object.class.getName());
+        FieldDef fieldDef = FieldDef.fromElement(field);
+        if (fieldDef == null) {
+            fieldDef = new FieldDef();
+            fieldDef.setPrimary(false);
+            fieldDef.setAlias(StrUtil.toUnderlineCase(fieldName));
+            fieldDef.setValueObj(false);
+            fieldDef.setExpression("");
+            fieldDef.setConverter(Object.class);
         }
         if ("id".equals(fieldName)) {
-            fieldDefinition.setPrimary(true);
+            fieldDef.setPrimary(true);
         }
-        if (StringUtils.isBlank(fieldDefinition.getAlias())) {
-            fieldDefinition.setAlias(StrUtil.toUnderlineCase(fieldName));
+        if (StringUtils.isBlank(fieldDef.getAlias())) {
+            fieldDef.setAlias(StrUtil.toUnderlineCase(fieldName));
         }
-        fieldDefinition.setTypeName(type.getName());
-        fieldDefinition.setCollection(collection);
-        fieldDefinition.setGenericTypeName(genericType.getName());
-        fieldDefinition.setFieldName(fieldName);
         return fieldDefinition;
     }
 
-    private FieldEntityDefinition readFieldEntity(Entity entity, Field field) {
-        boolean autoDiscovery = entity.autoDiscovery();
-        Order order = AnnotatedElementUtils.getMergedAnnotation(field, Order.class);
-        Class<?> type = field.getType();
-        boolean collection = false;
-        Class<?> genericType = field.getType();
-        String fieldName = field.getName();
-        if (Collection.class.isAssignableFrom(field.getType())) {
-            collection = true;
-            ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-            Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-            genericType = (Class<?>) actualTypeArgument;
-        }
-
-        EntityDefinition entityDefinition = read(genericType);
+    private FieldEntityDefinition readFieldEntity(Entity entityAnnotation, Field field) {
+        com.gitee.dorive.api.entity.core.Field myField = new com.gitee.dorive.api.entity.core.Field(field);
+        EntityDefinition entityDefinition = read(myField.getGenericType());
         if (entityDefinition == null) {
             return null;
         }
         FieldEntityDefinition fieldEntityDefinition = BeanUtil.copyProperties(entityDefinition, FieldEntityDefinition.class);
+        fieldEntityDefinition.setField(myField);
+        fieldEntityDefinition.setBindingDefs(BindingDef.fromElement(field));
+        fieldEntityDefinition.setOrderDef(OrderDef.fromElement(field));
 
-        fieldEntityDefinition.setAutoDiscovery(autoDiscovery);
-        fieldEntityDefinition.setBindingDefs(readBindingDefinitions(field));
-        if (order != null) {
-            fieldEntityDefinition.setSortBy(order.sortBy());
-            fieldEntityDefinition.setOrder(order.order());
-        }
-        fieldEntityDefinition.setTypeName(type.getName());
-        fieldEntityDefinition.setCollection(collection);
-        fieldEntityDefinition.setFieldName(fieldName);
-
+        EntityDef entityDef = fieldEntityDefinition.getEntityDef();
+        EntityDef newEntityDef = BeanUtil.copyProperties(entityDef, EntityDef.class);
         // 可重写
-        String name = entity.name();
-        if (StringUtils.isNotBlank(name)) {
-            fieldEntityDefinition.setName(name);
+        String name = entityAnnotation.name();
+        if (StringUtils.isNoneBlank(name)) {
+            newEntityDef.setName(name);
         }
+        boolean autoDiscovery = entityAnnotation.autoDiscovery();
+        if (autoDiscovery) {
+            newEntityDef.setAutoDiscovery(true);
+        }
+        fieldEntityDefinition.setEntityDef(newEntityDef);
 
         return fieldEntityDefinition;
-    }
-
-    private List<BindingDefinition> readBindingDefinitions(Field field) {
-        Set<Binding> bindings = AnnotatedElementUtils.getMergedRepeatableAnnotations(field, Binding.class);
-        List<BindingDefinition> bindingDefinitions = new ArrayList<>(bindings.size());
-        for (Binding binding : bindings) {
-            BindingDefinition bindingDefinition = new BindingDefinition();
-            bindingDefinition.setField(binding.field());
-            bindingDefinition.setValue(binding.value());
-            bindingDefinition.setBind(binding.bind());
-            bindingDefinition.setExpression(binding.expression());
-            bindingDefinition.setProcessorName(binding.processor().getName());
-            bindingDefinition.setBindField(binding.bindField());
-            bindingDefinitions.add(bindingDefinition);
-        }
-        return bindingDefinitions;
     }
 
 }
