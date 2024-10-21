@@ -152,9 +152,17 @@ public class EntityDefinitionReader {
         if (StringUtils.isNoneBlank(name)) {
             newEntityDef.setName(name);
         }
-        boolean autoDiscovery = entityAnnotation.autoDiscovery();
-        if (autoDiscovery) {
-            newEntityDef.setAutoDiscovery(true);
+        Class<?> source = entityAnnotation.source();
+        if (source != Object.class) {
+            newEntityDef.setSource(source);
+        }
+        Class<?> factory = entityAnnotation.factory();
+        if (factory != Object.class) {
+            newEntityDef.setFactory(factory);
+        }
+        boolean aggregate = entityAnnotation.isAggregate();
+        if (aggregate) {
+            newEntityDef.setAggregate(true);
         }
         fieldEntityDefinition.setEntityDef(newEntityDef);
 

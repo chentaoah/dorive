@@ -138,7 +138,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     private void resetEntityDef(EntityElement entityElement) {
         EntityDef entityDef = entityElement.getEntityDef();
-        if (entityDef.isAutoDiscovery()) {
+        if (entityDef.isAggregate()) {
             Class<?> entityClass = entityElement.getGenericType();
             Class<?> repositoryClass = RepositoryContext.findRepositoryClass(entityClass);
             Assert.notNull(repositoryClass, "No type of repository found! type: {}", entityClass.getName());
