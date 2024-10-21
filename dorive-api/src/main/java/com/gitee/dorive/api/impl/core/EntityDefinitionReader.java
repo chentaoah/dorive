@@ -149,7 +149,7 @@ public class EntityDefinitionReader {
         EntityDef newEntityDef = BeanUtil.copyProperties(entityDef, EntityDef.class);
         // 可重写
         String name = entityAnnotation.name();
-        if (StringUtils.isNoneBlank(name)) {
+        if (StringUtils.isNotBlank(name)) {
             newEntityDef.setName(name);
         }
         Class<?> source = entityAnnotation.source();
