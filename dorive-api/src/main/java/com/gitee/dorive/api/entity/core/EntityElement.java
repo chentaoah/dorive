@@ -47,10 +47,6 @@ public class EntityElement extends FieldEntityDefinition {
         ReflectUtil.setFieldValue(entity, getPrimaryKey(), value);
     }
 
-    public boolean hasField(String field) {
-        return ReflectUtil.hasField(getGenericType(), field);
-    }
-
     public String toAlias(String field) {
         return fieldAliasMapping.getOrDefault(field, field);
     }

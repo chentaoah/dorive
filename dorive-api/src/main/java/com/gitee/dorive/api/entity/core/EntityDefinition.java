@@ -18,6 +18,7 @@
 package com.gitee.dorive.api.entity.core;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.api.entity.core.def.EntityDef;
 import lombok.Data;
 
@@ -30,6 +31,10 @@ public class EntityDefinition {
     private String primaryKey;
     private List<FieldDefinition> fieldDefinitions;
     private List<FieldEntityDefinition> fieldEntityDefinitions;
+
+    public boolean hasField(String fieldName) {
+        return ReflectUtil.hasField(genericType, fieldName);
+    }
 
     public FieldDefinition getFieldDefinition(String fieldName) {
         return CollUtil.findOne(fieldDefinitions, fieldDefinition -> fieldName.equals(fieldDefinition.getFieldName()));
