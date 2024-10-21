@@ -17,9 +17,11 @@
 
 package com.gitee.dorive.core.api.binder;
 
+import com.gitee.dorive.api.entity.core.FieldDefinition;
+
 public interface Endpoint {
 
-    FieldElement getFieldElement();
+    FieldDefinition getFieldDefinition();
 
     Object getValue(Object entity);
 

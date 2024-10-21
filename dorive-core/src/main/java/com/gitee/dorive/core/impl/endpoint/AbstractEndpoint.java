@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.core.impl.endpoint;
 
+import com.gitee.dorive.api.entity.core.FieldDefinition;
 import com.gitee.dorive.core.api.binder.Endpoint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,10 +28,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public abstract class AbstractEndpoint implements Endpoint {
 
-    private FieldElement fieldElement;
+    private FieldDefinition fieldDefinition;
 
     public String getAlias() {
-        return fieldElement.getAlias();
+        return fieldDefinition.getAlias();
     }
 
 }

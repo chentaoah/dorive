@@ -34,7 +34,7 @@ public class ValueRouteBinder extends AbstractBinder {
 
     public ValueRouteBinder(BindingDef bindingDef, FieldEndpoint fieldEndpoint, BindEndpoint bindEndpoint, Processor processor) {
         super(bindingDef, fieldEndpoint, bindEndpoint, processor);
-        Class<?> genericType = bindEndpoint.getFieldElement().getGenericType();
+        Class<?> genericType = bindEndpoint.getFieldDefinition().getGenericType();
         this.value = Convert.convert(genericType, bindingDef.getValue());
     }
 

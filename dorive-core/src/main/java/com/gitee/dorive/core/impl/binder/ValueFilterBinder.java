@@ -34,7 +34,7 @@ public class ValueFilterBinder extends AbstractBinder {
 
     public ValueFilterBinder(BindingDef bindingDef, FieldEndpoint fieldEndpoint, BindEndpoint bindEndpoint, Processor processor) {
         super(bindingDef, fieldEndpoint, bindEndpoint, processor);
-        Class<?> genericType = fieldEndpoint.getFieldElement().getGenericType();
+        Class<?> genericType = fieldEndpoint.getFieldDefinition().getGenericType();
         this.value = Convert.convert(genericType, bindingDef.getValue());
     }
 

@@ -51,17 +51,16 @@ public class EntityMapperResolver {
     private EntityStoreInfo entityStoreInfo;
 
     public EntityMapper newEntityMapper() {
-        List<FieldElement> fieldElements = entityElement.getFieldElements();
+        List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
         Map<String, String> aliasPropMapping = entityStoreInfo.getAliasPropMapping();
 
-        Map<String, FieldConverter> fieldConverterMap = new LinkedHashMap<>(fieldElements.size() * 4 / 3 + 1);
+        Map<String, FieldConverter> fieldConverterMap = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
         List<FieldConverter> valueObjFields = new ArrayList<>(4);
         List<FieldConverter> matchedValueObjFields = new ArrayList<>(4);
         List<FieldConverter> unmatchedValueObjFields = new ArrayList<>(4);
         Set<Type> valueObjTypes = new HashSet<>(6);
 
-        for (FieldElement fieldElement : fieldElements) {
-            FieldDefinition fieldDefinition = fieldElement.getFieldDefinition();
+        for (FieldDefinition fieldDefinition : fieldDefinitions) {
             String fieldName = fieldDefinition.getFieldName();
 
             String expected = entityElement.toAlias(fieldName);
@@ -78,9 +77,9 @@ public class EntityMapperResolver {
                 names.put(Domain.POJO.name(), prop);
             }
 
-            FieldDef fieldDef = fieldElement.getFieldDef();
+            FieldDef fieldDef = fieldDefinition.getFieldDef();
             boolean isValueObj = fieldDef != null && fieldDef.isValueObj();
-            Converter converter = newConverter(fieldElement, isMatch, isValueObj);
+            Converter converter = newConverter(fieldDefinition, isMatch, isValueObj);
             FieldConverter fieldConverter = new FieldConverter(Domain.ENTITY.name(), fieldName, isMatch, names, converter);
 
             names.forEach((domain, eachName) -> fieldConverterMap.put(getKey(domain, eachName), fieldConverter));
@@ -91,30 +90,30 @@ public class EntityMapperResolver {
                 } else {
                     unmatchedValueObjFields.add(fieldConverter);
                 }
-                valueObjTypes.add(fieldElement.getGenericType());
+                valueObjTypes.add(fieldDefinition.getGenericType());
             }
         }
 
         return new DefaultEntityMapper(fieldConverterMap, valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes);
     }
 
-    private Converter newConverter(FieldElement fieldElement, boolean isMatch, boolean isValueObj) {
-        FieldDef fieldDef = fieldElement.getFieldDef();
+    private Converter newConverter(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {
+        FieldDef fieldDef = fieldDefinition.getFieldDef();
         if (fieldDef != null) {
             Class<?> converterClass = fieldDef.getConverter();
             if (converterClass != Object.class) {
                 return (Converter) ReflectUtil.newInstance(converterClass);
 
             } else if (isValueObj) {
-                Class<?> genericType = fieldElement.getGenericType();
+                Class<?> genericType = fieldDefinition.getGenericType();
                 if (isMatch) {
-                    return !fieldElement.isCollection() ? new JsonConverter(genericType) : new JsonArrayConverter(genericType);
+                    return !fieldDefinition.isCollection() ? new JsonConverter(genericType) : new JsonArrayConverter(genericType);
                 } else {
                     return new MapConverter(genericType);
                 }
 
             } else if (StringUtils.isNotBlank(fieldDef.getExpression())) {
-                return new MapExpConverter(fieldElement);
+                return new MapExpConverter(fieldDefinition);
             }
         }
         return null;

@@ -38,7 +38,7 @@ public abstract class AbstractBinder implements Binder {
     protected Processor processor;
 
     public String getFieldName() {
-        return fieldEndpoint.getFieldElement().getFieldName();
+        return fieldEndpoint.getFieldDefinition().getFieldName();
     }
 
     public Object getFieldValue(Context context, Object entity) {
@@ -50,7 +50,7 @@ public abstract class AbstractBinder implements Binder {
     }
 
     public String getBoundName() {
-        return bindEndpoint.getFieldElement().getFieldName();
+        return bindEndpoint.getFieldDefinition().getFieldName();
     }
 
     public Object getBoundValue(Context context, Object entity) {
@@ -80,7 +80,7 @@ public abstract class AbstractBinder implements Binder {
     }
 
     public boolean isBindCollection() {
-        return bindEndpoint.getFieldElement().isCollection();
+        return bindEndpoint.getFieldDefinition().isCollection();
     }
 
     public String getBelongAccessPath() {
@@ -92,7 +92,7 @@ public abstract class AbstractBinder implements Binder {
     }
 
     public boolean isSameType() {
-        return fieldEndpoint.getFieldElement().isSameType(bindEndpoint.getFieldElement());
+        return fieldEndpoint.getFieldDefinition().isSameType(bindEndpoint.getFieldDefinition());
     }
 
 }

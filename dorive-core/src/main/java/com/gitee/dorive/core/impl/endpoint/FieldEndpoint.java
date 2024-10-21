@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.core.impl.endpoint;
 
+import com.gitee.dorive.api.entity.core.FieldDefinition;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,8 +25,8 @@ import lombok.Setter;
 @Setter
 public class FieldEndpoint extends SpELEndpoint {
 
-    public FieldEndpoint(FieldElement fieldElement, String expression) {
-        super(fieldElement, expression);
+    public FieldEndpoint(FieldDefinition fieldDefinition, String expression) {
+        super(fieldDefinition, expression);
     }
 
 }
