@@ -50,13 +50,13 @@ public class EntityElementResolver {
 
     private EntityElement resolveElement(String accessPath, EntityDefinition entityDefinition) {
         EntityElement entityElement = BeanUtil.copyProperties(entityDefinition, EntityElement.class);
-
+        List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
         List<BindingDef> bindingDefs = entityElement.getBindingDefs();
+
         if (bindingDefs == null) {
             entityElement.setBindingDefs(Collections.emptyList());
         }
 
-        List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
         Map<String, String> fieldAliasMapping = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
             String fieldName = fieldDefinition.getFieldName();
