@@ -76,8 +76,10 @@ public class EntityDefinitionReader {
         EntityDefinition entityDefinition = new EntityDefinition();
         entityDefinition.setEntityDef(entityDef);
         entityDefinition.setGenericType(type);
+
         // 解析字段
         readFields(type, entityDefinition);
+
         return entityDefinition;
     }
 
