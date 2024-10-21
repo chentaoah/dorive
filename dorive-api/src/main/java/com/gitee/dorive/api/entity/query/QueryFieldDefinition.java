@@ -17,13 +17,17 @@
 
 package com.gitee.dorive.api.entity.query;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.gitee.dorive.api.entity.core.Field;
+import com.gitee.dorive.api.entity.query.def.QueryFieldDef;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class QueryFieldDefinition extends FieldDefinition {
-    private String belongTo;
-    private String field;
-    private String operator;
+@Getter
+@Setter
+public class QueryFieldDefinition extends Field {
+    private QueryFieldDef queryFieldDef;
+
+    public QueryFieldDefinition(java.lang.reflect.Field field) {
+        super(field);
+    }
 }

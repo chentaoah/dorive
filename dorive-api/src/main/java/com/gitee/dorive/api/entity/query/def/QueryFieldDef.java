@@ -15,18 +15,24 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity.query.ele;
+package com.gitee.dorive.api.entity.query.def;
 
-import com.gitee.dorive.api.entity.query.QueryFieldDefinition;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import cn.hutool.core.bean.BeanUtil;
+import com.gitee.dorive.api.annotation.query.QueryField;
+import lombok.Data;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class QueryFieldElement extends FieldElement {
-    private QueryFieldDefinition queryFieldDefinition;
+import java.lang.reflect.AnnotatedElement;
+import java.util.Map;
+
+@Data
+public class QueryFieldDef {
+    private String belongTo;
+    private String field;
+    private String operator;
+
+    public static QueryFieldDef fromElement(AnnotatedElement element) {
+        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, QueryField.class);
+        return attributes != null ? BeanUtil.copyProperties(attributes, QueryFieldDef.class) : null;
+    }
 }

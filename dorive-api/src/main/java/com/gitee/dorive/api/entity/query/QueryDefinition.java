@@ -17,18 +17,18 @@
 
 package com.gitee.dorive.api.entity.query;
 
+import com.gitee.dorive.api.entity.core.Field;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class QueryDefinition {
-    private String entityTypeName;
-    private String genericTypeName;
+    private Class<?> genericType;
     private List<QueryFieldDefinition> queryFieldDefinitions;
-    private List<FieldDefinition> ignoreFieldDefinitions;
-    private FieldDefinition sortByField;
-    private FieldDefinition orderField;
-    private FieldDefinition pageField;
-    private FieldDefinition limitField;
+    private List<Field> ignoreFields;
+    private Field sortByField;
+    private Field orderField;
+    private Field pageField;
+    private Field limitField;
 }

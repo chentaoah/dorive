@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.api.entity.core;
 
+import cn.hutool.core.util.ReflectUtil;
 import lombok.Data;
 
 import java.lang.reflect.ParameterizedType;
@@ -47,5 +48,9 @@ public class Field {
 
     public boolean isSameType(Field field) {
         return type == field.getType() && genericType == field.getGenericType();
+    }
+
+    public Object getFieldValue(Object object) {
+        return ReflectUtil.getFieldValue(object, field);
     }
 }

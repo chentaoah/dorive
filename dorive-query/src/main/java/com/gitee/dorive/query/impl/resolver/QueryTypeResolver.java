@@ -21,10 +21,8 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.api.entity.query.QueryDefinition;
 import com.gitee.dorive.api.entity.query.QueryFieldDefinition;
 import com.gitee.dorive.api.entity.query.def.EnableQueryDef;
-import com.gitee.dorive.api.entity.query.ele.QueryElement;
-import com.gitee.dorive.api.entity.query.ele.QueryFieldElement;
+import com.gitee.dorive.api.entity.query.def.QueryFieldDef;
 import com.gitee.dorive.api.impl.query.QueryDefinitionReader;
-import com.gitee.dorive.api.impl.query.QueryElementResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
@@ -54,18 +52,13 @@ public class QueryTypeResolver {
     }
 
     private void resolveQueryClass(Class<?> queryClass) {
-        Class<?> entityClass = repository.getEntityClass();
-
         QueryDefinitionReader queryDefinitionReader = new QueryDefinitionReader();
-        QueryDefinition queryDefinition = queryDefinitionReader.read(entityClass, queryClass);
-
-        QueryElementResolver queryElementResolver = new QueryElementResolver();
-        QueryElement queryElement = queryElementResolver.resolve(queryDefinition);
+        QueryDefinition queryDefinition = queryDefinitionReader.read(queryClass);
 
         Set<String> accessPaths = new HashSet<>();
         List<MergedRepository> mergedRepositories = new ArrayList<>();
-        for (QueryFieldElement queryFieldElement : queryElement.getQueryFieldElements()) {
-            MergedRepository mergedRepository = resetQueryField(queryFieldElement);
+        for (QueryFieldDefinition queryFieldDefinition : queryDefinition.getQueryFieldDefinitions()) {
+            MergedRepository mergedRepository = resetQueryField(queryFieldDefinition);
             if (accessPaths.add(mergedRepository.getAbsoluteAccessPath())) {
                 mergedRepositories.add(mergedRepository);
             }
@@ -86,26 +79,26 @@ public class QueryTypeResolver {
         List<MergedRepository> reversedMergedRepositories = new ArrayList<>(mergedRepositories);
         Collections.reverse(reversedMergedRepositories);
 
-        QueryExampleResolver queryExampleResolver = new QueryExampleResolver(queryElement);
+        QueryExampleResolver queryExampleResolver = new QueryExampleResolver(queryDefinition);
         classQueryExampleResolverMap.put(queryClass, queryExampleResolver);
         classMergedRepositoriesMap.put(queryClass, mergedRepositories);
         classReversedMergedRepositoriesMap.put(queryClass, reversedMergedRepositories);
     }
 
-    private MergedRepository resetQueryField(QueryFieldElement queryFieldElement) {
+    private MergedRepository resetQueryField(QueryFieldDefinition queryFieldDefinition) {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
         Map<String, MergedRepository> nameMergedRepositoryMap = mergedRepositoryResolver.getNameMergedRepositoryMap();
 
-        QueryFieldDefinition queryFieldDefinition = queryFieldElement.getQueryFieldDefinition();
-        String belongTo = queryFieldDefinition.getBelongTo();
-        String field = queryFieldDefinition.getField();
+        QueryFieldDef queryFieldDef = queryFieldDefinition.getQueryFieldDef();
+        String belongTo = queryFieldDef.getBelongTo();
+        String field = queryFieldDef.getField();
 
         if (!belongTo.startsWith("/")) {
             MergedRepository mergedRepository = nameMergedRepositoryMap.get(belongTo);
             Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
             belongTo = mergedRepository.getAbsoluteAccessPath();
-            queryFieldDefinition.setBelongTo(belongTo);
+            queryFieldDef.setBelongTo(belongTo);
         }
 
         MergedRepository mergedRepository = mergedRepositoryMap.get(belongTo);
@@ -113,7 +106,7 @@ public class QueryTypeResolver {
 
         CommonRepository repository = mergedRepository.getExecutedRepository();
         Assert.isTrue(repository.hasField(field), "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",
-                queryFieldElement.getField(), repository.getEntityClass(), field);
+                queryFieldDefinition.getField(), repository.getEntityClass(), field);
 
         return mergedRepository;
     }
