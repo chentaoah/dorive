@@ -131,6 +131,8 @@ public class EntityDefinitionReader {
         if (StringUtils.isBlank(fieldDef.getAlias())) {
             fieldDef.setAlias(StrUtil.toUnderlineCase(fieldName));
         }
+        fieldDefinition.setFieldDef(fieldDef);
+
         return fieldDefinition;
     }
 
