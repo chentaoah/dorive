@@ -56,7 +56,7 @@ public @interface Entity {
     /**
      * 是否聚合
      */
-    boolean isAggregate() default false;
+    boolean aggregate() default false;
 
 }
 

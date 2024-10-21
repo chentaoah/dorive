@@ -160,7 +160,7 @@ public class EntityDefinitionReader {
         if (factory != Object.class) {
             newEntityDef.setFactory(factory);
         }
-        boolean aggregate = entityAnnotation.isAggregate();
+        boolean aggregate = entityAnnotation.aggregate();
         if (aggregate) {
             newEntityDef.setAggregate(true);
         }

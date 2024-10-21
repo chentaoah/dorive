@@ -70,6 +70,6 @@ public @interface Aggregate {
      * @see Entity
      */
     @AliasFor(annotation = Entity.class)
-    boolean isAggregate() default true;
+    boolean aggregate() default true;
 
 }
