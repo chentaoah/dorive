@@ -105,6 +105,7 @@ public class QueryDefinitionReader {
             queryFieldDef.setField(field.getName());
             queryFieldDef.setOperator("=");
         }
+        queryFieldDefinition.setQueryFieldDef(queryFieldDef);
         return queryFieldDefinition;
     }
 
