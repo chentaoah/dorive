@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.api.entity.event.def;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.api.annotation.event.Listener;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,7 +24,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.AnnotatedElement;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -39,7 +37,17 @@ public class ListenerDef {
     private Class<? extends Throwable>[] throwExceptions;
 
     public static ListenerDef fromElement(AnnotatedElement element) {
-        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Listener.class);
-        return attributes != null ? BeanUtil.copyProperties(attributes, ListenerDef.class) : null;
+        Listener listener = AnnotatedElementUtils.getMergedAnnotation(element, Listener.class);
+        if (listener != null) {
+            ListenerDef listenerDef = new ListenerDef();
+            listenerDef.setPublishers(listener.publishers());
+            listenerDef.setEntityClass(listener.entityClass());
+            listenerDef.setEvents(listener.events());
+            listenerDef.setOnlyRoot(listener.onlyRoot());
+            listenerDef.setAfterCommit(listener.afterCommit());
+            listenerDef.setThrowExceptions(listener.throwExceptions());
+            return listenerDef;
+        }
+        return null;
     }
 }
