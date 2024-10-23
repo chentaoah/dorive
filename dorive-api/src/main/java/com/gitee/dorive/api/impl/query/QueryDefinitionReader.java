@@ -19,13 +19,12 @@ package com.gitee.dorive.api.impl.query;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
-import com.gitee.dorive.api.annotation.query.Query;
 import com.gitee.dorive.api.entity.query.QueryDefinition;
 import com.gitee.dorive.api.entity.query.QueryFieldDefinition;
+import com.gitee.dorive.api.entity.query.def.QueryDef;
 import com.gitee.dorive.api.entity.query.def.QueryFieldDef;
 import com.gitee.dorive.api.util.ReflectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -44,14 +43,14 @@ public class QueryDefinitionReader {
     }
 
     private void readFields(Class<?> queryType, QueryDefinition queryDefinition) {
-        Query queryAnnotation = AnnotatedElementUtils.getMergedAnnotation(queryType, Query.class);
-        Assert.notNull(queryAnnotation, "The @Query does not exist!");
-        assert queryAnnotation != null;
-        String[] ignoreFieldNames = queryAnnotation.ignoreFields();
-        String sortByField = queryAnnotation.sortByField();
-        String orderField = queryAnnotation.orderField();
-        String pageField = queryAnnotation.pageField();
-        String limitField = queryAnnotation.limitField();
+        QueryDef queryDef = QueryDef.fromElement(queryType);
+        Assert.notNull(queryDef, "The @Query does not exist!");
+        assert queryDef != null;
+        String[] ignoreFieldNames = queryDef.getIgnoreFields();
+        String sortByField = queryDef.getSortByField();
+        String orderField = queryDef.getOrderField();
+        String pageField = queryDef.getPageField();
+        String limitField = queryDef.getLimitField();
 
         List<QueryFieldDefinition> queryFieldDefinitions = new ArrayList<>();
         List<com.gitee.dorive.api.entity.core.Field> ignoreFields = new ArrayList<>();
