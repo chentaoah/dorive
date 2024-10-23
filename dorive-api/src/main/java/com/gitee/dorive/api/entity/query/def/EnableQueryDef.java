@@ -24,21 +24,19 @@ import lombok.NoArgsConstructor;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.AnnotatedElement;
-import java.util.Arrays;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class EnableQueryDef {
 
-    private List<Class<?>> queries;
+    private Class<?>[] queries;
 
     public static EnableQueryDef fromElement(AnnotatedElement element) {
         EnableQuery enableQuery = AnnotatedElementUtils.getMergedAnnotation(element, EnableQuery.class);
         if (enableQuery != null) {
             EnableQueryDef enableQueryDef = new EnableQueryDef();
-            enableQueryDef.setQueries(Arrays.asList(enableQuery.queries()));
+            enableQueryDef.setQueries(enableQuery.queries());
             return enableQueryDef;
         }
         return null;

@@ -45,7 +45,7 @@ public class QueryTypeResolver {
 
     public void resolve() {
         EnableQueryDef enableQueryDef = repository.getEnableQueryDef();
-        List<Class<?>> queries = enableQueryDef.getQueries();
+        Class<?>[] queries = enableQueryDef.getQueries();
         for (Class<?> queryClass : queries) {
             resolveQueryClass(queryClass);
         }
