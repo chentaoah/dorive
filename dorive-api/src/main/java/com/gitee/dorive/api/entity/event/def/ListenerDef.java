@@ -17,56 +17,29 @@
 
 package com.gitee.dorive.api.entity.event.def;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.api.annotation.event.Listener;
-import com.gitee.dorive.api.entity.event.ListenerDefinition;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.AnnotatedElement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ListenerDef {
-
-    private List<String> publishers;
+    private String[] publishers;
     private Class<?> entityClass;
-    private List<String> events;
+    private String[] events;
     private boolean onlyRoot;
     private boolean afterCommit;
-    private List<Class<? extends Throwable>> throwExceptions;
+    private Class<? extends Throwable>[] throwExceptions;
 
     public static ListenerDef fromElement(AnnotatedElement element) {
-        Listener listener = AnnotatedElementUtils.getMergedAnnotation(element, Listener.class);
-        if (listener != null) {
-            ListenerDefinition listenerDefinition = new ListenerDefinition();
-            listenerDefinition.setPublisherNames(Arrays.asList(listener.publishers()));
-            listenerDefinition.setEntityTypeName(listener.entityClass().getName());
-            listenerDefinition.setEventNames(Arrays.asList(listener.events()));
-            listenerDefinition.setOnlyRoot(listener.onlyRoot());
-            listenerDefinition.setAfterCommit(listener.afterCommit());
-            List<String> throwExceptionNames = new ArrayList<>();
-            for (Class<? extends Throwable> throwExceptionType : listener.throwExceptions()) {
-                throwExceptionNames.add(throwExceptionType.getName());
-            }
-            listenerDefinition.setThrowExceptionNames(throwExceptionNames);
-            listenerDefinition.setGenericTypeName(((Class<?>) element).getName());
-
-            ListenerDef listenerDef = new ListenerDef();
-            listenerDef.setPublishers(listenerDefinition.getPublisherNames());
-            listenerDef.setEntityClass(listener.entityClass());
-            listenerDef.setEvents(listenerDefinition.getEventNames());
-            listenerDef.setOnlyRoot(listenerDefinition.isOnlyRoot());
-            listenerDef.setAfterCommit(listenerDefinition.isAfterCommit());
-            listenerDef.setThrowExceptions(Arrays.asList(listener.throwExceptions()));
-            return listenerDef;
-        }
-        return null;
+        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Listener.class);
+        return attributes != null ? BeanUtil.copyProperties(attributes, ListenerDef.class) : null;
     }
-
 }

@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.event.impl.listener.adapter;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.gitee.dorive.api.entity.event.def.ListenerDef;
 import com.gitee.dorive.event.api.EntityEventListener;
 import com.gitee.dorive.event.entity.EntityEvent;
@@ -36,8 +37,8 @@ public class RouteListenerAdapter implements EntityEventListener {
 
     @Override
     public void onEntityEvent(EntityEvent entityEvent) {
-        boolean matchPublisher = listenerDef.getPublishers().contains(entityEvent.getPublisher());
-        boolean matchEvent = listenerDef.getEvents().contains(entityEvent.getName());
+        boolean matchPublisher = ArrayUtil.contains(listenerDef.getPublishers(), entityEvent.getPublisher());
+        boolean matchEvent = ArrayUtil.contains(listenerDef.getEvents(), entityEvent.getName());
         boolean matchOnlyRoot = !listenerDef.isOnlyRoot() || entityEvent.isRoot();
 
         if (matchPublisher && matchEvent && matchOnlyRoot) {
