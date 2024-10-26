@@ -33,9 +33,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class QueryDefinitionReader {
+public class QueryDefinitionResolver {
 
-    public QueryDefinition read(Class<?> queryType) {
+    public QueryDefinition resolve(Class<?> queryType) {
         QueryDefinition queryDefinition = new QueryDefinition();
         queryDefinition.setGenericType(queryType);
         readFields(queryType, queryDefinition);

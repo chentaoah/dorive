@@ -22,7 +22,7 @@ import com.gitee.dorive.api.entity.query.QueryDefinition;
 import com.gitee.dorive.api.entity.query.QueryFieldDefinition;
 import com.gitee.dorive.api.entity.query.def.EnableQueryDef;
 import com.gitee.dorive.api.entity.query.def.QueryFieldDef;
-import com.gitee.dorive.api.impl.query.QueryDefinitionReader;
+import com.gitee.dorive.api.impl.query.QueryDefinitionResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
@@ -52,8 +52,8 @@ public class QueryTypeResolver {
     }
 
     private void resolveQueryClass(Class<?> queryClass) {
-        QueryDefinitionReader queryDefinitionReader = new QueryDefinitionReader();
-        QueryDefinition queryDefinition = queryDefinitionReader.read(queryClass);
+        QueryDefinitionResolver queryDefinitionResolver = new QueryDefinitionResolver();
+        QueryDefinition queryDefinition = queryDefinitionResolver.resolve(queryClass);
 
         Set<String> accessPaths = new HashSet<>();
         List<MergedRepository> mergedRepositories = new ArrayList<>();

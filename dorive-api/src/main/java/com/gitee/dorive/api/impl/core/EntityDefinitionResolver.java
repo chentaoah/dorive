@@ -40,12 +40,12 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-public class EntityDefinitionReader {
+public class EntityDefinitionResolver {
 
     private static final Map<String, EntityDefinition> CACHE = new ConcurrentHashMap<>();
     private static final Set<String> LOCK = new ConcurrentHashSet<>();
 
-    public EntityDefinition read(Class<?> type) {
+    public EntityDefinition resolve(Class<?> type) {
         synchronized (CACHE) {
             String typeName = type.getName();
             EntityDefinition entityDefinition = CACHE.get(typeName);
@@ -140,7 +140,7 @@ public class EntityDefinitionReader {
 
     private FieldEntityDefinition readFieldEntity(Entity entityAnnotation, Field field) {
         com.gitee.dorive.api.entity.core.Field myField = new com.gitee.dorive.api.entity.core.Field(field);
-        EntityDefinition entityDefinition = read(myField.getGenericType());
+        EntityDefinition entityDefinition = resolve(myField.getGenericType());
         if (entityDefinition == null) {
             return null;
         }

@@ -24,7 +24,7 @@ import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.def.EntityDef;
 import com.gitee.dorive.api.entity.core.def.OrderDef;
 import com.gitee.dorive.api.entity.core.EntityElement;
-import com.gitee.dorive.api.impl.core.EntityDefinitionReader;
+import com.gitee.dorive.api.impl.core.EntityDefinitionResolver;
 import com.gitee.dorive.api.impl.core.EntityElementResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.executor.EntityHandler;
@@ -76,8 +76,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     public void afterPropertiesSet() throws Exception {
         Class<?> entityClass = ReflectUtils.getFirstArgumentType(this.getClass());
 
-        EntityDefinitionReader entityDefinitionReader = new EntityDefinitionReader();
-        EntityDefinition entityDefinition = entityDefinitionReader.read(entityClass);
+        EntityDefinitionResolver entityDefinitionResolver = new EntityDefinitionResolver();
+        EntityDefinition entityDefinition = entityDefinitionResolver.resolve(entityClass);
 
         EntityElementResolver entityElementResolver = new EntityElementResolver();
         List<EntityElement> entityElements = entityElementResolver.resolve(entityDefinition);
