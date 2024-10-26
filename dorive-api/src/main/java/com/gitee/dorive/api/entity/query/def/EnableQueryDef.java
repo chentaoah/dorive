@@ -29,7 +29,6 @@ import java.lang.reflect.AnnotatedElement;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EnableQueryDef {
-
     private Class<?>[] queries;
 
     public static EnableQueryDef fromElement(AnnotatedElement element) {
@@ -41,5 +40,4 @@ public class EnableQueryDef {
         }
         return null;
     }
-
 }
