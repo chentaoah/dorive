@@ -18,16 +18,15 @@
 package com.gitee.dorive.query.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.api.entity.query.QueryDefinition;
+import com.gitee.dorive.api.entity.query.QueryFieldDefinition;
+import com.gitee.dorive.api.entity.query.def.EnableQueryDef;
+import com.gitee.dorive.api.entity.query.def.QueryFieldDef;
+import com.gitee.dorive.api.impl.query.QueryDefinitionResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.entity.QueryField;
-import com.gitee.dorive.query.entity.SpecificFields;
-import com.gitee.dorive.query.entity.def.CriterionDef;
-import com.gitee.dorive.query.entity.def.ExampleDef;
-import com.gitee.dorive.query.entity.def.QueryScanDef;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import lombok.Data;
-import org.springframework.util.ReflectionUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,36 +44,27 @@ public class QueryTypeResolver {
     }
 
     public void resolve() {
-        QueryScanDef queryScanDef = repository.getQueryScanDef();
-        Class<?>[] queries = queryScanDef.getQueries();
+        EnableQueryDef enableQueryDef = repository.getEnableQueryDef();
+        Class<?>[] queries = enableQueryDef.getQueries();
         for (Class<?> queryClass : queries) {
             resolveQueryClass(queryClass);
         }
     }
 
     private void resolveQueryClass(Class<?> queryClass) {
-        ExampleDef exampleDef = ExampleDef.fromElement(queryClass);
-        if (exampleDef == null) {
-            return;
-        }
+        QueryDefinitionResolver queryDefinitionResolver = new QueryDefinitionResolver();
+        QueryDefinition queryDefinition = queryDefinitionResolver.resolve(queryClass);
 
-        List<QueryField> queryFields = new ArrayList<>();
-        SpecificFields specificFields = new SpecificFields();
         Set<String> accessPaths = new HashSet<>();
         List<MergedRepository> mergedRepositories = new ArrayList<>();
-
-        ReflectionUtils.doWithLocalFields(queryClass, declaredField -> {
-            QueryField queryField = new QueryField(declaredField);
-            if (queryField.isIgnore() || specificFields.tryAddField(queryField)) {
-                return;
-            }
-            MergedRepository mergedRepository = resetQueryField(queryField);
-            queryFields.add(queryField);
+        for (QueryFieldDefinition queryFieldDefinition : queryDefinition.getQueryFieldDefinitions()) {
+            MergedRepository mergedRepository = resetQueryField(queryFieldDefinition);
             if (accessPaths.add(mergedRepository.getAbsoluteAccessPath())) {
                 mergedRepositories.add(mergedRepository);
             }
-        });
+        }
 
+        // 添加绑定的且未添加到集合的仓储
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
         for (MergedRepository mergedRepository : mergedRepositoryMap.values()) {
@@ -83,38 +73,40 @@ public class QueryTypeResolver {
                 mergedRepositories.add(mergedRepository);
             }
         }
-
+        // 重新排序
         mergedRepositories.sort(Comparator.comparing(MergedRepository::getSequence));
+        // 反转顺序
         List<MergedRepository> reversedMergedRepositories = new ArrayList<>(mergedRepositories);
         Collections.reverse(reversedMergedRepositories);
 
-        QueryExampleResolver queryExampleResolver = new QueryExampleResolver(exampleDef, queryFields, specificFields);
+        QueryExampleResolver queryExampleResolver = new QueryExampleResolver(queryDefinition);
         classQueryExampleResolverMap.put(queryClass, queryExampleResolver);
         classMergedRepositoriesMap.put(queryClass, mergedRepositories);
         classReversedMergedRepositoriesMap.put(queryClass, reversedMergedRepositories);
     }
 
-    private MergedRepository resetQueryField(QueryField queryField) {
+    private MergedRepository resetQueryField(QueryFieldDefinition queryFieldDefinition) {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
         Map<String, MergedRepository> nameMergedRepositoryMap = mergedRepositoryResolver.getNameMergedRepositoryMap();
 
-        CriterionDef criterionDef = queryField.getCriterionDef();
-        String belongTo = criterionDef.getBelongTo();
-        String field = criterionDef.getField();
+        QueryFieldDef queryFieldDef = queryFieldDefinition.getQueryFieldDef();
+        String belongTo = queryFieldDef.getBelongTo();
+        String field = queryFieldDef.getField();
 
         if (!belongTo.startsWith("/")) {
             MergedRepository mergedRepository = nameMergedRepositoryMap.get(belongTo);
             Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
             belongTo = mergedRepository.getAbsoluteAccessPath();
-            criterionDef.setBelongTo(belongTo);
+            queryFieldDef.setBelongTo(belongTo);
         }
 
         MergedRepository mergedRepository = mergedRepositoryMap.get(belongTo);
         Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
 
         CommonRepository repository = mergedRepository.getExecutedRepository();
-        Assert.isTrue(repository.hasField(field), "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}", queryField.getField(), repository.getEntityClass(), field);
+        Assert.isTrue(repository.hasField(field), "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",
+                queryFieldDefinition.getField(), repository.getEntityClass(), field);
 
         return mergedRepository;
     }

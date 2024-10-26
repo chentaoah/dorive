@@ -17,10 +17,7 @@
 
 package com.gitee.dorive.event.config;
 
-import com.gitee.dorive.event.listener.ExecutorBatchEventListener;
-import com.gitee.dorive.event.listener.ExecutorEventListener;
-import com.gitee.dorive.event.listener.RepositoryEventListener;
-import com.gitee.dorive.event.listener.RepositoryRootEventListener;
+import com.gitee.dorive.event.impl.listener.EventListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -29,24 +26,9 @@ import org.springframework.core.annotation.Order;
 @Configuration
 public class DoriveEventConfiguration {
 
-    @Bean("executorEventListenerV3")
-    public ExecutorEventListener executorEventListener() {
-        return new ExecutorEventListener();
-    }
-
-    @Bean("executorBatchEventListenerV3")
-    public ExecutorBatchEventListener executorBatchEventListener() {
-        return new ExecutorBatchEventListener();
-    }
-
-    @Bean("repositoryEventListenerV3")
-    public RepositoryEventListener repositoryEventListener() {
-        return new RepositoryEventListener();
-    }
-
-    @Bean("repositoryRootEventListenerV3")
-    public RepositoryRootEventListener repositoryRootEventListener() {
-        return new RepositoryRootEventListener();
+    @Bean("eventListenerV3")
+    public EventListener eventListener() {
+        return new EventListener();
     }
 
 }

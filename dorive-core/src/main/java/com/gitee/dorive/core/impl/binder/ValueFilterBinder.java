@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.binder;
 
 import cn.hutool.core.convert.Convert;
-import com.gitee.dorive.api.entity.def.BindingDef;
+import com.gitee.dorive.api.entity.core.def.BindingDef;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.impl.endpoint.BindEndpoint;
@@ -34,7 +34,7 @@ public class ValueFilterBinder extends AbstractBinder {
 
     public ValueFilterBinder(BindingDef bindingDef, FieldEndpoint fieldEndpoint, BindEndpoint bindEndpoint, Processor processor) {
         super(bindingDef, fieldEndpoint, bindEndpoint, processor);
-        Class<?> genericType = fieldEndpoint.getFieldElement().getGenericType();
+        Class<?> genericType = fieldEndpoint.getFieldDefinition().getGenericType();
         this.value = Convert.convert(genericType, bindingDef.getValue());
     }
 

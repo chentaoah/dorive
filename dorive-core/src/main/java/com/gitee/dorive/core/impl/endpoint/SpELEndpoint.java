@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.impl.endpoint;
 
-import com.gitee.dorive.api.entity.ele.FieldElement;
+import com.gitee.dorive.api.entity.core.FieldDefinition;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -27,8 +27,8 @@ public class SpELEndpoint extends AbstractEndpoint {
 
     private final Expression expression;
 
-    public SpELEndpoint(FieldElement fieldElement, String expression) {
-        super(fieldElement);
+    public SpELEndpoint(FieldDefinition fieldDefinition, String expression) {
+        super(fieldDefinition);
         this.expression = new SpelExpressionParser().parseExpression(expression);
     }
 

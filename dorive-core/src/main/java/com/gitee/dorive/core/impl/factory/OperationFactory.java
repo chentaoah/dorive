@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.impl.factory;
 
-import com.gitee.dorive.api.entity.ele.EntityElement;
+import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.ConditionDelete;

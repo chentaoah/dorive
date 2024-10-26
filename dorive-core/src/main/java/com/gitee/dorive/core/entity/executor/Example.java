@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.core.entity.executor;
 
-import com.gitee.dorive.api.constant.Operator;
-import com.gitee.dorive.api.constant.Order;
+import com.gitee.dorive.api.constant.core.Operator;
+import com.gitee.dorive.api.constant.core.Order;
 import com.gitee.dorive.core.util.StringUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;

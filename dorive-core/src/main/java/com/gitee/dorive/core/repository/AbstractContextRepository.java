@@ -19,13 +19,13 @@ package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.api.constant.Order;
-import com.gitee.dorive.api.entity.EntityDefinition;
-import com.gitee.dorive.api.entity.def.EntityDef;
-import com.gitee.dorive.api.entity.def.OrderDef;
-import com.gitee.dorive.api.entity.ele.EntityElement;
-import com.gitee.dorive.api.impl.EntityDefinitionReader;
-import com.gitee.dorive.api.impl.EntityElementResolver;
+import com.gitee.dorive.api.constant.core.Order;
+import com.gitee.dorive.api.entity.core.EntityDefinition;
+import com.gitee.dorive.api.entity.core.def.EntityDef;
+import com.gitee.dorive.api.entity.core.def.OrderDef;
+import com.gitee.dorive.api.entity.core.EntityElement;
+import com.gitee.dorive.api.impl.core.EntityDefinitionResolver;
+import com.gitee.dorive.api.impl.core.EntityElementResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.Executor;
@@ -76,8 +76,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     public void afterPropertiesSet() throws Exception {
         Class<?> entityClass = ReflectUtils.getFirstArgumentType(this.getClass());
 
-        EntityDefinitionReader entityDefinitionReader = new EntityDefinitionReader();
-        EntityDefinition entityDefinition = entityDefinitionReader.read(entityClass);
+        EntityDefinitionResolver entityDefinitionResolver = new EntityDefinitionResolver();
+        EntityDefinition entityDefinition = entityDefinitionResolver.resolve(entityClass);
 
         EntityElementResolver entityElementResolver = new EntityElementResolver();
         List<EntityElement> entityElements = entityElementResolver.resolve(entityDefinition);
@@ -138,7 +138,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     private void resetEntityDef(EntityElement entityElement) {
         EntityDef entityDef = entityElement.getEntityDef();
-        if (entityDef.isAutoDiscovery()) {
+        if (entityDef.isAggregate()) {
             Class<?> entityClass = entityElement.getGenericType();
             Class<?> repositoryClass = RepositoryContext.findRepositoryClass(entityClass);
             Assert.notNull(repositoryClass, "No type of repository found! type: {}", entityClass.getName());

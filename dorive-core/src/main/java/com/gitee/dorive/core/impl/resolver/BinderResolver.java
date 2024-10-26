@@ -22,10 +22,10 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.api.entity.def.BindingDef;
-import com.gitee.dorive.api.entity.def.EntityDef;
-import com.gitee.dorive.api.entity.ele.EntityElement;
-import com.gitee.dorive.api.entity.ele.FieldElement;
+import com.gitee.dorive.api.entity.core.FieldDefinition;
+import com.gitee.dorive.api.entity.core.def.BindingDef;
+import com.gitee.dorive.api.entity.core.def.EntityDef;
+import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.binder.Binder;
 import com.gitee.dorive.core.api.binder.Processor;
 import com.gitee.dorive.core.api.context.Context;
@@ -101,9 +101,9 @@ public class BinderResolver {
             }
 
             String field = bindingDef.getField();
-            FieldElement fieldElement = entityElement.getFieldElement(field);
-            Assert.notNull(fieldElement, fieldErrorMsg, genericType.getName(), field);
-            FieldEndpoint fieldEndpoint = new FieldEndpoint(fieldElement, "#entity." + field);
+            FieldDefinition fieldDefinition = entityElement.getFieldDefinition(field);
+            Assert.notNull(fieldDefinition, fieldErrorMsg, genericType.getName(), field);
+            FieldEndpoint fieldEndpoint = new FieldEndpoint(fieldDefinition, "#entity." + field);
 
             if (bindingType == BindingType.STRONG) {
                 BindEndpoint bindEndpoint = newBindEndpoint(bindingDef);
@@ -134,7 +134,7 @@ public class BinderResolver {
                 valueFilterBinders.add(valueFilterBinder);
             }
         }
-        
+
         mergedStrongBindersMap = Collections.unmodifiableMap(mergedStrongBindersMap);
         mergedValueRouteBindersMap = Collections.unmodifiableMap(mergedValueRouteBindersMap);
         selfFields = Collections.unmodifiableList(selfFields);
@@ -227,9 +227,9 @@ public class BinderResolver {
 
         CommonRepository rootRepository = repository.getRootRepository();
         EntityElement entityElement = rootRepository.getEntityElement();
-        FieldElement fieldElement = entityElement.getFieldElement(bind);
-        Assert.notNull(fieldElement, "The bound property chain cannot be null! bind: {}", bind);
-        BindEndpoint bindEndpoint = new BindEndpoint(fieldElement, "#entity." + bind);
+        FieldDefinition fieldDefinition = entityElement.getFieldDefinition(bind);
+        Assert.notNull(fieldDefinition, "The bound property chain cannot be null! bind: {}", bind);
+        BindEndpoint bindEndpoint = new BindEndpoint(fieldDefinition, "#entity." + bind);
 
         Map<String, CommonRepository> repositoryMap = repository.getRepositoryMap();
         CommonRepository belongRepository = repositoryMap.getOrDefault("/" + bind, rootRepository);
