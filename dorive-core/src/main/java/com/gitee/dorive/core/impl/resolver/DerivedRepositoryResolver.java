@@ -62,7 +62,8 @@ public class DerivedRepositoryResolver {
     }
 
     public Map<Class<?>, EntityHandler> getEntityHandlerMap(EntityHandler entityHandler) {
-        Map<Class<?>, EntityHandler> entityHandlerMap = new LinkedHashMap<>();
+        int size = classRepositoryMap.size() + 1;
+        Map<Class<?>, EntityHandler> entityHandlerMap = new LinkedHashMap<>(size * 4 / 3 + 1);
         entityHandlerMap.put(repository.getEntityType(), entityHandler);
         classRepositoryMap.forEach((clazz, repository) -> {
             Executor executor = repository.getExecutor();
