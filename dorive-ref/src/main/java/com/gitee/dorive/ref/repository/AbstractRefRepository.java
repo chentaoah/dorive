@@ -24,7 +24,7 @@ public abstract class AbstractRefRepository<E, PK> extends AbstractInnerReposito
 
     @Override
     protected EntityHandler processEntityHandler(EntityHandler entityHandler) {
-        new RefInjector(this, entityHandler, getEntityClass());
+        new RefInjector(this, entityHandler, getEntityType());
         return entityHandler;
     }
 

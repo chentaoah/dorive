@@ -42,7 +42,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     private OperationFactory operationFactory;
     private Executor executor;
 
-    public Class<?> getEntityClass() {
+    public Class<?> getEntityType() {
         return entityElement.getGenericType();
     }
 

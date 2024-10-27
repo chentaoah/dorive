@@ -43,8 +43,9 @@ import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.factory.ValueObjEntityFactory;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
+import com.gitee.dorive.core.impl.handler.DelegatedEntityHandler;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.impl.resolver.DerivedResolver;
+import com.gitee.dorive.core.impl.resolver.DerivedRepositoryResolver;
 import com.gitee.dorive.core.impl.resolver.EntityMapperResolver;
 import lombok.Getter;
 import lombok.Setter;
@@ -65,7 +66,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     private CommonRepository rootRepository;
     private List<CommonRepository> subRepositories = new ArrayList<>();
     private List<CommonRepository> orderedRepositories = new ArrayList<>();
-    private DerivedResolver derivedResolver;
+    private DerivedRepositoryResolver derivedRepositoryResolver;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -98,8 +99,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setEntityElement(rootRepository.getEntityElement());
         setOperationFactory(rootRepository.getOperationFactory());
 
-        derivedResolver = new DerivedResolver(this);
         EntityHandler entityHandler = processEntityHandler(new BatchEntityHandler(this));
+        derivedRepositoryResolver = new DerivedRepositoryResolver(this);
+        derivedRepositoryResolver.resolve();
+        if (derivedRepositoryResolver.hasDerived()) {
+            entityHandler = new DelegatedEntityHandler(this, derivedRepositoryResolver.getEntityHandlerMap(entityHandler));
+        }
         Executor executor = new ContextExecutor(this, entityHandler);
         setExecutor(executor);
     }

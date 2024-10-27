@@ -18,6 +18,8 @@
 package com.gitee.dorive.core.impl.resolver;
 
 import cn.hutool.core.lang.Pair;
+import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
@@ -31,25 +33,24 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class DerivedResolver {
+public class DerivedRepositoryResolver {
 
     private AbstractContextRepository<?, ?> repository;
     private Map<Class<?>, AbstractContextRepository<?, ?>> classRepositoryMap = new LinkedHashMap<>(3 * 4 / 3 + 1);
 
-    public DerivedResolver(AbstractContextRepository<?, ?> repository) {
+    public DerivedRepositoryResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
-        resolve();
     }
 
-    private void resolve() {
+    public void resolve() {
         ReflectionUtils.doWithLocalFields(repository.getClass(), declaredField -> {
             Class<?> fieldClass = declaredField.getType();
             if (AbstractContextRepository.class.isAssignableFrom(fieldClass)) {
                 ApplicationContext applicationContext = repository.getApplicationContext();
                 Object beanInstance = applicationContext.getBean(fieldClass);
                 AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) beanInstance;
-                Class<?> fieldEntityClass = abstractContextRepository.getEntityClass();
-                if (repository.getEntityClass().isAssignableFrom(fieldEntityClass)) {
+                Class<?> fieldEntityClass = abstractContextRepository.getEntityType();
+                if (repository.getEntityType().isAssignableFrom(fieldEntityClass)) {
                     classRepositoryMap.put(fieldEntityClass, abstractContextRepository);
                 }
             }
@@ -58,6 +59,18 @@ public class DerivedResolver {
 
     public boolean hasDerived() {
         return !classRepositoryMap.isEmpty();
+    }
+
+    public Map<Class<?>, EntityHandler> getEntityHandlerMap(EntityHandler entityHandler) {
+        Map<Class<?>, EntityHandler> entityHandlerMap = new LinkedHashMap<>();
+        entityHandlerMap.put(repository.getEntityType(), entityHandler);
+        classRepositoryMap.forEach((clazz, repository) -> {
+            Executor executor = repository.getExecutor();
+            if (executor instanceof EntityHandler) {
+                entityHandlerMap.put(clazz, (EntityHandler) executor);
+            }
+        });
+        return entityHandlerMap;
     }
 
     public Collection<Pair<AbstractContextRepository<?, ?>, List<Object>>> distribute(List<?> entities) {

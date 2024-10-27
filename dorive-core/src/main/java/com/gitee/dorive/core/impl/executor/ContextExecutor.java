@@ -31,7 +31,6 @@ import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
-import com.gitee.dorive.core.impl.resolver.DerivedResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.CollectionUtils;
@@ -42,7 +41,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ContextExecutor extends AbstractExecutor {
+public class ContextExecutor extends AbstractExecutor implements EntityHandler {
 
     private final AbstractContextRepository<?, ?> repository;
     private final EntityHandler entityHandler;
@@ -60,27 +59,16 @@ public class ContextExecutor extends AbstractExecutor {
             Result<Object> result = rootRepository.executeQuery(context, query);
             List<Object> entities = result.getRecords();
             if (!entities.isEmpty()) {
-                populate(context, entities);
+                handle(context, entities);
             }
             return result;
         }
         return Result.emptyResult(query);
     }
 
-    public void populate(Context context, List<Object> entities) {
-        DerivedResolver derivedResolver = repository.getDerivedResolver();
-        if (!derivedResolver.hasDerived()) {
-            entityHandler.handle(context, entities);
-        } else {
-            for (Pair<AbstractContextRepository<?, ?>, List<Object>> pair : derivedResolver.distribute(entities)) {
-                if (pair.getKey() == this.repository) { // 避免自循环
-                    entityHandler.handle(context, pair.getValue());
-                } else {
-                    ContextExecutor contextExecutor = (ContextExecutor) pair.getKey().getExecutor();
-                    contextExecutor.populate(context, pair.getValue());
-                }
-            }
-        }
+    @Override
+    public long handle(Context context, List<Object> entities) {
+        return entityHandler.handle(context, entities);
     }
 
     @Override
@@ -95,7 +83,7 @@ public class ContextExecutor extends AbstractExecutor {
         Assert.notEmpty(entities, "The entities cannot be empty!");
 
         int totalCount = 0;
-        for (Pair<AbstractContextRepository<?, ?>, List<Object>> pair : repository.getDerivedResolver().distribute(entities)) {
+        for (Pair<AbstractContextRepository<?, ?>, List<Object>> pair : repository.getDerivedRepositoryResolver().distribute(entities)) {
             ContextExecutor contextExecutor = (ContextExecutor) pair.getKey().getExecutor();
             if (operation instanceof Insert) {
                 Insert insert = new Insert(pair.getValue());
@@ -235,5 +223,4 @@ public class ContextExecutor extends AbstractExecutor {
         }
         return totalCount;
     }
-
 }
