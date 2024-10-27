@@ -36,13 +36,14 @@ import java.util.Map;
 public class DerivedRepositoryResolver {
 
     private AbstractContextRepository<?, ?> repository;
-    private Map<Class<?>, AbstractContextRepository<?, ?>> classRepositoryMap = new LinkedHashMap<>(3 * 4 / 3 + 1);
+    private Map<Class<?>, AbstractContextRepository<?, ?>> classRepositoryMap;
 
     public DerivedRepositoryResolver(AbstractContextRepository<?, ?> repository) {
         this.repository = repository;
     }
 
     public void resolve() {
+        classRepositoryMap = new LinkedHashMap<>(4 * 4 / 3 + 1);
         ReflectionUtils.doWithLocalFields(repository.getClass(), declaredField -> {
             Class<?> fieldClass = declaredField.getType();
             if (AbstractContextRepository.class.isAssignableFrom(fieldClass)) {
