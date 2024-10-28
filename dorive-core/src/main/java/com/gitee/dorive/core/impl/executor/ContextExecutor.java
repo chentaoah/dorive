@@ -18,22 +18,15 @@
 package com.gitee.dorive.core.impl.executor;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.lang.Pair;
-import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.core.api.executor.EntityOpHandler;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.EntityOp;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.Query;
-import com.gitee.dorive.core.entity.operation.eop.Delete;
-import com.gitee.dorive.core.entity.operation.eop.Insert;
-import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
-import com.gitee.dorive.core.entity.operation.eop.Update;
-import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.core.util.CollectionUtils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,14 +34,16 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ContextExecutor extends AbstractExecutor implements EntityHandler {
+public class ContextExecutor extends AbstractExecutor implements EntityHandler, EntityOpHandler {
 
     private final AbstractContextRepository<?, ?> repository;
     private final EntityHandler entityHandler;
+    private final EntityOpHandler entityOpHandler;
 
-    public ContextExecutor(AbstractContextRepository<?, ?> repository, EntityHandler entityHandler) {
+    public ContextExecutor(AbstractContextRepository<?, ?> repository, EntityHandler entityHandler, EntityOpHandler entityOpHandler) {
         this.repository = repository;
         this.entityHandler = entityHandler;
+        this.entityOpHandler = entityOpHandler;
     }
 
     @Override
@@ -81,146 +76,12 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler {
         EntityOp entityOp = (EntityOp) operation;
         List<?> entities = entityOp.getEntities();
         Assert.notEmpty(entities, "The entities cannot be empty!");
-
-        int totalCount = 0;
-        for (Pair<AbstractContextRepository<?, ?>, List<Object>> pair : repository.getDerivedRepositoryResolver().distribute(entities)) {
-            ContextExecutor contextExecutor = (ContextExecutor) pair.getKey().getExecutor();
-            if (operation instanceof Insert) {
-                Insert insert = new Insert(pair.getValue());
-                totalCount += contextExecutor.executeInsert(context, insert);
-
-            } else if (operation instanceof Update) {
-                Update update = new Update(pair.getValue());
-                totalCount += contextExecutor.executeUpdateOrDelete(context, update);
-
-            } else if (operation instanceof Delete) {
-                Delete delete = new Delete(pair.getValue());
-                totalCount += contextExecutor.executeUpdateOrDelete(context, delete);
-
-            } else if (operation instanceof InsertOrUpdate) {
-                OperationFactory operationFactory = repository.getOperationFactory();
-                InsertOrUpdate insertOrUpdate = operationFactory.buildInsertOrUpdate(pair.getValue());
-                totalCount += contextExecutor.executeInsertOrUpdate(context, insertOrUpdate);
-            }
-        }
-        return totalCount;
+        return (int) handle(context, entityOp);
     }
 
-    public int executeInsert(Context context, Insert insert) {
-        int totalCount = 0;
-        for (CommonRepository repository : this.repository.getOrderedRepositories()) {
-            if (repository.isRoot()) {
-                if (insert.isNotIgnoreRoot()) {
-                    if (repository.matches(context) || insert.isIncludeRoot()) {
-                        totalCount += repository.execute(context, insert);
-                    }
-                }
-            } else {
-                boolean isMatch = repository.matches(context);
-                boolean isAggregated = repository.isAggregated();
-                if (!isMatch && !isAggregated) {
-                    continue;
-                }
-                List<?> rootEntities = insert.getEntities();
-                for (Object rootEntity : rootEntities) {
-                    EntityElement entityElement = repository.getEntityElement();
-                    Object targetEntity = entityElement.getValue(rootEntity);
-                    if (targetEntity == null) {
-                        continue;
-                    }
-                    List<?> entities = CollectionUtils.toList(targetEntity);
-                    if (entities.isEmpty()) {
-                        continue;
-                    }
-                    if (isMatch) {
-                        repository.getBoundValue(context, rootEntity, entities);
-                    }
-                    Operation operation = new Insert(entities);
-                    operation.switchRoot(isMatch);
-                    totalCount += repository.execute(context, operation);
-                    if (entities.size() == 1) {
-                        repository.setBoundId(context, rootEntity, entities.get(0));
-                    }
-                }
-            }
-        }
-        return totalCount;
+    @Override
+    public long handle(Context context, EntityOp entityOp) {
+        return entityOpHandler.handle(context, entityOp);
     }
 
-    public int executeUpdateOrDelete(Context context, EntityOp entityOp) {
-        int totalCount = 0;
-        for (CommonRepository repository : this.repository.getOrderedRepositories()) {
-            if (repository.isRoot()) {
-                if (entityOp.isNotIgnoreRoot()) {
-                    if (repository.matches(context) || entityOp.isIncludeRoot()) {
-                        totalCount += repository.execute(context, entityOp);
-                    }
-                }
-            } else {
-                boolean isMatch = repository.matches(context);
-                boolean isAggregated = repository.isAggregated();
-                if (!isMatch && !isAggregated) {
-                    continue;
-                }
-                List<?> rootEntities = entityOp.getEntities();
-                for (Object rootEntity : rootEntities) {
-                    EntityElement entityElement = repository.getEntityElement();
-                    Object targetEntity = entityElement.getValue(rootEntity);
-                    if (targetEntity == null) {
-                        continue;
-                    }
-                    List<?> entities = CollectionUtils.toList(targetEntity);
-                    if (entities.isEmpty()) {
-                        continue;
-                    }
-                    Operation operation = entityOp instanceof Update ? new Update(entities) : new Delete(entities);
-                    operation.switchRoot(isMatch);
-                    totalCount += repository.execute(context, operation);
-                }
-            }
-        }
-        return totalCount;
-    }
-
-    public int executeInsertOrUpdate(Context context, InsertOrUpdate insertOrUpdate) {
-        int totalCount = 0;
-        for (CommonRepository repository : this.repository.getOrderedRepositories()) {
-            if (repository.isRoot()) {
-                if (insertOrUpdate.isNotIgnoreRoot()) {
-                    if (repository.matches(context) || insertOrUpdate.isIncludeRoot()) {
-                        totalCount += repository.execute(context, insertOrUpdate);
-                    }
-                }
-            } else {
-                boolean isMatch = repository.matches(context);
-                boolean isAggregated = repository.isAggregated();
-                if (!isMatch && !isAggregated) {
-                    continue;
-                }
-                List<?> rootEntities = insertOrUpdate.getEntities();
-                for (Object rootEntity : rootEntities) {
-                    EntityElement entityElement = repository.getEntityElement();
-                    Object targetEntity = entityElement.getValue(rootEntity);
-                    if (targetEntity == null) {
-                        continue;
-                    }
-                    List<?> entities = CollectionUtils.toList(targetEntity);
-                    if (entities.isEmpty()) {
-                        continue;
-                    }
-                    if (isMatch) {
-                        repository.getBoundValue(context, rootEntity, entities);
-                    }
-                    OperationFactory operationFactory = repository.getOperationFactory();
-                    Operation operation = operationFactory.buildInsertOrUpdate(entities);
-                    operation.switchRoot(isMatch);
-                    totalCount += repository.execute(context, operation);
-                    if (entities.size() == 1) {
-                        repository.setBoundId(context, rootEntity, entities.get(0));
-                    }
-                }
-            }
-        }
-        return totalCount;
-    }
 }

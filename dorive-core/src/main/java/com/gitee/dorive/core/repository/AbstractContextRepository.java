@@ -28,6 +28,7 @@ import com.gitee.dorive.api.impl.core.EntityDefinitionResolver;
 import com.gitee.dorive.api.impl.core.EntityElementResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.core.api.executor.EntityOpHandler;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.factory.EntityMapper;
@@ -43,7 +44,9 @@ import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.factory.ValueObjEntityFactory;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
+import com.gitee.dorive.core.impl.handler.BatchEntityOpHandler;
 import com.gitee.dorive.core.impl.handler.DelegatedEntityHandler;
+import com.gitee.dorive.core.impl.handler.DelegatedEntityOpHandler;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DerivedRepositoryResolver;
 import com.gitee.dorive.core.impl.resolver.EntityMapperResolver;
@@ -100,12 +103,14 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setOperationFactory(rootRepository.getOperationFactory());
 
         EntityHandler entityHandler = processEntityHandler(new BatchEntityHandler(this));
+        EntityOpHandler entityOpHandler = new BatchEntityOpHandler(this);
         derivedRepositoryResolver = new DerivedRepositoryResolver(this);
         derivedRepositoryResolver.resolve();
         if (derivedRepositoryResolver.hasDerived()) {
             entityHandler = new DelegatedEntityHandler(this, derivedRepositoryResolver.getEntityHandlerMap(entityHandler));
+            entityOpHandler = new DelegatedEntityOpHandler(this, derivedRepositoryResolver.getEntityOpHandlerMap(entityOpHandler));
         }
-        Executor executor = new ContextExecutor(this, entityHandler);
+        Executor executor = new ContextExecutor(this, entityHandler, entityOpHandler);
         setExecutor(executor);
     }
 
