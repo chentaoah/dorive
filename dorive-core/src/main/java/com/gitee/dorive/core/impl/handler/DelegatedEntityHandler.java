@@ -44,7 +44,7 @@ public class DelegatedEntityHandler implements EntityHandler {
             List<Object> subEntities = subEntitiesMap.computeIfAbsent(entityType, k -> new ArrayList<>());
             subEntities.add(entity);
         }
-        long count = 0L;
+        long totalCount = 0L;
         for (Map.Entry<Class<?>, List<Object>> entry : subEntitiesMap.entrySet()) {
             Class<?> entityType = entry.getKey();
             List<Object> subEntities = entry.getValue();
@@ -53,10 +53,10 @@ public class DelegatedEntityHandler implements EntityHandler {
                 entityHandler = entityHandlerMap.get(repository.getEntityType());
             }
             if (entityHandler != null) {
-                count += entityHandler.handle(context, subEntities);
+                totalCount += entityHandler.handle(context, subEntities);
             }
         }
-        return count;
+        return totalCount;
     }
 
 }
