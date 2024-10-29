@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.handler;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.core.repository.AbstractContextRepository;
+import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -27,18 +27,14 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class BatchEntityHandler implements EntityHandler {
+public class ContextMatchEntityHandler implements EntityHandler {
 
-    private final AbstractContextRepository<?, ?> repository;
-    private final List<EntityHandler> entityHandlers;
+    private CommonRepository repository;
+    private EntityHandler entityHandler;
 
     @Override
     public long handle(Context context, List<Object> entities) {
-        long totalCount = 0L;
-        for (EntityHandler entityHandler : entityHandlers) {
-            totalCount += entityHandler.handle(context, entities);
-        }
-        return totalCount;
+        return repository.matches(context) ? entityHandler.handle(context, entities) : 0L;
     }
 
 }
