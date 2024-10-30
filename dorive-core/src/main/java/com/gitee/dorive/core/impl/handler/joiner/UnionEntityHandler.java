@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.joiner;
+package com.gitee.dorive.core.impl.handler.joiner;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -33,10 +33,10 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class UnionEntityJoiner extends AbstractEntityJoiner {
+public class UnionEntityHandler extends AbstractEntityJoiner {
 
-    public UnionEntityJoiner(CommonRepository repository, int entitiesSize) {
-        super(repository, entitiesSize);
+    public UnionEntityHandler(List<Object> entities, CommonRepository repository) {
+        super(entities, repository);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class UnionEntityJoiner extends AbstractEntityJoiner {
             String row = Integer.toString(index + 1);
             example.setSelectSuffix(row + " as $row");
             unionExample.addExample(example);
-            addToRootIndex(entity, row);
+            addLeft(entity, row);
         }
         return unionExample;
     }
@@ -81,7 +81,7 @@ public class UnionEntityJoiner extends AbstractEntityJoiner {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected void buildRecordIndex(Context context, List<Object> entities, Result<Object> result) {
+    protected void handleResult(Context context, Result<Object> result) {
         List<Map<String, Object>> recordMaps = result.getRecordMaps();
         for (Map<String, Object> resultMap : recordMaps) {
             Object row = resultMap.get("$row");
@@ -90,10 +90,10 @@ public class UnionEntityJoiner extends AbstractEntityJoiner {
             if (entity != null) {
                 if (rows != null) {
                     for (String eachRow : rows) {
-                        addToRecordIndex(eachRow, entity);
+                        addRight(eachRow, entity);
                     }
                 } else if (row != null) {
-                    addToRecordIndex(row.toString(), entity);
+                    addRight(row.toString(), entity);
                 }
             }
         }

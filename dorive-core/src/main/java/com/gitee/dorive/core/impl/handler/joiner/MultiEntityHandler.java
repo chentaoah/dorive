@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.joiner;
+package com.gitee.dorive.core.impl.handler.joiner;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -33,12 +33,12 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class MultiEntityJoiner extends AbstractEntityJoiner {
+public class MultiEntityHandler extends AbstractEntityJoiner {
 
     private List<StrongBinder> binders;
 
-    public MultiEntityJoiner(CommonRepository repository, int entitiesSize) {
-        super(repository, entitiesSize);
+    public MultiEntityHandler(List<Object> entities, CommonRepository repository) {
+        super(entities, repository);
         this.binders = repository.getRootStrongBinders();
     }
 
@@ -75,10 +75,10 @@ public class MultiEntityJoiner extends AbstractEntityJoiner {
             if (keyBuilder != null && keyBuilder.length() > 0) {
                 keyBuilder.deleteCharAt(keyBuilder.length() - 1);
                 String key = keyBuilder.toString();
-                if (keys.contains(key)) {
+                if (containsKey(key)) {
                     multiInBuilder.clearLast();
                 }
-                addToRootIndex(entity, key);
+                addLeft(entity, key);
             }
         }
 
@@ -86,7 +86,7 @@ public class MultiEntityJoiner extends AbstractEntityJoiner {
     }
 
     @Override
-    protected void buildRecordIndex(Context context, List<Object> entities, Result<Object> result) {
+    protected void handleResult(Context context, Result<Object> result) {
         List<Object> records = result.getRecords();
         for (Object entity : records) {
             StringBuilder keyBuilder = new StringBuilder();
@@ -103,7 +103,7 @@ public class MultiEntityJoiner extends AbstractEntityJoiner {
             if (keyBuilder != null && keyBuilder.length() > 0) {
                 keyBuilder.deleteCharAt(keyBuilder.length() - 1);
                 String key = keyBuilder.toString();
-                addToRecordIndex(key, entity);
+                addRight(key, entity);
             }
         }
     }

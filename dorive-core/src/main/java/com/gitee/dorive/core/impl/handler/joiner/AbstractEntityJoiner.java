@@ -28,29 +28,33 @@ import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.ObjectsJoiner;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-public abstract class AbstractEntityHandler implements EntityHandler {
+@Getter
+@Setter
+public abstract class AbstractEntityJoiner extends ObjectsJoiner implements EntityHandler {
 
     protected CommonRepository repository;
 
+    public AbstractEntityJoiner(List<Object> entities, CommonRepository repository) {
+        super(entities, repository.isCollection());
+        this.repository = repository;
+    }
+
     @Override
     public long handle(Context context, List<Object> entities) {
-        ObjectsJoiner objectsJoiner = new ElementObjectsJoiner(entities, repository.isCollection());
-        Example example = newExample(context, entities, objectsJoiner);
+        Example example = newExample(context, entities);
         if (!example.isEmpty()) {
             OperationFactory operationFactory = repository.getOperationFactory();
             Query query = operationFactory.buildQueryByExample(example);
             query.includeRoot();
             Result<Object> result = repository.executeQuery(context, query);
-            objectsJoiner.setAverageSize(result.getRecords().size() / entities.size() + 1);
-            handleResult(context, result, objectsJoiner);
-            objectsJoiner.join();
+            setAverageSize(result.getRecords().size() / entities.size() + 1);
+            handleResult(context, result);
+            join();
             return result.getCount();
         }
         return 0L;
@@ -71,24 +75,17 @@ public abstract class AbstractEntityHandler implements EntityHandler {
         }
     }
 
-    private class ElementObjectsJoiner extends ObjectsJoiner {
-
-        public ElementObjectsJoiner(List<Object> entities, boolean collection) {
-            super(entities, collection);
-        }
-
-        @Override
-        protected void doJoin(Object entity, Object object) {
-            EntityElement entityElement = repository.getEntityElement();
-            Object value = entityElement.getValue(entity);
-            if (value == null) {
-                entityElement.setValue(entity, object);
-            }
+    @Override
+    protected void doJoin(Object entity, Object object) {
+        EntityElement entityElement = repository.getEntityElement();
+        Object value = entityElement.getValue(entity);
+        if (value == null) {
+            entityElement.setValue(entity, object);
         }
     }
 
-    protected abstract Example newExample(Context context, List<Object> entities, ObjectsJoiner objectsJoiner);
+    protected abstract Example newExample(Context context, List<Object> entities);
 
-    protected abstract void handleResult(Context context, Result<Object> result, ObjectsJoiner objectsJoiner);
+    protected abstract void handleResult(Context context, Result<Object> result);
 
 }

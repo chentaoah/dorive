@@ -72,6 +72,10 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
         return binderResolver.getMergedStrongBindersMap().get("/");
     }
 
+    public boolean hasValueRouteBinders() {
+        return !binderResolver.getValueRouteBinders().isEmpty();
+    }
+
     @Override
     public boolean matches(Options options) {
         return matcher.matches(options);

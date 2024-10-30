@@ -20,17 +20,31 @@ package com.gitee.dorive.core.impl.handler;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
-import lombok.AllArgsConstructor;
+import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 public class BatchEntityHandler implements EntityHandler {
 
     private final AbstractContextRepository<?, ?> repository;
     private final List<EntityHandler> entityHandlers;
+
+    public BatchEntityHandler(AbstractContextRepository<?, ?> repository) {
+        this.repository = repository;
+        List<CommonRepository> subRepositories = repository.getSubRepositories();
+        this.entityHandlers = new ArrayList<>(subRepositories.size());
+        for (CommonRepository subRepository : subRepositories) {
+            EntityHandler entityHandler = new AdaptiveEntityHandler(subRepository);
+            if (subRepository.hasValueRouteBinders()) {
+                entityHandler = new ValueFilterEntityHandler(subRepository, entityHandler);
+            }
+            entityHandler = new ContextMatchEntityHandler(subRepository, entityHandler);
+            entityHandlers.add(entityHandler);
+        }
+    }
 
     @Override
     public long handle(Context context, List<Object> entities) {

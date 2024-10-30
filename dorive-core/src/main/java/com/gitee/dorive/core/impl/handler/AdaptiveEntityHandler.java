@@ -19,15 +19,10 @@ package com.gitee.dorive.core.impl.handler;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.core.api.executor.EntityJoiner;
 import com.gitee.dorive.core.entity.enums.JoinType;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.operation.cop.Query;
-import com.gitee.dorive.core.impl.factory.OperationFactory;
-import com.gitee.dorive.core.impl.joiner.MultiEntityJoiner;
-import com.gitee.dorive.core.impl.joiner.SingleEntityJoiner;
-import com.gitee.dorive.core.impl.joiner.UnionEntityJoiner;
+import com.gitee.dorive.core.impl.handler.joiner.MultiEntityHandler;
+import com.gitee.dorive.core.impl.handler.joiner.SingleEntityHandler;
+import com.gitee.dorive.core.impl.handler.joiner.UnionEntityHandler;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,37 +31,26 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class DefaultEntityHandler implements EntityHandler {
+public class AdaptiveEntityHandler implements EntityHandler {
 
     private CommonRepository repository;
 
     @Override
     public long handle(Context context, List<Object> entities) {
-        EntityJoiner entityJoiner = newEntityJoiner(entities.size());
-        if (entityJoiner != null) {
-            Example example = entityJoiner.newExample(context, entities);
-            if (!example.isEmpty()) {
-                OperationFactory operationFactory = repository.getOperationFactory();
-                Query query = operationFactory.buildQueryByExample(example);
-                query.includeRoot();
-                Result<Object> result = repository.executeQuery(context, query);
-                entityJoiner.join(context, entities, result);
-                return result.getCount();
-            }
-        }
-        return 0L;
+        EntityHandler entityHandler = newEntityHandler(entities);
+        return entityHandler != null ? entityHandler.handle(context, entities) : 0L;
     }
 
-    protected EntityJoiner newEntityJoiner(int entitiesSize) {
+    private EntityHandler newEntityHandler(List<Object> entities) {
         JoinType joinType = repository.getJoinType();
         if (joinType == JoinType.SINGLE) {
-            return new SingleEntityJoiner(repository, entitiesSize);
+            return new SingleEntityHandler(entities, repository);
 
         } else if (joinType == JoinType.MULTI) {
-            return new MultiEntityJoiner(repository, entitiesSize);
+            return new MultiEntityHandler(entities, repository);
 
         } else if (joinType == JoinType.UNION) {
-            return new UnionEntityJoiner(repository, entitiesSize);
+            return new UnionEntityHandler(entities, repository);
         }
         return null;
     }

@@ -44,9 +44,9 @@ import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.factory.ValueObjEntityFactory;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
-import com.gitee.dorive.core.impl.handler.BatchEntityOpHandler;
+import com.gitee.dorive.core.impl.handler.eo.BatchEntityOpHandler;
 import com.gitee.dorive.core.impl.handler.DelegatedEntityHandler;
-import com.gitee.dorive.core.impl.handler.DelegatedEntityOpHandler;
+import com.gitee.dorive.core.impl.handler.eo.DelegatedEntityOpHandler;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DerivedRepositoryResolver;
 import com.gitee.dorive.core.impl.resolver.EntityMapperResolver;
@@ -102,7 +102,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setEntityElement(rootRepository.getEntityElement());
         setOperationFactory(rootRepository.getOperationFactory());
 
-        EntityHandler entityHandler = processEntityHandler(new BatchEntityHandler(this));
+        EntityHandler entityHandler = new BatchEntityHandler(this);
+        entityHandler = processEntityHandler(entityHandler);
         EntityOpHandler entityOpHandler = new BatchEntityOpHandler(this);
         derivedRepositoryResolver = new DerivedRepositoryResolver(this);
         derivedRepositoryResolver.resolve();

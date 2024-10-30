@@ -23,7 +23,6 @@ import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.core.util.ObjectsJoiner;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,19 +31,19 @@ import java.util.List;
 
 @Getter
 @Setter
-public class SingleEntityHandler extends AbstractEntityHandler {
+public class SingleEntityHandler extends AbstractEntityJoiner {
 
     private StrongBinder binder;
 
-    public SingleEntityHandler(CommonRepository repository) {
-        super(repository);
+    public SingleEntityHandler(List<Object> entities, CommonRepository repository) {
+        super(entities, repository);
         this.binder = repository.getRootStrongBinders().get(0);
     }
 
     @Override
-    public Example newExample(Context context, List<Object> entities, ObjectsJoiner objectsJoiner) {
+    public Example newExample(Context context, List<Object> entities) {
         Example example = new InnerExample();
-        List<Object> boundValues = collectBoundValues(context, entities, objectsJoiner);
+        List<Object> boundValues = collectBoundValues(context, entities);
         if (!boundValues.isEmpty()) {
             String fieldName = binder.getFieldName();
             if (boundValues.size() == 1) {
@@ -57,30 +56,30 @@ public class SingleEntityHandler extends AbstractEntityHandler {
         return example;
     }
 
-    private List<Object> collectBoundValues(Context context, List<Object> entities, ObjectsJoiner objectsJoiner) {
+    private List<Object> collectBoundValues(Context context, List<Object> entities) {
         List<Object> boundValues = new ArrayList<>(entities.size());
         for (Object entity : entities) {
             Object boundValue = binder.getBoundValue(context, entity);
             boundValue = binder.input(context, boundValue);
             if (boundValue != null) {
                 String key = boundValue.toString();
-                if (!objectsJoiner.containsKey(key)) {
+                if (!containsKey(key)) {
                     boundValues.add(boundValue);
                 }
-                objectsJoiner.addLeft(entity, key);
+                addLeft(entity, key);
             }
         }
         return boundValues;
     }
 
     @Override
-    protected void handleResult(Context context, Result<Object> result, ObjectsJoiner objectsJoiner) {
+    protected void handleResult(Context context, Result<Object> result) {
         List<Object> records = result.getRecords();
         for (Object entity : records) {
             Object fieldValue = binder.getFieldValue(context, entity);
             if (fieldValue != null) {
                 String key = fieldValue.toString();
-                objectsJoiner.addRight(key, entity);
+                addRight(key, entity);
             }
         }
     }
