@@ -62,10 +62,7 @@ public abstract class ObjectsJoiner {
     }
 
     public String getLeftKey(Object entity) {
-        if (entity != null) {
-            return hashCodeKeyMap.get(System.identityHashCode(entity));
-        }
-        return null;
+        return entity != null ? hashCodeKeyMap.get(System.identityHashCode(entity)) : null;
     }
 
     public boolean containsKey(String key) {
@@ -73,25 +70,22 @@ public abstract class ObjectsJoiner {
     }
 
     public Object getRight(String key) {
-        if (key != null) {
-            return keyObjectMap.get(key);
-        }
-        return null;
+        return key != null ? keyObjectMap.get(key) : null;
+    }
+
+    public boolean isEmpty() {
+        return hashCodeKeyMap == null || hashCodeKeyMap.isEmpty() || keyObjectMap == null || keyObjectMap.isEmpty();
     }
 
     public void join() {
-        if (hashCodeKeyMap == null || hashCodeKeyMap.isEmpty()) {
-            return;
-        }
-        if (keyObjectMap == null || keyObjectMap.isEmpty()) {
-            return;
-        }
-        for (Object entity : entities) {
-            String key = getLeftKey(entity);
-            if (key != null) {
-                Object object = getRight(key);
-                if (entity != null || object != null) {
-                    doJoin(entity, object);
+        if (!isEmpty()) {
+            for (Object entity : entities) {
+                String key = getLeftKey(entity);
+                if (key != null) {
+                    Object object = getRight(key);
+                    if (entity != null || object != null) {
+                        doJoin(entity, object);
+                    }
                 }
             }
         }
