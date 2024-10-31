@@ -27,7 +27,6 @@ import com.gitee.dorive.core.impl.binder.WeakBinder;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.core.util.ObjectsJoiner;
 import lombok.Getter;
 import lombok.Setter;
 
