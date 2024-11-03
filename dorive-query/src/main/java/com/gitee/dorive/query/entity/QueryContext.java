@@ -18,55 +18,47 @@
 package com.gitee.dorive.query.entity;
 
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.context.AbstractProxyContext;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.impl.resolver.QueryExampleResolver;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-@Data
-public class QueryContext {
-
-    private Context context;
-    private Object query;
-    private ResultType resultType;
+@Getter
+@Setter
+public class QueryContext extends AbstractProxyContext {
     private Class<?> queryType;
+    private ResultType resultType;
+    private boolean abandoned;
+
     private QueryExampleResolver queryExampleResolver;
-    private List<MergedRepository> mergedRepositories;
     private Map<String, Example> exampleMap;
     private Example example;
+
+    private List<MergedRepository> mergedRepositories;
     private Map<String, QueryUnit> queryUnitMap;
     private QueryUnit queryUnit;
+
     private List<Object> args = new ArrayList<>(8);
+    private Result<Object> result;
 
-    public QueryContext(Context context, Object query, ResultType resultType) {
-        this.context = context;
-        this.query = query;
+    public QueryContext(Context context, Class<?> queryType, ResultType resultType) {
+        super(context);
+        this.queryType = queryType;
         this.resultType = resultType;
-        this.queryType = query.getClass();
-    }
-
-    public boolean isSimpleQuery() {
-        return exampleMap.size() == 1 && exampleMap.containsKey("/");
     }
 
     public boolean isNeedCount() {
         return resultType == ResultType.COUNT_AND_DATA || resultType == ResultType.COUNT;
     }
 
-    public Result<Object> newEmptyResult() {
-        if (resultType == ResultType.COUNT_AND_DATA) {
-            return new Result<>(example.getPage());
-
-        } else if (resultType == ResultType.DATA) {
-            return new Result<>(Collections.emptyList());
-
-        } else if (resultType == ResultType.COUNT) {
-            return new Result<>(0L);
-        }
-        throw new RuntimeException("Unsupported type!");
+    public boolean isAbandoned() {
+        return abandoned || (queryUnit != null && queryUnit.isAbandoned());
     }
-
 }

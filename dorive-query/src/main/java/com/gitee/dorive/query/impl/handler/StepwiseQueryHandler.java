@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.executor;
+package com.gitee.dorive.query.impl.handler;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.impl.binder.AbstractBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.MultiInBuilder;
+import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
@@ -35,30 +35,21 @@ import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class StepwiseQueryExecutor extends AbstractQueryExecutor {
+public class StepwiseQueryHandler extends QueryUnitQueryHandler {
 
-    public StepwiseQueryExecutor(AbstractQueryRepository<?, ?> repository) {
-        super(repository);
+    public StepwiseQueryHandler(AbstractQueryRepository<?, ?> repository, QueryHandler queryHandler) {
+        super(repository, queryHandler);
     }
 
     @Override
-    protected List<MergedRepository> getMergedRepositories(Class<?> queryType) {
-        QueryTypeResolver queryTypeResolver = repository.getQueryTypeResolver();
-        Map<Class<?>, List<MergedRepository>> classReversedMergedRepositoriesMap = queryTypeResolver.getClassReversedMergedRepositoriesMap();
-        return classReversedMergedRepositoriesMap.get(queryType);
+    protected Map<Class<?>, List<MergedRepository>> getClassMergedRepositoriesMap(QueryTypeResolver queryTypeResolver) {
+        return queryTypeResolver.getClassReversedMergedRepositoriesMap();
     }
 
     @Override
-    protected Result<Object> doExecuteQuery(QueryContext queryContext) {
-        executeReversedQuery(queryContext);
-        QueryUnit queryUnit = queryContext.getQueryUnit();
-        if (queryUnit.isAbandoned()) {
-            return queryContext.newEmptyResult();
-        }
-        return super.executeRootQuery(queryContext);
-    }
+    public void handle(QueryContext queryContext, Object query) {
+        super.handle(queryContext, query);
 
-    private void executeReversedQuery(QueryContext queryContext) {
         Context context = queryContext.getContext();
         Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
 

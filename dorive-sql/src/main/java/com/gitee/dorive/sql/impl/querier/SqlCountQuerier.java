@@ -15,12 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.impl.executor;
+package com.gitee.dorive.sql.impl.querier;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.enums.QueryMethod;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.CountQuerier;
@@ -29,6 +31,7 @@ import com.gitee.dorive.sql.entity.common.CountQuery;
 import com.gitee.dorive.sql.entity.common.SegmentUnit;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.impl.segment.SelectSegmentBuilder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,16 +42,21 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class CountSqlQueryExecutor extends SqlQueryExecutor implements CountQuerier {
+@AllArgsConstructor
+public class SqlCountQuerier implements CountQuerier {
 
-    public CountSqlQueryExecutor(AbstractQueryRepository<?, ?> repository, SqlRunner sqlRunner) {
-        super(repository, sqlRunner);
-    }
+    private final AbstractQueryRepository<?, ?> repository;
+    private final QueryHandler queryHandler;
+    private final SqlRunner sqlRunner;
 
     @Override
     public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
-        QueryContext queryContext = new QueryContext(context, countQuery.getQuery(), ResultType.COUNT);
-        resolve(queryContext);
+        Object query = countQuery.getQuery();
+        QueryContext queryContext = new QueryContext(context, query.getClass(), ResultType.COUNT);
+
+        queryContext.setOption(QueryMethod.class, QueryMethod.SQL_BUILD);
+        queryHandler.handle(queryContext, query);
+
         SegmentUnit segmentUnit = (SegmentUnit) queryContext.getQueryUnit();
         EntityElement entityElement = segmentUnit.getEntityElement();
         String tableAlias = segmentUnit.getTableAlias();

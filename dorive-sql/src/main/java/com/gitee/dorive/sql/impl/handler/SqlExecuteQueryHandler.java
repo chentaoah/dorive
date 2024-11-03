@@ -15,23 +15,21 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.impl.executor;
+package com.gitee.dorive.sql.impl.handler;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.*;
-import com.gitee.dorive.query.entity.MergedRepository;
+import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.entity.enums.ResultType;
-import com.gitee.dorive.query.impl.executor.AbstractQueryExecutor;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.segment.ArgSegment;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableSegment;
 import com.gitee.dorive.sql.impl.segment.SelectSegmentBuilder;
-import com.gitee.dorive.sql.impl.segment.SegmentUnitResolver;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,31 +39,29 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class SqlQueryExecutor extends AbstractQueryExecutor {
+public class SqlExecuteQueryHandler extends SqlBuildQueryHandler {
 
-    protected SqlRunner sqlRunner;
+    private final SqlRunner sqlRunner;
 
-    public SqlQueryExecutor(AbstractQueryRepository<?, ?> repository, SqlRunner sqlRunner) {
-        super(repository);
+    public SqlExecuteQueryHandler(AbstractQueryRepository<?, ?> repository, QueryHandler queryHandler, SqlRunner sqlRunner) {
+        super(repository, queryHandler);
         this.sqlRunner = sqlRunner;
     }
 
     @Override
-    protected QueryUnit newQueryUnit(QueryContext queryContext, MergedRepository mergedRepository, Example example) {
-        SegmentUnitResolver segmentUnitResolver = new SegmentUnitResolver(repository, queryContext, mergedRepository, example);
-        return segmentUnitResolver.resolve();
+    public void handle(QueryContext queryContext, Object query) {
+        super.handle(queryContext, query);
+        doHandle(queryContext);
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public Result<Object> doExecuteQuery(QueryContext queryContext) {
+    protected void doHandle(QueryContext queryContext) {
         Context context = queryContext.getContext();
         ResultType resultType = queryContext.getResultType();
         Example example = queryContext.getExample();
         QueryUnit queryUnit = queryContext.getQueryUnit();
 
         boolean needCount = queryContext.isNeedCount();
-        Result<Object> emptyResult = queryContext.newEmptyResult();
 
         OrderBy orderBy = example.getOrderBy();
         Page<Object> page = example.getPage();
@@ -81,7 +77,7 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
         List<Object> args = selectSegment.getArgs();
 
         if (!tableSegment.isJoin() || argSegments.isEmpty()) {
-            return super.executeRootQuery(queryContext);
+            return;
         }
 
         String tableAlias = tableSegment.getTableAlias();
@@ -97,10 +93,12 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
             String countSql = selectSql + fromWhereSql;
             long count = sqlRunner.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") c", args.toArray());
             if (count == 0L) {
-                return emptyResult;
+                queryUnit.setAbandoned(true);
+                return;
             }
             if (resultType == ResultType.COUNT) {
-                return new Result<>(count);
+                queryContext.setResult(new Result<>(count));
+                return;
             }
             if (page != null) {
                 page.setTotal(count);
@@ -132,12 +130,11 @@ public class SqlQueryExecutor extends AbstractQueryExecutor {
             List<Object> entities = (List<Object>) repository.selectByExample(context, newExample);
             if (page != null) {
                 page.setRecords(entities);
-                return new Result<>(page);
+                queryContext.setResult(new Result<>(page));
             } else {
-                return new Result<>(entities);
+                queryContext.setResult(new Result<>(entities));
             }
         }
-        return emptyResult;
     }
 
 }

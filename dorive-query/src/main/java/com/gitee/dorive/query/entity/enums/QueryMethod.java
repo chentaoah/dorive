@@ -15,13 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.api;
+package com.gitee.dorive.query.entity.enums;
 
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.query.entity.QueryContext;
-
-public interface QueryExecutor {
-
-    Result<Object> executeQuery(QueryContext queryContext);
-
+public enum QueryMethod {
+    STEPWISE,
+    SQL_BUILD,
+    SQL_EXECUTE,
 }

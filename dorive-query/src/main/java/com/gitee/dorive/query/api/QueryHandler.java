@@ -15,9 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.enums;
+package com.gitee.dorive.query.api;
 
-public enum QueryMethod {
-    DEFAULT,
-    SQL
+import com.gitee.dorive.query.entity.QueryContext;
+
+public interface QueryHandler {
+
+    void handle(QueryContext queryContext, Object query);
+
 }
