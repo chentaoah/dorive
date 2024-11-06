@@ -17,14 +17,14 @@
 
 package com.gitee.dorive.event.impl.executor;
 
-import com.gitee.dorive.api.constant.event.Publisher;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.operation.EntityOp;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.impl.executor.AbstractProxyExecutor;
-import com.gitee.dorive.event.entity.EntityEvent;
+import com.gitee.dorive.event.entity.BaseEvent;
+import com.gitee.dorive.event.impl.factory.EventFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationContext;
@@ -49,16 +49,8 @@ public class EventExecutor extends AbstractProxyExecutor {
             if (operation instanceof EntityOp) {
                 Class<?> entityClass = getEntityElement().getGenericType();
                 EntityOp entityOp = (EntityOp) operation;
-
-                EntityEvent entityEvent = new EntityEvent(this);
-                entityEvent.setPublisher(Publisher.EXECUTOR);
-                entityEvent.setEntityClass(entityClass);
-                entityEvent.setName(EntityEvent.getEventName(entityOp));
-                entityEvent.setContext(context);
-                entityEvent.setRoot(entityOp.isUncontrolled());
-                entityEvent.setEntities(entityOp.getEntities());
-
-                getApplicationContext().publishEvent(entityEvent);
+                BaseEvent baseEvent = EventFactory.newExecutorEvent(this, entityOp.isUncontrolled(), entityClass, context, entityOp);
+                getApplicationContext().publishEvent(baseEvent);
             }
         }
         return totalCount;
