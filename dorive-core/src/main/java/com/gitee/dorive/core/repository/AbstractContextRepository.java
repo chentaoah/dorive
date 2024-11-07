@@ -24,6 +24,7 @@ import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.def.EntityDef;
 import com.gitee.dorive.api.entity.core.def.OrderDef;
 import com.gitee.dorive.api.entity.core.EntityElement;
+import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.api.impl.core.EntityDefinitionResolver;
 import com.gitee.dorive.api.impl.core.EntityElementResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
@@ -65,6 +66,7 @@ import java.util.*;
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, InitializingBean {
 
     private ApplicationContext applicationContext;
+    private RepositoryDef repositoryDef;
     private Map<String, CommonRepository> repositoryMap = new LinkedHashMap<>();
     private CommonRepository rootRepository;
     private List<CommonRepository> subRepositories = new ArrayList<>();
@@ -78,7 +80,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Class<?> entityClass = ReflectUtils.getFirstArgumentType(this.getClass());
+        Class<?> repositoryClass = this.getClass();
+        repositoryDef = RepositoryDef.fromElement(repositoryClass);
+        Assert.notNull(repositoryDef, "No @Repository found! type: {}", repositoryClass);
+
+        Class<?> entityClass = ReflectUtils.getFirstArgumentType(repositoryClass);
 
         EntityDefinitionResolver entityDefinitionResolver = new EntityDefinitionResolver();
         EntityDefinition entityDefinition = entityDefinitionResolver.resolve(entityClass);

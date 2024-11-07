@@ -17,13 +17,13 @@
 
 package com.gitee.dorive.core.impl.resolver;
 
+import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.EntityOpHandler;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
-import org.springframework.util.ReflectionUtils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -39,19 +39,20 @@ public class DerivedRepositoryResolver {
     }
 
     public void resolve() {
-        classRepositoryMap = new LinkedHashMap<>(4 * 4 / 3 + 1);
-        ReflectionUtils.doWithLocalFields(repository.getClass(), declaredField -> {
-            Class<?> fieldClass = declaredField.getType();
-            if (AbstractContextRepository.class.isAssignableFrom(fieldClass)) {
+        RepositoryDef repositoryDef = repository.getRepositoryDef();
+        Class<?>[] derived = repositoryDef.getDerived();
+        classRepositoryMap = new LinkedHashMap<>(derived.length * 4 / 3 + 1);
+        for (Class<?> clazz : derived) {
+            if (AbstractContextRepository.class.isAssignableFrom(clazz)) {
                 ApplicationContext applicationContext = repository.getApplicationContext();
-                Object beanInstance = applicationContext.getBean(fieldClass);
+                Object beanInstance = applicationContext.getBean(clazz);
                 AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) beanInstance;
                 Class<?> fieldEntityClass = abstractContextRepository.getEntityType();
                 if (repository.getEntityType().isAssignableFrom(fieldEntityClass)) {
                     classRepositoryMap.put(fieldEntityClass, abstractContextRepository);
                 }
             }
-        });
+        }
     }
 
     public boolean hasDerived() {

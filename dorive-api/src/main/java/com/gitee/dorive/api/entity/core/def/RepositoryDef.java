@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity.event.def;
+package com.gitee.dorive.api.entity.core.def;
 
-import com.gitee.dorive.api.annotation.event.Listener;
+import com.gitee.dorive.api.annotation.core.Repository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,25 +28,21 @@ import java.lang.reflect.AnnotatedElement;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ListenerDef {
-    private String[] publishers;
-    private Class<?> entityClass;
-    private String[] events;
-    private boolean onlyRoot;
-    private boolean afterCommit;
-    private Class<? extends Throwable>[] throwExceptions;
+public class RepositoryDef {
+    private String value;
+    private Class<?>[] derived;
+    private Class<?>[] events;
+    private Class<?>[] queries;
 
-    public static ListenerDef fromElement(AnnotatedElement element) {
-        Listener listener = AnnotatedElementUtils.getMergedAnnotation(element, Listener.class);
-        if (listener != null) {
-            ListenerDef listenerDef = new ListenerDef();
-            listenerDef.setPublishers(listener.publishers());
-            listenerDef.setEntityClass(listener.entityClass());
-            listenerDef.setEvents(listener.events());
-            listenerDef.setOnlyRoot(listener.onlyRoot());
-            listenerDef.setAfterCommit(listener.afterCommit());
-            listenerDef.setThrowExceptions(listener.throwExceptions());
-            return listenerDef;
+    public static RepositoryDef fromElement(AnnotatedElement element) {
+        Repository repository = AnnotatedElementUtils.getMergedAnnotation(element, Repository.class);
+        if (repository != null) {
+            RepositoryDef repositoryDef = new RepositoryDef();
+            repositoryDef.setValue(repository.value());
+            repositoryDef.setDerived(repository.derived());
+            repositoryDef.setEvents(repository.events());
+            repositoryDef.setQueries(repository.queries());
+            return repositoryDef;
         }
         return null;
     }

@@ -17,8 +17,7 @@
 
 package com.gitee.dorive.query.repository;
 
-import com.gitee.dorive.api.annotation.core.Repository;
-import com.gitee.dorive.api.entity.query.def.EnableQueryDef;
+import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -35,7 +34,6 @@ import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -46,7 +44,6 @@ import java.util.Map;
 @Setter
 public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryRepository<E, PK> {
 
-    private EnableQueryDef enableQueryDef;
     private MergedRepositoryResolver mergedRepositoryResolver;
     private QueryTypeResolver queryTypeResolver;
     private QueryHandler queryHandler;
@@ -54,13 +51,13 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        Repository repository = AnnotatedElementUtils.getMergedAnnotation(this.getClass(), Repository.class);
-        this.enableQueryDef = EnableQueryDef.fromElement(this.getClass());
-        if (repository != null) {
-            this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
-            this.mergedRepositoryResolver.resolve();
-        }
-        if (repository != null && enableQueryDef != null) {
+
+        RepositoryDef repositoryDef = getRepositoryDef();
+        Class<?>[] queries = repositoryDef.getQueries();
+
+        this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
+        this.mergedRepositoryResolver.resolve();
+        if (queries.length > 0) {
             this.queryTypeResolver = new QueryTypeResolver(this);
             this.queryTypeResolver.resolve();
         }
