@@ -82,7 +82,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     public void afterPropertiesSet() throws Exception {
         Class<?> repositoryClass = this.getClass();
         repositoryDef = RepositoryDef.fromElement(repositoryClass);
-        Assert.notNull(repositoryDef, "The @Repository does not exist!! type: {}", repositoryClass);
+        Assert.notNull(repositoryDef, "The @Repository does not exist! type: {}", repositoryClass);
         Class<?> entityClass = ReflectUtils.getFirstArgumentType(repositoryClass);
         processRepositoryDef(repositoryClass, entityClass);
 
