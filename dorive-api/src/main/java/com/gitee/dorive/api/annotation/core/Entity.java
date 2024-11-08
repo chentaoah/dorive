@@ -34,7 +34,7 @@ public @interface Entity {
     String name() default "";
 
     /**
-     * 数据来源
+     * 数据源
      */
     Class<?> dataSource() default Object.class;
 
