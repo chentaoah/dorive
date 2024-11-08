@@ -47,8 +47,8 @@ public class DerivedRepositoryResolver {
                 ApplicationContext applicationContext = repository.getApplicationContext();
                 Object beanInstance = applicationContext.getBean(clazz);
                 AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) beanInstance;
-                Class<?> fieldEntityClass = abstractContextRepository.getEntityType();
-                if (repository.getEntityType().isAssignableFrom(fieldEntityClass)) {
+                Class<?> fieldEntityClass = abstractContextRepository.getEntityClass();
+                if (repository.getEntityClass().isAssignableFrom(fieldEntityClass)) {
                     classRepositoryMap.put(fieldEntityClass, abstractContextRepository);
                 }
             }
@@ -62,7 +62,7 @@ public class DerivedRepositoryResolver {
     public Map<Class<?>, EntityHandler> getEntityHandlerMap(EntityHandler entityHandler) {
         int size = classRepositoryMap.size() + 1;
         Map<Class<?>, EntityHandler> entityHandlerMap = new LinkedHashMap<>(size * 4 / 3 + 1);
-        entityHandlerMap.put(repository.getEntityType(), entityHandler);
+        entityHandlerMap.put(repository.getEntityClass(), entityHandler);
         classRepositoryMap.forEach((clazz, repository) -> {
             Executor executor = repository.getExecutor();
             if (executor instanceof EntityHandler) {
@@ -75,7 +75,7 @@ public class DerivedRepositoryResolver {
     public Map<Class<?>, EntityOpHandler> getEntityOpHandlerMap(EntityOpHandler entityOpHandler) {
         int size = classRepositoryMap.size() + 1;
         Map<Class<?>, EntityOpHandler> entityOpHandlerMap = new LinkedHashMap<>(size * 4 / 3 + 1);
-        entityOpHandlerMap.put(repository.getEntityType(), entityOpHandler);
+        entityOpHandlerMap.put(repository.getEntityClass(), entityOpHandler);
         classRepositoryMap.forEach((clazz, repository) -> {
             Executor executor = repository.getExecutor();
             if (executor instanceof EntityOpHandler) {

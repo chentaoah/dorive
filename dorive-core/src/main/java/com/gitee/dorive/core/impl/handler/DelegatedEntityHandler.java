@@ -50,7 +50,7 @@ public class DelegatedEntityHandler implements EntityHandler {
             List<Object> subEntities = entry.getValue();
             EntityHandler entityHandler = entityHandlerMap.get(entityType);
             if (entityHandler == null) {
-                entityHandler = entityHandlerMap.get(repository.getEntityType());
+                entityHandler = entityHandlerMap.get(repository.getEntityClass());
             }
             if (entityHandler != null) {
                 totalCount += entityHandler.handle(context, subEntities);

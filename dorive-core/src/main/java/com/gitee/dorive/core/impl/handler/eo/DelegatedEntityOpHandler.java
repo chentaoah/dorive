@@ -57,7 +57,7 @@ public class DelegatedEntityOpHandler implements EntityOpHandler {
             List<Object> subEntities = entry.getValue();
             EntityOpHandler entityOpHandler = entityOpHandlerMap.get(entityType);
             if (entityOpHandler == null) {
-                entityOpHandler = entityOpHandlerMap.get(repository.getEntityType());
+                entityOpHandler = entityOpHandlerMap.get(repository.getEntityClass());
             }
             if (entityOpHandler != null) {
                 totalCount += entityOpHandler.handle(context, buildOperation(entityOp, subEntities));
