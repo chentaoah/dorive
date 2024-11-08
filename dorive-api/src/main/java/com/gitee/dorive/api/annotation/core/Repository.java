@@ -40,4 +40,5 @@ public @interface Repository {
     Class<?>[] events() default {};
 
     Class<?>[] queries() default {};
+
 }
