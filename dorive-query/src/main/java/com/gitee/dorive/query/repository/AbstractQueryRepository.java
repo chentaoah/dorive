@@ -57,7 +57,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
         this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
         this.mergedRepositoryResolver.resolve();
-        if (queries.length > 0) {
+        if (queries != null && queries.length > 0) {
             this.queryTypeResolver = new QueryTypeResolver(this);
             this.queryTypeResolver.resolve();
         }
