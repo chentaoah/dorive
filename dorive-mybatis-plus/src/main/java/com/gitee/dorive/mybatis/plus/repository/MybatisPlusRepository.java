@@ -69,12 +69,12 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
     @Override
     protected EntityStoreInfo resolveEntityStoreInfo(EntityElement entityElement) {
         EntityDef entityDef = entityElement.getEntityDef();
-        Class<?> mapperClass = entityDef.getSource();
+        Class<?> mapperClass = entityDef.getDataSource();
         Object mapper = null;
         Class<?> pojoClass = null;
         if (mapperClass != Object.class) {
             mapper = getApplicationContext().getBean(mapperClass);
-            Assert.notNull(mapper, "The mapper cannot be null! source: {}", mapperClass);
+            Assert.notNull(mapper, "The mapper cannot be null! data source: {}", mapperClass);
             Type[] genericInterfaces = mapperClass.getGenericInterfaces();
             if (genericInterfaces.length > 0) {
                 Type genericInterface = mapperClass.getGenericInterfaces()[0];
@@ -86,9 +86,9 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
             }
         }
 
-        Assert.notNull(pojoClass, "The class of pojo cannot be null! source: {}", mapperClass);
+        Assert.notNull(pojoClass, "The class of pojo cannot be null! data source: {}", mapperClass);
         TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
-        Assert.notNull(tableInfo, "The table info cannot be null! source: {}", mapperClass);
+        Assert.notNull(tableInfo, "The table info cannot be null! data source: {}", mapperClass);
         assert tableInfo != null;
         return newEntityStoreInfo(mapperClass, mapper, pojoClass, tableInfo);
     }

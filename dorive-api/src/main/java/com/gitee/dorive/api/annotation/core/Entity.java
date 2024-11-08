@@ -36,7 +36,7 @@ public @interface Entity {
     /**
      * 数据来源
      */
-    Class<?> source() default Object.class;
+    Class<?> dataSource() default Object.class;
 
     /**
      * 实体工厂

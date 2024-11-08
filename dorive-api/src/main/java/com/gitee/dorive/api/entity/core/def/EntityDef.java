@@ -32,7 +32,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class EntityDef {
     private String name;
-    private Class<?> source;
+    private Class<?> dataSource;
     private Class<?> factory;
     private Class<?> repository;
     private int priority;

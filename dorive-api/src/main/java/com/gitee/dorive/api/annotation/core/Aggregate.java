@@ -46,7 +46,7 @@ public @interface Aggregate {
      * @see Entity
      */
     @AliasFor(annotation = Entity.class)
-    Class<?> source() default Object.class;
+    Class<?> dataSource() default Object.class;
 
     /**
      * @see Entity
