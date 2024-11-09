@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.entity.enums;
 
-public enum SelectType {
+public enum MatcherType {
     NONE,
     ROOT,
     ALL,

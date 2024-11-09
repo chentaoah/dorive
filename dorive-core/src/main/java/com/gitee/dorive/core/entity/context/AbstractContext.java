@@ -24,8 +24,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Setter
@@ -33,7 +33,7 @@ import java.util.Map;
 @AllArgsConstructor
 public abstract class AbstractContext extends AbstractOptions implements Context {
 
-    protected Map<String, Object> attachments = new LinkedHashMap<>(8);
+    private Map<String, Object> attachments = new ConcurrentHashMap<>(8);
 
     public AbstractContext(Options options) {
         super(options);

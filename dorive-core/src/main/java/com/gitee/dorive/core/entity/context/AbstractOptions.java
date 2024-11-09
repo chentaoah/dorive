@@ -23,8 +23,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Setter
@@ -32,7 +32,7 @@ import java.util.Map;
 @AllArgsConstructor
 public abstract class AbstractOptions implements Options {
 
-    protected Map<Class<?>, Object> options = new LinkedHashMap<>(4);
+    private Map<Class<?>, Object> options = new ConcurrentHashMap<>(4);
 
     public AbstractOptions(Options options) {
         this.options.putAll(options.getOptions());

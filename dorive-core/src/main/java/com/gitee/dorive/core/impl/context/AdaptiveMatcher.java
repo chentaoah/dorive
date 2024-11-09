@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.context;
 import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.context.Selector;
-import com.gitee.dorive.core.entity.enums.SelectType;
+import com.gitee.dorive.core.entity.enums.MatcherType;
 import com.gitee.dorive.core.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,24 +34,24 @@ import java.util.Set;
  */
 @Getter
 @Setter
-public class SelectTypeMatcher implements Matcher {
+public class AdaptiveMatcher implements Matcher {
 
     private CommonRepository repository;
-    private Map<SelectType, Matcher> matcherMap = new LinkedHashMap<>(8);
+    private Map<MatcherType, Matcher> matcherTypeMatcherMap = new LinkedHashMap<>(6);
 
-    public SelectTypeMatcher(CommonRepository repository) {
+    public AdaptiveMatcher(CommonRepository repository) {
         this.repository = repository;
-        this.matcherMap.put(SelectType.NONE, options -> false);
-        this.matcherMap.put(SelectType.ROOT, options -> repository.isRoot());
-        this.matcherMap.put(SelectType.ALL, options -> true);
-        this.matcherMap.put(SelectType.SELECTOR, new SelectorMatcher());
+        this.matcherTypeMatcherMap.put(MatcherType.NONE, options -> false);
+        this.matcherTypeMatcherMap.put(MatcherType.ROOT, options -> repository.isRoot());
+        this.matcherTypeMatcherMap.put(MatcherType.ALL, options -> true);
+        this.matcherTypeMatcherMap.put(MatcherType.SELECTOR, new SelectorMatcher());
     }
 
     @Override
     public boolean matches(Options options) {
-        SelectType selectType = options.getOption(SelectType.class);
-        if (selectType != null) {
-            Matcher matcher = matcherMap.get(selectType);
+        MatcherType matcherType = options.getOption(MatcherType.class);
+        if (matcherType != null) {
+            Matcher matcher = matcherTypeMatcherMap.get(matcherType);
             if (matcher != null) {
                 return matcher.matches(options);
             }
