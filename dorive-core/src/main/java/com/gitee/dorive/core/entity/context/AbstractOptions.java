@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.core.entity.context;
 
-import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Options;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,32 +30,28 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class AbstractContext extends AbstractOptions implements Context {
+public abstract class AbstractOptions implements Options {
 
-    protected Map<String, Object> attachments = new LinkedHashMap<>(8);
+    protected Map<Class<?>, Object> options = new LinkedHashMap<>(4);
 
-    public AbstractContext(Options options) {
-        super(options);
-    }
-
-    public AbstractContext(Context context) {
-        super(context);
-        this.attachments.putAll(context.getAttachments());
+    public AbstractOptions(Options options) {
+        this.options.putAll(options.getOptions());
     }
 
     @Override
-    public void setAttachment(String name, Object value) {
-        attachments.put(name, value);
+    public <T> void setOption(Class<T> type, T value) {
+        options.put(type, value);
     }
 
     @Override
-    public Object getAttachment(String name) {
-        return attachments.get(name);
+    @SuppressWarnings("unchecked")
+    public <T> T getOption(Class<T> type) {
+        return (T) options.get(type);
     }
 
     @Override
-    public void removeAttachment(String name) {
-        attachments.remove(name);
+    public void removeOption(Class<?> type) {
+        options.remove(type);
     }
 
 }

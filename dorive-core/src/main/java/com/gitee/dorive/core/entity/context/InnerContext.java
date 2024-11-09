@@ -28,8 +28,8 @@ public class InnerContext extends AbstractContext {
         super(options);
     }
 
-    public InnerContext(Context anotherContext) {
-        super(anotherContext);
+    public InnerContext(Context context) {
+        super(context);
     }
 
 }

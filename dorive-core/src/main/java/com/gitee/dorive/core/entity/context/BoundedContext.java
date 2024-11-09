@@ -28,8 +28,8 @@ public class BoundedContext extends AbstractContext {
         super(options);
     }
 
-    public BoundedContext(Context anotherContext) {
-        super(anotherContext);
+    public BoundedContext(Context context) {
+        super(context);
     }
 
 }
