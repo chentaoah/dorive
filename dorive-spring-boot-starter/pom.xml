@@ -20,10 +20,5 @@
             <artifactId>dorive-web</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-mybatis-plus</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 </project>
