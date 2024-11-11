@@ -32,19 +32,18 @@ import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.web.entity.QueryConfig;
 import com.gitee.dorive.web.entity.QueryContext;
 import com.gitee.dorive.web.entity.ResObject;
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-@AllArgsConstructor
 public class DomainService {
 
-    private final Map<String, QueryConfig> idQueryConfigMap;
+    private final Map<String, QueryConfig> idQueryConfigMap = new ConcurrentHashMap<>();
 
     public void executeQuery(QueryContext queryContext) throws IOException {
         HttpServletResponse response = queryContext.getResponse();

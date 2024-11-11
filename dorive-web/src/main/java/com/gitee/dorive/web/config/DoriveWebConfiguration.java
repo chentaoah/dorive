@@ -18,6 +18,8 @@
 package com.gitee.dorive.web.config;
 
 import com.gitee.dorive.web.advice.ParameterControllerAdvice;
+import com.gitee.dorive.web.impl.DomainController;
+import com.gitee.dorive.web.impl.DomainService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -29,6 +31,16 @@ public class DoriveWebConfiguration {
     @Bean("parameterControllerAdvice")
     public static ParameterControllerAdvice parameterControllerAdvice() {
         return new ParameterControllerAdvice();
+    }
+
+    @Bean("domainService")
+    public static DomainService domainService() {
+        return new DomainService();
+    }
+
+    @Bean("domainController")
+    public static DomainController domainController(DomainService domainService) {
+        return new DomainController(domainService);
     }
 
 }
