@@ -54,12 +54,12 @@ public class DomainService {
 
         QueryConfig queryConfig = idQueryConfigMap.get(configId);
         if (queryConfig == null) {
-            returnMessage(response, "没有找到配置信息！");
+            failMsg(response, "没有找到配置信息！");
             return;
         }
         Class<?> entityClass = queryConfig.getEntityClass();
         if (!entityName.equals(entityClass.getSimpleName())) {
-            returnMessage(response, "实体配置不匹配！");
+            failMsg(response, "实体配置不匹配！");
             return;
         }
 
@@ -81,7 +81,7 @@ public class DomainService {
         objectMapper.writeValue(response.getOutputStream(), data);
     }
 
-    private void returnMessage(HttpServletResponse response, String message) throws IOException {
+    private void failMsg(HttpServletResponse response, String message) throws IOException {
         ResObject<?> resObject = ResObject.failMsg(message);
         response.getWriter().write(JSONUtil.toJsonStr(resObject));
     }
