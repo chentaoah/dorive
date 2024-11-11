@@ -15,13 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.web.api;
+package com.gitee.dorive.web.entity;
 
-import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
+import com.gitee.dorive.core.api.context.Selector;
+import com.gitee.dorive.query.repository.AbstractQueryRepository;
+import lombok.Data;
 
-public interface RequestIdentifier {
-    
-    void resolve(Method method, HttpServletRequest request);
+import java.util.List;
+import java.util.Map;
 
+@Data
+public class QueryConfig {
+    private Class<?> entityClass;
+    private AbstractQueryRepository<?, ?> repository;
+    private Selector selector;
+    private Class<?> queryClass;
+    private Map<String, List<String>> filterIdPropertiesMap;
 }

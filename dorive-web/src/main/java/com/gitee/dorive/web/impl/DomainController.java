@@ -1,17 +1,24 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.gitee.dorive.web.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.json.JSONUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.gitee.dorive.core.api.context.Selector;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
-import com.gitee.dorive.web.entity.EntityQueryConfig;
-import com.gitee.dorive.web.entity.ResObject;
+import com.gitee.dorive.web.entity.QueryContext;
 import lombok.AllArgsConstructor;
-import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,62 +26,40 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
 @RestController("/domain")
 public class DomainController {
 
-    private final ApplicationContext applicationContext;
-    private Map<String, EntityQueryConfig> idConfigMap;
+    private final DomainService domainService;
 
-    @GetMapping("/list/{configId}")
-    public void list(HttpServletResponse response,
-                     @PathVariable String configId,
+    @GetMapping("/list/{entityName}/{configId}")
+    public void list(HttpServletRequest request, HttpServletResponse response,
+                     @PathVariable String entityName, @PathVariable String configId,
                      @RequestParam Map<String, Object> params) throws Exception {
-        EntityQueryConfig entityQueryConfig = idConfigMap.get(configId);
-        if (entityQueryConfig == null) {
-            ResObject<?> resObject = ResObject.failMsg("没有找到配置信息！");
-            response.getWriter().write(JSONUtil.toJsonStr(resObject));
-            return;
-        }
-
-        Class<?> repositoryClass = entityQueryConfig.getRepositoryClass();
-        AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) applicationContext.getBean(repositoryClass);
-
-        Class<?> queryClass = entityQueryConfig.getQueryClass();
-        Object query = BeanUtil.toBean(params, queryClass);
-
-        Class<?> entityClass = entityQueryConfig.getEntityClass();
-        String selectorName = entityQueryConfig.getSelectorName();
-        Selector selector = findSelectorByName(entityClass, selectorName);
-        List<?> entities = repository.selectByQuery(selector, query);
-        ResObject<List<?>> resObject = ResObject.successData(entities);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        addFilters(objectMapper, selector);
-        objectMapper.writeValue(response.getOutputStream(), resObject);
+        QueryContext queryContext = new QueryContext();
+        queryContext.setRequest(request);
+        queryContext.setResponse(response);
+        queryContext.setMethodName("list");
+        queryContext.setEntityName(entityName);
+        queryContext.setConfigId(configId);
+        queryContext.setParams(params);
+        domainService.executeQuery(queryContext);
     }
 
-    @GetMapping("/page/{configId}")
-    public void page(HttpServletResponse response,
-                     @PathVariable String configId,
-                     @RequestParam Map<String, Object> params) {
-
-    }
-
-    private Selector findSelectorByName(Class<?> entityClass, String selectorName) {
-        return null;
-    }
-
-    private void addFilters(ObjectMapper objectMapper, Selector selector) {
-        objectMapper.setSerializerFactory(new MyBeanSerializerFactory());
-
-        SimpleFilterProvider simpleFilterProvider = new SimpleFilterProvider();
-        simpleFilterProvider.addFilter("tenantFilter", SimpleBeanPropertyFilter.filterOutAllExcept("tenantCode", "departments"));
-        simpleFilterProvider.addFilter("deptFilter", SimpleBeanPropertyFilter.filterOutAllExcept("deptCode"));
-        objectMapper.setFilterProvider(simpleFilterProvider);
+    @GetMapping("/page/{entityName}/{configId}")
+    public void page(HttpServletRequest request, HttpServletResponse response,
+                     @PathVariable String entityName, @PathVariable String configId,
+                     @RequestParam Map<String, Object> params) throws Exception {
+        QueryContext queryContext = new QueryContext();
+        queryContext.setRequest(request);
+        queryContext.setResponse(response);
+        queryContext.setMethodName("page");
+        queryContext.setEntityName(entityName);
+        queryContext.setConfigId(configId);
+        queryContext.setParams(params);
+        domainService.executeQuery(queryContext);
     }
 
 }

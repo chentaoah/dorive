@@ -15,18 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.web.impl;
+package com.gitee.dorive.web.entity;
 
-import com.gitee.dorive.web.api.RequestIdentifier;
+import lombok.Data;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
-public class DefaultRequestIdentifier implements RequestIdentifier {
-
-    @Override
-    public void resolve(Method method, HttpServletRequest request) {
-
-    }
-
+@Data
+public class QueryContext {
+    private HttpServletRequest request;
+    private HttpServletResponse response;
+    private String methodName;
+    private String entityName;
+    private String configId;
+    private Map<String, Object> params;
 }
