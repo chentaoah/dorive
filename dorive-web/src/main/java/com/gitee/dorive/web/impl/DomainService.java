@@ -45,6 +45,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -89,7 +90,16 @@ public class DomainService {
             String filterId = genericType.getName() + ".Filter";
             List<String> properties = filterIdPropertiesMap.computeIfAbsent(filterId, key -> new ArrayList<>(4));
             List<String> select = selector.select(entityName);
-            properties.addAll(select);
+            if (select == null || select.isEmpty()) {
+                Field[] fields = genericType.getFields();
+                for (Field field : fields) {
+                    if (!Modifier.isStatic(field.getModifiers())) {
+                        properties.add(field.getName());
+                    }
+                }
+            } else {
+                properties.addAll(select);
+            }
 
             // 补充内部实体的字段
             Field field = entityElement.getJavaField();
