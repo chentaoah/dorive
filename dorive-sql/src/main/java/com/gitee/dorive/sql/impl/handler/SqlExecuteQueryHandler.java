@@ -18,8 +18,10 @@
 package com.gitee.dorive.sql.impl.handler;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.*;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
@@ -54,9 +56,7 @@ public class SqlExecuteQueryHandler extends SqlBuildQueryHandler {
         doHandle(queryContext);
     }
 
-    @SuppressWarnings("unchecked")
     protected void doHandle(QueryContext queryContext) {
-        Context context = queryContext.getContext();
         ResultType resultType = queryContext.getResultType();
         Example example = queryContext.getExample();
         QueryUnit queryUnit = queryContext.getQueryUnit();
@@ -122,18 +122,14 @@ public class SqlExecuteQueryHandler extends SqlBuildQueryHandler {
             selectSegment.setLimit(page.toString());
         }
 
+        // 查询主键
         String sql = selectSql + fromWhereSql + selectSegment.lastSql();
         List<Map<String, Object>> resultMaps = sqlRunner.selectList(sql, args.toArray());
-        List<Object> primaryKeys = CollUtil.map(resultMaps, map -> map.get(primaryKeyAlias), true);
-        if (!primaryKeys.isEmpty()) {
-            Example newExample = new InnerExample().in(primaryKey, primaryKeys);
-            List<Object> entities = (List<Object>) repository.selectByExample(context, newExample);
-            if (page != null) {
-                page.setRecords(entities);
-                queryContext.setResult(new Result<>(page));
-            } else {
-                queryContext.setResult(new Result<>(entities));
-            }
+        List<Object> ids = CollUtil.map(resultMaps, map -> map.get(primaryKeyAlias), true);
+        if (!ids.isEmpty()) {
+            example.in(primaryKey, ids);
+        } else {
+            queryContext.setAbandoned(true);
         }
     }
 
