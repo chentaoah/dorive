@@ -23,7 +23,7 @@ import lombok.Data;
 public class LoadConfigReq {
     private String name;
     private String entityType;
-    private String repositoryType;
     private String selectorName;
+    private String repositoryType;
     private String queryType;
 }

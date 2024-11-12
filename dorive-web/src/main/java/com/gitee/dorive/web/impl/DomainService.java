@@ -63,8 +63,8 @@ public class DomainService {
     public ResObject<Object> loadConfig(LoadConfigReq loadConfigReq) {
         String name = loadConfigReq.getName();
         String entityType = loadConfigReq.getEntityType();
-        String repositoryType = loadConfigReq.getRepositoryType();
         String selectorName = loadConfigReq.getSelectorName();
+        String repositoryType = loadConfigReq.getRepositoryType();
         String queryType = loadConfigReq.getQueryType();
 
         Class<?> entityClass = ClassLoaderUtil.loadClass(entityType);
@@ -104,8 +104,8 @@ public class DomainService {
         Configuration configuration = new Configuration();
         configuration.setName(name);
         configuration.setEntityClass(entityClass);
-        configuration.setRepository(repository);
         configuration.setSelector(selector);
+        configuration.setRepository(repository);
         configuration.setQueryClass(queryClass);
         configuration.setFilterIdPropertiesMap(filterIdPropertiesMap);
         nameConfigurationMap.put(name, configuration);

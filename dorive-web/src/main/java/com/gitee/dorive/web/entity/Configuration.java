@@ -28,8 +28,8 @@ import java.util.Map;
 public class Configuration {
     private String name;
     private Class<?> entityClass;
-    private AbstractQueryRepository<?, ?> repository;
     private Selector selector;
+    private AbstractQueryRepository<?, ?> repository;
     private Class<?> queryClass;
     private Map<String, List<String>> filterIdPropertiesMap;
 }
