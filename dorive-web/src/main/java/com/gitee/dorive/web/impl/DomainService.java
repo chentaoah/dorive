@@ -28,8 +28,12 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerFactory;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.gitee.dorive.api.annotation.core.Entity;
+import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.query.entity.MergedRepository;
+import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.web.entity.Configuration;
 import com.gitee.dorive.web.entity.ResObject;
@@ -41,9 +45,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -70,12 +72,34 @@ public class DomainService {
         Class<?> queryClass = ClassLoaderUtil.loadClass(queryType);
 
         AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) applicationContext.getBean(repositoryClass);
+        MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
+        Map<String, MergedRepository> nameMergedRepositoryMap = mergedRepositoryResolver.getNameMergedRepositoryMap();
 
-        Field field = ReflectUtil.getField(entityClass, selectorName);
-        Object value = ReflectUtil.getStaticFieldValue(field);
+        Field staticField = ReflectUtil.getField(entityClass, selectorName);
+        Object value = ReflectUtil.getStaticFieldValue(staticField);
         Selector selector = (Selector) value;
 
-        Map<String, List<String>> filterIdPropertiesMap = new LinkedHashMap<>();
+        Map<String, List<String>> filterIdPropertiesMap = new LinkedHashMap<>(8);
+        Set<String> names = selector.getNames();
+        for (String entityName : names) {
+            MergedRepository mergedRepository = nameMergedRepositoryMap.get(entityName);
+            CommonRepository definedRepository = mergedRepository.getDefinedRepository();
+            EntityElement entityElement = definedRepository.getEntityElement();
+            Class<?> genericType = entityElement.getGenericType();
+            String filterId = genericType.getName() + ".Filter";
+            List<String> properties = filterIdPropertiesMap.computeIfAbsent(filterId, key -> new ArrayList<>(4));
+            List<String> select = selector.select(entityName);
+            properties.addAll(select);
+
+            // 补充内部实体的字段
+            Field field = entityElement.getJavaField();
+            if (field != null) {
+                Class<?> declaringClass = field.getDeclaringClass();
+                String declaringFilterId = declaringClass.getName() + ".Filter";
+                List<String> declaringProperties = filterIdPropertiesMap.computeIfAbsent(declaringFilterId, key -> new ArrayList<>(4));
+                declaringProperties.add(field.getName());
+            }
+        }
 
         Configuration configuration = new Configuration();
         configuration.setName(name);
