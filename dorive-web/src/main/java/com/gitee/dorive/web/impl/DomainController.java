@@ -17,12 +17,11 @@
 
 package com.gitee.dorive.web.impl;
 
-import com.gitee.dorive.web.entity.EntityRequest;
+import com.gitee.dorive.web.entity.req.ListOrPageReq;
+import com.gitee.dorive.web.entity.req.LoadConfigReq;
+import com.gitee.dorive.web.entity.ResObject;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,10 +29,15 @@ import java.io.IOException;
 import java.util.Map;
 
 @AllArgsConstructor
-@Controller("/domain")
+@RestController("/domain")
 public class DomainController {
 
     private final DomainService domainService;
+
+    @PostMapping("/loadConfig")
+    public ResObject<Object> loadConfig(@RequestBody LoadConfigReq loadConfigReq) {
+        return domainService.loadConfig(loadConfigReq);
+    }
 
     @GetMapping("/list/{entity}/{config}")
     public void list(HttpServletRequest request, HttpServletResponse response,
@@ -52,14 +56,14 @@ public class DomainController {
     private void executeQuery(HttpServletRequest request, HttpServletResponse response,
                               String methodName, String entity, String config,
                               Map<String, Object> params) throws IOException {
-        EntityRequest entityRequest = new EntityRequest();
-        entityRequest.setRequest(request);
-        entityRequest.setResponse(response);
-        entityRequest.setMethodName(methodName);
-        entityRequest.setEntity(entity);
-        entityRequest.setConfig(config);
-        entityRequest.setParams(params);
-        domainService.executeQuery(entityRequest);
+        ListOrPageReq listOrPageReq = new ListOrPageReq();
+        listOrPageReq.setRequest(request);
+        listOrPageReq.setResponse(response);
+        listOrPageReq.setMethodName(methodName);
+        listOrPageReq.setEntity(entity);
+        listOrPageReq.setConfig(config);
+        listOrPageReq.setParams(params);
+        domainService.executeQuery(listOrPageReq);
     }
 
 }

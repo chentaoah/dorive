@@ -30,8 +30,9 @@ import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.web.entity.Configuration;
-import com.gitee.dorive.web.entity.EntityRequest;
 import com.gitee.dorive.web.entity.ResObject;
+import com.gitee.dorive.web.entity.req.ListOrPageReq;
+import com.gitee.dorive.web.entity.req.LoadConfigReq;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
@@ -46,12 +47,16 @@ public class DomainService {
     // name => configuration
     private final Map<String, Configuration> nameConfigurationMap = new ConcurrentHashMap<>();
 
-    public void executeQuery(EntityRequest entityRequest) throws IOException {
-        HttpServletResponse response = entityRequest.getResponse();
-        String methodName = entityRequest.getMethodName();
-        String entity = entityRequest.getEntity();
-        String config = entityRequest.getConfig();
-        Map<String, Object> params = entityRequest.getParams();
+    public ResObject<Object> loadConfig(LoadConfigReq loadConfigReq) {
+        return null;
+    }
+
+    public void executeQuery(ListOrPageReq listOrPageReq) throws IOException {
+        HttpServletResponse response = listOrPageReq.getResponse();
+        String methodName = listOrPageReq.getMethodName();
+        String entity = listOrPageReq.getEntity();
+        String config = listOrPageReq.getConfig();
+        Map<String, Object> params = listOrPageReq.getParams();
 
         Configuration configuration = nameConfigurationMap.get(entity + "/" + config);
         if (configuration == null) {

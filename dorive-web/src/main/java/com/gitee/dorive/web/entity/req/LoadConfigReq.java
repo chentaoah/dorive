@@ -15,20 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.web.entity;
+package com.gitee.dorive.web.entity.req;
 
 import lombok.Data;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
-
 @Data
-public class EntityRequest {
-    private HttpServletRequest request;
-    private HttpServletResponse response;
-    private String methodName;
-    private String entity;
-    private String config;
-    private Map<String, Object> params;
+public class LoadConfigReq {
+    private String name;
+    private String entityType;
+    private String repositoryType;
+    private String selectorType;
+    private String queryType;
 }
