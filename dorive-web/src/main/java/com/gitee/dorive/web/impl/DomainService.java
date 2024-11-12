@@ -91,7 +91,7 @@ public class DomainService {
             List<String> properties = filterIdPropertiesMap.computeIfAbsent(filterId, key -> new ArrayList<>(4));
             List<String> select = selector.select(entityName);
             if (select == null || select.isEmpty()) {
-                Field[] fields = genericType.getFields();
+                Field[] fields = ReflectUtil.getFieldsDirectly(genericType, true);
                 for (Field field : fields) {
                     if (!Modifier.isStatic(field.getModifiers())) {
                         properties.add(field.getName());
@@ -133,11 +133,6 @@ public class DomainService {
         Configuration configuration = nameConfigurationMap.get(entity + "/" + config);
         if (configuration == null) {
             failMsg(response, "没有找到配置信息！");
-            return;
-        }
-        Class<?> entityClass = configuration.getEntityClass();
-        if (!entity.equals(entityClass.getSimpleName())) {
-            failMsg(response, "实体配置不匹配！");
             return;
         }
 
