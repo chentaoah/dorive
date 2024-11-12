@@ -17,49 +17,49 @@
 
 package com.gitee.dorive.web.impl;
 
-import com.gitee.dorive.web.entity.QueryContext;
+import com.gitee.dorive.web.entity.EntityRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 
 @AllArgsConstructor
-@RestController("/domain")
+@Controller("/domain")
 public class DomainController {
 
     private final DomainService domainService;
 
-    @GetMapping("/list/{entityName}/{configId}")
+    @GetMapping("/list/{entity}/{config}")
     public void list(HttpServletRequest request, HttpServletResponse response,
-                     @PathVariable String entityName, @PathVariable String configId,
+                     @PathVariable String entity, @PathVariable String config,
                      @RequestParam Map<String, Object> params) throws Exception {
-        QueryContext queryContext = new QueryContext();
-        queryContext.setRequest(request);
-        queryContext.setResponse(response);
-        queryContext.setMethodName("list");
-        queryContext.setEntityName(entityName);
-        queryContext.setConfigId(configId);
-        queryContext.setParams(params);
-        domainService.executeQuery(queryContext);
+        executeQuery(request, response, "list", entity, config, params);
     }
 
-    @GetMapping("/page/{entityName}/{configId}")
+    @GetMapping("/page/{entity}/{config}")
     public void page(HttpServletRequest request, HttpServletResponse response,
-                     @PathVariable String entityName, @PathVariable String configId,
+                     @PathVariable String entity, @PathVariable String config,
                      @RequestParam Map<String, Object> params) throws Exception {
-        QueryContext queryContext = new QueryContext();
-        queryContext.setRequest(request);
-        queryContext.setResponse(response);
-        queryContext.setMethodName("page");
-        queryContext.setEntityName(entityName);
-        queryContext.setConfigId(configId);
-        queryContext.setParams(params);
-        domainService.executeQuery(queryContext);
+        executeQuery(request, response, "page", entity, config, params);
+    }
+
+    private void executeQuery(HttpServletRequest request, HttpServletResponse response,
+                              String methodName, String entity, String config,
+                              Map<String, Object> params) throws IOException {
+        EntityRequest entityRequest = new EntityRequest();
+        entityRequest.setRequest(request);
+        entityRequest.setResponse(response);
+        entityRequest.setMethodName(methodName);
+        entityRequest.setEntity(entity);
+        entityRequest.setConfig(config);
+        entityRequest.setParams(params);
+        domainService.executeQuery(entityRequest);
     }
 
 }

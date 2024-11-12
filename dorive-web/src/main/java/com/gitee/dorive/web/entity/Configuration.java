@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class QueryConfig {
+public class Configuration {
+    private String name;
     private Class<?> entityClass;
     private AbstractQueryRepository<?, ?> repository;
     private Selector selector;

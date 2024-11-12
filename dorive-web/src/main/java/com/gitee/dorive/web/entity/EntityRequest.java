@@ -24,11 +24,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @Data
-public class QueryContext {
+public class EntityRequest {
     private HttpServletRequest request;
     private HttpServletResponse response;
     private String methodName;
-    private String entityName;
-    private String configId;
+    private String entity;
+    private String config;
     private Map<String, Object> params;
 }

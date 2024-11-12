@@ -29,8 +29,8 @@ import com.gitee.dorive.api.annotation.core.Entity;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
-import com.gitee.dorive.web.entity.QueryConfig;
-import com.gitee.dorive.web.entity.QueryContext;
+import com.gitee.dorive.web.entity.Configuration;
+import com.gitee.dorive.web.entity.EntityRequest;
 import com.gitee.dorive.web.entity.ResObject;
 import org.springframework.stereotype.Service;
 
@@ -43,29 +43,30 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class DomainService {
 
-    private final Map<String, QueryConfig> idQueryConfigMap = new ConcurrentHashMap<>();
+    // name => configuration
+    private final Map<String, Configuration> nameConfigurationMap = new ConcurrentHashMap<>();
 
-    public void executeQuery(QueryContext queryContext) throws IOException {
-        HttpServletResponse response = queryContext.getResponse();
-        String methodName = queryContext.getMethodName();
-        String entityName = queryContext.getEntityName();
-        String configId = queryContext.getConfigId();
-        Map<String, Object> params = queryContext.getParams();
+    public void executeQuery(EntityRequest entityRequest) throws IOException {
+        HttpServletResponse response = entityRequest.getResponse();
+        String methodName = entityRequest.getMethodName();
+        String entity = entityRequest.getEntity();
+        String config = entityRequest.getConfig();
+        Map<String, Object> params = entityRequest.getParams();
 
-        QueryConfig queryConfig = idQueryConfigMap.get(configId);
-        if (queryConfig == null) {
+        Configuration configuration = nameConfigurationMap.get(entity + "/" + config);
+        if (configuration == null) {
             failMsg(response, "没有找到配置信息！");
             return;
         }
-        Class<?> entityClass = queryConfig.getEntityClass();
-        if (!entityName.equals(entityClass.getSimpleName())) {
+        Class<?> entityClass = configuration.getEntityClass();
+        if (!entity.equals(entityClass.getSimpleName())) {
             failMsg(response, "实体配置不匹配！");
             return;
         }
 
-        AbstractQueryRepository<?, ?> repository = queryConfig.getRepository();
-        Selector selector = queryConfig.getSelector();
-        Object query = BeanUtil.toBean(params, queryConfig.getQueryClass());
+        AbstractQueryRepository<?, ?> repository = configuration.getRepository();
+        Selector selector = configuration.getSelector();
+        Object query = BeanUtil.toBean(params, configuration.getQueryClass());
         Object data = null;
         if ("list".equals(methodName)) {
             List<?> entities = repository.selectByQuery(selector, query);
@@ -77,7 +78,7 @@ public class DomainService {
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
-        addFilters(objectMapper, queryConfig.getFilterIdPropertiesMap());
+        addFilters(objectMapper, configuration.getFilterIdPropertiesMap());
         objectMapper.writeValue(response.getOutputStream(), data);
     }
 
