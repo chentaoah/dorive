@@ -20,6 +20,7 @@ package com.gitee.dorive.web.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ClassLoaderUtil;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.http.ContentType;
 import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,6 +41,7 @@ import com.gitee.dorive.web.entity.ResObject;
 import com.gitee.dorive.web.entity.req.ListOrPageReq;
 import com.gitee.dorive.web.entity.req.LoadConfigReq;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
@@ -151,6 +153,7 @@ public class DomainService {
 
         ObjectMapper objectMapper = new ObjectMapper();
         addFilters(objectMapper, configuration.getFilterIdPropertiesMap());
+        response.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.JSON.getValue());
         objectMapper.writeValue(response.getOutputStream(), data);
     }
 
