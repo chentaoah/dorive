@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanSerializerFactory;
+import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.gitee.dorive.api.annotation.core.Entity;
@@ -89,7 +90,7 @@ public class DomainService {
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             EntityElement entityElement = definedRepository.getEntityElement();
             Class<?> genericType = entityElement.getGenericType();
-            String filterId = genericType.getName() + ".Filter";
+            String filterId = genericType.getName();
             List<String> properties = filterIdPropertiesMap.computeIfAbsent(filterId, key -> new ArrayList<>(4));
             List<String> select = selector.select(entityName);
             if (select == null || select.isEmpty()) {
@@ -107,7 +108,7 @@ public class DomainService {
             Field field = entityElement.getJavaField();
             if (field != null) {
                 Class<?> declaringClass = field.getDeclaringClass();
-                String declaringFilterId = declaringClass.getName() + ".Filter";
+                String declaringFilterId = declaringClass.getName();
                 List<String> declaringProperties = filterIdPropertiesMap.computeIfAbsent(declaringFilterId, key -> new ArrayList<>(4));
                 declaringProperties.add(field.getName());
             }
@@ -164,7 +165,7 @@ public class DomainService {
 
     private void addFilters(ObjectMapper objectMapper, Map<String, List<String>> filterIdPropertiesMap) {
         objectMapper.setSerializerFactory(FilterBeanSerializerFactory.instance);
-        SimpleFilterProvider simpleFilterProvider = new SimpleFilterProvider();
+        SimpleFilterProvider simpleFilterProvider = new SuperclassFilterProvider();
         filterIdPropertiesMap.forEach((filterId, properties) ->
                 simpleFilterProvider.addFilter(filterId, SimpleBeanPropertyFilter.filterOutAllExcept(properties.toArray(new String[0]))));
         objectMapper.setFilterProvider(simpleFilterProvider);
@@ -181,9 +182,29 @@ public class DomainService {
         protected Object findFilterId(SerializationConfig config, BeanDescription beanDesc) {
             Class<?> beanClass = beanDesc.getBeanClass();
             if (beanClass.isAnnotationPresent(Entity.class)) {
-                return beanClass.getName() + ".Filter";
+                return beanClass.getName();
             }
             return super.findFilterId(config, beanDesc);
+        }
+    }
+
+    public static class SuperclassFilterProvider extends SimpleFilterProvider {
+        @Override
+        public PropertyFilter findPropertyFilter(Object filterId, Object valueToFilter) {
+            String key = (String) filterId;
+            PropertyFilter propertyFilter;
+            while (true) {
+                propertyFilter = _filtersById.get(key);
+                if (propertyFilter != null) {
+                    break;
+                }
+                Class<?> superclass = valueToFilter.getClass().getSuperclass();
+                if (superclass == null || superclass == Object.class) {
+                    break;
+                }
+                key = superclass.getName();
+            }
+            return propertyFilter != null ? propertyFilter : super.findPropertyFilter(filterId, valueToFilter);
         }
     }
 
