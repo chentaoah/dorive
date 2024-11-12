@@ -28,8 +28,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+@RestController
 @AllArgsConstructor
-@RestController("/domain")
+@RequestMapping("/domain")
 public class DomainController {
 
     private final DomainService domainService;
