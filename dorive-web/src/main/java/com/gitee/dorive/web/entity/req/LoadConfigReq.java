@@ -24,6 +24,6 @@ public class LoadConfigReq {
     private String name;
     private String entityType;
     private String repositoryType;
-    private String selectorType;
+    private String selectorName;
     private String queryType;
 }

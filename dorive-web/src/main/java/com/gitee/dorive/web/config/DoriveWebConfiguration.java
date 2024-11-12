@@ -20,6 +20,7 @@ package com.gitee.dorive.web.config;
 import com.gitee.dorive.web.advice.ParameterControllerAdvice;
 import com.gitee.dorive.web.impl.DomainController;
 import com.gitee.dorive.web.impl.DomainService;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -34,8 +35,8 @@ public class DoriveWebConfiguration {
     }
 
     @Bean("domainService")
-    public static DomainService domainService() {
-        return new DomainService();
+    public static DomainService domainService(ApplicationContext applicationContext) {
+        return new DomainService(applicationContext);
     }
 
     @Bean("domainController")

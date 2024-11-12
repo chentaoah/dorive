@@ -18,6 +18,8 @@
 package com.gitee.dorive.web.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ClassLoaderUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,10 +35,13 @@ import com.gitee.dorive.web.entity.Configuration;
 import com.gitee.dorive.web.entity.ResObject;
 import com.gitee.dorive.web.entity.req.ListOrPageReq;
 import com.gitee.dorive.web.entity.req.LoadConfigReq;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,11 +49,44 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class DomainService {
 
+    private final ApplicationContext applicationContext;
     // name => configuration
-    private final Map<String, Configuration> nameConfigurationMap = new ConcurrentHashMap<>();
+    private final Map<String, Configuration> nameConfigurationMap;
+
+    public DomainService(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+        this.nameConfigurationMap = new ConcurrentHashMap<>();
+    }
 
     public ResObject<Object> loadConfig(LoadConfigReq loadConfigReq) {
-        return null;
+        String name = loadConfigReq.getName();
+        String entityType = loadConfigReq.getEntityType();
+        String repositoryType = loadConfigReq.getRepositoryType();
+        String selectorName = loadConfigReq.getSelectorName();
+        String queryType = loadConfigReq.getQueryType();
+
+        Class<?> entityClass = ClassLoaderUtil.loadClass(entityType);
+        Class<?> repositoryClass = ClassLoaderUtil.loadClass(repositoryType);
+        Class<?> queryClass = ClassLoaderUtil.loadClass(queryType);
+
+        AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) applicationContext.getBean(repositoryClass);
+
+        Field field = ReflectUtil.getField(entityClass, selectorName);
+        Object value = ReflectUtil.getStaticFieldValue(field);
+        Selector selector = (Selector) value;
+
+        Map<String, List<String>> filterIdPropertiesMap = new LinkedHashMap<>();
+
+        Configuration configuration = new Configuration();
+        configuration.setName(name);
+        configuration.setEntityClass(entityClass);
+        configuration.setRepository(repository);
+        configuration.setSelector(selector);
+        configuration.setQueryClass(queryClass);
+        configuration.setFilterIdPropertiesMap(filterIdPropertiesMap);
+        nameConfigurationMap.put(name, configuration);
+
+        return ResObject.successMsg("加载成功！");
     }
 
     public void executeQuery(ListOrPageReq listOrPageReq) throws IOException {
