@@ -56,7 +56,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DomainService {
 
     private final ApplicationContext applicationContext;
-    // name => configuration
     private final Map<String, Configuration> urlConfigurationMap;
 
     public DomainService(ApplicationContext applicationContext) {
