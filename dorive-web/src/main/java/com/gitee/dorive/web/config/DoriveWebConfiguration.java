@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.web.config;
 
-import com.gitee.dorive.web.advice.ParameterControllerAdvice;
+import com.gitee.dorive.web.impl.advice.ParameterControllerAdvice;
 import com.gitee.dorive.web.impl.DomainController;
 import com.gitee.dorive.web.impl.DomainService;
 import org.springframework.context.ApplicationContext;

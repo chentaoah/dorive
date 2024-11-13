@@ -57,15 +57,15 @@ public class DomainService {
 
     private final ApplicationContext applicationContext;
     // name => configuration
-    private final Map<String, Configuration> nameConfigurationMap;
+    private final Map<String, Configuration> urlConfigurationMap;
 
     public DomainService(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
-        this.nameConfigurationMap = new ConcurrentHashMap<>();
+        this.urlConfigurationMap = new ConcurrentHashMap<>();
     }
 
     public ResObject<Object> loadConfig(LoadConfigReq loadConfigReq) {
-        String name = loadConfigReq.getName();
+        String url = loadConfigReq.getUrl();
         String entityType = loadConfigReq.getEntityType();
         String selectorName = loadConfigReq.getSelectorName();
         String repositoryType = loadConfigReq.getRepositoryType();
@@ -115,13 +115,13 @@ public class DomainService {
         }
 
         Configuration configuration = new Configuration();
-        configuration.setName(name);
+        configuration.setUrl(url);
         configuration.setEntityClass(entityClass);
         configuration.setSelector(selector);
         configuration.setRepository(repository);
         configuration.setQueryClass(queryClass);
         configuration.setFilterIdPropertiesMap(filterIdPropertiesMap);
-        nameConfigurationMap.put(name, configuration);
+        urlConfigurationMap.put(url, configuration);
 
         return ResObject.successMsg("加载成功！");
     }
@@ -133,7 +133,7 @@ public class DomainService {
         String config = listOrPageReq.getConfig();
         Map<String, Object> params = listOrPageReq.getParams();
 
-        Configuration configuration = nameConfigurationMap.get(entity + "/" + config);
+        Configuration configuration = urlConfigurationMap.get(entity + "/" + config);
         if (configuration == null) {
             failMsg(response, "没有找到配置信息！");
             return;

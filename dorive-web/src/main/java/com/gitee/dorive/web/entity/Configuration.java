@@ -26,7 +26,7 @@ import java.util.Map;
 
 @Data
 public class Configuration {
-    private String name;
+    private String url;
     private Class<?> entityClass;
     private Selector selector;
     private AbstractQueryRepository<?, ?> repository;

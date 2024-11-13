@@ -21,7 +21,7 @@ import lombok.Data;
 
 @Data
 public class LoadConfigReq {
-    private String name;
+    private String url;
     private String entityType;
     private String selectorName;
     private String repositoryType;
