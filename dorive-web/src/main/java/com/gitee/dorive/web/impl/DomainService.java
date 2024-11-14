@@ -142,6 +142,8 @@ public class DomainService {
         String config = listOrPageReq.getConfig();
         Map<String, Object> params = listOrPageReq.getParams();
 
+        response.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.JSON.getValue());
+
         Configuration configuration = urlConfigurationMap.get(entity + "/" + config);
         if (configuration == null) {
             failMsg(response, "没有找到配置信息！");
@@ -152,18 +154,23 @@ public class DomainService {
         Selector selector = configuration.getSelector();
         Object query = BeanUtil.toBean(params, configuration.getQueryClass());
         Object data = null;
-        if ("list".equals(methodName)) {
-            List<?> entities = repository.selectByQuery(selector, query);
-            data = ResObject.successData(entities);
+        try {
+            if ("list".equals(methodName)) {
+                List<?> entities = repository.selectByQuery(selector, query);
+                data = ResObject.successData(entities);
 
-        } else if ("page".equals(methodName)) {
-            Page<?> page = repository.selectPageByQuery(selector, query);
-            data = ResObject.successData(page);
+            } else if ("page".equals(methodName)) {
+                Page<?> page = repository.selectPageByQuery(selector, query);
+                data = ResObject.successData(page);
+            }
+
+        } catch (Exception e) {
+            failMsg(response, e.getMessage());
+            return;
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
         addFilters(objectMapper, configuration.getFilterIdPropertiesMap());
-        response.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.JSON.getValue());
         objectMapper.writeValue(response.getOutputStream(), data);
     }
 
