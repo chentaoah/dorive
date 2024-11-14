@@ -23,23 +23,23 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.gitee.dorive.core.api.common.ImplFactory;
-import com.gitee.dorive.api.entity.core.def.EntityDef;
 import com.gitee.dorive.api.entity.core.EntityElement;
+import com.gitee.dorive.api.entity.core.def.EntityDef;
+import com.gitee.dorive.core.api.common.ImplFactory;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
-import com.gitee.dorive.core.entity.enums.QueryMethod;
 import com.gitee.dorive.mybatis.plus.executor.MybatisPlusExecutor;
-import com.gitee.dorive.query.api.QueryExecutor;
-import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.api.QueryHandler;
+import com.gitee.dorive.query.entity.enums.QueryMethod;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
 import com.gitee.dorive.sql.api.CountQuerier;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.common.CountQuery;
-import com.gitee.dorive.sql.impl.executor.CountSqlQueryExecutor;
-import com.gitee.dorive.sql.impl.executor.SqlQueryExecutor;
 import com.gitee.dorive.sql.impl.executor.UnionExecutor;
+import com.gitee.dorive.sql.impl.handler.SqlBuildQueryHandler;
+import com.gitee.dorive.sql.impl.handler.SqlExecuteQueryHandler;
+import com.gitee.dorive.sql.impl.querier.SqlCountQuerier;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -56,27 +56,25 @@ import java.util.Map;
 public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> implements CountQuerier {
 
     private SqlRunner sqlRunner;
-    private QueryExecutor sqlQueryExecutor;
     private CountQuerier countQuerier;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
         this.sqlRunner = implFactory.getInstance(SqlRunner.class);
-        this.sqlQueryExecutor = new SqlQueryExecutor(this, this.sqlRunner);
-        this.countQuerier = new CountSqlQueryExecutor(this, this.sqlRunner);
         super.afterPropertiesSet();
+        this.countQuerier = new SqlCountQuerier(this, getQueryHandler(), this.sqlRunner);
     }
 
     @Override
     protected EntityStoreInfo resolveEntityStoreInfo(EntityElement entityElement) {
         EntityDef entityDef = entityElement.getEntityDef();
-        Class<?> mapperClass = entityDef.getSource();
+        Class<?> mapperClass = entityDef.getDataSource();
         Object mapper = null;
         Class<?> pojoClass = null;
         if (mapperClass != Object.class) {
             mapper = getApplicationContext().getBean(mapperClass);
-            Assert.notNull(mapper, "The mapper cannot be null! source: {}", mapperClass);
+            Assert.notNull(mapper, "The mapper cannot be null! data source: {}", mapperClass);
             Type[] genericInterfaces = mapperClass.getGenericInterfaces();
             if (genericInterfaces.length > 0) {
                 Type genericInterface = mapperClass.getGenericInterfaces()[0];
@@ -88,9 +86,9 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
             }
         }
 
-        Assert.notNull(pojoClass, "The class of pojo cannot be null! source: {}", mapperClass);
+        Assert.notNull(pojoClass, "The class of pojo cannot be null! data source: {}", mapperClass);
         TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
-        Assert.notNull(tableInfo, "The table info cannot be null! source: {}", mapperClass);
+        Assert.notNull(tableInfo, "The table info cannot be null! data source: {}", mapperClass);
         assert tableInfo != null;
         return newEntityStoreInfo(mapperClass, mapper, pojoClass, tableInfo);
     }
@@ -128,13 +126,10 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
     }
 
     @Override
-    protected QueryExecutor adaptiveQueryExecutor(QueryContext queryContext) {
-        Context context = queryContext.getContext();
-        QueryMethod queryMethod = context.getOption(QueryMethod.class);
-        if (queryMethod == null || queryMethod == QueryMethod.SQL) {
-            return sqlQueryExecutor;
-        }
-        return super.adaptiveQueryExecutor(queryContext);
+    protected void registryQueryHandlers(Map<QueryMethod, QueryHandler> queryHandlerMap) {
+        super.registryQueryHandlers(queryHandlerMap);
+        queryHandlerMap.put(QueryMethod.SQL_BUILD, new SqlBuildQueryHandler(this, null));
+        queryHandlerMap.put(QueryMethod.SQL_EXECUTE, new SqlExecuteQueryHandler(this, null, sqlRunner));
     }
 
     @Override

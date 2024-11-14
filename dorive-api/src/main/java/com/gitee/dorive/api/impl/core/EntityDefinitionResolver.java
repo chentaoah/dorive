@@ -156,9 +156,9 @@ public class EntityDefinitionResolver {
         if (StringUtils.isNotBlank(name)) {
             newEntityDef.setName(name);
         }
-        Class<?> source = entityAnnotation.source();
-        if (source != Object.class) {
-            newEntityDef.setSource(source);
+        Class<?> dataSource = entityAnnotation.dataSource();
+        if (dataSource != Object.class) {
+            newEntityDef.setDataSource(dataSource);
         }
         Class<?> factory = entityAnnotation.factory();
         if (factory != Object.class) {

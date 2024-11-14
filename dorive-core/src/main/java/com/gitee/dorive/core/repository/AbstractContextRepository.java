@@ -24,10 +24,12 @@ import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.def.EntityDef;
 import com.gitee.dorive.api.entity.core.def.OrderDef;
 import com.gitee.dorive.api.entity.core.EntityElement;
+import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.api.impl.core.EntityDefinitionResolver;
 import com.gitee.dorive.api.impl.core.EntityElementResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.core.api.executor.EntityOpHandler;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.factory.EntityMapper;
@@ -35,7 +37,7 @@ import com.gitee.dorive.core.config.RepositoryContext;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.factory.FieldConverter;
-import com.gitee.dorive.core.impl.context.SelectTypeMatcher;
+import com.gitee.dorive.core.impl.context.AdaptiveMatcher;
 import com.gitee.dorive.core.impl.executor.ContextExecutor;
 import com.gitee.dorive.core.impl.executor.ExampleExecutor;
 import com.gitee.dorive.core.impl.executor.FactoryExecutor;
@@ -43,8 +45,11 @@ import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.factory.ValueObjEntityFactory;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
+import com.gitee.dorive.core.impl.handler.eo.BatchEntityOpHandler;
+import com.gitee.dorive.core.impl.handler.DelegatedEntityHandler;
+import com.gitee.dorive.core.impl.handler.eo.DelegatedEntityOpHandler;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.impl.resolver.DerivedResolver;
+import com.gitee.dorive.core.impl.resolver.DerivedRepositoryResolver;
 import com.gitee.dorive.core.impl.resolver.EntityMapperResolver;
 import lombok.Getter;
 import lombok.Setter;
@@ -61,11 +66,12 @@ import java.util.*;
 public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, InitializingBean {
 
     private ApplicationContext applicationContext;
+    private RepositoryDef repositoryDef;
     private Map<String, CommonRepository> repositoryMap = new LinkedHashMap<>();
     private CommonRepository rootRepository;
     private List<CommonRepository> subRepositories = new ArrayList<>();
     private List<CommonRepository> orderedRepositories = new ArrayList<>();
-    private DerivedResolver derivedResolver;
+    private DerivedRepositoryResolver derivedRepositoryResolver;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -74,7 +80,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Class<?> entityClass = ReflectUtils.getFirstArgumentType(this.getClass());
+        Class<?> repositoryClass = this.getClass();
+        repositoryDef = RepositoryDef.fromElement(repositoryClass);
+        Assert.notNull(repositoryDef, "The @Repository does not exist! type: {}", repositoryClass.getName());
+        Class<?> entityClass = ReflectUtils.getFirstArgumentType(repositoryClass);
+        processRepositoryDef(repositoryClass, entityClass);
 
         EntityDefinitionResolver entityDefinitionResolver = new EntityDefinitionResolver();
         EntityDefinition entityDefinition = entityDefinitionResolver.resolve(entityClass);
@@ -98,9 +108,16 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setEntityElement(rootRepository.getEntityElement());
         setOperationFactory(rootRepository.getOperationFactory());
 
-        derivedResolver = new DerivedResolver(this);
-        EntityHandler entityHandler = processEntityHandler(new BatchEntityHandler(this));
-        Executor executor = new ContextExecutor(this, entityHandler);
+        EntityHandler entityHandler = new BatchEntityHandler(this);
+        entityHandler = processEntityHandler(entityHandler);
+        EntityOpHandler entityOpHandler = new BatchEntityOpHandler(this);
+        derivedRepositoryResolver = new DerivedRepositoryResolver(this);
+        derivedRepositoryResolver.resolve();
+        if (derivedRepositoryResolver.hasDerived()) {
+            entityHandler = new DelegatedEntityHandler(this, derivedRepositoryResolver.getEntityHandlerMap(entityHandler));
+            entityOpHandler = new DelegatedEntityOpHandler(this, derivedRepositoryResolver.getEntityOpHandlerMap(entityOpHandler));
+        }
+        Executor executor = new ContextExecutor(this, entityHandler, entityOpHandler);
         setExecutor(executor);
     }
 
@@ -132,7 +149,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         repository.setBinderResolver(binderResolver);
         repository.setDefaultOrderBy(defaultOrderBy);
         repository.setBound(false);
-        repository.setMatcher(new SelectTypeMatcher(repository));
+        repository.setMatcher(new AdaptiveMatcher(repository));
         return repository;
     }
 
@@ -212,6 +229,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
         return null;
     }
+
+    protected abstract void processRepositoryDef(Class<?> repositoryClass, Class<?> entityClass);
 
     protected abstract EntityStoreInfo resolveEntityStoreInfo(EntityElement entityElement);
 

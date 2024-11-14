@@ -18,39 +18,14 @@
 package com.gitee.dorive.core.impl.context;
 
 import com.gitee.dorive.core.api.context.Selector;
-import com.gitee.dorive.core.entity.enums.SelectType;
+import com.gitee.dorive.core.entity.context.AbstractOptions;
+import com.gitee.dorive.core.entity.enums.MatcherType;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-public abstract class AbstractSelector implements Selector {
-
-    private final Map<Class<?>, Object> options = new LinkedHashMap<>(3);
+public abstract class AbstractSelector extends AbstractOptions implements Selector {
 
     public AbstractSelector() {
-        this.options.put(SelectType.class, SelectType.SELECTOR);
-        this.options.put(Selector.class, this);
-    }
-
-    @Override
-    public Map<Class<?>, Object> getOptions() {
-        return options;
-    }
-
-    @Override
-    public <T> void setOption(Class<T> type, T value) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getOption(Class<T> type) {
-        return (T) options.get(type);
-    }
-
-    @Override
-    public void removeOption(Class<?> type) {
-        throw new UnsupportedOperationException();
+        setOption(MatcherType.class, MatcherType.SELECTOR);
+        setOption(Selector.class, this);
     }
 
 }

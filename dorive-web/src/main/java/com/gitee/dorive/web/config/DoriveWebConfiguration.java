@@ -17,7 +17,11 @@
 
 package com.gitee.dorive.web.config;
 
-import com.gitee.dorive.web.advice.ParameterControllerAdvice;
+import com.gitee.dorive.web.impl.DomainController;
+import com.gitee.dorive.web.impl.DomainService;
+import com.gitee.dorive.web.impl.advice.ParameterControllerAdvice;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -29,6 +33,18 @@ public class DoriveWebConfiguration {
     @Bean("parameterControllerAdvice")
     public static ParameterControllerAdvice parameterControllerAdvice() {
         return new ParameterControllerAdvice();
+    }
+
+    @Bean("domainService")
+    @ConditionalOnProperty(name = "dorive.web.enable", havingValue = "true", matchIfMissing = true)
+    public static DomainService domainService(ApplicationContext applicationContext) {
+        return new DomainService(applicationContext);
+    }
+
+    @Bean("domainController")
+    @ConditionalOnProperty(name = "dorive.web.enable", havingValue = "true", matchIfMissing = true)
+    public static DomainController domainController(DomainService domainService) {
+        return new DomainController(domainService);
     }
 
 }

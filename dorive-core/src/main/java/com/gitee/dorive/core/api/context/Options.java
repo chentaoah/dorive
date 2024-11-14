@@ -18,14 +18,14 @@
 package com.gitee.dorive.core.api.context;
 
 import com.gitee.dorive.core.entity.context.EnumOptions;
-import com.gitee.dorive.core.entity.enums.SelectType;
+import com.gitee.dorive.core.entity.enums.MatcherType;
 
 import java.util.Map;
 
 public interface Options {
 
-    Options ROOT = new EnumOptions(SelectType.class, SelectType.ROOT);
-    Options ALL = new EnumOptions(SelectType.class, SelectType.ALL);
+    Options ROOT = new EnumOptions(MatcherType.class, MatcherType.ROOT);
+    Options ALL = new EnumOptions(MatcherType.class, MatcherType.ALL);
 
     Map<Class<?>, Object> getOptions();
 

@@ -19,67 +19,44 @@ package com.gitee.dorive.core.entity.context;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Options;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Setter
-public abstract class AbstractContext extends LinkedHashMap<String, Object> implements Context {
+@NoArgsConstructor
+@AllArgsConstructor
+public abstract class AbstractContext extends AbstractOptions implements Context {
 
-    protected Map<Class<?>, Object> options = new LinkedHashMap<>(4);
-
-    public AbstractContext() {
-        super(8);
-    }
+    private Map<String, Object> attachments = new ConcurrentHashMap<>(8);
 
     public AbstractContext(Options options) {
-        this();
-        this.options.putAll(options.getOptions());
+        super(options);
     }
 
-    public AbstractContext(Context anotherContext) {
-        this();
-        this.options.putAll(anotherContext.getOptions());
-        putAll(anotherContext.getAttachments());
-    }
-
-    @Override
-    public <T> void setOption(Class<T> type, T value) {
-        options.put(type, value);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getOption(Class<T> type) {
-        return (T) options.get(type);
-    }
-
-    @Override
-    public void removeOption(Class<?> type) {
-        options.remove(type);
-    }
-
-    @Override
-    public Map<String, Object> getAttachments() {
-        return this;
+    public AbstractContext(Context context) {
+        super(context);
+        this.attachments.putAll(context.getAttachments());
     }
 
     @Override
     public void setAttachment(String name, Object value) {
-        put(name, value);
+        attachments.put(name, value);
     }
 
     @Override
     public Object getAttachment(String name) {
-        return get(name);
+        return attachments.get(name);
     }
 
     @Override
     public void removeAttachment(String name) {
-        remove(name);
+        attachments.remove(name);
     }
 
 }

@@ -34,9 +34,9 @@ public @interface Entity {
     String name() default "";
 
     /**
-     * 数据来源
+     * 数据源
      */
-    Class<?> source() default Object.class;
+    Class<?> dataSource() default Object.class;
 
     /**
      * 实体工厂

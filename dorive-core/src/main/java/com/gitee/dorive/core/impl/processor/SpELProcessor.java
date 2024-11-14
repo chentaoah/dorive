@@ -38,7 +38,7 @@ public class SpELProcessor implements Processor {
     @Override
     public Object input(Context context, Object value) {
         EvaluationContext evaluationContext = new StandardEvaluationContext();
-        evaluationContext.setVariable("ctx", context);
+        evaluationContext.setVariable("ctx", context.getAttachments());
         evaluationContext.setVariable("val", value);
         return expression.getValue(evaluationContext);
     }

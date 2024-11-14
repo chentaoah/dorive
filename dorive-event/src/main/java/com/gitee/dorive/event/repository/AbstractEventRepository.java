@@ -17,9 +17,9 @@
 
 package com.gitee.dorive.event.repository;
 
-import com.gitee.dorive.api.annotation.event.EnableEvent;
-import com.gitee.dorive.api.constant.event.Publisher;
+import cn.hutool.core.util.ArrayUtil;
 import com.gitee.dorive.api.entity.core.EntityElement;
+import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.operation.EntityOp;
@@ -31,24 +31,28 @@ import com.gitee.dorive.core.repository.AbstractGenericRepository;
 import com.gitee.dorive.core.repository.AbstractProxyRepository;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.core.repository.DefaultRepository;
-import com.gitee.dorive.event.entity.EntityEvent;
+import com.gitee.dorive.event.entity.BaseEvent;
+import com.gitee.dorive.event.entity.ExecutorEvent;
+import com.gitee.dorive.event.entity.RepositoryEvent;
 import com.gitee.dorive.event.impl.executor.EventExecutor;
-import org.springframework.core.annotation.AnnotationUtils;
+import com.gitee.dorive.event.impl.factory.EventFactory;
 
 public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepository<E, PK> {
 
-    private boolean enableEvent;
+    private boolean enableExecutorEvent;
+    private boolean enableRepositoryEvent;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        EnableEvent enableEvent = AnnotationUtils.getAnnotation(this.getClass(), EnableEvent.class);
-        this.enableEvent = enableEvent != null;
-        super.afterPropertiesSet();
+    protected void processRepositoryDef(Class<?> repositoryClass, Class<?> entityClass) {
+        RepositoryDef repositoryDef = getRepositoryDef();
+        Class<?>[] events = repositoryDef.getEvents();
+        enableExecutorEvent = ArrayUtil.contains(events, ExecutorEvent.class);
+        enableRepositoryEvent = ArrayUtil.contains(events, RepositoryEvent.class);
     }
 
     @Override
     protected AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository) {
-        if (enableEvent) {
+        if (enableExecutorEvent) {
             AbstractRepository<Object, Object> actualRepository = repository;
             if (repository instanceof AbstractProxyRepository) {
                 actualRepository = ((AbstractProxyRepository) repository).getProxyRepository();
@@ -67,7 +71,7 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
     @Override
     public int execute(Context context, Operation operation) {
         int totalCount = super.execute(context, operation);
-        if (enableEvent && totalCount != 0) {
+        if (enableRepositoryEvent && totalCount != 0) {
             if (operation instanceof InsertOrUpdate) {
                 InsertOrUpdate insertOrUpdate = (InsertOrUpdate) operation;
                 Insert insert = insertOrUpdate.getInsert();
@@ -89,16 +93,8 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
         if (operation instanceof EntityOp) {
             Class<?> entityClass = getEntityElement().getGenericType();
             EntityOp entityOp = (EntityOp) operation;
-
-            EntityEvent entityEvent = new EntityEvent(this);
-            entityEvent.setPublisher(Publisher.REPOSITORY);
-            entityEvent.setEntityClass(entityClass);
-            entityEvent.setName(EntityEvent.getEventName(entityOp));
-            entityEvent.setContext(context);
-            entityEvent.setRoot(entityOp.isUncontrolled());
-            entityEvent.setEntities(entityOp.getEntities());
-
-            getApplicationContext().publishEvent(entityEvent);
+            BaseEvent baseEvent = EventFactory.newRepositoryEvent(this, entityOp.isUncontrolled(), entityClass, context, entityOp);
+            getApplicationContext().publishEvent(baseEvent);
         }
     }
 

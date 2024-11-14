@@ -35,4 +35,10 @@ public @interface Repository {
     @AliasFor(annotation = Component.class)
     String value() default "";
 
+    Class<?>[] derived() default {};
+
+    Class<?>[] events() default {};
+
+    Class<?>[] queries() default {};
+
 }

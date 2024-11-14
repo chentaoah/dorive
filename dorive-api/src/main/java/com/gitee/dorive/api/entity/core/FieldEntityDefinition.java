@@ -31,6 +31,10 @@ public class FieldEntityDefinition extends EntityDefinition {
     private List<BindingDef> bindingDefs;
     private OrderDef orderDef;
 
+    public java.lang.reflect.Field getJavaField() {
+        return field != null ? field.getField() : null;
+    }
+
     public boolean isCollection() {
         return field != null && field.isCollection();
     }
