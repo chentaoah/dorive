@@ -25,9 +25,11 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.ResolvableTypeProvider;
 
+import java.util.List;
+
 @Getter
 @Setter
-public abstract class BaseEvent extends ApplicationEvent implements ResolvableTypeProvider {
+public abstract class BaseEvent<T> extends ApplicationEvent implements ResolvableTypeProvider {
     private boolean root;
     private Class<?> entityClass;
     private Context context;
@@ -40,5 +42,10 @@ public abstract class BaseEvent extends ApplicationEvent implements ResolvableTy
     @Override
     public ResolvableType getResolvableType() {
         return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(entityClass));
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<T> getEntities() {
+        return (List<T>) entityOp.getEntities();
     }
 }
