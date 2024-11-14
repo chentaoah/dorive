@@ -31,7 +31,6 @@
     <modules>
         <module>dorive-inject</module>
         <module>dorive-env</module>
-        <module>dorive-web</module>
         <module>dorive-api</module>
         <module>dorive-core</module>
         <module>dorive-event</module>
@@ -39,6 +38,7 @@
         <module>dorive-ref</module>
         <module>dorive-sql</module>
         <module>dorive-mybatis-plus</module>
+        <module>dorive-web</module>
         <module>dorive-spring-boot-starter</module>
     </modules>
 
