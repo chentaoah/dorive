@@ -63,7 +63,17 @@ public class DomainService {
         this.urlConfigurationMap = new ConcurrentHashMap<>();
     }
 
-    public ResObject<Object> loadConfig(LoadConfigReq loadConfigReq) {
+    public ResObject<Object> loadConfigs(List<LoadConfigReq> loadConfigReqs) {
+        for (LoadConfigReq loadConfigReq : loadConfigReqs) {
+            ResObject<Object> resObject = loadConfig(loadConfigReq);
+            if (resObject.isFail()) {
+                return resObject;
+            }
+        }
+        return ResObject.successMsg("加载成功！");
+    }
+
+    private ResObject<Object> loadConfig(LoadConfigReq loadConfigReq) {
         String url = loadConfigReq.getUrl();
         String entityType = loadConfigReq.getEntityType();
         String selectorName = loadConfigReq.getSelectorName();

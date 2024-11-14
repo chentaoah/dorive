@@ -17,15 +17,16 @@
 
 package com.gitee.dorive.web.impl;
 
+import com.gitee.dorive.web.entity.ResObject;
 import com.gitee.dorive.web.entity.req.ListOrPageReq;
 import com.gitee.dorive.web.entity.req.LoadConfigReq;
-import com.gitee.dorive.web.entity.ResObject;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -35,9 +36,9 @@ public class DomainController {
 
     private final DomainService domainService;
 
-    @PostMapping("/loadConfig")
-    public ResObject<Object> loadConfig(@RequestBody LoadConfigReq loadConfigReq) {
-        return domainService.loadConfig(loadConfigReq);
+    @PostMapping("/loadConfigs")
+    public ResObject<Object> loadConfigs(@RequestBody List<LoadConfigReq> loadConfigReqs) {
+        return domainService.loadConfigs(loadConfigReqs);
     }
 
     @GetMapping("/list/{entity}/{config}")
