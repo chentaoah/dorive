@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class Configuration {
+public class ExporterConfig {
     private String url;
     private Class<?> entityClass;
     private Selector selector;

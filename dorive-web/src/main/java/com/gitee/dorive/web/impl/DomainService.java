@@ -37,7 +37,7 @@ import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
-import com.gitee.dorive.web.entity.Configuration;
+import com.gitee.dorive.web.entity.ExporterConfig;
 import com.gitee.dorive.web.entity.ResObject;
 import com.gitee.dorive.web.entity.req.ListOrPageReq;
 import com.gitee.dorive.web.entity.req.LoadConfigReq;
@@ -56,11 +56,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DomainService {
 
     private final ApplicationContext applicationContext;
-    private final Map<String, Configuration> urlConfigurationMap;
+    private final Map<String, ExporterConfig> urlExporterConfigMap;
 
     public DomainService(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
-        this.urlConfigurationMap = new ConcurrentHashMap<>();
+        this.urlExporterConfigMap = new ConcurrentHashMap<>();
     }
 
     public ResObject<Object> loadConfigs(List<LoadConfigReq> loadConfigReqs) {
@@ -123,14 +123,14 @@ public class DomainService {
             }
         }
 
-        Configuration configuration = new Configuration();
-        configuration.setUrl(url);
-        configuration.setEntityClass(entityClass);
-        configuration.setSelector(selector);
-        configuration.setRepository(repository);
-        configuration.setQueryClass(queryClass);
-        configuration.setFilterIdPropertiesMap(filterIdPropertiesMap);
-        urlConfigurationMap.put(url, configuration);
+        ExporterConfig exporterConfig = new ExporterConfig();
+        exporterConfig.setUrl(url);
+        exporterConfig.setEntityClass(entityClass);
+        exporterConfig.setSelector(selector);
+        exporterConfig.setRepository(repository);
+        exporterConfig.setQueryClass(queryClass);
+        exporterConfig.setFilterIdPropertiesMap(filterIdPropertiesMap);
+        urlExporterConfigMap.put(url, exporterConfig);
 
         return ResObject.successMsg("加载成功！");
     }
@@ -144,15 +144,15 @@ public class DomainService {
 
         response.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.JSON.getValue());
 
-        Configuration configuration = urlConfigurationMap.get(entity + "/" + config);
-        if (configuration == null) {
+        ExporterConfig exporterConfig = urlExporterConfigMap.get(entity + "/" + config);
+        if (exporterConfig == null) {
             failMsg(response, "没有找到配置信息！");
             return;
         }
 
-        AbstractQueryRepository<?, ?> repository = configuration.getRepository();
-        Selector selector = configuration.getSelector();
-        Object query = BeanUtil.toBean(params, configuration.getQueryClass());
+        AbstractQueryRepository<?, ?> repository = exporterConfig.getRepository();
+        Selector selector = exporterConfig.getSelector();
+        Object query = BeanUtil.toBean(params, exporterConfig.getQueryClass());
         Object data = null;
         try {
             if ("list".equals(methodName)) {
@@ -170,7 +170,7 @@ public class DomainService {
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
-        addFilters(objectMapper, configuration.getFilterIdPropertiesMap());
+        addFilters(objectMapper, exporterConfig.getFilterIdPropertiesMap());
         objectMapper.writeValue(response.getOutputStream(), data);
     }
 
