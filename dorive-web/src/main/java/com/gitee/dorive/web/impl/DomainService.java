@@ -156,7 +156,7 @@ public class DomainService {
             List<?> entities = repository.selectByQuery(selector, query);
             data = ResObject.successData(entities);
 
-        } else if ("query".equals(methodName)) {
+        } else if ("page".equals(methodName)) {
             Page<?> page = repository.selectPageByQuery(selector, query);
             data = ResObject.successData(page);
         }
