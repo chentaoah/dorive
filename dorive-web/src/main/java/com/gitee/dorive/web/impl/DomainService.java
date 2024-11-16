@@ -97,6 +97,9 @@ public class DomainService {
         Map<String, MergedRepository> nameMergedRepositoryMap = mergedRepositoryResolver.getNameMergedRepositoryMap();
 
         Field staticField = ReflectUtil.getField(entityClass, selectorName);
+        if (staticField == null) {
+            return ResObject.failMsg("选取器不存在！selectorName: " + selectorName);
+        }
         Object value = ReflectUtil.getStaticFieldValue(staticField);
         Selector selector = (Selector) value;
 
