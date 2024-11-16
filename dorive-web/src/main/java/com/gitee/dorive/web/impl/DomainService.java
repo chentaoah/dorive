@@ -80,9 +80,17 @@ public class DomainService {
         String repositoryType = loadConfigReq.getRepositoryType();
         String queryType = loadConfigReq.getQueryType();
 
-        Class<?> entityClass = ClassLoaderUtil.loadClass(entityType);
-        Class<?> repositoryClass = ClassLoaderUtil.loadClass(repositoryType);
-        Class<?> queryClass = ClassLoaderUtil.loadClass(queryType);
+        Class<?> entityClass;
+        Class<?> repositoryClass;
+        Class<?> queryClass;
+        try {
+            entityClass = ClassLoaderUtil.loadClass(entityType);
+            repositoryClass = ClassLoaderUtil.loadClass(repositoryType);
+            queryClass = ClassLoaderUtil.loadClass(queryType);
+
+        } catch (Exception e) {
+            return ResObject.failMsg("类型加载失败！");
+        }
 
         AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) applicationContext.getBean(repositoryClass);
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
