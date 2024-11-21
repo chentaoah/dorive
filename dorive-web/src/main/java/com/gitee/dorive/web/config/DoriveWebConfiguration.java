@@ -35,13 +35,13 @@ public class DoriveWebConfiguration {
         return new ParameterControllerAdvice();
     }
 
-    @Bean("domainService")
+    @Bean("dorive$domainService")
     @ConditionalOnProperty(name = "dorive.web.enable", havingValue = "true", matchIfMissing = true)
     public static DomainService domainService(ApplicationContext applicationContext) {
         return new DomainService(applicationContext);
     }
 
-    @Bean("domainController")
+    @Bean("dorive$domainController")
     @ConditionalOnProperty(name = "dorive.web.enable", havingValue = "true", matchIfMissing = true)
     public static DomainController domainController(DomainService domainService) {
         return new DomainController(domainService);
