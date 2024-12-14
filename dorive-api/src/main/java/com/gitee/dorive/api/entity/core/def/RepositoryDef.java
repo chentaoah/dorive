@@ -30,6 +30,8 @@ import java.lang.reflect.AnnotatedElement;
 @AllArgsConstructor
 public class RepositoryDef {
     private String value;
+    private Class<?> dataSource;
+    private Class<?> factory;
     private Class<?>[] derived;
     private Class<?>[] events;
     private Class<?>[] queries;
@@ -39,6 +41,8 @@ public class RepositoryDef {
         if (repository != null) {
             RepositoryDef repositoryDef = new RepositoryDef();
             repositoryDef.setValue(repository.value());
+            repositoryDef.setDataSource(repository.dataSource());
+            repositoryDef.setFactory(repository.factory());
             repositoryDef.setDerived(repository.derived());
             repositoryDef.setEvents(repository.events());
             repositoryDef.setQueries(repository.queries());

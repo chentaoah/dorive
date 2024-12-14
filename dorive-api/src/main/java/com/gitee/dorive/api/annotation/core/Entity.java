@@ -34,14 +34,9 @@ public @interface Entity {
     String name() default "";
 
     /**
-     * 数据源
+     * 是否聚合
      */
-    Class<?> dataSource() default Object.class;
-
-    /**
-     * 实体工厂
-     */
-    Class<?> factory() default Object.class;
+    boolean aggregate() default false;
 
     /**
      * 指定仓储
@@ -52,11 +47,6 @@ public @interface Entity {
      * 操作优先级
      */
     int priority() default 0;
-
-    /**
-     * 是否聚合
-     */
-    boolean aggregate() default false;
 
 }
 

@@ -156,18 +156,9 @@ public class EntityDefinitionResolver {
         if (StringUtils.isNotBlank(name)) {
             newEntityDef.setName(name);
         }
-        Class<?> dataSource = entityAnnotation.dataSource();
-        if (dataSource != Object.class) {
-            newEntityDef.setDataSource(dataSource);
-        }
-        Class<?> factory = entityAnnotation.factory();
-        if (factory != Object.class) {
-            newEntityDef.setFactory(factory);
-        }
-        boolean aggregate = entityAnnotation.aggregate();
-        if (aggregate) {
-            newEntityDef.setAggregate(true);
-        }
+        newEntityDef.setAggregate(entityAnnotation.aggregate());
+        newEntityDef.setRepository(entityAnnotation.repository());
+        newEntityDef.setPriority(entityAnnotation.priority());
         fieldEntityDefinition.setEntityDef(newEntityDef);
 
         return fieldEntityDefinition;

@@ -31,6 +31,10 @@ public class EntityElement extends FieldEntityDefinition {
     private Map<String, String> fieldAliasMapping;
     private Map<String, Object> attributes;
 
+    public boolean isRoot() {
+        return "/".equals(accessPath);
+    }
+
     public Object getValue(Object entity) {
         return ReflectUtil.getFieldValue(entity, getFieldName());
     }
