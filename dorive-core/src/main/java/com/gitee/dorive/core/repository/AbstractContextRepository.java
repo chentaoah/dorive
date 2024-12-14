@@ -182,10 +182,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     private AbstractRepository<Object, Object> doNewRepository(EntityElement entityElement, OperationFactory operationFactory) {
-        DefaultRepository defaultRepository = new DefaultRepository();
-        defaultRepository.setEntityElement(entityElement);
-        defaultRepository.setOperationFactory(operationFactory);
-
         Map<String, Object> attributes = new ConcurrentHashMap<>(4);
 
         EntityStoreInfo entityStoreInfo = resolveEntityStoreInfo(repositoryDef);
@@ -200,9 +196,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         executor = new ExampleExecutor(executor, entityElement, entityMapper);
         attributes.put(ExampleExecutor.class.getName(), executor);
 
+        DefaultRepository defaultRepository = new DefaultRepository();
+        defaultRepository.setEntityElement(entityElement);
+        defaultRepository.setOperationFactory(operationFactory);
         defaultRepository.setExecutor(executor);
         defaultRepository.setAttributes(attributes);
-
         return defaultRepository;
     }
 
