@@ -29,7 +29,6 @@ import java.util.*;
 public class EntityElement extends FieldEntityDefinition {
     private String accessPath;
     private Map<String, String> fieldAliasMapping;
-    private Map<String, Object> attributes;
 
     public boolean isRoot() {
         return "/".equals(accessPath);

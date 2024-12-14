@@ -60,6 +60,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Setter
@@ -185,7 +186,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         defaultRepository.setEntityElement(entityElement);
         defaultRepository.setOperationFactory(operationFactory);
 
-        Map<String, Object> attributes = entityElement.getAttributes();
+        Map<String, Object> attributes = new ConcurrentHashMap<>(4);
 
         EntityStoreInfo entityStoreInfo = resolveEntityStoreInfo(repositoryDef);
         attributes.put(EntityStoreInfo.class.getName(), entityStoreInfo);
@@ -199,6 +200,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         executor = new ExampleExecutor(executor, entityElement, entityMapper);
         attributes.put(ExampleExecutor.class.getName(), executor);
         defaultRepository.setExecutor(executor);
+        defaultRepository.setAttributes(attributes);
+
         return defaultRepository;
     }
 
@@ -209,11 +212,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         AbstractRepository<Object, Object> repository = (AbstractRepository<Object, Object>) applicationContext.getBean(repositoryClass);
         if (!entityDef.isAggregate()) {
             AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) repository;
-            CommonRepository rootRepository = abstractContextRepository.getRootRepository();
-            // 拷贝
-            EntityElement rootEntityElement = rootRepository.getEntityElement();
-            entityElement.getAttributes().putAll(rootEntityElement.getAttributes());
-            return rootRepository.getProxyRepository();
+            return abstractContextRepository.getRootRepository().getProxyRepository();
         }
         return repository;
     }

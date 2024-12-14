@@ -20,6 +20,7 @@ package com.gitee.dorive.query.entity;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.core.repository.DefaultRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -46,6 +47,8 @@ public class MergedRepository {
     private Set<String> boundAccessPaths;
     // 执行仓储
     private CommonRepository executedRepository;
+    // 真正执行仓储
+    private DefaultRepository defaultRepository;
     // 序列号
     private Integer sequence;
     // 别名
@@ -53,5 +56,9 @@ public class MergedRepository {
 
     public String getName() {
         return definedRepository.getEntityElement().getEntityDef().getName();
+    }
+
+    public Map<String, Object> getAttributes() {
+        return defaultRepository.getAttributes();
     }
 }

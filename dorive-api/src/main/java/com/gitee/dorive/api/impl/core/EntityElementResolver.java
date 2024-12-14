@@ -69,7 +69,6 @@ public class EntityElementResolver {
 
         entityElement.setAccessPath(accessPath);
         entityElement.setFieldAliasMapping(fieldAliasMapping);
-        entityElement.setAttributes(new HashMap<>(4));
         return entityElement;
     }
 
