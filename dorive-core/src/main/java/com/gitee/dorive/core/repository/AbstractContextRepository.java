@@ -199,6 +199,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         executor = new FactoryExecutor(executor, entityElement, entityStoreInfo, entityFactory);
         executor = new ExampleExecutor(executor, entityElement, entityMapper);
         attributes.put(ExampleExecutor.class.getName(), executor);
+
         defaultRepository.setExecutor(executor);
         defaultRepository.setAttributes(attributes);
 
