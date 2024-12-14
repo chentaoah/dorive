@@ -196,12 +196,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         executor = new ExampleExecutor(executor, entityElement, entityMapper);
         attributes.put(ExampleExecutor.class.getName(), executor);
 
-        DefaultRepository defaultRepository = new DefaultRepository();
-        defaultRepository.setEntityElement(entityElement);
-        defaultRepository.setOperationFactory(operationFactory);
-        defaultRepository.setExecutor(executor);
-        defaultRepository.setAttributes(attributes);
-        return defaultRepository;
+        DefaultRepository repository = new DefaultRepository();
+        repository.setEntityElement(entityElement);
+        repository.setOperationFactory(operationFactory);
+        repository.setExecutor(executor);
+        repository.setAttributes(attributes);
+        return repository;
     }
 
     @SuppressWarnings("unchecked")
