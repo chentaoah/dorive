@@ -20,13 +20,11 @@ package com.gitee.dorive.core.impl.executor;
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
-import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.EntityOp;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
@@ -35,7 +33,6 @@ import com.gitee.dorive.core.entity.operation.eop.Insert;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +60,7 @@ public class FactoryExecutor extends AbstractProxyExecutor {
 
         List<Object> entities = Collections.emptyList();
         if (recordMaps != null && !recordMaps.isEmpty()) {
-            entities = reconstitute(context, query, recordMaps);
+            entities = entityFactory.reconstitute(context, recordMaps);
         }
 
         if (page != null) {
@@ -75,33 +72,12 @@ public class FactoryExecutor extends AbstractProxyExecutor {
         return result;
     }
 
-    private List<Object> reconstitute(Context context, Query query, List<Map<String, Object>> resultMaps) {
-        Example example = query.getExample();
-        boolean isUnion = example instanceof UnionExample;
-        List<Object> entities = new ArrayList<>(resultMaps.size());
-        for (Map<String, Object> resultMap : resultMaps) {
-            Object entity = entityFactory.reconstitute(context, resultMap);
-            if (entity != null) {
-                if (isUnion) {
-                    resultMap.put("$entity", entity);
-                }
-                entities.add(entity);
-            }
-        }
-        return entities;
-    }
-
     @Override
     public int execute(Context context, Operation operation) {
         if (operation instanceof EntityOp) {
             EntityOp entityOp = (EntityOp) operation;
             List<?> entities = entityOp.getEntities();
-            List<Object> persistentObjs = new ArrayList<>(entities.size());
-            for (Object entity : entities) {
-                Object persistent = entityFactory.deconstruct(context, entity);
-                persistentObjs.add(persistent);
-            }
-
+            List<Object> persistentObjs = entityFactory.deconstruct(context, entities);
             entityOp.setEntities(persistentObjs);
             int totalCount = super.execute(context, operation);
             entityOp.setEntities(entities);
@@ -122,8 +98,8 @@ public class FactoryExecutor extends AbstractProxyExecutor {
             ConditionUpdate conditionUpdate = (ConditionUpdate) operation;
             Object entity = conditionUpdate.getEntity();
             if (entity != null) {
-                Object persistent = entityFactory.deconstruct(context, entity);
-                conditionUpdate.setEntity(persistent);
+                List<Object> persistentObjs = entityFactory.deconstruct(context, Collections.singletonList(entity));
+                conditionUpdate.setEntity(persistentObjs.get(0));
                 int totalCount = super.execute(context, operation);
                 conditionUpdate.setEntity(entity);
                 return totalCount;

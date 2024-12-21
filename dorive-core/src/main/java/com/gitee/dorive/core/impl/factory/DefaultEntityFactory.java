@@ -31,6 +31,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -72,11 +75,29 @@ public class DefaultEntityFactory implements EntityFactory {
     }
 
     @Override
+    public List<Object> reconstitute(Context context, List<?> persistentObjs) {
+        List<Object> entities = new ArrayList<>(persistentObjs.size());
+        for (Object persistent : persistentObjs) {
+            Object entity = reconstitute(context, persistent);
+            entities.add(entity);
+        }
+        return entities;
+    }
+
     public Object reconstitute(Context context, Object persistent) {
         return BeanUtil.toBean(persistent, entityElement.getGenericType(), reCopyOptions);
     }
 
     @Override
+    public List<Object> deconstruct(Context context, List<?> entities) {
+        List<Object> persistentObjs = new ArrayList<>(entities.size());
+        for (Object entity : entities) {
+            Object persistent = deconstruct(context, entity);
+            persistentObjs.add(persistent);
+        }
+        return persistentObjs;
+    }
+
     public Object deconstruct(Context context, Object entity) {
         return BeanUtil.toBean(entity, entityStoreInfo.getPojoClass(), deCopyOptions);
     }
