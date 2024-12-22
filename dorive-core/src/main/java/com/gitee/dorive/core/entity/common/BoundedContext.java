@@ -15,15 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.util;
+package com.gitee.dorive.core.entity.common;
 
-import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.context.InnerContext;
+import lombok.NoArgsConstructor;
 
-public class ContextUtils {
+import java.util.Properties;
 
-    public static Context clone(Context context) {
-        return new InnerContext(context);
-    }
-
+@NoArgsConstructor
+public class BoundedContext extends Properties {
 }

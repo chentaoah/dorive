@@ -22,13 +22,13 @@ import com.gitee.dorive.core.api.context.Options;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class BoundedContext extends AbstractContext {
+public class DefaultContext extends AbstractContext {
 
-    public BoundedContext(Options options) {
+    public DefaultContext(Options options) {
         super(options);
     }
 
-    public BoundedContext(Context context) {
+    public DefaultContext(Context context) {
         super(context);
     }
 
