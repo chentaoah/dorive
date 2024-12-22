@@ -21,9 +21,9 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.constant.core.Order;
 import com.gitee.dorive.api.entity.core.EntityDefinition;
+import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.def.EntityDef;
 import com.gitee.dorive.api.entity.core.def.OrderDef;
-import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.api.impl.core.EntityDefinitionResolver;
 import com.gitee.dorive.api.impl.core.EntityElementResolver;
@@ -34,6 +34,7 @@ import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.config.RepositoryContext;
+import com.gitee.dorive.core.entity.common.BoundedContext;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.factory.FieldConverter;
@@ -45,8 +46,8 @@ import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.factory.ValueObjEntityFactory;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
-import com.gitee.dorive.core.impl.handler.eo.BatchEntityOpHandler;
 import com.gitee.dorive.core.impl.handler.DelegatedEntityHandler;
+import com.gitee.dorive.core.impl.handler.eo.BatchEntityOpHandler;
 import com.gitee.dorive.core.impl.handler.eo.DelegatedEntityOpHandler;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.resolver.DerivedRepositoryResolver;
@@ -230,6 +231,15 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultEntityFactory.setEntityElement(entityElement);
             defaultEntityFactory.setEntityStoreInfo(entityStoreInfo);
             defaultEntityFactory.setEntityMapper(entityMapper);
+            // 边界上下文
+            String boundedContextName = repositoryDef.getBoundedContext();
+            if (StringUtils.isNotBlank(boundedContextName)) {
+                defaultEntityFactory.setBoundedContextName(boundedContextName);
+                if (applicationContext.containsBean(boundedContextName)) {
+                    BoundedContext boundedContext = (BoundedContext) applicationContext.getBean(boundedContextName);
+                    defaultEntityFactory.setBoundedContext(boundedContext);
+                }
+            }
         }
         return entityFactory;
     }

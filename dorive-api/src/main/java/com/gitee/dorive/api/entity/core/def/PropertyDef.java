@@ -15,29 +15,26 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity.core;
+package com.gitee.dorive.api.entity.core.def;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.api.entity.core.def.EntityDef;
+import cn.hutool.core.bean.BeanUtil;
+import com.gitee.dorive.api.annotation.core.Property;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
-import java.util.List;
+import java.lang.reflect.AnnotatedElement;
+import java.util.Map;
 
 @Data
-public class EntityDefinition {
-    private EntityDef entityDef;
-    private Class<?> genericType;
-    private String primaryKey;
-    private List<PropertyDefinition> propertyDefinitions;
-    private List<FieldDefinition> fieldDefinitions;
-    private List<FieldEntityDefinition> fieldEntityDefinitions;
+@NoArgsConstructor
+@AllArgsConstructor
+public class PropertyDef {
+    private String value;
 
-    public boolean hasField(String fieldName) {
-        return ReflectUtil.hasField(genericType, fieldName);
-    }
-
-    public FieldDefinition getFieldDefinition(String fieldName) {
-        return CollUtil.findOne(fieldDefinitions, fieldDefinition -> fieldName.equals(fieldDefinition.getFieldName()));
+    public static PropertyDef fromElement(AnnotatedElement element) {
+        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Property.class);
+        return attributes != null ? BeanUtil.copyProperties(attributes, PropertyDef.class) : null;
     }
 }

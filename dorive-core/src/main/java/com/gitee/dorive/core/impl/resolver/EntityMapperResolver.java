@@ -126,7 +126,6 @@ public class EntityMapperResolver {
     @Getter
     @AllArgsConstructor
     private class DefaultEntityMapper implements EntityMapper {
-
         private final Map<String, FieldConverter> fieldConverterMap;
         private final List<FieldConverter> valueObjFields;
         private final List<FieldConverter> matchedValueObjFields;
@@ -142,7 +141,6 @@ public class EntityMapperResolver {
         public boolean isValueObjType(Type type) {
             return valueObjTypes.contains(type);
         }
-
     }
 
 }

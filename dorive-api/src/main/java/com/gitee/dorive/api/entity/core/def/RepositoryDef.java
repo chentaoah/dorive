@@ -32,6 +32,7 @@ public class RepositoryDef {
     private String value;
     private Class<?> dataSource;
     private Class<?> factory;
+    private String boundedContext;
     private Class<?>[] derived;
     private Class<?>[] events;
     private Class<?>[] queries;
@@ -43,6 +44,7 @@ public class RepositoryDef {
             repositoryDef.setValue(repository.value());
             repositoryDef.setDataSource(repository.dataSource());
             repositoryDef.setFactory(repository.factory());
+            repositoryDef.setBoundedContext(repository.boundedContext());
             repositoryDef.setDerived(repository.derived());
             repositoryDef.setEvents(repository.events());
             repositoryDef.setQueries(repository.queries());

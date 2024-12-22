@@ -17,27 +17,18 @@
 
 package com.gitee.dorive.api.entity.core;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.api.entity.core.def.EntityDef;
-import lombok.Data;
+import com.gitee.dorive.api.entity.core.def.PropertyDef;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+public class PropertyDefinition extends Field {
+    private PropertyDef propertyDef;
 
-@Data
-public class EntityDefinition {
-    private EntityDef entityDef;
-    private Class<?> genericType;
-    private String primaryKey;
-    private List<PropertyDefinition> propertyDefinitions;
-    private List<FieldDefinition> fieldDefinitions;
-    private List<FieldEntityDefinition> fieldEntityDefinitions;
-
-    public boolean hasField(String fieldName) {
-        return ReflectUtil.hasField(genericType, fieldName);
-    }
-
-    public FieldDefinition getFieldDefinition(String fieldName) {
-        return CollUtil.findOne(fieldDefinitions, fieldDefinition -> fieldName.equals(fieldDefinition.getFieldName()));
+    public PropertyDefinition(java.lang.reflect.Field field) {
+        super(field);
     }
 }
