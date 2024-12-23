@@ -48,8 +48,7 @@ public class QueryUnit {
     }
 
     public String getPrimaryKeyAlias() {
-        EntityElement entityElement = getEntityElement();
-        Map<String, Object> attributes = entityElement.getAttributes();
+        Map<String, Object> attributes = mergedRepository.getAttributes();
         EntityStoreInfo entityStoreInfo = (EntityStoreInfo) attributes.get(EntityStoreInfo.class.getName());
         return entityStoreInfo.getIdColumn();
     }

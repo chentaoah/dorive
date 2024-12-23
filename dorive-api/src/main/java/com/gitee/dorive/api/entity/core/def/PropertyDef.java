@@ -15,15 +15,26 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.web.entity.req;
+package com.gitee.dorive.api.entity.core.def;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.gitee.dorive.api.annotation.core.Property;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+
+import java.lang.reflect.AnnotatedElement;
+import java.util.Map;
 
 @Data
-public class LoadConfigReq {
-    private String url;
-    private String entityType;
-    private String selectorName;
-    private String repositoryType;
-    private String queryType;
+@NoArgsConstructor
+@AllArgsConstructor
+public class PropertyDef {
+    private String value;
+
+    public static PropertyDef fromElement(AnnotatedElement element) {
+        Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Property.class);
+        return attributes != null ? BeanUtil.copyProperties(attributes, PropertyDef.class) : null;
+    }
 }

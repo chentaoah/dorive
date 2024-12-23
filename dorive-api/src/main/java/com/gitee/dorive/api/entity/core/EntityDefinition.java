@@ -29,6 +29,7 @@ public class EntityDefinition {
     private EntityDef entityDef;
     private Class<?> genericType;
     private String primaryKey;
+    private List<PropertyDefinition> propertyDefinitions;
     private List<FieldDefinition> fieldDefinitions;
     private List<FieldEntityDefinition> fieldEntityDefinitions;
 

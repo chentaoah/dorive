@@ -32,11 +32,9 @@ import java.util.Map;
 @AllArgsConstructor
 public class EntityDef {
     private String name;
-    private Class<?> dataSource;
-    private Class<?> factory;
+    private boolean aggregate;
     private Class<?> repository;
     private int priority;
-    private boolean aggregate;
 
     public static EntityDef fromElement(AnnotatedElement element) {
         Map<String, Object> attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(element, Entity.class);

@@ -15,21 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.web.entity;
+package com.gitee.dorive.api.entity.core;
 
-import com.gitee.dorive.core.api.context.Selector;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
-import lombok.Data;
+import com.gitee.dorive.api.entity.core.def.PropertyDef;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
-import java.util.Map;
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+public class PropertyDefinition extends Field {
+    private PropertyDef propertyDef;
 
-@Data
-public class ExporterConfig {
-    private String url;
-    private Class<?> entityClass;
-    private Selector selector;
-    private AbstractQueryRepository<?, ?> repository;
-    private Class<?> queryClass;
-    private Map<String, List<String>> filterIdPropertiesMap;
+    public PropertyDefinition(java.lang.reflect.Field field) {
+        super(field);
+    }
 }

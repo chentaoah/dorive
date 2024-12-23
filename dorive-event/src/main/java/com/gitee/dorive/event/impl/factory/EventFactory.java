@@ -27,8 +27,8 @@ import com.gitee.dorive.event.entity.ext.*;
 
 public class EventFactory {
 
-    public static BaseEvent newExecutorEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
-        BaseEvent baseEvent = null;
+    public static BaseEvent<?> newExecutorEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
+        BaseEvent<?> baseEvent = null;
         if (entityOp instanceof Insert) {
             baseEvent = new ExecutorInsertEvent<>(source);
 
@@ -47,8 +47,8 @@ public class EventFactory {
         return baseEvent;
     }
 
-    public static BaseEvent newRepositoryEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
-        BaseEvent baseEvent = null;
+    public static BaseEvent<?> newRepositoryEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
+        BaseEvent<?> baseEvent = null;
         if (entityOp instanceof Insert) {
             baseEvent = new RepositoryInsertEvent<>(source);
 

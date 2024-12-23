@@ -24,7 +24,7 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.api.entity.core.EntityElement;
-import com.gitee.dorive.api.entity.core.def.EntityDef;
+import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.core.api.common.ImplFactory;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
@@ -67,9 +67,8 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
     }
 
     @Override
-    protected EntityStoreInfo resolveEntityStoreInfo(EntityElement entityElement) {
-        EntityDef entityDef = entityElement.getEntityDef();
-        Class<?> mapperClass = entityDef.getDataSource();
+    protected EntityStoreInfo resolveEntityStoreInfo(RepositoryDef repositoryDef) {
+        Class<?> mapperClass = repositoryDef.getDataSource();
         Object mapper = null;
         Class<?> pojoClass = null;
         if (mapperClass != Object.class) {

@@ -23,6 +23,7 @@ import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.core.repository.DefaultRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import lombok.Data;
@@ -71,6 +72,7 @@ public class MergedRepositoryResolver {
             mergedRepository.setExecutedRepository(executedRepository);
             addMergedRepository(mergedRepository);
 
+            // 合并内部仓储
             if (abstractQueryRepository != null) {
                 mergeRepository(accessPath, abstractQueryRepository);
             }
@@ -78,6 +80,8 @@ public class MergedRepositoryResolver {
     }
 
     private void addMergedRepository(MergedRepository mergedRepository) {
+        CommonRepository executedRepository = mergedRepository.getExecutedRepository();
+        mergedRepository.setDefaultRepository((DefaultRepository) executedRepository.getProxyRepository());
         mergedRepository.setSequence(mergedRepositoryMap.size() + 1);
         mergedRepository.setAlias("t" + mergedRepository.getSequence());
 

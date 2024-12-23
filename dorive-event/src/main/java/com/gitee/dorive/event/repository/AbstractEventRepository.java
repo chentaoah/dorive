@@ -93,7 +93,7 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
         if (operation instanceof EntityOp) {
             Class<?> entityClass = getEntityElement().getGenericType();
             EntityOp entityOp = (EntityOp) operation;
-            BaseEvent baseEvent = EventFactory.newRepositoryEvent(this, entityOp.isUncontrolled(), entityClass, context, entityOp);
+            BaseEvent<?> baseEvent = EventFactory.newRepositoryEvent(this, entityOp.isUncontrolled(), entityClass, context, entityOp);
             getApplicationContext().publishEvent(baseEvent);
         }
     }

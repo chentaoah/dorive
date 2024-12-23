@@ -19,7 +19,7 @@ package com.gitee.dorive.ref.repository;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Options;
-import com.gitee.dorive.core.entity.context.InnerContext;
+import com.gitee.dorive.core.entity.context.DefaultContext;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -33,7 +33,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public E selectByPrimaryKey(Options options, PK primaryKey) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         return super.selectByPrimaryKey(options, primaryKey);
     }
@@ -41,7 +41,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public List<E> selectByExample(Options options, Example example) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         if (!(example instanceof InnerExample)) {
             example = ExampleUtils.clone(example);
@@ -52,7 +52,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public E selectOneByExample(Options options, Example example) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         if (!(example instanceof InnerExample)) {
             example = ExampleUtils.clone(example);
@@ -63,7 +63,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public Page<E> selectPageByExample(Options options, Example example) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         if (!(example instanceof InnerExample)) {
             example = ExampleUtils.clone(example);
@@ -74,7 +74,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public long selectCountByExample(Options options, Example example) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         if (!(example instanceof InnerExample)) {
             example = ExampleUtils.clone(example);
@@ -85,7 +85,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public int insert(Options options, E entity) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         return super.insert(options, entity);
     }
@@ -93,7 +93,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public int update(Options options, E entity) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         return super.update(options, entity);
     }
@@ -101,7 +101,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public int updateByExample(Options options, Object entity, Example example) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         if (!(example instanceof InnerExample)) {
             example = ExampleUtils.clone(example);
@@ -112,7 +112,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public int insertOrUpdate(Options options, E entity) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         return super.insertOrUpdate(options, entity);
     }
@@ -120,7 +120,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public int delete(Options options, E entity) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         return super.delete(options, entity);
     }
@@ -128,7 +128,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public int deleteByPrimaryKey(Options options, PK primaryKey) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         return super.deleteByPrimaryKey(options, primaryKey);
     }
@@ -136,7 +136,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public int deleteByExample(Options options, Example example) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         if (!(example instanceof InnerExample)) {
             example = ExampleUtils.clone(example);
@@ -147,7 +147,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public int insertList(Options options, List<E> entities) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         return super.insertList(options, entities);
     }
@@ -155,7 +155,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public int updateList(Options options, List<E> entities) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         return super.updateList(options, entities);
     }
@@ -163,7 +163,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public int insertOrUpdateList(Options options, List<E> entities) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         return super.insertOrUpdateList(options, entities);
     }
@@ -171,7 +171,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public int deleteList(Options options, List<E> entities) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         return super.deleteList(options, entities);
     }
@@ -179,7 +179,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public List<E> selectByQuery(Options options, Object query) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         return super.selectByQuery(options, query);
     }
@@ -187,7 +187,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public Page<E> selectPageByQuery(Options options, Object query) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         return super.selectPageByQuery(options, query);
     }
@@ -195,7 +195,7 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryReposi
     @Override
     public long selectCountByQuery(Options options, Object query) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         return super.selectCountByQuery(options, query);
     }

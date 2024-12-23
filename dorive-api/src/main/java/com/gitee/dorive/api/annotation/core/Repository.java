@@ -35,10 +35,34 @@ public @interface Repository {
     @AliasFor(annotation = Component.class)
     String value() default "";
 
+    /**
+     * 数据源
+     */
+    Class<?> dataSource();
+
+    /**
+     * 实体工厂
+     */
+    Class<?> factory() default Object.class;
+
+    /**
+     * 边界上下文
+     */
+    String boundedContext() default "";
+
+    /**
+     * 派生
+     */
     Class<?>[] derived() default {};
 
+    /**
+     * 事件
+     */
     Class<?>[] events() default {};
 
+    /**
+     * 查询对象
+     */
     Class<?>[] queries() default {};
 
 }

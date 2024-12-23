@@ -19,10 +19,12 @@ package com.gitee.dorive.core.api.factory;
 
 import com.gitee.dorive.core.api.context.Context;
 
+import java.util.List;
+
 public interface EntityFactory {
 
-    Object reconstitute(Context context, Object persistent);
+    List<Object> reconstitute(Context context, List<?> persistentObjs);
 
-    Object deconstruct(Context context, Object entity);
+    List<Object> deconstruct(Context context, List<?> entities);
 
 }

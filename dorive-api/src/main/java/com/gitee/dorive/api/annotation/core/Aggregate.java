@@ -19,12 +19,7 @@ package com.gitee.dorive.api.annotation.core;
 
 import org.springframework.core.annotation.AliasFor;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * 聚合
@@ -32,8 +27,8 @@ import java.lang.annotation.Target;
 @Entity
 @Inherited
 @Documented
-@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Aggregate {
 
     /**
@@ -46,13 +41,7 @@ public @interface Aggregate {
      * @see Entity
      */
     @AliasFor(annotation = Entity.class)
-    Class<?> dataSource() default Object.class;
-
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    Class<?> factory() default Object.class;
+    boolean aggregate() default true;
 
     /**
      * @see Entity
@@ -65,11 +54,5 @@ public @interface Aggregate {
      */
     @AliasFor(annotation = Entity.class)
     int priority() default 0;
-
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    boolean aggregate() default true;
 
 }

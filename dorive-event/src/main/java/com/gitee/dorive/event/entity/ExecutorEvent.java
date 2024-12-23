@@ -22,7 +22,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ExecutorEvent<T> extends BaseEvent {
+public class ExecutorEvent<T> extends BaseEvent<T> {
     public ExecutorEvent(Object source) {
         super(source);
     }

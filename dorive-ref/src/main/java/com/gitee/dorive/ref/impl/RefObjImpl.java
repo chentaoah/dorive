@@ -20,7 +20,7 @@ package com.gitee.dorive.ref.impl;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.core.entity.context.InnerContext;
+import com.gitee.dorive.core.entity.context.DefaultContext;
 import com.gitee.dorive.core.repository.AbstractRepository;
 import com.gitee.dorive.ref.api.RefObj;
 import lombok.AllArgsConstructor;
@@ -38,7 +38,7 @@ public class RefObjImpl implements RefObj {
     @Override
     public long select(Options options) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         EntityHandler entityHandler = ref.getEntityHandler();
         return entityHandler.handle((Context) options, Collections.singletonList(object));
@@ -47,7 +47,7 @@ public class RefObjImpl implements RefObj {
     @Override
     public int insertOrUpdate(Options options) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         AbstractRepository<Object, Object> repository = ref.getProxyRepository();
         return repository.insertOrUpdate(options, object);
@@ -56,7 +56,7 @@ public class RefObjImpl implements RefObj {
     @Override
     public int delete(Options options) {
         if (!(options instanceof Context)) {
-            options = new InnerContext(options);
+            options = new DefaultContext(options);
         }
         AbstractRepository<Object, Object> repository = ref.getProxyRepository();
         return repository.delete(options, object);

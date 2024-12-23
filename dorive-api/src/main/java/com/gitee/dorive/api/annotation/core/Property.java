@@ -15,15 +15,22 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.util;
+package com.gitee.dorive.api.annotation.core;
 
-import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.context.InnerContext;
+import java.lang.annotation.*;
 
-public class ContextUtils {
+/**
+ * 上下文属性
+ */
+@Inherited
+@Documented
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Property {
 
-    public static Context clone(Context context) {
-        return new InnerContext(context);
-    }
+    /**
+     * 键
+     */
+    String value();
 
 }

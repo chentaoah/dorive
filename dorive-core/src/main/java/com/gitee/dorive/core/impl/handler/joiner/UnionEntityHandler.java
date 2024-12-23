@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.core.impl.handler.joiner;
 
+import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
@@ -83,11 +84,14 @@ public class UnionEntityHandler extends AbstractEntityJoiner {
     @SuppressWarnings("unchecked")
     protected void handleResult(Context context, Result<Object> result) {
         List<Map<String, Object>> recordMaps = result.getRecordMaps();
-        for (Map<String, Object> resultMap : recordMaps) {
-            Object row = resultMap.get("$row");
-            List<String> rows = (List<String>) resultMap.get("$rows");
-            Object entity = resultMap.get("$entity");
+        List<Object> entities = result.getRecords();
+        Assert.isTrue(recordMaps.size() == entities.size(), "Inconsistent data!");
+        for (int index = 0; index < recordMaps.size(); index++) {
+            Map<String, Object> resultMap = recordMaps.get(index);
+            Object entity = entities.get(index);
             if (entity != null) {
+                Object row = resultMap.get("$row");
+                List<String> rows = (List<String>) resultMap.get("$rows");
                 if (rows != null) {
                     for (String eachRow : rows) {
                         addRight(eachRow, entity);

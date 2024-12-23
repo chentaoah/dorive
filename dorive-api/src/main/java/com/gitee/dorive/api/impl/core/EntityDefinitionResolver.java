@@ -22,13 +22,12 @@ import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.annotation.core.Entity;
+import com.gitee.dorive.api.annotation.core.Property;
 import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.FieldDefinition;
 import com.gitee.dorive.api.entity.core.FieldEntityDefinition;
-import com.gitee.dorive.api.entity.core.def.BindingDef;
-import com.gitee.dorive.api.entity.core.def.EntityDef;
-import com.gitee.dorive.api.entity.core.def.FieldDef;
-import com.gitee.dorive.api.entity.core.def.OrderDef;
+import com.gitee.dorive.api.entity.core.PropertyDefinition;
+import com.gitee.dorive.api.entity.core.def.*;
 import com.gitee.dorive.api.util.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -84,8 +83,10 @@ public class EntityDefinitionResolver {
     }
 
     private void readFields(Class<?> type, EntityDefinition entityDefinition) {
+        List<PropertyDefinition> propertyDefinitions = new ArrayList<>();
         List<FieldDefinition> fieldDefinitions = new ArrayList<>();
         List<FieldEntityDefinition> fieldEntityDefinitions = new ArrayList<>();
+
         List<Field> fields = ReflectUtils.getAllFields(type);
         // 去重
         Map<String, Field> fieldMap = new LinkedHashMap<>();
@@ -94,6 +95,13 @@ public class EntityDefinitionResolver {
         }
         for (Field field : fieldMap.values()) {
             if (!Modifier.isStatic(field.getModifiers())) {
+                // 上下文属性
+                Property propertyAnnotation = AnnotatedElementUtils.getMergedAnnotation(field, Property.class);
+                if (propertyAnnotation != null) {
+                    PropertyDefinition propertyDefinition = readProperty(field);
+                    propertyDefinitions.add(propertyDefinition);
+                    continue;
+                }
                 // 所有字段
                 FieldDefinition fieldDefinition = readField(field);
                 if (fieldDefinition.isPrimary()) {
@@ -110,8 +118,16 @@ public class EntityDefinitionResolver {
                 }
             }
         }
+
+        entityDefinition.setPropertyDefinitions(propertyDefinitions);
         entityDefinition.setFieldDefinitions(fieldDefinitions);
         entityDefinition.setFieldEntityDefinitions(fieldEntityDefinitions);
+    }
+
+    private PropertyDefinition readProperty(Field field) {
+        PropertyDefinition propertyDefinition = new PropertyDefinition(field);
+        propertyDefinition.setPropertyDef(PropertyDef.fromElement(field));
+        return propertyDefinition;
     }
 
     private FieldDefinition readField(Field field) {
@@ -156,18 +172,9 @@ public class EntityDefinitionResolver {
         if (StringUtils.isNotBlank(name)) {
             newEntityDef.setName(name);
         }
-        Class<?> dataSource = entityAnnotation.dataSource();
-        if (dataSource != Object.class) {
-            newEntityDef.setDataSource(dataSource);
-        }
-        Class<?> factory = entityAnnotation.factory();
-        if (factory != Object.class) {
-            newEntityDef.setFactory(factory);
-        }
-        boolean aggregate = entityAnnotation.aggregate();
-        if (aggregate) {
-            newEntityDef.setAggregate(true);
-        }
+        newEntityDef.setAggregate(entityAnnotation.aggregate());
+        newEntityDef.setRepository(entityAnnotation.repository());
+        newEntityDef.setPriority(entityAnnotation.priority());
         fieldEntityDefinition.setEntityDef(newEntityDef);
 
         return fieldEntityDefinition;

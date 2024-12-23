@@ -49,7 +49,7 @@ public class EventExecutor extends AbstractProxyExecutor {
             if (operation instanceof EntityOp) {
                 Class<?> entityClass = getEntityElement().getGenericType();
                 EntityOp entityOp = (EntityOp) operation;
-                BaseEvent baseEvent = EventFactory.newExecutorEvent(this, entityOp.isUncontrolled(), entityClass, context, entityOp);
+                BaseEvent<?> baseEvent = EventFactory.newExecutorEvent(this, entityOp.isUncontrolled(), entityClass, context, entityOp);
                 getApplicationContext().publishEvent(baseEvent);
             }
         }

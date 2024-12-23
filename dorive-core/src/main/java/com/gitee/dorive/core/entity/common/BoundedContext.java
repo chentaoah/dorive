@@ -15,20 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.web.entity.req;
+package com.gitee.dorive.core.entity.common;
 
-import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
+import java.util.Properties;
 
-@Data
-public class ListOrPageReq {
-    private HttpServletRequest request;
-    private HttpServletResponse response;
-    private String methodName;
-    private String entity;
-    private String config;
-    private Map<String, Object> params;
+@NoArgsConstructor
+public class BoundedContext extends Properties {
 }

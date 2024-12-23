@@ -18,7 +18,6 @@
 package com.gitee.dorive.sql.impl.segment;
 
 import com.gitee.dorive.api.constant.core.Operator;
-import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Criterion;
@@ -59,9 +58,7 @@ public class SegmentUnitResolver {
     public SegmentUnit resolve() {
         Context context = queryContext.getContext();
 
-        CommonRepository executedRepository = mergedRepository.getExecutedRepository();
-        EntityElement entityElement = executedRepository.getEntityElement();
-        Map<String, Object> attributes = entityElement.getAttributes();
+        Map<String, Object> attributes = mergedRepository.getAttributes();
         EntityStoreInfo entityStoreInfo = (EntityStoreInfo) attributes.get(EntityStoreInfo.class.getName());
         ExampleExecutor exampleExecutor = (ExampleExecutor) attributes.get(ExampleExecutor.class.getName());
 
