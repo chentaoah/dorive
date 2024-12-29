@@ -23,6 +23,7 @@ import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.PropertyDefinition;
 import com.gitee.dorive.api.entity.core.def.PropertyDef;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.factory.EntityAdapter;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.entity.common.BoundedContext;
@@ -47,16 +48,21 @@ public class DefaultEntityFactory implements EntityFactory {
 
     private EntityElement entityElement;
     private EntityStoreInfo entityStoreInfo;
+    // 序列化
     private EntityMapper entityMapper;
     private CopyOptions reCopyOptions;
     private CopyOptions deCopyOptions;
+    // 边界上下文
     private String boundedContextName;
     private BoundedContext boundedContext;
     private CopyOptions ctxCopyOptions;
+    // 适配器
+    private EntityAdapter entityAdapter;
 
     public void setEntityElement(EntityElement entityElement) {
         this.entityElement = entityElement;
         initCtxCopyOptions();
+        initEntityAdapter();
     }
 
     private void initCtxCopyOptions() {
@@ -71,6 +77,10 @@ public class DefaultEntityFactory implements EntityFactory {
             }
             this.ctxCopyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(keyFieldNameMapping);
         }
+    }
+
+    protected void initEntityAdapter() {
+        this.entityAdapter = (persistent) -> entityElement.getGenericType();
     }
 
     public void setEntityMapper(EntityMapper entityMapper) {
@@ -130,7 +140,7 @@ public class DefaultEntityFactory implements EntityFactory {
     }
 
     public Object reconstitute(Context context, Object persistent) {
-        return BeanUtil.toBean(persistent, entityElement.getGenericType(), reCopyOptions);
+        return BeanUtil.toBean(persistent, entityAdapter.adaptEntityType(persistent), reCopyOptions);
     }
 
     @Override
