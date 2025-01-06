@@ -15,18 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.inject.api;
+package com.gitee.dorive.inject.entity;
 
-import com.gitee.dorive.inject.entity.DomainDefinition;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-public interface TypeDomainResolver {
-
-    boolean isUnderScanPackage(Class<?> typeToMatch);
-
-    DomainDefinition getDomainDefinition(Class<?> typeToMatch);
-
-    void checkDomain(Class<?> type, Class<?> injectedType);
-
-    void checkProtection(Class<?> type);
-
+@Data
+@AllArgsConstructor
+public class ExportDefinition {
+    private String path;
 }

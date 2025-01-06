@@ -15,15 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.inject.entity;
+package com.gitee.dorive.inject.api;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+public interface ModuleInjectionLimiter {
 
-@Data
-@AllArgsConstructor
-public class DomainDefinition {
-    private String name;
-    private String pattern;
-    private String protect;
+    boolean isUnderScanPackage(Class<?> typeToMatch);
+
+    void checkInjectedType(Class<?> type, Class<?> injectedType);
+
 }

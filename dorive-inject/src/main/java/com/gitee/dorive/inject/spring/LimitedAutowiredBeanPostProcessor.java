@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.inject.spring;
 
-import com.gitee.dorive.inject.api.TypeDomainResolver;
+import com.gitee.dorive.inject.api.ModuleInjectionLimiter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +39,12 @@ import java.util.*;
 public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter implements MergedBeanDefinitionPostProcessor {
 
     protected final Log logger = LogFactory.getLog(getClass());
-    private final TypeDomainResolver typeDomainResolver;
+    private final ModuleInjectionLimiter moduleInjectionLimiter;
     private final Set<Class<? extends Annotation>> autowiredAnnotationTypes = new LinkedHashSet<>(4);
 
     @SuppressWarnings("unchecked")
-    public LimitedAutowiredBeanPostProcessor(TypeDomainResolver typeDomainResolver) {
-        this.typeDomainResolver = typeDomainResolver;
+    public LimitedAutowiredBeanPostProcessor(ModuleInjectionLimiter moduleInjectionLimiter) {
+        this.moduleInjectionLimiter = moduleInjectionLimiter;
         this.autowiredAnnotationTypes.add(Autowired.class);
         try {
             this.autowiredAnnotationTypes.add((Class<? extends Annotation>)
@@ -57,7 +57,7 @@ public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPos
 
     @Override
     public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
-        checkAutowiredFieldDomain(beanType);
+        checkAutowiredFieldModule(beanType);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPos
         // ignore
     }
 
-    private void checkAutowiredFieldDomain(final Class<?> clazz) {
+    private void checkAutowiredFieldModule(final Class<?> clazz) {
         ReflectionUtils.doWithLocalFields(clazz, field -> {
             AnnotationAttributes ann = findAutowiredAnnotation(field);
             if (ann != null) {
@@ -75,7 +75,7 @@ public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPos
                     }
                     return;
                 }
-                doCheckAutowiredFieldDomain(clazz, field);
+                doCheckAutowiredFieldModule(clazz, field);
             }
         });
     }
@@ -93,10 +93,8 @@ public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPos
         return null;
     }
 
-    private void doCheckAutowiredFieldDomain(Class<?> clazz, Field field) {
-        if (typeDomainResolver.isUnderScanPackage(clazz) && typeDomainResolver.isUnderScanPackage(field.getType())) {
-            typeDomainResolver.checkDomain(clazz, field.getType());
-        }
+    private void doCheckAutowiredFieldModule(Class<?> clazz, Field field) {
+        moduleInjectionLimiter.checkInjectedType(clazz, field.getType());
     }
 
 }

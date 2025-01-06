@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.inject.spring;
 
-import com.gitee.dorive.inject.api.TypeDomainResolver;
+import com.gitee.dorive.inject.api.ModuleInjectionLimiter;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -26,17 +26,17 @@ import java.lang.reflect.Constructor;
 
 public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassingInstantiationStrategy {
 
-    private TypeDomainResolver typeDomainResolver;
+    private ModuleInjectionLimiter moduleInjectionLimiter;
 
     @Override
     public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Constructor<?> ctor, Object... args) {
         tryGetResolverFromContext(owner);
-        if (typeDomainResolver != null) {
+        if (moduleInjectionLimiter != null) {
             Class<?> resolvableType = (Class<?>) bd.getResolvableType().getType();
-            if (isNotSpringInternalType(resolvableType) && typeDomainResolver.isUnderScanPackage(resolvableType)) {
+            if (isNotSpringInternalType(resolvableType) && moduleInjectionLimiter.isUnderScanPackage(resolvableType)) {
                 for (Class<?> parameterType : ctor.getParameterTypes()) {
-                    if (isNotSpringInternalType(parameterType) && typeDomainResolver.isUnderScanPackage(parameterType)) {
-                        typeDomainResolver.checkDomain(resolvableType, parameterType);
+                    if (isNotSpringInternalType(parameterType) && moduleInjectionLimiter.isUnderScanPackage(parameterType)) {
+                        moduleInjectionLimiter.checkInjectedType(resolvableType, parameterType);
                     }
                 }
             }
@@ -45,10 +45,10 @@ public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassi
     }
 
     private void tryGetResolverFromContext(BeanFactory owner) {
-        if (typeDomainResolver == null) {
+        if (moduleInjectionLimiter == null) {
             synchronized (this) {
-                if (typeDomainResolver == null) {
-                    typeDomainResolver = owner.getBean(TypeDomainResolver.class);
+                if (moduleInjectionLimiter == null) {
+                    moduleInjectionLimiter = owner.getBean(ModuleInjectionLimiter.class);
                 }
             }
         }
