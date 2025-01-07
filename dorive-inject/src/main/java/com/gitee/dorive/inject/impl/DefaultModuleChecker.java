@@ -45,21 +45,15 @@ public class DefaultModuleChecker implements ModuleChecker {
     @Override
     public void checkInjection(Class<?> type, Class<?> injectedType) {
         if (isUnderScanPackage(injectedType)) {
-            ModuleDefinition moduleDefinition = findModuleDefinition(injectedType);
             // 模块定义不存在，则判定为通过
+            ModuleDefinition moduleDefinition = findModuleDefinition(injectedType);
             if (moduleDefinition == null) {
                 return;
             }
             // 在公开的包路径下，则判定为通过
-            String typeName = injectedType.getName();
-            List<ExportDefinition> exportDefinitions = moduleDefinition.getExports();
-            if (exportDefinitions != null && !exportDefinitions.isEmpty()) {
-                for (ExportDefinition exportDefinition : exportDefinitions) {
-                    String path = exportDefinition.getPath();
-                    if (antPathMatcher.match(path, typeName)) {
-                        return;
-                    }
-                }
+            ExportDefinition exportDefinition = findExportDefinition(injectedType, moduleDefinition);
+            if (exportDefinition != null) {
+                return;
             }
             // 模块
             if (isUnderScanPackage(type)) {
@@ -84,6 +78,10 @@ public class DefaultModuleChecker implements ModuleChecker {
 
     private ModuleDefinition findModuleDefinition(Class<?> typeToMatch) {
         return CollUtil.findOne(moduleDefinitions, item -> antPathMatcher.match(item.getPath(), typeToMatch.getName()));
+    }
+
+    private ExportDefinition findExportDefinition(Class<?> typeToMatch, ModuleDefinition moduleDefinition) {
+        return CollUtil.findOne(moduleDefinition.getExports(), item -> antPathMatcher.match(item.getPath(), typeToMatch.getName()));
     }
 
     private void throwInjectionException(Class<?> type, Class<?> injectedType) {
