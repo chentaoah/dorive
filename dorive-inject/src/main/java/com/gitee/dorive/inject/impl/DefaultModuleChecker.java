@@ -53,10 +53,12 @@ public class DefaultModuleChecker implements ModuleChecker {
             // 在公开的包路径下，则判定为通过
             String typeName = injectedType.getName();
             List<ExportDefinition> exportDefinitions = moduleDefinition.getExports();
-            for (ExportDefinition exportDefinition : exportDefinitions) {
-                String path = exportDefinition.getPath();
-                if (antPathMatcher.match(path, typeName)) {
-                    return;
+            if (exportDefinitions != null && !exportDefinitions.isEmpty()) {
+                for (ExportDefinition exportDefinition : exportDefinitions) {
+                    String path = exportDefinition.getPath();
+                    if (antPathMatcher.match(path, typeName)) {
+                        return;
+                    }
                 }
             }
             // 模块
