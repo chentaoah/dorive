@@ -47,7 +47,6 @@ public class DoriveInjectionConfiguration implements EnvironmentAware, BeanFacto
 
     public static final String DORIVE_SCAN_KEY = "dorive.scan";
     public static final String DORIVE_MODULES_KEY = "dorive.modules";
-
     public static ModuleChecker moduleChecker;
 
     @Override
