@@ -18,7 +18,7 @@
 package com.gitee.dorive.inject.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.inject.api.ModuleInjectionLimiter;
+import com.gitee.dorive.inject.api.ModuleChecker;
 import com.gitee.dorive.inject.entity.ExportDefinition;
 import com.gitee.dorive.inject.entity.ModuleDefinition;
 import org.springframework.beans.factory.BeanCreationException;
@@ -26,13 +26,13 @@ import org.springframework.util.AntPathMatcher;
 
 import java.util.List;
 
-public class DefaultModuleInjectionLimiter implements ModuleInjectionLimiter {
+public class DefaultModuleChecker implements ModuleChecker {
 
     private final AntPathMatcher antPathMatcher = new AntPathMatcher(".");
     private final String scanPackage;
     private final List<ModuleDefinition> moduleDefinitions;
 
-    public DefaultModuleInjectionLimiter(String scanPackage, List<ModuleDefinition> moduleDefinitions) {
+    public DefaultModuleChecker(String scanPackage, List<ModuleDefinition> moduleDefinitions) {
         this.scanPackage = scanPackage;
         this.moduleDefinitions = moduleDefinitions;
     }
@@ -43,7 +43,7 @@ public class DefaultModuleInjectionLimiter implements ModuleInjectionLimiter {
     }
 
     @Override
-    public void checkInjectedType(Class<?> type, Class<?> injectedType) {
+    public void checkInjection(Class<?> type, Class<?> injectedType) {
         if (isUnderScanPackage(injectedType)) {
             ModuleDefinition moduleDefinition = findModuleDefinition(injectedType);
             // 模块定义不存在，则判定为通过

@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.inject.spring;
 
-import com.gitee.dorive.inject.api.ModuleInjectionLimiter;
+import com.gitee.dorive.inject.api.ModuleChecker;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -26,17 +26,17 @@ import java.lang.reflect.Constructor;
 
 public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassingInstantiationStrategy {
 
-    private ModuleInjectionLimiter moduleInjectionLimiter;
+    private ModuleChecker moduleChecker;
 
     @Override
     public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Constructor<?> ctor, Object... args) {
         tryGetResolverFromContext(owner);
-        if (moduleInjectionLimiter != null) {
+        if (moduleChecker != null) {
             Class<?> resolvableType = (Class<?>) bd.getResolvableType().getType();
-            if (isNotSpringInternalType(resolvableType) && moduleInjectionLimiter.isUnderScanPackage(resolvableType)) {
+            if (isNotSpringInternalType(resolvableType) && moduleChecker.isUnderScanPackage(resolvableType)) {
                 for (Class<?> parameterType : ctor.getParameterTypes()) {
-                    if (isNotSpringInternalType(parameterType) && moduleInjectionLimiter.isUnderScanPackage(parameterType)) {
-                        moduleInjectionLimiter.checkInjectedType(resolvableType, parameterType);
+                    if (isNotSpringInternalType(parameterType) && moduleChecker.isUnderScanPackage(parameterType)) {
+                        moduleChecker.checkInjection(resolvableType, parameterType);
                     }
                 }
             }
@@ -45,10 +45,10 @@ public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassi
     }
 
     private void tryGetResolverFromContext(BeanFactory owner) {
-        if (moduleInjectionLimiter == null) {
+        if (moduleChecker == null) {
             synchronized (this) {
-                if (moduleInjectionLimiter == null) {
-                    moduleInjectionLimiter = owner.getBean(ModuleInjectionLimiter.class);
+                if (moduleChecker == null) {
+                    moduleChecker = owner.getBean(ModuleChecker.class);
                 }
             }
         }

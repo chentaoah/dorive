@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.inject.spring;
 
-import com.gitee.dorive.inject.api.ModuleInjectionLimiter;
+import com.gitee.dorive.inject.api.ModuleChecker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +39,12 @@ import java.util.*;
 public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter implements MergedBeanDefinitionPostProcessor {
 
     protected final Log logger = LogFactory.getLog(getClass());
-    private final ModuleInjectionLimiter moduleInjectionLimiter;
+    private final ModuleChecker moduleChecker;
     private final Set<Class<? extends Annotation>> autowiredAnnotationTypes = new LinkedHashSet<>(4);
 
     @SuppressWarnings("unchecked")
-    public LimitedAutowiredBeanPostProcessor(ModuleInjectionLimiter moduleInjectionLimiter) {
-        this.moduleInjectionLimiter = moduleInjectionLimiter;
+    public LimitedAutowiredBeanPostProcessor(ModuleChecker moduleChecker) {
+        this.moduleChecker = moduleChecker;
         this.autowiredAnnotationTypes.add(Autowired.class);
         try {
             this.autowiredAnnotationTypes.add((Class<? extends Annotation>)
@@ -94,7 +94,7 @@ public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPos
     }
 
     private void doCheckAutowiredFieldModule(Class<?> clazz, Field field) {
-        moduleInjectionLimiter.checkInjectedType(clazz, field.getType());
+        moduleChecker.checkInjection(clazz, field.getType());
     }
 
 }

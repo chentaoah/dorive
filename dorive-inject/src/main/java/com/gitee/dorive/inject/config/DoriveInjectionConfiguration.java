@@ -18,10 +18,10 @@
 package com.gitee.dorive.inject.config;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.inject.impl.DefaultModuleInjectionLimiter;
+import com.gitee.dorive.inject.impl.DefaultModuleChecker;
 import com.gitee.dorive.inject.spring.LimitedAutowiredBeanPostProcessor;
 import com.gitee.dorive.inject.spring.LimitedCglibSubclassingInstantiationStrategy;
-import com.gitee.dorive.inject.api.ModuleInjectionLimiter;
+import com.gitee.dorive.inject.api.ModuleChecker;
 import com.gitee.dorive.inject.entity.ModuleDefinition;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -54,20 +54,20 @@ public class DoriveInjectionConfiguration implements BeanFactoryPostProcessor {
         }
     }
 
-    @Bean("moduleInjectionLimiterV3")
+    @Bean("moduleCheckerV3")
     @ConditionalOnMissingClass
-    public ModuleInjectionLimiter moduleInjectionLimiter(Environment environment) {
+    public ModuleChecker moduleChecker(Environment environment) {
         String scanPackage = environment.getProperty(DORIVE_SCAN_KEY);
         Assert.notBlank(scanPackage, "The configuration item could not be found! name: {}", DORIVE_SCAN_KEY);
         List<ModuleDefinition> moduleDefinitions = Binder.get(environment).bind(DORIVE_MODULES_KEY, Bindable.listOf(ModuleDefinition.class)).get();
         moduleDefinitions.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
-        return new DefaultModuleInjectionLimiter(scanPackage, moduleDefinitions);
+        return new DefaultModuleChecker(scanPackage, moduleDefinitions);
     }
 
     @Bean("limitedAnnotationBeanPostProcessorV3")
     @ConditionalOnMissingClass
-    public LimitedAutowiredBeanPostProcessor limitedAnnotationBeanPostProcessor(ModuleInjectionLimiter moduleInjectionLimiter) {
-        return new LimitedAutowiredBeanPostProcessor(moduleInjectionLimiter);
+    public LimitedAutowiredBeanPostProcessor limitedAnnotationBeanPostProcessor(ModuleChecker moduleChecker) {
+        return new LimitedAutowiredBeanPostProcessor(moduleChecker);
     }
 
 }

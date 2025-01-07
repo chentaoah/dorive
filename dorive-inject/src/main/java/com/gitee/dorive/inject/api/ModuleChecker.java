@@ -17,10 +17,10 @@
 
 package com.gitee.dorive.inject.api;
 
-public interface ModuleInjectionLimiter {
+public interface ModuleChecker {
 
     boolean isUnderScanPackage(Class<?> typeToMatch);
 
-    void checkInjectedType(Class<?> type, Class<?> injectedType);
+    void checkInjection(Class<?> type, Class<?> injectedType);
 
 }
