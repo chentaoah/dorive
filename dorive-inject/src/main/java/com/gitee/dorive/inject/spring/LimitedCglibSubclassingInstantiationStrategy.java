@@ -18,40 +18,29 @@
 package com.gitee.dorive.inject.spring;
 
 import com.gitee.dorive.inject.api.ModuleChecker;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 
 import java.lang.reflect.Constructor;
 
+@AllArgsConstructor
 public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassingInstantiationStrategy {
 
-    private ModuleChecker moduleChecker;
+    private final ModuleChecker moduleChecker;
 
     @Override
     public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Constructor<?> ctor, Object... args) {
-        tryGetResolverFromContext(owner);
-        if (moduleChecker != null) {
-            Class<?> resolvableType = (Class<?>) bd.getResolvableType().getType();
-            if (isNotSpringInternalType(resolvableType) && moduleChecker.isUnderScanPackage(resolvableType)) {
-                for (Class<?> parameterType : ctor.getParameterTypes()) {
-                    if (isNotSpringInternalType(parameterType) && moduleChecker.isUnderScanPackage(parameterType)) {
-                        moduleChecker.checkInjection(resolvableType, parameterType);
-                    }
+        Class<?> resolvableType = (Class<?>) bd.getResolvableType().getType();
+        if (isNotSpringInternalType(resolvableType) && moduleChecker.isUnderScanPackage(resolvableType)) {
+            for (Class<?> parameterType : ctor.getParameterTypes()) {
+                if (isNotSpringInternalType(parameterType) && moduleChecker.isUnderScanPackage(parameterType)) {
+                    moduleChecker.checkInjection(resolvableType, parameterType);
                 }
             }
         }
         return super.instantiate(bd, beanName, owner, ctor, args);
-    }
-
-    private void tryGetResolverFromContext(BeanFactory owner) {
-        if (moduleChecker == null) {
-            synchronized (this) {
-                if (moduleChecker == null) {
-                    moduleChecker = owner.getBean(ModuleChecker.class);
-                }
-            }
-        }
     }
 
     private boolean isNotSpringInternalType(Class<?> typeToMatch) {
