@@ -8,6 +8,7 @@
         <artifactId>dorive</artifactId>
         <version>3.5.0.5</version>
     </parent>
+    <packaging>pom</packaging>
     <artifactId>dorive-spring-boot-starter</artifactId>
     <dependencies>
         <dependency>
