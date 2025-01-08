@@ -19,6 +19,7 @@ package com.gitee.dorive.mybatis.plus.repository;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
@@ -30,6 +31,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.mybatis.plus.executor.MybatisPlusExecutor;
+import com.gitee.dorive.mybatis.plus.impl.SqlCustomQueryHandler;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.enums.QueryMethod;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;
@@ -44,6 +46,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -56,6 +59,7 @@ import java.util.Map;
 public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> implements CountQuerier {
 
     private SqlRunner sqlRunner;
+    private EntityStoreInfo entityStoreInfo;
     private CountQuerier countQuerier;
 
     @Override
@@ -89,7 +93,8 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
         Assert.notNull(tableInfo, "The table info cannot be null! data source: {}", mapperClass);
         assert tableInfo != null;
-        return newEntityStoreInfo(mapperClass, mapper, pojoClass, tableInfo);
+        this.entityStoreInfo = newEntityStoreInfo(mapperClass, mapper, pojoClass, tableInfo);
+        return entityStoreInfo;
     }
 
     private EntityStoreInfo newEntityStoreInfo(Class<?> mapperClass, Object mapper, Class<?> pojoClass, TableInfo tableInfo) {
@@ -115,7 +120,8 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         List<String> columns = new ArrayList<>(propAliasMapping.values());
         String selectColumns = StrUtil.join(",", columns);
 
-        return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn, propAliasMappingWithoutPk, propAliasMapping, aliasPropMapping, selectColumns);
+        Method selectByQueryMethod = ReflectUtil.getMethodByName(mapperClass, "selectByQuery");
+        return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn, propAliasMappingWithoutPk, propAliasMapping, aliasPropMapping, selectColumns, selectByQueryMethod);
     }
 
     @Override
@@ -129,6 +135,10 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         super.registryQueryHandlers(queryHandlerMap);
         queryHandlerMap.put(QueryMethod.SQL_BUILD, new SqlBuildQueryHandler(this, null));
         queryHandlerMap.put(QueryMethod.SQL_EXECUTE, new SqlExecuteQueryHandler(this, null, sqlRunner));
+        Method selectByQueryMethod = entityStoreInfo.getSelectByQueryMethod();
+        if (selectByQueryMethod != null) {
+            queryHandlerMap.put(QueryMethod.SQL_CUSTOM, new SqlCustomQueryHandler(this, null, entityStoreInfo));
+        }
     }
 
     @Override

@@ -20,6 +20,7 @@ package com.gitee.dorive.core.entity.common;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 @Data
@@ -35,4 +36,5 @@ public class EntityStoreInfo {
     private Map<String, String> propAliasMapping;
     private Map<String, String> aliasPropMapping;
     private String selectColumns;
+    private Method selectByQueryMethod;
 }

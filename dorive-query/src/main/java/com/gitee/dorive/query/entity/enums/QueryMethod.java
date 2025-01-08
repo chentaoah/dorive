@@ -21,4 +21,5 @@ public enum QueryMethod {
     STEPWISE,
     SQL_BUILD,
     SQL_EXECUTE,
+    SQL_CUSTOM,
 }
