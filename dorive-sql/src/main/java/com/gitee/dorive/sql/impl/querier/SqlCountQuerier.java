@@ -54,7 +54,7 @@ public class SqlCountQuerier implements CountQuerier {
         Object query = countQuery.getQuery();
         QueryContext queryContext = new QueryContext(context, query.getClass(), ResultType.COUNT);
 
-        queryContext.setOption(QueryMethod.class, QueryMethod.SQL_BUILD);
+        context.setOption(QueryMethod.class, QueryMethod.SQL_BUILD);
         queryHandler.handle(queryContext, query);
 
         SegmentUnit segmentUnit = (SegmentUnit) queryContext.getQueryUnit();

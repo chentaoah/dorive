@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.query.impl.handler;
 
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.enums.QueryMethod;
@@ -31,7 +32,8 @@ public class AdaptiveQueryHandler implements QueryHandler {
 
     @Override
     public void handle(QueryContext queryContext, Object query) {
-        QueryMethod queryMethod = queryContext.getOption(QueryMethod.class);
+        Context context = queryContext.getContext();
+        QueryMethod queryMethod = context.getOption(QueryMethod.class);
         if (queryMethod == null) {
             queryMethod = QueryMethod.SQL_EXECUTE;
         }
