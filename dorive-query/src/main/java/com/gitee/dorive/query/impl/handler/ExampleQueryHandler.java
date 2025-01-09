@@ -20,6 +20,7 @@ package com.gitee.dorive.query.impl.handler;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.query.api.QueryHandler;
+import com.gitee.dorive.query.entity.QueryConfig;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.impl.resolver.QueryExampleResolver;
 import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
@@ -36,16 +37,17 @@ public class ExampleQueryHandler implements QueryHandler {
 
     @Override
     public void handle(QueryContext queryContext, Object query) {
-        QueryTypeResolver queryTypeResolver = repository.getQueryTypeResolver();
-        Map<Class<?>, QueryExampleResolver> classQueryExampleResolverMap = queryTypeResolver.getClassQueryExampleResolverMap();
-
         Class<?> queryType = queryContext.getQueryType();
-        QueryExampleResolver queryExampleResolver = classQueryExampleResolverMap.get(queryType);
 
-        Assert.notNull(queryExampleResolver, "No query resolver found!");
-        queryContext.setQueryExampleResolver(queryExampleResolver);
-        queryContext.setMethod(queryExampleResolver.getMethod());
+        QueryTypeResolver queryTypeResolver = repository.getQueryTypeResolver();
+        Map<Class<?>, QueryConfig> classQueryConfigMap = queryTypeResolver.getClassQueryConfigMap();
+        QueryConfig queryConfig = classQueryConfigMap.get(queryType);
+        Assert.notNull(queryConfig, "No query config found!");
 
+        queryContext.setQueryConfig(queryConfig);
+        queryContext.setMethod(queryConfig.getMethod());
+
+        QueryExampleResolver queryExampleResolver = queryConfig.getQueryExampleResolver();
         Map<String, Example> exampleMap = queryExampleResolver.resolve(query);
         queryContext.setExampleMap(exampleMap);
         queryContext.setExample(exampleMap.get("/"));

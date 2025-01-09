@@ -15,21 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.entity.common;
+package com.gitee.dorive.query.entity;
 
-import com.gitee.dorive.query.entity.QueryUnit;
-import com.gitee.dorive.sql.entity.segment.TableSegment;
-import lombok.Getter;
-import lombok.Setter;
+import com.gitee.dorive.query.impl.resolver.QueryExampleResolver;
+import lombok.Data;
 
-@Getter
-@Setter
-public class SegmentUnit extends QueryUnit {
+import java.util.List;
 
-    private TableSegment tableSegment;
+@Data
+public class QueryConfig {
+    private QueryExampleResolver queryExampleResolver;
+    private List<MergedRepository> mergedRepositories;
+    private List<MergedRepository> reversedMergedRepositories;
 
-    public String getTableAlias() {
-        return tableSegment.getTableAlias();
+    public String getMethod() {
+        return queryExampleResolver.getQueryDefinition().getQueryDef().getMethod();
     }
-
 }

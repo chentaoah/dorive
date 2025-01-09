@@ -30,10 +30,10 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QueryUnit {
-
     protected MergedRepository mergedRepository;
     protected Example example;
     protected boolean abandoned;
+    protected Object segment;
 
     public boolean isRoot() {
         return "/".equals(mergedRepository.getAbsoluteAccessPath());
@@ -52,5 +52,4 @@ public class QueryUnit {
         EntityStoreInfo entityStoreInfo = (EntityStoreInfo) attributes.get(EntityStoreInfo.class.getName());
         return entityStoreInfo.getIdColumn();
     }
-
 }

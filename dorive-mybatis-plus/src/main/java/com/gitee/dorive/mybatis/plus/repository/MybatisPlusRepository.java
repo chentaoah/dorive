@@ -140,9 +140,9 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
     @Override
     protected void registryQueryHandlers(Map<QueryMethod, QueryHandler> queryHandlerMap) {
         super.registryQueryHandlers(queryHandlerMap);
-        queryHandlerMap.put(QueryMethod.SQL_BUILD, new SqlBuildQueryHandler(this, null));
-        queryHandlerMap.put(QueryMethod.SQL_EXECUTE, new SqlExecuteQueryHandler(this, null, sqlRunner));
-        queryHandlerMap.put(QueryMethod.SQL_CUSTOM, new SqlCustomQueryHandler(this, null, entityStoreInfo));
+        queryHandlerMap.put(QueryMethod.SQL_BUILD, new SqlBuildQueryHandler(this));
+        queryHandlerMap.put(QueryMethod.SQL_EXECUTE, new SqlExecuteQueryHandler(this, sqlRunner));
+        queryHandlerMap.put(QueryMethod.SQL_CUSTOM, new SqlCustomQueryHandler(entityStoreInfo));
     }
 
     @Override

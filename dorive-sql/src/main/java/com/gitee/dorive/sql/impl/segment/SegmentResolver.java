@@ -34,7 +34,7 @@ import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
-import com.gitee.dorive.sql.entity.common.SegmentUnit;
+import com.gitee.dorive.sql.api.Segment;
 import com.gitee.dorive.sql.entity.segment.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -48,15 +48,17 @@ import java.util.Set;
 @Getter
 @Setter
 @AllArgsConstructor
-public class SegmentUnitResolver {
+public class SegmentResolver {
 
     private AbstractQueryRepository<?, ?> repository;
     private QueryContext queryContext;
-    private MergedRepository mergedRepository;
-    private Example example;
+    private Map<String, QueryUnit> queryUnitMap;
+    private QueryUnit queryUnit;
 
-    public SegmentUnit resolve() {
+    public Segment resolve() {
         Context context = queryContext.getContext();
+        MergedRepository mergedRepository = queryUnit.getMergedRepository();
+        Example example = queryUnit.getExample();
 
         Map<String, Object> attributes = mergedRepository.getAttributes();
         EntityStoreInfo entityStoreInfo = (EntityStoreInfo) attributes.get(EntityStoreInfo.class.getName());
@@ -65,15 +67,13 @@ public class SegmentUnitResolver {
         String tableName = entityStoreInfo.getTableName();
         exampleExecutor.convert(context, example);
 
-        SegmentUnit segmentUnit = new SegmentUnit();
-        segmentUnit.setMergedRepository(mergedRepository);
-        segmentUnit.setExample(example);
-        segmentUnit.setAbandoned(false);
-        segmentUnit.setTableSegment(newTableSegment(tableName));
-        return segmentUnit;
+        return newTableSegment(tableName);
     }
 
     private TableSegment newTableSegment(String tableName) {
+        MergedRepository mergedRepository = queryUnit.getMergedRepository();
+        Example example = queryUnit.getExample();
+
         String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
         TableSegment tableSegment = "/".equals(absoluteAccessPath) ? new TableSegment() : new TableJoinSegment(newOnSegments());
         tableSegment.setTableName(tableName);
@@ -88,9 +88,10 @@ public class SegmentUnitResolver {
 
     private List<OnSegment> newOnSegments() {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
-        Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
-
         Context context = queryContext.getContext();
+        MergedRepository mergedRepository = queryUnit.getMergedRepository();
+
+        Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
 
         CommonRepository definedRepository = mergedRepository.getDefinedRepository();
         Map<String, List<StrongBinder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
@@ -132,6 +133,9 @@ public class SegmentUnitResolver {
 
     private List<ArgSegment> newArgSegments() {
         List<Object> args = queryContext.getArgs();
+        MergedRepository mergedRepository = queryUnit.getMergedRepository();
+        Example example = queryUnit.getExample();
+
         String tableAlias = mergedRepository.getAlias();
         List<ArgSegment> argSegments = new ArrayList<>(example.getCriteria().size());
         for (Criterion criterion : example.getCriteria()) {
@@ -153,14 +157,12 @@ public class SegmentUnitResolver {
     }
 
     private void setJoinForBound(MergedRepository mergedRepository) {
-        Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
         Set<String> boundAccessPaths = mergedRepository.getBoundAccessPaths();
         for (String boundAccessPath : boundAccessPaths) {
-            SegmentUnit segmentUnit = (SegmentUnit) queryUnitMap.get(boundAccessPath);
-            TableSegment tableSegment = segmentUnit.getTableSegment();
+            QueryUnit queryUnit = queryUnitMap.get(boundAccessPath);
+            TableSegment tableSegment = (TableSegment) queryUnit.getSegment();
             tableSegment.setJoin(true);
-            setJoinForBound(segmentUnit.getMergedRepository());
+            setJoinForBound(queryUnit.getMergedRepository());
         }
     }
-
 }

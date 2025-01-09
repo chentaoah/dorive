@@ -21,7 +21,6 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.query.entity.enums.ResultType;
-import com.gitee.dorive.query.impl.resolver.QueryExampleResolver;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,12 +36,12 @@ public class QueryContext {
     private ResultType resultType;
     private boolean abandoned;
 
-    private QueryExampleResolver queryExampleResolver;
+    private QueryConfig queryConfig;
     private String method;
+
     private Map<String, Example> exampleMap;
     private Example example;
 
-    private List<MergedRepository> mergedRepositories;
     private Map<String, QueryUnit> queryUnitMap;
     private QueryUnit queryUnit;
 

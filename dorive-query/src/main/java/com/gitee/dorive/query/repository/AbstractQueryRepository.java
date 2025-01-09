@@ -72,7 +72,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     }
 
     protected void registryQueryHandlers(Map<QueryMethod, QueryHandler> queryHandlerMap) {
-        queryHandlerMap.put(QueryMethod.STEPWISE, new StepwiseQueryHandler(this, null));
+        queryHandlerMap.put(QueryMethod.STEPWISE, new StepwiseQueryHandler());
     }
 
     @Override

@@ -21,11 +21,9 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.impl.handler.QueryUnitQueryHandler;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,13 +37,12 @@ public class SqlCustomQueryHandler extends QueryUnitQueryHandler {
 
     private final EntityStoreInfo entityStoreInfo;
 
-    public SqlCustomQueryHandler(AbstractQueryRepository<?, ?> repository, QueryHandler queryHandler, EntityStoreInfo entityStoreInfo) {
-        super(repository, queryHandler);
+    public SqlCustomQueryHandler(EntityStoreInfo entityStoreInfo) {
         this.entityStoreInfo = entityStoreInfo;
     }
 
     @Override
-    public void handle(QueryContext queryContext, Object query) {
+    protected void doHandle(QueryContext queryContext, Object query) {
         super.handle(queryContext, query);
 
         Context context = queryContext.getContext();
