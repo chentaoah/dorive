@@ -44,6 +44,7 @@ public class ExampleQueryHandler implements QueryHandler {
 
         Assert.notNull(queryExampleResolver, "No query resolver found!");
         queryContext.setQueryExampleResolver(queryExampleResolver);
+        queryContext.setMethod(queryExampleResolver.getMethod());
 
         Map<String, Example> exampleMap = queryExampleResolver.resolve(query);
         queryContext.setExampleMap(exampleMap);

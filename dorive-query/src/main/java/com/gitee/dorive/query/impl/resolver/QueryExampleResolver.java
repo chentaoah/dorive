@@ -40,6 +40,10 @@ public class QueryExampleResolver {
 
     private QueryDefinition queryDefinition;
 
+    public String getMethod() {
+        return queryDefinition.getQueryDef().getMethod();
+    }
+
     public Map<String, Example> resolve(Object query) {
         Map<String, Example> exampleMap = newExampleMap(query);
         Example example = exampleMap.computeIfAbsent("/", key -> new InnerExample());
@@ -99,5 +103,4 @@ public class QueryExampleResolver {
         }
         return null;
     }
-
 }

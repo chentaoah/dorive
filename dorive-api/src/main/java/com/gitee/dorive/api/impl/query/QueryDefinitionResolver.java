@@ -36,16 +36,18 @@ import java.util.Map;
 public class QueryDefinitionResolver {
 
     public QueryDefinition resolve(Class<?> queryType) {
-        QueryDefinition queryDefinition = new QueryDefinition();
-        queryDefinition.setGenericType(queryType);
-        readFields(queryType, queryDefinition);
-        return queryDefinition;
-    }
-
-    private void readFields(Class<?> queryType, QueryDefinition queryDefinition) {
         QueryDef queryDef = QueryDef.fromElement(queryType);
         Assert.notNull(queryDef, "The @Query does not exist!");
         assert queryDef != null;
+
+        QueryDefinition queryDefinition = new QueryDefinition();
+        queryDefinition.setQueryDef(queryDef);
+        queryDefinition.setGenericType(queryType);
+        readFields(queryType, queryDef, queryDefinition);
+        return queryDefinition;
+    }
+
+    private void readFields(Class<?> queryType, QueryDef queryDef, QueryDefinition queryDefinition) {
         String[] ignoreFieldNames = queryDef.getIgnoreFields();
         String sortByField = queryDef.getSortByField();
         String orderField = queryDef.getOrderField();

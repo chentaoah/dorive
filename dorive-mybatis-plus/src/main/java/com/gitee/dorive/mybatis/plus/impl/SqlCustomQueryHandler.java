@@ -47,11 +47,16 @@ public class SqlCustomQueryHandler extends QueryUnitQueryHandler {
     @Override
     public void handle(QueryContext queryContext, Object query) {
         super.handle(queryContext, query);
-        Object mapper = entityStoreInfo.getMapper();
-        Method selectByQueryMethod = entityStoreInfo.getSelectByQueryMethod();
+
         Context context = queryContext.getContext();
+        String method = queryContext.getMethod();
+
+        Object mapper = entityStoreInfo.getMapper();
+        Map<String, Method> selectMethodMap = entityStoreInfo.getSelectMethodMap();
+        Method selectMethod = selectMethodMap.get(method);
         Map<String, Object> attachments = context.getAttachments();
-        List<Object> ids = ReflectUtil.invoke(mapper, selectByQueryMethod, attachments, query);
+
+        List<Object> ids = ReflectUtil.invoke(mapper, selectMethod, attachments, query);
         if (!ids.isEmpty()) {
             Example example = queryContext.getExample();
             QueryUnit queryUnit = queryContext.getQueryUnit();

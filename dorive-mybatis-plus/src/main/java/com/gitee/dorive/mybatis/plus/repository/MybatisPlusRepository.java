@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Setter
@@ -120,8 +121,14 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         List<String> columns = new ArrayList<>(propAliasMapping.values());
         String selectColumns = StrUtil.join(",", columns);
 
-        Method selectByQueryMethod = ReflectUtil.getMethodByName(mapperClass, "selectByQuery");
-        return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn, propAliasMappingWithoutPk, propAliasMapping, aliasPropMapping, selectColumns, selectByQueryMethod);
+        Map<String, Method> selectMethodMap = new ConcurrentHashMap<>(8);
+        for (Method method : ReflectUtil.getMethodsDirectly(mapperClass, false, false)) {
+            String name = method.getName();
+            if (name.startsWith("select")) {
+                selectMethodMap.putIfAbsent(name, method);
+            }
+        }
+        return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn, propAliasMappingWithoutPk, propAliasMapping, aliasPropMapping, selectColumns, selectMethodMap);
     }
 
     @Override
@@ -135,10 +142,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         super.registryQueryHandlers(queryHandlerMap);
         queryHandlerMap.put(QueryMethod.SQL_BUILD, new SqlBuildQueryHandler(this, null));
         queryHandlerMap.put(QueryMethod.SQL_EXECUTE, new SqlExecuteQueryHandler(this, null, sqlRunner));
-        Method selectByQueryMethod = entityStoreInfo.getSelectByQueryMethod();
-        if (selectByQueryMethod != null) {
-            queryHandlerMap.put(QueryMethod.SQL_CUSTOM, new SqlCustomQueryHandler(this, null, entityStoreInfo));
-        }
+        queryHandlerMap.put(QueryMethod.SQL_CUSTOM, new SqlCustomQueryHandler(this, null, entityStoreInfo));
     }
 
     @Override

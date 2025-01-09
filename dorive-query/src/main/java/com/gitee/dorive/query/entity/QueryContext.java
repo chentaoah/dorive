@@ -38,6 +38,7 @@ public class QueryContext {
     private boolean abandoned;
 
     private QueryExampleResolver queryExampleResolver;
+    private String method;
     private Map<String, Example> exampleMap;
     private Example example;
 

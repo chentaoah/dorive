@@ -18,12 +18,14 @@
 package com.gitee.dorive.api.entity.query;
 
 import com.gitee.dorive.api.entity.core.Field;
+import com.gitee.dorive.api.entity.query.def.QueryDef;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class QueryDefinition {
+    private QueryDef queryDef;
     private Class<?> genericType;
     private List<QueryFieldDefinition> queryFieldDefinitions;
     private List<Field> ignoreFields;

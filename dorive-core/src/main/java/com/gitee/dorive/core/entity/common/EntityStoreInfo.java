@@ -36,5 +36,5 @@ public class EntityStoreInfo {
     private Map<String, String> propAliasMapping;
     private Map<String, String> aliasPropMapping;
     private String selectColumns;
-    private Method selectByQueryMethod;
+    private Map<String, Method> selectMethodMap;
 }
