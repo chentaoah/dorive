@@ -43,8 +43,6 @@ public class SqlCustomQueryHandler extends QueryUnitQueryHandler {
 
     @Override
     protected void doHandle(QueryContext queryContext, Object query) {
-        super.handle(queryContext, query);
-
         Context context = queryContext.getContext();
         String method = queryContext.getMethod();
 
