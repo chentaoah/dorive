@@ -36,19 +36,19 @@ dorive的优势：
 
 ###  🛠️模块说明
 
-| 模块                       | 说明                                                 |
-| -------------------------- | ---------------------------------------------------- |
-| dorive-inject              | 实现了依赖注入校验                                   |
-| dorive-env                 | 实现了依赖即用配置                                   |
-| dorive-web                 | 提供web开发工具类                                    |
-| dorive-api                 | 内含实体定义规范                                     |
-| dorive-core                | 核心实现（实体定义与映射、级联查询与操作、实体多态） |
-| dorive-event               | 实现了实体事件通知                                   |
-| dorive-query               | 实现了复杂推导查询                                   |
-| dorive-ref                 | 实现了ref引用                                        |
-| dorive-sql                 | 实现了复杂计数统计                                   |
-| dorive-mybatis-plus        | 提供mybatis-plus底层实现                             |
-| dorive-spring-boot-starter | 依赖管理启动器                                       |
+| 模块                       | 说明             |
+| -------------------------- | ---------------- |
+| dorive-inject              | 模块化依赖校验   |
+| dorive-env                 | 简易化配置       |
+| dorive-web                 | web开发适配      |
+| dorive-api                 | 领域驱动统一规范 |
+| dorive-core                | 核心实现         |
+| dorive-event               | 事件通知实现     |
+| dorive-query               | 关联查询实现     |
+| dorive-ref                 | 仓储引用实现     |
+| dorive-sql                 | 动态查询语句实现 |
+| dorive-mybatis-plus        | mybatis-plus适配 |
+| dorive-spring-boot-starter | 启动器           |
 
 ### 🔗依赖说明
 
@@ -73,7 +73,7 @@ mvn install
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.5.0.5</version>
+    <version>3.5.0.6</version>
 </dependency>
 ```
 
