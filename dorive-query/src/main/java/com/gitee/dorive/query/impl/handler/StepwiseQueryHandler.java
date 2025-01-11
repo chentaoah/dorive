@@ -32,7 +32,7 @@ import com.gitee.dorive.query.entity.QueryUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class StepwiseQueryHandler extends QueryUnitQueryHandler {
+public class StepwiseQueryHandler extends AbstractQueryUnitQueryHandler {
 
     @Override
     protected List<MergedRepository> getMergedRepositories(QueryContext queryContext) {

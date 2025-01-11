@@ -23,7 +23,7 @@ import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
-import com.gitee.dorive.query.impl.handler.QueryUnitQueryHandler;
+import com.gitee.dorive.query.impl.handler.AbstractQueryUnitQueryHandler;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,7 +33,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class SqlCustomQueryHandler extends QueryUnitQueryHandler {
+public class SqlCustomQueryHandler extends AbstractQueryUnitQueryHandler {
 
     private final EntityStoreInfo entityStoreInfo;
 

@@ -19,7 +19,7 @@ package com.gitee.dorive.sql.impl.handler;
 
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
-import com.gitee.dorive.query.impl.handler.QueryUnitQueryHandler;
+import com.gitee.dorive.query.impl.handler.AbstractQueryUnitQueryHandler;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.impl.segment.SegmentResolver;
 import lombok.AllArgsConstructor;
@@ -31,14 +31,14 @@ import java.util.Map;
 @Getter
 @Setter
 @AllArgsConstructor
-public class SqlBuildQueryHandler extends QueryUnitQueryHandler {
+public class SqlBuildQueryHandler extends AbstractQueryUnitQueryHandler {
 
     private final AbstractQueryRepository<?, ?> repository;
 
     @Override
     protected QueryUnit processQueryUnit(QueryContext queryContext, Map<String, QueryUnit> queryUnitMap, QueryUnit queryUnit) {
         SegmentResolver segmentResolver = new SegmentResolver(repository, queryContext, queryUnitMap, queryUnit);
-        queryUnit.setSegment(segmentResolver.resolve());
+        queryUnit.setAttachment(segmentResolver.resolve());
         return queryUnit;
     }
 

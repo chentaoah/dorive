@@ -60,7 +60,7 @@ public class SqlCountQuerier implements CountQuerier {
 
         QueryUnit queryUnit = queryContext.getQueryUnit();
         EntityElement entityElement = queryUnit.getEntityElement();
-        TableSegment tableSegment = (TableSegment) queryUnit.getSegment();
+        TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
         String tableAlias = tableSegment.getTableAlias();
 
         SelectSegmentBuilder selectSegmentBuilder = new SelectSegmentBuilder(queryContext);
@@ -91,7 +91,7 @@ public class SqlCountQuerier implements CountQuerier {
 
     private String buildCountByExp(CountQuery countQuery, QueryUnit queryUnit) {
         EntityElement entityElement = queryUnit.getEntityElement();
-        TableSegment tableSegment = (TableSegment) queryUnit.getSegment();
+        TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
         String tableAlias = tableSegment.getTableAlias();
 
         List<String> countBy = entityElement.toAliases(countQuery.getCountBy());

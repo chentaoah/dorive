@@ -49,7 +49,7 @@ public class SelectSegmentBuilder {
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             boolean isMatch = definedRepository.matches(selector);
             if (isMatch) {
-                TableSegment tableSegment = (TableSegment) queryUnit.getSegment();
+                TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
                 tableSegment.setJoin(true);
                 queryUnits.add(queryUnit);
             }
@@ -64,7 +64,7 @@ public class SelectSegmentBuilder {
 
         Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
         for (QueryUnit queryUnit : queryUnitMap.values()) {
-            TableSegment tableSegment = (TableSegment) queryUnit.getSegment();
+            TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
             if (queryUnit.isRoot()) {
                 selectSegment.setTableSegment(tableSegment);
 

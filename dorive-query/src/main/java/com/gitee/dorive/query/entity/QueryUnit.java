@@ -33,7 +33,7 @@ public class QueryUnit {
     protected MergedRepository mergedRepository;
     protected Example example;
     protected boolean abandoned;
-    protected Object segment;
+    protected Object attachment;
 
     public boolean isRoot() {
         return "/".equals(mergedRepository.getAbsoluteAccessPath());

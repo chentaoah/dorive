@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
-public abstract class QueryUnitQueryHandler implements QueryHandler {
+public abstract class AbstractQueryUnitQueryHandler implements QueryHandler {
 
     @Override
     public void handle(QueryContext queryContext, Object query) {
