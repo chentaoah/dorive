@@ -37,6 +37,8 @@ public class QueryContext {
     private boolean abandoned;
 
     private QueryConfig queryConfig;
+    private String primaryKey;
+    private String primaryKeyAlias;
     private String method;
 
     private Map<String, Example> exampleMap;

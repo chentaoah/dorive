@@ -80,6 +80,7 @@ public class QueryTypeResolver {
         Collections.reverse(reversedMergedRepositories);
 
         QueryConfig queryConfig = new QueryConfig();
+        queryConfig.setRepository(repository);
         queryConfig.setQueryExampleResolver(queryExampleResolver);
         queryConfig.setMergedRepositories(mergedRepositories);
         queryConfig.setReversedMergedRepositories(reversedMergedRepositories);

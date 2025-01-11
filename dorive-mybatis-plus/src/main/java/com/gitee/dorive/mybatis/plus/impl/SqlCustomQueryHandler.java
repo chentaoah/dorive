@@ -22,7 +22,6 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.impl.handler.AbstractQueryUnitQueryHandler;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,7 +43,9 @@ public class SqlCustomQueryHandler extends AbstractQueryUnitQueryHandler {
     @Override
     protected void doHandle(QueryContext queryContext, Object query) {
         Context context = queryContext.getContext();
+        String primaryKey = queryContext.getPrimaryKey();
         String method = queryContext.getMethod();
+        Example example = queryContext.getExample();
 
         Object mapper = entityStoreInfo.getMapper();
         Map<String, Method> selectMethodMap = entityStoreInfo.getSelectMethodMap();
@@ -53,9 +54,6 @@ public class SqlCustomQueryHandler extends AbstractQueryUnitQueryHandler {
 
         List<Object> ids = ReflectUtil.invoke(mapper, selectMethod, attachments, query);
         if (!ids.isEmpty()) {
-            Example example = queryContext.getExample();
-            QueryUnit queryUnit = queryContext.getQueryUnit();
-            String primaryKey = queryUnit.getPrimaryKey();
             example.in(primaryKey, ids);
         } else {
             queryContext.setAbandoned(true);

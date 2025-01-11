@@ -17,16 +17,32 @@
 
 package com.gitee.dorive.query.entity;
 
+import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.query.impl.resolver.QueryExampleResolver;
+import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class QueryConfig {
+    private AbstractQueryRepository<?, ?> repository;
     private QueryExampleResolver queryExampleResolver;
     private List<MergedRepository> mergedRepositories;
     private List<MergedRepository> reversedMergedRepositories;
+
+    public EntityElement getEntityElement() {
+        return repository.getEntityElement();
+    }
+
+    public String getPrimaryKey() {
+        return getEntityElement().getPrimaryKey();
+    }
+
+    public String getPrimaryKeyAlias() {
+        EntityElement entityElement = getEntityElement();
+        return entityElement.toAlias(entityElement.getPrimaryKey());
+    }
 
     public String getMethod() {
         return queryExampleResolver.getQueryDefinition().getQueryDef().getMethod();

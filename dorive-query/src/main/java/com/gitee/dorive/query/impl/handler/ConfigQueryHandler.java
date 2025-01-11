@@ -43,6 +43,8 @@ public class ConfigQueryHandler implements QueryHandler {
         Assert.notNull(queryConfig, "No query config found!");
 
         queryContext.setQueryConfig(queryConfig);
+        queryContext.setPrimaryKey(queryConfig.getPrimaryKey());
+        queryContext.setPrimaryKeyAlias(queryConfig.getPrimaryKeyAlias());
         queryContext.setMethod(queryConfig.getMethod());
 
         if (queryHandler != null) {

@@ -18,13 +18,10 @@
 package com.gitee.dorive.query.entity;
 
 import com.gitee.dorive.api.entity.core.EntityElement;
-import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -41,15 +38,5 @@ public class QueryUnit {
 
     public EntityElement getEntityElement() {
         return mergedRepository.getExecutedRepository().getEntityElement();
-    }
-
-    public String getPrimaryKey() {
-        return getEntityElement().getPrimaryKey();
-    }
-
-    public String getPrimaryKeyAlias() {
-        Map<String, Object> attributes = mergedRepository.getAttributes();
-        EntityStoreInfo entityStoreInfo = (EntityStoreInfo) attributes.get(EntityStoreInfo.class.getName());
-        return entityStoreInfo.getIdColumn();
     }
 }
