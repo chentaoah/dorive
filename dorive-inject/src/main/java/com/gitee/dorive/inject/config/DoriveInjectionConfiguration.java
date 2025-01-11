@@ -18,12 +18,11 @@
 package com.gitee.dorive.inject.config;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.inject.impl.DefaultTypeDomainResolver;
+import com.gitee.dorive.inject.api.ModuleChecker;
+import com.gitee.dorive.inject.entity.ModuleDefinition;
+import com.gitee.dorive.inject.impl.DefaultModuleChecker;
 import com.gitee.dorive.inject.spring.LimitedAutowiredBeanPostProcessor;
 import com.gitee.dorive.inject.spring.LimitedCglibSubclassingInstantiationStrategy;
-import com.gitee.dorive.inject.spring.LimitedRootInitializingBean;
-import com.gitee.dorive.inject.api.TypeDomainResolver;
-import com.gitee.dorive.inject.entity.DomainDefinition;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -32,49 +31,45 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClas
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Order(-100)
 @Configuration
 @ConditionalOnProperty(prefix = "dorive", name = "enable", havingValue = "true")
-public class DoriveInjectionConfiguration implements BeanFactoryPostProcessor {
+public class DoriveInjectionConfiguration implements EnvironmentAware, BeanFactoryPostProcessor {
 
-    public static final String SCAN_KEY = "dorive.scan";
-    public static final String DOMAINS_KEY = "dorive.domains";
+    public static final String DORIVE_SCAN_KEY = "dorive.scan";
+    public static final String DORIVE_MODULES_KEY = "dorive.modules";
+    public static ModuleChecker moduleChecker;
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        String scanPackage = environment.getProperty(DORIVE_SCAN_KEY);
+        Assert.notBlank(scanPackage, "The configuration item could not be found! name: {}", DORIVE_SCAN_KEY);
+        List<ModuleDefinition> moduleDefinitions = Binder.get(environment).bind(DORIVE_MODULES_KEY, Bindable.listOf(ModuleDefinition.class)).get();
+        moduleDefinitions.sort(Comparator.comparing(ModuleDefinition::getName));
+        moduleChecker = new DefaultModuleChecker(scanPackage, moduleDefinitions);
+    }
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        if (beanFactory instanceof AbstractAutowireCapableBeanFactory) {
-            AbstractAutowireCapableBeanFactory abstractAutowireCapableBeanFactory = (AbstractAutowireCapableBeanFactory) beanFactory;
-            abstractAutowireCapableBeanFactory.setInstantiationStrategy(new LimitedCglibSubclassingInstantiationStrategy());
+        if (moduleChecker != null && beanFactory instanceof AbstractAutowireCapableBeanFactory) {
+            AbstractAutowireCapableBeanFactory abstractBeanFactory = (AbstractAutowireCapableBeanFactory) beanFactory;
+            abstractBeanFactory.setInstantiationStrategy(new LimitedCglibSubclassingInstantiationStrategy(moduleChecker));
         }
-    }
-
-    @Bean("typeDomainResolverV3")
-    @ConditionalOnMissingClass
-    public TypeDomainResolver typeDomainResolver(Environment environment) {
-        String scanPackage = environment.getProperty(SCAN_KEY);
-        Assert.notBlank(scanPackage, "The configuration item could not be found! name: [spring.domain.scan]");
-        List<DomainDefinition> domainDefinitions = Binder.get(environment).bind(DOMAINS_KEY, Bindable.listOf(DomainDefinition.class)).get();
-        domainDefinitions.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
-        return new DefaultTypeDomainResolver(scanPackage, domainDefinitions);
     }
 
     @Bean("limitedAnnotationBeanPostProcessorV3")
     @ConditionalOnMissingClass
-    public LimitedAutowiredBeanPostProcessor limitedAnnotationBeanPostProcessor(TypeDomainResolver typeDomainResolver) {
-        return new LimitedAutowiredBeanPostProcessor(typeDomainResolver);
-    }
-
-    @Bean("limitedRootInitializingBeanV3")
-    @ConditionalOnMissingClass
-    public LimitedRootInitializingBean limitedRootInitializingBean(TypeDomainResolver typeDomainResolver) {
-        return new LimitedRootInitializingBean(typeDomainResolver);
+    public LimitedAutowiredBeanPostProcessor limitedAnnotationBeanPostProcessor() {
+        return new LimitedAutowiredBeanPostProcessor(moduleChecker);
     }
 
 }

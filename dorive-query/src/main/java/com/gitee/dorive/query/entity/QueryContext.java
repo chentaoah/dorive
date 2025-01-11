@@ -18,11 +18,9 @@
 package com.gitee.dorive.query.entity;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.context.AbstractProxyContext;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.query.entity.enums.ResultType;
-import com.gitee.dorive.query.impl.resolver.QueryExampleResolver;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,16 +30,20 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class QueryContext extends AbstractProxyContext {
+public class QueryContext {
+    private Context context;
     private Class<?> queryType;
     private ResultType resultType;
     private boolean abandoned;
 
-    private QueryExampleResolver queryExampleResolver;
+    private QueryConfig queryConfig;
+    private String primaryKey;
+    private String primaryKeyAlias;
+    private String method;
+
     private Map<String, Example> exampleMap;
     private Example example;
 
-    private List<MergedRepository> mergedRepositories;
     private Map<String, QueryUnit> queryUnitMap;
     private QueryUnit queryUnit;
 
@@ -49,7 +51,7 @@ public class QueryContext extends AbstractProxyContext {
     private Result<Object> result;
 
     public QueryContext(Context context, Class<?> queryType, ResultType resultType) {
-        super(context);
+        this.context = context;
         this.queryType = queryType;
         this.resultType = resultType;
     }

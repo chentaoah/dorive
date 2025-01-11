@@ -17,29 +17,33 @@
 
 package com.gitee.dorive.sql.impl.handler;
 
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
-import com.gitee.dorive.query.impl.handler.QueryUnitQueryHandler;
+import com.gitee.dorive.query.impl.handler.AbstractQueryUnitQueryHandler;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
-import com.gitee.dorive.sql.impl.segment.SegmentUnitResolver;
+import com.gitee.dorive.sql.impl.segment.SegmentResolver;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Map;
+
 @Getter
 @Setter
-public class SqlBuildQueryHandler extends QueryUnitQueryHandler {
+@AllArgsConstructor
+public class SqlBuildQueryHandler extends AbstractQueryUnitQueryHandler {
 
-    public SqlBuildQueryHandler(AbstractQueryRepository<?, ?> repository, QueryHandler queryHandler) {
-        super(repository, queryHandler);
+    private final AbstractQueryRepository<?, ?> repository;
+
+    @Override
+    protected QueryUnit processQueryUnit(QueryContext queryContext, Map<String, QueryUnit> queryUnitMap, QueryUnit queryUnit) {
+        SegmentResolver segmentResolver = new SegmentResolver(repository, queryContext, queryUnitMap, queryUnit);
+        queryUnit.setAttachment(segmentResolver.resolve());
+        return queryUnit;
     }
 
     @Override
-    protected QueryUnit newQueryUnit(QueryContext queryContext, MergedRepository mergedRepository, Example example) {
-        SegmentUnitResolver segmentUnitResolver = new SegmentUnitResolver(repository, queryContext, mergedRepository, example);
-        return segmentUnitResolver.resolve();
+    protected void doHandle(QueryContext queryContext, Object query) {
+        // ignore
     }
-
 }

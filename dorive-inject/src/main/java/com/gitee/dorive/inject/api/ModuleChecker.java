@@ -15,21 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.sql.entity.common;
+package com.gitee.dorive.inject.api;
 
-import com.gitee.dorive.query.entity.QueryUnit;
-import com.gitee.dorive.sql.entity.segment.TableSegment;
-import lombok.Getter;
-import lombok.Setter;
+public interface ModuleChecker {
 
-@Getter
-@Setter
-public class SegmentUnit extends QueryUnit {
+    boolean isUnderScanPackage(Class<?> typeToMatch);
 
-    private TableSegment tableSegment;
-
-    public String getTableAlias() {
-        return tableSegment.getTableAlias();
-    }
+    void checkInjection(Class<?> type, Class<?> injectedType);
 
 }

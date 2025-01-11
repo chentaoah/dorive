@@ -25,6 +25,7 @@ import com.gitee.dorive.api.entity.query.def.QueryFieldDef;
 import com.gitee.dorive.api.impl.query.QueryDefinitionResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
+import com.gitee.dorive.query.entity.QueryConfig;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import lombok.Data;
 
@@ -35,9 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class QueryTypeResolver {
 
     private AbstractQueryRepository<?, ?> repository;
-    private Map<Class<?>, QueryExampleResolver> classQueryExampleResolverMap = new ConcurrentHashMap<>();
-    private Map<Class<?>, List<MergedRepository>> classMergedRepositoriesMap = new ConcurrentHashMap<>();
-    private Map<Class<?>, List<MergedRepository>> classReversedMergedRepositoriesMap = new ConcurrentHashMap<>();
+    private Map<Class<?>, QueryConfig> classQueryConfigMap = new ConcurrentHashMap<>();
 
     public QueryTypeResolver(AbstractQueryRepository<?, ?> repository) {
         this.repository = repository;
@@ -54,6 +53,7 @@ public class QueryTypeResolver {
     private void resolveQueryClass(Class<?> queryClass) {
         QueryDefinitionResolver queryDefinitionResolver = new QueryDefinitionResolver();
         QueryDefinition queryDefinition = queryDefinitionResolver.resolve(queryClass);
+        QueryExampleResolver queryExampleResolver = new QueryExampleResolver(queryDefinition);
 
         Set<String> accessPaths = new HashSet<>();
         List<MergedRepository> mergedRepositories = new ArrayList<>();
@@ -79,10 +79,12 @@ public class QueryTypeResolver {
         List<MergedRepository> reversedMergedRepositories = new ArrayList<>(mergedRepositories);
         Collections.reverse(reversedMergedRepositories);
 
-        QueryExampleResolver queryExampleResolver = new QueryExampleResolver(queryDefinition);
-        classQueryExampleResolverMap.put(queryClass, queryExampleResolver);
-        classMergedRepositoriesMap.put(queryClass, mergedRepositories);
-        classReversedMergedRepositoriesMap.put(queryClass, reversedMergedRepositories);
+        QueryConfig queryConfig = new QueryConfig();
+        queryConfig.setRepository(repository);
+        queryConfig.setQueryExampleResolver(queryExampleResolver);
+        queryConfig.setMergedRepositories(mergedRepositories);
+        queryConfig.setReversedMergedRepositories(reversedMergedRepositories);
+        classQueryConfigMap.put(queryClass, queryConfig);
     }
 
     private MergedRepository resetQueryField(QueryFieldDefinition queryFieldDefinition) {

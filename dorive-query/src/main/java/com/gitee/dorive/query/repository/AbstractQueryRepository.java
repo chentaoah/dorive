@@ -67,12 +67,13 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         QueryHandler queryHandler = new AdaptiveQueryHandler(queryHandlerMap);
         queryHandler = new SimpleQueryHandler(queryHandler);
         queryHandler = new ContextMatchQueryHandler(this, queryHandler);
-        queryHandler = new ExampleQueryHandler(this, queryHandler);
+        queryHandler = new ExampleQueryHandler(queryHandler);
+        queryHandler = new ConfigQueryHandler(this, queryHandler);
         this.queryHandler = queryHandler;
     }
 
     protected void registryQueryHandlers(Map<QueryMethod, QueryHandler> queryHandlerMap) {
-        queryHandlerMap.put(QueryMethod.STEPWISE, new StepwiseQueryHandler(this, null));
+        queryHandlerMap.put(QueryMethod.STEPWISE, new StepwiseQueryHandler());
     }
 
     @Override

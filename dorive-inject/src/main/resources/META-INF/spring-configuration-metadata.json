@@ -11,9 +11,9 @@
       "description": "Global scan path."
     },
     {
-      "name": "dorive.domains",
-      "type": "com.gitee.dorive.inject.entity.DomainDefinition",
-      "description": "Definition of domain."
+      "name": "dorive.modules",
+      "type": "com.gitee.dorive.inject.entity.ModuleDefinition",
+      "description": "Definition of module."
     }
   ]
 }

@@ -22,7 +22,6 @@ import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
-import com.gitee.dorive.sql.entity.common.SegmentUnit;
 import com.gitee.dorive.sql.entity.segment.ArgSegment;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
 import com.gitee.dorive.sql.entity.segment.TableJoinSegment;
@@ -42,21 +41,20 @@ public class SelectSegmentBuilder {
         this.queryContext = queryContext;
     }
 
-    public List<SegmentUnit> select(Selector selector) {
-        List<SegmentUnit> segmentUnits = new ArrayList<>(4);
+    public List<QueryUnit> select(Selector selector) {
+        List<QueryUnit> queryUnits = new ArrayList<>(4);
         Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
         for (QueryUnit queryUnit : queryUnitMap.values()) {
             MergedRepository mergedRepository = queryUnit.getMergedRepository();
             CommonRepository definedRepository = mergedRepository.getDefinedRepository();
             boolean isMatch = definedRepository.matches(selector);
             if (isMatch) {
-                SegmentUnit segmentUnit = (SegmentUnit) queryUnit;
-                TableSegment tableSegment = segmentUnit.getTableSegment();
+                TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
                 tableSegment.setJoin(true);
-                segmentUnits.add(segmentUnit);
+                queryUnits.add(queryUnit);
             }
         }
-        return segmentUnits;
+        return queryUnits;
     }
 
     public SelectSegment build() {
@@ -66,9 +64,8 @@ public class SelectSegmentBuilder {
 
         Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
         for (QueryUnit queryUnit : queryUnitMap.values()) {
-            SegmentUnit segmentUnit = (SegmentUnit) queryUnit;
-            TableSegment tableSegment = segmentUnit.getTableSegment();
-            if (segmentUnit.isRoot()) {
+            TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
+            if (queryUnit.isRoot()) {
                 selectSegment.setTableSegment(tableSegment);
 
             } else if (tableSegment.isJoin()) {

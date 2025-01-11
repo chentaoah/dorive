@@ -17,23 +17,34 @@
 
 package com.gitee.dorive.query.impl.handler;
 
+import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.enums.QueryMethod;
-import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
-@AllArgsConstructor
 public class AdaptiveQueryHandler implements QueryHandler {
 
     private final Map<QueryMethod, QueryHandler> queryHandlerMap;
 
+    public AdaptiveQueryHandler(Map<QueryMethod, QueryHandler> queryHandlerMap) {
+        this.queryHandlerMap = queryHandlerMap;
+    }
+
     @Override
     public void handle(QueryContext queryContext, Object query) {
-        QueryMethod queryMethod = queryContext.getOption(QueryMethod.class);
+        Context context = queryContext.getContext();
+        QueryMethod queryMethod = context.getOption(QueryMethod.class);
+        // 如果开发者没有指定
         if (queryMethod == null) {
-            queryMethod = QueryMethod.SQL_EXECUTE;
+            String method = queryContext.getMethod();
+            if (StringUtils.isNotBlank(method)) {
+                queryMethod = QueryMethod.SQL_CUSTOM;
+            } else {
+                queryMethod = QueryMethod.SQL_EXECUTE;
+            }
         }
         QueryHandler queryHandler = queryHandlerMap.get(queryMethod);
         if (queryHandler != null) {

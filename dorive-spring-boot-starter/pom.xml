@@ -6,9 +6,10 @@
     <parent>
         <groupId>com.gitee.digital-engine</groupId>
         <artifactId>dorive</artifactId>
-        <version>3.5.0.5</version>
+        <version>3.5.0.6</version>
     </parent>
     <artifactId>dorive-spring-boot-starter</artifactId>
+    <packaging>pom</packaging>
     <dependencies>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>

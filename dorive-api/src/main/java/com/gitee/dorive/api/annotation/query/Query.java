@@ -25,6 +25,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Query {
 
+    String method() default "";
+
     String[] ignoreFields() default {};
 
     String sortByField() default "sortBy";

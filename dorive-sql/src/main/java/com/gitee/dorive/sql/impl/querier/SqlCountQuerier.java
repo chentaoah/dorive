@@ -22,14 +22,15 @@ import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.entity.enums.QueryMethod;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.CountQuerier;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.common.CountQuery;
-import com.gitee.dorive.sql.entity.common.SegmentUnit;
 import com.gitee.dorive.sql.entity.segment.SelectSegment;
+import com.gitee.dorive.sql.entity.segment.TableSegment;
 import com.gitee.dorive.sql.impl.segment.SelectSegmentBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -54,15 +55,16 @@ public class SqlCountQuerier implements CountQuerier {
         Object query = countQuery.getQuery();
         QueryContext queryContext = new QueryContext(context, query.getClass(), ResultType.COUNT);
 
-        queryContext.setOption(QueryMethod.class, QueryMethod.SQL_BUILD);
+        context.setOption(QueryMethod.class, QueryMethod.SQL_BUILD);
         queryHandler.handle(queryContext, query);
 
-        SegmentUnit segmentUnit = (SegmentUnit) queryContext.getQueryUnit();
-        EntityElement entityElement = segmentUnit.getEntityElement();
-        String tableAlias = segmentUnit.getTableAlias();
+        QueryUnit queryUnit = queryContext.getQueryUnit();
+        EntityElement entityElement = queryUnit.getEntityElement();
+        TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
+        String tableAlias = tableSegment.getTableAlias();
 
         SelectSegmentBuilder selectSegmentBuilder = new SelectSegmentBuilder(queryContext);
-        List<SegmentUnit> segmentUnits = selectSegmentBuilder.select(countQuery.getSelector());
+        List<QueryUnit> queryUnits = selectSegmentBuilder.select(countQuery.getSelector());
         SelectSegment selectSegment = selectSegmentBuilder.build();
         List<Object> args = selectSegment.getArgs();
 
@@ -72,8 +74,8 @@ public class SqlCountQuerier implements CountQuerier {
         selectSegment.setGroupBy("GROUP BY " + groupByColumns);
 
         // count by
-        SegmentUnit selectSegmentUnit = segmentUnits != null && !segmentUnits.isEmpty() ? segmentUnits.get(0) : segmentUnit;
-        String countByExp = buildCountByExp(countQuery, selectSegmentUnit);
+        QueryUnit selectQueryUnit = queryUnits != null && !queryUnits.isEmpty() ? queryUnits.get(0) : queryUnit;
+        String countByExp = buildCountByExp(countQuery, selectQueryUnit);
 
         // select columns
         List<String> selectColumns = new ArrayList<>(2);
@@ -87,9 +89,10 @@ public class SqlCountQuerier implements CountQuerier {
         return countMap;
     }
 
-    private String buildCountByExp(CountQuery countQuery, SegmentUnit segmentUnit) {
-        EntityElement entityElement = segmentUnit.getEntityElement();
-        String tableAlias = segmentUnit.getTableAlias();
+    private String buildCountByExp(CountQuery countQuery, QueryUnit queryUnit) {
+        EntityElement entityElement = queryUnit.getEntityElement();
+        TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
+        String tableAlias = tableSegment.getTableAlias();
 
         List<String> countBy = entityElement.toAliases(countQuery.getCountBy());
         String countByStr = CollUtil.join(countBy, ",',',", tableAlias + ".", null);

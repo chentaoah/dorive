@@ -22,7 +22,6 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.entity.enums.ResultType;
@@ -45,19 +44,16 @@ public class SqlExecuteQueryHandler extends SqlBuildQueryHandler {
 
     private final SqlRunner sqlRunner;
 
-    public SqlExecuteQueryHandler(AbstractQueryRepository<?, ?> repository, QueryHandler queryHandler, SqlRunner sqlRunner) {
-        super(repository, queryHandler);
+    public SqlExecuteQueryHandler(AbstractQueryRepository<?, ?> repository, SqlRunner sqlRunner) {
+        super(repository);
         this.sqlRunner = sqlRunner;
     }
 
     @Override
-    public void handle(QueryContext queryContext, Object query) {
-        super.handle(queryContext, query);
-        doHandle(queryContext);
-    }
-
-    protected void doHandle(QueryContext queryContext) {
+    protected void doHandle(QueryContext queryContext, Object query) {
         ResultType resultType = queryContext.getResultType();
+        String primaryKey = queryContext.getPrimaryKey();
+        String primaryKeyAlias = queryContext.getPrimaryKeyAlias();
         Example example = queryContext.getExample();
         QueryUnit queryUnit = queryContext.getQueryUnit();
 
@@ -65,9 +61,6 @@ public class SqlExecuteQueryHandler extends SqlBuildQueryHandler {
 
         OrderBy orderBy = example.getOrderBy();
         Page<Object> page = example.getPage();
-
-        String primaryKey = queryUnit.getPrimaryKey();
-        String primaryKeyAlias = queryUnit.getPrimaryKeyAlias();
 
         SelectSegmentBuilder selectSegmentBuilder = new SelectSegmentBuilder(queryContext);
         SelectSegment selectSegment = selectSegmentBuilder.build();

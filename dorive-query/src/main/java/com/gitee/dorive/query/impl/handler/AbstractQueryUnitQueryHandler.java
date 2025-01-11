@@ -17,15 +17,12 @@
 
 package com.gitee.dorive.query.impl.handler;
 
-import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
-import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import lombok.AllArgsConstructor;
 
 import java.util.LinkedHashMap;
@@ -33,51 +30,37 @@ import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
-public class QueryUnitQueryHandler implements QueryHandler {
-
-    protected final AbstractQueryRepository<?, ?> repository;
-    protected final QueryHandler queryHandler;
+public abstract class AbstractQueryUnitQueryHandler implements QueryHandler {
 
     @Override
     public void handle(QueryContext queryContext, Object query) {
-        QueryTypeResolver queryTypeResolver = repository.getQueryTypeResolver();
-        Map<Class<?>, List<MergedRepository>> classMergedRepositoriesMap = getClassMergedRepositoriesMap(queryTypeResolver);
-
-        Class<?> queryType = queryContext.getQueryType();
-        List<MergedRepository> mergedRepositories = classMergedRepositoriesMap.get(queryType);
-
-        Assert.notEmpty(mergedRepositories, "The merged repositories cannot be empty!");
-        queryContext.setMergedRepositories(mergedRepositories);
-
         Map<String, QueryUnit> queryUnitMap = newQueryUnitMap(queryContext);
+        queryContext.setQueryUnitMap(queryUnitMap);
         queryContext.setQueryUnit(queryUnitMap.get("/"));
-
-        if (queryHandler != null) {
-            queryHandler.handle(queryContext, query);
-        }
-    }
-
-    protected Map<Class<?>, List<MergedRepository>> getClassMergedRepositoriesMap(QueryTypeResolver queryTypeResolver) {
-        return queryTypeResolver.getClassMergedRepositoriesMap();
+        doHandle(queryContext, query);
     }
 
     private Map<String, QueryUnit> newQueryUnitMap(QueryContext queryContext) {
-        List<MergedRepository> mergedRepositories = queryContext.getMergedRepositories();
         Map<String, Example> exampleMap = queryContext.getExampleMap();
-        Map<String, QueryUnit> queryUnitMap = new LinkedHashMap<>();
-        // 后续可能用到
-        queryContext.setQueryUnitMap(queryUnitMap);
+        List<MergedRepository> mergedRepositories = getMergedRepositories(queryContext);
+        Map<String, QueryUnit> queryUnitMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);
         for (MergedRepository mergedRepository : mergedRepositories) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample());
-            QueryUnit queryUnit = newQueryUnit(queryContext, mergedRepository, example);
+            QueryUnit queryUnit = new QueryUnit(mergedRepository, example, false, null);
+            queryUnit = processQueryUnit(queryContext, queryUnitMap, queryUnit);
             queryUnitMap.put(absoluteAccessPath, queryUnit);
         }
         return queryUnitMap;
     }
 
-    protected QueryUnit newQueryUnit(QueryContext queryContext, MergedRepository mergedRepository, Example example) {
-        return new QueryUnit(mergedRepository, example, false);
+    protected List<MergedRepository> getMergedRepositories(QueryContext queryContext) {
+        return queryContext.getQueryConfig().getMergedRepositories();
     }
 
+    protected QueryUnit processQueryUnit(QueryContext queryContext, Map<String, QueryUnit> queryUnitMap, QueryUnit queryUnit) {
+        return queryUnit;
+    }
+
+    protected abstract void doHandle(QueryContext queryContext, Object query);
 }

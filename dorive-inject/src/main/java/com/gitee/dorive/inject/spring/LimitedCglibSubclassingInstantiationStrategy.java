@@ -17,41 +17,30 @@
 
 package com.gitee.dorive.inject.spring;
 
-import com.gitee.dorive.inject.api.TypeDomainResolver;
+import com.gitee.dorive.inject.api.ModuleChecker;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 
 import java.lang.reflect.Constructor;
 
+@AllArgsConstructor
 public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassingInstantiationStrategy {
 
-    private TypeDomainResolver typeDomainResolver;
+    private final ModuleChecker moduleChecker;
 
     @Override
     public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Constructor<?> ctor, Object... args) {
-        tryGetResolverFromContext(owner);
-        if (typeDomainResolver != null) {
-            Class<?> resolvableType = (Class<?>) bd.getResolvableType().getType();
-            if (isNotSpringInternalType(resolvableType) && typeDomainResolver.isUnderScanPackage(resolvableType)) {
-                for (Class<?> parameterType : ctor.getParameterTypes()) {
-                    if (isNotSpringInternalType(parameterType) && typeDomainResolver.isUnderScanPackage(parameterType)) {
-                        typeDomainResolver.checkDomain(resolvableType, parameterType);
-                    }
+        Class<?> resolvableType = (Class<?>) bd.getResolvableType().getType();
+        if (isNotSpringInternalType(resolvableType) && moduleChecker.isUnderScanPackage(resolvableType)) {
+            for (Class<?> parameterType : ctor.getParameterTypes()) {
+                if (isNotSpringInternalType(parameterType) && moduleChecker.isUnderScanPackage(parameterType)) {
+                    moduleChecker.checkInjection(resolvableType, parameterType);
                 }
             }
         }
         return super.instantiate(bd, beanName, owner, ctor, args);
-    }
-
-    private void tryGetResolverFromContext(BeanFactory owner) {
-        if (typeDomainResolver == null) {
-            synchronized (this) {
-                if (typeDomainResolver == null) {
-                    typeDomainResolver = owner.getBean(TypeDomainResolver.class);
-                }
-            }
-        }
     }
 
     private boolean isNotSpringInternalType(Class<?> typeToMatch) {
