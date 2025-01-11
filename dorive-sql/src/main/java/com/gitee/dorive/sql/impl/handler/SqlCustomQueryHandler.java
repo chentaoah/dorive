@@ -54,15 +54,15 @@ public class SqlCustomQueryHandler implements QueryHandler {
         Map<String, Object> attachments = context.getAttachments();
 
         int parameterCount = selectMethod.getParameterCount();
-        List<Object> primaryKeys = Collections.emptyList();
+        List<Object> ids = Collections.emptyList();
         if (parameterCount == 1) {
-            primaryKeys = ReflectUtil.invoke(mapper, selectMethod, query);
+            ids = ReflectUtil.invoke(mapper, selectMethod, query);
 
         } else if (parameterCount == 2) {
-            primaryKeys = ReflectUtil.invoke(mapper, selectMethod, attachments, query);
+            ids = ReflectUtil.invoke(mapper, selectMethod, attachments, query);
         }
-        if (!primaryKeys.isEmpty()) {
-            example.in(primaryKey, primaryKeys);
+        if (!ids.isEmpty()) {
+            example.in(primaryKey, ids);
         } else {
             queryContext.setAbandoned(true);
         }
