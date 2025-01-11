@@ -21,8 +21,8 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.impl.handler.AbstractQueryUnitQueryHandler;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,7 +32,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class SqlCustomQueryHandler extends AbstractQueryUnitQueryHandler {
+public class SqlCustomQueryHandler implements QueryHandler {
 
     private final EntityStoreInfo entityStoreInfo;
 
@@ -41,7 +41,7 @@ public class SqlCustomQueryHandler extends AbstractQueryUnitQueryHandler {
     }
 
     @Override
-    protected void doHandle(QueryContext queryContext, Object query) {
+    public void handle(QueryContext queryContext, Object query) {
         Context context = queryContext.getContext();
         String primaryKey = queryContext.getPrimaryKey();
         String method = queryContext.getMethod();
@@ -59,5 +59,4 @@ public class SqlCustomQueryHandler extends AbstractQueryUnitQueryHandler {
             queryContext.setAbandoned(true);
         }
     }
-
 }
