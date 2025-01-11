@@ -124,7 +124,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         Map<String, Method> selectMethodMap = new ConcurrentHashMap<>(8);
         for (Method method : ReflectUtil.getMethodsDirectly(mapperClass, false, false)) {
             String name = method.getName();
-            if (name.startsWith("select")) {
+            if (name.startsWith("select") || name.startsWith("query")) {
                 selectMethodMap.putIfAbsent(name, method);
             }
         }
