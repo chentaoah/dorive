@@ -31,7 +31,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.mybatis.plus.executor.MybatisPlusExecutor;
-import com.gitee.dorive.mybatis.plus.impl.SqlCustomQueryHandler;
+import com.gitee.dorive.sql.impl.handler.SqlCustomQueryHandler;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.enums.QueryMethod;
 import com.gitee.dorive.ref.repository.AbstractRefRepository;

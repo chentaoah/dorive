@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.plus.impl;
+package com.gitee.dorive.sql.impl.handler;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.core.api.context.Context;
