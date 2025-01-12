@@ -38,16 +38,16 @@ dorive的优势：
 
 | 模块                       | 说明             |
 | -------------------------- | ---------------- |
-| dorive-inject              | 模块化依赖校验   |
-| dorive-env                 | 简易化配置       |
-| dorive-web                 | web开发适配      |
 | dorive-api                 | 领域驱动统一规范 |
 | dorive-core                | 核心实现         |
 | dorive-event               | 事件通知实现     |
 | dorive-query               | 关联查询实现     |
 | dorive-ref                 | 仓储引用实现     |
+| dorive-env                 | 简易化配置       |
 | dorive-sql                 | 动态查询语句实现 |
 | dorive-mybatis-plus        | mybatis-plus适配 |
+| dorive-inject              | 模块化依赖校验   |
+| dorive-web                 | web开发适配      |
 | dorive-spring-boot-starter | 启动器           |
 
 ### 🔗依赖说明
