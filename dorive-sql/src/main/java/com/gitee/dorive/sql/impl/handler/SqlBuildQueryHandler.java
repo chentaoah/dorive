@@ -37,9 +37,18 @@ public class SqlBuildQueryHandler extends AbstractQueryUnitQueryHandler {
 
     @Override
     protected QueryUnit processQueryUnit(QueryContext queryContext, Map<String, QueryUnit> queryUnitMap, QueryUnit queryUnit) {
+        processExample(queryContext, queryUnit);
+        processAttachment(queryContext, queryUnitMap, queryUnit);
+        return queryUnit;
+    }
+
+    protected void processExample(QueryContext queryContext, QueryUnit queryUnit) {
+        queryUnit.convertExample(queryContext);
+    }
+
+    protected void processAttachment(QueryContext queryContext, Map<String, QueryUnit> queryUnitMap, QueryUnit queryUnit) {
         SegmentResolver segmentResolver = new SegmentResolver(repository, queryContext, queryUnitMap, queryUnit);
         queryUnit.setAttachment(segmentResolver.resolve());
-        return queryUnit;
     }
 
     @Override

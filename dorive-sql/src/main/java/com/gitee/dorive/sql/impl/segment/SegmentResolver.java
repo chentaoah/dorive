@@ -25,7 +25,6 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.ValueFilterBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.core.impl.executor.ExampleExecutor;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.repository.CommonRepository;
 import com.gitee.dorive.core.util.CriterionUtils;
@@ -56,17 +55,10 @@ public class SegmentResolver {
     private QueryUnit queryUnit;
 
     public Segment resolve() {
-        Context context = queryContext.getContext();
         MergedRepository mergedRepository = queryUnit.getMergedRepository();
-        Example example = queryUnit.getExample();
-
         Map<String, Object> attributes = mergedRepository.getAttributes();
         EntityStoreInfo entityStoreInfo = (EntityStoreInfo) attributes.get(EntityStoreInfo.class.getName());
-        ExampleExecutor exampleExecutor = (ExampleExecutor) attributes.get(ExampleExecutor.class.getName());
-
         String tableName = entityStoreInfo.getTableName();
-        exampleExecutor.convert(context, example);
-
         return newTableSegment(tableName);
     }
 

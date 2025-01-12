@@ -17,54 +17,69 @@
 
 package com.gitee.dorive.sql.impl.handler;
 
-import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.core.api.common.MethodInvoker;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.query.api.QueryHandler;
+import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.entity.QueryUnit;
+import com.gitee.dorive.query.repository.AbstractQueryRepository;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.lang.reflect.Method;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Getter
 @Setter
-public class SqlCustomQueryHandler implements QueryHandler {
+public class SqlCustomQueryHandler extends SqlBuildQueryHandler {
 
     private final EntityStoreInfo entityStoreInfo;
 
-    public SqlCustomQueryHandler(EntityStoreInfo entityStoreInfo) {
+    public SqlCustomQueryHandler(AbstractQueryRepository<?, ?> repository, EntityStoreInfo entityStoreInfo) {
+        super(repository);
         this.entityStoreInfo = entityStoreInfo;
     }
 
     @Override
-    public void handle(QueryContext queryContext, Object query) {
+    protected void processAttachment(QueryContext queryContext, Map<String, QueryUnit> queryUnitMap, QueryUnit queryUnit) {
+        // ignore
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected void doHandle(QueryContext queryContext, Object query) {
         Context context = queryContext.getContext();
         String primaryKey = queryContext.getPrimaryKey();
         String method = queryContext.getMethod();
         Example example = queryContext.getExample();
 
-        Object mapper = entityStoreInfo.getMapper();
-        Map<String, Method> selectMethodMap = entityStoreInfo.getSelectMethodMap();
-        Method selectMethod = selectMethodMap.get(method);
-        Map<String, Object> attachments = context.getAttachments();
+        OrderBy orderBy = example.getOrderBy();
+        Page<Object> page = example.getPage();
 
-        int parameterCount = selectMethod.getParameterCount();
-        List<Object> ids = Collections.emptyList();
-        if (parameterCount == 1) {
-            ids = ReflectUtil.invoke(mapper, selectMethod, query);
+        Map<String, Object> params = new HashMap<>(8);
+        params.put("context", context.getAttachments());
+        params.put("query", query);
+        params.put("orderBy", orderBy);
+        params.put("page", page);
 
-        } else if (parameterCount == 2) {
-            ids = ReflectUtil.invoke(mapper, selectMethod, attachments, query);
-        }
-        if (!ids.isEmpty()) {
-            example.in(primaryKey, ids);
-        } else {
+        Map<String, MethodInvoker> selectMethodMap = entityStoreInfo.getSelectMethodMap();
+        MethodInvoker methodInvoker = selectMethodMap.get(method);
+        Assert.notNull(methodInvoker, "The method invoker does not exist!");
+        List<Object> ids = (List<Object>) methodInvoker.invoke(params);
+        if (ids.isEmpty()) {
             queryContext.setAbandoned(true);
+            return;
+        }
+        example.in(primaryKey, ids);
+        List<Object> entities = (List<Object>) getRepository().selectByExample(context, new InnerExample().in(primaryKey, ids));
+        if (page != null) {
+            page.setRecords(entities);
+            queryContext.setResult(new Result<>(page));
+        } else {
+            queryContext.setResult(new Result<>(entities));
         }
     }
 }

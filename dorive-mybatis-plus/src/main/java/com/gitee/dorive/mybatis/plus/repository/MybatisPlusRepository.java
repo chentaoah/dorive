@@ -27,10 +27,12 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.core.api.common.ImplFactory;
+import com.gitee.dorive.core.api.common.MethodInvoker;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.mybatis.plus.executor.MybatisPlusExecutor;
+import com.gitee.dorive.mybatis.plus.impl.DefaultMethodInvoker;
 import com.gitee.dorive.sql.impl.handler.SqlCustomQueryHandler;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.enums.QueryMethod;
@@ -121,11 +123,12 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         List<String> columns = new ArrayList<>(propAliasMapping.values());
         String selectColumns = StrUtil.join(",", columns);
 
-        Map<String, Method> selectMethodMap = new ConcurrentHashMap<>(8);
+        Map<String, MethodInvoker> selectMethodMap = new ConcurrentHashMap<>(8);
         for (Method method : ReflectUtil.getMethodsDirectly(mapperClass, false, false)) {
             String name = method.getName();
             if (name.startsWith("select") || name.startsWith("query")) {
-                selectMethodMap.putIfAbsent(name, method);
+                MethodInvoker methodInvoker = new DefaultMethodInvoker(mapper, method);
+                selectMethodMap.putIfAbsent(name, methodInvoker);
             }
         }
         return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn, propAliasMappingWithoutPk, propAliasMapping, aliasPropMapping, selectColumns, selectMethodMap);
@@ -142,7 +145,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         super.registryQueryHandlers(queryHandlerMap);
         queryHandlerMap.put(QueryMethod.SQL_BUILD, new SqlBuildQueryHandler(this));
         queryHandlerMap.put(QueryMethod.SQL_EXECUTE, new SqlExecuteQueryHandler(this, sqlRunner));
-        queryHandlerMap.put(QueryMethod.SQL_CUSTOM, new SqlCustomQueryHandler(entityStoreInfo));
+        queryHandlerMap.put(QueryMethod.SQL_CUSTOM, new SqlCustomQueryHandler(this, entityStoreInfo));
     }
 
     @Override

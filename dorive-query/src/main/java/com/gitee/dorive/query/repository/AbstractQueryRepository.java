@@ -131,5 +131,4 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         }
         return selectCountByExample(context, example);
     }
-
 }

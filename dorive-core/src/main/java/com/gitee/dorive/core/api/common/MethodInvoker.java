@@ -15,26 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.common;
-
-import com.gitee.dorive.core.api.common.MethodInvoker;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+package com.gitee.dorive.core.api.common;
 
 import java.util.Map;
 
-@Data
-@AllArgsConstructor
-public class EntityStoreInfo {
-    private Class<?> mapperClass;
-    private Object mapper;
-    private Class<?> pojoClass;
-    private String tableName;
-    private String idProperty;
-    private String idColumn;
-    private Map<String, String> propAliasMappingWithoutPk;
-    private Map<String, String> propAliasMapping;
-    private Map<String, String> aliasPropMapping;
-    private String selectColumns;
-    private Map<String, MethodInvoker> selectMethodMap;
+public interface MethodInvoker {
+
+    Object invoke(Map<String, Object> params);
+
 }
