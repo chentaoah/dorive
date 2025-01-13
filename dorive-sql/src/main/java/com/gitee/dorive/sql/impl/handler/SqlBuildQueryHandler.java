@@ -68,7 +68,7 @@ public class SqlBuildQueryHandler extends AbstractQueryUnitQueryHandler {
         String primaryKey = queryContext.getPrimaryKey();
         Example example = queryContext.getExample();
 
-        List<Object> entities = (List<Object>) getRepository().selectByExample(context, new InnerExample().in(primaryKey, ids));
+        List<Object> entities = (List<Object>) repository.selectByExample(context, new InnerExample().in(primaryKey, ids));
 
         Page<Object> page = example.getPage();
         if (page != null) {
