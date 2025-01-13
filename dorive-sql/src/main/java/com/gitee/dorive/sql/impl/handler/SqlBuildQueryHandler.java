@@ -17,6 +17,11 @@
 
 package com.gitee.dorive.sql.impl.handler;
 
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.InnerExample;
+import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.impl.handler.AbstractQueryUnitQueryHandler;
@@ -26,6 +31,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -54,5 +60,22 @@ public class SqlBuildQueryHandler extends AbstractQueryUnitQueryHandler {
     @Override
     protected void doHandle(QueryContext queryContext, Object query) {
         // ignore
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void doQuery(QueryContext queryContext, List<Object> ids) {
+        Context context = queryContext.getContext();
+        String primaryKey = queryContext.getPrimaryKey();
+        Example example = queryContext.getExample();
+
+        List<Object> entities = (List<Object>) getRepository().selectByExample(context, new InnerExample().in(primaryKey, ids));
+
+        Page<Object> page = example.getPage();
+        if (page != null) {
+            page.setRecords(entities);
+            queryContext.setResult(new Result<>(page));
+        } else {
+            queryContext.setResult(new Result<>(entities));
+        }
     }
 }

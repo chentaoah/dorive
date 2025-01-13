@@ -121,13 +121,7 @@ public class SqlExecuteQueryHandler extends SqlBuildQueryHandler {
         List<Object> ids = CollUtil.map(resultMaps, map -> map.get(primaryKeyAlias), true);
         if (!ids.isEmpty()) {
             example.in(primaryKey, ids);
-            List<Object> entities = (List<Object>) getRepository().selectByExample(context, new InnerExample().in(primaryKey, ids));
-            if (page != null) {
-                page.setRecords(entities);
-                queryContext.setResult(new Result<>(page));
-            } else {
-                queryContext.setResult(new Result<>(entities));
-            }
+            doQuery(queryContext, ids);
         } else {
             queryContext.setAbandoned(true);
         }

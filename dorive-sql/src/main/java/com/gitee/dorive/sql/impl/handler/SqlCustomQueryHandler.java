@@ -69,17 +69,11 @@ public class SqlCustomQueryHandler extends SqlBuildQueryHandler {
         MethodInvoker methodInvoker = selectMethodMap.get(method);
         Assert.notNull(methodInvoker, "The method invoker does not exist!");
         List<Object> ids = (List<Object>) methodInvoker.invoke(params);
-        if (ids.isEmpty()) {
-            queryContext.setAbandoned(true);
-            return;
-        }
-        example.in(primaryKey, ids);
-        List<Object> entities = (List<Object>) getRepository().selectByExample(context, new InnerExample().in(primaryKey, ids));
-        if (page != null) {
-            page.setRecords(entities);
-            queryContext.setResult(new Result<>(page));
+        if (!ids.isEmpty()) {
+            example.in(primaryKey, ids);
+            doQuery(queryContext, ids);
         } else {
-            queryContext.setResult(new Result<>(entities));
+            queryContext.setAbandoned(true);
         }
     }
 }
