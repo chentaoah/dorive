@@ -18,8 +18,10 @@
 package com.gitee.dorive.sql.impl.handler;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.*;
+import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.entity.enums.ResultType;
@@ -48,9 +50,7 @@ public class SqlExecuteQueryHandler extends SqlBuildQueryHandler {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected void doHandle(QueryContext queryContext, Object query) {
-        Context context = queryContext.getContext();
         ResultType resultType = queryContext.getResultType();
         String primaryKey = queryContext.getPrimaryKey();
         String primaryKeyAlias = queryContext.getPrimaryKeyAlias();
