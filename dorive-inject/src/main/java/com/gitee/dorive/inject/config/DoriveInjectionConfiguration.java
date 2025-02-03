@@ -45,6 +45,7 @@ import java.util.List;
 @ConditionalOnProperty(prefix = "dorive", name = "enable", havingValue = "true")
 public class DoriveInjectionConfiguration implements EnvironmentAware, BeanFactoryPostProcessor {
 
+    public static final String DORIVE_ENABLE_KEY = "dorive.enable";
     public static final String DORIVE_SCAN_KEY = "dorive.scan";
     public static final String DORIVE_MODULES_KEY = "dorive.modules";
     public static ModuleChecker moduleChecker;

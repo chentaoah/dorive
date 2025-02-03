@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.module.impl;
 
+import com.gitee.dorive.inject.config.DoriveInjectionConfiguration;
 import com.gitee.dorive.inject.entity.ExportDefinition;
 
 import cn.hutool.core.lang.Assert;
@@ -90,9 +91,9 @@ public class SpringMultiApplication {
 
         Map<String, Object> properties = new LinkedHashMap<>();
         if (!propModuleDefinitions.isEmpty()) {
-            properties.put("dorive.enable", true);
-            properties.put("dorive.scan", project + ".**");
-            properties.put("dorive.modules", propModuleDefinitions);
+            properties.put(DoriveInjectionConfiguration.DORIVE_ENABLE_KEY, true);
+            properties.put(DoriveInjectionConfiguration.DORIVE_SCAN_KEY, project + ".**");
+            properties.put(DoriveInjectionConfiguration.DORIVE_MODULES_KEY, propModuleDefinitions);
         }
         return properties;
     }
