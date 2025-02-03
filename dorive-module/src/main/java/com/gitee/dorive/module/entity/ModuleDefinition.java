@@ -112,7 +112,7 @@ public class ModuleDefinition {
         return Collections.emptyList();
     }
 
-    public String getMainClassName() {
+    public String getBasePackage() {
         StringBuilder builder = new StringBuilder();
         if (StringUtils.isNotBlank(project)) {
             builder.append(project).append(".");
@@ -126,7 +126,10 @@ public class ModuleDefinition {
         if (StringUtils.isNotBlank(version)) {
             builder.append(version).append(".");
         }
-        builder.append("Application");
-        return builder.toString();
+        return StrUtil.removeSuffix(builder.toString(), ".");
+    }
+
+    public String getMainClassName() {
+        return getBasePackage() + ".Application";
     }
 }

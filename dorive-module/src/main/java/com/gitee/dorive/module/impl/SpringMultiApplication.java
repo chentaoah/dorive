@@ -17,14 +17,15 @@
 
 package com.gitee.dorive.module.impl;
 
+import com.gitee.dorive.inject.entity.ExportDefinition;
+
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ClassUtil;
 import com.gitee.dorive.module.entity.ModuleDefinition;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.jar.Manifest;
 
 public class SpringMultiApplication {
@@ -59,10 +60,40 @@ public class SpringMultiApplication {
 
         String project = launcherModuleDefinition.getProject();
         Assert.notEmpty(project, "The project name of launcher cannot be empty!");
+        Map<String, Object> properties = prepareProperties(project);
 
         return new SpringApplicationBuilder(sources.toArray(new Class[0]))
                 .profiles(profiles.toArray(new String[0]))
+                .properties(properties)
                 .beanNameGenerator(new ClassNameBeanNameGenerator(project + "."))
                 .run(args);
+    }
+
+    private static Map<String, Object> prepareProperties(String project) {
+        List<com.gitee.dorive.inject.entity.ModuleDefinition> propModuleDefinitions = new ArrayList<>();
+        for (ModuleDefinition moduleDefinition : MODULE_DEFINITIONS) {
+            com.gitee.dorive.inject.entity.ModuleDefinition propModuleDefinition = new com.gitee.dorive.inject.entity.ModuleDefinition();
+            propModuleDefinition.setName(moduleDefinition.getModule());
+            propModuleDefinition.setPath(moduleDefinition.getBasePackage() + ".**");
+
+            List<ExportDefinition> exportDefinitions = new ArrayList<>();
+            for (String export : moduleDefinition.getExports()) {
+                ExportDefinition exportDefinition = new ExportDefinition(export);
+                exportDefinitions.add(exportDefinition);
+            }
+            propModuleDefinition.setExports(exportDefinitions);
+
+            if (!exportDefinitions.isEmpty()) {
+                propModuleDefinitions.add(propModuleDefinition);
+            }
+        }
+
+        Map<String, Object> properties = new LinkedHashMap<>();
+        if (!propModuleDefinitions.isEmpty()) {
+            properties.put("dorive.enable", true);
+            properties.put("dorive.scan", project + ".**");
+            properties.put("dorive.modules", propModuleDefinitions);
+        }
+        return properties;
     }
 }
