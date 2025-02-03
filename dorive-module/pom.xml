@@ -8,22 +8,23 @@
         <artifactId>dorive</artifactId>
         <version>3.5.0.6</version>
     </parent>
-    <artifactId>dorive-spring-boot-starter</artifactId>
+    <artifactId>dorive-module</artifactId>
     <dependencies>
         <dependency>
-            <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-inject</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-module</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-web</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
         </dependency>
     </dependencies>
 </project>
