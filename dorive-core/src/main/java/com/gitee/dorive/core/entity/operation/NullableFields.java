@@ -15,31 +15,24 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.operation.cop;
+package com.gitee.dorive.core.entity.operation;
 
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.operation.Condition;
-import lombok.Getter;
-import lombok.Setter;
+import cn.hutool.core.lang.func.Func1;
+import cn.hutool.core.lang.func.LambdaUtil;
 
-import java.util.Collections;
-import java.util.Set;
+import java.util.HashSet;
 
-@Getter
-@Setter
-public class ConditionUpdate extends Condition {
+public class NullableFields<T> extends HashSet<String> {
 
-    private Object entity;
-    private Set<String> nullableProps = Collections.emptySet();
-
-    public ConditionUpdate(Object entity, Object primaryKey) {
-        super(primaryKey);
-        this.entity = entity;
-    }
-
-    public ConditionUpdate(Object entity, Example example) {
-        super(example);
-        this.entity = entity;
+    @SafeVarargs
+    public final boolean add(Func1<T, ?>... functions) {
+        if (functions != null && functions.length > 0) {
+            for (Func1<T, ?> function : functions) {
+                add(LambdaUtil.getFieldName(function));
+            }
+            return true;
+        }
+        return false;
     }
 
 }

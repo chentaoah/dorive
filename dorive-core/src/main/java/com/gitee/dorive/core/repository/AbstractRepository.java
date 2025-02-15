@@ -97,7 +97,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     @Override
     public int update(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = operationFactory.buildUpdate(entity);
+        Operation operation = operationFactory.buildUpdate(options, entity);
         return execute((Context) options, operation);
     }
 
@@ -105,7 +105,7 @@ public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Ex
     public int updateByExample(Options options, Object entity, Example example) {
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
-        Operation operation = operationFactory.buildUpdateByExample(entity, example);
+        Operation operation = operationFactory.buildUpdateByExample(options, entity, example);
         return execute((Context) options, operation);
     }
 

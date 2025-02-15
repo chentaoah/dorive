@@ -18,7 +18,9 @@
 package com.gitee.dorive.core.impl.factory;
 
 import com.gitee.dorive.api.entity.core.EntityElement;
+import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.core.entity.operation.NullableFields;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.ConditionDelete;
 import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
@@ -52,12 +54,22 @@ public class OperationFactory {
         return new Insert(Collections.singletonList(entity));
     }
 
-    public Operation buildUpdate(Object entity) {
-        return new Update(Collections.singletonList(entity));
+    public Operation buildUpdate(Options options, Object entity) {
+        Update update = new Update(Collections.singletonList(entity));
+        NullableFields<?> nullableFields = options.getOption(NullableFields.class);
+        if (nullableFields != null) {
+            update.setNullableProps(nullableFields);
+        }
+        return update;
     }
 
-    public Operation buildUpdateByExample(Object entity, Example example) {
-        return new ConditionUpdate(entity, example);
+    public Operation buildUpdateByExample(Options options, Object entity, Example example) {
+        ConditionUpdate conditionUpdate = new ConditionUpdate(entity, example);
+        NullableFields<?> nullableFields = options.getOption(NullableFields.class);
+        if (nullableFields != null) {
+            conditionUpdate.setNullableProps(nullableFields);
+        }
+        return conditionUpdate;
     }
 
     public Operation buildInsertOrUpdate(Object entity) {
