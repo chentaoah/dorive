@@ -92,9 +92,7 @@ public class SpringMultiApplication {
             }
             propModuleDefinition.setExports(exportDefinitions);
 
-            if (!exportDefinitions.isEmpty()) {
-                propModuleDefinitions.add(propModuleDefinition);
-            }
+            propModuleDefinitions.add(propModuleDefinition);
         }
 
         Map<String, Object> properties = new LinkedHashMap<>();
