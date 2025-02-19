@@ -80,12 +80,17 @@ public class SpringMultiApplication {
             propModuleDefinition.setName(moduleDefinition.getModule());
             propModuleDefinition.setPath(moduleDefinition.getBasePackage() + ".**");
 
-            List<ExportDefinition> exportDefinitions = new ArrayList<>();
-            for (String export : moduleDefinition.getExports()) {
-                ExportDefinition exportDefinition = new ExportDefinition(export);
-                exportDefinitions.add(exportDefinition);
+            List<String> exports = moduleDefinition.getExports();
+            if (exports != null && !exports.isEmpty()) {
+                List<ExportDefinition> exportDefinitions = new ArrayList<>(exports.size());
+                for (String export : exports) {
+                    ExportDefinition exportDefinition = new ExportDefinition(export);
+                    exportDefinitions.add(exportDefinition);
+                }
+                propModuleDefinition.setExports(exportDefinitions);
+            } else {
+                propModuleDefinition.setExports(Collections.emptyList());
             }
-            propModuleDefinition.setExports(exportDefinitions);
 
             propModuleDefinitions.add(propModuleDefinition);
         }
