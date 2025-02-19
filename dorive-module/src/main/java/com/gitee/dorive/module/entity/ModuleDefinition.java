@@ -97,20 +97,20 @@ public class ModuleDefinition {
     }
 
     public String getBasePackage() {
-        StringBuilder builder = new StringBuilder();
+        List<String> packages = new ArrayList<>(4);
         if (StringUtils.isNotBlank(project)) {
-            builder.append(project).append(".");
+            packages.add(project);
         }
         if (StringUtils.isNotBlank(domain)) {
-            builder.append(domain).append(".");
+            packages.add(domain);
         }
         if (StringUtils.isNotBlank(subdomain)) {
-            builder.append(subdomain).append(".");
+            packages.add(subdomain);
         }
         if (StringUtils.isNotBlank(version)) {
-            builder.append(version).append(".");
+            packages.add(version);
         }
-        return StrUtil.removeSuffix(builder.toString(), ".");
+        return StrUtil.join(".", packages);
     }
 
     public String getMainClassName() {
