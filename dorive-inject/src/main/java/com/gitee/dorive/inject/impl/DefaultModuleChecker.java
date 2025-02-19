@@ -18,28 +18,36 @@
 package com.gitee.dorive.inject.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.inject.api.ModuleChecker;
 import com.gitee.dorive.inject.entity.ExportDefinition;
 import com.gitee.dorive.inject.entity.ModuleDefinition;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.util.AntPathMatcher;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DefaultModuleChecker implements ModuleChecker {
 
     private final AntPathMatcher antPathMatcher = new AntPathMatcher(".");
-    private final String scanPackage;
+    private final Set<String> scanPackages;
     private final List<ModuleDefinition> moduleDefinitions;
 
-    public DefaultModuleChecker(String scanPackage, List<ModuleDefinition> moduleDefinitions) {
-        this.scanPackage = scanPackage;
+    public DefaultModuleChecker(String scanPackages, List<ModuleDefinition> moduleDefinitions) {
+        this.scanPackages = new LinkedHashSet<>(StrUtil.splitTrim(scanPackages, ","));
         this.moduleDefinitions = moduleDefinitions;
     }
 
     @Override
     public boolean isUnderScanPackage(Class<?> typeToMatch) {
-        return antPathMatcher.match(scanPackage, typeToMatch.getName());
+        for (String scanPackage : scanPackages) {
+            if (antPathMatcher.match(scanPackage, typeToMatch.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

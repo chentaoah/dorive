@@ -17,17 +17,19 @@
 
 package com.gitee.dorive.module.impl;
 
-import com.gitee.dorive.inject.config.DoriveInjectionConfiguration;
-import com.gitee.dorive.inject.entity.ExportDefinition;
-
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ClassUtil;
+import com.gitee.dorive.inject.config.DoriveInjectionConfiguration;
+import com.gitee.dorive.inject.entity.ExportDefinition;
 import com.gitee.dorive.module.entity.ModuleDefinition;
+import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.*;
 import java.util.jar.Manifest;
+import java.util.stream.Collectors;
 
 public class SpringMultiApplication {
 
@@ -35,42 +37,48 @@ public class SpringMultiApplication {
     public static final List<ModuleDefinition> MODULE_DEFINITIONS = new ArrayList<>();
 
     public static ConfigurableApplicationContext run(Class<?> primarySource, String... args) {
-        MODULE_RESOURCE_RESOLVER.resolveUriManifestMap();
+        MODULE_RESOURCE_RESOLVER.resolveManifestMap();
 
         List<Class<?>> sources = new ArrayList<>();
-        sources.add(primarySource);
+        List<String> profiles = new ArrayList<>();
 
-        Manifest launcherManifest = MODULE_RESOURCE_RESOLVER.getManifest(primarySource);
-        Assert.notNull(launcherManifest, "The manifest of launcher cannot be null!");
-        ModuleDefinition launcherModuleDefinition = new ModuleDefinition(launcherManifest);
-        MODULE_DEFINITIONS.add(launcherModuleDefinition);
-        List<String> profiles = new ArrayList<>(launcherModuleDefinition.getProfiles());
-
-        for (String moduleName : launcherModuleDefinition.getDepends()) {
-            Manifest moduleManifest = MODULE_RESOURCE_RESOLVER.getManifest(moduleName);
-            Assert.notNull(moduleManifest, "The manifest of module cannot be null!");
-            ModuleDefinition moduleDefinition = new ModuleDefinition(moduleManifest);
+        Set<String> names = MODULE_RESOURCE_RESOLVER.getNames();
+        for (String name : names) {
+            Manifest manifest = MODULE_RESOURCE_RESOLVER.getManifest(name);
+            Assert.notNull(manifest, "The manifest of module cannot be null!");
+            ModuleDefinition moduleDefinition = new ModuleDefinition(manifest);
             MODULE_DEFINITIONS.add(moduleDefinition);
+
             String mainClassName = moduleDefinition.getMainClassName();
-            Class<?> clazz = ClassUtil.loadClass(mainClassName);
-            if (clazz != null) {
-                sources.add(clazz);
+            Class<?> mainClass = null;
+            try {
+                mainClass = ClassUtil.loadClass(mainClassName);
+            } catch (Exception e) {
+                // ignore
+            }
+            if (mainClass != null) {
+                sources.add(mainClass);
                 profiles.addAll(moduleDefinition.getProfiles());
             }
         }
 
-        String project = launcherModuleDefinition.getProject();
-        Assert.notEmpty(project, "The project name of launcher cannot be empty!");
-        Map<String, Object> properties = prepareProperties(project);
+        String scanPackages = getScanPackages();
+        Map<String, Object> properties = prepareProperties(scanPackages);
+        BeanNameGenerator beanNameGenerator = new ClassNameBeanNameGenerator(scanPackages);
 
         return new SpringApplicationBuilder(sources.toArray(new Class[0]))
                 .profiles(profiles.toArray(new String[0]))
                 .properties(properties)
-                .beanNameGenerator(new ClassNameBeanNameGenerator(project + "."))
+                .beanNameGenerator(beanNameGenerator)
                 .run(args);
     }
 
-    private static Map<String, Object> prepareProperties(String project) {
+    private static String getScanPackages() {
+        Set<String> scanPackages = MODULE_DEFINITIONS.stream().map(ModuleDefinition::getProject).collect(Collectors.toSet());
+        return CollUtil.join(scanPackages, ", ", null, ".**");
+    }
+
+    private static Map<String, Object> prepareProperties(String scanPackages) {
         List<com.gitee.dorive.inject.entity.ModuleDefinition> propModuleDefinitions = new ArrayList<>();
         for (ModuleDefinition moduleDefinition : MODULE_DEFINITIONS) {
             com.gitee.dorive.inject.entity.ModuleDefinition propModuleDefinition = new com.gitee.dorive.inject.entity.ModuleDefinition();
@@ -92,7 +100,7 @@ public class SpringMultiApplication {
         Map<String, Object> properties = new LinkedHashMap<>();
         if (!propModuleDefinitions.isEmpty()) {
             properties.put(DoriveInjectionConfiguration.DORIVE_ENABLE_KEY, true);
-            properties.put(DoriveInjectionConfiguration.DORIVE_SCAN_KEY, project + ".**");
+            properties.put(DoriveInjectionConfiguration.DORIVE_SCAN_KEY, scanPackages);
             properties.put(DoriveInjectionConfiguration.DORIVE_MODULES_KEY, propModuleDefinitions);
         }
         return properties;

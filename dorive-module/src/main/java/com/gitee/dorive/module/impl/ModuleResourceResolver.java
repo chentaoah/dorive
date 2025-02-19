@@ -28,6 +28,7 @@ import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -36,7 +37,7 @@ public class ModuleResourceResolver {
     private final Map<URI, Manifest> uriManifestMap = new HashMap<>();
     private final Map<String, Manifest> moduleManifestMap = new HashMap<>();
 
-    public void resolveUriManifestMap() {
+    public void resolveManifestMap() {
         try {
             ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             Resource[] resources = resolver.getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "META-INF/MANIFEST.MF");
@@ -98,8 +99,11 @@ public class ModuleResourceResolver {
         return null;
     }
 
+    public Set<String> getNames() {
+        return moduleManifestMap.keySet();
+    }
+
     public Manifest getManifest(String module) {
         return moduleManifestMap.get(module);
     }
-
 }

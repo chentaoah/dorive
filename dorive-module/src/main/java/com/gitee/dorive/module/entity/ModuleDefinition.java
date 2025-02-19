@@ -39,7 +39,6 @@ public class ModuleDefinition {
     private String moduleType;
     private List<String> configs;
     private List<String> exports;
-    private List<String> depends;
     private List<String> externalDepends;
     private String tablePrefix;
 
@@ -58,7 +57,6 @@ public class ModuleDefinition {
 
         String configs = mainAttributes.getValue("Dorive-Configs");
         String exports = mainAttributes.getValue("Dorive-Exports");
-        String depends = mainAttributes.getValue("Dorive-Depends");
         String externalDepends = mainAttributes.getValue("Dorive-External-Depends");
         String tablePrefix = mainAttributes.getValue("Dorive-Table-Prefix");
 
@@ -73,7 +71,6 @@ public class ModuleDefinition {
 
         this.configs = filterValues(configs);
         this.exports = filterValues(exports);
-        this.depends = filterValues(depends);
         this.externalDepends = filterValues(externalDepends);
         this.tablePrefix = filterValue(tablePrefix);
     }

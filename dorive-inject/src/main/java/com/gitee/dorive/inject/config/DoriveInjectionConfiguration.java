@@ -52,11 +52,11 @@ public class DoriveInjectionConfiguration implements EnvironmentAware, BeanFacto
 
     @Override
     public void setEnvironment(Environment environment) {
-        String scanPackage = environment.getProperty(DORIVE_SCAN_KEY);
-        Assert.notBlank(scanPackage, "The configuration item could not be found! name: {}", DORIVE_SCAN_KEY);
+        String scanPackages = environment.getProperty(DORIVE_SCAN_KEY);
+        Assert.notBlank(scanPackages, "The configuration item could not be found! name: {}", DORIVE_SCAN_KEY);
         List<ModuleDefinition> moduleDefinitions = Binder.get(environment).bind(DORIVE_MODULES_KEY, Bindable.listOf(ModuleDefinition.class)).get();
         moduleDefinitions.sort(Comparator.comparing(ModuleDefinition::getName));
-        moduleChecker = new DefaultModuleChecker(scanPackage, moduleDefinitions);
+        moduleChecker = new DefaultModuleChecker(scanPackages, moduleDefinitions);
     }
 
     @Override
