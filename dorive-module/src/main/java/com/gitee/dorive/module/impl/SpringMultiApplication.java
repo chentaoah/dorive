@@ -19,7 +19,6 @@ package com.gitee.dorive.module.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ClassUtil;
 import com.gitee.dorive.inject.config.DoriveInjectionConfiguration;
 import com.gitee.dorive.inject.entity.ExportDefinition;
 import com.gitee.dorive.module.entity.ModuleDefinition;
@@ -39,8 +38,8 @@ public class SpringMultiApplication {
     public static ConfigurableApplicationContext run(Class<?> primarySource, String... args) {
         MODULE_RESOURCE_RESOLVER.resolveManifestMap();
 
-        List<Class<?>> sources = new ArrayList<>();
-        List<String> profiles = new ArrayList<>();
+        Set<Class<?>> sources = new LinkedHashSet<>();
+        Set<String> profiles = new LinkedHashSet<>();
 
         Set<String> names = MODULE_RESOURCE_RESOLVER.getNames();
         for (String name : names) {
@@ -49,18 +48,14 @@ public class SpringMultiApplication {
             ModuleDefinition moduleDefinition = new ModuleDefinition(manifest);
             MODULE_DEFINITIONS.add(moduleDefinition);
 
-            String mainClassName = moduleDefinition.getMainClassName();
-            Class<?> mainClass = null;
-            try {
-                mainClass = ClassUtil.loadClass(mainClassName);
-            } catch (Exception e) {
-                // ignore
-            }
+            Class<?> mainClass = moduleDefinition.getMainClass();
             if (mainClass != null) {
                 sources.add(mainClass);
-                profiles.addAll(moduleDefinition.getProfiles());
             }
+            profiles.addAll(moduleDefinition.getProfiles());
         }
+
+        sources.add(primarySource);
 
         String scanPackages = getScanPackages();
         Map<String, Object> properties = prepareProperties(scanPackages);
@@ -94,13 +89,13 @@ public class SpringMultiApplication {
 
             propModuleDefinitions.add(propModuleDefinition);
         }
-
-        Map<String, Object> properties = new LinkedHashMap<>();
         if (!propModuleDefinitions.isEmpty()) {
+            Map<String, Object> properties = new LinkedHashMap<>();
             properties.put(DoriveInjectionConfiguration.DORIVE_ENABLE_KEY, true);
             properties.put(DoriveInjectionConfiguration.DORIVE_SCAN_KEY, scanPackages);
             properties.put(DoriveInjectionConfiguration.DORIVE_MODULES_KEY, propModuleDefinitions);
+            return properties;
         }
-        return properties;
+        return Collections.emptyMap();
     }
 }

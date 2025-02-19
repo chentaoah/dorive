@@ -18,6 +18,7 @@
 package com.gitee.dorive.module.entity;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -95,20 +96,6 @@ public class ModuleDefinition {
         return StrUtil.splitTrim(values, ",");
     }
 
-    public List<String> getProfiles() {
-        if (configs != null && !configs.isEmpty()) {
-            List<String> profiles = new ArrayList<>(configs.size());
-            for (String config : configs) {
-                if (config.startsWith("application-") && config.endsWith(".yml")) {
-                    String profile = config.substring(12, config.length() - 4);
-                    profiles.add(profile);
-                }
-            }
-            return profiles;
-        }
-        return Collections.emptyList();
-    }
-
     public String getBasePackage() {
         StringBuilder builder = new StringBuilder();
         if (StringUtils.isNotBlank(project)) {
@@ -128,5 +115,27 @@ public class ModuleDefinition {
 
     public String getMainClassName() {
         return getBasePackage() + ".Application";
+    }
+
+    public Class<?> getMainClass() {
+        try {
+            return ClassUtil.loadClass(getMainClassName());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<String> getProfiles() {
+        if (configs != null && !configs.isEmpty()) {
+            List<String> profiles = new ArrayList<>(configs.size());
+            for (String config : configs) {
+                if (config.startsWith("application-") && config.endsWith(".yml")) {
+                    String profile = config.substring(12, config.length() - 4);
+                    profiles.add(profile);
+                }
+            }
+            return profiles;
+        }
+        return Collections.emptyList();
     }
 }
