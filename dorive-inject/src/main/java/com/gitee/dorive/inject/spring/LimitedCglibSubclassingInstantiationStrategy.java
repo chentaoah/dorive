@@ -33,7 +33,7 @@ public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassi
     @Override
     public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Constructor<?> ctor, Object... args) {
         Class<?> resolvableType = (Class<?>) bd.getResolvableType().getType();
-        if (isNotSpringInternalType(resolvableType) && moduleChecker.isUnderScanPackage(resolvableType)) {
+        if (moduleChecker.isNotSpringInternalType(resolvableType) && moduleChecker.isUnderScanPackage(resolvableType)) {
             Class<?>[] parameterTypes = ctor.getParameterTypes();
             for (int index = 0; index < parameterTypes.length; index++) {
                 Class<?> parameterType = parameterTypes[index];
@@ -42,10 +42,6 @@ public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassi
             }
         }
         return super.instantiate(bd, beanName, owner, ctor, args);
-    }
-
-    private boolean isNotSpringInternalType(Class<?> typeToMatch) {
-        return !typeToMatch.getName().startsWith("org.springframework.");
     }
 
 }

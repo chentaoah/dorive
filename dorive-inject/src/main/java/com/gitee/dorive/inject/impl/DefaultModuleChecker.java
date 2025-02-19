@@ -42,6 +42,11 @@ public class DefaultModuleChecker implements ModuleChecker {
     }
 
     @Override
+    public boolean isNotSpringInternalType(Class<?> typeToMatch) {
+        return !typeToMatch.getName().startsWith("org.springframework.");
+    }
+
+    @Override
     public boolean isUnderScanPackage(Class<?> typeToMatch) {
         for (String scanPackage : scanPackages) {
             if (antPathMatcher.match(scanPackage, typeToMatch.getName())) {

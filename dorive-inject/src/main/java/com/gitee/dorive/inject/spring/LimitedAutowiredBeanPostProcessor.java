@@ -17,84 +17,62 @@
 
 package com.gitee.dorive.inject.spring;
 
+import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.inject.api.ModuleChecker;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.AllArgsConstructor;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.PropertyValues;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
-import org.springframework.beans.factory.support.MergedBeanDefinitionPostProcessor;
-import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
+import org.springframework.core.Ordered;
+import org.springframework.core.PriorityOrdered;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
-import org.springframework.lang.Nullable;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.*;
 
-public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter implements MergedBeanDefinitionPostProcessor {
+@AllArgsConstructor
+public class LimitedAutowiredBeanPostProcessor implements SmartInstantiationAwareBeanPostProcessor, PriorityOrdered {
 
-    protected final Log logger = LogFactory.getLog(getClass());
+    private static final int order = Ordered.LOWEST_PRECEDENCE;
     private final ModuleChecker moduleChecker;
-    private final Set<Class<? extends Annotation>> autowiredAnnotationTypes = new LinkedHashSet<>(4);
 
-    @SuppressWarnings("unchecked")
-    public LimitedAutowiredBeanPostProcessor(ModuleChecker moduleChecker) {
-        this.moduleChecker = moduleChecker;
-        this.autowiredAnnotationTypes.add(Autowired.class);
-        try {
-            this.autowiredAnnotationTypes.add((Class<? extends Annotation>)
-                    ClassUtils.forName("javax.inject.Inject", LimitedAutowiredBeanPostProcessor.class.getClassLoader()));
-            logger.trace("JSR-330 'javax.inject.Inject' annotation found and supported for autowiring");
-        } catch (ClassNotFoundException ex) {
-            // JSR-330 API not available - simply skip.
+    @Override
+    public int getOrder() {
+        return order;
+    }
+
+    @Override
+    public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) {
+        Class<?> beanType = AopUtils.getTargetClass(bean);
+        if (moduleChecker.isNotSpringInternalType(beanType) && moduleChecker.isUnderScanPackage(beanType)) {
+            try {
+                checkAutowiredFieldModule(beanType, bean);
+
+            } catch (BeanCreationException ex) {
+                throw ex;
+            } catch (Throwable ex) {
+                throw new BeanCreationException(beanName, "Injection of autowired dependencies failed", ex);
+            }
         }
+        return pvs;
     }
 
-    @Override
-    public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
-        checkAutowiredFieldModule(beanType);
-    }
-
-    @Override
-    public void resetBeanDefinition(String beanName) {
-        // ignore
-    }
-
-    private void checkAutowiredFieldModule(final Class<?> clazz) {
-        ReflectionUtils.doWithLocalFields(clazz, field -> {
+    private void checkAutowiredFieldModule(Class<?> beanType, Object bean) {
+        ReflectionUtils.doWithLocalFields(beanType, field -> {
             AnnotationAttributes ann = findAutowiredAnnotation(field);
-            if (ann != null) {
-                if (Modifier.isStatic(field.getModifiers())) {
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Autowired annotation is not supported on static fields: " + field);
-                    }
-                    return;
-                }
-                doCheckAutowiredFieldModule(clazz, field);
+            if (ann != null && !Modifier.isStatic(field.getModifiers())) {
+                Object fieldValue = ReflectUtil.getFieldValue(bean, field);
+                moduleChecker.checkInjection(beanType, field.getType(), fieldValue);
             }
         });
     }
 
-    @Nullable
     private AnnotationAttributes findAutowiredAnnotation(AccessibleObject ao) {
-        if (ao.getAnnotations().length > 0) {  // autowiring annotations have to be local
-            for (Class<? extends Annotation> type : this.autowiredAnnotationTypes) {
-                AnnotationAttributes attributes = AnnotatedElementUtils.getMergedAnnotationAttributes(ao, type);
-                if (attributes != null) {
-                    return attributes;
-                }
-            }
-        }
-        return null;
-    }
-
-    private void doCheckAutowiredFieldModule(Class<?> clazz, Field field) {
-        moduleChecker.checkInjection(clazz, field.getType(), null);
+        return ao.getAnnotations().length > 0 ? AnnotatedElementUtils.getMergedAnnotationAttributes(ao, Autowired.class) : null;
     }
 
 }
