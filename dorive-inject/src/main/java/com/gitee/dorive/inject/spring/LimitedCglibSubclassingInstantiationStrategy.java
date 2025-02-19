@@ -34,11 +34,11 @@ public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassi
     public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Constructor<?> ctor, Object... args) {
         Class<?> resolvableType = (Class<?>) bd.getResolvableType().getType();
         if (isNotSpringInternalType(resolvableType) && moduleChecker.isUnderScanPackage(resolvableType)) {
-            int index = 0;
-            for (Class<?> parameterType : ctor.getParameterTypes()) {
-                if (isNotSpringInternalType(parameterType) && moduleChecker.isUnderScanPackage(parameterType)) {
-                    moduleChecker.checkInjection(resolvableType, parameterType, args[index++]);
-                }
+            Class<?>[] parameterTypes = ctor.getParameterTypes();
+            for (int index = 0; index < parameterTypes.length; index++) {
+                Class<?> parameterType = parameterTypes[index];
+                Object arg = args[index];
+                moduleChecker.checkInjection(resolvableType, parameterType, arg);
             }
         }
         return super.instantiate(bd, beanName, owner, ctor, args);
