@@ -94,7 +94,7 @@ public class LimitedAutowiredBeanPostProcessor extends InstantiationAwareBeanPos
     }
 
     private void doCheckAutowiredFieldModule(Class<?> clazz, Field field) {
-        moduleChecker.checkInjection(clazz, field.getType());
+        moduleChecker.checkInjection(clazz, field.getType(), null);
     }
 
 }

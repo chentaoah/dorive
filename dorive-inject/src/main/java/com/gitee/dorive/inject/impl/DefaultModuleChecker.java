@@ -22,6 +22,7 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.inject.api.ModuleChecker;
 import com.gitee.dorive.inject.entity.ExportDefinition;
 import com.gitee.dorive.inject.entity.ModuleDefinition;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.util.AntPathMatcher;
 
@@ -51,7 +52,14 @@ public class DefaultModuleChecker implements ModuleChecker {
     }
 
     @Override
-    public void checkInjection(Class<?> type, Class<?> injectedType) {
+    public void checkInjection(Class<?> type, Class<?> injectedType, Object instance) {
+        doCheckInjection(type, injectedType);
+        if (instance != null) {
+            doCheckInjection(type, AopUtils.getTargetClass(instance));
+        }
+    }
+
+    private void doCheckInjection(Class<?> type, Class<?> injectedType) {
         if (isUnderScanPackage(injectedType)) {
             // 模块定义不存在，则判定为通过
             ModuleDefinition moduleDefinition = findModuleDefinition(injectedType);

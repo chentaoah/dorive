@@ -21,6 +21,6 @@ public interface ModuleChecker {
 
     boolean isUnderScanPackage(Class<?> typeToMatch);
 
-    void checkInjection(Class<?> type, Class<?> injectedType);
+    void checkInjection(Class<?> type, Class<?> injectedType, Object instance);
 
 }
