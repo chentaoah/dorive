@@ -60,7 +60,10 @@ public class DefaultModuleChecker implements ModuleChecker {
     public void checkInjection(Class<?> type, Class<?> injectedType, Object instance) {
         doCheckInjection(type, injectedType);
         if (instance != null) {
-            doCheckInjection(type, AopUtils.getTargetClass(instance));
+            Class<?> targetClass = AopUtils.getTargetClass(instance);
+            if (!injectedType.equals(targetClass)) {
+                doCheckInjection(type, targetClass);
+            }
         }
     }
 

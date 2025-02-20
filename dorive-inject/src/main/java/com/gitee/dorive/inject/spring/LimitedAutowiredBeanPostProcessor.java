@@ -21,12 +21,10 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.inject.api.ModuleChecker;
 import lombok.AllArgsConstructor;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.PropertyValues;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
-import org.springframework.core.Ordered;
-import org.springframework.core.PriorityOrdered;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.util.ReflectionUtils;
@@ -35,18 +33,12 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Modifier;
 
 @AllArgsConstructor
-public class LimitedAutowiredBeanPostProcessor implements SmartInstantiationAwareBeanPostProcessor, PriorityOrdered {
+public class LimitedAutowiredBeanPostProcessor implements BeanPostProcessor {
 
-    private static final int order = Ordered.LOWEST_PRECEDENCE;
     private final ModuleChecker moduleChecker;
 
     @Override
-    public int getOrder() {
-        return order;
-    }
-
-    @Override
-    public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) {
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> beanType = AopUtils.getTargetClass(bean);
         if (moduleChecker.isNotSpringInternalType(beanType) && moduleChecker.isUnderScanPackage(beanType)) {
             try {
@@ -58,7 +50,7 @@ public class LimitedAutowiredBeanPostProcessor implements SmartInstantiationAwar
                 throw new BeanCreationException(beanName, "Injection of autowired dependencies failed", ex);
             }
         }
-        return pvs;
+        return bean;
     }
 
     private void checkAutowiredFieldModule(Class<?> beanType, Object bean) {
