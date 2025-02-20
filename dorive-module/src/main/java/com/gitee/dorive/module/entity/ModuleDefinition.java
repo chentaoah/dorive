@@ -138,4 +138,15 @@ public class ModuleDefinition {
         }
         return Collections.emptyList();
     }
+
+    public int getOrder() {
+        if ("base".equals(moduleType)) {
+            return 1;
+        } else if ("biz".equals(moduleType)) {
+            return 2;
+        } else if ("launcher".equals(moduleType)) {
+            return 3;
+        }
+        return 2;
+    }
 }

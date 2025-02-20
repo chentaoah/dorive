@@ -47,7 +47,10 @@ public class SpringMultiApplication {
             Assert.notNull(manifest, "The manifest of module cannot be null!");
             ModuleDefinition moduleDefinition = new ModuleDefinition(manifest);
             MODULE_DEFINITIONS.add(moduleDefinition);
+        }
+        MODULE_DEFINITIONS.sort(Comparator.comparing(ModuleDefinition::getOrder));
 
+        for (ModuleDefinition moduleDefinition : MODULE_DEFINITIONS) {
             Class<?> mainClass = moduleDefinition.getMainClass();
             if (mainClass != null) {
                 sources.add(mainClass);
