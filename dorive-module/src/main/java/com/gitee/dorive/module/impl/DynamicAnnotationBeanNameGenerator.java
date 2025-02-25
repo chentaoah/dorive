@@ -19,19 +19,18 @@ package com.gitee.dorive.module.impl;
 
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.util.AntPathMatcher;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ClassNameBeanNameGenerator extends AnnotationBeanNameGenerator {
+public class DynamicAnnotationBeanNameGenerator extends AnnotationBeanNameGenerator {
 
     private final AntPathMatcher antPathMatcher = new AntPathMatcher(".");
     private final Set<String> scanPackages;
 
-    public ClassNameBeanNameGenerator(String scanPackages) {
+    public DynamicAnnotationBeanNameGenerator(String scanPackages) {
         this.scanPackages = new LinkedHashSet<>(StrUtil.splitTrim(scanPackages, ","));
     }
 
@@ -45,12 +44,12 @@ public class ClassNameBeanNameGenerator extends AnnotationBeanNameGenerator {
     }
 
     @Override
-    public String generateBeanName(BeanDefinition definition, BeanDefinitionRegistry registry) {
+    protected String buildDefaultBeanName(BeanDefinition definition) {
         String beanClassName = definition.getBeanClassName();
         if (beanClassName != null && isUnderScanPackage(beanClassName)) {
             return beanClassName;
         }
-        return super.generateBeanName(definition, registry);
+        return super.buildDefaultBeanName(definition);
     }
 
 }

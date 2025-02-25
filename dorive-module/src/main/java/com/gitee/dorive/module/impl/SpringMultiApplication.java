@@ -62,7 +62,7 @@ public class SpringMultiApplication {
 
         String scanPackages = getScanPackages();
         Map<String, Object> properties = prepareProperties(scanPackages);
-        BeanNameGenerator beanNameGenerator = new ClassNameBeanNameGenerator(scanPackages);
+        BeanNameGenerator beanNameGenerator = new DynamicAnnotationBeanNameGenerator(scanPackages);
 
         return new SpringApplicationBuilder(sources.toArray(new Class[0]))
                 .profiles(profiles.toArray(new String[0]))
