@@ -23,14 +23,15 @@ import com.gitee.dorive.inject.config.DoriveInjectionConfiguration;
 import com.gitee.dorive.inject.entity.ExportDefinition;
 import com.gitee.dorive.module.entity.ModuleDefinition;
 import org.springframework.beans.factory.support.BeanNameGenerator;
-import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.io.ResourceLoader;
 
 import java.util.*;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
-public class SpringMultiApplication {
+public class SpringMultiApplication extends SpringApplication {
 
     public static final ModuleResourceResolver MODULE_RESOURCE_RESOLVER = new ModuleResourceResolver();
     public static final List<ModuleDefinition> MODULE_DEFINITIONS = new ArrayList<>();
@@ -64,7 +65,7 @@ public class SpringMultiApplication {
         Map<String, Object> properties = prepareProperties(scanPackages);
         BeanNameGenerator beanNameGenerator = new DynamicAnnotationBeanNameGenerator(scanPackages);
 
-        return new SpringApplicationBuilder(sources.toArray(new Class[0]))
+        return new SpringMultiApplicationBuilder(sources.toArray(new Class[0]))
                 .profiles(profiles.toArray(new String[0]))
                 .properties(properties)
                 .beanNameGenerator(beanNameGenerator)
@@ -106,4 +107,14 @@ public class SpringMultiApplication {
         }
         return Collections.emptyMap();
     }
+
+    public SpringMultiApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
+        super(resourceLoader, primarySources);
+    }
+
+    @Override
+    protected void postProcessApplicationContext(ConfigurableApplicationContext context) {
+        super.postProcessApplicationContext(context);
+    }
+
 }
