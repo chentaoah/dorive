@@ -25,12 +25,12 @@ import org.springframework.util.AntPathMatcher;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class DynamicAnnotationBeanNameGenerator extends AnnotationBeanNameGenerator {
+public class ModuleAnnotationBeanNameGenerator extends AnnotationBeanNameGenerator {
 
     private final AntPathMatcher antPathMatcher = new AntPathMatcher(".");
     private final Set<String> scanPackages;
 
-    public DynamicAnnotationBeanNameGenerator(String scanPackages) {
+    public ModuleAnnotationBeanNameGenerator(String scanPackages) {
         this.scanPackages = new LinkedHashSet<>(StrUtil.splitTrim(scanPackages, ","));
     }
 

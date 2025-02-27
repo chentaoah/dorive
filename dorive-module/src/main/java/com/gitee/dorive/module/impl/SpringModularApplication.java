@@ -22,7 +22,10 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.inject.config.DoriveInjectionConfiguration;
 import com.gitee.dorive.inject.entity.ExportDefinition;
 import com.gitee.dorive.module.entity.ModuleDefinition;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.ResourceLoader;
@@ -31,7 +34,9 @@ import java.util.*;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
-public class SpringMultiApplication extends SpringApplication {
+import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
+
+public class SpringModularApplication extends SpringApplication {
 
     public static final ModuleResourceResolver MODULE_RESOURCE_RESOLVER = new ModuleResourceResolver();
     public static final List<ModuleDefinition> MODULE_DEFINITIONS = new ArrayList<>();
@@ -63,9 +68,9 @@ public class SpringMultiApplication extends SpringApplication {
 
         String scanPackages = getScanPackages();
         Map<String, Object> properties = prepareProperties(scanPackages);
-        BeanNameGenerator beanNameGenerator = new DynamicAnnotationBeanNameGenerator(scanPackages);
+        BeanNameGenerator beanNameGenerator = new ModuleAnnotationBeanNameGenerator(scanPackages);
 
-        return new SpringMultiApplicationBuilder(sources.toArray(new Class[0]))
+        return new SpringModularApplicationBuilder(sources.toArray(new Class[0]))
                 .profiles(profiles.toArray(new String[0]))
                 .properties(properties)
                 .beanNameGenerator(beanNameGenerator)
@@ -108,13 +113,23 @@ public class SpringMultiApplication extends SpringApplication {
         return Collections.emptyMap();
     }
 
-    public SpringMultiApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
+    public SpringModularApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
         super(resourceLoader, primarySources);
     }
 
     @Override
     protected void postProcessApplicationContext(ConfigurableApplicationContext context) {
         super.postProcessApplicationContext(context);
+        if (context instanceof BeanDefinitionRegistry) {
+            BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context;
+            if (registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME)) {
+                registry.removeBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME);
+                RootBeanDefinition beanDefinition = new RootBeanDefinition(ModuleConfigurationClassPostProcessor.class);
+                beanDefinition.setSource(null);
+                beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+                registry.registerBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME, beanDefinition);
+            }
+        }
     }
 
 }

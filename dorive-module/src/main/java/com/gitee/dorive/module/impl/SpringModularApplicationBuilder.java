@@ -21,15 +21,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.core.io.ResourceLoader;
 
-public class SpringMultiApplicationBuilder extends SpringApplicationBuilder {
+public class SpringModularApplicationBuilder extends SpringApplicationBuilder {
 
-    public SpringMultiApplicationBuilder(Class<?>... sources) {
+    public SpringModularApplicationBuilder(Class<?>... sources) {
         super(null, sources);
     }
 
     @Override
     protected SpringApplication createSpringApplication(ResourceLoader resourceLoader, Class<?>... sources) {
-        return new SpringMultiApplication(resourceLoader, sources);
+        return new SpringModularApplication(resourceLoader, sources);
     }
 
 }
