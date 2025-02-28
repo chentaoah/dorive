@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.module.impl;
 
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -29,12 +30,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.core.type.MethodMetadata;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
 public class ModuleConfigurationClassPostProcessor extends ConfigurationClassPostProcessor implements MethodInterceptor {
 
-    public static final String BEAN_DEFINITION_CLASS_NAME = "org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$ConfigurationClassBeanDefinition";
+    public static final String CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME = "org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$ConfigurationClassBeanDefinition";
+    public static final String BEAN_ANNOTATION_HELPER_CLASS_NAME = "org.springframework.context.annotation.BeanAnnotationHelper";
+
     private DefaultListableBeanFactory beanFactory;
 
     @Override
@@ -56,7 +60,7 @@ public class ModuleConfigurationClassPostProcessor extends ConfigurationClassPos
             BeanDefinition beanDefinition = (BeanDefinition) args[1];
             Class<? extends BeanDefinition> beanDefinitionClass = beanDefinition.getClass();
             String className = beanDefinitionClass.getName();
-            if (BEAN_DEFINITION_CLASS_NAME.equals(className)) {
+            if (CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME.equals(className)) {
                 String factoryBeanName = beanDefinition.getFactoryBeanName();
                 if (isUnderScanPackage(factoryBeanName)) {
                     MethodMetadata factoryMethodMetadata = getFieldValue(beanDefinition, "factoryMethodMetadata");
@@ -82,14 +86,24 @@ public class ModuleConfigurationClassPostProcessor extends ConfigurationClassPos
         return factoryBeanName != null && factoryBeanName.startsWith("dolives.");
     }
 
+    @SuppressWarnings("unchecked")
     private void resetBeanName(Object[] args, BeanDefinition beanDefinition, String factoryBeanName, MethodMetadata factoryMethodMetadata, String derivedBeanName) {
         Map<String, Object> annotationAttributes = factoryMethodMetadata.getAnnotationAttributes(Bean.class.getName());
         if (annotationAttributes != null) {
             Object name = annotationAttributes.get("name");
             if (name instanceof String[] && ((String[]) name).length == 0) {
-//                derivedBeanName = factoryBeanName + "." + derivedBeanName;
-//                args[0] = derivedBeanName;
-//                ReflectUtil.setFieldValue(beanDefinition, "derivedBeanName", derivedBeanName);
+                Class<?> beanAnnotationHelperClass = ClassUtil.loadClass(BEAN_ANNOTATION_HELPER_CLASS_NAME);
+                Field beanNameCacheField = ReflectUtil.getField(beanAnnotationHelperClass, "beanNameCache");
+                Map<Method, String> beanNameCache = (Map<Method, String>) ReflectUtil.getStaticFieldValue(beanNameCacheField);
+
+                Class<?> beanClass = ClassUtil.loadClass(factoryBeanName);
+                String factoryMethodName = beanDefinition.getFactoryMethodName();
+                Method factoryMethod = ReflectUtil.getMethod(beanClass, factoryMethodName);
+
+                derivedBeanName = factoryBeanName + "." + derivedBeanName;
+                beanNameCache.put(factoryMethod, derivedBeanName);
+                args[0] = derivedBeanName;
+                ReflectUtil.setFieldValue(beanDefinition, "derivedBeanName", derivedBeanName);
             }
         }
     }
