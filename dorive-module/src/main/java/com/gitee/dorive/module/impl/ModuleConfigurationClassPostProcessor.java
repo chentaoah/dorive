@@ -18,8 +18,6 @@
 package com.gitee.dorive.module.impl;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.inject.api.ModuleChecker;
-import com.gitee.dorive.inject.config.DoriveInjectionConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -27,11 +25,12 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
+import org.springframework.core.type.MethodMetadata;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Objects;
+import java.util.Map;
 
 public class ModuleConfigurationClassPostProcessor extends ConfigurationClassPostProcessor implements MethodInterceptor {
 
@@ -59,14 +58,11 @@ public class ModuleConfigurationClassPostProcessor extends ConfigurationClassPos
             String className = beanDefinitionClass.getName();
             if (BEAN_DEFINITION_CLASS_NAME.equals(className)) {
                 String factoryBeanName = beanDefinition.getFactoryBeanName();
-                String factoryMethodName = beanDefinition.getFactoryMethodName();
-                Field field = ReflectUtil.getField(beanDefinitionClass, "derivedBeanName");
-                if (isUnderScanPackage(factoryBeanName) && StringUtils.isNotBlank(factoryMethodName) && field != null) {
-                    Object derivedBeanName = ReflectUtil.getFieldValue(beanDefinition, field);
-                    if (Objects.equals(factoryMethodName, derivedBeanName)) {
-                        derivedBeanName = factoryBeanName + "." + derivedBeanName;
-                        args[0] = derivedBeanName;
-                        ReflectUtil.setFieldValue(beanDefinition, field, derivedBeanName);
+                if (isUnderScanPackage(factoryBeanName)) {
+                    MethodMetadata factoryMethodMetadata = getFieldValue(beanDefinition, "factoryMethodMetadata");
+                    String derivedBeanName = getFieldValue(beanDefinition, "derivedBeanName");
+                    if (factoryMethodMetadata != null && StringUtils.isNotBlank(derivedBeanName)) {
+                        resetBeanName(args, beanDefinition, factoryBeanName, factoryMethodMetadata, derivedBeanName);
                     }
                 }
             }
@@ -74,9 +70,28 @@ public class ModuleConfigurationClassPostProcessor extends ConfigurationClassPos
         return ReflectUtil.invoke(beanFactory, method, args);
     }
 
+    @SuppressWarnings("unchecked")
+    private <T> T getFieldValue(Object instance, String fieldName) {
+        return (T) ReflectUtil.getFieldValue(instance, fieldName);
+    }
+
     private boolean isUnderScanPackage(String factoryBeanName) {
-        ModuleChecker moduleChecker = DoriveInjectionConfiguration.moduleChecker;
-        return moduleChecker != null && moduleChecker.isNotSpringInternalType(factoryBeanName) && moduleChecker.isUnderScanPackage(factoryBeanName);
+//        ModuleChecker moduleChecker = DoriveInjectionConfiguration.moduleChecker;
+//        return factoryBeanName != null && moduleChecker != null
+//                && moduleChecker.isNotSpringInternalType(factoryBeanName) && moduleChecker.isUnderScanPackage(factoryBeanName)
+        return factoryBeanName != null && factoryBeanName.startsWith("dolives.");
+    }
+
+    private void resetBeanName(Object[] args, BeanDefinition beanDefinition, String factoryBeanName, MethodMetadata factoryMethodMetadata, String derivedBeanName) {
+        Map<String, Object> annotationAttributes = factoryMethodMetadata.getAnnotationAttributes(Bean.class.getName());
+        if (annotationAttributes != null) {
+            Object name = annotationAttributes.get("name");
+            if (name instanceof String[] && ((String[]) name).length == 0) {
+//                derivedBeanName = factoryBeanName + "." + derivedBeanName;
+//                args[0] = derivedBeanName;
+//                ReflectUtil.setFieldValue(beanDefinition, "derivedBeanName", derivedBeanName);
+            }
+        }
     }
 
 }
