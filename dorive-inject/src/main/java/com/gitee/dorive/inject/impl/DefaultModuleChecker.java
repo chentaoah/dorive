@@ -42,14 +42,14 @@ public class DefaultModuleChecker implements ModuleChecker {
     }
 
     @Override
-    public boolean isNotSpringInternalType(Class<?> typeToMatch) {
-        return !typeToMatch.getName().startsWith("org.springframework.");
+    public boolean isNotSpringInternalType(String className) {
+        return !className.startsWith("org.springframework.");
     }
 
     @Override
-    public boolean isUnderScanPackage(Class<?> typeToMatch) {
+    public boolean isUnderScanPackage(String className) {
         for (String scanPackage : scanPackages) {
-            if (antPathMatcher.match(scanPackage, typeToMatch.getName())) {
+            if (antPathMatcher.match(scanPackage, className)) {
                 return true;
             }
         }
@@ -68,7 +68,7 @@ public class DefaultModuleChecker implements ModuleChecker {
     }
 
     private void doCheckInjection(Class<?> type, Class<?> injectedType) {
-        if (isUnderScanPackage(injectedType)) {
+        if (isUnderScanPackage(injectedType.getName())) {
             // 模块定义不存在，则判定为通过
             ModuleDefinition moduleDefinition = findModuleDefinition(injectedType);
             if (moduleDefinition == null) {
@@ -80,7 +80,7 @@ public class DefaultModuleChecker implements ModuleChecker {
                 return;
             }
             // 模块
-            if (isUnderScanPackage(type)) {
+            if (isUnderScanPackage(type.getName())) {
                 ModuleDefinition thisModuleDefinition = findModuleDefinition(type);
                 if (thisModuleDefinition != null) {
                     String thisModuleName = thisModuleDefinition.getName();

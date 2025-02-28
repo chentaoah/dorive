@@ -19,9 +19,9 @@ package com.gitee.dorive.inject.api;
 
 public interface ModuleChecker {
 
-    boolean isNotSpringInternalType(Class<?> typeToMatch);
+    boolean isNotSpringInternalType(String className);
 
-    boolean isUnderScanPackage(Class<?> typeToMatch);
+    boolean isUnderScanPackage(String className);
 
     void checkInjection(Class<?> type, Class<?> injectedType, Object instance);
 

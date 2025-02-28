@@ -40,7 +40,8 @@ public class LimitedAutowiredBeanPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> beanType = AopUtils.getTargetClass(bean);
-        if (moduleChecker.isNotSpringInternalType(beanType) && moduleChecker.isUnderScanPackage(beanType)) {
+        String beanTypeName = beanType.getName();
+        if (moduleChecker.isNotSpringInternalType(beanTypeName) && moduleChecker.isUnderScanPackage(beanTypeName)) {
             try {
                 checkAutowiredFieldModule(beanType, bean);
 
