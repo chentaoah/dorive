@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.module.impl;
 
+import cn.hutool.core.util.ReflectUtil;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.cglib.proxy.Enhancer;
@@ -43,8 +44,8 @@ public class ModuleConfigurationClassPostProcessor extends ConfigurationClassPos
     }
 
     @Override
-    public Object intercept(Object instance, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
-        return methodProxy.invokeSuper(beanFactory, args);
+    public Object intercept(Object instance, Method method, Object[] args, MethodProxy methodProxy) {
+        return ReflectUtil.invoke(beanFactory, method, args);
     }
 
 }
