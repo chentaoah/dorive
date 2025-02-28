@@ -122,12 +122,13 @@ public class SpringModularApplication extends SpringApplication {
         super.postProcessApplicationContext(context);
         if (context instanceof BeanDefinitionRegistry) {
             BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context;
-            if (registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME)) {
-                registry.removeBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME);
+            String beanName = CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
+            if (registry.containsBeanDefinition(beanName)) {
+                registry.removeBeanDefinition(beanName);
                 RootBeanDefinition beanDefinition = new RootBeanDefinition(ModuleConfigurationClassPostProcessor.class);
                 beanDefinition.setSource(null);
                 beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-                registry.registerBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME, beanDefinition);
+                registry.registerBeanDefinition(beanName, beanDefinition);
             }
         }
     }
