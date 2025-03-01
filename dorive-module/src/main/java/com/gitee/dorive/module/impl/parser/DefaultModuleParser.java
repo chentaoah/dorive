@@ -15,52 +15,22 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.inject.impl;
+package com.gitee.dorive.module.impl.parser;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.inject.api.ModuleChecker;
-import com.gitee.dorive.inject.entity.ExportDefinition;
-import com.gitee.dorive.inject.entity.ModuleDefinition;
+import com.gitee.dorive.module.api.ModuleChecker;
+import com.gitee.dorive.module.entity.ModuleDefinition;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.util.AntPathMatcher;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+public class DefaultModuleParser extends AbstractModuleParser implements ModuleChecker {
 
-public class DefaultModuleChecker implements ModuleChecker {
-
-    private final AntPathMatcher antPathMatcher = new AntPathMatcher(".");
-    private final Set<String> scanPackages;
-    private final List<ModuleDefinition> moduleDefinitions;
-
-    public DefaultModuleChecker(String scanPackages, List<ModuleDefinition> moduleDefinitions) {
-        this.scanPackages = new LinkedHashSet<>(StrUtil.splitTrim(scanPackages, ","));
-        this.moduleDefinitions = moduleDefinitions;
-    }
+    public static final DefaultModuleParser INSTANCE = new DefaultModuleParser();
 
     @Override
-    public boolean isNotSpringInternalType(String className) {
-        return !className.startsWith("org.springframework.");
-    }
-
-    @Override
-    public boolean isUnderScanPackage(String className) {
-        for (String scanPackage : scanPackages) {
-            if (antPathMatcher.match(scanPackage, className)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public void checkInjection(Class<?> type, Class<?> injectedType, Object instance) {
+    public void checkInjection(Class<?> type, Class<?> injectedType, Object injectedInstance) {
         doCheckInjection(type, injectedType);
-        if (instance != null) {
-            Class<?> targetClass = AopUtils.getTargetClass(instance);
+        if (injectedInstance != null) {
+            Class<?> targetClass = AopUtils.getTargetClass(injectedInstance);
             if (!injectedType.equals(targetClass)) {
                 doCheckInjection(type, targetClass);
             }
@@ -70,13 +40,9 @@ public class DefaultModuleChecker implements ModuleChecker {
     private void doCheckInjection(Class<?> type, Class<?> injectedType) {
         if (isUnderScanPackage(injectedType.getName())) {
             // 模块定义不存在，则判定为通过
-            ModuleDefinition moduleDefinition = findModuleDefinition(injectedType);
-            if (moduleDefinition == null) {
-                return;
-            }
             // 在公开的包路径下，则判定为通过
-            ExportDefinition exportDefinition = findExportDefinition(injectedType, moduleDefinition);
-            if (exportDefinition != null) {
+            ModuleDefinition moduleDefinition = findModuleDefinition(injectedType);
+            if (moduleDefinition == null || moduleDefinition.isExposed(injectedType)) {
                 return;
             }
             // 模块
@@ -98,14 +64,6 @@ public class DefaultModuleChecker implements ModuleChecker {
             // 抛出异常
             throwInjectionException(type, injectedType);
         }
-    }
-
-    private ModuleDefinition findModuleDefinition(Class<?> typeToMatch) {
-        return CollUtil.findOne(moduleDefinitions, item -> antPathMatcher.match(item.getPath(), typeToMatch.getName()));
-    }
-
-    private ExportDefinition findExportDefinition(Class<?> typeToMatch, ModuleDefinition moduleDefinition) {
-        return CollUtil.findOne(moduleDefinition.getExports(), item -> antPathMatcher.match(item.getPath(), typeToMatch.getName()));
     }
 
     private void throwInjectionException(Class<?> type, Class<?> injectedType) {

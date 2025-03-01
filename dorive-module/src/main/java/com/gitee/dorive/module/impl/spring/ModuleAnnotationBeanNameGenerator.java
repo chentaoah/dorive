@@ -15,38 +15,25 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.impl;
+package com.gitee.dorive.module.impl.spring;
 
-import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.module.api.ModuleParser;
+import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
-import org.springframework.util.AntPathMatcher;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
+@Getter
+@Setter
 public class ModuleAnnotationBeanNameGenerator extends AnnotationBeanNameGenerator {
 
-    private final AntPathMatcher antPathMatcher = new AntPathMatcher(".");
-    private final Set<String> scanPackages;
-
-    public ModuleAnnotationBeanNameGenerator(String scanPackages) {
-        this.scanPackages = new LinkedHashSet<>(StrUtil.splitTrim(scanPackages, ","));
-    }
-
-    private boolean isUnderScanPackage(String className) {
-        for (String scanPackage : scanPackages) {
-            if (antPathMatcher.match(scanPackage, className)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    private ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
 
     @Override
     protected String buildDefaultBeanName(BeanDefinition definition) {
         String beanClassName = definition.getBeanClassName();
-        if (beanClassName != null && isUnderScanPackage(beanClassName)) {
+        if (beanClassName != null && moduleParser.isUnderScanPackage(beanClassName)) {
             return beanClassName;
         }
         return super.buildDefaultBeanName(definition);

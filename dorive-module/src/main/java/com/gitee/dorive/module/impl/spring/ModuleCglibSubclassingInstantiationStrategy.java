@@ -15,26 +15,31 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.inject.spring;
+package com.gitee.dorive.module.impl.spring;
 
-import com.gitee.dorive.inject.api.ModuleChecker;
-import lombok.AllArgsConstructor;
+import com.gitee.dorive.module.api.ModuleChecker;
+import com.gitee.dorive.module.api.ModuleParser;
+import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 
 import java.lang.reflect.Constructor;
 
-@AllArgsConstructor
-public class LimitedCglibSubclassingInstantiationStrategy extends CglibSubclassingInstantiationStrategy {
+@Getter
+@Setter
+public class ModuleCglibSubclassingInstantiationStrategy extends CglibSubclassingInstantiationStrategy {
 
-    private final ModuleChecker moduleChecker;
+    private ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
+    private ModuleChecker moduleChecker = DefaultModuleParser.INSTANCE;
 
     @Override
     public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Constructor<?> ctor, Object... args) {
         Class<?> resolvableType = (Class<?>) bd.getResolvableType().getType();
         String resolvableTypeName = resolvableType.getName();
-        if (moduleChecker.isNotSpringInternalType(resolvableTypeName) && moduleChecker.isUnderScanPackage(resolvableTypeName)) {
+        if (moduleParser.isUnderScanPackage(resolvableTypeName)) {
             Class<?>[] parameterTypes = ctor.getParameterTypes();
             for (int index = 0; index < parameterTypes.length; index++) {
                 Class<?> parameterType = parameterTypes[index];

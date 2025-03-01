@@ -17,11 +17,13 @@
 
 package com.gitee.dorive.module.entity;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,21 +31,26 @@ import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import static com.gitee.dorive.module.impl.parser.AbstractModuleParser.PATH_MATCHER;
+
 @Data
 public class ModuleDefinition {
+    private Resource resource;
     private String originId;
     private String project;
     private String domain;
     private String subdomain;
     private String version;
-    private String module;
-    private String moduleType;
+    private String name;
+    private String type;
     private List<String> configs;
     private List<String> exports;
     private List<String> externalDepends;
     private String tablePrefix;
 
-    public ModuleDefinition(Manifest manifest) {
+    public ModuleDefinition(Resource resource, Manifest manifest) {
+        this.resource = resource;
+
         Assert.notNull(manifest, "The manifest can not be null!");
         Attributes mainAttributes = manifest.getMainAttributes();
 
@@ -67,8 +74,8 @@ public class ModuleDefinition {
         this.subdomain = filterValue(subdomain);
         this.version = filterValue(version);
 
-        this.module = filterValue(module);
-        this.moduleType = filterValue(moduleType);
+        this.name = filterValue(module);
+        this.type = filterValue(moduleType);
 
         this.configs = filterValues(configs);
         this.exports = filterValues(exports);
@@ -94,6 +101,15 @@ public class ModuleDefinition {
             return Collections.emptyList();
         }
         return StrUtil.splitTrim(values, ",");
+    }
+
+    public String getScanPackage() {
+        return project + ".**";
+    }
+
+    public boolean isExposed(Class<?> clazz) {
+        String className = clazz.getName();
+        return CollUtil.findOne(exports, export -> PATH_MATCHER.match(export, className)) != null;
     }
 
     public String getBasePackage() {
@@ -140,11 +156,11 @@ public class ModuleDefinition {
     }
 
     public int getOrder() {
-        if ("base".equals(moduleType)) {
+        if ("base".equals(type)) {
             return 1;
-        } else if ("biz".equals(moduleType)) {
+        } else if ("biz".equals(type)) {
             return 2;
-        } else if ("launcher".equals(moduleType)) {
+        } else if ("launcher".equals(type)) {
             return 3;
         }
         return 2;

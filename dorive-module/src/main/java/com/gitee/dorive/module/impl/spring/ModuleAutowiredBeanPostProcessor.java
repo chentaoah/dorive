@@ -15,11 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.inject.spring;
+package com.gitee.dorive.module.impl.spring;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.inject.api.ModuleChecker;
-import lombok.AllArgsConstructor;
+import com.gitee.dorive.module.api.ModuleChecker;
+import com.gitee.dorive.module.api.ModuleParser;
+import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
@@ -32,16 +35,18 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Modifier;
 
-@AllArgsConstructor
-public class LimitedAutowiredBeanPostProcessor implements BeanPostProcessor {
+@Getter
+@Setter
+public class ModuleAutowiredBeanPostProcessor implements BeanPostProcessor {
 
-    private final ModuleChecker moduleChecker;
+    private ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
+    private ModuleChecker moduleChecker = DefaultModuleParser.INSTANCE;
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> beanType = AopUtils.getTargetClass(bean);
         String beanTypeName = beanType.getName();
-        if (moduleChecker.isNotSpringInternalType(beanTypeName) && moduleChecker.isUnderScanPackage(beanTypeName)) {
+        if (moduleParser.isUnderScanPackage(beanTypeName)) {
             try {
                 checkAutowiredFieldModule(beanType, bean);
 

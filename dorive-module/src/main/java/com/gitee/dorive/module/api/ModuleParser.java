@@ -15,15 +15,28 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.inject.entity;
+package com.gitee.dorive.module.api;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.gitee.dorive.module.entity.ModuleDefinition;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class ExportDefinition {
-    private String path;
+import java.net.URI;
+import java.util.List;
+import java.util.Set;
+
+public interface ModuleParser {
+
+    void parse();
+
+    Set<String> getModuleNames();
+
+    ModuleDefinition getModuleDefinition(String name);
+
+    List<ModuleDefinition> getModuleDefinitions();
+
+    boolean isUnderScanPackage(String className);
+
+    ModuleDefinition findModuleDefinition(URI uri);
+
+    ModuleDefinition findModuleDefinition(Class<?> clazz);
+
 }

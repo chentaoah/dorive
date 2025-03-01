@@ -15,14 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.inject.api;
+package com.gitee.dorive.module.api;
 
 public interface ModuleChecker {
 
-    boolean isNotSpringInternalType(String className);
-
-    boolean isUnderScanPackage(String className);
-
-    void checkInjection(Class<?> type, Class<?> injectedType, Object instance);
+    void checkInjection(Class<?> type, Class<?> injectedType, Object injectedInstance);
 
 }
