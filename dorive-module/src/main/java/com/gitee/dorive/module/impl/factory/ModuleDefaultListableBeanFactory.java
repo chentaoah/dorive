@@ -45,7 +45,7 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
 
     @Override
     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) throws BeanDefinitionStoreException {
-        String finalBeanName = beanNameEditor.reset(beanName, beanDefinition, this);
+        String finalBeanName = beanNameEditor.resetBeanName(beanName, beanDefinition, this);
         super.registerBeanDefinition(finalBeanName, beanDefinition);
     }
 

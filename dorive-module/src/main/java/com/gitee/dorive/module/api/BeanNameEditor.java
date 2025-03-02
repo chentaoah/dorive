@@ -22,6 +22,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 public interface BeanNameEditor {
 
-    String reset(String beanName, BeanDefinition definition, BeanDefinitionRegistry registry);
+    String resetBeanName(String beanName, BeanDefinition definition, BeanDefinitionRegistry registry);
 
 }

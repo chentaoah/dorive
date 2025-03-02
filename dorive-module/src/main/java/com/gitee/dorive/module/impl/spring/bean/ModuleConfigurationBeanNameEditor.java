@@ -60,7 +60,7 @@ public class ModuleConfigurationBeanNameEditor implements BeanNameEditor {
     private ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
 
     @Override
-    public String reset(String beanName, BeanDefinition beanDefinition, BeanDefinitionRegistry registry) {
+    public String resetBeanName(String beanName, BeanDefinition beanDefinition, BeanDefinitionRegistry registry) {
         Class<?> beanDefinitionClass = beanDefinition.getClass();
         String className = beanDefinitionClass.getName();
         if (CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME.equals(className)) {
