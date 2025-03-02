@@ -32,8 +32,8 @@ public class BeanAnnotationHelper {
     static {
         Class<?> beanAnnotationHelperClass = ClassUtil.loadClass(BeanAnnotationHelper.BEAN_ANNOTATION_HELPER_CLASS_NAME);
         Field beanNameCacheField = ReflectUtil.getField(beanAnnotationHelperClass, "beanNameCache");
-        Object staticFieldValue = ReflectUtil.getStaticFieldValue(beanNameCacheField);
-        BEAN_NAME_CACHE = castValue(staticFieldValue);
+        Object beanNameCacheFieldValue = ReflectUtil.getStaticFieldValue(beanNameCacheField);
+        BEAN_NAME_CACHE = castValue(beanNameCacheFieldValue);
     }
 
     // 该方法是为了避免编译时提示使用了不安全的操作
