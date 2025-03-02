@@ -19,22 +19,17 @@ package com.gitee.dorive.module.impl;
 
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.entity.ModuleDefinition;
+import com.gitee.dorive.module.impl.factory.ModuleApplicationContextFactory;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
 import com.gitee.dorive.module.impl.spring.bean.ModuleAnnotationBeanNameGenerator;
-import com.gitee.dorive.module.impl.spring.bean.ModuleConfigurationClassPostProcessor;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.ApplicationContextFactory;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.io.ResourceLoader;
 
 import java.util.*;
 
-import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
-
-public class SpringModularApplication extends SpringApplication {
+public class SpringModularApplication {
 
     public static ConfigurableApplicationContext run(Class<?> primarySource, String... args) {
         ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
@@ -55,32 +50,14 @@ public class SpringModularApplication extends SpringApplication {
         Map<String, Object> properties = new LinkedHashMap<>();
         properties.put("dorive.module.enable", true);
         BeanNameGenerator beanNameGenerator = new ModuleAnnotationBeanNameGenerator();
+        ApplicationContextFactory applicationContextFactory = new ModuleApplicationContextFactory();
 
-        return new SpringModularApplicationBuilder(sources.toArray(new Class[0]))
+        return new SpringApplicationBuilder(sources.toArray(new Class[0]))
                 .profiles(profiles.toArray(new String[0]))
                 .properties(properties)
                 .beanNameGenerator(beanNameGenerator)
+                .contextFactory(applicationContextFactory)
                 .run(args);
-    }
-
-    public SpringModularApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
-        super(resourceLoader, primarySources);
-    }
-
-    @Override
-    protected void postProcessApplicationContext(ConfigurableApplicationContext context) {
-        super.postProcessApplicationContext(context);
-        if (context instanceof BeanDefinitionRegistry) {
-            BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context;
-            String beanName = CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
-            if (registry.containsBeanDefinition(beanName)) {
-                registry.removeBeanDefinition(beanName);
-                RootBeanDefinition beanDefinition = new RootBeanDefinition(ModuleConfigurationClassPostProcessor.class);
-                beanDefinition.setSource(null);
-                beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-                registry.registerBeanDefinition(beanName, beanDefinition);
-            }
-        }
     }
 
 }

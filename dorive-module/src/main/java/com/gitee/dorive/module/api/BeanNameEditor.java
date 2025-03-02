@@ -15,21 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.impl;
+package com.gitee.dorive.module.api;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
-public class SpringModularApplicationBuilder extends SpringApplicationBuilder {
+public interface BeanNameEditor {
 
-    public SpringModularApplicationBuilder(Class<?>... sources) {
-        super(null, sources);
-    }
-
-    @Override
-    protected SpringApplication createSpringApplication(ResourceLoader resourceLoader, Class<?>... sources) {
-        return new SpringModularApplication(resourceLoader, sources);
-    }
+    String reset(String beanName, BeanDefinition definition, BeanDefinitionRegistry registry);
 
 }
