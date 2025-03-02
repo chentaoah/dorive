@@ -32,6 +32,7 @@ import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
+import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.MethodMetadata;
 
 import java.lang.reflect.Field;
@@ -45,62 +46,93 @@ public class ModuleConfigurationClassPostProcessor extends ConfigurationClassPos
     public static final String CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME = "org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$ConfigurationClassBeanDefinition";
     public static final String BEAN_ANNOTATION_HELPER_CLASS_NAME = "org.springframework.context.annotation.BeanAnnotationHelper";
 
+    private static final Map<Method, String> BEAN_NAME_CACHE;
+
+    static {
+        Class<?> beanAnnotationHelperClass = ClassUtil.loadClass(BEAN_ANNOTATION_HELPER_CLASS_NAME);
+        Field beanNameCacheField = ReflectUtil.getField(beanAnnotationHelperClass, "beanNameCache");
+        Object staticFieldValue = ReflectUtil.getStaticFieldValue(beanNameCacheField);
+        BEAN_NAME_CACHE = castValue(staticFieldValue);
+    }
+
+    // 该方法是为了避免编译时提示使用了不安全的操作
+    @SuppressWarnings("unchecked")
+    public static <T> T castValue(Object value) {
+        return (T) value;
+    }
+
     private ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
     private DefaultListableBeanFactory beanFactory;
 
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
         if (registry instanceof DefaultListableBeanFactory) {
-            this.beanFactory = (DefaultListableBeanFactory) registry;
-            Enhancer enhancer = new Enhancer();
-            enhancer.setSuperclass(DefaultListableBeanFactory.class);
-            enhancer.setCallback(this);
-            registry = (BeanDefinitionRegistry) enhancer.create();
+            registry = createBeanFactoryProxy((DefaultListableBeanFactory) registry);
         }
         super.postProcessBeanDefinitionRegistry(registry);
     }
 
+    private DefaultListableBeanFactory createBeanFactoryProxy(DefaultListableBeanFactory beanFactory) {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(DefaultListableBeanFactory.class);
+        this.beanFactory = beanFactory;
+        enhancer.setCallback(this);
+        return (DefaultListableBeanFactory) enhancer.create();
+    }
+
     @Override
     public Object intercept(Object instance, Method method, Object[] args, MethodProxy methodProxy) {
-        String methodName = method.getName();
-        if ("registerBeanDefinition".equals(methodName)) {
-            BeanDefinition beanDefinition = (BeanDefinition) args[1];
-            Class<? extends BeanDefinition> beanDefinitionClass = beanDefinition.getClass();
-            String className = beanDefinitionClass.getName();
-            if (CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME.equals(className)) {
-                String factoryBeanName = beanDefinition.getFactoryBeanName();
-                if (factoryBeanName != null && moduleParser.isUnderScanPackage(factoryBeanName)) {
-                    MethodMetadata factoryMethodMetadata = (MethodMetadata) ReflectUtil.getFieldValue(beanDefinition, "factoryMethodMetadata");
-                    String derivedBeanName = (String) ReflectUtil.getFieldValue(beanDefinition, "derivedBeanName");
-                    if (factoryMethodMetadata != null && StringUtils.isNotBlank(derivedBeanName)) {
-                        resetBeanName(args, beanDefinition, factoryBeanName, factoryMethodMetadata, derivedBeanName);
-                    }
-                }
-            }
-        }
+        resetArgsBeforeInvoke(method, args);
         return ReflectUtil.invoke(beanFactory, method, args);
     }
 
-    @SuppressWarnings("unchecked")
-    private void resetBeanName(Object[] args, BeanDefinition beanDefinition, String factoryBeanName, MethodMetadata factoryMethodMetadata, String derivedBeanName) {
-        Map<String, Object> annotationAttributes = factoryMethodMetadata.getAnnotationAttributes(Bean.class.getName());
-        if (annotationAttributes != null) {
-            Object name = annotationAttributes.get("name");
-            if (name instanceof String[] && ((String[]) name).length == 0) {
-                Class<?> beanAnnotationHelperClass = ClassUtil.loadClass(BEAN_ANNOTATION_HELPER_CLASS_NAME);
-                Field beanNameCacheField = ReflectUtil.getField(beanAnnotationHelperClass, "beanNameCache");
-                Map<Method, String> beanNameCache = (Map<Method, String>) ReflectUtil.getStaticFieldValue(beanNameCacheField);
+    private void resetArgsBeforeInvoke(Method method, Object[] args) {
+        String methodName = method.getName();
+        if ("registerBeanDefinition".equals(methodName)) {
+            resetArgsBeforeRegisterBeanDefinition(args);
+        }
+    }
 
-                Class<?> beanClass = ClassUtil.loadClass(factoryBeanName);
-                String factoryMethodName = beanDefinition.getFactoryMethodName();
-                Method factoryMethod = ReflectUtil.getMethod(beanClass, factoryMethodName);
+    private void resetArgsBeforeRegisterBeanDefinition(Object[] args) {
+        BeanDefinition beanDefinition = (BeanDefinition) args[1];
+        Class<? extends BeanDefinition> beanDefinitionClass = beanDefinition.getClass();
+        String className = beanDefinitionClass.getName();
+        if (CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME.equals(className)) {
+            resetConfigurationClassBeanDefinition(args, beanDefinition);
+        }
+    }
 
-                derivedBeanName = factoryBeanName + "." + derivedBeanName;
-                beanNameCache.put(factoryMethod, derivedBeanName);
-                args[0] = derivedBeanName;
-                ReflectUtil.setFieldValue(beanDefinition, "derivedBeanName", derivedBeanName);
+    private void resetConfigurationClassBeanDefinition(Object[] args, BeanDefinition beanDefinition) {
+        String factoryBeanName = beanDefinition.getFactoryBeanName();
+        AnnotationMetadata annotationMetadata = (AnnotationMetadata) ReflectUtil.getFieldValue(beanDefinition, "annotationMetadata");
+        MethodMetadata factoryMethodMetadata = (MethodMetadata) ReflectUtil.getFieldValue(beanDefinition, "factoryMethodMetadata");
+        String derivedBeanName = (String) ReflectUtil.getFieldValue(beanDefinition, "derivedBeanName");
+        if (StringUtils.isBlank(factoryBeanName) || annotationMetadata == null || factoryMethodMetadata == null || StringUtils.isBlank(derivedBeanName)) {
+            return;
+        }
+        // 类型
+        String className = annotationMetadata.getClassName();
+        if (moduleParser.isUnderScanPackage(className)) {
+            Class<?> configurationClass = ClassUtil.loadClass(className);
+            // 方法
+            String methodName = factoryMethodMetadata.getMethodName();
+            Method factoryMethod = ReflectUtil.getMethod(configurationClass, methodName);
+            // @Bean注解
+            Map<String, Object> annotationAttributes = factoryMethodMetadata.getAnnotationAttributes(Bean.class.getName());
+            if (annotationAttributes != null) {
+                Object name = annotationAttributes.get("name");
+                if (name instanceof String[] && ((String[]) name).length == 0) {
+                    String newDerivedBeanName = factoryBeanName + "." + derivedBeanName;
+                    resetBeanName(factoryMethod, args, beanDefinition, newDerivedBeanName);
+                }
             }
         }
+    }
+
+    private void resetBeanName(Method factoryMethod, Object[] args, BeanDefinition beanDefinition, String derivedBeanName) {
+        BEAN_NAME_CACHE.put(factoryMethod, derivedBeanName);
+        args[0] = derivedBeanName;
+        ReflectUtil.setFieldValue(beanDefinition, "derivedBeanName", derivedBeanName);
     }
 
 }
