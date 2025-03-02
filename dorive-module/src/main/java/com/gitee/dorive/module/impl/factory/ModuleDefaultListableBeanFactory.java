@@ -23,36 +23,66 @@ import com.gitee.dorive.module.api.BeanNameEditor;
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.entity.ModuleDefinition;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
-import com.gitee.dorive.module.impl.spring.bean.ModuleConfigurationBeanNameEditor;
+import com.gitee.dorive.module.impl.spring.uitl.ConfigurationUtils;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.DependencyDescriptor;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.core.type.MethodMetadata;
 
+import java.lang.reflect.Method;
 import java.util.Map;
+
+import static com.gitee.dorive.module.impl.spring.uitl.BeanAnnotationHelper.BEAN_NAME_CACHE;
 
 @Getter
 @Setter
-public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory {
-
-    public static final String CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME = "org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$ConfigurationClassBeanDefinition";
+public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory implements BeanNameEditor {
 
     private ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
-    private BeanNameEditor beanNameEditor = new ModuleConfigurationBeanNameEditor();
-
-    private boolean isConfigurationClassBeanDefinition(BeanDefinition beanDefinition) {
-        return CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME.equals(beanDefinition.getClass().getName());
-    }
 
     @Override
     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) throws BeanDefinitionStoreException {
-        if (isConfigurationClassBeanDefinition(beanDefinition)) {
-            beanName = beanNameEditor.resetBeanName(beanName, beanDefinition, this);
+        if (ConfigurationUtils.isConfigurationClass(beanDefinition)) {
+            beanName = resetBeanName(beanName, beanDefinition, this);
         }
         super.registerBeanDefinition(beanName, beanDefinition);
+    }
+
+    @Override
+    public String resetBeanName(String beanName, BeanDefinition beanDefinition, BeanDefinitionRegistry registry) {
+        String factoryBeanName = beanDefinition.getFactoryBeanName();
+        AnnotationMetadata annotationMetadata = (AnnotationMetadata) ReflectUtil.getFieldValue(beanDefinition, "annotationMetadata");
+        MethodMetadata factoryMethodMetadata = (MethodMetadata) ReflectUtil.getFieldValue(beanDefinition, "factoryMethodMetadata");
+        String derivedBeanName = (String) ReflectUtil.getFieldValue(beanDefinition, "derivedBeanName");
+        if (StringUtils.isNotBlank(factoryBeanName) && annotationMetadata != null && factoryMethodMetadata != null && StringUtils.isNotBlank(derivedBeanName)) {
+            // 类型
+            String className = annotationMetadata.getClassName();
+            if (moduleParser.isUnderScanPackage(className)) {
+                Class<?> configurationClass = ClassUtil.loadClass(className);
+                // 方法
+                String methodName = factoryMethodMetadata.getMethodName();
+                Method factoryMethod = ReflectUtil.getMethod(configurationClass, methodName);
+                // @Bean注解
+                Map<String, Object> annotationAttributes = factoryMethodMetadata.getAnnotationAttributes(Bean.class.getName());
+                if (annotationAttributes != null) {
+                    Object name = annotationAttributes.get("name");
+                    if (name instanceof String[] && ((String[]) name).length == 0) {
+                        String newDerivedBeanName = factoryBeanName + "." + derivedBeanName;
+                        BEAN_NAME_CACHE.put(factoryMethod, newDerivedBeanName);
+                        ReflectUtil.setFieldValue(beanDefinition, "derivedBeanName", newDerivedBeanName);
+                        return newDerivedBeanName;
+                    }
+                }
+            }
+        }
+        return beanName;
     }
 
     @Override
@@ -66,7 +96,7 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                     Class<?> targetClass = null;
                     // class of factory bean
                     BeanDefinition beanDefinition = getBeanDefinition(candidateBeanName);
-                    if (isConfigurationClassBeanDefinition(beanDefinition)) {
+                    if (ConfigurationUtils.isConfigurationClass(beanDefinition)) {
                         AnnotationMetadata annotationMetadata = (AnnotationMetadata) ReflectUtil.getFieldValue(beanDefinition, "annotationMetadata");
                         String className = annotationMetadata.getClassName();
                         if (moduleParser.isUnderScanPackage(className)) {

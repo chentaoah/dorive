@@ -15,13 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.api;
+package com.gitee.dorive.module.impl.spring.uitl;
 
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
-public interface BeanNameEditor {
+public class ConfigurationUtils {
 
-    String resetBeanName(String beanName, BeanDefinition beanDefinition, BeanDefinitionRegistry registry);
+    public static final String CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME = "org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$ConfigurationClassBeanDefinition";
+
+    public static boolean isConfigurationClass(BeanDefinition beanDefinition) {
+        return CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME.equals(beanDefinition.getClass().getName());
+    }
 
 }
