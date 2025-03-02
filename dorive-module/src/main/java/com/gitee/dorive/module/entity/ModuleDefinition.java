@@ -49,9 +49,10 @@ public class ModuleDefinition {
     private String tablePrefix;
 
     public ModuleDefinition(Resource resource, Manifest manifest) {
-        this.resource = resource;
-
+        Assert.notNull(resource, "The resource can not be null!");
         Assert.notNull(manifest, "The manifest can not be null!");
+
+        this.resource = resource;
         Attributes mainAttributes = manifest.getMainAttributes();
 
         String originId = mainAttributes.getValue("Dorive-Origin-Id");
