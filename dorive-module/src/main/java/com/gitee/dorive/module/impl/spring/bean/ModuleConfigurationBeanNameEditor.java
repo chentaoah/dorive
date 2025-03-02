@@ -40,8 +40,6 @@ import java.util.Map;
 public class ModuleConfigurationBeanNameEditor implements BeanNameEditor {
 
     public static final String BEAN_ANNOTATION_HELPER_CLASS_NAME = "org.springframework.context.annotation.BeanAnnotationHelper";
-    public static final String CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME = "org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$ConfigurationClassBeanDefinition";
-
     private static final Map<Method, String> BEAN_NAME_CACHE;
 
     static {
@@ -61,15 +59,6 @@ public class ModuleConfigurationBeanNameEditor implements BeanNameEditor {
 
     @Override
     public String resetBeanName(String beanName, BeanDefinition beanDefinition, BeanDefinitionRegistry registry) {
-        Class<?> beanDefinitionClass = beanDefinition.getClass();
-        String className = beanDefinitionClass.getName();
-        if (CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME.equals(className)) {
-            return resetConfigurationClassBeanDefinition(beanName, beanDefinition);
-        }
-        return beanName;
-    }
-
-    private String resetConfigurationClassBeanDefinition(String beanName, BeanDefinition beanDefinition) {
         String factoryBeanName = beanDefinition.getFactoryBeanName();
         AnnotationMetadata annotationMetadata = (AnnotationMetadata) ReflectUtil.getFieldValue(beanDefinition, "annotationMetadata");
         MethodMetadata factoryMethodMetadata = (MethodMetadata) ReflectUtil.getFieldValue(beanDefinition, "factoryMethodMetadata");

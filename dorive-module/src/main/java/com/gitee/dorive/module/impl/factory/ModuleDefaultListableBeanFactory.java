@@ -34,19 +34,25 @@ import org.springframework.core.type.AnnotationMetadata;
 
 import java.util.Map;
 
-import static com.gitee.dorive.module.impl.spring.bean.ModuleConfigurationBeanNameEditor.CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME;
-
 @Getter
 @Setter
 public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory {
 
+    public static final String CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME = "org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$ConfigurationClassBeanDefinition";
+
     private ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
     private BeanNameEditor beanNameEditor = new ModuleConfigurationBeanNameEditor();
 
+    private boolean isConfigurationClassBeanDefinition(BeanDefinition beanDefinition) {
+        return CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME.equals(beanDefinition.getClass().getName());
+    }
+
     @Override
     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) throws BeanDefinitionStoreException {
-        String finalBeanName = beanNameEditor.resetBeanName(beanName, beanDefinition, this);
-        super.registerBeanDefinition(finalBeanName, beanDefinition);
+        if (isConfigurationClassBeanDefinition(beanDefinition)) {
+            beanName = beanNameEditor.resetBeanName(beanName, beanDefinition, this);
+        }
+        super.registerBeanDefinition(beanName, beanDefinition);
     }
 
     @Override
@@ -60,7 +66,7 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                     Class<?> targetClass = null;
                     // class of factory bean
                     BeanDefinition beanDefinition = getBeanDefinition(candidateBeanName);
-                    if (CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME.equals(beanDefinition.getClass().getName())) {
+                    if (isConfigurationClassBeanDefinition(beanDefinition)) {
                         AnnotationMetadata annotationMetadata = (AnnotationMetadata) ReflectUtil.getFieldValue(beanDefinition, "annotationMetadata");
                         String className = annotationMetadata.getClassName();
                         if (moduleParser.isUnderScanPackage(className)) {
