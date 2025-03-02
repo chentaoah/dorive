@@ -38,8 +38,7 @@ public class ModuleCglibSubclassingInstantiationStrategy extends CglibSubclassin
     @Override
     public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Constructor<?> ctor, Object... args) {
         Class<?> resolvableType = (Class<?>) bd.getResolvableType().getType();
-        String resolvableTypeName = resolvableType.getName();
-        if (moduleParser.isUnderScanPackage(resolvableTypeName)) {
+        if (moduleParser.isUnderScanPackage(resolvableType.getName())) {
             Class<?>[] parameterTypes = ctor.getParameterTypes();
             for (int index = 0; index < parameterTypes.length; index++) {
                 Class<?> parameterType = parameterTypes[index];

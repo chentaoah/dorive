@@ -45,8 +45,7 @@ public class ModuleAutowiredBeanPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> beanType = AopUtils.getTargetClass(bean);
-        String beanTypeName = beanType.getName();
-        if (moduleParser.isUnderScanPackage(beanTypeName)) {
+        if (moduleParser.isUnderScanPackage(beanType.getName())) {
             try {
                 checkAutowiredFieldModule(beanType, bean);
 
