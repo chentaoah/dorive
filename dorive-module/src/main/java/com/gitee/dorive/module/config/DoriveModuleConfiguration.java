@@ -18,7 +18,11 @@
 package com.gitee.dorive.module.config;
 
 import com.gitee.dorive.module.impl.spring.ModuleAutowiredBeanPostProcessor;
-import com.gitee.dorive.module.impl.spring.ModuleBeanFactoryPostProcessor;
+import com.gitee.dorive.module.impl.spring.ModuleCglibSubclassingInstantiationStrategy;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -28,12 +32,17 @@ import org.springframework.core.annotation.Order;
 @Order(-100)
 @Configuration
 @ConditionalOnProperty(prefix = "dorive.module", name = "enable", havingValue = "true")
-public class DoriveModuleConfiguration {
+public class DoriveModuleConfiguration implements BeanFactoryPostProcessor {
 
-    @Bean("moduleBeanFactoryPostProcessorV3")
-    @ConditionalOnMissingClass
-    public ModuleBeanFactoryPostProcessor moduleBeanFactoryPostProcessor() {
-        return new ModuleBeanFactoryPostProcessor();
+    /**
+     * 在这里实现postProcessBeanFactory，spring boot不会提示修改建议
+     */
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        if (beanFactory instanceof AbstractAutowireCapableBeanFactory) {
+            AbstractAutowireCapableBeanFactory abstractBeanFactory = (AbstractAutowireCapableBeanFactory) beanFactory;
+            abstractBeanFactory.setInstantiationStrategy(new ModuleCglibSubclassingInstantiationStrategy());
+        }
     }
 
     @Bean("moduleAutowiredBeanPostProcessorV3")
