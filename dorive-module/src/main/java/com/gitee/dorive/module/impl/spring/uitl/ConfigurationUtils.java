@@ -23,7 +23,7 @@ public class ConfigurationUtils {
 
     public static final String CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME = "org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$ConfigurationClassBeanDefinition";
 
-    public static boolean isConfigurationClass(BeanDefinition beanDefinition) {
+    public static boolean isConfigurationBeanDefinition(BeanDefinition beanDefinition) {
         return CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME.equals(beanDefinition.getClass().getName());
     }
 

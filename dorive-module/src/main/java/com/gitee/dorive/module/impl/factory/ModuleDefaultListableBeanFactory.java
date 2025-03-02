@@ -49,7 +49,7 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
 
     @Override
     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) throws BeanDefinitionStoreException {
-        if (ConfigurationUtils.isConfigurationClass(beanDefinition)) {
+        if (ConfigurationUtils.isConfigurationBeanDefinition(beanDefinition)) {
             beanName = resetBeanName(beanName, beanDefinition, this);
         }
         super.registerBeanDefinition(beanName, beanDefinition);
@@ -96,7 +96,7 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                     Class<?> targetClass = null;
                     // class of factory bean
                     BeanDefinition beanDefinition = getBeanDefinition(candidateBeanName);
-                    if (ConfigurationUtils.isConfigurationClass(beanDefinition)) {
+                    if (ConfigurationUtils.isConfigurationBeanDefinition(beanDefinition)) {
                         AnnotationMetadata annotationMetadata = (AnnotationMetadata) ReflectUtil.getFieldValue(beanDefinition, "annotationMetadata");
                         String className = annotationMetadata.getClassName();
                         if (moduleParser.isUnderScanPackage(className)) {
