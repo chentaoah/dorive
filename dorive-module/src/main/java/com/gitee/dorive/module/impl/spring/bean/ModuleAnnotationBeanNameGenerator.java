@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.impl.spring;
+package com.gitee.dorive.module.impl.spring.bean;
 
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;

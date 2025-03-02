@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.impl.spring;
+package com.gitee.dorive.module.impl.spring.inject;
 
 import com.gitee.dorive.module.api.ModuleChecker;
 import com.gitee.dorive.module.api.ModuleParser;

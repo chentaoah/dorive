@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.module.config;
 
-import com.gitee.dorive.module.impl.spring.ModuleAutowiredBeanPostProcessor;
-import com.gitee.dorive.module.impl.spring.ModuleCglibSubclassingInstantiationStrategy;
+import com.gitee.dorive.module.impl.spring.inject.ModuleAutowiredBeanPostProcessor;
+import com.gitee.dorive.module.impl.spring.inject.ModuleCglibSubclassingInstantiationStrategy;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
