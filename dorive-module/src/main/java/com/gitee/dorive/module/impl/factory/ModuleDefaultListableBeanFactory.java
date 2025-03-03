@@ -109,18 +109,19 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                         if (ConfigurationUtils.isConfigurationBeanDefinition(beanDefinition)) {
                             AnnotationMetadata annotationMetadata = (AnnotationMetadata) ReflectUtil.getFieldValue(beanDefinition, "annotationMetadata");
                             String className = annotationMetadata.getClassName();
-                            if (moduleParser.isUnderScanPackage(className)) {
-                                targetClass = ClassUtil.loadClass(className);
-                            }
+                            targetClass = ClassUtil.loadClass(className);
                         }
                         // class of bean
                         if (targetClass == null) {
                             targetClass = (Class<?>) candidates.get(candidateBeanName);
                         }
-                        ModuleDefinition targetModuleDefinition = moduleParser.findModuleDefinition(targetClass);
-                        // 当存在多个候选时，相同模块的Bean将被选出
-                        if (moduleDefinition.equals(targetModuleDefinition)) {
-                            candidateBeanNames.add(candidateBeanName);
+                        String className = targetClass.getName();
+                        if (moduleParser.isUnderScanPackage(className)) {
+                            ModuleDefinition targetModuleDefinition = moduleParser.findModuleDefinition(targetClass);
+                            // 当存在多个候选时，相同模块的Bean将被选出
+                            if (moduleDefinition.equals(targetModuleDefinition)) {
+                                candidateBeanNames.add(candidateBeanName);
+                            }
                         }
                     }
                     if (candidateBeanNames.size() == 1) {
