@@ -23,6 +23,7 @@ import com.gitee.dorive.module.api.BeanNameEditor;
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.entity.ModuleDefinition;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
+import com.gitee.dorive.module.impl.spring.inject.ModuleCglibSubclassingInstantiationStrategy;
 import com.gitee.dorive.module.impl.spring.uitl.ConfigurationUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,6 +47,11 @@ import static com.gitee.dorive.module.impl.spring.uitl.BeanAnnotationHelper.BEAN
 public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory implements BeanNameEditor {
 
     private ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
+
+    public ModuleDefaultListableBeanFactory() {
+        // 实例化策略
+        setInstantiationStrategy(new ModuleCglibSubclassingInstantiationStrategy());
+    }
 
     @Override
     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) throws BeanDefinitionStoreException {
