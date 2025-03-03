@@ -38,6 +38,8 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.MethodMetadata;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.gitee.dorive.module.impl.spring.uitl.BeanAnnotationHelper.BEAN_NAME_CACHE;
@@ -98,25 +100,31 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
             Class<?> declaringClass = (Class<?>) ReflectUtil.getFieldValue(descriptor, "declaringClass");
             if (moduleParser.isUnderScanPackage(declaringClass.getName())) {
                 ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(declaringClass);
-                for (String candidateBeanName : candidates.keySet()) {
-                    Class<?> targetClass = null;
-                    // class of factory bean
-                    BeanDefinition beanDefinition = getBeanDefinition(candidateBeanName);
-                    if (ConfigurationUtils.isConfigurationBeanDefinition(beanDefinition)) {
-                        AnnotationMetadata annotationMetadata = (AnnotationMetadata) ReflectUtil.getFieldValue(beanDefinition, "annotationMetadata");
-                        String className = annotationMetadata.getClassName();
-                        if (moduleParser.isUnderScanPackage(className)) {
-                            targetClass = ClassUtil.loadClass(className);
+                if (moduleDefinition != null) {
+                    List<String> candidateBeanNames = new ArrayList<>(candidates.size());
+                    for (String candidateBeanName : candidates.keySet()) {
+                        Class<?> targetClass = null;
+                        // class of factory bean
+                        BeanDefinition beanDefinition = getBeanDefinition(candidateBeanName);
+                        if (ConfigurationUtils.isConfigurationBeanDefinition(beanDefinition)) {
+                            AnnotationMetadata annotationMetadata = (AnnotationMetadata) ReflectUtil.getFieldValue(beanDefinition, "annotationMetadata");
+                            String className = annotationMetadata.getClassName();
+                            if (moduleParser.isUnderScanPackage(className)) {
+                                targetClass = ClassUtil.loadClass(className);
+                            }
+                        }
+                        // class of bean
+                        if (targetClass == null) {
+                            targetClass = (Class<?>) candidates.get(candidateBeanName);
+                        }
+                        ModuleDefinition targetModuleDefinition = moduleParser.findModuleDefinition(targetClass);
+                        // 当存在多个候选时，相同模块的Bean将被选出
+                        if (moduleDefinition.equals(targetModuleDefinition)) {
+                            candidateBeanNames.add(candidateBeanName);
                         }
                     }
-                    // class of bean
-                    if (targetClass == null) {
-                        targetClass = (Class<?>) candidates.get(candidateBeanName);
-                    }
-                    ModuleDefinition targetModuleDefinition = moduleParser.findModuleDefinition(targetClass);
-                    // 当存在多个候选时，相同模块的Bean将被选出
-                    if (moduleDefinition.equals(targetModuleDefinition)) {
-                        return candidateBeanName;
+                    if (candidateBeanNames.size() == 1) {
+                        return candidateBeanNames.get(0);
                     }
                 }
             }
