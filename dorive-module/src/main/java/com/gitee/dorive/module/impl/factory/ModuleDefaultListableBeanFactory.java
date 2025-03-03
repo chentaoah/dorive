@@ -115,8 +115,7 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                         if (targetClass == null) {
                             targetClass = (Class<?>) candidates.get(candidateBeanName);
                         }
-                        String className = targetClass.getName();
-                        if (moduleParser.isUnderScanPackage(className)) {
+                        if (moduleParser.isUnderScanPackage(targetClass.getName())) {
                             ModuleDefinition targetModuleDefinition = moduleParser.findModuleDefinition(targetClass);
                             // 当存在多个候选时，相同模块的Bean将被选出
                             if (moduleDefinition.equals(targetModuleDefinition)) {
