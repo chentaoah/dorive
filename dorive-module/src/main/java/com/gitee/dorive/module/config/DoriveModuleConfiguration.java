@@ -31,7 +31,7 @@ public class DoriveModuleConfiguration {
 
     @Bean("moduleAutowiredBeanPostProcessorV3")
     @ConditionalOnMissingClass
-    public ModuleAutowiredBeanPostProcessor moduleAutowiredBeanPostProcessor() {
+    public static ModuleAutowiredBeanPostProcessor moduleAutowiredBeanPostProcessor() {
         return new ModuleAutowiredBeanPostProcessor();
     }
 
