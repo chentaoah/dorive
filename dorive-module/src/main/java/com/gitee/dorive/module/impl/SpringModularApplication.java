@@ -22,6 +22,7 @@ import com.gitee.dorive.module.entity.ModuleDefinition;
 import com.gitee.dorive.module.impl.factory.ModuleApplicationContextFactory;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
 import com.gitee.dorive.module.impl.spring.bean.ModuleAnnotationBeanNameGenerator;
+import com.gitee.dorive.module.impl.spring.uitl.URLClassLoaderUtils;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.boot.ApplicationContextFactory;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -32,6 +33,8 @@ import java.util.*;
 public class SpringModularApplication {
 
     public static ConfigurableApplicationContext run(Class<?> primarySource, String... args) {
+        URLClassLoaderUtils.loadClasspathIdx(primarySource);
+
         ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
         moduleParser.parse();
         List<ModuleDefinition> moduleDefinitions = moduleParser.getModuleDefinitions();
