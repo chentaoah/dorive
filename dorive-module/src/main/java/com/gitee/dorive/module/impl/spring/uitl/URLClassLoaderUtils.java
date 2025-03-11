@@ -52,24 +52,11 @@ public class URLClassLoaderUtils {
         if (!fileUrlStr.endsWith("/target/classes/META-INF/classpath.idx")) {
             return;
         }
-
-        String repositoryPath = findMavenRepositoryPath();
-        boolean existMavenRepository = FileUtil.exist(repositoryPath);
-
-        List<String> lines = FileUtil.readLines(fileUrl, StandardCharsets.UTF_8);
-        List<URL> urls = new ArrayList<>(lines.size());
-        for (String line : lines) {
-            line = line.trim();
-            if (line.startsWith("module:")) {
-                urls.add(handleModule(fileUrlStr, line));
-
-            } else if (line.startsWith("maven:") && existMavenRepository) {
-                urls.add(handleMaven(repositoryPath, line));
-            }
+        List<URL> urls = doLoadClasspathIdx(fileUrl, fileUrlStr);
+        if (!urls.isEmpty()) {
+            ClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]));
+            Thread.currentThread().setContextClassLoader(classLoader);
         }
-
-        ClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]));
-        Thread.currentThread().setContextClassLoader(classLoader);
     }
 
     private static URL findResource(URI sourceUri) {
@@ -92,6 +79,25 @@ public class URLClassLoaderUtils {
         }
         return null;
     }
+
+    private static List<URL> doLoadClasspathIdx(URL fileUrl, String fileUrlStr) {
+        String repositoryPath = findMavenRepositoryPath();
+        boolean existMavenRepository = FileUtil.exist(repositoryPath);
+
+        List<String> lines = FileUtil.readLines(fileUrl, StandardCharsets.UTF_8);
+        List<URL> urls = new ArrayList<>(lines.size());
+        for (String line : lines) {
+            line = line.trim();
+            if (line.startsWith("module:")) {
+                urls.add(handleModule(fileUrlStr, line));
+
+            } else if (line.startsWith("maven:") && existMavenRepository) {
+                urls.add(handleMaven(repositoryPath, line));
+            }
+        }
+        return urls;
+    }
+
 
     private static String findMavenRepositoryPath() {
         String mavenHome = System.getenv("MAVEN_HOME");
