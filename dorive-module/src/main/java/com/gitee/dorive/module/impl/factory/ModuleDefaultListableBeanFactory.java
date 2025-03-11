@@ -140,4 +140,18 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
         return beanName;
     }
 
+    public BeanDefinition getBeanDefinition(Class<?> beanType, Object bean) {
+        String[] beanNamesForType = getBeanNamesForType(beanType);
+        if (beanNamesForType.length == 1) {
+            return getBeanDefinition(beanNamesForType[0]);
+        }
+        for (String beanName : beanNamesForType) {
+            Object candidateBean = getBean(beanName);
+            if (bean == candidateBean) {
+                return getBeanDefinition(beanName);
+            }
+        }
+        return null;
+    }
+
 }
