@@ -19,6 +19,7 @@ package com.gitee.dorive.module.impl.parser;
 
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.entity.ModuleDefinition;
+import com.gitee.dorive.module.impl.spring.uitl.ClassUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.core.io.Resource;
@@ -30,8 +31,6 @@ import org.springframework.util.PathMatcher;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.security.CodeSource;
-import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.Attributes;
@@ -132,32 +131,12 @@ public abstract class AbstractModuleParser implements ModuleParser {
 
     @Override
     public ModuleDefinition findModuleDefinition(URI uri) {
-        return uriModuleDefinitionMap.get(uri);
+        return uri != null ? uriModuleDefinitionMap.get(uri) : null;
     }
 
     @Override
     public ModuleDefinition findModuleDefinition(Class<?> clazz) {
-        try {
-            ProtectionDomain protectionDomain = clazz.getProtectionDomain();
-            CodeSource codeSource = protectionDomain.getCodeSource();
-            if (codeSource != null) {
-                URI codeSourceUri = codeSource.getLocation().toURI();
-                if ("jar".equals(codeSourceUri.getScheme())) {
-                    String newPath = codeSourceUri.getSchemeSpecificPart();
-                    if (newPath.endsWith("!/BOOT-INF/classes!/")) {
-                        newPath = newPath.substring(0, newPath.length() - 20);
-                    }
-                    if (newPath.endsWith("!/")) {
-                        newPath = newPath.substring(0, newPath.length() - 2);
-                    }
-                    codeSourceUri = new URI(newPath);
-                }
-                return findModuleDefinition(codeSourceUri);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        return findModuleDefinition(ClassUtils.toURI(clazz));
     }
 
 }
