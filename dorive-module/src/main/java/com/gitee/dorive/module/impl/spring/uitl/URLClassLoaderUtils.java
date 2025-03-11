@@ -18,8 +18,11 @@
 package com.gitee.dorive.module.impl.spring.uitl;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
@@ -30,28 +33,66 @@ public class URLClassLoaderUtils {
 
     public static void tryLoadClasspathIdx(Class<?> source) {
         URL fileUrl = source.getResource("/META-INF/classpath.idx");
-        if (fileUrl != null) {
-            String fileUrlStr = fileUrl.toString();
-            if (!fileUrlStr.endsWith("/target/classes/META-INF/classpath.idx")) {
-                return;
-            }
-            List<String> lines = FileUtil.readLines(fileUrl, StandardCharsets.UTF_8);
-            List<URL> urls = new ArrayList<>(lines.size());
-            for (String line : lines) {
-                line = line.trim();
-                if (line.startsWith("module:")) {
-                    String path = line.substring(line.indexOf(":") + 1).trim();
-                    if (!path.endsWith("/")) {
-                        path = path + "/";
-                    }
-                    String project = path.substring(0, path.indexOf("/"));
-                    String urlPrefix = fileUrlStr.substring(0, fileUrlStr.indexOf("/" + project + "/"));
-                    urls.add(URLUtil.url(urlPrefix + "/" + path));
-                }
-            }
-            ClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]));
-            Thread.currentThread().setContextClassLoader(classLoader);
+        if (fileUrl == null) {
+            return;
         }
+        String fileUrlStr = fileUrl.toString();
+        if (!fileUrlStr.endsWith("/target/classes/META-INF/classpath.idx")) {
+            return;
+        }
+
+        String repositoryPath = findMavenRepositoryPath();
+        boolean existMavenRepository = FileUtil.exist(repositoryPath);
+
+        List<String> lines = FileUtil.readLines(fileUrl, StandardCharsets.UTF_8);
+        List<URL> urls = new ArrayList<>(lines.size());
+        for (String line : lines) {
+            line = line.trim();
+            if (line.startsWith("module:")) {
+                urls.add(handleModule(fileUrlStr, line));
+
+            } else if (line.startsWith("maven:") && existMavenRepository) {
+                urls.add(handleMaven(repositoryPath, line));
+            }
+        }
+
+        ClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]));
+        Thread.currentThread().setContextClassLoader(classLoader);
+    }
+
+    private static String findMavenRepositoryPath() {
+        String mavenHome = System.getenv("MAVEN_HOME");
+        if (StringUtils.isNotBlank(mavenHome)) {
+            return mavenHome + File.separator + "repository";
+        }
+        String userHome = System.getProperty("user.home");
+        if (StringUtils.isNotBlank(userHome)) {
+            return userHome + File.separator + ".m2" + File.separator + "repository";
+        }
+        return null;
+    }
+
+    private static URL handleModule(String fileUrlStr, String line) {
+        String path = line.substring(line.indexOf(":") + 1).trim();
+        if (!path.endsWith("/")) {
+            path = path + "/";
+        }
+        String project = path.substring(0, path.indexOf("/"));
+        String urlPrefix = fileUrlStr.substring(0, fileUrlStr.indexOf("/" + project + "/"));
+        return URLUtil.url(urlPrefix + "/" + path);
+    }
+
+    private static URL handleMaven(String repositoryPath, String line) {
+        String path = line.substring(line.indexOf(":") + 1).trim();
+        List<String> strings = StrUtil.splitTrim(path, ":");
+        String groupId = strings.get(0);
+        String artifactId = strings.get(1);
+        String version = strings.get(2);
+
+        String jarPath = StrUtil.replace(groupId, ".", File.separator);
+        jarPath = jarPath + File.separator + artifactId + File.separator + version + File.separator + artifactId + "-" + version + ".jar";
+        jarPath = repositoryPath + File.separator + jarPath;
+        return URLUtil.url(jarPath);
     }
 
 }
