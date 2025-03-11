@@ -33,7 +33,7 @@ import java.util.*;
 public class SpringModularApplication {
 
     public static ConfigurableApplicationContext run(Class<?> primarySource, String... args) {
-        URLClassLoaderUtils.loadClasspathIdx(primarySource);
+        URLClassLoaderUtils.tryLoadClasspathIdx(primarySource);
 
         ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
         moduleParser.parse();

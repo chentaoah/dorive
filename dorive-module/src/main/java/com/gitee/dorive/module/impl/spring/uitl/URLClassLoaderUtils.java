@@ -28,10 +28,13 @@ import java.util.List;
 
 public class URLClassLoaderUtils {
 
-    public static void loadClasspathIdx(Class<?> source) {
+    public static void tryLoadClasspathIdx(Class<?> source) {
         URL fileUrl = source.getResource("/META-INF/classpath.idx");
         if (fileUrl != null) {
             String fileUrlStr = fileUrl.toString();
+            if (!fileUrlStr.endsWith("/target/classes/META-INF/classpath.idx")) {
+                return;
+            }
             List<String> lines = FileUtil.readLines(fileUrl, StandardCharsets.UTF_8);
             List<URL> urls = new ArrayList<>(lines.size());
             for (String line : lines) {
