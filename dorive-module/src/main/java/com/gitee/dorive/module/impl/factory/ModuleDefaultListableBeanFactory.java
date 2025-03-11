@@ -102,6 +102,7 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                 ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(declaringClass);
                 if (moduleDefinition != null) {
                     List<String> candidateBeanNames = new ArrayList<>(candidates.size());
+                    List<String> exposedCandidateBeanNames = new ArrayList<>(candidates.size());
                     for (String candidateBeanName : candidates.keySet()) {
                         Class<?> targetClass = null;
                         // class of factory bean
@@ -117,14 +118,21 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                         }
                         if (moduleParser.isUnderScanPackage(targetClass.getName())) {
                             ModuleDefinition targetModuleDefinition = moduleParser.findModuleDefinition(targetClass);
-                            // 当存在多个候选时，相同模块的Bean将被选出
+                            // 1、相同模块
+                            // 2、模块内对外公开
                             if (moduleDefinition.equals(targetModuleDefinition)) {
                                 candidateBeanNames.add(candidateBeanName);
+
+                            } else if (targetModuleDefinition.isExposed(targetClass)) {
+                                exposedCandidateBeanNames.add(candidateBeanName);
                             }
                         }
                     }
                     if (candidateBeanNames.size() == 1) {
                         return candidateBeanNames.get(0);
+                    }
+                    if (candidateBeanNames.isEmpty() && exposedCandidateBeanNames.size() == 1) {
+                        return exposedCandidateBeanNames.get(0);
                     }
                 }
             }
