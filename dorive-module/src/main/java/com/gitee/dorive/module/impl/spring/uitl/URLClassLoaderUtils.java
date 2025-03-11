@@ -98,7 +98,6 @@ public class URLClassLoaderUtils {
         return urls;
     }
 
-
     private static String findMavenRepositoryPath() {
         String mavenHome = System.getenv("MAVEN_HOME");
         if (StringUtils.isNotBlank(mavenHome)) {
