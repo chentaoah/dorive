@@ -33,6 +33,10 @@ import java.util.*;
 public class SpringModularApplication {
 
     public static ConfigurableApplicationContext run(Class<?> primarySource, String... args) {
+        return build(primarySource).run(args);
+    }
+
+    public static SpringApplicationBuilder build(Class<?> primarySource) {
         URLClassLoaderUtils.tryLoadClasspathIdx(primarySource);
 
         ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
@@ -59,8 +63,7 @@ public class SpringModularApplication {
                 .profiles(profiles.toArray(new String[0]))
                 .properties(properties)
                 .beanNameGenerator(beanNameGenerator)
-                .contextFactory(applicationContextFactory)
-                .run(args);
+                .contextFactory(applicationContextFactory);
     }
 
 }
