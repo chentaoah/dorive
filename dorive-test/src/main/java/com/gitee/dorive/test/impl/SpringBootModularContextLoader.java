@@ -32,7 +32,7 @@ public class SpringBootModularContextLoader extends SpringBootContextLoader {
     public void processContextConfiguration(ContextConfigurationAttributes configAttributes) {
         super.processContextConfiguration(configAttributes);
         if (primarySource == null) {
-            synchronized (this) {
+            synchronized (SpringBootModularContextLoader.class) {
                 if (primarySource == null) {
                     Class<?> declaringClass = configAttributes.getDeclaringClass();
                     String packageName = declaringClass.getPackage().getName();
