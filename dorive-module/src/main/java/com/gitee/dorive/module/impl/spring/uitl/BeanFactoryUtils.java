@@ -8,6 +8,17 @@ import org.springframework.core.type.AnnotationMetadata;
 
 public class BeanFactoryUtils {
 
+    public static Class<?> tryGetConfigurationClass(DefaultListableBeanFactory beanFactory, Class<?> beanType, Object bean) {
+        // class of factory bean
+        BeanDefinition beanDefinition = BeanFactoryUtils.getBeanDefinition(beanFactory, beanType, bean);
+        if (beanDefinition != null && ConfigurationUtils.isConfigurationBeanDefinition(beanDefinition)) {
+            AnnotationMetadata annotationMetadata = (AnnotationMetadata) ReflectUtil.getFieldValue(beanDefinition, "annotationMetadata");
+            String className = annotationMetadata.getClassName();
+            return ClassUtil.loadClass(className);
+        }
+        return null;
+    }
+
     public static BeanDefinition getBeanDefinition(DefaultListableBeanFactory beanFactory, Class<?> beanType, Object bean) {
         String[] beanNamesForType = beanFactory.getBeanNamesForType(beanType);
         if (beanNamesForType.length == 1) {
@@ -18,17 +29,6 @@ public class BeanFactoryUtils {
             if (bean == candidateBean) {
                 return beanFactory.getBeanDefinition(beanName);
             }
-        }
-        return null;
-    }
-
-    public static Class<?> tryGetConfigurationClass(DefaultListableBeanFactory beanFactory, Class<?> beanType, Object bean) {
-        // class of factory bean
-        BeanDefinition beanDefinition = BeanFactoryUtils.getBeanDefinition(beanFactory, beanType, bean);
-        if (beanDefinition != null && ConfigurationUtils.isConfigurationBeanDefinition(beanDefinition)) {
-            AnnotationMetadata annotationMetadata = (AnnotationMetadata) ReflectUtil.getFieldValue(beanDefinition, "annotationMetadata");
-            String className = annotationMetadata.getClassName();
-            return ClassUtil.loadClass(className);
         }
         return null;
     }
