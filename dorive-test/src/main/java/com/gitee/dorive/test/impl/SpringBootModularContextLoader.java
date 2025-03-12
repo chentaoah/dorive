@@ -17,29 +17,32 @@
 
 package com.gitee.dorive.test.impl;
 
-import cn.hutool.core.util.ClassLoaderUtil;
 import com.gitee.dorive.module.impl.SpringModularApplication;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.context.SpringBootContextLoader;
-import org.springframework.test.context.ContextConfigurationAttributes;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.test.context.MergedContextConfiguration;
 
 public class SpringBootModularContextLoader extends SpringBootContextLoader {
 
-    private static Class<?> primarySource;
+    private Class<?> primarySource;
 
     @Override
-    public void processContextConfiguration(ContextConfigurationAttributes configAttributes) {
-        super.processContextConfiguration(configAttributes);
-        if (primarySource == null) {
-            synchronized (SpringBootModularContextLoader.class) {
-                if (primarySource == null) {
-                    Class<?> declaringClass = configAttributes.getDeclaringClass();
-                    String packageName = declaringClass.getPackage().getName();
-                    primarySource = ClassLoaderUtil.loadClass(packageName + ".Application");
+    public ApplicationContext loadContext(MergedContextConfiguration config) throws Exception {
+        Class<?>[] configClasses = config.getClasses();
+        if (configClasses.length > 0) {
+            for (Class<?> configClass : configClasses) {
+                SpringBootApplication annotation = AnnotationUtils.getAnnotation(configClass, SpringBootApplication.class);
+                if (annotation != null) {
+                    primarySource = configClass;
+                    break;
                 }
             }
         }
+        return super.loadContext(config);
     }
 
     @Override
