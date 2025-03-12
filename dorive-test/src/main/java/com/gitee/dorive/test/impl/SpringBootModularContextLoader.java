@@ -17,27 +17,41 @@
 
 package com.gitee.dorive.test.impl;
 
+import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.module.impl.SpringModularApplication;
+import com.gitee.dorive.module.impl.factory.ModuleDefaultListableBeanFactory;
+import org.springframework.boot.ApplicationContextFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.context.SpringBootContextLoader;
+import org.springframework.boot.web.reactive.context.GenericReactiveWebApplicationContext;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
+import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.test.context.MergedContextConfiguration;
+import org.springframework.web.context.support.GenericWebApplicationContext;
 
-public class SpringBootModularContextLoader extends SpringBootContextLoader {
+import java.lang.reflect.Method;
 
+public class SpringBootModularContextLoader extends SpringBootContextLoader implements MethodInterceptor {
+
+    private MergedContextConfiguration config;
     private Class<?> primarySource;
+    private SpringApplication springApplication;
 
     @Override
     public ApplicationContext loadContext(MergedContextConfiguration config) throws Exception {
+        this.config = config;
         Class<?>[] configClasses = config.getClasses();
         if (configClasses.length > 0) {
             for (Class<?> configClass : configClasses) {
                 SpringBootApplication annotation = AnnotationUtils.getAnnotation(configClass, SpringBootApplication.class);
                 if (annotation != null) {
-                    primarySource = configClass;
+                    this.primarySource = configClass;
                     break;
                 }
             }
@@ -48,7 +62,34 @@ public class SpringBootModularContextLoader extends SpringBootContextLoader {
     @Override
     protected SpringApplication getSpringApplication() {
         SpringApplicationBuilder builder = SpringModularApplication.build(primarySource);
-        return builder.build();
+        this.springApplication = builder.build();
+
+        boolean isEmbeddedWebEnvironment = ReflectUtil.invoke(this, "isEmbeddedWebEnvironment", config);
+        springApplication.setApplicationContextFactory((type) -> {
+            if (type != WebApplicationType.NONE && !isEmbeddedWebEnvironment) {
+                if (type == WebApplicationType.REACTIVE) {
+                    return new GenericReactiveWebApplicationContext(new ModuleDefaultListableBeanFactory());
+
+                } else if (type == WebApplicationType.SERVLET) {
+                    return new GenericWebApplicationContext(new ModuleDefaultListableBeanFactory());
+                }
+            }
+            return ApplicationContextFactory.DEFAULT.create(type);
+        });
+
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(SpringApplication.class);
+        enhancer.setCallback(this);
+        return (SpringApplication) enhancer.create();
+    }
+
+    @Override
+    public Object intercept(Object instance, Method method, Object[] args, MethodProxy methodProxy) throws Exception {
+        String methodName = method.getName();
+        if ("setApplicationContextFactory".equals(methodName)) {
+            return null;
+        }
+        return method.invoke(springApplication, args);
     }
 
 }
