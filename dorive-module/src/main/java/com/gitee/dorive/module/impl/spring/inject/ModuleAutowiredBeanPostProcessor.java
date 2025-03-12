@@ -21,13 +21,17 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.module.api.ModuleChecker;
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
+import com.gitee.dorive.module.impl.spring.uitl.BeanFactoryUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.util.ReflectionUtils;
@@ -37,10 +41,16 @@ import java.lang.reflect.Modifier;
 
 @Getter
 @Setter
-public class ModuleAutowiredBeanPostProcessor implements BeanPostProcessor {
+public class ModuleAutowiredBeanPostProcessor implements BeanFactoryAware, BeanPostProcessor {
 
     private ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
     private ModuleChecker moduleChecker = DefaultModuleParser.INSTANCE;
+    private DefaultListableBeanFactory beanFactory;
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        this.beanFactory = (DefaultListableBeanFactory) beanFactory;
+    }
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
@@ -62,8 +72,14 @@ public class ModuleAutowiredBeanPostProcessor implements BeanPostProcessor {
         ReflectionUtils.doWithLocalFields(beanType, field -> {
             AnnotationAttributes ann = findAutowiredAnnotation(field);
             if (ann != null && !Modifier.isStatic(field.getModifiers())) {
+                Class<?> fieldType = field.getType();
                 Object fieldValue = ReflectUtil.getFieldValue(bean, field);
-                moduleChecker.checkInjection(beanType, field.getType(), fieldValue);
+                Class<?> configurationClass = BeanFactoryUtils.tryGetConfigurationClass(beanFactory, fieldType, fieldValue);
+                if (configurationClass != null) {
+                    fieldType = configurationClass;
+                    fieldValue = null;
+                }
+                moduleChecker.checkInjection(beanType, fieldType, fieldValue);
             }
         });
     }

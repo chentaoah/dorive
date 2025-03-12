@@ -17,20 +17,16 @@
 
 package com.gitee.dorive.module.impl.spring.inject;
 
-import cn.hutool.core.util.ClassUtil;
-import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.module.api.ModuleChecker;
 import com.gitee.dorive.module.api.ModuleParser;
-import com.gitee.dorive.module.impl.factory.ModuleDefaultListableBeanFactory;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
-import com.gitee.dorive.module.impl.spring.uitl.ConfigurationUtils;
+import com.gitee.dorive.module.impl.spring.uitl.BeanFactoryUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.core.type.AnnotationMetadata;
 
 import java.lang.reflect.Constructor;
 
@@ -49,13 +45,11 @@ public class ModuleCglibSubclassingInstantiationStrategy extends CglibSubclassin
             for (int index = 0; index < parameterTypes.length; index++) {
                 Class<?> parameterType = parameterTypes[index];
                 Object arg = args[index];
-                if (owner instanceof ModuleDefaultListableBeanFactory) {
-                    // class of factory bean
-                    BeanDefinition beanDefinition = ((ModuleDefaultListableBeanFactory) owner).getBeanDefinition(parameterType, arg);
-                    if (beanDefinition != null && ConfigurationUtils.isConfigurationBeanDefinition(beanDefinition)) {
-                        AnnotationMetadata annotationMetadata = (AnnotationMetadata) ReflectUtil.getFieldValue(beanDefinition, "annotationMetadata");
-                        String className = annotationMetadata.getClassName();
-                        parameterType = ClassUtil.loadClass(className);
+                if (owner instanceof DefaultListableBeanFactory) {
+                    Class<?> configurationClass = BeanFactoryUtils.tryGetConfigurationClass(
+                            (DefaultListableBeanFactory) owner, parameterType, arg);
+                    if (configurationClass != null) {
+                        parameterType = configurationClass;
                         arg = null;
                     }
                 }
