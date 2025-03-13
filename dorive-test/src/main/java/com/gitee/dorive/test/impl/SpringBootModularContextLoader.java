@@ -64,29 +64,32 @@ public class SpringBootModularContextLoader extends SpringBootContextLoader impl
         SpringApplicationBuilder builder = SpringModularApplication.build(primarySource);
         this.springApplication = builder.build();
 
-        boolean isEmbeddedWebEnvironment = ReflectUtil.invoke(this, "isEmbeddedWebEnvironment", config);
-        springApplication.setApplicationContextFactory((type) -> {
-            if (type != WebApplicationType.NONE && !isEmbeddedWebEnvironment) {
-                if (type == WebApplicationType.REACTIVE) {
-                    return new GenericReactiveWebApplicationContext(new ModuleDefaultListableBeanFactory());
-
-                } else if (type == WebApplicationType.SERVLET) {
-                    return new GenericWebApplicationContext(new ModuleDefaultListableBeanFactory());
-                }
-            }
-            return ApplicationContextFactory.DEFAULT.create(type);
-        });
-
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(SpringApplication.class);
         enhancer.setCallback(this);
-        return (SpringApplication) enhancer.create();
+        Class<?>[] argumentTypes = new Class[]{Class[].class};
+        Object[] arguments = new Object[]{new Class[]{primarySource}};
+        return (SpringApplication) enhancer.create(argumentTypes, arguments);
     }
 
     @Override
     public Object intercept(Object instance, Method method, Object[] args, MethodProxy methodProxy) throws Exception {
         String methodName = method.getName();
         if ("setApplicationContextFactory".equals(methodName)) {
+            boolean isEmbeddedWebEnvironment = ReflectUtil.invoke(this, "isEmbeddedWebEnvironment", config);
+            if (!isEmbeddedWebEnvironment) {
+                springApplication.setApplicationContextFactory((type) -> {
+                    if (type != WebApplicationType.NONE) {
+                        if (type == WebApplicationType.REACTIVE) {
+                            return new GenericReactiveWebApplicationContext(new ModuleDefaultListableBeanFactory());
+
+                        } else if (type == WebApplicationType.SERVLET) {
+                            return new GenericWebApplicationContext(new ModuleDefaultListableBeanFactory());
+                        }
+                    }
+                    return ApplicationContextFactory.DEFAULT.create(type);
+                });
+            }
             return null;
         }
         return method.invoke(springApplication, args);
