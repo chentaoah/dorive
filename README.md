@@ -1,5 +1,5 @@
 <h1 align="center">Dorive</h1>
-<h3 align="center">轻量级领域驱动框架</h3>
+<h3 align="center">轻量级、渐进式、领域驱动式开发框架</h3>
 <p align="center">
   <img src="https://img.shields.io/github/license/chentaoah/dorive" alt="license">
   <img src="https://img.shields.io/github/v/release/chentaoah/dorive?display_name=tag&include_prereleases" alt="release">
@@ -82,10 +82,10 @@ dorive = domain + driven 或 do + driven ，是原公司项目沉淀后的开源
 
 |  所属  | 模块                       | 说明             | 适配Spring Boot版本 |
 | :----: | -------------------------- | ---------------- | ------------------- |
-| 模块化 | dorive-module              | 模块化实现       | 2.7.18              |
+| 模块化 | dorive-module              | 模块化核心实现   | 2.7.18              |
 | 模块化 | dorive-test                | 测试插件实现     | 2.7.18              |
 | 模型化 | dorive-api                 | 领域建模范式     | 2.2.2 - 2.7.18      |
-| 模型化 | dorive-core                | 核心实现         | 2.2.2 - 2.7.18      |
+| 模型化 | dorive-core                | 模型化核心实现   | 2.2.2 - 2.7.18      |
 | 模型化 | dorive-event               | 事件通知实现     | 2.2.2 - 2.7.18      |
 | 模型化 | dorive-query               | 关联查询实现     | 2.2.2 - 2.7.18      |
 | 模型化 | dorive-ref                 | 仓储引用实现     | 2.2.2 - 2.7.18      |
