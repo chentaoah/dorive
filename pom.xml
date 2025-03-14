@@ -29,6 +29,8 @@
     </scm>
 
     <modules>
+        <module>dorive-module</module>
+        <module>dorive-test</module>
         <module>dorive-api</module>
         <module>dorive-core</module>
         <module>dorive-event</module>
@@ -37,10 +39,8 @@
         <module>dorive-env</module>
         <module>dorive-sql</module>
         <module>dorive-mybatis-plus</module>
-        <module>dorive-module</module>
         <module>dorive-web</module>
         <module>dorive-spring-boot-starter</module>
-        <module>dorive-test</module>
     </modules>
 
     <properties>
