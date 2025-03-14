@@ -1,5 +1,5 @@
 <h1 align="center">Dorive</h1>
-<h3 align="center">轻量级、渐进式、领域驱动式开发框架</h3>
+<h3 align="center">轻量化、渐进式、领域驱动式开发框架</h3>
 <p align="center">
   <img src="https://img.shields.io/github/license/chentaoah/dorive" alt="license">
   <img src="https://img.shields.io/github/v/release/chentaoah/dorive?display_name=tag&include_prereleases" alt="release">
