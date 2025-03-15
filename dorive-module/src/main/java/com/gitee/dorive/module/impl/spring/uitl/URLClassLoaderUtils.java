@@ -21,9 +21,6 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 
 import java.io.File;
 import java.net.URI;
@@ -44,43 +41,20 @@ public class URLClassLoaderUtils {
         if (!sourceUriStr.endsWith("/target/classes/")) {
             return;
         }
-        URL fileUrl = findResource(sourceUri);
-        if (fileUrl == null) {
+        URI fileUri = sourceUri.resolve("META-INF/classpath.idx");
+        File file = new File(fileUri);
+        if (!file.exists()) {
             return;
         }
-        String fileUrlStr = fileUrl.toString();
-        if (!fileUrlStr.endsWith("/target/classes/META-INF/classpath.idx")) {
-            return;
-        }
-        List<URL> urls = doLoadClasspathIdx(fileUrl, fileUrlStr);
+        URL fileUrl = URLUtil.getURL(file);
+        List<URL> urls = doLoadClasspathIdx(fileUrl);
         if (!urls.isEmpty()) {
             ClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]));
             Thread.currentThread().setContextClassLoader(classLoader);
         }
     }
 
-    private static URL findResource(URI sourceUri) {
-        try {
-            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-            Resource[] resources = resolver.getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "META-INF/classpath.idx");
-            for (Resource resource : resources) {
-                URL fileUrl = resource.getURL();
-                if ("file".equals(fileUrl.getProtocol())) {
-                    String path = fileUrl.toString();
-                    int index = path.indexOf("META-INF/classpath.idx");
-                    URI fileUri = URLUtil.toURI(path.substring(0, index));
-                    if (sourceUri.equals(fileUri)) {
-                        return fileUrl;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            return null;
-        }
-        return null;
-    }
-
-    private static List<URL> doLoadClasspathIdx(URL fileUrl, String fileUrlStr) {
+    private static List<URL> doLoadClasspathIdx(URL fileUrl) {
         String repositoryPath = findMavenRepositoryPath();
         boolean existMavenRepository = FileUtil.exist(repositoryPath);
 
@@ -89,7 +63,7 @@ public class URLClassLoaderUtils {
         for (String line : lines) {
             line = line.trim();
             if (line.startsWith("module:")) {
-                urls.add(handleModule(fileUrlStr, line));
+                urls.add(handleModule(fileUrl, line));
 
             } else if (line.startsWith("maven:") && existMavenRepository) {
                 urls.add(handleMaven(repositoryPath, line));
@@ -110,7 +84,8 @@ public class URLClassLoaderUtils {
         return null;
     }
 
-    private static URL handleModule(String fileUrlStr, String line) {
+    private static URL handleModule(URL fileUrl, String line) {
+        String fileUrlStr = fileUrl.toString();
         String path = line.substring(line.indexOf(":") + 1).trim();
         if (!path.endsWith("/")) {
             path = path + "/";
