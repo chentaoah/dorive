@@ -107,7 +107,7 @@ public class ModuleLauncher {
             path = path + "/";
         }
         String project = path.substring(0, path.indexOf("/"));
-        String urlPrefix = fileUrlStr.substring(0, fileUrlStr.indexOf("/" + project + "/"));
+        String urlPrefix = fileUrlStr.substring(0, fileUrlStr.lastIndexOf("/" + project + "/"));
         return URLUtil.url(urlPrefix + "/" + path);
     }
 
