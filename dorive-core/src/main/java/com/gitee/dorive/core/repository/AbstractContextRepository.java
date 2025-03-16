@@ -110,17 +110,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         setEntityElement(rootRepository.getEntityElement());
         setOperationFactory(rootRepository.getOperationFactory());
-
-        EntityHandler entityHandler = newEntityHandler();
-        EntityOpHandler entityOpHandler = newEntityOpHandler();
-        derivedRepositoryResolver = new DerivedRepositoryResolver(this);
-        derivedRepositoryResolver.resolve();
-        if (derivedRepositoryResolver.hasDerived()) {
-            entityHandler = new DelegatedEntityHandler(this, derivedRepositoryResolver.getEntityHandlerMap(entityHandler));
-            entityOpHandler = new DelegatedEntityOpHandler(this, derivedRepositoryResolver.getEntityOpHandlerMap(entityOpHandler));
-        }
-        Executor executor = new ContextExecutor(this, entityHandler, entityOpHandler);
-        setExecutor(executor);
+        setExecutor(newExecutor());
     }
 
     protected void prepareRepositoryDef(Class<?> repositoryClass, Class<?> entityClass) {
@@ -261,6 +251,18 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         }
         return null;
+    }
+
+    protected Executor newExecutor() {
+        EntityHandler entityHandler = newEntityHandler();
+        EntityOpHandler entityOpHandler = newEntityOpHandler();
+        derivedRepositoryResolver = new DerivedRepositoryResolver(this);
+        derivedRepositoryResolver.resolve();
+        if (derivedRepositoryResolver.hasDerived()) {
+            entityHandler = new DelegatedEntityHandler(this, derivedRepositoryResolver.getEntityHandlerMap(entityHandler));
+            entityOpHandler = new DelegatedEntityOpHandler(this, derivedRepositoryResolver.getEntityOpHandlerMap(entityOpHandler));
+        }
+        return new ContextExecutor(this, entityHandler, entityOpHandler);
     }
 
     protected EntityHandler newEntityHandler() {
