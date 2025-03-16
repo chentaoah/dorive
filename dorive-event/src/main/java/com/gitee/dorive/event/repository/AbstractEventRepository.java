@@ -43,7 +43,8 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
     private boolean enableRepositoryEvent;
 
     @Override
-    protected void processRepositoryDef(Class<?> repositoryClass, Class<?> entityClass) {
+    protected void prepareRepositoryDef(Class<?> repositoryClass, Class<?> entityClass) {
+        super.prepareRepositoryDef(repositoryClass, entityClass);
         RepositoryDef repositoryDef = getRepositoryDef();
         Class<?>[] events = repositoryDef.getEvents();
         enableExecutorEvent = ArrayUtil.contains(events, ExecutorEvent.class);

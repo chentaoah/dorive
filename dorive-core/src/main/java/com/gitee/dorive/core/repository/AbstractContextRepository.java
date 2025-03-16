@@ -28,6 +28,7 @@ import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.api.impl.core.EntityDefinitionResolver;
 import com.gitee.dorive.api.impl.core.EntityElementResolver;
 import com.gitee.dorive.api.util.ReflectUtils;
+import com.gitee.dorive.core.api.common.RepositoryPostProcessor;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.EntityOpHandler;
 import com.gitee.dorive.core.api.executor.Executor;
@@ -83,10 +84,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     @Override
     public void afterPropertiesSet() throws Exception {
         Class<?> repositoryClass = this.getClass();
-        this.repositoryDef = RepositoryDef.fromElement(repositoryClass);
-        Assert.notNull(repositoryDef, "The @Repository does not exist! type: {}", repositoryClass.getName());
         Class<?> entityClass = ReflectUtils.getFirstArgumentType(repositoryClass);
-        processRepositoryDef(repositoryClass, entityClass);
+
+        prepareRepositoryDef(repositoryClass, entityClass);
+        Assert.notNull(repositoryDef, "The @Repository does not exist! type: {}", repositoryClass.getName());
 
         EntityDefinitionResolver entityDefinitionResolver = new EntityDefinitionResolver();
         EntityDefinition entityDefinition = entityDefinitionResolver.resolve(entityClass);
@@ -121,6 +122,13 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
         Executor executor = new ContextExecutor(this, entityHandler, entityOpHandler);
         setExecutor(executor);
+    }
+
+    protected void prepareRepositoryDef(Class<?> repositoryClass, Class<?> entityClass) {
+        this.repositoryDef = RepositoryDef.fromElement(repositoryClass);
+        for (RepositoryPostProcessor postProcessor : RepositoryContext.getRepositoryPostProcessors()) {
+            postProcessor.postProcessRepositoryDef(repositoryClass, entityClass, repositoryDef);
+        }
     }
 
     private CommonRepository newRepository(EntityElement entityElement) {
@@ -258,8 +266,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
         return null;
     }
-
-    protected abstract void processRepositoryDef(Class<?> repositoryClass, Class<?> entityClass);
 
     protected abstract EntityStoreInfo resolveEntityStoreInfo(RepositoryDef repositoryDef);
 
