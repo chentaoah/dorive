@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.impl.spring.uitl;
+package com.gitee.dorive.module.impl;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
+import com.gitee.dorive.module.impl.spring.uitl.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -27,52 +28,25 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class URLClassLoaderUtils {
+public class ModuleLauncher {
 
-    public static void tryLoadClasspathIdx(Class<?> source) {
-        URI sourceUri = ClassUtils.toURI(source);
-        if (sourceUri == null) {
-            return;
-        }
-        String sourceUriStr = sourceUri.toString();
-        if (!sourceUriStr.endsWith("/target/classes/")) {
-            return;
-        }
-        URI fileUri = sourceUri.resolve("META-INF/classpath.idx");
-        File file = new File(fileUri);
-        if (!file.exists()) {
-            return;
-        }
-        URL fileUrl = URLUtil.getURL(file);
-        List<URL> urls = doLoadClasspathIdx(fileUrl);
-        if (!urls.isEmpty()) {
-            ClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]));
-            Thread.currentThread().setContextClassLoader(classLoader);
-        }
+    public static final ModuleLauncher INSTANCE = new ModuleLauncher();
+
+    private final String mavenRepositoryPath;
+    private final boolean existMavenRepository;
+    private final Set<URI> addedUris;
+    private final Set<URL> urlsToLoad;
+
+    public ModuleLauncher() {
+        this.mavenRepositoryPath = findMavenRepositoryPath();
+        this.existMavenRepository = mavenRepositoryPath != null && FileUtil.exist(mavenRepositoryPath);
+        this.addedUris = new HashSet<>();
+        this.urlsToLoad = new LinkedHashSet<>();
     }
 
-    private static List<URL> doLoadClasspathIdx(URL fileUrl) {
-        String repositoryPath = findMavenRepositoryPath();
-        boolean existMavenRepository = FileUtil.exist(repositoryPath);
-
-        List<String> lines = FileUtil.readLines(fileUrl, StandardCharsets.UTF_8);
-        List<URL> urls = new ArrayList<>(lines.size());
-        for (String line : lines) {
-            line = line.trim();
-            if (line.startsWith("module:")) {
-                urls.add(handleModule(fileUrl, line));
-
-            } else if (line.startsWith("maven:") && existMavenRepository) {
-                urls.add(handleMaven(repositoryPath, line));
-            }
-        }
-        return urls;
-    }
-
-    private static String findMavenRepositoryPath() {
+    private String findMavenRepositoryPath() {
         String mavenHome = System.getenv("MAVEN_HOME");
         if (StringUtils.isNotBlank(mavenHome)) {
             return mavenHome + File.separator + "repository";
@@ -84,7 +58,49 @@ public class URLClassLoaderUtils {
         return null;
     }
 
-    private static URL handleModule(URL fileUrl, String line) {
+    public void tryLoadClasspathIdx(Class<?> source) {
+        URI sourceUri = ClassUtils.toURI(source);
+        if (sourceUri == null) {
+            return;
+        }
+        String sourceUriStr = sourceUri.toString();
+        if (!sourceUriStr.endsWith("/target/classes/")) {
+            return;
+        }
+        loadClasspathIdx(sourceUri);
+        if (!urlsToLoad.isEmpty()) {
+            ClassLoader classLoader = new URLClassLoader(urlsToLoad.toArray(new URL[0]));
+            Thread.currentThread().setContextClassLoader(classLoader);
+        }
+    }
+
+    private void loadClasspathIdx(URI targetClassesUri) {
+        if (addedUris.add(targetClassesUri)) {
+            URI fileUri = targetClassesUri.resolve("META-INF/classpath.idx");
+            File file = new File(fileUri);
+            if (file.exists()) {
+                doLoadClasspathIdx(file);
+            }
+        }
+    }
+
+    private void doLoadClasspathIdx(File file) {
+        List<String> lines = FileUtil.readLines(file, StandardCharsets.UTF_8);
+        for (String line : lines) {
+            line = line.trim();
+            if (line.startsWith("module:")) {
+                URL moduleUrl = handleModule(file, line);
+                urlsToLoad.add(moduleUrl);
+                loadClasspathIdx(URLUtil.toURI(moduleUrl));
+
+            } else if (line.startsWith("maven:") && existMavenRepository) {
+                urlsToLoad.add(handleMaven(line));
+            }
+        }
+    }
+
+    private URL handleModule(File file, String line) {
+        URL fileUrl = URLUtil.getURL(file);
         String fileUrlStr = fileUrl.toString();
         String path = line.substring(line.indexOf(":") + 1).trim();
         if (!path.endsWith("/")) {
@@ -95,7 +111,7 @@ public class URLClassLoaderUtils {
         return URLUtil.url(urlPrefix + "/" + path);
     }
 
-    private static URL handleMaven(String repositoryPath, String line) {
+    private URL handleMaven(String line) {
         String path = line.substring(line.indexOf(":") + 1).trim();
         List<String> strings = StrUtil.splitTrim(path, ":");
         String groupId = strings.get(0);
@@ -104,7 +120,7 @@ public class URLClassLoaderUtils {
 
         String jarPath = StrUtil.replace(groupId, ".", File.separator);
         jarPath = jarPath + File.separator + artifactId + File.separator + version + File.separator + artifactId + "-" + version + ".jar";
-        jarPath = repositoryPath + File.separator + jarPath;
+        jarPath = mavenRepositoryPath + File.separator + jarPath;
         return URLUtil.url(jarPath);
     }
 
