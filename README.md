@@ -1,5 +1,5 @@
 <h1 align="center">Dorive</h1>
-<h3 align="center">轻量级领域驱动框架</h3>
+<h3 align="center">轻量化、渐进式、领域驱动式开发框架</h3>
 <p align="center">
   <img src="https://img.shields.io/github/license/chentaoah/dorive" alt="license">
   <img src="https://img.shields.io/github/v/release/chentaoah/dorive?display_name=tag&include_prereleases" alt="release">
@@ -8,74 +8,94 @@
 </p>
 <hr/>
 
-###  📚简介
+###  🎁简介
 
-dorive是一个轻量的以领域驱动为核心的业务框架，它提供了诸多开箱即用的功能，旨在帮助开发者，在项目中快速、便捷地应用领域驱动。
+🔥🔥🔥dorive是一个”轻量化、渐进式“开发框架，帮助开发者，快速落地领域驱动式项目。 
 
-这些功能涵盖了依赖注入校验、依赖即用配置、实体定义与映射、级联查询与操作、实体多态、实体事件通知、复杂推导查询、ref引用、复杂计数统计、表结构生成、数据库逆向生成、接口代码生成等，可以满足大部分开发场景。
+dorive = domain + driven 或 do + driven ，是原公司项目沉淀后的开源库。
 
-###  🎁名称由来
+“do”表明了一种态度，只有付诸行动，才能有所收获。
 
-dorive = domain + driven 或 do + driven ，是原公司项目沉淀后的开源库。“do”表明了一种态度，只有付诸行动，才能有所收获。
+### 📚DDD概论
 
-###  🍺设计理念
+现代应用架构正朝着微服务化、模块化、模型化（3M）方向发展，而这些都和领域驱动设计的核心思想（高内聚、低耦合）不谋而合。
 
-dorive是Mybatis-Plus的拓展，易于集成，开发者无需添加任何配置与代码。
+- 微服务化：由多个较小的，松散耦合的服务组成一个应用。
+- 模块化：由多个可组合、分解、更换的单元，组成一个服务。
+- 模型化：对业务进行描述、抽象，形成多个对象，组成一个模块。
+- 概念上：微服务 > 模块 > 模型
 
-dorive的优势：
+### 📦模块化
 
-- 极少的sql编写（与数据存储方式解耦）
-- 一次建模，任意查询（代码的通用性强，开发成本低）
-- 面向对象，动态拓展（可维护性、可拓展性强）
-- 事件通知，代码解耦（耦合度低）
-- 正向+逆向工程（开发速度快）
+模块应该具有以下特性：
 
-### 📊架构设计
+- 易于组合、分解、更换
+- 相互间通过公共服务或事件进行交互
+- 能够独立运行、测试
+- 对运行环境不敏感
+- 提供接口，支持重写业务逻辑
 
-<img src="https://gitee.com/digital-engine/dorive/raw/master/doc/img/framework.png" alt="avatar" style="zoom: 50%;" />
+### 🛠️模型化
 
-###  🛠️模块说明
+模型应该具有以下特性：
 
-| 模块                       | 说明             |
-| -------------------------- | ---------------- |
-| dorive-api                 | 领域驱动统一规范 |
-| dorive-core                | 核心实现         |
-| dorive-event               | 事件通知实现     |
-| dorive-query               | 关联查询实现     |
-| dorive-ref                 | 仓储引用实现     |
-| dorive-env                 | 简易化配置       |
-| dorive-sql                 | 动态查询语句实现 |
-| dorive-mybatis-plus        | mybatis-plus适配 |
-| dorive-inject              | 模块化依赖校验   |
-| dorive-web                 | web开发适配      |
-| dorive-spring-boot-starter | 启动器           |
+- 由业务抽象而来，反映出结构、逻辑、关系
+- 面向对象，支持重写业务逻辑
+- 与存储方式解耦
+- 能够向外传播事件
 
-### 🔗依赖说明
+###  💯推荐理由
+
+dorive开发框架实现了模块化、模型化的全部特性，你可以有选择性地使用。
+
+模块化、模型化的优势：
+
+- 多个模块互不影响，多人协同开发项目，效率高。
+- 单个模块升级或回退，影响小。
+- 模块间调用关系简单，易维护。
+- 模块可嵌入其他项目，复用性好。
+- 模块提供接口，重写业务逻辑，拓展性好。
+- 建模后，可自动生成基本代码与脚本。
+- 可重写模型方法，定制业务逻辑。
+- 可监听模型事件，减少代码耦合度。
+
+### 💬使用建议
+
+基础依赖说明：
 
 | 依赖库                    | 版本   | 说明                |
 | ------------------------- | ------ | ------------------- |
-| spring-boot-starter-web   | 2.7.18 | spring-boot web集成 |
+| spring-boot-starter-web   | 2.7.18 | spring boot web集成 |
 | spring-tx                 | 5.3.31 | spring事务管理      |
 | hutool-all                | 5.8.25 | 工具库              |
-| mybatis-plus-boot-starter | 3.5.7  | 数据库操作          |
+| mybatis-plus-boot-starter | 3.5.7  | 数据库框架          |
 
-###  📦安装
-
-因项目尚未上传至Maven中央仓库，请访问Gitee主页：[dorive](https://gitee.com/digital-engine/dorive/tree/master)，下载源码至本地后，使用Maven命令安装。
-
-```shell
-mvn install
-```
-
-然后就可以使用Maven引入了。
+如果是新项目，你将毫无负担地使用它：
 
 ```xml
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.5.0.6</version>
+    <version>3.5.0.7</version>
 </dependency>
 ```
+
+如果是存量项目，你还需要考虑兼容性：
+
+|  所属  | 模块                       | 说明             | 适配Spring Boot版本 |
+| :----: | -------------------------- | ---------------- | ------------------- |
+| 模块化 | dorive-module              | 模块化核心实现   | 2.7.18              |
+| 模块化 | dorive-test                | 测试插件实现     | 2.7.18              |
+| 模型化 | dorive-api                 | 领域建模范式     | 2.2.2 - 2.7.18      |
+| 模型化 | dorive-core                | 模型化核心实现   | 2.2.2 - 2.7.18      |
+| 模型化 | dorive-event               | 事件通知实现     | 2.2.2 - 2.7.18      |
+| 模型化 | dorive-query               | 关联查询实现     | 2.2.2 - 2.7.18      |
+| 模型化 | dorive-ref                 | 仓储引用实现     | 2.2.2 - 2.7.18      |
+| 模型化 | dorive-env                 | 简易化配置实现   | 2.2.2 - 2.7.18      |
+| 模型化 | dorive-sql                 | 动态查询实现     | 2.2.2 - 2.7.18      |
+| 模型化 | dorive-mybatis-plus        | mybatis-plus适配 | 2.2.2 - 2.7.18      |
+| 模型化 | dorive-web                 | web开发适配      | 2.2.2 - 2.7.18      |
+|        | dorive-spring-boot-starter | 启动器           | 2.2.2 - 2.7.18      |
 
 ### 📝文档
 

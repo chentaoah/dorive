@@ -23,7 +23,8 @@ import com.gitee.dorive.ref.impl.RefInjector;
 public abstract class AbstractRefRepository<E, PK> extends AbstractInnerRepository<E, PK> {
 
     @Override
-    protected EntityHandler processEntityHandler(EntityHandler entityHandler) {
+    protected EntityHandler newEntityHandler() {
+        EntityHandler entityHandler = super.newEntityHandler();
         new RefInjector(this, entityHandler, getEntityClass());
         return entityHandler;
     }

@@ -19,19 +19,24 @@ package com.gitee.dorive.core.config;
 
 import cn.hutool.core.util.ClassUtil;
 import com.gitee.dorive.api.util.ReflectUtils;
+import com.gitee.dorive.core.api.common.RepositoryPostProcessor;
 import com.gitee.dorive.core.repository.AbstractContextRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RepositoryContext implements BeanFactoryPostProcessor {
 
     private static final Map<Class<?>, Class<?>> ENTITY_REPOSITORY_MAP = new ConcurrentHashMap<>();
+    private static final List<RepositoryPostProcessor> REPOSITORY_POST_PROCESSORS = new ArrayList<>();
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
@@ -47,10 +52,17 @@ public class RepositoryContext implements BeanFactoryPostProcessor {
                 }
             }
         }
+        Map<String, RepositoryPostProcessor> beansOfType = beanFactory.getBeansOfType(RepositoryPostProcessor.class);
+        REPOSITORY_POST_PROCESSORS.addAll(beansOfType.values());
+        AnnotationAwareOrderComparator.sort(REPOSITORY_POST_PROCESSORS);
     }
 
     public static Class<?> findRepositoryClass(Class<?> entityClass) {
         return ENTITY_REPOSITORY_MAP.get(entityClass);
+    }
+
+    public static List<RepositoryPostProcessor> getRepositoryPostProcessors() {
+        return REPOSITORY_POST_PROCESSORS;
     }
 
 }

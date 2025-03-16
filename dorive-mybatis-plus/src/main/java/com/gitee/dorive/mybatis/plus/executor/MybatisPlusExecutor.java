@@ -162,8 +162,8 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                 if (canInsertBatch && isBatch) {
                     totalCount += ((EasyBaseMapper<Object>) baseMapper).insertBatchSomeColumn((Collection<Object>) persistentObjs);
                 } else {
-                    for (Object persistent : persistentObjs) {
-                        totalCount += baseMapper.insert(persistent);
+                    for (Object persistentObj : persistentObjs) {
+                        totalCount += baseMapper.insert(persistentObj);
                     }
                 }
 
@@ -171,34 +171,47 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                 Update update = (Update) operation;
                 Set<String> nullableProps = update.getNullableProps();
                 if (nullableProps != null && !nullableProps.isEmpty()) {
-                    for (Object persistent : persistentObjs) {
-                        Object primaryKey = BeanUtil.getFieldValue(persistent, entityStoreInfo.getIdProperty());
-                        UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(persistent, nullableProps, primaryKey);
+                    for (Object persistentObj : persistentObjs) {
+                        Object primaryKey = BeanUtil.getFieldValue(persistentObj, entityStoreInfo.getIdProperty());
+                        UpdateWrapper<Object> updateWrapper = buildUpdateWrapper(primaryKey);
+                        buildUpdateWrapper(updateWrapper, persistentObj, nullableProps);
                         totalCount += baseMapper.update(null, updateWrapper);
                     }
                 } else {
-                    for (Object persistent : persistentObjs) {
-                        totalCount += baseMapper.updateById(persistent);
+                    for (Object persistentObj : persistentObjs) {
+                        totalCount += baseMapper.updateById(persistentObj);
                     }
                 }
 
             } else if (operation instanceof Delete) {
-                for (Object persistent : persistentObjs) {
-                    totalCount += baseMapper.deleteById(persistent);
+                for (Object persistentObj : persistentObjs) {
+                    totalCount += baseMapper.deleteById(persistentObj);
                 }
             }
 
         } else if (operation instanceof Condition) {
             if (operation instanceof ConditionUpdate) {
                 ConditionUpdate conditionUpdate = (ConditionUpdate) operation;
-                Object entity = conditionUpdate.getEntity();
+                Object persistentObj = conditionUpdate.getEntity();
+                Set<String> nullableProps = conditionUpdate.getNullableProps();
                 Object primaryKey = conditionUpdate.getPrimaryKey();
                 Example example = conditionUpdate.getExample();
+                UpdateWrapper<Object> updateWrapper = null;
+                // 设置查询条件
                 if (primaryKey != null) {
-                    totalCount += baseMapper.update(entity, buildUpdateWrapper(primaryKey));
+                    updateWrapper = buildUpdateWrapper(primaryKey);
 
                 } else if (example != null) {
-                    totalCount += baseMapper.update(entity, buildUpdateWrapper(example));
+                    updateWrapper = buildUpdateWrapper(example);
+                }
+                if (updateWrapper != null) {
+                    if (nullableProps != null && !nullableProps.isEmpty()) {
+                        // 设置更新的值
+                        buildUpdateWrapper(updateWrapper, persistentObj, nullableProps);
+                        totalCount += baseMapper.update(null, updateWrapper);
+                    } else {
+                        totalCount += baseMapper.update(persistentObj, updateWrapper);
+                    }
                 }
 
             } else if (operation instanceof ConditionDelete) {
@@ -216,21 +229,6 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         return totalCount;
     }
 
-    private UpdateWrapper<Object> buildUpdateWrapper(Object persistent, Set<String> nullableProps, Object primaryKey) {
-        UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
-        Map<String, String> propAliasMappingWithoutPk = entityStoreInfo.getPropAliasMappingWithoutPk();
-        propAliasMappingWithoutPk.forEach((prop, alias) -> {
-            Object value = BeanUtil.getFieldValue(persistent, prop);
-            if (value != null || nullableProps.contains(alias)) {
-                updateWrapper.set(true, alias, value);
-            }
-        });
-        if (primaryKey != null) {
-            updateWrapper.eq(entityStoreInfo.getIdColumn(), primaryKey);
-        }
-        return updateWrapper;
-    }
-
     private UpdateWrapper<Object> buildUpdateWrapper(Object primaryKey) {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq(entityStoreInfo.getIdColumn(), primaryKey);
@@ -241,6 +239,16 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         UpdateWrapper<Object> updateWrapper = new UpdateWrapper<>();
         AppenderContext.appendCriterion(updateWrapper, example);
         return updateWrapper;
+    }
+
+    private void buildUpdateWrapper(UpdateWrapper<Object> updateWrapper, Object persistentObj, Set<String> nullableProps) {
+        Map<String, String> propAliasMappingWithoutPk = entityStoreInfo.getPropAliasMappingWithoutPk();
+        propAliasMappingWithoutPk.forEach((prop, alias) -> {
+            Object value = BeanUtil.getFieldValue(persistentObj, prop);
+            if (value != null || nullableProps.contains(alias)) {
+                updateWrapper.set(true, alias, value);
+            }
+        });
     }
 
 }

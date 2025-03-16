@@ -31,6 +31,7 @@ import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.factory.FieldConverter;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
 import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.operation.eop.Update;
 import lombok.Getter;
@@ -85,6 +86,9 @@ public class ExampleExecutor extends AbstractProxyExecutor {
         if (operation instanceof Update) {
             convertUpdate((Update) operation);
         }
+        if (operation instanceof ConditionUpdate) {
+            convertConditionUpdate((ConditionUpdate) operation);
+        }
         return super.execute(context, operation);
     }
 
@@ -106,6 +110,14 @@ public class ExampleExecutor extends AbstractProxyExecutor {
         if (nullableProps != null && !nullableProps.isEmpty()) {
             nullableProps = entityElement.toAliases(nullableProps);
             update.setNullableProps(nullableProps);
+        }
+    }
+
+    private void convertConditionUpdate(ConditionUpdate conditionUpdate) {
+        Set<String> nullableProps = conditionUpdate.getNullableProps();
+        if (nullableProps != null && !nullableProps.isEmpty()) {
+            nullableProps = entityElement.toAliases(nullableProps);
+            conditionUpdate.setNullableProps(nullableProps);
         }
     }
 

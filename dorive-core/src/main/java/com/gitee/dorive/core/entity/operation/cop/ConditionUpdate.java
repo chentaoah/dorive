@@ -22,11 +22,15 @@ import com.gitee.dorive.core.entity.operation.Condition;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collections;
+import java.util.Set;
+
 @Getter
 @Setter
 public class ConditionUpdate extends Condition {
 
     private Object entity;
+    private Set<String> nullableProps = Collections.emptySet();
 
     public ConditionUpdate(Object entity, Object primaryKey) {
         super(primaryKey);
