@@ -27,10 +27,8 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
-import com.gitee.dorive.core.repository.AbstractGenericRepository;
-import com.gitee.dorive.core.repository.AbstractProxyRepository;
-import com.gitee.dorive.core.repository.AbstractRepository;
-import com.gitee.dorive.core.repository.DefaultRepository;
+import com.gitee.dorive.core.impl.factory.OperationFactory;
+import com.gitee.dorive.core.repository.*;
 import com.gitee.dorive.event.entity.BaseEvent;
 import com.gitee.dorive.event.entity.ExecutorEvent;
 import com.gitee.dorive.event.entity.RepositoryEvent;
@@ -52,19 +50,12 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
     }
 
     @Override
-    protected AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository) {
-        if (enableExecutorEvent) {
-            AbstractRepository<Object, Object> actualRepository = repository;
-            if (repository instanceof AbstractProxyRepository) {
-                actualRepository = ((AbstractProxyRepository) repository).getProxyRepository();
-            }
-            if (actualRepository instanceof DefaultRepository) {
-                DefaultRepository defaultRepository = (DefaultRepository) actualRepository;
-                EntityElement entityElement = defaultRepository.getEntityElement();
-                Executor executor = defaultRepository.getExecutor();
-                executor = new EventExecutor(executor, getApplicationContext(), entityElement);
-                defaultRepository.setExecutor(executor);
-            }
+    protected AbstractRepository<Object, Object> doNewRepository(EntityElement entityElement, OperationFactory operationFactory) {
+        AbstractRepository<Object, Object> repository = super.doNewRepository(entityElement, operationFactory);
+        if (enableExecutorEvent && repository instanceof DefaultRepository) {
+            Executor executor = repository.getExecutor();
+            executor = new EventExecutor(executor, getApplicationContext(), entityElement);
+            repository.setExecutor(executor);
         }
         return repository;
     }
