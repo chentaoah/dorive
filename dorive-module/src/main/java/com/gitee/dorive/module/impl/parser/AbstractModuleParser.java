@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.module.impl.parser;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.entity.ModuleDefinition;
 import com.gitee.dorive.module.impl.uitl.ClassUtils;
@@ -49,51 +51,64 @@ public abstract class AbstractModuleParser implements ModuleParser {
 
     @Override
     public void parse() {
-        try {
-            parseModuleDefinitions();
-            collectScanPackages();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        parseModuleDefinitions();
+        collectScanPackages();
+        checkRequiresAndProvides();
     }
 
-    private void parseModuleDefinitions() throws Exception {
-        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        Resource[] resources = resolver.getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "META-INF/MANIFEST.MF");
-        for (Resource resource : resources) {
-            URL url = resource.getURL();
-            String protocol = url.getProtocol();
-            URI uriForMatch;
-            if ("file".equals(protocol)) {
-                String path = url.toString();
-                int index = path.indexOf("META-INF/MANIFEST.MF");
-                uriForMatch = new URI(path.substring(0, index));
+    private void parseModuleDefinitions() {
+        try {
+            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+            Resource[] resources = resolver.getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "META-INF/MANIFEST.MF");
+            for (Resource resource : resources) {
+                URL url = resource.getURL();
+                String protocol = url.getProtocol();
+                URI uriForMatch;
+                if ("file".equals(protocol)) {
+                    String path = url.toString();
+                    int index = path.indexOf("META-INF/MANIFEST.MF");
+                    uriForMatch = new URI(path.substring(0, index));
 
-            } else if ("jar".equals(protocol)) {
-                String path = url.getPath();
-                int index = path.indexOf("!/META-INF/MANIFEST.MF");
-                uriForMatch = new URI(path.substring(0, index));
+                } else if ("jar".equals(protocol)) {
+                    String path = url.getPath();
+                    int index = path.indexOf("!/META-INF/MANIFEST.MF");
+                    uriForMatch = new URI(path.substring(0, index));
 
-            } else {
-                continue;
-            }
-            try (InputStream inputStream = resource.getInputStream()) {
-                Manifest manifest = new Manifest(inputStream);
-                Attributes mainAttributes = manifest.getMainAttributes();
-                String moduleName = mainAttributes.getValue("Dorive-Module");
-                if (moduleName != null) {
-                    ModuleDefinition moduleDefinition = new ModuleDefinition(resource, manifest);
-                    nameModuleDefinitionMap.put(moduleName, moduleDefinition);
-                    uriModuleDefinitionMap.put(uriForMatch, moduleDefinition);
+                } else {
+                    continue;
+                }
+                try (InputStream inputStream = resource.getInputStream()) {
+                    Manifest manifest = new Manifest(inputStream);
+                    Attributes mainAttributes = manifest.getMainAttributes();
+                    String moduleName = mainAttributes.getValue("Dorive-Module");
+                    if (moduleName != null) {
+                        ModuleDefinition moduleDefinition = new ModuleDefinition(resource, manifest);
+                        nameModuleDefinitionMap.put(moduleName, moduleDefinition);
+                        uriModuleDefinitionMap.put(uriForMatch, moduleDefinition);
+                    }
                 }
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     private void collectScanPackages() {
         Set<String> scanPackages = nameModuleDefinitionMap.values().stream().map(ModuleDefinition::getScanPackage).collect(Collectors.toSet());
         this.scanPackages.addAll(scanPackages);
+    }
+
+    private void checkRequiresAndProvides() {
+        Set<String> requires = new HashSet<>();
+        Set<String> provides = new HashSet<>();
+        for (ModuleDefinition moduleDefinition : getModuleDefinitions()) {
+            requires.addAll(moduleDefinition.getRequires());
+            provides.addAll(moduleDefinition.getProvides());
+        }
+        Collection<String> collection = CollectionUtil.subtract(requires, provides);
+        if (!collection.isEmpty()) {
+            throw new RuntimeException("Lack of required services! service: " + StrUtil.join(", ", collection));
+        }
     }
 
     @Override
