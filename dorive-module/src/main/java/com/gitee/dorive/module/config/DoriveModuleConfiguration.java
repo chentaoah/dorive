@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.module.config;
 
-import com.gitee.dorive.module.impl.spring.inject.ModuleAutowiredBeanPostProcessor;
+import com.gitee.dorive.module.impl.inject.ModuleAutowiredBeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;

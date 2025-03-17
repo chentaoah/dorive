@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.impl.spring.uitl;
+package com.gitee.dorive.module.impl.uitl;
 
 import java.net.URI;
 import java.security.CodeSource;

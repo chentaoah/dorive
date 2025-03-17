@@ -15,28 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.impl.spring.bean;
+package com.gitee.dorive.module.impl.uitl;
 
-import com.gitee.dorive.module.api.ModuleParser;
-import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 
-@Getter
-@Setter
-public class ModuleAnnotationBeanNameGenerator extends AnnotationBeanNameGenerator {
+public class ConfigurationUtils {
 
-    private ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
+    public static final String CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME = "org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$ConfigurationClassBeanDefinition";
 
-    @Override
-    protected String buildDefaultBeanName(BeanDefinition definition) {
-        String beanClassName = definition.getBeanClassName();
-        if (beanClassName != null && moduleParser.isUnderScanPackage(beanClassName)) {
-            return beanClassName;
-        }
-        return super.buildDefaultBeanName(definition);
+    public static boolean isConfigurationBeanDefinition(BeanDefinition beanDefinition) {
+        return CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME.equals(beanDefinition.getClass().getName());
     }
 
 }

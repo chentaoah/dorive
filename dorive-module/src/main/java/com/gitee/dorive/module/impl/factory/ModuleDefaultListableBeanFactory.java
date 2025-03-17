@@ -23,8 +23,8 @@ import com.gitee.dorive.module.api.BeanNameEditor;
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.entity.ModuleDefinition;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
-import com.gitee.dorive.module.impl.spring.inject.ModuleCglibSubclassingInstantiationStrategy;
-import com.gitee.dorive.module.impl.spring.uitl.ConfigurationUtils;
+import com.gitee.dorive.module.impl.inject.ModuleCglibSubclassingInstantiationStrategy;
+import com.gitee.dorive.module.impl.uitl.ConfigurationUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.gitee.dorive.module.impl.spring.uitl.BeanAnnotationHelper.BEAN_NAME_CACHE;
+import static com.gitee.dorive.module.impl.uitl.BeanAnnotationHelper.BEAN_NAME_CACHE;
 
 @Getter
 @Setter

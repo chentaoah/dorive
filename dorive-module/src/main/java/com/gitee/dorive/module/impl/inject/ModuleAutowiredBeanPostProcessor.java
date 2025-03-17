@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.impl.spring.inject;
+package com.gitee.dorive.module.impl.inject;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.module.api.ModuleChecker;
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
-import com.gitee.dorive.module.impl.spring.uitl.BeanFactoryUtils;
+import com.gitee.dorive.module.impl.uitl.BeanFactoryUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.aop.support.AopUtils;

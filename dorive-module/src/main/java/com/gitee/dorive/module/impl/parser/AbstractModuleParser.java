@@ -19,7 +19,7 @@ package com.gitee.dorive.module.impl.parser;
 
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.entity.ModuleDefinition;
-import com.gitee.dorive.module.impl.spring.uitl.ClassUtils;
+import com.gitee.dorive.module.impl.uitl.ClassUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.core.io.Resource;
