@@ -40,8 +40,8 @@ public class ModuleDefinition {
     private String project;
     private String domain;
     private String subdomain;
-    private String version;
     private String name;
+    private String version;
     private String type;
     private List<String> configs;
     private List<String> exports;
@@ -60,10 +60,10 @@ public class ModuleDefinition {
         String project = mainAttributes.getValue("Dorive-Project");
         String domain = mainAttributes.getValue("Dorive-Domain");
         String subdomain = mainAttributes.getValue("Dorive-Subdomain");
-        String version = mainAttributes.getValue("Dorive-Version");
 
-        String module = mainAttributes.getValue("Dorive-Module");
-        String moduleType = mainAttributes.getValue("Dorive-Module-Type");
+        String name = mainAttributes.getValue("Dorive-Module");
+        String version = mainAttributes.getValue("Dorive-Version");
+        String type = mainAttributes.getValue("Dorive-Module-Type");
 
         String configs = mainAttributes.getValue("Dorive-Configs");
         String exports = mainAttributes.getValue("Dorive-Exports");
@@ -75,10 +75,10 @@ public class ModuleDefinition {
         this.project = filterValue(project);
         this.domain = filterValue(domain);
         this.subdomain = filterValue(subdomain);
-        this.version = filterValue(version);
 
-        this.name = filterValue(module);
-        this.type = filterValue(moduleType);
+        this.name = filterValue(name);
+        this.version = filterValue(version);
+        this.type = filterValue(type);
 
         this.configs = filterValues(configs);
         this.exports = filterValues(exports);
