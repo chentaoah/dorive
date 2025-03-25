@@ -47,6 +47,8 @@ public class ModuleDefinition {
     private List<String> exports;
     private List<String> requires;
     private List<String> impls;
+    private List<String> provides;
+    private List<String> consumes;
     private String tablePrefix;
 
     public ModuleDefinition(Resource resource, Manifest manifest) {
@@ -69,6 +71,8 @@ public class ModuleDefinition {
         String exports = mainAttributes.getValue("Dorive-Exports");
         String requires = mainAttributes.getValue("Dorive-Requires");
         String impls = mainAttributes.getValue("Dorive-Implements");
+        String provides = mainAttributes.getValue("Dorive-Provides");
+        String consumes = mainAttributes.getValue("Dorive-Consumes");
         String tablePrefix = mainAttributes.getValue("Dorive-Table-Prefix");
 
         this.originId = filterValue(originId);
@@ -84,6 +88,8 @@ public class ModuleDefinition {
         this.exports = filterValues(exports);
         this.requires = filterValues(requires);
         this.impls = filterValues(impls);
+        this.provides = filterValues(provides);
+        this.consumes = filterValues(consumes);
         this.tablePrefix = filterValue(tablePrefix);
     }
 
