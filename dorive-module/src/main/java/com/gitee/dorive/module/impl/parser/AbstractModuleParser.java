@@ -53,7 +53,7 @@ public abstract class AbstractModuleParser implements ModuleParser {
     public void parse() {
         parseModuleDefinitions();
         collectScanPackages();
-        checkRequiresAndProvides();
+        checkRequiresAndImpls();
     }
 
     private void parseModuleDefinitions() {
@@ -98,14 +98,14 @@ public abstract class AbstractModuleParser implements ModuleParser {
         this.scanPackages.addAll(scanPackages);
     }
 
-    private void checkRequiresAndProvides() {
+    private void checkRequiresAndImpls() {
         Set<String> requires = new HashSet<>();
-        Set<String> provides = new HashSet<>();
+        Set<String> impls = new HashSet<>();
         for (ModuleDefinition moduleDefinition : getModuleDefinitions()) {
             requires.addAll(moduleDefinition.getRequires());
-            provides.addAll(moduleDefinition.getProvides());
+            impls.addAll(moduleDefinition.getImpls());
         }
-        Collection<String> collection = CollectionUtil.subtract(requires, provides);
+        Collection<String> collection = CollectionUtil.subtract(requires, impls);
         if (!collection.isEmpty()) {
             throw new RuntimeException("Lack of required services! service: " + StrUtil.join(", ", collection));
         }
