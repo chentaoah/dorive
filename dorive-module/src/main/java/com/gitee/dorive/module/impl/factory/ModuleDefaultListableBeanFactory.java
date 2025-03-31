@@ -22,9 +22,10 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.module.api.BeanNameEditor;
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.entity.ModuleDefinition;
-import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
 import com.gitee.dorive.module.impl.inject.ModuleCglibSubclassingInstantiationStrategy;
-import com.gitee.dorive.module.impl.uitl.ConfigurationUtils;
+import com.gitee.dorive.module.impl.inject.ModuleContextAnnotationAutowireCandidateResolver;
+import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
+import com.gitee.dorive.module.impl.util.ConfigurationUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.gitee.dorive.module.impl.uitl.BeanAnnotationHelper.BEAN_NAME_CACHE;
+import static com.gitee.dorive.module.impl.util.BeanAnnotationHelper.BEAN_NAME_CACHE;
 
 @Getter
 @Setter
@@ -53,6 +54,8 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
     public ModuleDefaultListableBeanFactory() {
         // 实例化策略
         setInstantiationStrategy(new ModuleCglibSubclassingInstantiationStrategy());
+        // 依赖注入解析器
+        setAutowireCandidateResolver(new ModuleContextAnnotationAutowireCandidateResolver());
     }
 
     @Override

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.impl.uitl;
+package com.gitee.dorive.module.impl.util;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 
