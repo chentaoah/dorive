@@ -55,11 +55,11 @@ public class ModuleEnvironmentPostProcessor implements EnvironmentPostProcessor,
                 String configName = parseConfigName(name);
                 ModuleDefinition moduleDefinition = moduleParser.findModuleDefinitionByConfigName(configName);
                 if (moduleDefinition != null) {
-                    String moduleName = moduleDefinition.getName();
                     Object source = propertySource.getSource();
                     if (source instanceof Map) {
                         Map<String, Object> map = (Map<String, Object>) source;
                         if (!map.isEmpty()) {
+                            String moduleName = moduleDefinition.getName();
                             Map<String, Object> newMap = new LinkedHashMap<>();
                             map.forEach((key, value) -> newMap.put(moduleName + "." + key, value));
                             PropertySource<?> newPropertySource = new OriginTrackedMapPropertySource(name, Collections.unmodifiableMap(newMap));

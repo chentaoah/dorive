@@ -43,6 +43,7 @@ public class ModuleDefinition {
     private String name;
     private String version;
     private String type;
+    private List<String> profiles;
     private List<String> configs;
     private List<String> exports;
     private List<String> requires;
@@ -67,6 +68,7 @@ public class ModuleDefinition {
         String version = mainAttributes.getValue("Dorive-Version");
         String type = mainAttributes.getValue("Dorive-Module-Type");
 
+        String profiles = mainAttributes.getValue("Dorive-Profiles");
         String configs = mainAttributes.getValue("Dorive-Configs");
         String exports = mainAttributes.getValue("Dorive-Exports");
         String requires = mainAttributes.getValue("Dorive-Requires");
@@ -84,6 +86,7 @@ public class ModuleDefinition {
         this.version = filterValue(version);
         this.type = filterValue(type);
 
+        this.profiles = filterValues(profiles);
         this.configs = filterValues(configs);
         this.exports = filterValues(exports);
         this.requires = filterValues(requires);
@@ -152,17 +155,22 @@ public class ModuleDefinition {
     }
 
     public List<String> getProfiles() {
+        List<String> activeProfiles = Collections.emptyList();
+        if (profiles != null && !profiles.isEmpty()) {
+            activeProfiles = new ArrayList<>(profiles);
+        }
         if (configs != null && !configs.isEmpty()) {
-            List<String> profiles = new ArrayList<>(configs.size());
+            if (activeProfiles.isEmpty()) {
+                activeProfiles = new ArrayList<>(configs.size());
+            }
             for (String config : configs) {
                 if (config.startsWith("application-") && config.endsWith(".yml")) {
                     String profile = config.substring(12, config.length() - 4);
-                    profiles.add(profile);
+                    activeProfiles.add(profile);
                 }
             }
-            return profiles;
         }
-        return Collections.emptyList();
+        return activeProfiles;
     }
 
     public int getOrder() {
