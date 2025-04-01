@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.config;
+package com.gitee.dorive.autoconfigure.module;
 
 import com.gitee.dorive.module.impl.inject.ModuleAutowiredBeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;

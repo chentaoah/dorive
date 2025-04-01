@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.web.config;
+package com.gitee.dorive.autoconfigure.web;
 
 import com.gitee.dorive.web.impl.advice.ParameterControllerAdvice;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +26,7 @@ import org.springframework.core.annotation.Order;
 @Configuration
 public class DoriveWebConfiguration {
 
-    @Bean("parameterControllerAdvice")
+    @Bean("parameterControllerAdviceV3")
     public static ParameterControllerAdvice parameterControllerAdvice() {
         return new ParameterControllerAdvice();
     }

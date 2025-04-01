@@ -15,21 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.plus.config;
+package com.gitee.dorive.autoconfigure.core;
 
-import com.gitee.dorive.mybatis.plus.impl.DefaultImplFactory;
-import com.gitee.dorive.core.api.common.ImplFactory;
+import com.gitee.dorive.core.config.RepositoryContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
 @Order(-100)
 @Configuration
-public class DoriveMybatisPlusConfiguration {
+public class DoriveCoreConfiguration {
 
-    @Bean
-    public static ImplFactory implFactory() {
-        return new DefaultImplFactory();
+    @Bean("repositoryContextV3")
+    public static RepositoryContext repositoryContext() {
+        return new RepositoryContext();
     }
 
 }
