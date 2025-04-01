@@ -1,2 +1,4 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  com.gitee.dorive.module.impl.environment.ModuleEnvironmentPostProcessor
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.gitee.dorive.module.config.DoriveModuleConfiguration

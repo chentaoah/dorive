@@ -24,6 +24,7 @@ import com.gitee.dorive.module.entity.ModuleDefinition;
 import com.gitee.dorive.module.impl.util.ClassUtils;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -47,6 +48,7 @@ public abstract class AbstractModuleParser implements ModuleParser {
 
     private final Map<String, ModuleDefinition> nameModuleDefinitionMap = new ConcurrentHashMap<>();
     private final Map<URI, ModuleDefinition> uriModuleDefinitionMap = new ConcurrentHashMap<>();
+    private final Map<String, ModuleDefinition> configModuleDefinitionMap = new ConcurrentHashMap<>();
     private final List<String> scanPackages = new ArrayList<>();
 
     @Override
@@ -85,6 +87,14 @@ public abstract class AbstractModuleParser implements ModuleParser {
                         ModuleDefinition moduleDefinition = new ModuleDefinition(resource, manifest);
                         nameModuleDefinitionMap.put(moduleName, moduleDefinition);
                         uriModuleDefinitionMap.put(uriForMatch, moduleDefinition);
+                        List<String> configs = moduleDefinition.getConfigs();
+                        if (configs != null && !configs.isEmpty()) {
+                            for (String config : configs) {
+                                if (StringUtils.isNotBlank(config)) {
+                                    configModuleDefinitionMap.put(config, moduleDefinition);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -152,6 +162,11 @@ public abstract class AbstractModuleParser implements ModuleParser {
     @Override
     public ModuleDefinition findModuleDefinition(Class<?> clazz) {
         return findModuleDefinition(ClassUtils.toURI(clazz));
+    }
+
+    @Override
+    public ModuleDefinition findModuleDefinitionByConfigName(String configName) {
+        return configModuleDefinitionMap.get(configName);
     }
 
 }

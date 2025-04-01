@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.impl.inject;
+package com.gitee.dorive.module.impl.environment;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;

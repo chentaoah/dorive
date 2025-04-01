@@ -39,4 +39,6 @@ public interface ModuleParser {
 
     ModuleDefinition findModuleDefinition(Class<?> clazz);
 
+    ModuleDefinition findModuleDefinitionByConfigName(String configName);
+
 }

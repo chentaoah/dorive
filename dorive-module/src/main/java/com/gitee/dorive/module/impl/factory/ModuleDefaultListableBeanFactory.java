@@ -23,7 +23,7 @@ import com.gitee.dorive.module.api.BeanNameEditor;
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.entity.ModuleDefinition;
 import com.gitee.dorive.module.impl.inject.ModuleCglibSubclassingInstantiationStrategy;
-import com.gitee.dorive.module.impl.inject.ModuleContextAnnotationAutowireCandidateResolver;
+import com.gitee.dorive.module.impl.environment.ModuleContextAnnotationAutowireCandidateResolver;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
 import com.gitee.dorive.module.impl.util.ConfigurationUtils;
 import lombok.Getter;
