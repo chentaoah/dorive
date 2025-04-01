@@ -36,7 +36,6 @@
         <module>dorive-event</module>
         <module>dorive-query</module>
         <module>dorive-ref</module>
-        <module>dorive-env</module>
         <module>dorive-sql</module>
         <module>dorive-mybatis-plus</module>
         <module>dorive-web</module>
