@@ -110,12 +110,12 @@ public abstract class AbstractModuleParser implements ModuleParser {
 
     private void checkRequiresAndImpls() {
         Set<String> requires = new HashSet<>();
-        Set<String> impls = new HashSet<>();
+        Set<String> provides = new HashSet<>();
         for (ModuleDefinition moduleDefinition : getModuleDefinitions()) {
             requires.addAll(moduleDefinition.getRequires());
-            impls.addAll(moduleDefinition.getImpls());
+            provides.addAll(moduleDefinition.getProvides());
         }
-        Collection<String> collection = CollectionUtil.subtract(requires, impls);
+        Collection<String> collection = CollectionUtil.subtract(requires, provides);
         if (!collection.isEmpty()) {
             throw new RuntimeException("Lack of required services! service: " + StrUtil.join(", ", collection));
         }
