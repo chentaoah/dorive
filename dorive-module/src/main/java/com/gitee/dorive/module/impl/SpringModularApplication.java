@@ -21,7 +21,7 @@ import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.entity.ModuleDefinition;
 import com.gitee.dorive.module.impl.factory.ModuleApplicationContextFactory;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
-import com.gitee.dorive.module.impl.spring.bean.ModuleAnnotationBeanNameGenerator;
+import com.gitee.dorive.module.impl.bean.ModuleAnnotationBeanNameGenerator;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.boot.ApplicationContextFactory;
 import org.springframework.boot.builder.SpringApplicationBuilder;

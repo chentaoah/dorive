@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.gitee.digital-engine</groupId>
         <artifactId>dorive</artifactId>
-        <version>3.5.0.7</version>
+        <version>3.5.0.8</version>
     </parent>
     <artifactId>dorive-spring-boot-starter</artifactId>
     <dependencies>
@@ -18,6 +18,11 @@
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
             <artifactId>dorive-web</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-autoconfigure</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

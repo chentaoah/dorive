@@ -15,30 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.api;
+package com.gitee.dorive.autoconfigure.web;
 
-import com.gitee.dorive.module.entity.ModuleDefinition;
+import com.gitee.dorive.web.impl.advice.ParameterControllerAdvice;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Set;
+@Order(-100)
+@Configuration
+public class DoriveWebConfiguration {
 
-public interface ModuleParser {
-
-    void parse();
-
-    Set<String> getModuleNames();
-
-    ModuleDefinition getModuleDefinition(String name);
-
-    List<ModuleDefinition> getModuleDefinitions();
-
-    boolean isUnderScanPackage(String className);
-
-    ModuleDefinition findModuleDefinition(URI uri);
-
-    ModuleDefinition findModuleDefinition(Class<?> clazz);
-
-    ModuleDefinition findModuleDefinitionByConfigName(String configName);
+    @Bean("parameterControllerAdviceV3")
+    public static ParameterControllerAdvice parameterControllerAdvice() {
+        return new ParameterControllerAdvice();
+    }
 
 }

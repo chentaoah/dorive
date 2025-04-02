@@ -40,12 +40,16 @@ public class ModuleDefinition {
     private String project;
     private String domain;
     private String subdomain;
-    private String version;
     private String name;
+    private String version;
     private String type;
+    private List<String> profiles;
     private List<String> configs;
     private List<String> exports;
-    private List<String> externalDepends;
+    private List<String> requires;
+    private List<String> provides;
+    private List<String> publishes;
+    private List<String> consumes;
     private String tablePrefix;
 
     public ModuleDefinition(Resource resource, Manifest manifest) {
@@ -59,28 +63,36 @@ public class ModuleDefinition {
         String project = mainAttributes.getValue("Dorive-Project");
         String domain = mainAttributes.getValue("Dorive-Domain");
         String subdomain = mainAttributes.getValue("Dorive-Subdomain");
+
+        String name = mainAttributes.getValue("Dorive-Module");
         String version = mainAttributes.getValue("Dorive-Version");
+        String type = mainAttributes.getValue("Dorive-Module-Type");
 
-        String module = mainAttributes.getValue("Dorive-Module");
-        String moduleType = mainAttributes.getValue("Dorive-Module-Type");
-
+        String profiles = mainAttributes.getValue("Dorive-Profiles");
         String configs = mainAttributes.getValue("Dorive-Configs");
         String exports = mainAttributes.getValue("Dorive-Exports");
-        String externalDepends = mainAttributes.getValue("Dorive-External-Depends");
+        String requires = mainAttributes.getValue("Dorive-Requires");
+        String provides = mainAttributes.getValue("Dorive-Provides");
+        String publishes = mainAttributes.getValue("Dorive-Publishes");
+        String consumes = mainAttributes.getValue("Dorive-Consumes");
         String tablePrefix = mainAttributes.getValue("Dorive-Table-Prefix");
 
         this.originId = filterValue(originId);
         this.project = filterValue(project);
         this.domain = filterValue(domain);
         this.subdomain = filterValue(subdomain);
+
+        this.name = filterValue(name);
         this.version = filterValue(version);
+        this.type = filterValue(type);
 
-        this.name = filterValue(module);
-        this.type = filterValue(moduleType);
-
+        this.profiles = filterValues(profiles);
         this.configs = filterValues(configs);
         this.exports = filterValues(exports);
-        this.externalDepends = filterValues(externalDepends);
+        this.requires = filterValues(requires);
+        this.provides = filterValues(provides);
+        this.publishes = filterValues(publishes);
+        this.consumes = filterValues(consumes);
         this.tablePrefix = filterValue(tablePrefix);
     }
 
@@ -143,17 +155,22 @@ public class ModuleDefinition {
     }
 
     public List<String> getProfiles() {
+        List<String> activeProfiles = Collections.emptyList();
+        if (profiles != null && !profiles.isEmpty()) {
+            activeProfiles = new ArrayList<>(profiles);
+        }
         if (configs != null && !configs.isEmpty()) {
-            List<String> profiles = new ArrayList<>(configs.size());
+            if (activeProfiles.isEmpty()) {
+                activeProfiles = new ArrayList<>(configs.size());
+            }
             for (String config : configs) {
                 if (config.startsWith("application-") && config.endsWith(".yml")) {
                     String profile = config.substring(12, config.length() - 4);
-                    profiles.add(profile);
+                    activeProfiles.add(profile);
                 }
             }
-            return profiles;
         }
-        return Collections.emptyList();
+        return activeProfiles;
     }
 
     public int getOrder() {

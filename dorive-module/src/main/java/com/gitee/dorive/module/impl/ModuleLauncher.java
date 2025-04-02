@@ -20,7 +20,7 @@ package com.gitee.dorive.module.impl;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
-import com.gitee.dorive.module.impl.spring.uitl.ClassUtils;
+import com.gitee.dorive.module.impl.util.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;

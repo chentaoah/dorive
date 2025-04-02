@@ -15,30 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.api;
+package com.gitee.dorive.module.impl.util;
 
-import com.gitee.dorive.module.entity.ModuleDefinition;
+import org.springframework.beans.factory.config.BeanDefinition;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Set;
+public class ConfigurationUtils {
 
-public interface ModuleParser {
+    public static final String CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME = "org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$ConfigurationClassBeanDefinition";
 
-    void parse();
-
-    Set<String> getModuleNames();
-
-    ModuleDefinition getModuleDefinition(String name);
-
-    List<ModuleDefinition> getModuleDefinitions();
-
-    boolean isUnderScanPackage(String className);
-
-    ModuleDefinition findModuleDefinition(URI uri);
-
-    ModuleDefinition findModuleDefinition(Class<?> clazz);
-
-    ModuleDefinition findModuleDefinitionByConfigName(String configName);
+    public static boolean isConfigurationBeanDefinition(BeanDefinition beanDefinition) {
+        return CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME.equals(beanDefinition.getClass().getName());
+    }
 
 }

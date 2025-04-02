@@ -15,30 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.api;
+package com.gitee.dorive.autoconfigure.core;
 
-import com.gitee.dorive.module.entity.ModuleDefinition;
+import com.gitee.dorive.core.config.RepositoryContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Set;
+@Order(-100)
+@Configuration
+public class DoriveCoreConfiguration {
 
-public interface ModuleParser {
-
-    void parse();
-
-    Set<String> getModuleNames();
-
-    ModuleDefinition getModuleDefinition(String name);
-
-    List<ModuleDefinition> getModuleDefinitions();
-
-    boolean isUnderScanPackage(String className);
-
-    ModuleDefinition findModuleDefinition(URI uri);
-
-    ModuleDefinition findModuleDefinition(Class<?> clazz);
-
-    ModuleDefinition findModuleDefinitionByConfigName(String configName);
+    @Bean("repositoryContextV3")
+    public static RepositoryContext repositoryContext() {
+        return new RepositoryContext();
+    }
 
 }
