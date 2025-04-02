@@ -48,7 +48,7 @@ public class ModuleDefinition {
     private List<String> exports;
     private List<String> requires;
     private List<String> impls;
-    private List<String> provides;
+    private List<String> publishes;
     private List<String> consumes;
     private String tablePrefix;
 
@@ -73,7 +73,7 @@ public class ModuleDefinition {
         String exports = mainAttributes.getValue("Dorive-Exports");
         String requires = mainAttributes.getValue("Dorive-Requires");
         String impls = mainAttributes.getValue("Dorive-Implements");
-        String provides = mainAttributes.getValue("Dorive-Provides");
+        String publishes = mainAttributes.getValue("Dorive-Publishes");
         String consumes = mainAttributes.getValue("Dorive-Consumes");
         String tablePrefix = mainAttributes.getValue("Dorive-Table-Prefix");
 
@@ -91,7 +91,7 @@ public class ModuleDefinition {
         this.exports = filterValues(exports);
         this.requires = filterValues(requires);
         this.impls = filterValues(impls);
-        this.provides = filterValues(provides);
+        this.publishes = filterValues(publishes);
         this.consumes = filterValues(consumes);
         this.tablePrefix = filterValue(tablePrefix);
     }
