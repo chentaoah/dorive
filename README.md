@@ -81,7 +81,7 @@ dorive开发框架实现了模块化、模型化的全部特性，你可以有�
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.5.0.7</version>
+    <version>3.5.0.8</version>
 </dependency>
 ```
 
@@ -96,7 +96,6 @@ dorive开发框架实现了模块化、模型化的全部特性，你可以有�
 | 模型化 | dorive-event               | 事件通知实现     | 2.2.2 - 2.7.18      |
 | 模型化 | dorive-query               | 关联查询实现     | 2.2.2 - 2.7.18      |
 | 模型化 | dorive-ref                 | 仓储引用实现     | 2.2.2 - 2.7.18      |
-| 模型化 | dorive-env                 | 简易化配置实现   | 2.2.2 - 2.7.18      |
 | 模型化 | dorive-sql                 | 动态查询实现     | 2.2.2 - 2.7.18      |
 | 模型化 | dorive-mybatis-plus        | mybatis-plus适配 | 2.2.2 - 2.7.18      |
 | 模型化 | dorive-web                 | web开发适配      | 2.2.2 - 2.7.18      |
