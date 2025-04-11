@@ -46,11 +46,6 @@ public @interface Repository {
     Class<?> factory() default Object.class;
 
     /**
-     * 边界上下文
-     */
-    String boundedContext() default "";
-
-    /**
      * 派生
      */
     Class<?>[] derived() default {};
@@ -64,5 +59,10 @@ public @interface Repository {
      * 查询对象
      */
     Class<?>[] queries() default {};
+
+    /**
+     * 边界上下文
+     */
+    String boundedContext() default "";
 
 }

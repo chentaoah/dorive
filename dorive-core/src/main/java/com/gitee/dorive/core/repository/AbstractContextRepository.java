@@ -218,7 +218,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             if (StringUtils.isNotBlank(boundedContextName)) {
                 defaultEntityFactory.setBoundedContextName(boundedContextName);
                 if (applicationContext.containsBean(boundedContextName)) {
-                    BoundedContext boundedContext = (BoundedContext) applicationContext.getBean(boundedContextName);
+                    BoundedContext boundedContext = applicationContext.getBean(boundedContextName, BoundedContext.class);
                     defaultEntityFactory.setBoundedContext(boundedContext);
                 }
             }

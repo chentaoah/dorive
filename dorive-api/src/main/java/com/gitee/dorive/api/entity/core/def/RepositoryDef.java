@@ -32,10 +32,10 @@ public class RepositoryDef {
     private String value;
     private Class<?> dataSource;
     private Class<?> factory;
-    private String boundedContext;
     private Class<?>[] derived;
     private Class<?>[] events;
     private Class<?>[] queries;
+    private String boundedContext;
 
     public static RepositoryDef fromElement(AnnotatedElement element) {
         Repository repository = AnnotatedElementUtils.getMergedAnnotation(element, Repository.class);
@@ -44,10 +44,10 @@ public class RepositoryDef {
             repositoryDef.setValue(repository.value());
             repositoryDef.setDataSource(repository.dataSource());
             repositoryDef.setFactory(repository.factory());
-            repositoryDef.setBoundedContext(repository.boundedContext());
             repositoryDef.setDerived(repository.derived());
             repositoryDef.setEvents(repository.events());
             repositoryDef.setQueries(repository.queries());
+            repositoryDef.setBoundedContext(repository.boundedContext());
             return repositoryDef;
         }
         return null;
