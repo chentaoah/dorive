@@ -55,7 +55,7 @@ public abstract class AbstractModuleParser implements ModuleParser {
     public void parse() {
         parseModuleDefinitions();
         collectScanPackages();
-        checkRequiresAndImpls();
+        checkRequiresAndProvides();
     }
 
     private void parseModuleDefinitions() {
@@ -108,7 +108,7 @@ public abstract class AbstractModuleParser implements ModuleParser {
         this.scanPackages.addAll(scanPackages);
     }
 
-    private void checkRequiresAndImpls() {
+    private void checkRequiresAndProvides() {
         Set<String> requires = new HashSet<>();
         Set<String> provides = new HashSet<>();
         for (ModuleDefinition moduleDefinition : getModuleDefinitions()) {
