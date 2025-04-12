@@ -135,18 +135,15 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                     // 2、其他模块对外公开
                     if (candidateBeanNames.isEmpty()) {
                         Class<?> declaredType = descriptor.getDeclaredType();
-                        if (declaredType == BoundedContext.class) {
-                            if (!exposedCandidateBeanNames.isEmpty()) {
-                                String domainPackage = moduleDefinition.getDomainPackage();
-                                String boundedContextName = domainPackage + ".boundedContext";
-                                if (exposedCandidateBeanNames.contains(boundedContextName)) {
-                                    return boundedContextName;
-                                }
+                        if (declaredType == BoundedContext.class && !exposedCandidateBeanNames.isEmpty()) {
+                            String domainPackage = moduleDefinition.getDomainPackage();
+                            String boundedContextName = domainPackage + ".boundedContext";
+                            if (exposedCandidateBeanNames.contains(boundedContextName)) {
+                                return boundedContextName;
                             }
-                        } else {
-                            if (exposedCandidateBeanNames.size() == 1) {
-                                return exposedCandidateBeanNames.iterator().next();
-                            }
+                        }
+                        if (exposedCandidateBeanNames.size() == 1) {
+                            return exposedCandidateBeanNames.iterator().next();
                         }
                     }
                 }
