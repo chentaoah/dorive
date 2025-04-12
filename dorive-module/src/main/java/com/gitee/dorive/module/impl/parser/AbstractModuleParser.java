@@ -117,7 +117,7 @@ public abstract class AbstractModuleParser implements ModuleParser {
         }
         Collection<String> collection = CollectionUtil.subtract(requires, provides);
         if (!collection.isEmpty()) {
-            throw new RuntimeException("Lack of required services! service: " + StrUtil.join(", ", collection));
+            throw new RuntimeException("Lack of required resources! resources: " + StrUtil.join(", ", collection));
         }
     }
 
