@@ -99,7 +99,10 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
     protected String determineAutowireCandidate(Map<String, Object> candidates, DependencyDescriptor descriptor) {
         String beanName = super.determineAutowireCandidate(candidates, descriptor);
         if (beanName == null && candidates.size() > 1) {
-            Class<?> declaringClass = (Class<?>) ReflectUtil.getFieldValue(descriptor, "declaringClass");
+            Class<?> declaringClass = (Class<?>) ReflectUtil.getFieldValue(descriptor, "containingClass");
+            if (declaringClass == null) {
+                declaringClass = (Class<?>) ReflectUtil.getFieldValue(descriptor, "declaringClass");
+            }
             if (moduleParser.isUnderScanPackage(declaringClass.getName())) {
                 ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(declaringClass);
                 if (moduleDefinition != null) {
