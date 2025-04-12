@@ -19,7 +19,7 @@ package com.gitee.dorive.module.impl.factory;
 
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.api.entity.common.BoundedContext;
+import com.gitee.dorive.api.entity.BoundedContext;
 import com.gitee.dorive.module.api.BeanNameEditor;
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.entity.ModuleDefinition;

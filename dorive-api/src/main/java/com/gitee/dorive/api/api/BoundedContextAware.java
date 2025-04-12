@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.api.api;
 
-import com.gitee.dorive.api.entity.common.BoundedContext;
+import com.gitee.dorive.api.entity.BoundedContext;
 
 public interface BoundedContextAware {
 
