@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.common;
+package com.gitee.dorive.api.entity.common;
 
 import lombok.NoArgsConstructor;
 

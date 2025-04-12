@@ -26,7 +26,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.factory.EntityAdapter;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.factory.EntityMapper;
-import com.gitee.dorive.core.entity.common.BoundedContext;
+import com.gitee.dorive.api.entity.common.BoundedContext;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.enums.Domain;
 import com.gitee.dorive.core.entity.factory.FieldConverter;

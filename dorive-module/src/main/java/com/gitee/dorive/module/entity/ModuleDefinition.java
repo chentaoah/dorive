@@ -125,6 +125,17 @@ public class ModuleDefinition {
         return CollUtil.findOne(exports, export -> PATH_MATCHER.match(export, className)) != null;
     }
 
+    public String getDomainPackage() {
+        List<String> packages = new ArrayList<>(2);
+        if (StringUtils.isNotBlank(project)) {
+            packages.add(project);
+        }
+        if (StringUtils.isNotBlank(domain)) {
+            packages.add(domain);
+        }
+        return StrUtil.join(".", packages);
+    }
+
     public String getBasePackage() {
         List<String> packages = new ArrayList<>(4);
         if (StringUtils.isNotBlank(project)) {

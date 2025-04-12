@@ -19,11 +19,12 @@ package com.gitee.dorive.module.impl.factory;
 
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
+import com.gitee.dorive.api.entity.common.BoundedContext;
 import com.gitee.dorive.module.api.BeanNameEditor;
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.entity.ModuleDefinition;
-import com.gitee.dorive.module.impl.inject.ModuleCglibSubclassingInstantiationStrategy;
 import com.gitee.dorive.module.impl.environment.ModuleContextAnnotationAutowireCandidateResolver;
+import com.gitee.dorive.module.impl.inject.ModuleCglibSubclassingInstantiationStrategy;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
 import com.gitee.dorive.module.impl.util.ConfigurationUtils;
 import lombok.Getter;
@@ -39,9 +40,7 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.MethodMetadata;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.gitee.dorive.module.impl.util.BeanAnnotationHelper.BEAN_NAME_CACHE;
 
@@ -105,7 +104,7 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                 ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(declaringClass);
                 if (moduleDefinition != null) {
                     List<String> candidateBeanNames = new ArrayList<>(candidates.size());
-                    List<String> exposedCandidateBeanNames = new ArrayList<>(candidates.size());
+                    Set<String> exposedCandidateBeanNames = new HashSet<>(candidates.size() * 4 / 3 + 1);
                     for (String candidateBeanName : candidates.keySet()) {
                         Class<?> targetClass = null;
                         // class of factory bean
@@ -121,21 +120,34 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                         }
                         if (moduleParser.isUnderScanPackage(targetClass.getName())) {
                             ModuleDefinition targetModuleDefinition = moduleParser.findModuleDefinition(targetClass);
-                            // 1、相同模块
-                            // 2、模块内对外公开
-                            if (moduleDefinition.equals(targetModuleDefinition)) {
+                            if (moduleDefinition.equals(targetModuleDefinition)) { // 1、相同模块
                                 candidateBeanNames.add(candidateBeanName);
 
-                            } else if (targetModuleDefinition.isExposed(targetClass)) {
+                            } else if (targetModuleDefinition.isExposed(targetClass)) { // 2、其他模块对外公开
                                 exposedCandidateBeanNames.add(candidateBeanName);
                             }
                         }
                     }
+                    // 1、相同模块
                     if (candidateBeanNames.size() == 1) {
                         return candidateBeanNames.get(0);
                     }
-                    if (candidateBeanNames.isEmpty() && exposedCandidateBeanNames.size() == 1) {
-                        return exposedCandidateBeanNames.get(0);
+                    // 2、其他模块对外公开
+                    if (candidateBeanNames.isEmpty()) {
+                        Class<?> declaredType = descriptor.getDeclaredType();
+                        if (declaredType == BoundedContext.class) {
+                            if (!exposedCandidateBeanNames.isEmpty()) {
+                                String domainPackage = moduleDefinition.getDomainPackage();
+                                String boundedContextName = domainPackage + ".boundedContext";
+                                if (exposedCandidateBeanNames.contains(boundedContextName)) {
+                                    return boundedContextName;
+                                }
+                            }
+                        } else {
+                            if (exposedCandidateBeanNames.size() == 1) {
+                                return exposedCandidateBeanNames.iterator().next();
+                            }
+                        }
                     }
                 }
             }

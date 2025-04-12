@@ -35,7 +35,7 @@ import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.config.RepositoryContext;
-import com.gitee.dorive.core.entity.common.BoundedContext;
+import com.gitee.dorive.api.entity.common.BoundedContext;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.factory.FieldConverter;
