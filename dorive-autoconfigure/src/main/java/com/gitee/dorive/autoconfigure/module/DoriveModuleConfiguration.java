@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.autoconfigure.module;
 
+import com.gitee.dorive.module.impl.inject.BoundedContextBeanPostProcessor;
 import com.gitee.dorive.module.impl.inject.ModuleAutowiredBeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -28,6 +29,12 @@ import org.springframework.core.annotation.Order;
 @Configuration
 @ConditionalOnProperty(prefix = "dorive.module", name = "enable", havingValue = "true")
 public class DoriveModuleConfiguration {
+
+    @Bean("boundedContextBeanPostProcessorV3")
+    @ConditionalOnMissingClass
+    public static BoundedContextBeanPostProcessor boundedContextBeanPostProcessor() {
+        return new BoundedContextBeanPostProcessor();
+    }
 
     @Bean("moduleAutowiredBeanPostProcessorV3")
     @ConditionalOnMissingClass

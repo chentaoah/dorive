@@ -19,6 +19,7 @@ package com.gitee.dorive.core.repository;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.api.api.BoundedContextAware;
 import com.gitee.dorive.api.constant.core.Order;
 import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.EntityElement;
@@ -66,9 +67,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Setter
-public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, InitializingBean {
+public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, BoundedContextAware, InitializingBean {
 
     private ApplicationContext applicationContext;
+    private BoundedContext boundedContext;
+
     private RepositoryDef repositoryDef;
     private Map<String, CommonRepository> repositoryMap = new LinkedHashMap<>();
     private CommonRepository rootRepository;
@@ -82,12 +85,18 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     @Override
+    public void setBoundedContext(BoundedContext boundedContext) {
+        this.boundedContext = boundedContext;
+    }
+
+    @Override
     public void afterPropertiesSet() throws Exception {
         Class<?> repositoryClass = this.getClass();
         Class<?> entityClass = ReflectUtils.getFirstArgumentType(repositoryClass);
 
         prepareRepositoryDef(repositoryClass, entityClass);
         Assert.notNull(repositoryDef, "The @Repository does not exist! type: {}", repositoryClass.getName());
+        resetBoundedContextIfNecessary();
 
         EntityDefinitionResolver entityDefinitionResolver = new EntityDefinitionResolver();
         EntityDefinition entityDefinition = entityDefinitionResolver.resolve(entityClass);
@@ -117,6 +126,15 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         this.repositoryDef = RepositoryDef.fromElement(repositoryClass);
         for (RepositoryPostProcessor postProcessor : RepositoryContext.getRepositoryPostProcessors()) {
             postProcessor.postProcessRepositoryDef(repositoryClass, entityClass, repositoryDef);
+        }
+    }
+
+    protected void resetBoundedContextIfNecessary() {
+        String boundedContextName = repositoryDef.getBoundedContext();
+        if (StringUtils.isNotBlank(boundedContextName)) {
+            if (applicationContext.containsBean(boundedContextName)) {
+                this.boundedContext = applicationContext.getBean(boundedContextName, BoundedContext.class);
+            }
         }
     }
 
@@ -213,15 +231,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultEntityFactory.setEntityElement(entityElement);
             defaultEntityFactory.setEntityStoreInfo(entityStoreInfo);
             defaultEntityFactory.setEntityMapper(entityMapper);
-            // 边界上下文
-            String boundedContextName = repositoryDef.getBoundedContext();
-            if (StringUtils.isNotBlank(boundedContextName)) {
-                defaultEntityFactory.setBoundedContextName(boundedContextName);
-                if (applicationContext.containsBean(boundedContextName)) {
-                    BoundedContext boundedContext = applicationContext.getBean(boundedContextName, BoundedContext.class);
-                    defaultEntityFactory.setBoundedContext(boundedContext);
-                }
-            }
+            defaultEntityFactory.setBoundedContextName(repositoryDef.getBoundedContext());
+            defaultEntityFactory.setBoundedContext(boundedContext);
         }
         return entityFactory;
     }
