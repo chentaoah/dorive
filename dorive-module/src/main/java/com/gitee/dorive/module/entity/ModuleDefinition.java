@@ -43,6 +43,7 @@ public class ModuleDefinition {
     private String name;
     private String version;
     private String type;
+    private List<String> tags;
     private List<String> profiles;
     private List<String> configs;
     private List<String> exports;
@@ -67,6 +68,7 @@ public class ModuleDefinition {
         String name = mainAttributes.getValue("Dorive-Module");
         String version = mainAttributes.getValue("Dorive-Version");
         String type = mainAttributes.getValue("Dorive-Module-Type");
+        String tags = mainAttributes.getValue("Dorive-Tags");
 
         String profiles = mainAttributes.getValue("Dorive-Profiles");
         String configs = mainAttributes.getValue("Dorive-Configs");
@@ -85,6 +87,7 @@ public class ModuleDefinition {
         this.name = filterValue(name);
         this.version = filterValue(version);
         this.type = filterValue(type);
+        this.tags = filterValues(tags);
 
         this.profiles = filterValues(profiles);
         this.configs = filterValues(configs);
