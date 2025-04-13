@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.api;
+package com.gitee.dorive.module.entity;
 
-import com.gitee.dorive.module.entity.ModuleBeanDescriptor;
-import org.springframework.beans.factory.config.DependencyDescriptor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-import java.util.Map;
-
-public interface ExposedBeanFilter {
-
-    void filterExposedCandidates(DependencyDescriptor descriptor, ModuleBeanDescriptor beanDescriptor, Map<String, ModuleBeanDescriptor> exposedCandidates);
-
+@Data
+@AllArgsConstructor
+public class ModuleBeanDescriptor {
+    private ModuleDefinition moduleDefinition;
+    private Class<?> beanType;
 }

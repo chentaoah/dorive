@@ -19,6 +19,7 @@ package com.gitee.dorive.module.impl.filter;
 
 import com.gitee.dorive.api.entity.BoundedContext;
 import com.gitee.dorive.module.api.ExposedBeanFilter;
+import com.gitee.dorive.module.entity.ModuleBeanDescriptor;
 import com.gitee.dorive.module.entity.ModuleDefinition;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 
@@ -27,16 +28,18 @@ import java.util.Map;
 public class BoundedContextExposedBeanFilter implements ExposedBeanFilter {
 
     @Override
-    public void filterExposedCandidates(DependencyDescriptor descriptor, ModuleDefinition moduleDefinition, Map<String, ModuleDefinition> exposedCandidates) {
+    public void filterExposedCandidates(DependencyDescriptor descriptor, ModuleBeanDescriptor beanDescriptor, Map<String, ModuleBeanDescriptor> exposedCandidates) {
         Class<?> declaredType = descriptor.getDeclaredType();
         if (declaredType == BoundedContext.class && !exposedCandidates.isEmpty()) {
+            ModuleDefinition moduleDefinition = beanDescriptor.getModuleDefinition();
             String domainPackage = moduleDefinition.getDomainPackage();
             String boundedContextName = domainPackage + ".boundedContext";
-            ModuleDefinition existModuleDefinition = exposedCandidates.get(boundedContextName);
+            ModuleBeanDescriptor existModuleBeanDescriptor = exposedCandidates.get(boundedContextName);
             // 清空
             exposedCandidates.clear();
-            if (existModuleDefinition != null) {
-                exposedCandidates.put(boundedContextName, existModuleDefinition);
+            // 保留符合条件的
+            if (existModuleBeanDescriptor != null) {
+                exposedCandidates.put(boundedContextName, existModuleBeanDescriptor);
             }
         }
     }

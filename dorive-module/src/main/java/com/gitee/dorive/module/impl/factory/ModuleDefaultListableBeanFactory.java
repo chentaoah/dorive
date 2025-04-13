@@ -22,6 +22,7 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.module.api.BeanNameEditor;
 import com.gitee.dorive.module.api.ExposedBeanFilter;
 import com.gitee.dorive.module.api.ModuleParser;
+import com.gitee.dorive.module.entity.ModuleBeanDescriptor;
 import com.gitee.dorive.module.entity.ModuleDefinition;
 import com.gitee.dorive.module.impl.environment.ModuleContextAnnotationAutowireCandidateResolver;
 import com.gitee.dorive.module.impl.inject.ModuleCglibSubclassingInstantiationStrategy;
@@ -118,10 +119,11 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                                 return candidates;
 
                             } else if (targetModuleDefinition.isExposed(targetClass)) { // 2、其他模块对外公开
-                                Map<String, ModuleDefinition> exposedCandidates = new HashMap<>(2);
-                                exposedCandidates.put(candidateBeanName, targetModuleDefinition);
+                                ModuleBeanDescriptor beanDescriptor = new ModuleBeanDescriptor(moduleDefinition, declaringClass);
+                                Map<String, ModuleBeanDescriptor> exposedCandidates = new HashMap<>(2);
+                                exposedCandidates.put(candidateBeanName, new ModuleBeanDescriptor(targetModuleDefinition, targetClass));
                                 // 过滤
-                                invokeExposedBeanFilters(descriptor, moduleDefinition, exposedCandidates);
+                                invokeExposedBeanFilters(descriptor, beanDescriptor, exposedCandidates);
                                 if (exposedCandidates.isEmpty()) {
                                     candidates.clear();
                                 }
@@ -143,7 +145,9 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                 ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(declaringClass);
                 if (moduleDefinition != null) {
                     List<String> candidateBeanNames = new ArrayList<>(candidates.size());
-                    Map<String, ModuleDefinition> exposedCandidates = new HashMap<>(candidates.size() * 4 / 3 + 1);
+                    ModuleBeanDescriptor beanDescriptor = new ModuleBeanDescriptor(moduleDefinition, declaringClass);
+                    Map<String, ModuleBeanDescriptor> exposedCandidates = new HashMap<>(candidates.size() * 4 / 3 + 1);
+
                     for (String candidateBeanName : candidates.keySet()) {
                         Class<?> targetClass = getTargetClass(candidates, candidateBeanName);
                         if (moduleParser.isUnderScanPackage(targetClass.getName())) {
@@ -152,7 +156,7 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                                 candidateBeanNames.add(candidateBeanName);
 
                             } else if (targetModuleDefinition.isExposed(targetClass)) { // 2、其他模块对外公开
-                                exposedCandidates.put(candidateBeanName, targetModuleDefinition);
+                                exposedCandidates.put(candidateBeanName, new ModuleBeanDescriptor(targetModuleDefinition, targetClass));
                             }
                         }
                     }
@@ -163,7 +167,7 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                     // 2、其他模块对外公开
                     if (candidateBeanNames.isEmpty()) {
                         // 过滤
-                        invokeExposedBeanFilters(descriptor, moduleDefinition, exposedCandidates);
+                        invokeExposedBeanFilters(descriptor, beanDescriptor, exposedCandidates);
                         if (exposedCandidates.size() == 1) {
                             return exposedCandidates.keySet().iterator().next();
                         }
@@ -199,7 +203,7 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
         return targetClass;
     }
 
-    private void invokeExposedBeanFilters(DependencyDescriptor descriptor, ModuleDefinition moduleDefinition, Map<String, ModuleDefinition> exposedCandidates) {
+    private void invokeExposedBeanFilters(DependencyDescriptor descriptor, ModuleBeanDescriptor beanDescriptor, Map<String, ModuleBeanDescriptor> exposedCandidates) {
         if (exposedBeanFilters == null) {
             synchronized (this) {
                 if (exposedBeanFilters == null) {
@@ -214,7 +218,7 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
             }
         }
         for (ExposedBeanFilter exposedBeanFilter : exposedBeanFilters) {
-            exposedBeanFilter.filterExposedCandidates(descriptor, moduleDefinition, exposedCandidates);
+            exposedBeanFilter.filterExposedCandidates(descriptor, beanDescriptor, exposedCandidates);
         }
     }
 
