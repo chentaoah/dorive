@@ -15,16 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.impl.util;
+package com.gitee.dorive.module.api;
 
-import org.springframework.beans.factory.config.BeanDefinition;
+import com.gitee.dorive.module.entity.ModuleDefinition;
+import org.springframework.beans.factory.config.DependencyDescriptor;
 
-public class ConfigurationUtils {
+import java.util.Map;
 
-    public static final String CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME = "org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$ConfigurationClassBeanDefinition";
+public interface ExposedBeanFilter {
 
-    public static boolean isConfigurationBeanDefinition(BeanDefinition beanDefinition) {
-        return CONFIGURATION_CLASS_BEAN_DEFINITION_CLASS_NAME.equals(beanDefinition.getClass().getName());
-    }
+    void filterExposedCandidates(DependencyDescriptor descriptor, ModuleDefinition moduleDefinition, Map<String, ModuleDefinition> exposedCandidates);
 
 }
