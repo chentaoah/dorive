@@ -27,10 +27,10 @@ public class DefaultModuleParser extends AbstractModuleParser implements ModuleC
     public static final DefaultModuleParser INSTANCE = new DefaultModuleParser();
 
     @Override
-    public void checkInjection(Class<?> type, Class<?> injectedType, Object injectedInstance) {
+    public void checkInjection(Class<?> type, Class<?> injectedType, Object injectedBean) {
         doCheckInjection(type, injectedType);
-        if (injectedInstance != null) {
-            Class<?> targetClass = AopUtils.getTargetClass(injectedInstance);
+        if (injectedBean != null) {
+            Class<?> targetClass = AopUtils.getTargetClass(injectedBean);
             if (!injectedType.equals(targetClass)) {
                 doCheckInjection(type, targetClass);
             }

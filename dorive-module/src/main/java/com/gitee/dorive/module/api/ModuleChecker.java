@@ -19,6 +19,6 @@ package com.gitee.dorive.module.api;
 
 public interface ModuleChecker {
 
-    void checkInjection(Class<?> type, Class<?> injectedType, Object injectedInstance);
+    void checkInjection(Class<?> type, Class<?> injectedType, Object injectedBean);
 
 }
