@@ -113,15 +113,17 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                     if (moduleDefinition != null) {
                         String candidateBeanName = candidates.keySet().iterator().next();
                         Class<?> targetClass = getTargetClass(candidates, candidateBeanName);
-                        if (moduleParser.isUnderScanPackage(targetClass.getName())) {
-                            ModuleDefinition targetModuleDefinition = moduleParser.findModuleDefinition(targetClass);
+                        Class<?> targetDeclaringClass = getTargetDeclaringClass(candidateBeanName, targetClass);
+
+                        if (moduleParser.isUnderScanPackage(targetDeclaringClass.getName())) {
+                            ModuleDefinition targetModuleDefinition = moduleParser.findModuleDefinition(targetDeclaringClass);
                             if (moduleDefinition.equals(targetModuleDefinition)) { // 1、相同模块
                                 return candidates;
 
-                            } else if (targetModuleDefinition.isExposed(targetClass)) { // 2、其他模块对外公开
-                                ModuleBeanDescriptor beanDescriptor = new ModuleBeanDescriptor(moduleDefinition, declaringClass);
+                            } else if (targetModuleDefinition.isExposed(targetDeclaringClass)) { // 2、其他模块对外公开
+                                ModuleBeanDescriptor beanDescriptor = new ModuleBeanDescriptor(moduleDefinition, beanName, null, declaringClass);
                                 Map<String, ModuleBeanDescriptor> exposedCandidates = new HashMap<>(2);
-                                exposedCandidates.put(candidateBeanName, new ModuleBeanDescriptor(targetModuleDefinition, targetClass));
+                                exposedCandidates.put(candidateBeanName, new ModuleBeanDescriptor(targetModuleDefinition, candidateBeanName, targetDeclaringClass, targetClass));
                                 // 过滤
                                 invokeExposedBeanFilters(descriptor, beanDescriptor, exposedCandidates);
                                 if (exposedCandidates.isEmpty()) {
@@ -145,21 +147,24 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
                 ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(declaringClass);
                 if (moduleDefinition != null) {
                     List<String> candidateBeanNames = new ArrayList<>(candidates.size());
-                    ModuleBeanDescriptor beanDescriptor = new ModuleBeanDescriptor(moduleDefinition, declaringClass);
+                    ModuleBeanDescriptor beanDescriptor = new ModuleBeanDescriptor(moduleDefinition, null, null, declaringClass);
                     Map<String, ModuleBeanDescriptor> exposedCandidates = new HashMap<>(candidates.size() * 4 / 3 + 1);
 
                     for (String candidateBeanName : candidates.keySet()) {
                         Class<?> targetClass = getTargetClass(candidates, candidateBeanName);
-                        if (moduleParser.isUnderScanPackage(targetClass.getName())) {
-                            ModuleDefinition targetModuleDefinition = moduleParser.findModuleDefinition(targetClass);
+                        Class<?> targetDeclaringClass = getTargetDeclaringClass(candidateBeanName, targetClass);
+
+                        if (moduleParser.isUnderScanPackage(targetDeclaringClass.getName())) {
+                            ModuleDefinition targetModuleDefinition = moduleParser.findModuleDefinition(targetDeclaringClass);
                             if (moduleDefinition.equals(targetModuleDefinition)) { // 1、相同模块
                                 candidateBeanNames.add(candidateBeanName);
 
-                            } else if (targetModuleDefinition.isExposed(targetClass)) { // 2、其他模块对外公开
-                                exposedCandidates.put(candidateBeanName, new ModuleBeanDescriptor(targetModuleDefinition, targetClass));
+                            } else if (targetModuleDefinition.isExposed(targetDeclaringClass)) { // 2、其他模块对外公开
+                                exposedCandidates.put(candidateBeanName, new ModuleBeanDescriptor(targetModuleDefinition, candidateBeanName, targetDeclaringClass, targetClass));
                             }
                         }
                     }
+
                     // 1、相同模块
                     if (candidateBeanNames.size() == 1) {
                         return candidateBeanNames.get(0);
@@ -187,18 +192,16 @@ public class ModuleDefaultListableBeanFactory extends DefaultListableBeanFactory
     }
 
     private Class<?> getTargetClass(Map<String, Object> candidates, String candidateBeanName) {
-        Class<?> targetClass = null;
-        // class of factory bean
+        Object candidate = candidates.get(candidateBeanName);
+        return candidate instanceof Class ? (Class<?>) candidate : ClassUtils.getUserClass(candidate);
+    }
+
+    private Class<?> getTargetDeclaringClass(String candidateBeanName, Class<?> targetClass) {
         BeanDefinition beanDefinition = getBeanDefinition(candidateBeanName);
         if (SpringClassUtils.isConfigurationBeanDefinition(beanDefinition)) {
             AnnotationMetadata annotationMetadata = (AnnotationMetadata) ReflectUtil.getFieldValue(beanDefinition, "annotationMetadata");
             String className = annotationMetadata.getClassName();
-            targetClass = ClassUtil.loadClass(className);
-        }
-        // class of bean
-        if (targetClass == null) {
-            Object candidate = candidates.get(candidateBeanName);
-            targetClass = candidate instanceof Class ? (Class<?>) candidate : ClassUtils.getUserClass(candidate);
+            return ClassUtil.loadClass(className);
         }
         return targetClass;
     }
