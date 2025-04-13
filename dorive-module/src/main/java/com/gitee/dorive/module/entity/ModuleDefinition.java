@@ -197,4 +197,15 @@ public class ModuleDefinition {
         }
         return 2;
     }
+
+    @Override
+    public String toString() {
+        List<String> paths = new ArrayList<>(5);
+        paths.add(String.valueOf(project));
+        paths.add(String.valueOf(domain));
+        paths.add(String.valueOf(subdomain));
+        paths.add(String.valueOf(name));
+        paths.add(String.valueOf(version));
+        return StrUtil.join(".", paths);
+    }
 }
