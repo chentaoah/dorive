@@ -42,10 +42,11 @@ public class ModuleContextAnnotationAutowireCandidateResolver extends ContextAnn
                 ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(declaringClass);
                 if (moduleDefinition != null) {
                     String name = moduleDefinition.getName();
+                    String version = moduleDefinition.getVersion();
                     String strValue = (String) value;
                     if (strValue.startsWith("${") && strValue.endsWith("}")) {
                         strValue = StrUtil.removePrefix(strValue, "${");
-                        return "${" + name + "." + strValue;
+                        return "${" + name + "." + version + "." + strValue;
                     }
                 }
             }
