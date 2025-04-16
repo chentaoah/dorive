@@ -101,7 +101,7 @@ dorive开发框架实现了模块化、模型化的全部特性，你可以有�
 | dorive-sql                 | 动态查询实现     | 模型化 | 2.2.2 - 2.7.18      |
 | dorive-mybatis-plus        | mybatis-plus适配 | 模型化 | 2.2.2 - 2.7.18      |
 | dorive-web                 | web开发适配      | 模型化 | 2.2.2 - 2.7.18      |
-| dorive-autoconfigure       | 自动配置         |        |                     |
+| dorive-autoconfigure       | 自动配置实现     |        |                     |
 | dorive-spring-boot-starter | 启动器           |        |                     |
 
 ### 📝文档
