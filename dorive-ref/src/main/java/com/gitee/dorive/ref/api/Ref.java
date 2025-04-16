@@ -18,7 +18,7 @@
 package com.gitee.dorive.ref.api;
 
 import com.gitee.dorive.query.api.QueryRepository;
-import com.gitee.dorive.ref.repository.AbstractRefRepository;
+import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
 
 public interface Ref<E> extends QueryRepository<E, Object> {
 

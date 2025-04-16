@@ -20,7 +20,7 @@ package com.gitee.dorive.ref.impl;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.ref.api.Ref;
-import com.gitee.dorive.ref.repository.AbstractRefRepository;
+import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
 import lombok.Data;
 
 import java.lang.reflect.Field;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.plus.repository;
+package com.gitee.dorive.mybatis.plus.impl.repository;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
@@ -31,12 +31,12 @@ import com.gitee.dorive.core.api.common.MethodInvoker;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
-import com.gitee.dorive.mybatis.plus.executor.MybatisPlusExecutor;
+import com.gitee.dorive.mybatis.plus.impl.executor.MybatisPlusExecutor;
 import com.gitee.dorive.mybatis.plus.impl.DefaultMethodInvoker;
 import com.gitee.dorive.sql.impl.handler.SqlCustomQueryHandler;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.enums.QueryMethod;
-import com.gitee.dorive.ref.repository.AbstractRefRepository;
+import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
 import com.gitee.dorive.sql.api.CountQuerier;
 import com.gitee.dorive.sql.api.SqlRunner;
 import com.gitee.dorive.sql.entity.common.CountQuery;
