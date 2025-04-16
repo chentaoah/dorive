@@ -31,8 +31,8 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
     @Override
     @SuppressWarnings("unchecked")
     public void afterPropertiesSet() {
-        Class<?> firstArgumentType = ReflectUtils.getFirstTypeArgument(getClass());
-        Class<?> repositoryClass = RepositoryContext.findRepositoryClass(firstArgumentType);
+        Class<?> entityClass = ReflectUtils.getFirstTypeArgument(getClass());
+        Class<?> repositoryClass = RepositoryContext.findRepositoryClass(entityClass);
         this.repository = (AbstractQueryRepository<E, Object>) applicationContext.getBean(repositoryClass);
     }
 
