@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.util;
+package com.gitee.dorive.module.impl.util;
 
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.impl;
+package com.gitee.dorive.ref.impl.injector;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.core.api.executor.EntityHandler;

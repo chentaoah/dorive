@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.util;
+package com.gitee.dorive.api.impl.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;

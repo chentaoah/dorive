@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.entity.executor;
 
-import com.gitee.dorive.core.util.CriterionUtils;
+import com.gitee.dorive.core.impl.util.CriterionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

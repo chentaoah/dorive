@@ -26,7 +26,7 @@ import com.gitee.dorive.api.entity.query.QueryDefinition;
 import com.gitee.dorive.api.entity.query.QueryFieldDefinition;
 import com.gitee.dorive.api.entity.query.def.QueryFieldDef;
 import com.gitee.dorive.core.entity.executor.*;
-import com.gitee.dorive.core.util.StringUtils;
+import com.gitee.dorive.core.impl.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

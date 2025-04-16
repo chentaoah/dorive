@@ -23,7 +23,7 @@ import com.gitee.dorive.api.entity.query.QueryDefinition;
 import com.gitee.dorive.api.entity.query.QueryFieldDefinition;
 import com.gitee.dorive.api.entity.query.def.QueryDef;
 import com.gitee.dorive.api.entity.query.def.QueryFieldDef;
-import com.gitee.dorive.api.util.ReflectUtils;
+import com.gitee.dorive.api.impl.util.ReflectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;

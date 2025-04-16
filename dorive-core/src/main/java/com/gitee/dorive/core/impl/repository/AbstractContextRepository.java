@@ -28,7 +28,7 @@ import com.gitee.dorive.api.entity.core.def.OrderDef;
 import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.api.impl.core.EntityDefinitionResolver;
 import com.gitee.dorive.api.impl.core.EntityElementResolver;
-import com.gitee.dorive.api.util.ReflectUtils;
+import com.gitee.dorive.api.impl.util.ReflectUtils;
 import com.gitee.dorive.core.api.common.RepositoryPostProcessor;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.EntityOpHandler;

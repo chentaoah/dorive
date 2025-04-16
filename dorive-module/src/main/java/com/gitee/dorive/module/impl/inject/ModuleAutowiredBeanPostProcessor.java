@@ -21,7 +21,7 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.module.api.ModuleChecker;
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
-import com.gitee.dorive.module.util.BeanFactoryUtils;
+import com.gitee.dorive.module.impl.util.BeanFactoryUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.BeansException;

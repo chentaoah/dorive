@@ -27,7 +27,7 @@ import com.gitee.dorive.core.impl.binder.ValueFilterBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.repository.CommonRepository;
-import com.gitee.dorive.core.util.CriterionUtils;
+import com.gitee.dorive.core.impl.util.CriterionUtils;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;

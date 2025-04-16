@@ -33,7 +33,7 @@ import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.util.ExampleUtils;
+import com.gitee.dorive.core.impl.util.ExampleUtils;
 import lombok.Getter;
 import lombok.Setter;
 

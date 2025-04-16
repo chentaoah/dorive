@@ -27,7 +27,7 @@ import com.gitee.dorive.module.entity.ModuleDefinition;
 import com.gitee.dorive.module.impl.environment.ModuleContextAnnotationAutowireCandidateResolver;
 import com.gitee.dorive.module.impl.inject.ModuleCglibSubclassingInstantiationStrategy;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
-import com.gitee.dorive.module.util.SpringClassUtils;
+import com.gitee.dorive.module.impl.util.SpringClassUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -48,7 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.gitee.dorive.module.util.BeanAnnotationHelper.BEAN_NAME_CACHE;
+import static com.gitee.dorive.module.impl.util.BeanAnnotationHelper.BEAN_NAME_CACHE;
 
 @Getter
 @Setter

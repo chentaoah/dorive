@@ -27,7 +27,7 @@ import com.gitee.dorive.core.entity.operation.eop.Delete;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
-import com.gitee.dorive.core.util.ExampleUtils;
+import com.gitee.dorive.core.impl.util.ExampleUtils;
 
 import java.util.List;
 

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.util;
+package com.gitee.dorive.module.impl.util;
 
 import java.net.URI;
 import java.security.CodeSource;

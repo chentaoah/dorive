@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.impl;
+package com.gitee.dorive.ref.impl.injector;
 
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.executor.EntityHandler;

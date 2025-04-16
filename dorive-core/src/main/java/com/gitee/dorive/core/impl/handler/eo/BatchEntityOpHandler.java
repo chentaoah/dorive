@@ -29,7 +29,7 @@ import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
 import com.gitee.dorive.core.impl.repository.CommonRepository;
-import com.gitee.dorive.core.util.CollectionUtils;
+import com.gitee.dorive.core.impl.util.CollectionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.util;
+package com.gitee.dorive.core.impl.util;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.constant.core.Operator;

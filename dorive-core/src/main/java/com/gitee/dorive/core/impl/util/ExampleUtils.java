@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.util;
+package com.gitee.dorive.core.impl.util;
 
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;

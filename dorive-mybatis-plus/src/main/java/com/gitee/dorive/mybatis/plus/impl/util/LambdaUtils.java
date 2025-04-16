@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.plus.util;
+package com.gitee.dorive.mybatis.plus.impl.util;
 
 import com.baomidou.mybatisplus.core.toolkit.support.LambdaMeta;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;

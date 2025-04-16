@@ -15,18 +15,28 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.impl.repository;
+package com.gitee.dorive.module.impl.util;
 
-import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.ref.impl.injector.RefInjector;
+import cn.hutool.core.util.ReflectUtil;
 
-public abstract class AbstractRefRepository<E, PK> extends AbstractInnerRepository<E, PK> {
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Map;
 
-    @Override
-    protected EntityHandler newEntityHandler() {
-        EntityHandler entityHandler = super.newEntityHandler();
-        new RefInjector(this, entityHandler, getEntityClass());
-        return entityHandler;
+public class BeanAnnotationHelper {
+
+    public static final Map<Method, String> BEAN_NAME_CACHE;
+
+    static {
+        Field beanNameCacheField = ReflectUtil.getField(SpringClassUtils.BEAN_ANNOTATION_HELPER, "beanNameCache");
+        Object beanNameCacheFieldValue = ReflectUtil.getStaticFieldValue(beanNameCacheField);
+        BEAN_NAME_CACHE = castValue(beanNameCacheFieldValue);
+    }
+
+    // 该方法是为了避免编译时提示使用了不安全的操作
+    @SuppressWarnings("unchecked")
+    public static <T> T castValue(Object value) {
+        return (T) value;
     }
 
 }
