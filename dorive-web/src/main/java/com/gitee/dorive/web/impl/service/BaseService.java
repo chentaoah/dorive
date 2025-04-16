@@ -4,7 +4,7 @@ import com.gitee.dorive.api.util.ReflectUtils;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.config.RepositoryContext;
 import com.gitee.dorive.core.entity.executor.Page;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
+import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.web.entity.ResObject;
 import lombok.Getter;
 import lombok.Setter;

@@ -32,7 +32,7 @@ import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
+import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.sql.api.Segment;
 import com.gitee.dorive.sql.entity.segment.*;
 import lombok.AllArgsConstructor;

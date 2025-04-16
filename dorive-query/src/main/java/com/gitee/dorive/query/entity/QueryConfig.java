@@ -19,7 +19,7 @@ package com.gitee.dorive.query.entity;
 
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.query.impl.resolver.QueryExampleResolver;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
+import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
 import lombok.Data;
 
 import java.util.List;

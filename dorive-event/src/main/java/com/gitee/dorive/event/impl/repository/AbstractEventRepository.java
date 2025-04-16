@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.repository;
+package com.gitee.dorive.event.impl.repository;
 
 import cn.hutool.core.util.ArrayUtil;
 import com.gitee.dorive.api.entity.core.EntityElement;

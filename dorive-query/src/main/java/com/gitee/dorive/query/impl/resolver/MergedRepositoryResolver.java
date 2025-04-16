@@ -25,7 +25,7 @@ import com.gitee.dorive.core.impl.repository.AbstractRepository;
 import com.gitee.dorive.core.impl.repository.CommonRepository;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
+import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
