@@ -23,7 +23,7 @@ import com.gitee.dorive.core.impl.binder.AbstractBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.CommonRepository;
 import com.gitee.dorive.core.util.MultiInBuilder;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;

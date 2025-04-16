@@ -18,7 +18,7 @@
 package com.gitee.dorive.sql.impl.segment;
 
 import com.gitee.dorive.core.api.context.Selector;
-import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.CommonRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;

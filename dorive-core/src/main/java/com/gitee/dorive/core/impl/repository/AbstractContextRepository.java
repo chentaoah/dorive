@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.repository;
+package com.gitee.dorive.core.impl.repository;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;

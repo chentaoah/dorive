@@ -23,7 +23,7 @@ import com.gitee.dorive.api.entity.query.QueryDefinition;
 import com.gitee.dorive.api.entity.query.QueryFieldDefinition;
 import com.gitee.dorive.api.entity.query.def.QueryFieldDef;
 import com.gitee.dorive.api.impl.query.QueryDefinitionResolver;
-import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.CommonRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryConfig;
 import com.gitee.dorive.query.repository.AbstractQueryRepository;
