@@ -29,9 +29,9 @@
     </scm>
 
     <modules>
+        <module>dorive-api</module>
         <module>dorive-module</module>
         <module>dorive-test</module>
-        <module>dorive-api</module>
         <module>dorive-core</module>
         <module>dorive-event</module>
         <module>dorive-query</module>
