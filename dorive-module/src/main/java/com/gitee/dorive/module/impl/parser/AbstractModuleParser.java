@@ -21,7 +21,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.entity.ModuleDefinition;
-import com.gitee.dorive.module.impl.util.ClassUtils;
+import com.gitee.dorive.module.util.ClassUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
