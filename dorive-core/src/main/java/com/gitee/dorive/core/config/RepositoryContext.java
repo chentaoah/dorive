@@ -47,7 +47,7 @@ public class RepositoryContext implements BeanFactoryPostProcessor {
             if (StringUtils.isNotBlank(beanClassName) && !beanClassName.startsWith("org.springframework.")) {
                 Class<?> beanClass = ClassUtil.loadClass(beanClassName);
                 if (AbstractContextRepository.class.isAssignableFrom(beanClass)) {
-                    Class<?> entityClass = ReflectUtils.getFirstArgumentType(beanClass);
+                    Class<?> entityClass = ReflectUtils.getFirstTypeArgument(beanClass);
                     ENTITY_REPOSITORY_MAP.put(entityClass, beanClass);
                 }
             }

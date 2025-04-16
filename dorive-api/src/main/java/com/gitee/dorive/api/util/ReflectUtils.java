@@ -50,7 +50,7 @@ public class ReflectUtils {
         return fields;
     }
 
-    public static Class<?> getFirstArgumentType(Class<?> type) {
+    public static Class<?> getFirstTypeArgument(Class<?> type) {
         Type genericSuperclass = type.getGenericSuperclass();
         ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
         Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
