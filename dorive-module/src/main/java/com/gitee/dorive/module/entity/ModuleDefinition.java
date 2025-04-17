@@ -198,6 +198,14 @@ public class ModuleDefinition {
         return 2;
     }
 
+    public String getModulePathKey() {
+        return name + "." + version + ".module_path";
+    }
+
+    public String getModulePathValue() {
+        return name + "/" + version;
+    }
+
     @Override
     public String toString() {
         List<String> paths = new ArrayList<>(5);
