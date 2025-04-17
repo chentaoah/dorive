@@ -83,7 +83,7 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
                     List<String> pathList = new ArrayList<>(paths.length);
                     for (String path : paths) {
                         if (PlaceholderUtils.contains(path)) {
-                            path = PlaceholderUtils.replace(path, str -> "$$P$$" + moduleDefinition.getPropertiesPrefix() + str + "$$S$$");
+                            path = PlaceholderUtils.replace(path, strValue -> "$$P$$" + moduleDefinition.getPropertiesPrefix() + strValue + "$$S$$");
                             path = StrUtil.replace(path, "$$P$$", "${");
                             path = StrUtil.replace(path, "$$S$$", "}");
                         }
