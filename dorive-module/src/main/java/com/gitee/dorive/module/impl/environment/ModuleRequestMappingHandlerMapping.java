@@ -86,7 +86,7 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
                         if (existPaths != null) {
                             return existPaths;
                         }
-                        String[] newPaths = doHandlePaths(paths, sourceType);
+                        String[] newPaths = doHandlePaths(sourceType, paths);
                         if (newPaths != null) {
                             classRequestMappingPathsCache.put(sourceType, newPaths);
                             return newPaths;
@@ -96,7 +96,7 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
                 } else if (source instanceof Method) {
                     Class<?> sourceType = ((Method) source).getDeclaringClass();
                     if (moduleParser.isUnderScanPackage(sourceType.getName())) {
-                        String[] newPaths = doHandlePaths(paths, sourceType);
+                        String[] newPaths = doHandlePaths(sourceType, paths);
                         if (newPaths != null) {
                             return newPaths;
                         }
@@ -107,7 +107,7 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
         return paths;
     }
 
-    private String[] doHandlePaths(String[] paths, Class<?> sourceType) {
+    private String[] doHandlePaths(Class<?> sourceType, String[] paths) {
         ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(sourceType);
         if (moduleDefinition != null) {
             // 替换占位符
