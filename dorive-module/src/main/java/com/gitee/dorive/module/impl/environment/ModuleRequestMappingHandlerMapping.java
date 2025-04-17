@@ -65,6 +65,9 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
     }
 
     private String[] handlePaths(RequestMapping requestMapping, String[] paths) {
+        if (paths.length == 1 && !paths[0].contains("$")) {
+            return paths;
+        }
         if (requestMapping instanceof Proxy) {
             InvocationHandler invocationHandler = Proxy.getInvocationHandler(requestMapping);
             if (SpringClassUtils.isSynthesizedMergedAnnotationInvocationHandler(invocationHandler)) {
