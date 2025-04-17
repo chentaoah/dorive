@@ -38,12 +38,15 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Setter
 public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
 
     private ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
+    private Map<Class<?>, String[]> classRequestMappingPathsCache = new ConcurrentHashMap<>();
 
     @Override
     protected RequestMappingInfo createRequestMappingInfo(
@@ -65,6 +68,9 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
     }
 
     private String[] handlePaths(RequestMapping requestMapping, String[] paths) {
+        if (paths == null || paths.length == 0) {
+            return paths;
+        }
         if (paths.length == 1 && !paths[0].contains("$")) {
             return paths;
         }
@@ -81,18 +87,26 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
                     sourceType = ((Method) source).getDeclaringClass();
                 }
                 if (sourceType != null && moduleParser.isUnderScanPackage(sourceType.getName())) {
-                    ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(sourceType);
-                    // 替换占位符
-                    List<String> pathList = new ArrayList<>(paths.length);
-                    for (String path : paths) {
-                        if (PlaceholderUtils.contains(path)) {
-                            path = PlaceholderUtils.replace(path, strValue -> "$$P$$" + moduleDefinition.getPropertiesPrefix() + strValue + "$$S$$");
-                            path = StrUtil.replace(path, "$$P$$", "${");
-                            path = StrUtil.replace(path, "$$S$$", "}");
-                        }
-                        pathList.add(path);
+                    String[] existPaths = classRequestMappingPathsCache.get(sourceType);
+                    if (existPaths != null) {
+                        return existPaths;
                     }
-                    paths = pathList.toArray(new String[0]);
+                    ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(sourceType);
+                    if (moduleDefinition != null) {
+                        // 替换占位符
+                        List<String> pathList = new ArrayList<>(paths.length);
+                        for (String path : paths) {
+                            if (PlaceholderUtils.contains(path)) {
+                                path = PlaceholderUtils.replace(path, strValue -> "$$P$$" + moduleDefinition.getPropertiesPrefix() + strValue + "$$S$$");
+                                path = StrUtil.replace(path, "$$P$$", "${");
+                                path = StrUtil.replace(path, "$$S$$", "}");
+                            }
+                            pathList.add(path);
+                        }
+                        String[] newPaths = pathList.toArray(new String[0]);
+                        classRequestMappingPathsCache.put(sourceType, newPaths);
+                        return newPaths;
+                    }
                 }
             }
         }
