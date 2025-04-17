@@ -198,6 +198,10 @@ public class ModuleDefinition {
         return 2;
     }
 
+    public String getPropertiesPrefix() {
+        return name + "." + version + ".";
+    }
+
     public String getModulePathKey() {
         return name + "." + version + ".module_path";
     }
