@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,24 +49,28 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
             if (SpringClassUtils.isSynthesizedMergedAnnotationInvocationHandler(invocationHandler)) {
                 MergedAnnotation<?> annotation = (MergedAnnotation<?>) ReflectUtil.getFieldValue(invocationHandler, "annotation");
                 Object source = annotation.getSource();
+                Class<?> sourceType = null;
                 if (source instanceof Class<?>) {
-                    Class<?> sourceType = (Class<?>) source;
-                    if (moduleParser.isUnderScanPackage(sourceType.getName())) {
-                        ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(sourceType);
-                        String name = moduleDefinition.getName();
-                        String version = moduleDefinition.getVersion();
-                        // 替换占位符
-                        List<String> pathList = new ArrayList<>(paths.length);
-                        for (String path : paths) {
-                            if (PlaceholderUtils.contains(path)) {
-                                path = PlaceholderUtils.replace(path, str -> "$$P$$" + name + "." + version + "." + str + "$$S$$");
-                                path = StrUtil.replace(path, "$$P$$", "${");
-                                path = StrUtil.replace(path, "$$S$$", "}");
-                            }
-                            pathList.add(path);
+                    sourceType = (Class<?>) source;
+
+                } else if (source instanceof Method) {
+                    sourceType = ((Method) source).getDeclaringClass();
+                }
+                if (sourceType != null && moduleParser.isUnderScanPackage(sourceType.getName())) {
+                    ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(sourceType);
+                    String name = moduleDefinition.getName();
+                    String version = moduleDefinition.getVersion();
+                    // 替换占位符
+                    List<String> pathList = new ArrayList<>(paths.length);
+                    for (String path : paths) {
+                        if (PlaceholderUtils.contains(path)) {
+                            path = PlaceholderUtils.replace(path, str -> "$$P$$" + name + "." + version + "." + str + "$$S$$");
+                            path = StrUtil.replace(path, "$$P$$", "${");
+                            path = StrUtil.replace(path, "$$S$$", "}");
                         }
-                        paths = pathList.toArray(new String[0]);
+                        pathList.add(path);
                     }
+                    paths = pathList.toArray(new String[0]);
                 }
             }
         }
