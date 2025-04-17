@@ -79,38 +79,50 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
             if (SpringClassUtils.isSynthesizedMergedAnnotationInvocationHandler(invocationHandler)) {
                 MergedAnnotation<?> annotation = (MergedAnnotation<?>) ReflectUtil.getFieldValue(invocationHandler, "annotation");
                 Object source = annotation.getSource();
-                Class<?> sourceType = null;
                 if (source instanceof Class<?>) {
-                    sourceType = (Class<?>) source;
+                    Class<?> sourceType = (Class<?>) source;
+                    if (moduleParser.isUnderScanPackage(sourceType.getName())) {
+                        String[] existPaths = classRequestMappingPathsCache.get(sourceType);
+                        if (existPaths != null) {
+                            return existPaths;
+                        }
+                        String[] newPaths = doHandlePaths(paths, sourceType);
+                        if (newPaths != null) {
+                            classRequestMappingPathsCache.put(sourceType, newPaths);
+                            return newPaths;
+                        }
+                    }
 
                 } else if (source instanceof Method) {
-                    sourceType = ((Method) source).getDeclaringClass();
-                }
-                if (sourceType != null && moduleParser.isUnderScanPackage(sourceType.getName())) {
-                    String[] existPaths = classRequestMappingPathsCache.get(sourceType);
-                    if (existPaths != null) {
-                        return existPaths;
-                    }
-                    ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(sourceType);
-                    if (moduleDefinition != null) {
-                        // 替换占位符
-                        List<String> pathList = new ArrayList<>(paths.length);
-                        for (String path : paths) {
-                            if (PlaceholderUtils.contains(path)) {
-                                path = PlaceholderUtils.replace(path, strValue -> "$$P$$" + moduleDefinition.getPropertiesPrefix() + strValue + "$$S$$");
-                                path = StrUtil.replace(path, "$$P$$", "${");
-                                path = StrUtil.replace(path, "$$S$$", "}");
-                            }
-                            pathList.add(path);
+                    Class<?> sourceType = ((Method) source).getDeclaringClass();
+                    if (moduleParser.isUnderScanPackage(sourceType.getName())) {
+                        String[] newPaths = doHandlePaths(paths, sourceType);
+                        if (newPaths != null) {
+                            return newPaths;
                         }
-                        String[] newPaths = pathList.toArray(new String[0]);
-                        classRequestMappingPathsCache.put(sourceType, newPaths);
-                        return newPaths;
                     }
                 }
             }
         }
         return paths;
+    }
+
+    private String[] doHandlePaths(String[] paths, Class<?> sourceType) {
+        ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(sourceType);
+        if (moduleDefinition != null) {
+            // 替换占位符
+            List<String> pathList = new ArrayList<>(paths.length);
+            for (String path : paths) {
+                if (PlaceholderUtils.contains(path)) {
+                    path = PlaceholderUtils.replace(path, strValue -> "$$P$$" + moduleDefinition.getPropertiesPrefix() + strValue + "$$S$$");
+                    path = StrUtil.replace(path, "$$P$$", "${");
+                    path = StrUtil.replace(path, "$$S$$", "}");
+                }
+                pathList.add(path);
+            }
+            return pathList.toArray(new String[0]);
+        }
+        return null;
     }
 
 }
