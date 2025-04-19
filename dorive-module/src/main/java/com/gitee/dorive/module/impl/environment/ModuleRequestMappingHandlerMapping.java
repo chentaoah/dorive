@@ -79,27 +79,28 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
             if (SpringClassUtils.isSynthesizedMergedAnnotationInvocationHandler(invocationHandler)) {
                 MergedAnnotation<?> annotation = (MergedAnnotation<?>) ReflectUtil.getFieldValue(invocationHandler, "annotation");
                 Object source = annotation.getSource();
+                Class<?> sourceType = null;
+                boolean needCache = false;
                 if (source instanceof Class<?>) {
-                    Class<?> sourceType = (Class<?>) source;
-                    if (moduleParser.isUnderScanPackage(sourceType.getName())) {
+                    sourceType = (Class<?>) source;
+                    needCache = true;
+
+                } else if (source instanceof Method) {
+                    sourceType = ((Method) source).getDeclaringClass();
+                }
+                if (sourceType != null && moduleParser.isUnderScanPackage(sourceType.getName())) {
+                    if (needCache) {
                         String[] existPaths = classRequestMappingPathsCache.get(sourceType);
                         if (existPaths != null) {
                             return existPaths;
                         }
-                        String[] newPaths = doHandlePaths(sourceType, paths);
-                        if (newPaths != null) {
-                            classRequestMappingPathsCache.put(sourceType, newPaths);
-                            return newPaths;
-                        }
                     }
-
-                } else if (source instanceof Method) {
-                    Class<?> sourceType = ((Method) source).getDeclaringClass();
-                    if (moduleParser.isUnderScanPackage(sourceType.getName())) {
-                        String[] newPaths = doHandlePaths(sourceType, paths);
-                        if (newPaths != null) {
-                            return newPaths;
-                        }
+                    String[] newPaths = doHandlePaths(sourceType, paths);
+                    if (needCache) {
+                        classRequestMappingPathsCache.put(sourceType, newPaths);
+                    }
+                    if (newPaths != null) {
+                        return newPaths;
                     }
                 }
             }
@@ -122,7 +123,7 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
             }
             return pathList.toArray(new String[0]);
         }
-        return null;
+        return paths;
     }
 
 }
