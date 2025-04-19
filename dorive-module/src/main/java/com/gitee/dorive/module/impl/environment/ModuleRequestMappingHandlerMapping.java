@@ -96,10 +96,10 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
                         }
                     }
                     String[] newPaths = doHandlePaths(sourceType, paths);
-                    if (needCache) {
-                        classRequestMappingPathsCache.put(sourceType, newPaths);
-                    }
                     if (newPaths != null) {
+                        if (needCache) {
+                            classRequestMappingPathsCache.put(sourceType, newPaths);
+                        }
                         return newPaths;
                     }
                 }
