@@ -95,8 +95,9 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
                             return existPaths;
                         }
                     }
-                    String[] newPaths = doHandlePaths(sourceType, paths);
-                    if (newPaths != null) {
+                    ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(sourceType);
+                    if (moduleDefinition != null) {
+                        String[] newPaths = doHandlePaths(moduleDefinition.getPropertiesPrefix(), paths);
                         if (needCache) {
                             classRequestMappingPathsCache.put(sourceType, newPaths);
                         }
@@ -108,22 +109,18 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
         return paths;
     }
 
-    private String[] doHandlePaths(Class<?> sourceType, String[] paths) {
-        ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(sourceType);
-        if (moduleDefinition != null) {
-            // 替换占位符
-            List<String> pathList = new ArrayList<>(paths.length);
-            for (String path : paths) {
-                if (PlaceholderUtils.contains(path)) {
-                    path = PlaceholderUtils.replace(path, strValue -> "$$P$$" + moduleDefinition.getPropertiesPrefix() + strValue + "$$S$$");
-                    path = StrUtil.replace(path, "$$P$$", "${");
-                    path = StrUtil.replace(path, "$$S$$", "}");
-                }
-                pathList.add(path);
+    private String[] doHandlePaths(String propertiesPrefix, String[] paths) {
+        // 替换占位符
+        List<String> pathList = new ArrayList<>(paths.length);
+        for (String path : paths) {
+            if (PlaceholderUtils.contains(path)) {
+                path = PlaceholderUtils.replace(path, strValue -> "$$P$$" + propertiesPrefix + strValue + "$$S$$");
+                path = StrUtil.replace(path, "$$P$$", "${");
+                path = StrUtil.replace(path, "$$S$$", "}");
             }
-            return pathList.toArray(new String[0]);
+            pathList.add(path);
         }
-        return paths;
+        return pathList.toArray(new String[0]);
     }
 
 }
