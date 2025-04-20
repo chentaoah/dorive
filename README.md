@@ -83,7 +83,7 @@ dorive开发框架实现了模块化、模型化的全部特性，你可以有�
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.5.0.9</version>
+    <version>3.5.1</version>
 </dependency>
 ```
 
@@ -104,6 +104,14 @@ dorive开发框架实现了模块化、模型化的全部特性，你可以有�
 | dorive-autoconfigure       | 自动配置实现     |        |                     |
 | dorive-spring-boot-starter | 启动器           |        |                     |
 
+### 🌿分支版本说明
+
+例如：3.5.1（格式A.B.C）
+
+- A-架构版本：架构重构时增加，不保证兼容性。
+- B-特性版本：新特性引入时增加。
+- C-迭代版本：功能优化、bug修复时增加。
+
 ### 📝文档
 
 wiki地址：
@@ -115,30 +123,6 @@ wiki地址：
 提交问题反馈请说明正在使用的JDK版本、dorive版本，以及依赖库版本。
 
 - [Gitee issue](https://gitee.com/digital-engine/dorive/issues)
-
-### 📘版本说明
-
-| 版本 | 说明                                                         |
-| ---- | ------------------------------------------------------------ |
-| 1.x  | 试验领域驱动落地的可能性                                     |
-| 2.x  | 完成基本功能开发，并在项目中应用                             |
-| 3.x  | 重新设计内部架构，并优化大量代码。自3.4.3.4版本开始，项目进入维护阶段 |
-
-### 🌿分支说明
-
-| 分支   | 说明                                                         |
-| ------ | ------------------------------------------------------------ |
-| master | 主分支，release版本使用的分支，不接收任何pr或修改            |
-| 3.x    | 版本分支，分支名即版本号，版本号高于master的，为正在开发的分支 |
-
-### 🤝与我（们）一起
-
-1. 请将个人联系方式，发送邮件至digital_engine@163.com
-2. 等待维护者向你发出邀请
-
-###  ⭐Star dorive
-
-[![Stargazers over time](https://starchart.cc/chentaoah/dorive.svg?variant=adaptive)](https://starchart.cc/chentaoah/dorive)
 
 ### 🙏🏻特别感谢
 
