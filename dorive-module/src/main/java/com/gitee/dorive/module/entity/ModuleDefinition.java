@@ -68,7 +68,7 @@ public class ModuleDefinition {
 
         String name = mainAttributes.getValue("Dorive-Module");
         String version = mainAttributes.getValue("Dorive-Version");
-        String type = mainAttributes.getValue("Dorive-Module-Type");
+        String type = mainAttributes.getValue("Dorive-Type");
         String tags = mainAttributes.getValue("Dorive-Tags");
 
         String profiles = mainAttributes.getValue("Dorive-Profiles");
