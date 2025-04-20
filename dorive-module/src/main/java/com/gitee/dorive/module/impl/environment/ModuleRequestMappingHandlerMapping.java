@@ -79,27 +79,27 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
             if (SpringClassUtils.isSynthesizedMergedAnnotationInvocationHandler(invocationHandler)) {
                 MergedAnnotation<?> annotation = (MergedAnnotation<?>) ReflectUtil.getFieldValue(invocationHandler, "annotation");
                 Object source = annotation.getSource();
-                Class<?> sourceType = null;
-                boolean needCache = false;
+                Class<?> clazz = null;
+                boolean isTypeAnnotated = false;
                 if (source instanceof Class<?>) {
-                    sourceType = (Class<?>) source;
-                    needCache = true;
+                    clazz = (Class<?>) source;
+                    isTypeAnnotated = true;
 
                 } else if (source instanceof Method) {
-                    sourceType = ((Method) source).getDeclaringClass();
+                    clazz = ((Method) source).getDeclaringClass();
                 }
-                if (sourceType != null && moduleParser.isUnderScanPackage(sourceType.getName())) {
-                    if (needCache) {
-                        String[] existPaths = classRequestMappingPathsCache.get(sourceType);
+                if (clazz != null && moduleParser.isUnderScanPackage(clazz.getName())) {
+                    if (isTypeAnnotated) {
+                        String[] existPaths = classRequestMappingPathsCache.get(clazz);
                         if (existPaths != null) {
                             return existPaths;
                         }
                     }
-                    ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(sourceType);
+                    ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(clazz);
                     if (moduleDefinition != null) {
                         String[] newPaths = doHandlePaths(moduleDefinition.getPropertiesPrefix(), paths);
-                        if (needCache) {
-                            classRequestMappingPathsCache.put(sourceType, newPaths);
+                        if (isTypeAnnotated) {
+                            classRequestMappingPathsCache.put(clazz, newPaths);
                         }
                         return newPaths;
                     }
