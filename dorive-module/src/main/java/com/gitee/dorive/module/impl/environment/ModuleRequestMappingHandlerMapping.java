@@ -97,7 +97,7 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
                     }
                     ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(clazz);
                     if (moduleDefinition != null) {
-                        String[] newPaths = doHandlePaths(moduleDefinition.getPropertiesPrefix(), paths);
+                        String[] newPaths = addPrefixForPlaceholders(moduleDefinition.getPropertiesPrefix(), paths);
                         if (isTypeAnnotated) {
                             classRequestMappingPathsCache.put(clazz, newPaths);
                         }
@@ -109,7 +109,7 @@ public class ModuleRequestMappingHandlerMapping extends RequestMappingHandlerMap
         return paths;
     }
 
-    private String[] doHandlePaths(String propertiesPrefix, String[] paths) {
+    private String[] addPrefixForPlaceholders(String propertiesPrefix, String[] paths) {
         // 替换占位符
         List<String> pathList = new ArrayList<>(paths.length);
         for (String path : paths) {
