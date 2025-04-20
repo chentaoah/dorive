@@ -23,7 +23,7 @@ import com.gitee.dorive.core.entity.enums.JoinType;
 import com.gitee.dorive.core.impl.handler.joiner.MultiEntityHandler;
 import com.gitee.dorive.core.impl.handler.joiner.SingleEntityHandler;
 import com.gitee.dorive.core.impl.handler.joiner.UnionEntityHandler;
-import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.CommonRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

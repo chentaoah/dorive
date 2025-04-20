@@ -59,9 +59,8 @@ public class ModuleEnvironmentPostProcessor implements EnvironmentPostProcessor,
                     if (source instanceof Map) {
                         Map<String, Object> map = (Map<String, Object>) source;
                         if (!map.isEmpty()) {
-                            String moduleName = moduleDefinition.getName();
                             Map<String, Object> newMap = new LinkedHashMap<>();
-                            map.forEach((key, value) -> newMap.put(moduleName + "." + key, value));
+                            map.forEach((key, value) -> newMap.put(moduleDefinition.getPropertiesPrefix() + key, value));
                             PropertySource<?> newPropertySource = new OriginTrackedMapPropertySource(name, Collections.unmodifiableMap(newMap));
                             propertySources.replace(name, newPropertySource);
                         }

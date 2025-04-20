@@ -20,12 +20,12 @@ package com.gitee.dorive.query.impl.resolver;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.repository.AbstractContextRepository;
-import com.gitee.dorive.core.repository.AbstractRepository;
-import com.gitee.dorive.core.repository.CommonRepository;
-import com.gitee.dorive.core.repository.DefaultRepository;
+import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
+import com.gitee.dorive.core.impl.repository.AbstractRepository;
+import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
+import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 

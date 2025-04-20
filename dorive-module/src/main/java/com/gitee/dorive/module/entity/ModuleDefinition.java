@@ -43,14 +43,16 @@ public class ModuleDefinition {
     private String name;
     private String version;
     private String type;
+    private List<String> tags;
     private List<String> profiles;
     private List<String> configs;
     private List<String> exports;
     private List<String> requires;
     private List<String> provides;
-    private List<String> publishes;
-    private List<String> consumes;
+    private List<String> notifies;
+    private List<String> waits;
     private String tablePrefix;
+    private String requestPrefix;
 
     public ModuleDefinition(Resource resource, Manifest manifest) {
         Assert.notNull(resource, "The resource can not be null!");
@@ -66,16 +68,18 @@ public class ModuleDefinition {
 
         String name = mainAttributes.getValue("Dorive-Module");
         String version = mainAttributes.getValue("Dorive-Version");
-        String type = mainAttributes.getValue("Dorive-Module-Type");
+        String type = mainAttributes.getValue("Dorive-Type");
+        String tags = mainAttributes.getValue("Dorive-Tags");
 
         String profiles = mainAttributes.getValue("Dorive-Profiles");
         String configs = mainAttributes.getValue("Dorive-Configs");
         String exports = mainAttributes.getValue("Dorive-Exports");
         String requires = mainAttributes.getValue("Dorive-Requires");
         String provides = mainAttributes.getValue("Dorive-Provides");
-        String publishes = mainAttributes.getValue("Dorive-Publishes");
-        String consumes = mainAttributes.getValue("Dorive-Consumes");
+        String notifies = mainAttributes.getValue("Dorive-Notifies");
+        String waits = mainAttributes.getValue("Dorive-Waits");
         String tablePrefix = mainAttributes.getValue("Dorive-Table-Prefix");
+        String requestPrefix = mainAttributes.getValue("Dorive-Request-Prefix");
 
         this.originId = filterValue(originId);
         this.project = filterValue(project);
@@ -85,15 +89,17 @@ public class ModuleDefinition {
         this.name = filterValue(name);
         this.version = filterValue(version);
         this.type = filterValue(type);
+        this.tags = filterValues(tags);
 
         this.profiles = filterValues(profiles);
         this.configs = filterValues(configs);
         this.exports = filterValues(exports);
         this.requires = filterValues(requires);
         this.provides = filterValues(provides);
-        this.publishes = filterValues(publishes);
-        this.consumes = filterValues(consumes);
+        this.notifies = filterValues(notifies);
+        this.waits = filterValues(waits);
         this.tablePrefix = filterValue(tablePrefix);
+        this.requestPrefix = filterValue(requestPrefix);
     }
 
     private String filterValue(String value) {
@@ -123,6 +129,17 @@ public class ModuleDefinition {
     public boolean isExposed(Class<?> clazz) {
         String className = clazz.getName();
         return CollUtil.findOne(exports, export -> PATH_MATCHER.match(export, className)) != null;
+    }
+
+    public String getDomainPackage() {
+        List<String> packages = new ArrayList<>(2);
+        if (StringUtils.isNotBlank(project)) {
+            packages.add(project);
+        }
+        if (StringUtils.isNotBlank(domain)) {
+            packages.add(domain);
+        }
+        return StrUtil.join(".", packages);
     }
 
     public String getBasePackage() {
@@ -182,5 +199,28 @@ public class ModuleDefinition {
             return 3;
         }
         return 2;
+    }
+
+    public String getPropertiesPrefix() {
+        return name + "." + version + ".";
+    }
+
+    public String getModulePathKey() {
+        return name + "." + version + ".module_path";
+    }
+
+    public String getModulePathValue() {
+        return StringUtils.isNotBlank(requestPrefix) ? requestPrefix : name + "/" + version;
+    }
+
+    @Override
+    public String toString() {
+        List<String> paths = new ArrayList<>(5);
+        paths.add(String.valueOf(project));
+        paths.add(String.valueOf(domain));
+        paths.add(String.valueOf(subdomain));
+        paths.add(String.valueOf(name));
+        paths.add(String.valueOf(version));
+        return StrUtil.join(".", paths);
     }
 }

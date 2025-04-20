@@ -28,7 +28,7 @@ import com.gitee.dorive.api.entity.core.FieldDefinition;
 import com.gitee.dorive.api.entity.core.FieldEntityDefinition;
 import com.gitee.dorive.api.entity.core.PropertyDefinition;
 import com.gitee.dorive.api.entity.core.def.*;
-import com.gitee.dorive.api.util.ReflectUtils;
+import com.gitee.dorive.api.impl.util.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;

@@ -22,7 +22,7 @@ import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryConfig;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
+import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
 import lombok.AllArgsConstructor;
 
 import java.util.Map;

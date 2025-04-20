@@ -21,7 +21,7 @@ import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.enums.MatcherType;
-import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;
 

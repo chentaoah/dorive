@@ -38,25 +38,26 @@ public class SpringModularApplication {
     public static SpringApplicationBuilder build(Class<?> primarySource) {
         ModuleLauncher.INSTANCE.tryLoadClasspathIdx(primarySource);
 
+        Set<Class<?>> sources = new LinkedHashSet<>();
+        Set<String> profiles = new LinkedHashSet<>();
+        Map<String, Object> properties = new LinkedHashMap<>();
+        BeanNameGenerator beanNameGenerator = new ModuleAnnotationBeanNameGenerator();
+        ApplicationContextFactory applicationContextFactory = new ModuleApplicationContextFactory();
+
         ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
         moduleParser.parse();
         List<ModuleDefinition> moduleDefinitions = moduleParser.getModuleDefinitions();
 
-        Set<Class<?>> sources = new LinkedHashSet<>();
-        Set<String> profiles = new LinkedHashSet<>();
+        sources.add(primarySource);
+        properties.put("dorive.module.enable", true);
         for (ModuleDefinition moduleDefinition : moduleDefinitions) {
             Class<?> mainClass = moduleDefinition.getMainClass();
             if (mainClass != null) {
                 sources.add(mainClass);
             }
             profiles.addAll(moduleDefinition.getProfiles());
+            properties.put(moduleDefinition.getModulePathKey(), moduleDefinition.getModulePathValue());
         }
-        sources.add(primarySource);
-
-        Map<String, Object> properties = new LinkedHashMap<>();
-        properties.put("dorive.module.enable", true);
-        BeanNameGenerator beanNameGenerator = new ModuleAnnotationBeanNameGenerator();
-        ApplicationContextFactory applicationContextFactory = new ModuleApplicationContextFactory();
 
         return new SpringApplicationBuilder(sources.toArray(new Class[0]))
                 .profiles(profiles.toArray(new String[0]))

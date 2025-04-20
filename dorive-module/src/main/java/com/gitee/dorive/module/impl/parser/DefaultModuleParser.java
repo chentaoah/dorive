@@ -19,18 +19,18 @@ package com.gitee.dorive.module.impl.parser;
 
 import com.gitee.dorive.module.api.ModuleChecker;
 import com.gitee.dorive.module.entity.ModuleDefinition;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.util.ClassUtils;
 
 public class DefaultModuleParser extends AbstractModuleParser implements ModuleChecker {
 
     public static final DefaultModuleParser INSTANCE = new DefaultModuleParser();
 
     @Override
-    public void checkInjection(Class<?> type, Class<?> injectedType, Object injectedInstance) {
+    public void checkInjection(Class<?> type, Class<?> injectedType, Object injectedBean) {
         doCheckInjection(type, injectedType);
-        if (injectedInstance != null) {
-            Class<?> targetClass = AopUtils.getTargetClass(injectedInstance);
+        if (injectedBean != null) {
+            Class<?> targetClass = ClassUtils.getUserClass(injectedBean);
             if (!injectedType.equals(targetClass)) {
                 doCheckInjection(type, targetClass);
             }

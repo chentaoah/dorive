@@ -19,8 +19,8 @@ package com.gitee.dorive.core.impl.handler;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.core.repository.AbstractContextRepository;
-import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
+import com.gitee.dorive.core.impl.repository.CommonRepository;
 import lombok.Data;
 
 import java.util.ArrayList;

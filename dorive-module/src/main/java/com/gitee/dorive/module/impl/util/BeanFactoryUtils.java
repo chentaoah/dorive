@@ -28,7 +28,7 @@ public class BeanFactoryUtils {
     public static Class<?> tryGetConfigurationClass(DefaultListableBeanFactory beanFactory, Class<?> beanType, Object bean) {
         // class of factory bean
         BeanDefinition beanDefinition = BeanFactoryUtils.getBeanDefinition(beanFactory, beanType, bean);
-        if (beanDefinition != null && ConfigurationUtils.isConfigurationBeanDefinition(beanDefinition)) {
+        if (SpringClassUtils.isConfigurationBeanDefinition(beanDefinition)) {
             AnnotationMetadata annotationMetadata = (AnnotationMetadata) ReflectUtil.getFieldValue(beanDefinition, "annotationMetadata");
             String className = annotationMetadata.getClassName();
             return ClassUtil.loadClass(className);

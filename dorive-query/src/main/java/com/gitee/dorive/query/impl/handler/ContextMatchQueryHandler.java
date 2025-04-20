@@ -20,7 +20,7 @@ package com.gitee.dorive.query.impl.handler;
 import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.repository.AbstractQueryRepository;
+import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

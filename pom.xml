@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive</artifactId>
-    <version>3.5.0.8</version>
+    <version>3.5.1</version>
     <packaging>pom</packaging>
 
     <licenses>
@@ -29,9 +29,9 @@
     </scm>
 
     <modules>
+        <module>dorive-api</module>
         <module>dorive-module</module>
         <module>dorive-test</module>
-        <module>dorive-api</module>
         <module>dorive-core</module>
         <module>dorive-event</module>
         <module>dorive-query</module>

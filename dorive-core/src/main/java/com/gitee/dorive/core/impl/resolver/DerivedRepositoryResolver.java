@@ -21,7 +21,7 @@ import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.EntityOpHandler;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.repository.AbstractContextRepository;
+import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
 

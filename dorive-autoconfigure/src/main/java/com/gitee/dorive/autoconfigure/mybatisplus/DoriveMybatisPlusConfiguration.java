@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.gitee.dorive.core.api.common.ImplFactory;
 import com.gitee.dorive.mybatis.plus.impl.DefaultImplFactory;
-import com.gitee.dorive.mybatis.plus.injector.EasySqlInjector;
+import com.gitee.dorive.mybatis.plus.impl.injector.EasySqlInjector;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.env.EnvironmentPostProcessor;

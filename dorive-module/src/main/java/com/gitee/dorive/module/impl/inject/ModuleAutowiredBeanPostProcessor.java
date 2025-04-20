@@ -24,7 +24,6 @@ import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
 import com.gitee.dorive.module.impl.util.BeanFactoryUtils;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactory;
@@ -34,6 +33,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.AccessibleObject;
@@ -54,7 +54,7 @@ public class ModuleAutowiredBeanPostProcessor implements BeanFactoryAware, BeanP
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        Class<?> beanType = AopUtils.getTargetClass(bean);
+        Class<?> beanType = ClassUtils.getUserClass(bean);
         if (moduleParser.isUnderScanPackage(beanType.getName())) {
             try {
                 checkAutowiredFieldModule(beanType, bean);

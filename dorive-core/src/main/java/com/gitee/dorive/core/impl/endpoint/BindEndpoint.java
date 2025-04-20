@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.endpoint;
 
 import com.gitee.dorive.api.entity.core.FieldDefinition;
-import com.gitee.dorive.core.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.CommonRepository;
 import lombok.Getter;
 import lombok.Setter;
 

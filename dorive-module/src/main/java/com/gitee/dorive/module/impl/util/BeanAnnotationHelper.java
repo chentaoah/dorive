@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.module.impl.util;
 
-import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 
 import java.lang.reflect.Field;
@@ -26,12 +25,10 @@ import java.util.Map;
 
 public class BeanAnnotationHelper {
 
-    public static final String BEAN_ANNOTATION_HELPER_CLASS_NAME = "org.springframework.context.annotation.BeanAnnotationHelper";
     public static final Map<Method, String> BEAN_NAME_CACHE;
 
     static {
-        Class<?> beanAnnotationHelperClass = ClassUtil.loadClass(BeanAnnotationHelper.BEAN_ANNOTATION_HELPER_CLASS_NAME);
-        Field beanNameCacheField = ReflectUtil.getField(beanAnnotationHelperClass, "beanNameCache");
+        Field beanNameCacheField = ReflectUtil.getField(SpringClassUtils.BEAN_ANNOTATION_HELPER, "beanNameCache");
         Object beanNameCacheFieldValue = ReflectUtil.getStaticFieldValue(beanNameCacheField);
         BEAN_NAME_CACHE = castValue(beanNameCacheFieldValue);
     }
