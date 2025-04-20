@@ -52,6 +52,7 @@ public class ModuleDefinition {
     private List<String> notifies;
     private List<String> waits;
     private String tablePrefix;
+    private String requestPrefix;
 
     public ModuleDefinition(Resource resource, Manifest manifest) {
         Assert.notNull(resource, "The resource can not be null!");
@@ -78,6 +79,7 @@ public class ModuleDefinition {
         String notifies = mainAttributes.getValue("Dorive-Notifies");
         String waits = mainAttributes.getValue("Dorive-Waits");
         String tablePrefix = mainAttributes.getValue("Dorive-Table-Prefix");
+        String requestPrefix = mainAttributes.getValue("Dorive-Request-Prefix");
 
         this.originId = filterValue(originId);
         this.project = filterValue(project);
@@ -97,6 +99,7 @@ public class ModuleDefinition {
         this.notifies = filterValues(notifies);
         this.waits = filterValues(waits);
         this.tablePrefix = filterValue(tablePrefix);
+        this.requestPrefix = filterValue(requestPrefix);
     }
 
     private String filterValue(String value) {
@@ -207,7 +210,7 @@ public class ModuleDefinition {
     }
 
     public String getModulePathValue() {
-        return name + "/" + version;
+        return StringUtils.isNotBlank(requestPrefix) ? requestPrefix : name + "/" + version;
     }
 
     @Override
