@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.entity.executor;
 
 import com.gitee.dorive.api.constant.core.Operator;
-import com.gitee.dorive.api.constant.core.Order;
+import com.gitee.dorive.api.constant.core.Sort;
 import com.gitee.dorive.core.impl.util.StringUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -133,12 +133,12 @@ public class Example {
     }
 
     public Example orderByAsc(String... fields) {
-        orderBy = new OrderBy(Arrays.asList(fields), Order.ASC);
+        orderBy = new OrderBy(Arrays.asList(fields), Sort.ASC);
         return this;
     }
 
     public Example orderByDesc(String... fields) {
-        orderBy = new OrderBy(Arrays.asList(fields), Order.DESC);
+        orderBy = new OrderBy(Arrays.asList(fields), Sort.DESC);
         return this;
     }
 

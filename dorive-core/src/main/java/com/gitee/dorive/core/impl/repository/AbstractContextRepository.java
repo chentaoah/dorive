@@ -20,11 +20,11 @@ package com.gitee.dorive.core.impl.repository;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.api.BoundedContextAware;
-import com.gitee.dorive.api.constant.core.Order;
+import com.gitee.dorive.api.constant.core.Sort;
 import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.def.EntityDef;
-import com.gitee.dorive.api.entity.core.def.OrderDef;
+import com.gitee.dorive.api.entity.core.def.OrderByDef;
 import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.api.impl.core.EntityDefinitionResolver;
 import com.gitee.dorive.api.impl.core.EntityElementResolver;
@@ -142,7 +142,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         resetEntityDef(entityElement);
 
         EntityDef entityDef = entityElement.getEntityDef();
-        OrderDef orderDef = entityElement.getOrderDef();
+        OrderByDef orderByDef = entityElement.getOrderByDef();
         String accessPath = entityElement.getAccessPath();
 
         OperationFactory operationFactory = new OperationFactory(entityElement);
@@ -159,7 +159,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         boolean isAggregated = repository instanceof AbstractContextRepository;
         BinderResolver binderResolver = new BinderResolver(this);
         binderResolver.resolve(entityElement);
-        OrderBy defaultOrderBy = newDefaultOrderBy(orderDef);
+        OrderBy defaultOrderBy = newDefaultOrderBy(orderByDef);
 
         CommonRepository repositoryWrapper = new CommonRepository();
         repositoryWrapper.setEntityElement(entityElement);
@@ -249,15 +249,15 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return repository;
     }
 
-    private OrderBy newDefaultOrderBy(OrderDef orderDef) {
-        if (orderDef != null) {
-            String sortBy = orderDef.getSortBy();
-            String order = orderDef.getOrder();
-            if (StringUtils.isNotBlank(sortBy) && StringUtils.isNotBlank(order)) {
-                order = order.toUpperCase();
-                if (Order.ASC.equals(order) || Order.DESC.equals(order)) {
-                    List<String> properties = StrUtil.splitTrim(sortBy, ",");
-                    return new OrderBy(properties, order);
+    private OrderBy newDefaultOrderBy(OrderByDef orderByDef) {
+        if (orderByDef != null) {
+            String field = orderByDef.getField();
+            String sort = orderByDef.getSort();
+            if (StringUtils.isNotBlank(field) && StringUtils.isNotBlank(sort)) {
+                sort = sort.toUpperCase();
+                if (Sort.ASC.equals(sort) || Sort.DESC.equals(sort)) {
+                    List<String> properties = StrUtil.splitTrim(field, ",");
+                    return new OrderBy(properties, sort);
                 }
             }
         }

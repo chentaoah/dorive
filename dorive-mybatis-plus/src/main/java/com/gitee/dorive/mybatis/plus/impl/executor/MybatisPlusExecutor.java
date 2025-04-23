@@ -23,7 +23,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gitee.dorive.api.constant.core.Order;
+import com.gitee.dorive.api.constant.core.Sort;
 import com.gitee.dorive.api.entity.core.def.EntityDef;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
@@ -137,11 +137,11 @@ public class MybatisPlusExecutor extends AbstractExecutor {
 
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
-            String order = orderBy.getOrder();
-            if (Order.ASC.equals(order)) {
+            String sort = orderBy.getSort();
+            if (Sort.ASC.equals(sort)) {
                 queryWrapper.orderByAsc(orderBy.getProperties());
 
-            } else if (Order.DESC.equals(order)) {
+            } else if (Sort.DESC.equals(sort)) {
                 queryWrapper.orderByDesc(orderBy.getProperties());
             }
         }

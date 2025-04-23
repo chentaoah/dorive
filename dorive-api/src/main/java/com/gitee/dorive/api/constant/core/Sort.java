@@ -15,33 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.annotation.core;
+package com.gitee.dorive.api.constant.core;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-/**
- * 排序
- */
-@Inherited
-@Documented
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Order {
-
-    /**
-     * 排序字段
-     */
-    String sortBy() default "";
-
-    /**
-     * 排序方式
-     */
-    String order() default "";
-
+public interface Sort {
+    String ASC = "ASC";
+    String DESC = "DESC";
 }
-

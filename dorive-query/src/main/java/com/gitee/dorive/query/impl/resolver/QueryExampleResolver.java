@@ -19,7 +19,7 @@ package com.gitee.dorive.query.impl.resolver;
 
 import cn.hutool.core.convert.Convert;
 import com.gitee.dorive.api.constant.core.Operator;
-import com.gitee.dorive.api.constant.core.Order;
+import com.gitee.dorive.api.constant.core.Sort;
 import com.gitee.dorive.api.constant.query.OperatorV2;
 import com.gitee.dorive.api.entity.core.Field;
 import com.gitee.dorive.api.entity.query.QueryDefinition;
@@ -78,7 +78,7 @@ public class QueryExampleResolver {
                 List<String> properties = StringUtils.toList(sortBy);
                 if (properties != null && !properties.isEmpty()) {
                     String orderStr = ((String) order).toUpperCase();
-                    if (Order.ASC.equals(orderStr) || Order.DESC.equals(orderStr)) {
+                    if (Sort.ASC.equals(orderStr) || Sort.DESC.equals(orderStr)) {
                         return new OrderBy(properties, orderStr);
                     }
                 }
