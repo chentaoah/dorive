@@ -2,3 +2,4 @@ com.gitee.dorive.autoconfigure.module.DoriveModuleConfiguration
 com.gitee.dorive.autoconfigure.core.DoriveCoreConfiguration
 com.gitee.dorive.autoconfigure.mybatisplus.DoriveMybatisPlusConfiguration
 com.gitee.dorive.autoconfigure.web.DoriveWebConfiguration
+com.gitee.dorive.autoconfigure.starter.DoriveStarterConfiguration
