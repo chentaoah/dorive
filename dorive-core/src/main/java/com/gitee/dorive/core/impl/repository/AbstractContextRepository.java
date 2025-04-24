@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.repository;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.api.api.BoundedContextAware;
+import com.gitee.dorive.api.api.common.BoundedContextAware;
 import com.gitee.dorive.api.constant.core.Sort;
 import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.EntityElement;
@@ -36,7 +36,7 @@ import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.config.RepositoryContext;
-import com.gitee.dorive.api.entity.BoundedContext;
+import com.gitee.dorive.api.entity.common.BoundedContext;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.factory.FieldConverter;

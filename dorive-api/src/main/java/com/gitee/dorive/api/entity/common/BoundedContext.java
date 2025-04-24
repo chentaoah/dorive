@@ -15,12 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.api;
+package com.gitee.dorive.api.entity.common;
 
-import com.gitee.dorive.api.entity.BoundedContext;
+import java.util.Properties;
 
-public interface BoundedContextAware {
-
-    void setBoundedContext(BoundedContext boundedContext);
-
+public class BoundedContext extends Properties {
 }

@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity;
+package com.gitee.dorive.api.api.common;
 
-import lombok.NoArgsConstructor;
+import com.gitee.dorive.api.entity.common.BoundedContext;
 
-import java.util.Properties;
+public interface BoundedContextAware {
 
-@NoArgsConstructor
-public class BoundedContext extends Properties {
+    void setBoundedContext(BoundedContext boundedContext);
+
 }
