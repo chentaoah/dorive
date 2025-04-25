@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.autoconfigure.starter;
+package com.gitee.dorive.web.impl.banner;
 
 import java.io.File;
 import java.io.IOException;
