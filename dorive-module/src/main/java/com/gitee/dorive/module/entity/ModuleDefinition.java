@@ -21,6 +21,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.module.impl.util.NameUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
@@ -123,7 +124,7 @@ public class ModuleDefinition {
     }
 
     public String getScanPackage() {
-        return project + ".**";
+        return NameUtils.toPackage(project) + ".**";
     }
 
     public boolean isExposed(Class<?> clazz) {
@@ -131,7 +132,7 @@ public class ModuleDefinition {
         return CollUtil.findOne(exports, export -> PATH_MATCHER.match(export, className)) != null;
     }
 
-    public String getDomainPackage() {
+    public String getDomainPath() {
         List<String> packages = new ArrayList<>(2);
         if (StringUtils.isNotBlank(project)) {
             packages.add(project);
@@ -145,16 +146,16 @@ public class ModuleDefinition {
     public String getBasePackage() {
         List<String> packages = new ArrayList<>(4);
         if (StringUtils.isNotBlank(project)) {
-            packages.add(project);
+            packages.add(NameUtils.toPackage(project));
         }
         if (StringUtils.isNotBlank(domain)) {
-            packages.add(domain);
+            packages.add(NameUtils.toPackage(domain));
         }
         if (StringUtils.isNotBlank(subdomain)) {
-            packages.add(subdomain);
+            packages.add(NameUtils.toPackage(subdomain));
         }
         if (StringUtils.isNotBlank(version)) {
-            packages.add(version);
+            packages.add(NameUtils.toPackage(version));
         }
         return StrUtil.join(".", packages);
     }

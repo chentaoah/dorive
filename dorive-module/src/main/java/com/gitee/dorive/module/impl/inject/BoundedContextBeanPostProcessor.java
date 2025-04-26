@@ -50,8 +50,8 @@ public class BoundedContextBeanPostProcessor implements BeanFactoryAware, BeanPo
             if (bean instanceof BoundedContextAware) {
                 ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(userClass);
                 if (moduleDefinition != null) {
-                    String domainPackage = moduleDefinition.getDomainPackage();
-                    String boundedContextName = domainPackage + ".boundedContext";
+                    String domainPath = moduleDefinition.getDomainPath();
+                    String boundedContextName = domainPath + ".boundedContext";
                     if (beanFactory.containsBean(boundedContextName)) {
                         BoundedContext boundedContext = beanFactory.getBean(boundedContextName, BoundedContext.class);
                         ((BoundedContextAware) bean).setBoundedContext(boundedContext);
