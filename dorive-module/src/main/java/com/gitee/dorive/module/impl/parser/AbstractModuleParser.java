@@ -87,6 +87,7 @@ public abstract class AbstractModuleParser implements ModuleParser {
                         ModuleDefinition moduleDefinition = new ModuleDefinition(resource, manifest);
                         nameModuleDefinitionMap.put(moduleName, moduleDefinition);
                         uriModuleDefinitionMap.put(uriForMatch, moduleDefinition);
+                        // for test
                         String uri = uriForMatch.toString();
                         if (uri.endsWith("/target/classes/")) {
                             uri = StrUtil.removeSuffix(uri, "/target/classes/");
