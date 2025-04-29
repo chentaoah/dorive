@@ -38,6 +38,7 @@ import static com.gitee.dorive.module.impl.parser.AbstractModuleParser.PATH_MATC
 public class ModuleDefinition {
     private Resource resource;
     private String originId;
+    private String organization;
     private String project;
     private String domain;
     private String subdomain;
@@ -63,6 +64,7 @@ public class ModuleDefinition {
         Attributes mainAttributes = manifest.getMainAttributes();
 
         String originId = mainAttributes.getValue("Dorive-Origin-Id");
+        String organization = mainAttributes.getValue("Dorive-Organization");
         String project = mainAttributes.getValue("Dorive-Project");
         String domain = mainAttributes.getValue("Dorive-Domain");
         String subdomain = mainAttributes.getValue("Dorive-Subdomain");
@@ -83,6 +85,7 @@ public class ModuleDefinition {
         String requestPrefix = mainAttributes.getValue("Dorive-Request-Prefix");
 
         this.originId = filterValue(originId);
+        this.organization = filterValue(organization);
         this.project = filterValue(project);
         this.domain = filterValue(domain);
         this.subdomain = filterValue(subdomain);
@@ -124,7 +127,14 @@ public class ModuleDefinition {
     }
 
     public String getScanPackage() {
-        return NameUtils.toPackage(project) + ".**";
+        List<String> packages = new ArrayList<>(2);
+        if (StringUtils.isNotBlank(organization)) {
+            packages.add(NameUtils.toPackage(organization));
+        }
+        if (StringUtils.isNotBlank(project)) {
+            packages.add(NameUtils.toPackage(project));
+        }
+        return StrUtil.join(".", packages) + ".**";
     }
 
     public boolean isExposed(Class<?> clazz) {
@@ -144,7 +154,10 @@ public class ModuleDefinition {
     }
 
     public String getBasePackage() {
-        List<String> packages = new ArrayList<>(4);
+        List<String> packages = new ArrayList<>(5);
+        if (StringUtils.isNotBlank(organization)) {
+            packages.add(NameUtils.toPackage(organization));
+        }
         if (StringUtils.isNotBlank(project)) {
             packages.add(NameUtils.toPackage(project));
         }
