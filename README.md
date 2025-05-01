@@ -4,9 +4,9 @@
   <img src="https://img.shields.io/github/license/chentaoah/dorive" alt="license">
   <img src="https://img.shields.io/github/v/release/chentaoah/dorive?display_name=tag&include_prereleases" alt="release">
   <img src="https://img.shields.io/github/commit-activity/y/chentaoah/dorive" alt="commit">
-  <img src="https://img.shields.io/github/stars/chentaoah/dorive?color=%231890FF&style=flat-square" alt="stars">
 </p>
 <hr/>
+
 
 ###  🎁简介
 
@@ -66,18 +66,9 @@ dorive开发框架实现了模块化、模型化的全部特性，你可以有�
 - 持续演进，技术负债低。
 - 代码生成，开发快。
 
-### 💬使用建议
+### 🚅快速开始
 
-基础依赖说明：
-
-| 依赖库                    | 版本   | 说明                |
-| ------------------------- | ------ | ------------------- |
-| spring-boot-starter-web   | 2.7.18 | spring boot web集成 |
-| spring-tx                 | 5.3.31 | spring事务管理      |
-| hutool-all                | 5.8.25 | 工具库              |
-| mybatis-plus-boot-starter | 3.5.7  | 数据库框架          |
-
-如果是新项目，你将毫无负担地使用它：
+Maven引入：
 
 ```xml
 <dependency>
@@ -87,7 +78,32 @@ dorive开发框架实现了模块化、模型化的全部特性，你可以有�
 </dependency>
 ```
 
-如果是存量项目，你还需要考虑兼容性：
+### 🌰项目案例
+
+项目地址：[dorive-example](https://gitee.com/digital-engine/dorive-example)
+
+### 📝说明文档
+
+wiki地址：[Gitee wiki](https://gitee.com/digital-engine/dorive/wikis/pages)
+
+### 🌿版本说明
+
+例如：3.5.1（格式A.B.C）
+
+- A-架构版本：架构重构时增加，不保证兼容性。
+- B-特性版本：新特性引入时增加。
+- C-迭代版本：功能优化、bug修复时增加。
+
+### 💬依赖项
+
+| 依赖库                    | 版本   | 说明                |
+| ------------------------- | ------ | ------------------- |
+| spring-boot-starter-web   | 2.7.18 | spring boot web集成 |
+| spring-tx                 | 5.3.31 | spring事务管理      |
+| hutool-all                | 5.8.25 | 工具库              |
+| mybatis-plus-boot-starter | 3.5.7  | 数据库框架          |
+
+### 🤝兼容性
 
 | 模块                       | 说明             | 模块   | 适配Spring Boot版本 |
 | -------------------------- | ---------------- | ------ | ------------------- |
@@ -103,20 +119,6 @@ dorive开发框架实现了模块化、模型化的全部特性，你可以有�
 | dorive-web                 | web开发适配      | 模型化 | 2.2.2 - 2.7.18      |
 | dorive-autoconfigure       | 自动配置实现     |        |                     |
 | dorive-spring-boot-starter | 启动器           |        |                     |
-
-### 🌿分支版本说明
-
-例如：3.5.1（格式A.B.C）
-
-- A-架构版本：架构重构时增加，不保证兼容性。
-- B-特性版本：新特性引入时增加。
-- C-迭代版本：功能优化、bug修复时增加。
-
-### 📝文档
-
-wiki地址：
-
-- [Gitee wiki](https://gitee.com/digital-engine/dorive/wikis/pages)
 
 ### 🐞bug反馈与建议
 
