@@ -47,9 +47,10 @@ dorive = domain + driven 或 do + driven ，是原公司项目沉淀后的开源
 
 - **3M架构（Microservices + Module + Model）**
 
-3M架构：
+### 3️⃣3M架构
 
-- 简介：一种新的架构实现。在分层架构、微服务架构的基础上，提出将项目**模块化、模型化**，从而达到业务自由组合，灵活定制的效果。
+一种新的架构实现。在分层架构、微服务架构的基础上，提出将项目**模块化、模型化**，从而达到业务自由组合，灵活定制的效果。
+
 - 逻辑架构图：[logic.png](https://gitee.com/digital-engine/dorive/blob/3.5.2/doc/img/logic.png)
 - 物理架构图：[physical.png](https://gitee.com/digital-engine/dorive/blob/3.5.2/doc/img/physical.png)
 
