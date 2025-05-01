@@ -15,7 +15,7 @@ dorive = domain + driven 或 do + driven ，是原公司项目沉淀后的开源
 
 “do”表明了一种态度，只有付诸行动，才能有所收获。
 
-### 🏗️领域驱动
+### 🧱领域驱动
 
 领域驱动是一种软件开发方式。
 
@@ -34,7 +34,7 @@ dorive = domain + driven 或 do + driven ，是原公司项目沉淀后的开源
 - **高内聚**
 - **低耦合**
 
-### 📚架构实现
+### 🏗️架构实现
 
 领域驱动的几种架构实现方式：
 
@@ -109,7 +109,7 @@ Maven引入：
 </dependency>
 ```
 
-### 🌰项目案例
+### 💡项目案例
 
 项目地址：[dorive-example](https://gitee.com/digital-engine/dorive-example)
 
