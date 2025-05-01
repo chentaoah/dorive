@@ -155,7 +155,7 @@ Maven引入：
 
 提交问题反馈请说明正在使用的JDK版本、dorive版本，以及依赖库版本。
 
-链接地址：[Gitee issue](https://gitee.com/digital-engine/dorive/issues)
+页面地址：[Gitee issue](https://gitee.com/digital-engine/dorive/issues)
 
 ### 🙏🏻特别感谢
 
