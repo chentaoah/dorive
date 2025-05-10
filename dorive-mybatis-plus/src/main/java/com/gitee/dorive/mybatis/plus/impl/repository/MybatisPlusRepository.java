@@ -30,7 +30,18 @@ import com.gitee.dorive.core.api.common.ImplFactory;
 import com.gitee.dorive.core.api.common.MethodInvoker;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
+import com.gitee.dorive.core.api.factory.EntityFactory;
+import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
+import com.gitee.dorive.core.entity.factory.FieldConverter;
+import com.gitee.dorive.core.impl.executor.ExampleExecutor;
+import com.gitee.dorive.core.impl.executor.FactoryExecutor;
+import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
+import com.gitee.dorive.core.impl.factory.OperationFactory;
+import com.gitee.dorive.core.impl.factory.ValueObjEntityFactory;
+import com.gitee.dorive.core.impl.repository.AbstractRepository;
+import com.gitee.dorive.core.impl.repository.DefaultRepository;
+import com.gitee.dorive.core.impl.resolver.EntityMapperResolver;
 import com.gitee.dorive.mybatis.plus.impl.executor.MybatisPlusExecutor;
 import com.gitee.dorive.mybatis.plus.impl.DefaultMethodInvoker;
 import com.gitee.dorive.sql.impl.handler.SqlCustomQueryHandler;
@@ -74,6 +85,50 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
     }
 
     @Override
+    protected AbstractRepository<Object, Object> doNewRepository(EntityElement entityElement, OperationFactory operationFactory) {
+        Map<String, Object> attributes = new ConcurrentHashMap<>(4);
+
+        EntityStoreInfo entityStoreInfo = resolveEntityStoreInfo(getRepositoryDef());
+        attributes.put(EntityStoreInfo.class.getName(), entityStoreInfo);
+
+        EntityMapperResolver entityMapperResolver = new EntityMapperResolver(entityElement, entityStoreInfo);
+        EntityMapper entityMapper = entityMapperResolver.newEntityMapper();
+        EntityFactory entityFactory = newEntityFactory(entityElement, entityStoreInfo, entityMapper);
+
+        Executor executor = newExecutor(entityElement, entityStoreInfo);
+        executor = new FactoryExecutor(executor, entityElement, entityStoreInfo, entityFactory);
+        executor = new ExampleExecutor(executor, entityElement, entityMapper);
+        attributes.put(ExampleExecutor.class.getName(), executor);
+
+        DefaultRepository defaultRepository = new DefaultRepository();
+        defaultRepository.setEntityElement(entityElement);
+        defaultRepository.setOperationFactory(operationFactory);
+        defaultRepository.setExecutor(executor);
+        defaultRepository.setAttributes(attributes);
+        return defaultRepository;
+    }
+
+    protected EntityFactory newEntityFactory(EntityElement entityElement, EntityStoreInfo entityStoreInfo, EntityMapper entityMapper) {
+        RepositoryDef repositoryDef = getRepositoryDef();
+        Class<?> factoryClass = repositoryDef.getFactory();
+        EntityFactory entityFactory;
+        if (factoryClass == Object.class) {
+            List<FieldConverter> valueObjFields = entityMapper.getValueObjFields();
+            entityFactory = valueObjFields.isEmpty() ? new DefaultEntityFactory() : new ValueObjEntityFactory();
+        } else {
+            entityFactory = (EntityFactory) getApplicationContext().getBean(factoryClass);
+        }
+        if (entityFactory instanceof DefaultEntityFactory) {
+            DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
+            defaultEntityFactory.setEntityElement(entityElement);
+            defaultEntityFactory.setEntityStoreInfo(entityStoreInfo);
+            defaultEntityFactory.setEntityMapper(entityMapper);
+            defaultEntityFactory.setBoundedContextName(repositoryDef.getBoundedContext());
+            defaultEntityFactory.setBoundedContext(getBoundedContext());
+        }
+        return entityFactory;
+    }
+
     protected EntityStoreInfo resolveEntityStoreInfo(RepositoryDef repositoryDef) {
         Class<?> mapperClass = repositoryDef.getDataSource();
         Object mapper = null;
@@ -100,7 +155,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         return entityStoreInfo;
     }
 
-    private EntityStoreInfo newEntityStoreInfo(Class<?> mapperClass, Object mapper, Class<?> pojoClass, TableInfo tableInfo) {
+    protected EntityStoreInfo newEntityStoreInfo(Class<?> mapperClass, Object mapper, Class<?> pojoClass, TableInfo tableInfo) {
         String tableName = tableInfo.getTableName();
         String keyProperty = tableInfo.getKeyProperty();
         String keyColumn = tableInfo.getKeyColumn();
@@ -134,7 +189,6 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn, propAliasMappingWithoutPk, propAliasMapping, aliasPropMapping, selectColumns, selectMethodMap);
     }
 
-    @Override
     protected Executor newExecutor(EntityElement entityElement, EntityStoreInfo entityStoreInfo) {
         Executor executor = new MybatisPlusExecutor(entityElement.getEntityDef(), entityElement, entityStoreInfo);
         return new UnionExecutor(executor, sqlRunner, entityStoreInfo);

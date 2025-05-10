@@ -18,7 +18,6 @@
 package com.gitee.dorive.event.impl.repository;
 
 import cn.hutool.core.util.ArrayUtil;
-import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
@@ -27,7 +26,6 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
-import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.repository.AbstractGenericRepository;
 import com.gitee.dorive.core.impl.repository.AbstractRepository;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
@@ -52,11 +50,10 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
     }
 
     @Override
-    protected AbstractRepository<Object, Object> doNewRepository(EntityElement entityElement, OperationFactory operationFactory) {
-        AbstractRepository<Object, Object> repository = super.doNewRepository(entityElement, operationFactory);
+    protected AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository) {
         if (enableExecutorEvent && repository instanceof DefaultRepository) {
             Executor executor = repository.getExecutor();
-            executor = new EventExecutor(executor, getApplicationContext(), entityElement);
+            executor = new EventExecutor(executor, getApplicationContext(), repository.getEntityElement());
             repository.setExecutor(executor);
         }
         return repository;
