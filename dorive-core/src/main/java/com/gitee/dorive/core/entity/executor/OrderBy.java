@@ -28,11 +28,11 @@ import java.util.List;
 public class OrderBy {
 
     private List<String> properties;
-    private String order;
+    private String sort;
 
     @Override
     public String toString() {
-        return "ORDER BY " + StrUtil.join(",", properties) + " " + order.toUpperCase();
+        return "ORDER BY " + StrUtil.join(",", properties) + " " + sort.toUpperCase();
     }
 
 }

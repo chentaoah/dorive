@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.module.impl.inject;
 
-import com.gitee.dorive.api.api.BoundedContextAware;
-import com.gitee.dorive.api.entity.BoundedContext;
+import com.gitee.dorive.api.api.common.BoundedContextAware;
+import com.gitee.dorive.api.entity.common.BoundedContext;
 import com.gitee.dorive.module.api.ModuleParser;
 import com.gitee.dorive.module.entity.ModuleDefinition;
 import com.gitee.dorive.module.impl.parser.DefaultModuleParser;
@@ -50,8 +50,8 @@ public class BoundedContextBeanPostProcessor implements BeanFactoryAware, BeanPo
             if (bean instanceof BoundedContextAware) {
                 ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(userClass);
                 if (moduleDefinition != null) {
-                    String domainPackage = moduleDefinition.getDomainPackage();
-                    String boundedContextName = domainPackage + ".boundedContext";
+                    String domainPath = moduleDefinition.getDomainPath();
+                    String boundedContextName = domainPath + ".boundedContext";
                     if (beanFactory.containsBean(boundedContextName)) {
                         BoundedContext boundedContext = beanFactory.getBean(boundedContextName, BoundedContext.class);
                         ((BoundedContextAware) bean).setBoundedContext(boundedContext);

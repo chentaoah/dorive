@@ -15,26 +15,23 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.autoconfigure.web;
+package com.gitee.dorive.web.impl.banner;
 
-import com.gitee.dorive.web.impl.advice.ParameterControllerAdvice;
-import com.gitee.dorive.web.impl.banner.BannerPrinter;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
+import org.springframework.beans.factory.InitializingBean;
 
-@Order(-100)
-@Configuration
-public class DoriveWebConfiguration {
+public class BannerPrinter implements InitializingBean {
 
-    @Bean("parameterControllerAdviceV3")
-    public static ParameterControllerAdvice parameterControllerAdvice() {
-        return new ParameterControllerAdvice();
+    @Override
+    public void afterPropertiesSet() {
+        System.out.println(" __   __   __          ___ ");
+        System.out.println("|  \\ /  \\ |__) | \\  / |__  ");
+        System.out.println("|__/ \\__/ |  \\ |  \\/  |___ ");
+        System.out.println("                      " + DoriveVersion.getVersion() + "");
     }
 
-    @Bean("bannerPrinterV3")
-    public static BannerPrinter bannerPrinter() {
-        return new BannerPrinter();
+    public static void main(String[] args) {
+        BannerPrinter bannerPrinter = new BannerPrinter();
+        bannerPrinter.afterPropertiesSet();
     }
 
 }

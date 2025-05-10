@@ -4,25 +4,57 @@
   <img src="https://img.shields.io/github/license/chentaoah/dorive" alt="license">
   <img src="https://img.shields.io/github/v/release/chentaoah/dorive?display_name=tag&include_prereleases" alt="release">
   <img src="https://img.shields.io/github/commit-activity/y/chentaoah/dorive" alt="commit">
-  <img src="https://img.shields.io/github/stars/chentaoah/dorive?color=%231890FF&style=flat-square" alt="stars">
 </p>
 <hr/>
 
 ###  🎁简介
 
-🔥🔥🔥dorive是一个轻量化、渐进式开发框架，帮助开发者，快速落地领域驱动式项目。 
+🔥🔥🔥dorive是一个轻量化、渐进式、领域驱动式开发框架，帮助开发者，开发**可持续演进的复杂应用**。 
 
 dorive = domain + driven 或 do + driven ，是原公司项目沉淀后的开源库。
 
 “do”表明了一种态度，只有付诸行动，才能有所收获。
 
-### 📚3M架构
+### 🧱领域驱动
 
-领域驱动设计的核心是高内聚、低耦合。为了实现它，现代应用架构正朝着微服务化、模块化、模型化方向发展。
+领域驱动是一种软件开发方式。
 
-3M架构 =  Microservices + Module + Model
+解决痛点：
 
-### 📦模块化
+- **腐化**（代码组织混乱，逻辑互相渗透）
+- **僵化**（直接依赖过多，修改困难）
+
+实施方法：
+
+- 通过**业务划界**，理清业务之间的关系。
+- 通过**业务建模**，表达真实的业务逻辑。
+
+核心：
+
+- **高内聚**
+- **低耦合**
+
+### 🏗️架构实现
+
+领域驱动的几种架构实现方式：
+
+- 分层架构（Layered Architecture）
+- 六边形架构（Hexagonal Architecture）
+- 清洁架构（Clean Architecture）
+- 事件驱动架构（Event-Driven Architecture, EDA）
+- CQRS（命令查询职责分离）
+- 微服务架构（Microservices + DDD）
+
+- **3M架构（Microservices + Module + Model）**
+
+### 3️⃣3M架构
+
+一种新的架构实现。在分层架构、微服务架构的基础上，提出将项目**模块化、模型化**，从而达到业务自由组合，灵活定制的效果。
+
+- 逻辑架构图：[logic.png](https://gitee.com/digital-engine/dorive/blob/3.5.2/doc/img/logic.png)
+- 物理架构图：[physical.png](https://gitee.com/digital-engine/dorive/blob/3.5.2/doc/img/physical.png)
+
+### 📦模块化（module)
 
 一个应用系统由一个或多个模块组成。
 
@@ -36,7 +68,7 @@ dorive = domain + driven 或 do + driven ，是原公司项目沉淀后的开源
 - 模块可选择向外暴露的bean。
 - 模块之间不直接依赖，可通过接口与事件进行交互。
 
-### 🛠️模型化
+### 🛠️模型化（model)
 
 同个领域内的多个模块共享一个边界上下文。
 
@@ -66,9 +98,35 @@ dorive开发框架实现了模块化、模型化的全部特性，你可以有�
 - 持续演进，技术负债低。
 - 代码生成，开发快。
 
-### 💬使用建议
+### 🚅快速开始
 
-基础依赖说明：
+Maven引入：
+
+```xml
+<dependency>
+    <groupId>com.gitee.digital-engine</groupId>
+    <artifactId>dorive-spring-boot-starter</artifactId>
+    <version>3.5.2</version>
+</dependency>
+```
+
+### 💡项目案例
+
+项目地址：[dorive-example](https://gitee.com/digital-engine/dorive-example)
+
+### 📝说明文档
+
+文档地址：[Gitee wiki](https://gitee.com/digital-engine/dorive/wikis/pages)
+
+### 🌿版本说明
+
+例如：3.5.1（格式A.B.C）
+
+- A-架构版本：架构重构时增加，不保证兼容性。
+- B-特性版本：新特性引入时增加。
+- C-迭代版本：功能优化、bug修复时增加。
+
+### 💬依赖项
 
 | 依赖库                    | 版本   | 说明                |
 | ------------------------- | ------ | ------------------- |
@@ -77,17 +135,7 @@ dorive开发框架实现了模块化、模型化的全部特性，你可以有�
 | hutool-all                | 5.8.25 | 工具库              |
 | mybatis-plus-boot-starter | 3.5.7  | 数据库框架          |
 
-如果是新项目，你将毫无负担地使用它：
-
-```xml
-<dependency>
-    <groupId>com.gitee.digital-engine</groupId>
-    <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.5.1</version>
-</dependency>
-```
-
-如果是存量项目，你还需要考虑兼容性：
+### 🤝兼容性
 
 | 模块                       | 说明             | 模块   | 适配Spring Boot版本 |
 | -------------------------- | ---------------- | ------ | ------------------- |
@@ -104,25 +152,11 @@ dorive开发框架实现了模块化、模型化的全部特性，你可以有�
 | dorive-autoconfigure       | 自动配置实现     |        |                     |
 | dorive-spring-boot-starter | 启动器           |        |                     |
 
-### 🌿分支版本说明
-
-例如：3.5.1（格式A.B.C）
-
-- A-架构版本：架构重构时增加，不保证兼容性。
-- B-特性版本：新特性引入时增加。
-- C-迭代版本：功能优化、bug修复时增加。
-
-### 📝文档
-
-wiki地址：
-
-- [Gitee wiki](https://gitee.com/digital-engine/dorive/wikis/pages)
-
 ### 🐞bug反馈与建议
 
 提交问题反馈请说明正在使用的JDK版本、dorive版本，以及依赖库版本。
 
-- [Gitee issue](https://gitee.com/digital-engine/dorive/issues)
+页面地址：[Gitee issue](https://gitee.com/digital-engine/dorive/issues)
 
 ### 🙏🏻特别感谢
 

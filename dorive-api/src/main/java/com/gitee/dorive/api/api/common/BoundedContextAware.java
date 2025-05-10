@@ -15,26 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.autoconfigure.web;
+package com.gitee.dorive.api.api.common;
 
-import com.gitee.dorive.web.impl.advice.ParameterControllerAdvice;
-import com.gitee.dorive.web.impl.banner.BannerPrinter;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
+import com.gitee.dorive.api.entity.common.BoundedContext;
 
-@Order(-100)
-@Configuration
-public class DoriveWebConfiguration {
+public interface BoundedContextAware {
 
-    @Bean("parameterControllerAdviceV3")
-    public static ParameterControllerAdvice parameterControllerAdvice() {
-        return new ParameterControllerAdvice();
-    }
-
-    @Bean("bannerPrinterV3")
-    public static BannerPrinter bannerPrinter() {
-        return new BannerPrinter();
-    }
+    void setBoundedContext(BoundedContext boundedContext);
 
 }

@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.module.impl.filter;
 
-import com.gitee.dorive.api.entity.BoundedContext;
+import com.gitee.dorive.api.entity.common.BoundedContext;
 import com.gitee.dorive.module.api.ExposedBeanFilter;
 import com.gitee.dorive.module.entity.ModuleBeanDescriptor;
 import com.gitee.dorive.module.entity.ModuleDefinition;
@@ -32,8 +32,8 @@ public class BoundedContextExposedBeanFilter implements ExposedBeanFilter {
         Class<?> declaredType = descriptor.getDeclaredType();
         if (declaredType == BoundedContext.class && !exposedCandidates.isEmpty()) {
             ModuleDefinition moduleDefinition = beanDescriptor.getModuleDefinition();
-            String domainPackage = moduleDefinition.getDomainPackage();
-            String boundedContextName = domainPackage + ".boundedContext";
+            String domainPath = moduleDefinition.getDomainPath();
+            String boundedContextName = domainPath + ".boundedContext";
             ModuleBeanDescriptor existModuleBeanDescriptor = exposedCandidates.get(boundedContextName);
             // 清空
             exposedCandidates.clear();

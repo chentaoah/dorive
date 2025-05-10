@@ -15,12 +15,33 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity;
+package com.gitee.dorive.api.annotation.core;
 
-import lombok.NoArgsConstructor;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.util.Properties;
+/**
+ * 排序
+ */
+@Inherited
+@Documented
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface OrderBy {
 
-@NoArgsConstructor
-public class BoundedContext extends Properties {
+    /**
+     * 排序字段
+     */
+    String field() default "";
+
+    /**
+     * 排序方式
+     */
+    String sort() default "";
+
 }
+

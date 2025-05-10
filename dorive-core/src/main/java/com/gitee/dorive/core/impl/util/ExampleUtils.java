@@ -70,7 +70,7 @@ public class ExampleUtils {
     }
 
     public static OrderBy clone(OrderBy orderBy) {
-        return new OrderBy(new ArrayList<>(orderBy.getProperties()), orderBy.getOrder());
+        return new OrderBy(new ArrayList<>(orderBy.getProperties()), orderBy.getSort());
     }
 
     public static <T> Page<T> clone(Page<T> page) {

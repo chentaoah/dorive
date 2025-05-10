@@ -163,7 +163,7 @@ public class EntityDefinitionResolver {
         FieldEntityDefinition fieldEntityDefinition = BeanUtil.copyProperties(entityDefinition, FieldEntityDefinition.class);
         fieldEntityDefinition.setField(myField);
         fieldEntityDefinition.setBindingDefs(BindingDef.fromElement(field));
-        fieldEntityDefinition.setOrderDef(OrderDef.fromElement(field));
+        fieldEntityDefinition.setOrderByDef(OrderByDef.fromElement(field));
 
         EntityDef entityDef = fieldEntityDefinition.getEntityDef();
         EntityDef newEntityDef = BeanUtil.copyProperties(entityDef, EntityDef.class);

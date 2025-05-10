@@ -15,12 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.api;
+package com.gitee.dorive.module.impl.util;
 
-import com.gitee.dorive.api.entity.BoundedContext;
+import cn.hutool.core.util.StrUtil;
 
-public interface BoundedContextAware {
+public class NameUtils {
 
-    void setBoundedContext(BoundedContext boundedContext);
+    public static String toPackage(String name) {
+        name = StrUtil.replace(name, "-", "_");
+        name = StrUtil.toUnderlineCase(name);
+        return name;
+    }
 
 }

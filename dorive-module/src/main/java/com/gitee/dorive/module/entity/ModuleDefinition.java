@@ -21,6 +21,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.module.impl.util.NameUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
@@ -37,6 +38,7 @@ import static com.gitee.dorive.module.impl.parser.AbstractModuleParser.PATH_MATC
 public class ModuleDefinition {
     private Resource resource;
     private String originId;
+    private String organization;
     private String project;
     private String domain;
     private String subdomain;
@@ -62,6 +64,7 @@ public class ModuleDefinition {
         Attributes mainAttributes = manifest.getMainAttributes();
 
         String originId = mainAttributes.getValue("Dorive-Origin-Id");
+        String organization = mainAttributes.getValue("Dorive-Organization");
         String project = mainAttributes.getValue("Dorive-Project");
         String domain = mainAttributes.getValue("Dorive-Domain");
         String subdomain = mainAttributes.getValue("Dorive-Subdomain");
@@ -82,6 +85,7 @@ public class ModuleDefinition {
         String requestPrefix = mainAttributes.getValue("Dorive-Request-Prefix");
 
         this.originId = filterValue(originId);
+        this.organization = filterValue(organization);
         this.project = filterValue(project);
         this.domain = filterValue(domain);
         this.subdomain = filterValue(subdomain);
@@ -123,7 +127,14 @@ public class ModuleDefinition {
     }
 
     public String getScanPackage() {
-        return project + ".**";
+        List<String> packages = new ArrayList<>(2);
+        if (StringUtils.isNotBlank(organization)) {
+            packages.add(NameUtils.toPackage(organization));
+        }
+        if (StringUtils.isNotBlank(project)) {
+            packages.add(NameUtils.toPackage(project));
+        }
+        return StrUtil.join(".", packages) + ".**";
     }
 
     public boolean isExposed(Class<?> clazz) {
@@ -131,7 +142,7 @@ public class ModuleDefinition {
         return CollUtil.findOne(exports, export -> PATH_MATCHER.match(export, className)) != null;
     }
 
-    public String getDomainPackage() {
+    public String getDomainPath() {
         List<String> packages = new ArrayList<>(2);
         if (StringUtils.isNotBlank(project)) {
             packages.add(project);
@@ -143,18 +154,21 @@ public class ModuleDefinition {
     }
 
     public String getBasePackage() {
-        List<String> packages = new ArrayList<>(4);
+        List<String> packages = new ArrayList<>(5);
+        if (StringUtils.isNotBlank(organization)) {
+            packages.add(NameUtils.toPackage(organization));
+        }
         if (StringUtils.isNotBlank(project)) {
-            packages.add(project);
+            packages.add(NameUtils.toPackage(project));
         }
         if (StringUtils.isNotBlank(domain)) {
-            packages.add(domain);
+            packages.add(NameUtils.toPackage(domain));
         }
         if (StringUtils.isNotBlank(subdomain)) {
-            packages.add(subdomain);
+            packages.add(NameUtils.toPackage(subdomain));
         }
         if (StringUtils.isNotBlank(version)) {
-            packages.add(version);
+            packages.add(NameUtils.toPackage(version));
         }
         return StrUtil.join(".", packages);
     }
