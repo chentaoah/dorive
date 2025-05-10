@@ -17,15 +17,14 @@
 
 package com.gitee.dorive.core.impl.repository;
 
+import com.gitee.dorive.core.api.common.ExampleConverter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Map;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class DefaultRepository extends AbstractRepository<Object, Object> {
-    private Map<String, Object> attributes;
+    private ExampleConverter exampleConverter;
 }

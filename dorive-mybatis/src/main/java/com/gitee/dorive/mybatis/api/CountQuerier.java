@@ -15,24 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.plus.impl;
+package com.gitee.dorive.mybatis.api;
 
-import com.gitee.dorive.core.api.common.ImplFactory;
-import com.gitee.dorive.core.api.format.SqlFormat;
-import com.gitee.dorive.mybatis.api.SqlRunner;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.mybatis.entity.common.CountQuery;
 
-public class DefaultImplFactory implements ImplFactory {
+import java.util.Map;
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getInstance(Class<T> clazz, Object... args) {
-        if (clazz == SqlFormat.class) {
-            return (T) new DefaultSqlHelper();
+public interface CountQuerier {
 
-        } else if (clazz == SqlRunner.class) {
-            return (T) new DefaultSqlHelper();
-        }
-        return null;
-    }
+    Map<String, Long> selectCountMap(Context context, CountQuery countQuery);
 
 }

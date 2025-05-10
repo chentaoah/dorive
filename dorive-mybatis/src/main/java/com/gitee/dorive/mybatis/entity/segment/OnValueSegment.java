@@ -15,24 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.plus.impl;
+package com.gitee.dorive.mybatis.entity.segment;
 
-import com.gitee.dorive.core.api.common.ImplFactory;
-import com.gitee.dorive.core.api.format.SqlFormat;
-import com.gitee.dorive.mybatis.api.SqlRunner;
+import lombok.Getter;
+import lombok.Setter;
 
-public class DefaultImplFactory implements ImplFactory {
+@Getter
+@Setter
+public class OnValueSegment extends OnSegment {
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getInstance(Class<T> clazz, Object... args) {
-        if (clazz == SqlFormat.class) {
-            return (T) new DefaultSqlHelper();
-
-        } else if (clazz == SqlRunner.class) {
-            return (T) new DefaultSqlHelper();
-        }
-        return null;
+    public OnValueSegment(String leftExpr, String operator, String rightExpr) {
+        super(leftExpr, operator, rightExpr);
     }
 
 }

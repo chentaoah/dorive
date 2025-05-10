@@ -8,16 +8,12 @@
         <artifactId>dorive</artifactId>
         <version>3.5.2</version>
     </parent>
-    <artifactId>dorive-mybatis-plus</artifactId>
+    <artifactId>dorive-mybatis</artifactId>
     <dependencies>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-mybatis</artifactId>
+            <artifactId>dorive-ref</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -15,24 +15,30 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.plus.impl;
+package com.gitee.dorive.mybatis.entity.segment;
 
-import com.gitee.dorive.core.api.common.ImplFactory;
-import com.gitee.dorive.core.api.format.SqlFormat;
-import com.gitee.dorive.mybatis.api.SqlRunner;
+import com.gitee.dorive.mybatis.api.Segment;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public class DefaultImplFactory implements ImplFactory {
+import java.util.List;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class TableSegment implements Segment {
+
+    private String tableName;
+    private String tableAlias;
+    private boolean join;
+    private List<ArgSegment> argSegments;
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getInstance(Class<T> clazz, Object... args) {
-        if (clazz == SqlFormat.class) {
-            return (T) new DefaultSqlHelper();
-
-        } else if (clazz == SqlRunner.class) {
-            return (T) new DefaultSqlHelper();
-        }
-        return null;
+    public String toString() {
+        return tableName + " " + tableAlias;
     }
 
 }

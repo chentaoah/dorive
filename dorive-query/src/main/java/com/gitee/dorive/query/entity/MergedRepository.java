@@ -57,8 +57,4 @@ public class MergedRepository {
     public String getName() {
         return definedRepository.getEntityElement().getEntityDef().getName();
     }
-
-    public Map<String, Object> getAttributes() {
-        return defaultRepository.getAttributes();
-    }
 }

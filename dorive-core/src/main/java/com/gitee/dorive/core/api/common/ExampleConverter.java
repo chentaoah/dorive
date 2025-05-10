@@ -15,24 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.plus.impl;
+package com.gitee.dorive.core.api.common;
 
-import com.gitee.dorive.core.api.common.ImplFactory;
-import com.gitee.dorive.core.api.format.SqlFormat;
-import com.gitee.dorive.mybatis.api.SqlRunner;
+import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.entity.executor.Example;
 
-public class DefaultImplFactory implements ImplFactory {
+public interface ExampleConverter {
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getInstance(Class<T> clazz, Object... args) {
-        if (clazz == SqlFormat.class) {
-            return (T) new DefaultSqlHelper();
-
-        } else if (clazz == SqlRunner.class) {
-            return (T) new DefaultSqlHelper();
-        }
-        return null;
-    }
+    void convert(Context context, Example example);
 
 }

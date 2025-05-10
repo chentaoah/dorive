@@ -15,24 +15,33 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.plus.impl;
+package com.gitee.dorive.mybatis.entity.common;
 
-import com.gitee.dorive.core.api.common.ImplFactory;
-import com.gitee.dorive.core.api.format.SqlFormat;
-import com.gitee.dorive.mybatis.api.SqlRunner;
+import com.gitee.dorive.core.api.context.Selector;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public class DefaultImplFactory implements ImplFactory {
+import java.util.Collections;
+import java.util.List;
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getInstance(Class<T> clazz, Object... args) {
-        if (clazz == SqlFormat.class) {
-            return (T) new DefaultSqlHelper();
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CountQuery {
 
-        } else if (clazz == SqlRunner.class) {
-            return (T) new DefaultSqlHelper();
-        }
-        return null;
+    private Object query;
+    private boolean distinct = true;
+    private Selector selector;
+    private List<String> countBy;
+    private List<String> groupBy;
+
+    public CountQuery(Object query, String countBy, String groupBy) {
+        this.query = query;
+        this.countBy = Collections.singletonList(countBy);
+        this.groupBy = Collections.singletonList(groupBy);
     }
 
 }

@@ -19,6 +19,7 @@ package com.gitee.dorive.core.impl.executor;
 
 import com.gitee.dorive.api.constant.core.Operator;
 import com.gitee.dorive.api.entity.core.EntityElement;
+import com.gitee.dorive.core.api.common.ExampleConverter;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.api.executor.Executor;
@@ -42,7 +43,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class ExampleExecutor extends AbstractProxyExecutor {
+public class ExampleExecutor extends AbstractProxyExecutor implements ExampleConverter {
 
     private EntityElement entityElement;
     private EntityMapper entityMapper;
@@ -92,6 +93,7 @@ public class ExampleExecutor extends AbstractProxyExecutor {
         return super.execute(context, operation);
     }
 
+    @Override
     public void convert(Context context, Example example) {
         convertSelectProps(example);
         convertCriteria(context, example);
