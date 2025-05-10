@@ -24,7 +24,6 @@ import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.enums.JoinType;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
-import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.Query;
@@ -32,8 +31,8 @@ import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
+import com.gitee.dorive.core.impl.factory.OrderByFactory;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.impl.util.ExampleUtils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -48,7 +47,7 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
     private boolean root;
     private boolean aggregated;
     private BinderResolver binderResolver;
-    private OrderBy defaultOrderBy;
+    private OrderByFactory orderByFactory;
     private boolean bound;
     private Matcher matcher;
 
@@ -101,8 +100,8 @@ public class CommonRepository extends AbstractProxyRepository implements Matcher
         }
         Example example = query.getExample();
         if (example != null) {
-            if (example.getOrderBy() == null && defaultOrderBy != null) {
-                example.setOrderBy(ExampleUtils.clone(defaultOrderBy));
+            if (example.getOrderBy() == null && orderByFactory != null) {
+                example.setOrderBy(orderByFactory.newOrderBy());
             }
         }
         return super.executeQuery(context, query);

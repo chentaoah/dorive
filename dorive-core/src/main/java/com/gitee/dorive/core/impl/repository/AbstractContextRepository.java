@@ -18,9 +18,8 @@
 package com.gitee.dorive.core.impl.repository;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.api.common.BoundedContextAware;
-import com.gitee.dorive.api.constant.core.Sort;
+import com.gitee.dorive.api.entity.common.BoundedContext;
 import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.def.EntityDef;
@@ -36,9 +35,7 @@ import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.config.RepositoryContext;
-import com.gitee.dorive.api.entity.common.BoundedContext;
 import com.gitee.dorive.core.entity.common.EntityStoreInfo;
-import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.factory.FieldConverter;
 import com.gitee.dorive.core.impl.context.AdaptiveMatcher;
 import com.gitee.dorive.core.impl.executor.ContextExecutor;
@@ -46,6 +43,7 @@ import com.gitee.dorive.core.impl.executor.ExampleExecutor;
 import com.gitee.dorive.core.impl.executor.FactoryExecutor;
 import com.gitee.dorive.core.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
+import com.gitee.dorive.core.impl.factory.OrderByFactory;
 import com.gitee.dorive.core.impl.factory.ValueObjEntityFactory;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
 import com.gitee.dorive.core.impl.handler.DelegatedEntityHandler;
@@ -159,7 +157,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         boolean isAggregated = repository instanceof AbstractContextRepository;
         BinderResolver binderResolver = new BinderResolver(this);
         binderResolver.resolve(entityElement);
-        OrderBy defaultOrderBy = newDefaultOrderBy(orderByDef);
+        OrderByFactory orderByFactory = orderByDef == null ? null : new OrderByFactory(orderByDef);
 
         CommonRepository repositoryWrapper = new CommonRepository();
         repositoryWrapper.setEntityElement(entityElement);
@@ -169,7 +167,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         repositoryWrapper.setRoot(isRoot);
         repositoryWrapper.setAggregated(isAggregated);
         repositoryWrapper.setBinderResolver(binderResolver);
-        repositoryWrapper.setDefaultOrderBy(defaultOrderBy);
+        repositoryWrapper.setOrderByFactory(orderByFactory);
         repositoryWrapper.setBound(false);
         repositoryWrapper.setMatcher(new AdaptiveMatcher(repositoryWrapper));
         return repositoryWrapper;
@@ -247,21 +245,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             return abstractContextRepository.getRootRepository().getProxyRepository();
         }
         return repository;
-    }
-
-    private OrderBy newDefaultOrderBy(OrderByDef orderByDef) {
-        if (orderByDef != null) {
-            String field = orderByDef.getField();
-            String sort = orderByDef.getSort();
-            if (StringUtils.isNotBlank(field) && StringUtils.isNotBlank(sort)) {
-                sort = sort.toUpperCase();
-                if (Sort.ASC.equals(sort) || Sort.DESC.equals(sort)) {
-                    List<String> properties = StrUtil.splitTrim(field, ",");
-                    return new OrderBy(properties, sort);
-                }
-            }
-        }
-        return null;
     }
 
     protected Executor newExecutor() {
