@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.api;
+package com.gitee.dorive.mybatis.api.sql;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.mybatis.entity.common.CountQuery;

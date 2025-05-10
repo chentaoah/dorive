@@ -19,7 +19,7 @@ package com.gitee.dorive.mybatis.entity.segment;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlBuilder;
-import com.gitee.dorive.mybatis.api.Segment;
+import com.gitee.dorive.mybatis.api.sql.Segment;
 import lombok.Data;
 
 import java.util.ArrayList;

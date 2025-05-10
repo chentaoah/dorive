@@ -15,7 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.api;
+package com.gitee.dorive.mybatis.api.sql;
 
-public interface Segment {
+import java.util.List;
+import java.util.Map;
+
+public interface SqlRunner {
+
+    long selectCount(String sql, Object... args);
+
+    List<Map<String, Object>> selectList(String sql, Object... args);
+
 }

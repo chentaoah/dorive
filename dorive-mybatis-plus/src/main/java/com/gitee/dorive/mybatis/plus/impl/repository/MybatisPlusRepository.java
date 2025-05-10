@@ -28,7 +28,7 @@ import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.core.api.common.MethodInvoker;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.entity.common.EntityStoreInfo;
+import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.mybatis.impl.executor.UnionExecutor;
 import com.gitee.dorive.mybatis.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.mybatis.plus.impl.DefaultMethodInvoker;

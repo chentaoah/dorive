@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.factory;
+package com.gitee.dorive.mybatis.impl.factory;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
@@ -27,7 +27,7 @@ import com.gitee.dorive.core.api.factory.EntityAdapter;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.api.entity.common.BoundedContext;
-import com.gitee.dorive.core.entity.common.EntityStoreInfo;
+import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.enums.Domain;
 import com.gitee.dorive.core.entity.factory.FieldConverter;
 import lombok.AllArgsConstructor;

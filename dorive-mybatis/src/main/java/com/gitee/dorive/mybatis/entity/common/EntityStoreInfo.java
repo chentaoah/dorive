@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.common;
+package com.gitee.dorive.mybatis.entity.common;
 
 import com.gitee.dorive.core.api.common.MethodInvoker;
 import lombok.AllArgsConstructor;

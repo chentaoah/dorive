@@ -26,7 +26,7 @@ import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
-import com.gitee.dorive.mybatis.api.SqlRunner;
+import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 import com.gitee.dorive.mybatis.entity.segment.ArgSegment;
 import com.gitee.dorive.mybatis.entity.segment.SelectSegment;
 import com.gitee.dorive.mybatis.entity.segment.TableSegment;

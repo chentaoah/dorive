@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.mybatis.entity.segment;
 
-import com.gitee.dorive.mybatis.api.Segment;
+import com.gitee.dorive.mybatis.api.sql.Segment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

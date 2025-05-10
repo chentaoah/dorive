@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.executor;
+package com.gitee.dorive.mybatis.impl.executor;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.factory.EntityFactory;
-import com.gitee.dorive.core.entity.common.EntityStoreInfo;
+import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.EntityOp;
@@ -30,6 +30,7 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
 import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
+import com.gitee.dorive.core.impl.executor.AbstractProxyExecutor;
 import lombok.Getter;
 import lombok.Setter;
 

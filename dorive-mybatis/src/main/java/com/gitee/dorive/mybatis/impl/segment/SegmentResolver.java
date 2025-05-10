@@ -19,7 +19,7 @@ package com.gitee.dorive.mybatis.impl.segment;
 
 import com.gitee.dorive.api.constant.core.Operator;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.common.EntityStoreInfo;
+import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
@@ -28,7 +28,7 @@ import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.repository.CommonRepository;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.util.CriterionUtils;
-import com.gitee.dorive.mybatis.api.Segment;
+import com.gitee.dorive.mybatis.api.sql.Segment;
 import com.gitee.dorive.mybatis.entity.segment.*;
 import com.gitee.dorive.mybatis.impl.repository.DefaultStoreRepository;
 import com.gitee.dorive.query.entity.MergedRepository;

@@ -20,7 +20,7 @@ package com.gitee.dorive.mybatis.impl.handler;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.common.MethodInvoker;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.common.EntityStoreInfo;
+import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
