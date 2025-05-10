@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.executor;
+package com.gitee.dorive.mybatis.impl.executor;
 
 import com.gitee.dorive.api.constant.core.Operator;
 import com.gitee.dorive.api.entity.core.EntityElement;
@@ -35,6 +35,7 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
 import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.operation.eop.Update;
+import com.gitee.dorive.core.impl.executor.AbstractProxyExecutor;
 import lombok.Getter;
 import lombok.Setter;
 

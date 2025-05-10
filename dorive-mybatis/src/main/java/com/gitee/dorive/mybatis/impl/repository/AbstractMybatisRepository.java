@@ -27,7 +27,7 @@ import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.factory.FieldConverter;
-import com.gitee.dorive.core.impl.executor.ExampleExecutor;
+import com.gitee.dorive.mybatis.impl.executor.ExampleExecutor;
 import com.gitee.dorive.mybatis.impl.executor.FactoryExecutor;
 import com.gitee.dorive.mybatis.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
