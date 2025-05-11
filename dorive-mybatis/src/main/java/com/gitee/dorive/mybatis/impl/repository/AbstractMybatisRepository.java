@@ -25,30 +25,26 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
-import com.gitee.dorive.core.api.mapper.FieldMapper;
+import com.gitee.dorive.core.impl.executor.unit.ExampleExecutor;
+import com.gitee.dorive.core.impl.executor.unit.FactoryExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.repository.AbstractRepository;
+import com.gitee.dorive.core.impl.resolver.EntityMapperResolver;
 import com.gitee.dorive.mybatis.api.sql.CountQuerier;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 import com.gitee.dorive.mybatis.entity.common.CountQuery;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
-import com.gitee.dorive.core.impl.executor.unit.ExampleExecutor;
-import com.gitee.dorive.core.impl.executor.unit.FactoryExecutor;
-import com.gitee.dorive.core.impl.factory.entity.DefaultEntityFactory;
-import com.gitee.dorive.core.impl.factory.entity.ValueObjEntityFactory;
 import com.gitee.dorive.mybatis.impl.executor.UnionExecutor;
 import com.gitee.dorive.mybatis.impl.handler.SqlBuildQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlCustomQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlExecuteQueryHandler;
 import com.gitee.dorive.mybatis.impl.querier.SqlCountQuerier;
-import com.gitee.dorive.core.impl.resolver.EntityMapperResolver;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.enums.QueryMethod;
 import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -73,7 +69,7 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
 
         EntityMapperResolver entityMapperResolver = new EntityMapperResolver(entityElement, entityStoreInfo.getAliasPropMapping());
         EntityMapper entityMapper = entityMapperResolver.newEntityMapper();
-        EntityFactory entityFactory = newEntityFactory(entityElement, entityStoreInfo, entityMapper);
+        EntityFactory entityFactory = newEntityFactory(entityElement, entityStoreInfo.getPojoClass(), entityMapper);
 
         Executor executor = newExecutor(entityElement, entityStoreInfo);
         executor = new UnionExecutor(executor, sqlRunner, entityStoreInfo);
@@ -87,28 +83,6 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
         repository.setExampleConverter((ExampleConverter) executor);
         repository.setEntityStoreInfo(entityStoreInfo);
         return repository;
-    }
-
-    protected EntityFactory newEntityFactory(EntityElement entityElement, EntityStoreInfo entityStoreInfo, EntityMapper entityMapper) {
-        RepositoryDef repositoryDef = getRepositoryDef();
-        Class<?> factoryClass = repositoryDef.getFactory();
-        EntityFactory entityFactory;
-        if (factoryClass == Object.class) {
-            List<FieldMapper> valueObjFields = entityMapper.getValueObjFields();
-            entityFactory = valueObjFields.isEmpty() ? new DefaultEntityFactory() : new ValueObjEntityFactory();
-        } else {
-            entityFactory = (EntityFactory) getApplicationContext().getBean(factoryClass);
-        }
-        if (entityFactory instanceof DefaultEntityFactory) {
-            DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
-            defaultEntityFactory.setEntityElement(entityElement);
-            defaultEntityFactory.setReconstituteType(entityElement.getGenericType());
-            defaultEntityFactory.setDeconstructType(entityStoreInfo.getPojoClass());
-            defaultEntityFactory.setEntityMapper(entityMapper);
-            defaultEntityFactory.setBoundedContextName(repositoryDef.getBoundedContext());
-            defaultEntityFactory.setBoundedContext(getBoundedContext());
-        }
-        return entityFactory;
     }
 
     @Override
