@@ -15,10 +15,29 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.enums;
+package com.gitee.dorive.core.impl.mapper.value;
 
-public enum Domain {
-    ENTITY,
-    DATABASE,
-    POJO
+import cn.hutool.json.JSONUtil;
+import com.gitee.dorive.core.api.mapper.ValueMapper;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class JsonConverter implements ValueMapper {
+
+    private Class<?> entityClass;
+
+    @Override
+    public Object reconstitute(Object value) {
+        return JSONUtil.toBean((String) value, entityClass);
+    }
+
+    @Override
+    public Object deconstruct(Object value) {
+        return JSONUtil.toJsonStr(value);
+    }
+
 }

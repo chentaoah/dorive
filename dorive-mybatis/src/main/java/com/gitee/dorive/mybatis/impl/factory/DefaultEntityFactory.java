@@ -19,17 +19,17 @@ package com.gitee.dorive.mybatis.impl.factory;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import com.gitee.dorive.api.entity.common.BoundedContext;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.PropertyDefinition;
 import com.gitee.dorive.api.entity.core.def.PropertyDef;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.factory.EntityAdapter;
 import com.gitee.dorive.core.api.factory.EntityFactory;
-import com.gitee.dorive.core.api.factory.EntityMapper;
-import com.gitee.dorive.api.entity.common.BoundedContext;
+import com.gitee.dorive.core.api.mapper.EntityMapper;
+import com.gitee.dorive.core.api.mapper.FieldMapper;
+import com.gitee.dorive.core.entity.enums.Mapper;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
-import com.gitee.dorive.core.entity.enums.Domain;
-import com.gitee.dorive.core.entity.factory.FieldConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -90,24 +90,24 @@ public class DefaultEntityFactory implements EntityFactory {
     }
 
     private void initReCopyOptions() {
-        this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(name -> {
-            FieldConverter fieldConverter = entityMapper.getField(Domain.DATABASE.name(), name);
-            return fieldConverter != null ? fieldConverter.getName() : name;
+        this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(alias -> {
+            FieldMapper mapperByAlias = entityMapper.getMapperByAlias(Mapper.ENTITY_DATABASE.name(), alias);
+            return mapperByAlias != null ? mapperByAlias.getField() : alias;
 
-        }).setFieldValueEditor((name, value) -> {
-            FieldConverter fieldConverter = entityMapper.getField(Domain.ENTITY.name(), name);
-            return fieldConverter != null ? fieldConverter.reconstitute(value) : value;
+        }).setFieldValueEditor((field, value) -> {
+            FieldMapper mapperByField = entityMapper.getMapperByField(Mapper.ENTITY_DATABASE.name(), field);
+            return mapperByField != null ? mapperByField.reconstitute(value) : value;
         });
     }
 
     private void initDeCopyOptions() {
-        this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(name -> {
-            FieldConverter fieldConverter = entityMapper.getField(Domain.ENTITY.name(), name);
-            return fieldConverter != null ? fieldConverter.getName(Domain.POJO.name()) : name;
+        this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(field -> {
+            FieldMapper mapperByField = entityMapper.getMapperByField(Mapper.ENTITY_POJO.name(), field);
+            return mapperByField != null ? mapperByField.getAlias() : field;
 
-        }).setFieldValueEditor((name, value) -> {
-            FieldConverter fieldConverter = entityMapper.getField(Domain.POJO.name(), name);
-            return fieldConverter != null ? fieldConverter.deconstruct(value) : value;
+        }).setFieldValueEditor((alias, value) -> {
+            FieldMapper mapperByAlias = entityMapper.getMapperByAlias(Mapper.ENTITY_POJO.name(), alias);
+            return mapperByAlias != null ? mapperByAlias.deconstruct(value) : value;
         });
     }
 

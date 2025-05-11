@@ -26,8 +26,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONUtil;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.factory.EntityMapper;
-import com.gitee.dorive.core.entity.factory.FieldConverter;
+import com.gitee.dorive.core.api.mapper.EntityMapper;
+import com.gitee.dorive.core.api.mapper.FieldMapper;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
@@ -51,7 +51,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     @Override
     public void setEntityMapper(EntityMapper entityMapper) {
         super.setEntityMapper(entityMapper);
-        List<FieldConverter> matchedValueObjFields = entityMapper.getMatchedValueObjFields();
+        List<FieldMapper> matchedValueObjFields = entityMapper.getMatchedValueObjFields();
         if (!matchedValueObjFields.isEmpty()) {
             setReCopyOptions();
             setDeCopyOptions();
@@ -103,11 +103,11 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
         Object entity = super.reconstitute(context, persistent);
         Map<String, Object> resultMap = (Map<String, Object>) persistent;
         EntityMapper entityMapper = getEntityMapper();
-        List<FieldConverter> unmatchedValueObjFields = entityMapper.getUnmatchedValueObjFields();
-        for (FieldConverter fieldConverter : unmatchedValueObjFields) {
-            Object valueObj = fieldConverter.reconstitute(resultMap);
+        List<FieldMapper> unmatchedValueObjFields = entityMapper.getUnmatchedValueObjFields();
+        for (FieldMapper fieldMapper : unmatchedValueObjFields) {
+            Object valueObj = fieldMapper.reconstitute(resultMap);
             if (valueObj != null) {
-                BeanUtil.setFieldValue(entity, fieldConverter.getName(), valueObj);
+                BeanUtil.setFieldValue(entity, fieldMapper.getField(), valueObj);
             }
         }
         return entity;
@@ -117,10 +117,10 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     public Object deconstruct(Context context, Object entity) {
         Object pojo = super.deconstruct(context, entity);
         EntityMapper entityMapper = getEntityMapper();
-        List<FieldConverter> unmatchedValueObjFields = entityMapper.getUnmatchedValueObjFields();
-        for (FieldConverter fieldConverter : unmatchedValueObjFields) {
-            Object valueObj = BeanUtil.getFieldValue(entity, fieldConverter.getName());
-            valueObj = valueObj != null ? fieldConverter.deconstruct(valueObj) : null;
+        List<FieldMapper> unmatchedValueObjFields = entityMapper.getUnmatchedValueObjFields();
+        for (FieldMapper fieldMapper : unmatchedValueObjFields) {
+            Object valueObj = BeanUtil.getFieldValue(entity, fieldMapper.getField());
+            valueObj = valueObj != null ? fieldMapper.deconstruct(valueObj) : null;
             if (valueObj != null) {
                 BeanUtil.copyProperties(valueObj, pojo, CopyOptions.create().ignoreNullValue());
             }

@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.converter;
+package com.gitee.dorive.core.impl.mapper.value;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.entity.core.FieldDefinition;
 import com.gitee.dorive.api.entity.core.def.FieldDef;
-import com.gitee.dorive.core.api.factory.Converter;
+import com.gitee.dorive.core.api.mapper.ValueMapper;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +32,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class MapExpConverter implements Converter {
+public class MapExpConverter implements ValueMapper {
 
     private FieldDefinition fieldDefinition;
     private Map<Object, Object> reMapping = Collections.emptyMap();

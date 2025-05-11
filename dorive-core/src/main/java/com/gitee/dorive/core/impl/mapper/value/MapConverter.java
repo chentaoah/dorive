@@ -15,38 +15,29 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.factory;
+package com.gitee.dorive.core.impl.mapper.value;
 
-import com.gitee.dorive.core.api.factory.Converter;
+import cn.hutool.core.bean.BeanUtil;
+import com.gitee.dorive.core.api.mapper.ValueMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Map;
-
 @Getter
 @Setter
 @AllArgsConstructor
-public class FieldConverter implements Converter {
+public class MapConverter implements ValueMapper {
 
-    private String domain;
-    private String name;
-    private boolean match;
-    private Map<String, String> names;
-    private Converter converter;
-
-    public String getName(String domain) {
-        return names.get(domain);
-    }
+    private Class<?> entityClass;
 
     @Override
     public Object reconstitute(Object value) {
-        return converter == null ? value : converter.reconstitute(value);
+        return BeanUtil.toBean(value, entityClass);
     }
 
     @Override
     public Object deconstruct(Object value) {
-        return converter == null ? value : converter.deconstruct(value);
+        return BeanUtil.beanToMap(value);
     }
 
 }

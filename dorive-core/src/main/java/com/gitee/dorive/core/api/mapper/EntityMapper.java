@@ -15,29 +15,23 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.converter;
+package com.gitee.dorive.core.api.mapper;
 
-import cn.hutool.json.JSONUtil;
-import com.gitee.dorive.core.api.factory.Converter;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import java.lang.reflect.Type;
+import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
-public class JsonConverter implements Converter {
+public interface EntityMapper {
 
-    private Class<?> entityClass;
+    FieldMapper getMapperByField(String mapper, String field);
 
-    @Override
-    public Object reconstitute(Object value) {
-        return JSONUtil.toBean((String) value, entityClass);
-    }
+    FieldMapper getMapperByAlias(String mapper, String alias);
 
-    @Override
-    public Object deconstruct(Object value) {
-        return JSONUtil.toJsonStr(value);
-    }
+    List<FieldMapper> getValueObjFields();
+
+    List<FieldMapper> getMatchedValueObjFields();
+
+    List<FieldMapper> getUnmatchedValueObjFields();
+
+    boolean isValueObjType(Type type);
 
 }

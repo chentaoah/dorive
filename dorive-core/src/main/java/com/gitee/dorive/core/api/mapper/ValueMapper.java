@@ -15,23 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.factory;
+package com.gitee.dorive.core.api.mapper;
 
-import com.gitee.dorive.core.entity.factory.FieldConverter;
+public interface ValueMapper {
 
-import java.lang.reflect.Type;
-import java.util.List;
+    Object reconstitute(Object value);
 
-public interface EntityMapper {
-
-    FieldConverter getField(String domain, String name);
-
-    List<FieldConverter> getValueObjFields();
-
-    List<FieldConverter> getMatchedValueObjFields();
-
-    List<FieldConverter> getUnmatchedValueObjFields();
-
-    boolean isValueObjType(Type type);
+    Object deconstruct(Object value);
 
 }

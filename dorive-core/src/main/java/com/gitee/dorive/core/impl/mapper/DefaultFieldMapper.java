@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.converter;
+package com.gitee.dorive.core.impl.mapper;
 
-import cn.hutool.json.JSONUtil;
-import com.gitee.dorive.core.api.factory.Converter;
+import com.gitee.dorive.core.api.mapper.FieldMapper;
+import com.gitee.dorive.core.api.mapper.ValueMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,18 +26,21 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class JsonArrayConverter implements Converter {
+public class DefaultFieldMapper implements FieldMapper {
 
-    private Class<?> entityClass;
+    private String mapper;
+    private String field;
+    private String alias;
+    private ValueMapper valueMapper;
 
     @Override
     public Object reconstitute(Object value) {
-        return JSONUtil.toList((String) value, entityClass);
+        return valueMapper == null ? value : valueMapper.reconstitute(value);
     }
 
     @Override
     public Object deconstruct(Object value) {
-        return JSONUtil.toJsonStr(value);
+        return valueMapper == null ? value : valueMapper.deconstruct(value);
     }
 
 }

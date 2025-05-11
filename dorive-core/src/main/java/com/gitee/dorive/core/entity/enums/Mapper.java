@@ -15,12 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.api.factory;
+package com.gitee.dorive.core.entity.enums;
 
-public interface Converter {
-
-    Object reconstitute(Object value);
-
-    Object deconstruct(Object value);
-
+public enum Mapper {
+    ENTITY_DATABASE,
+    ENTITY_POJO
 }

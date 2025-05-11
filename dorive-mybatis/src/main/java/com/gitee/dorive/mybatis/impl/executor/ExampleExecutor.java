@@ -21,15 +21,11 @@ import com.gitee.dorive.api.constant.core.Operator;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.common.ExampleConverter;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.factory.EntityMapper;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.entity.enums.Domain;
-import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.executor.UnionExample;
-import com.gitee.dorive.core.entity.factory.FieldConverter;
+import com.gitee.dorive.core.api.mapper.EntityMapper;
+import com.gitee.dorive.core.api.mapper.FieldMapper;
+import com.gitee.dorive.core.entity.enums.Mapper;
+import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
@@ -153,13 +149,13 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
         String property = criterion.getProperty();
         Object value = criterion.getValue();
 
-        FieldConverter fieldConverter = entityMapper.getField(Domain.ENTITY.name(), property);
-        if (fieldConverter == null) {
-            fieldConverter = entityMapper.getField(Domain.DATABASE.name(), property);
+        FieldMapper fieldMapper = entityMapper.getMapperByField(Mapper.ENTITY_DATABASE.name(), property);
+        if (fieldMapper == null) {
+            fieldMapper = entityMapper.getMapperByAlias(Mapper.ENTITY_DATABASE.name(), property);
         }
-        if (fieldConverter != null) {
-            property = fieldConverter.getName(Domain.DATABASE.name());
-            value = fieldConverter.deconstruct(value);
+        if (fieldMapper != null) {
+            property = fieldMapper.getAlias();
+            value = fieldMapper.deconstruct(value);
             criterion.setProperty(property);
             criterion.setValue(value);
         }

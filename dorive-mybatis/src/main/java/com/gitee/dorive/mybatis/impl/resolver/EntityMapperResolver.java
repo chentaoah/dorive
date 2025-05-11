@@ -18,30 +18,28 @@
 package com.gitee.dorive.mybatis.impl.resolver;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.api.entity.core.def.FieldDef;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.FieldDefinition;
-import com.gitee.dorive.core.api.factory.Converter;
-import com.gitee.dorive.core.api.factory.EntityMapper;
+import com.gitee.dorive.api.entity.core.def.FieldDef;
+import com.gitee.dorive.core.api.mapper.EntityMapper;
+import com.gitee.dorive.core.api.mapper.FieldMapper;
+import com.gitee.dorive.core.api.mapper.ValueMapper;
+import com.gitee.dorive.core.entity.enums.Mapper;
+import com.gitee.dorive.core.impl.mapper.DefaultEntityMapper;
+import com.gitee.dorive.core.impl.mapper.DefaultFieldMapper;
+import com.gitee.dorive.core.impl.mapper.value.JsonArrayConverter;
+import com.gitee.dorive.core.impl.mapper.value.JsonConverter;
+import com.gitee.dorive.core.impl.mapper.value.MapConverter;
+import com.gitee.dorive.core.impl.mapper.value.MapExpConverter;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
-import com.gitee.dorive.core.entity.enums.Domain;
-import com.gitee.dorive.core.entity.factory.FieldConverter;
-import com.gitee.dorive.core.impl.converter.JsonArrayConverter;
-import com.gitee.dorive.core.impl.converter.JsonConverter;
-import com.gitee.dorive.core.impl.converter.MapConverter;
-import com.gitee.dorive.core.impl.converter.MapExpConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import static com.gitee.dorive.core.impl.mapper.DefaultEntityMapper.getKey;
 
 @Data
 @AllArgsConstructor
@@ -54,55 +52,40 @@ public class EntityMapperResolver {
         List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
         Map<String, String> aliasPropMapping = entityStoreInfo.getAliasPropMapping();
 
-        Map<String, FieldConverter> fieldConverterMap = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
-        List<FieldConverter> valueObjFields = new ArrayList<>(4);
-        List<FieldConverter> matchedValueObjFields = new ArrayList<>(4);
-        List<FieldConverter> unmatchedValueObjFields = new ArrayList<>(4);
+        Map<String, FieldMapper> keyFieldMapperMap = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
+        List<FieldMapper> valueObjFields = new ArrayList<>(4);
+        List<FieldMapper> matchedValueObjFields = new ArrayList<>(4);
+        List<FieldMapper> unmatchedValueObjFields = new ArrayList<>(4);
         Set<Type> valueObjTypes = new HashSet<>(6);
 
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
-            String fieldName = fieldDefinition.getFieldName();
+            String field = fieldDefinition.getFieldName();
+            String expected = entityElement.toAlias(field);
 
-            String expected = entityElement.toAlias(fieldName);
             boolean isMatch = aliasPropMapping.containsKey(expected);
             String alias = isMatch ? expected : null;
             String prop = isMatch ? aliasPropMapping.get(alias) : null;
 
-            Map<String, String> names = new LinkedHashMap<>(5);
-            names.put(Domain.ENTITY.name(), fieldName);
-            if (alias != null) {
-                names.put(Domain.DATABASE.name(), alias);
-            }
-            if (prop != null) {
-                names.put(Domain.POJO.name(), prop);
-            }
-
             FieldDef fieldDef = fieldDefinition.getFieldDef();
             boolean isValueObj = fieldDef != null && fieldDef.isValueObj();
-            Converter converter = newConverter(fieldDefinition, isMatch, isValueObj);
-            FieldConverter fieldConverter = new FieldConverter(Domain.ENTITY.name(), fieldName, isMatch, names, converter);
+            ValueMapper valueMapper = newValueMapper(fieldDefinition, isMatch, isValueObj);
 
-            names.forEach((domain, eachName) -> fieldConverterMap.put(getKey(domain, eachName), fieldConverter));
-            if (isValueObj) {
-                valueObjFields.add(fieldConverter);
-                if (isMatch) {
-                    matchedValueObjFields.add(fieldConverter);
-                } else {
-                    unmatchedValueObjFields.add(fieldConverter);
-                }
-                valueObjTypes.add(fieldDefinition.getGenericType());
-            }
+            FieldMapper fieldMapper1 = newFieldMapper(keyFieldMapperMap, Mapper.ENTITY_DATABASE.name(), field, alias, valueMapper);
+            FieldMapper fieldMapper2 = newFieldMapper(keyFieldMapperMap, Mapper.ENTITY_POJO.name(), field, prop, valueMapper);
+
+            handleValueObjMapper(valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes, fieldDefinition, isMatch, isValueObj, fieldMapper1);
+            handleValueObjMapper(valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes, fieldDefinition, isMatch, isValueObj, fieldMapper2);
         }
 
-        return new DefaultEntityMapper(fieldConverterMap, valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes);
+        return new DefaultEntityMapper(keyFieldMapperMap, valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes);
     }
 
-    private Converter newConverter(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {
+    private ValueMapper newValueMapper(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {
         FieldDef fieldDef = fieldDefinition.getFieldDef();
         if (fieldDef != null) {
             Class<?> converterClass = fieldDef.getConverter();
             if (converterClass != Object.class) {
-                return (Converter) ReflectUtil.newInstance(converterClass);
+                return (ValueMapper) ReflectUtil.newInstance(converterClass);
 
             } else if (isValueObj) {
                 Class<?> genericType = fieldDefinition.getGenericType();
@@ -119,27 +102,23 @@ public class EntityMapperResolver {
         return null;
     }
 
-    private String getKey(String domain, String name) {
-        return domain + ":" + name;
+    private FieldMapper newFieldMapper(Map<String, FieldMapper> keyFieldMapperMap, String mapper, String field, String alias, ValueMapper valueMapper) {
+        FieldMapper fieldMapper = new DefaultFieldMapper(mapper, field, alias, valueMapper);
+        keyFieldMapperMap.put(getKey(mapper, "field", field), fieldMapper);
+        keyFieldMapperMap.put(getKey(mapper, "alias", alias), fieldMapper);
+        return fieldMapper;
     }
 
-    @Getter
-    @AllArgsConstructor
-    private class DefaultEntityMapper implements EntityMapper {
-        private final Map<String, FieldConverter> fieldConverterMap;
-        private final List<FieldConverter> valueObjFields;
-        private final List<FieldConverter> matchedValueObjFields;
-        private final List<FieldConverter> unmatchedValueObjFields;
-        private final Set<Type> valueObjTypes;
-
-        @Override
-        public FieldConverter getField(String domain, String name) {
-            return fieldConverterMap.get(getKey(domain, name));
-        }
-
-        @Override
-        public boolean isValueObjType(Type type) {
-            return valueObjTypes.contains(type);
+    private void handleValueObjMapper(List<FieldMapper> valueObjFields, List<FieldMapper> matchedValueObjFields, List<FieldMapper> unmatchedValueObjFields, Set<Type> valueObjTypes,
+                                      FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj, FieldMapper fieldMapper) {
+        if (isValueObj) {
+            valueObjFields.add(fieldMapper);
+            if (isMatch) {
+                matchedValueObjFields.add(fieldMapper);
+            } else {
+                unmatchedValueObjFields.add(fieldMapper);
+            }
+            valueObjTypes.add(fieldDefinition.getGenericType());
         }
     }
 
