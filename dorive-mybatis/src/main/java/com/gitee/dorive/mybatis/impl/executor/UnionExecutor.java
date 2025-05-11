@@ -29,7 +29,7 @@ import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.entity.operation.cop.Query;
-import com.gitee.dorive.core.impl.executor.AbstractProxyExecutor;
+import com.gitee.dorive.core.impl.executor.unit.AbstractProxyExecutor;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 import lombok.Getter;
 import lombok.Setter;

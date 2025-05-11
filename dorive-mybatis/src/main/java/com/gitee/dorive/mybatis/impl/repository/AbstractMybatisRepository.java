@@ -32,10 +32,11 @@ import com.gitee.dorive.mybatis.api.sql.CountQuerier;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 import com.gitee.dorive.mybatis.entity.common.CountQuery;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
-import com.gitee.dorive.core.impl.executor.ExampleExecutor;
-import com.gitee.dorive.core.impl.executor.FactoryExecutor;
+import com.gitee.dorive.core.impl.executor.unit.ExampleExecutor;
+import com.gitee.dorive.core.impl.executor.unit.FactoryExecutor;
 import com.gitee.dorive.core.impl.factory.entity.DefaultEntityFactory;
 import com.gitee.dorive.core.impl.factory.entity.ValueObjEntityFactory;
+import com.gitee.dorive.mybatis.impl.executor.UnionExecutor;
 import com.gitee.dorive.mybatis.impl.handler.SqlBuildQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlCustomQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlExecuteQueryHandler;
@@ -75,6 +76,7 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
         EntityFactory entityFactory = newEntityFactory(entityElement, entityStoreInfo, entityMapper);
 
         Executor executor = newExecutor(entityElement, entityStoreInfo);
+        executor = new UnionExecutor(executor, sqlRunner, entityStoreInfo);
         executor = new FactoryExecutor(executor, entityElement, entityStoreInfo.getIdProperty(), entityFactory);
         executor = new ExampleExecutor(executor, entityElement, entityMapper);
 

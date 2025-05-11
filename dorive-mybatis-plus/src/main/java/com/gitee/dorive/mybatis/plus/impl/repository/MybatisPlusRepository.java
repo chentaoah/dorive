@@ -29,7 +29,6 @@ import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.core.api.common.MethodInvoker;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
-import com.gitee.dorive.mybatis.impl.executor.UnionExecutor;
 import com.gitee.dorive.mybatis.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.mybatis.plus.impl.DefaultMethodInvoker;
 import com.gitee.dorive.mybatis.plus.impl.executor.MybatisPlusExecutor;
@@ -112,8 +111,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractMybatisRepository<E, P
 
     @Override
     protected Executor newExecutor(EntityElement entityElement, EntityStoreInfo entityStoreInfo) {
-        Executor executor = new MybatisPlusExecutor(entityElement.getEntityDef(), entityElement, entityStoreInfo);
-        return new UnionExecutor(executor, getSqlRunner(), entityStoreInfo);
+        return new MybatisPlusExecutor(entityElement.getEntityDef(), entityElement, entityStoreInfo);
     }
 
 }

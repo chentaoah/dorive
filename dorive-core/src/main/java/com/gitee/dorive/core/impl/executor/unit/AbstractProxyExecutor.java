@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.executor;
+package com.gitee.dorive.core.impl.executor.unit;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.Query;
+import com.gitee.dorive.core.impl.executor.AbstractExecutor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
