@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.impl.factory;
+package com.gitee.dorive.core.impl.factory.entity;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
@@ -29,7 +29,6 @@ import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.api.mapper.FieldMapper;
 import com.gitee.dorive.core.entity.enums.Mapper;
-import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,7 +46,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultEntityFactory implements EntityFactory {
 
     private EntityElement entityElement;
-    private EntityStoreInfo entityStoreInfo;
+    private Class<?> reconstituteType;
+    private Class<?> deconstructType;
     // 序列化
     private EntityMapper entityMapper;
     private CopyOptions reCopyOptions;
@@ -80,7 +80,7 @@ public class DefaultEntityFactory implements EntityFactory {
     }
 
     protected void initEntityAdapter() {
-        this.entityAdapter = (persistent) -> entityElement.getGenericType();
+        this.entityAdapter = (persistent) -> reconstituteType;
     }
 
     public void setEntityMapper(EntityMapper entityMapper) {
@@ -154,7 +154,7 @@ public class DefaultEntityFactory implements EntityFactory {
     }
 
     public Object deconstruct(Context context, Object entity) {
-        return BeanUtil.toBean(entity, entityStoreInfo.getPojoClass(), deCopyOptions);
+        return BeanUtil.toBean(entity, deconstructType, deCopyOptions);
     }
 
 }

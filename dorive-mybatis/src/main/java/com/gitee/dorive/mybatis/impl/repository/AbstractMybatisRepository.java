@@ -34,8 +34,8 @@ import com.gitee.dorive.mybatis.entity.common.CountQuery;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.mybatis.impl.executor.ExampleExecutor;
 import com.gitee.dorive.mybatis.impl.executor.FactoryExecutor;
-import com.gitee.dorive.mybatis.impl.factory.DefaultEntityFactory;
-import com.gitee.dorive.mybatis.impl.factory.ValueObjEntityFactory;
+import com.gitee.dorive.core.impl.factory.entity.DefaultEntityFactory;
+import com.gitee.dorive.core.impl.factory.entity.ValueObjEntityFactory;
 import com.gitee.dorive.mybatis.impl.handler.SqlBuildQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlCustomQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlExecuteQueryHandler;
@@ -100,7 +100,8 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
         if (entityFactory instanceof DefaultEntityFactory) {
             DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
             defaultEntityFactory.setEntityElement(entityElement);
-            defaultEntityFactory.setEntityStoreInfo(entityStoreInfo);
+            defaultEntityFactory.setReconstituteType(entityElement.getGenericType());
+            defaultEntityFactory.setDeconstructType(entityStoreInfo.getPojoClass());
             defaultEntityFactory.setEntityMapper(entityMapper);
             defaultEntityFactory.setBoundedContextName(repositoryDef.getBoundedContext());
             defaultEntityFactory.setBoundedContext(getBoundedContext());
