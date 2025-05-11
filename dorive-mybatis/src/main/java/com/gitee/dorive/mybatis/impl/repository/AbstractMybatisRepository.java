@@ -40,7 +40,7 @@ import com.gitee.dorive.mybatis.impl.handler.SqlBuildQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlCustomQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlExecuteQueryHandler;
 import com.gitee.dorive.mybatis.impl.querier.SqlCountQuerier;
-import com.gitee.dorive.mybatis.impl.resolver.EntityMapperResolver;
+import com.gitee.dorive.core.impl.resolver.EntityMapperResolver;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.enums.QueryMethod;
 import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
@@ -70,7 +70,7 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
     protected AbstractRepository<Object, Object> doNewRepository(EntityElement entityElement, OperationFactory operationFactory) {
         this.entityStoreInfo = resolveEntityStoreInfo(getRepositoryDef());
 
-        EntityMapperResolver entityMapperResolver = new EntityMapperResolver(entityElement, entityStoreInfo);
+        EntityMapperResolver entityMapperResolver = new EntityMapperResolver(entityElement, entityStoreInfo.getAliasPropMapping());
         EntityMapper entityMapper = entityMapperResolver.newEntityMapper();
         EntityFactory entityFactory = newEntityFactory(entityElement, entityStoreInfo, entityMapper);
 

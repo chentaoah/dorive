@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.impl.resolver;
+package com.gitee.dorive.core.impl.resolver;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.api.entity.core.EntityElement;
@@ -31,7 +31,6 @@ import com.gitee.dorive.core.impl.mapper.value.JsonArrayConverter;
 import com.gitee.dorive.core.impl.mapper.value.JsonConverter;
 import com.gitee.dorive.core.impl.mapper.value.MapConverter;
 import com.gitee.dorive.core.impl.mapper.value.MapExpConverter;
-import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -46,11 +45,10 @@ import static com.gitee.dorive.core.impl.mapper.DefaultEntityMapper.getKey;
 public class EntityMapperResolver {
 
     private EntityElement entityElement;
-    private EntityStoreInfo entityStoreInfo;
+    private Map<String, String> aliasPropMapping;
 
     public EntityMapper newEntityMapper() {
         List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
-        Map<String, String> aliasPropMapping = entityStoreInfo.getAliasPropMapping();
 
         Map<String, FieldMapper> keyFieldMapperMap = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
         List<FieldMapper> valueObjFields = new ArrayList<>(4);
