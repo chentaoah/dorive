@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.impl.executor;
+package com.gitee.dorive.core.impl.executor;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.factory.EntityFactory;
-import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.EntityOp;
@@ -30,7 +29,6 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
 import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
-import com.gitee.dorive.core.impl.executor.AbstractProxyExecutor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -43,13 +41,13 @@ import java.util.Map;
 public class FactoryExecutor extends AbstractProxyExecutor {
 
     private EntityElement entityElement;
-    private EntityStoreInfo entityStoreInfo;
+    private String pkOfPersistentObj;
     private EntityFactory entityFactory;
 
-    public FactoryExecutor(Executor executor, EntityElement entityElement, EntityStoreInfo entityStoreInfo, EntityFactory entityFactory) {
+    public FactoryExecutor(Executor executor, EntityElement entityElement, String pkOfPersistentObj, EntityFactory entityFactory) {
         super(executor);
         this.entityElement = entityElement;
-        this.entityStoreInfo = entityStoreInfo;
+        this.pkOfPersistentObj = pkOfPersistentObj;
         this.entityFactory = entityFactory;
     }
 
@@ -86,8 +84,8 @@ public class FactoryExecutor extends AbstractProxyExecutor {
             if (operation instanceof Insert) {
                 for (int index = 0; index < entities.size(); index++) {
                     Object entity = entities.get(index);
-                    Object persistent = persistentObjs.get(index);
-                    Object primaryKey = BeanUtil.getFieldValue(persistent, entityStoreInfo.getIdProperty());
+                    Object persistentObj = persistentObjs.get(index);
+                    Object primaryKey = BeanUtil.getFieldValue(persistentObj, pkOfPersistentObj);
                     if (primaryKey != null) {
                         entityElement.setPrimaryKey(entity, primaryKey);
                     }
