@@ -18,6 +18,7 @@
 package com.gitee.dorive.core.impl.repository;
 
 import com.gitee.dorive.core.api.common.ExampleConverter;
+import com.gitee.dorive.core.api.mapper.EntityMapper;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,5 +27,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class DefaultRepository extends AbstractRepository<Object, Object> {
+    private EntityMapper entityMapper;
     private ExampleConverter exampleConverter;
 }

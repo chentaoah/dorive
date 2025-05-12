@@ -17,14 +17,17 @@
 
 package com.gitee.dorive.query.entity;
 
-import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.common.ExampleConverter;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.mapper.EntityMapper;
+import com.gitee.dorive.core.entity.enums.Mapper;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -39,8 +42,10 @@ public class QueryUnit {
         return "/".equals(mergedRepository.getAbsoluteAccessPath());
     }
 
-    public EntityElement getEntityElement() {
-        return mergedRepository.getExecutedRepository().getEntityElement();
+    public List<String> toAliases(List<String> properties) {
+        DefaultRepository defaultRepository = mergedRepository.getDefaultRepository();
+        EntityMapper entityMapper = defaultRepository.getEntityMapper();
+        return entityMapper.toAliases(Mapper.ENTITY_DATABASE.name(), properties);
     }
 
     public void convertExample(QueryContext queryContext) {

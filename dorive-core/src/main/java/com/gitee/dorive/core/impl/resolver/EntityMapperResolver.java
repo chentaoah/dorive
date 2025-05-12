@@ -50,11 +50,17 @@ public class EntityMapperResolver {
     public EntityMapper newEntityMapper() {
         List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
 
+        Map<String, Map<String, String>> mapperFieldAliasMappingMap = new LinkedHashMap<>(4);
         Map<String, FieldMapper> keyFieldMapperMap = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
         List<FieldMapper> valueObjFields = new ArrayList<>(4);
         List<FieldMapper> matchedValueObjFields = new ArrayList<>(4);
         List<FieldMapper> unmatchedValueObjFields = new ArrayList<>(4);
         Set<Type> valueObjTypes = new HashSet<>(6);
+
+        Map<String, String> fieldAliasMapping1 = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
+        Map<String, String> fieldAliasMapping2 = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
+        mapperFieldAliasMappingMap.put(Mapper.ENTITY_DATABASE.name(), fieldAliasMapping1);
+        mapperFieldAliasMappingMap.put(Mapper.ENTITY_POJO.name(), fieldAliasMapping2);
 
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
             String field = fieldDefinition.getFieldName();
@@ -63,6 +69,9 @@ public class EntityMapperResolver {
             boolean isMatch = aliasPropMapping.containsKey(expected);
             String alias = isMatch ? expected : null;
             String prop = isMatch ? aliasPropMapping.get(alias) : null;
+
+            fieldAliasMapping1.put(field, alias);
+            fieldAliasMapping2.put(field, prop);
 
             FieldDef fieldDef = fieldDefinition.getFieldDef();
             boolean isValueObj = fieldDef != null && fieldDef.isValueObj();
@@ -75,7 +84,7 @@ public class EntityMapperResolver {
             handleValueObjMapper(valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes, fieldDefinition, isMatch, isValueObj, fieldMapper2);
         }
 
-        return new DefaultEntityMapper(keyFieldMapperMap, valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes);
+        return new DefaultEntityMapper(mapperFieldAliasMappingMap, keyFieldMapperMap, valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes);
     }
 
     private ValueMapper newValueMapper(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {

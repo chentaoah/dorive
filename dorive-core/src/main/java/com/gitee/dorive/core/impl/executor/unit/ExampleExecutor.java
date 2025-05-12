@@ -106,7 +106,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
     private void convertUpdate(Update update) {
         Set<String> nullableProps = update.getNullableProps();
         if (nullableProps != null && !nullableProps.isEmpty()) {
-            nullableProps = entityElement.toAliases(nullableProps);
+            nullableProps = entityMapper.toAliases(Mapper.ENTITY_DATABASE.name(), nullableProps);
             update.setNullableProps(nullableProps);
         }
     }
@@ -114,7 +114,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
     private void convertConditionUpdate(ConditionUpdate conditionUpdate) {
         Set<String> nullableProps = conditionUpdate.getNullableProps();
         if (nullableProps != null && !nullableProps.isEmpty()) {
-            nullableProps = entityElement.toAliases(nullableProps);
+            nullableProps = entityMapper.toAliases(Mapper.ENTITY_DATABASE.name(), nullableProps);
             conditionUpdate.setNullableProps(nullableProps);
         }
     }
@@ -122,7 +122,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
     private void convertSelectProps(Example example) {
         List<String> properties = example.getSelectProps();
         if (properties != null && !properties.isEmpty()) {
-            properties = entityElement.toAliases(properties);
+            properties = entityMapper.toAliases(Mapper.ENTITY_DATABASE.name(), properties);
             example.setSelectProps(properties);
         }
     }
@@ -164,7 +164,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
             List<String> properties = orderBy.getProperties();
-            properties = entityElement.toAliases(properties);
+            properties = entityMapper.toAliases(Mapper.ENTITY_DATABASE.name(), properties);
             orderBy.setProperties(properties);
         }
     }

@@ -23,14 +23,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @AllArgsConstructor
 public class DefaultEntityMapper implements EntityMapper {
 
+    private final Map<String, Map<String, String>> mapperFieldAliasMappingMap;
     private final Map<String, FieldMapper> keyFieldMapperMap;
     private final List<FieldMapper> valueObjFields;
     private final List<FieldMapper> matchedValueObjFields;
@@ -39,6 +38,40 @@ public class DefaultEntityMapper implements EntityMapper {
 
     public static String getKey(String mapper, String type, String name) {
         return mapper + ":" + type + ":" + name;
+    }
+
+    @Override
+    public String toAlias(String mapper, String field) {
+        Map<String, String> fieldAliasMapping = mapperFieldAliasMappingMap.get(mapper);
+        return fieldAliasMapping.getOrDefault(field, field);
+    }
+
+    @Override
+    public List<String> toAliases(String mapper, List<String> fields) {
+        if (fields != null && !fields.isEmpty()) {
+            Map<String, String> fieldAliasMapping = mapperFieldAliasMappingMap.get(mapper);
+            List<String> aliases = new ArrayList<>(fields.size());
+            for (String field : fields) {
+                String alias = fieldAliasMapping.getOrDefault(field, field);
+                aliases.add(alias);
+            }
+            return aliases;
+        }
+        return fields;
+    }
+
+    @Override
+    public Set<String> toAliases(String mapper, Set<String> fields) {
+        if (fields != null && !fields.isEmpty()) {
+            Map<String, String> fieldAliasMapping = mapperFieldAliasMappingMap.get(mapper);
+            Set<String> aliases = new LinkedHashSet<>(fields.size() * 4 / 3 + 1);
+            for (String field : fields) {
+                String alias = fieldAliasMapping.getOrDefault(field, field);
+                aliases.add(alias);
+            }
+            return aliases;
+        }
+        return fields;
     }
 
     @Override

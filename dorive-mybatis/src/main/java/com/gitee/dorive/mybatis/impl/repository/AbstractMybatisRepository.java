@@ -28,7 +28,7 @@ import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.impl.executor.unit.ExampleExecutor;
 import com.gitee.dorive.core.impl.executor.unit.FactoryExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
-import com.gitee.dorive.core.impl.repository.AbstractRepository;
+import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import com.gitee.dorive.core.impl.resolver.EntityMapperResolver;
 import com.gitee.dorive.mybatis.api.sql.CountQuerier;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
@@ -64,7 +64,7 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
     }
 
     @Override
-    protected AbstractRepository<Object, Object> doNewRepository(EntityElement entityElement, OperationFactory operationFactory) {
+    protected DefaultRepository doNewRepository(EntityElement entityElement, OperationFactory operationFactory) {
         this.entityStoreInfo = resolveEntityStoreInfo(getRepositoryDef());
 
         EntityMapperResolver entityMapperResolver = new EntityMapperResolver(entityElement, entityStoreInfo.getAliasPropMapping());
@@ -80,6 +80,7 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
         repository.setEntityElement(entityElement);
         repository.setOperationFactory(operationFactory);
         repository.setExecutor(executor);
+        repository.setEntityMapper(entityMapper);
         repository.setExampleConverter((ExampleConverter) executor);
         repository.setEntityStoreInfo(entityStoreInfo);
         return repository;

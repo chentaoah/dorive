@@ -19,8 +19,15 @@ package com.gitee.dorive.core.api.mapper;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Set;
 
 public interface EntityMapper {
+
+    String toAlias(String mapper, String field);
+
+    List<String> toAliases(String mapper, List<String> fields);
+
+    Set<String> toAliases(String mapper, Set<String> fields);
 
     FieldMapper getMapperByField(String mapper, String field);
 

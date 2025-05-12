@@ -134,22 +134,19 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     private CommonRepository newRepository(EntityElement entityElement) {
         resetEntityDef(entityElement);
 
-        EntityDef entityDef = entityElement.getEntityDef();
         OrderByDef orderByDef = entityElement.getOrderByDef();
         String accessPath = entityElement.getAccessPath();
-
+        boolean isRoot = entityElement.isRoot();
         OperationFactory operationFactory = new OperationFactory(entityElement);
 
-        Class<?> repositoryClass = entityDef.getRepository();
         AbstractRepository<Object, Object> repository;
-        if (repositoryClass == DefaultRepository.class) {
+        if (isRoot) {
             repository = doNewRepository(entityElement, operationFactory);
             repository = processRepository(repository);
         } else {
             repository = doGetRepository(entityElement);
         }
 
-        boolean isRoot = "/".equals(accessPath);
         boolean isAggregated = repository instanceof AbstractContextRepository;
         BinderResolver binderResolver = new BinderResolver(this);
         binderResolver.resolve(entityElement);
@@ -246,6 +243,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return new BatchEntityOpHandler(this);
     }
 
-    protected abstract AbstractRepository<Object, Object> doNewRepository(EntityElement entityElement, OperationFactory operationFactory);
+    protected abstract DefaultRepository doNewRepository(EntityElement entityElement, OperationFactory operationFactory);
 
 }
