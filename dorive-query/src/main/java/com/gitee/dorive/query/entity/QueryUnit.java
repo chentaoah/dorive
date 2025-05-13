@@ -20,6 +20,7 @@ package com.gitee.dorive.query.entity;
 import com.gitee.dorive.core.api.common.ExampleConverter;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
+import com.gitee.dorive.core.api.mapper.EntityMappers;
 import com.gitee.dorive.core.entity.enums.Mapper;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
@@ -44,8 +45,9 @@ public class QueryUnit {
 
     public List<String> toAliases(List<String> properties) {
         DefaultRepository defaultRepository = mergedRepository.getDefaultRepository();
-        EntityMapper entityMapper = defaultRepository.getEntityMapper();
-        return entityMapper.toAliases(Mapper.ENTITY_DATABASE.name(), properties);
+        EntityMappers entityMappers = defaultRepository.getEntityMappers();
+        EntityMapper entityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
+        return entityMapper.toAliases(properties);
     }
 
     public void convertExample(QueryContext queryContext) {

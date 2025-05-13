@@ -34,6 +34,7 @@ import com.gitee.dorive.core.api.executor.EntityOpHandler;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
+import com.gitee.dorive.core.api.mapper.EntityMappers;
 import com.gitee.dorive.core.api.mapper.FieldMapper;
 import com.gitee.dorive.core.config.RepositoryContext;
 import com.gitee.dorive.core.impl.context.AdaptiveMatcher;
@@ -185,12 +186,13 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         entityDef.setRepository(newRepositoryClass);
     }
 
-    protected EntityFactory newEntityFactory(EntityElement entityElement, Class<?> persistentType, EntityMapper entityMapper) {
+    protected EntityFactory newEntityFactory(EntityElement entityElement, Class<?> persistentType,
+                                             EntityMappers entityMappers, EntityMapper reEntityMapper, EntityMapper deEntityMapper) {
         RepositoryDef repositoryDef = getRepositoryDef();
         Class<?> factoryClass = repositoryDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
-            List<FieldMapper> valueObjFields = entityMapper.getValueObjFields();
+            List<FieldMapper> valueObjFields = entityMappers.getValueObjFields();
             entityFactory = valueObjFields.isEmpty() ? new DefaultEntityFactory() : new ValueObjEntityFactory();
         } else {
             entityFactory = (EntityFactory) getApplicationContext().getBean(factoryClass);
@@ -200,7 +202,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             defaultEntityFactory.setEntityElement(entityElement);
             defaultEntityFactory.setReconstituteType(entityElement.getGenericType());
             defaultEntityFactory.setDeconstructType(persistentType);
-            defaultEntityFactory.setEntityMapper(entityMapper);
+            defaultEntityFactory.setEntityMappers(entityMappers, reEntityMapper, deEntityMapper);
             defaultEntityFactory.setBoundedContextName(repositoryDef.getBoundedContext());
             defaultEntityFactory.setBoundedContext(getBoundedContext());
         }

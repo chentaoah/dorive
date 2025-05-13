@@ -25,11 +25,13 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
+import com.gitee.dorive.core.api.mapper.EntityMappers;
+import com.gitee.dorive.core.entity.enums.Mapper;
 import com.gitee.dorive.core.impl.executor.unit.ExampleExecutor;
 import com.gitee.dorive.core.impl.executor.unit.FactoryExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
-import com.gitee.dorive.core.impl.resolver.EntityMapperResolver;
+import com.gitee.dorive.core.impl.resolver.EntityMappersResolver;
 import com.gitee.dorive.mybatis.api.sql.CountQuerier;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 import com.gitee.dorive.mybatis.entity.common.CountQuery;
@@ -67,20 +69,23 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
     protected DefaultRepository doNewRepository(EntityElement entityElement, OperationFactory operationFactory) {
         this.entityStoreInfo = resolveEntityStoreInfo(getRepositoryDef());
 
-        EntityMapperResolver entityMapperResolver = new EntityMapperResolver(entityElement, entityStoreInfo.getAliasPropMapping());
-        EntityMapper entityMapper = entityMapperResolver.newEntityMapper();
-        EntityFactory entityFactory = newEntityFactory(entityElement, entityStoreInfo.getPojoClass(), entityMapper);
+        EntityMappersResolver entityMappersResolver = new EntityMappersResolver(entityElement, entityStoreInfo.getAliasPropMapping());
+        EntityMappers entityMappers = entityMappersResolver.newEntityMappers();
+
+        EntityMapper reEntityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
+        EntityMapper deEntityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_POJO.name());
+        EntityFactory entityFactory = newEntityFactory(entityElement, entityStoreInfo.getPojoClass(), entityMappers, reEntityMapper, deEntityMapper);
 
         Executor executor = newExecutor(entityElement, entityStoreInfo);
         executor = new UnionExecutor(executor, sqlRunner, entityStoreInfo);
         executor = new FactoryExecutor(executor, entityElement, entityStoreInfo.getIdProperty(), entityFactory);
-        executor = new ExampleExecutor(executor, entityElement, entityMapper);
+        executor = new ExampleExecutor(executor, entityElement, reEntityMapper);
 
         DefaultStoreRepository repository = new DefaultStoreRepository();
         repository.setEntityElement(entityElement);
         repository.setOperationFactory(operationFactory);
         repository.setExecutor(executor);
-        repository.setEntityMapper(entityMapper);
+        repository.setEntityMappers(entityMappers);
         repository.setExampleConverter((ExampleConverter) executor);
         repository.setEntityStoreInfo(entityStoreInfo);
         return repository;

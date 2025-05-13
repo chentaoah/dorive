@@ -22,10 +22,12 @@ import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.FieldDefinition;
 import com.gitee.dorive.api.entity.core.def.FieldDef;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
+import com.gitee.dorive.core.api.mapper.EntityMappers;
 import com.gitee.dorive.core.api.mapper.FieldMapper;
 import com.gitee.dorive.core.api.mapper.ValueMapper;
 import com.gitee.dorive.core.entity.enums.Mapper;
 import com.gitee.dorive.core.impl.mapper.DefaultEntityMapper;
+import com.gitee.dorive.core.impl.mapper.DefaultEntityMappers;
 import com.gitee.dorive.core.impl.mapper.DefaultFieldMapper;
 import com.gitee.dorive.core.impl.mapper.value.JsonArrayConverter;
 import com.gitee.dorive.core.impl.mapper.value.JsonConverter;
@@ -38,29 +40,27 @@ import org.apache.commons.lang3.StringUtils;
 import java.lang.reflect.Type;
 import java.util.*;
 
-import static com.gitee.dorive.core.impl.mapper.DefaultEntityMapper.getKey;
-
 @Data
 @AllArgsConstructor
-public class EntityMapperResolver {
+public class EntityMappersResolver {
 
     private EntityElement entityElement;
     private Map<String, String> aliasPropMapping;
 
-    public EntityMapper newEntityMapper() {
+    public EntityMappers newEntityMappers() {
         List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
 
-        Map<String, Map<String, String>> mapperFieldAliasMappingMap = new LinkedHashMap<>(4);
-        Map<String, FieldMapper> keyFieldMapperMap = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
+        Map<String, EntityMapper> mapperEntityMapperMap = new LinkedHashMap<>(4);
         List<FieldMapper> valueObjFields = new ArrayList<>(4);
         List<FieldMapper> matchedValueObjFields = new ArrayList<>(4);
         List<FieldMapper> unmatchedValueObjFields = new ArrayList<>(4);
         Set<Type> valueObjTypes = new HashSet<>(6);
 
-        Map<String, String> fieldAliasMapping1 = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
-        Map<String, String> fieldAliasMapping2 = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
-        mapperFieldAliasMappingMap.put(Mapper.ENTITY_DATABASE.name(), fieldAliasMapping1);
-        mapperFieldAliasMappingMap.put(Mapper.ENTITY_POJO.name(), fieldAliasMapping2);
+        int size = fieldDefinitions.size() * 4 / 3 + 1;
+        DefaultEntityMapper entityMapper1 = new DefaultEntityMapper(new LinkedHashMap<>(size), new LinkedHashMap<>(size), new LinkedHashMap<>(size));
+        DefaultEntityMapper entityMapper2 = new DefaultEntityMapper(new LinkedHashMap<>(size), new LinkedHashMap<>(size), new LinkedHashMap<>(size));
+        mapperEntityMapperMap.put(Mapper.ENTITY_DATABASE.name(), entityMapper1);
+        mapperEntityMapperMap.put(Mapper.ENTITY_POJO.name(), entityMapper2);
 
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
             String field = fieldDefinition.getFieldName();
@@ -70,21 +70,18 @@ public class EntityMapperResolver {
             String alias = isMatch ? expected : null;
             String prop = isMatch ? aliasPropMapping.get(alias) : null;
 
-            fieldAliasMapping1.put(field, alias);
-            fieldAliasMapping2.put(field, prop);
-
             FieldDef fieldDef = fieldDefinition.getFieldDef();
             boolean isValueObj = fieldDef != null && fieldDef.isValueObj();
             ValueMapper valueMapper = newValueMapper(fieldDefinition, isMatch, isValueObj);
 
-            FieldMapper fieldMapper1 = newFieldMapper(keyFieldMapperMap, Mapper.ENTITY_DATABASE.name(), field, alias, valueMapper);
-            FieldMapper fieldMapper2 = newFieldMapper(keyFieldMapperMap, Mapper.ENTITY_POJO.name(), field, prop, valueMapper);
+            addToEntityMapper(entityMapper1, field, alias, valueMapper);
+            addToEntityMapper(entityMapper2, field, prop, valueMapper);
 
-            handleValueObjMapper(valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes, fieldDefinition, isMatch, isValueObj, fieldMapper1);
-            handleValueObjMapper(valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes, fieldDefinition, isMatch, isValueObj, fieldMapper2);
+            FieldMapper fieldMapper = new DefaultFieldMapper(field, alias, valueMapper);
+            handleValueObjMapper(valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes, fieldDefinition, isMatch, isValueObj, fieldMapper);
         }
 
-        return new DefaultEntityMapper(mapperFieldAliasMappingMap, keyFieldMapperMap, valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes);
+        return new DefaultEntityMappers(mapperEntityMapperMap, valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes);
     }
 
     private ValueMapper newValueMapper(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {
@@ -109,11 +106,11 @@ public class EntityMapperResolver {
         return null;
     }
 
-    private FieldMapper newFieldMapper(Map<String, FieldMapper> keyFieldMapperMap, String mapper, String field, String alias, ValueMapper valueMapper) {
-        FieldMapper fieldMapper = new DefaultFieldMapper(mapper, field, alias, valueMapper);
-        keyFieldMapperMap.put(getKey(mapper, "field", field), fieldMapper);
-        keyFieldMapperMap.put(getKey(mapper, "alias", alias), fieldMapper);
-        return fieldMapper;
+    private void addToEntityMapper(DefaultEntityMapper entityMapper, String field, String alias, ValueMapper valueMapper) {
+        entityMapper.getFieldAliasMapping().put(field, alias);
+        FieldMapper fieldMapper = new DefaultFieldMapper(field, alias, valueMapper);
+        entityMapper.getFieldFieldMapperMap().put(field, fieldMapper);
+        entityMapper.getAliasFieldMapperMap().put(alias, fieldMapper);
     }
 
     private void handleValueObjMapper(List<FieldMapper> valueObjFields, List<FieldMapper> matchedValueObjFields, List<FieldMapper> unmatchedValueObjFields, Set<Type> valueObjTypes,

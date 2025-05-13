@@ -27,8 +27,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class DefaultFieldMapper implements FieldMapper {
-
-    private String mapper;
     private String field;
     private String alias;
     private ValueMapper valueMapper;
@@ -42,5 +40,4 @@ public class DefaultFieldMapper implements FieldMapper {
     public Object deconstruct(Object value) {
         return valueMapper == null ? value : valueMapper.deconstruct(value);
     }
-
 }

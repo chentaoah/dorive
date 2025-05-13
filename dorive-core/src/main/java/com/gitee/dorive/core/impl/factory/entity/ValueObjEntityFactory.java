@@ -27,6 +27,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONUtil;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
+import com.gitee.dorive.core.api.mapper.EntityMappers;
 import com.gitee.dorive.core.api.mapper.FieldMapper;
 
 import java.lang.reflect.ParameterizedType;
@@ -49,9 +50,9 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     };
 
     @Override
-    public void setEntityMapper(EntityMapper entityMapper) {
-        super.setEntityMapper(entityMapper);
-        List<FieldMapper> matchedValueObjFields = entityMapper.getMatchedValueObjFields();
+    public void setEntityMappers(EntityMappers entityMappers, EntityMapper reEntityMapper, EntityMapper deEntityMapper) {
+        super.setEntityMappers(entityMappers, reEntityMapper, deEntityMapper);
+        List<FieldMapper> matchedValueObjFields = entityMappers.getMatchedValueObjFields();
         if (!matchedValueObjFields.isEmpty()) {
             setReCopyOptions();
             setDeCopyOptions();
@@ -60,7 +61,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
 
     private void setReCopyOptions() {
         // 如果是值对象，则跳过hutool的类型转换
-        EntityMapper entityMapper = getEntityMapper();
+        EntityMappers entityMappers = getEntityMappers();
         getReCopyOptions().setConverter(((targetType, value) -> {
             if (value == null) {
                 return null;
@@ -69,7 +70,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
                 if (targetType instanceof ParameterizedType) {
                     targetType = ((ParameterizedType) targetType).getActualTypeArguments()[0];
                 }
-                if (entityMapper.isValueObjType(targetType)) {
+                if (entityMappers.isValueObjType(targetType)) {
                     return value;
                 }
             }
@@ -79,7 +80,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
 
     private void setDeCopyOptions() {
         // 如果是值对象，则跳过hutool的类型转换
-        EntityMapper entityMapper = getEntityMapper();
+        EntityMappers entityMappers = getEntityMappers();
         getDeCopyOptions().setConverter(((targetType, value) -> {
             if (value == null) {
                 return null;
@@ -89,7 +90,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
                 if (value instanceof Collection) {
                     return JSONUtil.toJsonStr(value);
                 }
-                if (entityMapper.isValueObjType(value.getClass())) {
+                if (entityMappers.isValueObjType(value.getClass())) {
                     return value;
                 }
             }
@@ -102,8 +103,8 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     public Object reconstitute(Context context, Object persistent) {
         Object entity = super.reconstitute(context, persistent);
         Map<String, Object> resultMap = (Map<String, Object>) persistent;
-        EntityMapper entityMapper = getEntityMapper();
-        List<FieldMapper> unmatchedValueObjFields = entityMapper.getUnmatchedValueObjFields();
+        EntityMappers entityMappers = getEntityMappers();
+        List<FieldMapper> unmatchedValueObjFields = entityMappers.getUnmatchedValueObjFields();
         for (FieldMapper fieldMapper : unmatchedValueObjFields) {
             Object valueObj = fieldMapper.reconstitute(resultMap);
             if (valueObj != null) {
@@ -116,8 +117,8 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     @Override
     public Object deconstruct(Context context, Object entity) {
         Object pojo = super.deconstruct(context, entity);
-        EntityMapper entityMapper = getEntityMapper();
-        List<FieldMapper> unmatchedValueObjFields = entityMapper.getUnmatchedValueObjFields();
+        EntityMappers entityMappers = getEntityMappers();
+        List<FieldMapper> unmatchedValueObjFields = entityMappers.getUnmatchedValueObjFields();
         for (FieldMapper fieldMapper : unmatchedValueObjFields) {
             Object valueObj = BeanUtil.getFieldValue(entity, fieldMapper.getField());
             valueObj = valueObj != null ? fieldMapper.deconstruct(valueObj) : null;

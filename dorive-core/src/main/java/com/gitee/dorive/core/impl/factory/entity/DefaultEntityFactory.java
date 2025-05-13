@@ -27,8 +27,8 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.factory.EntityAdapter;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
+import com.gitee.dorive.core.api.mapper.EntityMappers;
 import com.gitee.dorive.core.api.mapper.FieldMapper;
-import com.gitee.dorive.core.entity.enums.Mapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -49,7 +49,9 @@ public class DefaultEntityFactory implements EntityFactory {
     private Class<?> reconstituteType;
     private Class<?> deconstructType;
     // 序列化
-    private EntityMapper entityMapper;
+    private EntityMappers entityMappers;
+    private EntityMapper reEntityMapper;
+    private EntityMapper deEntityMapper;
     private CopyOptions reCopyOptions;
     private CopyOptions deCopyOptions;
     // 边界上下文
@@ -83,31 +85,33 @@ public class DefaultEntityFactory implements EntityFactory {
         this.entityAdapter = (persistent) -> reconstituteType;
     }
 
-    public void setEntityMapper(EntityMapper entityMapper) {
-        this.entityMapper = entityMapper;
+    public void setEntityMappers(EntityMappers entityMappers, EntityMapper reEntityMapper, EntityMapper deEntityMapper) {
+        this.entityMappers = entityMappers;
+        this.reEntityMapper = reEntityMapper;
+        this.deEntityMapper = deEntityMapper;
         initReCopyOptions();
         initDeCopyOptions();
     }
 
     private void initReCopyOptions() {
         this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(alias -> {
-            FieldMapper mapperByAlias = entityMapper.getMapperByAlias(Mapper.ENTITY_DATABASE.name(), alias);
-            return mapperByAlias != null ? mapperByAlias.getField() : alias;
+            FieldMapper fieldMapperByAlias = reEntityMapper.getFieldMapperByAlias(alias);
+            return fieldMapperByAlias != null ? fieldMapperByAlias.getField() : alias;
 
         }).setFieldValueEditor((field, value) -> {
-            FieldMapper mapperByField = entityMapper.getMapperByField(Mapper.ENTITY_DATABASE.name(), field);
-            return mapperByField != null ? mapperByField.reconstitute(value) : value;
+            FieldMapper fieldMapperByField = reEntityMapper.getFieldMapperByField(field);
+            return fieldMapperByField != null ? fieldMapperByField.reconstitute(value) : value;
         });
     }
 
     private void initDeCopyOptions() {
         this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(field -> {
-            FieldMapper mapperByField = entityMapper.getMapperByField(Mapper.ENTITY_POJO.name(), field);
-            return mapperByField != null ? mapperByField.getAlias() : field;
+            FieldMapper fieldMapperByField = deEntityMapper.getFieldMapperByField(field);
+            return fieldMapperByField != null ? fieldMapperByField.getAlias() : field;
 
         }).setFieldValueEditor((alias, value) -> {
-            FieldMapper mapperByAlias = entityMapper.getMapperByAlias(Mapper.ENTITY_POJO.name(), alias);
-            return mapperByAlias != null ? mapperByAlias.deconstruct(value) : value;
+            FieldMapper fieldMapperByAlias = deEntityMapper.getFieldMapperByAlias(alias);
+            return fieldMapperByAlias != null ? fieldMapperByAlias.deconstruct(value) : value;
         });
     }
 

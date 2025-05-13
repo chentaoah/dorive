@@ -15,18 +15,33 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.repository;
+package com.gitee.dorive.core.impl.mapper;
 
-import com.gitee.dorive.core.api.common.ExampleConverter;
+import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.api.mapper.EntityMappers;
+import com.gitee.dorive.core.api.mapper.FieldMapper;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import java.lang.reflect.Type;
+import java.util.*;
 
 @Getter
-@Setter
-@NoArgsConstructor
-public class DefaultRepository extends AbstractRepository<Object, Object> {
-    private EntityMappers entityMappers;
-    private ExampleConverter exampleConverter;
+@AllArgsConstructor
+public class DefaultEntityMappers implements EntityMappers {
+    private final Map<String, EntityMapper> mapperEntityMapperMap;
+    private final List<FieldMapper> valueObjFields;
+    private final List<FieldMapper> matchedValueObjFields;
+    private final List<FieldMapper> unmatchedValueObjFields;
+    private final Set<Type> valueObjTypes;
+
+    @Override
+    public EntityMapper getEntityMapper(String mapper) {
+        return mapperEntityMapperMap.get(mapper);
+    }
+
+    @Override
+    public boolean isValueObjType(Type type) {
+        return valueObjTypes.contains(type);
+    }
 }

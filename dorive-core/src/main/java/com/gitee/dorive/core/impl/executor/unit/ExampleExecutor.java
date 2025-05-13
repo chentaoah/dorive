@@ -24,7 +24,6 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.api.mapper.FieldMapper;
-import com.gitee.dorive.core.entity.enums.Mapper;
 import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.Operation;
@@ -106,7 +105,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
     private void convertUpdate(Update update) {
         Set<String> nullableProps = update.getNullableProps();
         if (nullableProps != null && !nullableProps.isEmpty()) {
-            nullableProps = entityMapper.toAliases(Mapper.ENTITY_DATABASE.name(), nullableProps);
+            nullableProps = entityMapper.toAliases(nullableProps);
             update.setNullableProps(nullableProps);
         }
     }
@@ -114,7 +113,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
     private void convertConditionUpdate(ConditionUpdate conditionUpdate) {
         Set<String> nullableProps = conditionUpdate.getNullableProps();
         if (nullableProps != null && !nullableProps.isEmpty()) {
-            nullableProps = entityMapper.toAliases(Mapper.ENTITY_DATABASE.name(), nullableProps);
+            nullableProps = entityMapper.toAliases(nullableProps);
             conditionUpdate.setNullableProps(nullableProps);
         }
     }
@@ -122,7 +121,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
     private void convertSelectProps(Example example) {
         List<String> properties = example.getSelectProps();
         if (properties != null && !properties.isEmpty()) {
-            properties = entityMapper.toAliases(Mapper.ENTITY_DATABASE.name(), properties);
+            properties = entityMapper.toAliases(properties);
             example.setSelectProps(properties);
         }
     }
@@ -148,9 +147,9 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
         String property = criterion.getProperty();
         Object value = criterion.getValue();
 
-        FieldMapper fieldMapper = entityMapper.getMapperByField(Mapper.ENTITY_DATABASE.name(), property);
+        FieldMapper fieldMapper = entityMapper.getFieldMapperByField(property);
         if (fieldMapper == null) {
-            fieldMapper = entityMapper.getMapperByAlias(Mapper.ENTITY_DATABASE.name(), property);
+            fieldMapper = entityMapper.getFieldMapperByAlias(property);
         }
         if (fieldMapper != null) {
             property = fieldMapper.getAlias();
@@ -164,7 +163,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
             List<String> properties = orderBy.getProperties();
-            properties = entityMapper.toAliases(Mapper.ENTITY_DATABASE.name(), properties);
+            properties = entityMapper.toAliases(properties);
             orderBy.setProperties(properties);
         }
     }

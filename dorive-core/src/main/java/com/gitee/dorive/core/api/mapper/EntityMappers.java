@@ -17,19 +17,19 @@
 
 package com.gitee.dorive.core.api.mapper;
 
+import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Set;
 
-public interface EntityMapper {
+public interface EntityMappers {
 
-    String toAlias(String field);
+    EntityMapper getEntityMapper(String mapper);
 
-    List<String> toAliases(List<String> fields);
+    List<FieldMapper> getValueObjFields();
 
-    Set<String> toAliases(Set<String> fields);
+    List<FieldMapper> getMatchedValueObjFields();
 
-    FieldMapper getFieldMapperByField(String field);
+    List<FieldMapper> getUnmatchedValueObjFields();
 
-    FieldMapper getFieldMapperByAlias(String alias);
+    boolean isValueObjType(Type type);
 
 }

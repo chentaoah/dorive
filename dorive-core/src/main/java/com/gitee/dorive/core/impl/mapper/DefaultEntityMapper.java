@@ -21,38 +21,31 @@ import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.api.mapper.FieldMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.lang.reflect.Type;
 import java.util.*;
 
 @Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class DefaultEntityMapper implements EntityMapper {
-
-    private final Map<String, Map<String, String>> mapperFieldAliasMappingMap;
-    private final Map<String, FieldMapper> keyFieldMapperMap;
-    private final List<FieldMapper> valueObjFields;
-    private final List<FieldMapper> matchedValueObjFields;
-    private final List<FieldMapper> unmatchedValueObjFields;
-    private final Set<Type> valueObjTypes;
-
-    public static String getKey(String mapper, String type, String name) {
-        return mapper + ":" + type + ":" + name;
-    }
+    private Map<String, String> fieldAliasMapping;
+    private Map<String, FieldMapper> fieldFieldMapperMap;
+    private Map<String, FieldMapper> aliasFieldMapperMap;
 
     @Override
-    public String toAlias(String mapper, String field) {
-        Map<String, String> fieldAliasMapping = mapperFieldAliasMappingMap.get(mapper);
+    public String toAlias(String field) {
         return fieldAliasMapping.getOrDefault(field, field);
     }
 
     @Override
-    public List<String> toAliases(String mapper, List<String> fields) {
+    public List<String> toAliases(List<String> fields) {
         if (fields != null && !fields.isEmpty()) {
-            Map<String, String> fieldAliasMapping = mapperFieldAliasMappingMap.get(mapper);
             List<String> aliases = new ArrayList<>(fields.size());
             for (String field : fields) {
-                String alias = fieldAliasMapping.getOrDefault(field, field);
+                String alias = toAlias(field);
                 aliases.add(alias);
             }
             return aliases;
@@ -61,12 +54,11 @@ public class DefaultEntityMapper implements EntityMapper {
     }
 
     @Override
-    public Set<String> toAliases(String mapper, Set<String> fields) {
+    public Set<String> toAliases(Set<String> fields) {
         if (fields != null && !fields.isEmpty()) {
-            Map<String, String> fieldAliasMapping = mapperFieldAliasMappingMap.get(mapper);
             Set<String> aliases = new LinkedHashSet<>(fields.size() * 4 / 3 + 1);
             for (String field : fields) {
-                String alias = fieldAliasMapping.getOrDefault(field, field);
+                String alias = toAlias(field);
                 aliases.add(alias);
             }
             return aliases;
@@ -75,20 +67,12 @@ public class DefaultEntityMapper implements EntityMapper {
     }
 
     @Override
-    public FieldMapper getMapperByField(String mapper, String field) {
-        String key = getKey(mapper, "field", field);
-        return keyFieldMapperMap.get(key);
+    public FieldMapper getFieldMapperByField(String field) {
+        return fieldFieldMapperMap.get(field);
     }
 
     @Override
-    public FieldMapper getMapperByAlias(String mapper, String alias) {
-        String key = getKey(mapper, "alias", alias);
-        return keyFieldMapperMap.get(key);
+    public FieldMapper getFieldMapperByAlias(String alias) {
+        return aliasFieldMapperMap.get(alias);
     }
-
-    @Override
-    public boolean isValueObjType(Type type) {
-        return valueObjTypes.contains(type);
-    }
-
 }
