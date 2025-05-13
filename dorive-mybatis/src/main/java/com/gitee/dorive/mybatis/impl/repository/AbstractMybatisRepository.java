@@ -66,7 +66,8 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
     }
 
     @Override
-    protected DefaultRepository doNewRepository(EntityElement entityElement, OperationFactory operationFactory) {
+    protected DefaultRepository doNewRepository(EntityElement entityElement) {
+        OperationFactory operationFactory = new OperationFactory(entityElement);
         this.entityStoreInfo = resolveEntityStoreInfo(getRepositoryDef());
 
         EntityMappersResolver entityMappersResolver = new EntityMappersResolver(entityElement, entityStoreInfo.getAliasPropMapping());
