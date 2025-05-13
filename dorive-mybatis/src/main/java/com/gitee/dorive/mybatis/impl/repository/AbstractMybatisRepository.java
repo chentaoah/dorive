@@ -71,7 +71,6 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
 
         EntityMappersResolver entityMappersResolver = new EntityMappersResolver(entityElement, entityStoreInfo.getAliasPropMapping());
         EntityMappers entityMappers = entityMappersResolver.newEntityMappers();
-
         EntityMapper reEntityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
         EntityMapper deEntityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_POJO.name());
         EntityFactory entityFactory = newEntityFactory(entityElement, entityStoreInfo.getPojoClass(), entityMappers, reEntityMapper, deEntityMapper);
