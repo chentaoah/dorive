@@ -49,6 +49,7 @@ public class EntityMappersResolver {
 
     public EntityMappers newEntityMappers() {
         List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
+        Map<String, String> fieldAliasMapping = entityElement.getFieldAliasMapping();
 
         Map<String, EntityMapper> mapperEntityMapperMap = new LinkedHashMap<>(4);
         List<FieldMapper> valueObjFields = new ArrayList<>(4);
@@ -64,7 +65,7 @@ public class EntityMappersResolver {
 
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
             String field = fieldDefinition.getFieldName();
-            String expected = entityElement.toAlias(field);
+            String expected = fieldAliasMapping.getOrDefault(field, field);
 
             boolean isMatch = aliasPropMapping.containsKey(expected);
             String alias = isMatch ? expected : null;
