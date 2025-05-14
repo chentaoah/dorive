@@ -49,8 +49,4 @@ public class EntityElement extends FieldEntityDefinition {
     public void setPrimaryKey(Object entity, Object value) {
         ReflectUtil.setFieldValue(entity, getPrimaryKey(), value);
     }
-
-    public String toAlias(String field) {
-        return fieldAliasMapping.getOrDefault(field, field);
-    }
 }
