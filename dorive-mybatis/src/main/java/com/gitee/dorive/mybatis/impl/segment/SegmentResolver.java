@@ -19,6 +19,9 @@ package com.gitee.dorive.mybatis.impl.segment;
 
 import com.gitee.dorive.api.constant.core.Operator;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.mapper.EntityMapper;
+import com.gitee.dorive.core.api.mapper.EntityMappers;
+import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.core.entity.executor.Criterion;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -29,6 +32,7 @@ import com.gitee.dorive.core.impl.repository.CommonRepository;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.util.CriterionUtils;
 import com.gitee.dorive.mybatis.api.sql.Segment;
+import com.gitee.dorive.mybatis.entity.enums.Mapper;
 import com.gitee.dorive.mybatis.entity.segment.*;
 import com.gitee.dorive.mybatis.impl.repository.DefaultStoreRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
@@ -89,6 +93,7 @@ public class SegmentResolver {
         CommonRepository definedRepository = mergedRepository.getDefinedRepository();
         Map<String, List<StrongBinder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
         Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
+        EntityMapper entityMapper = getEntityMapper(mergedRepository);
 
         BinderResolver binderResolver = definedRepository.getBinderResolver();
         List<ValueFilterBinder> valueFilterBinders = binderResolver.getValueFilterBinders();
@@ -96,18 +101,20 @@ public class SegmentResolver {
         List<OnSegment> onSegments = new ArrayList<>(mergedStrongBindersMap.size() + mergedValueRouteBindersMap.size() + valueFilterBinders.size());
         mergedStrongBindersMap.forEach((absoluteAccessPath, strongBinders) -> {
             MergedRepository targetMergedRepository = mergedRepositoryMap.get(absoluteAccessPath);
+            EntityMapper targetEntityMapper = getEntityMapper(targetMergedRepository);
             for (StrongBinder strongBinder : strongBinders) {
-                String leftExpr = mergedRepository.getAlias() + "." + strongBinder.getFieldAlias();
+                String leftExpr = mergedRepository.getAlias() + "." + entityMapper.toAlias(strongBinder.getFieldName());
                 String operator = "=";
-                String rightExpr = targetMergedRepository.getAlias() + "." + strongBinder.getBindFieldAlias();
+                String rightExpr = targetMergedRepository.getAlias() + "." + targetEntityMapper.toAlias(strongBinder.getBindField());
                 OnSegment onSegment = new OnSegment(leftExpr, operator, rightExpr);
                 onSegments.add(onSegment);
             }
         });
         mergedValueRouteBindersMap.forEach((absoluteAccessPath, valueRouteBinders) -> {
             MergedRepository targetMergedRepository = mergedRepositoryMap.get(absoluteAccessPath);
+            EntityMapper targetEntityMapper = getEntityMapper(targetMergedRepository);
             for (ValueRouteBinder valueRouteBinder : valueRouteBinders) {
-                String leftExpr = targetMergedRepository.getAlias() + "." + valueRouteBinder.getBindFieldAlias();
+                String leftExpr = targetMergedRepository.getAlias() + "." + targetEntityMapper.toAlias(valueRouteBinder.getBindField());
                 String operator = "=";
                 String rightExpr = CriterionUtils.sqlParam(valueRouteBinder.getFieldValue(context, null));
                 OnValueSegment onValueSegment = new OnValueSegment(leftExpr, operator, rightExpr);
@@ -115,13 +122,19 @@ public class SegmentResolver {
             }
         });
         for (ValueFilterBinder valueFilterBinder : valueFilterBinders) {
-            String leftExpr = mergedRepository.getAlias() + "." + valueFilterBinder.getFieldAlias();
+            String leftExpr = mergedRepository.getAlias() + "." + entityMapper.toAlias(valueFilterBinder.getFieldName());
             String operator = "=";
             String rightExpr = CriterionUtils.sqlParam(valueFilterBinder.getBoundValue(context, null));
             OnValueSegment onValueSegment = new OnValueSegment(leftExpr, operator, rightExpr);
             onSegments.add(onValueSegment);
         }
         return onSegments;
+    }
+
+    private EntityMapper getEntityMapper(MergedRepository mergedRepository) {
+        DefaultRepository defaultRepository = mergedRepository.getDefaultRepository();
+        EntityMappers entityMappers = defaultRepository.getEntityMappers();
+        return entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
     }
 
     private List<ArgSegment> newArgSegments() {
