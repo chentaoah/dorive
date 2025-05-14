@@ -87,6 +87,7 @@ public class DefaultEntityFactory implements EntityFactory {
         initReCopyOptions();
         initDeCopyOptions();
         initEntityAdapter();
+        processEntityAdapter();
     }
 
     private void initReCopyOptions() {
@@ -113,6 +114,12 @@ public class DefaultEntityFactory implements EntityFactory {
 
     protected void initEntityAdapter() {
         this.entityAdapter = (persistent) -> reconstituteType;
+    }
+
+    protected void processEntityAdapter() {
+        if (entityAdapter instanceof AdaptiveEntityAdapter) {
+            ((AdaptiveEntityAdapter) entityAdapter).initialize(entityElement, reEntityMapper);
+        }
     }
 
     @Override

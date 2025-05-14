@@ -33,24 +33,23 @@ import java.util.Map;
 @Setter
 public class AdaptiveEntityAdapter implements EntityAdapter {
 
+    private String field;
+    private Map<Object, Class<?>> valueEntityTypeMap;
     private EntityElement entityElement;
     private EntityMapper entityMapper;
-    private String field;
     private String alias;
-    private Map<Object, Class<?>> valueEntityTypeMap;
 
-    public <T> AdaptiveEntityAdapter(EntityElement entityElement, EntityMapper entityMapper,
-                                     Func1<T, ?> func, Map<Object, Class<?>> valueEntityTypeMap) {
-        Assert.notNull(entityElement, "The entityElement cannot be null!");
-        Assert.notNull(entityMapper, "The entityMapper cannot be null!");
+    public <T> AdaptiveEntityAdapter(Func1<T, ?> func, Map<Object, Class<?>> valueEntityTypeMap) {
         Assert.notNull(func, "The func cannot be null!");
         Assert.notEmpty(valueEntityTypeMap, "The valueEntityTypeMap cannot be empty!");
+        this.field = LambdaUtil.getFieldName(func);
+        this.valueEntityTypeMap = valueEntityTypeMap;
+    }
 
+    public void initialize(EntityElement entityElement, EntityMapper entityMapper) {
         this.entityElement = entityElement;
         this.entityMapper = entityMapper;
-        this.field = LambdaUtil.getFieldName(func);
         this.alias = entityMapper.toAlias(field);
-        this.valueEntityTypeMap = valueEntityTypeMap;
     }
 
     @Override
