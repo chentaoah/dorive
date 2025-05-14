@@ -18,6 +18,7 @@
 package com.gitee.dorive.mybatis.impl.handler;
 
 import cn.hutool.core.collection.CollUtil;
+import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.OrderBy;
 import com.gitee.dorive.core.entity.executor.Page;
@@ -43,21 +44,23 @@ import java.util.Map;
 public class SqlExecuteQueryHandler extends SqlBuildQueryHandler {
 
     private final SqlRunner sqlRunner;
+    private final EntityMapper entityMapper;
 
-    public SqlExecuteQueryHandler(AbstractQueryRepository<?, ?> repository, SqlRunner sqlRunner) {
+    public SqlExecuteQueryHandler(AbstractQueryRepository<?, ?> repository, SqlRunner sqlRunner, EntityMapper entityMapper) {
         super(repository);
         this.sqlRunner = sqlRunner;
+        this.entityMapper = entityMapper;
     }
 
     @Override
     protected void doHandle(QueryContext queryContext, Object query) {
         ResultType resultType = queryContext.getResultType();
         String primaryKey = queryContext.getPrimaryKey();
-        String primaryKeyAlias = queryContext.getPrimaryKeyAlias();
         Example example = queryContext.getExample();
         QueryUnit queryUnit = queryContext.getQueryUnit();
-
         boolean needCount = queryContext.isNeedCount();
+
+        String primaryKeyAlias = entityMapper.toAlias(primaryKey);
 
         OrderBy orderBy = example.getOrderBy();
         Page<Object> page = example.getPage();

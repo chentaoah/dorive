@@ -55,6 +55,7 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
 
     private SqlRunner sqlRunner;
     private EntityStoreInfo entityStoreInfo;
+    private EntityMappers entityMappers;
     private CountQuerier countQuerier;
 
     @Override
@@ -71,7 +72,8 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
         this.entityStoreInfo = resolveEntityStoreInfo(getRepositoryDef());
 
         EntityMappersResolver entityMappersResolver = new EntityMappersResolver(entityElement, entityStoreInfo.getAliasPropMapping());
-        EntityMappers entityMappers = entityMappersResolver.newEntityMappers();
+        this.entityMappers = entityMappersResolver.newEntityMappers();
+
         EntityMapper reEntityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
         EntityMapper deEntityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_POJO.name());
         EntityFactory entityFactory = newEntityFactory(entityElement, entityStoreInfo.getPojoClass(), entityMappers, reEntityMapper, deEntityMapper);
@@ -94,8 +96,9 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
     @Override
     protected void registryQueryHandlers(Map<QueryMethod, QueryHandler> queryHandlerMap) {
         super.registryQueryHandlers(queryHandlerMap);
+        EntityMapper entityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
         queryHandlerMap.put(QueryMethod.SQL_BUILD, new SqlBuildQueryHandler(this));
-        queryHandlerMap.put(QueryMethod.SQL_EXECUTE, new SqlExecuteQueryHandler(this, sqlRunner));
+        queryHandlerMap.put(QueryMethod.SQL_EXECUTE, new SqlExecuteQueryHandler(this, sqlRunner, entityMapper));
         queryHandlerMap.put(QueryMethod.SQL_CUSTOM, new SqlCustomQueryHandler(this, entityStoreInfo));
     }
 

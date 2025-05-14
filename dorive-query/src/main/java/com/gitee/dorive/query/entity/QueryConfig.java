@@ -39,11 +39,6 @@ public class QueryConfig {
         return getEntityElement().getPrimaryKey();
     }
 
-    public String getPrimaryKeyAlias() {
-        EntityElement entityElement = getEntityElement();
-        return entityElement.toAlias(entityElement.getPrimaryKey());
-    }
-
     public String getMethod() {
         return queryExampleResolver.getQueryDefinition().getQueryDef().getMethod();
     }
