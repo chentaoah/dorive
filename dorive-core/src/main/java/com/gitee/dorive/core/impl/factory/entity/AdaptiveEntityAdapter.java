@@ -49,7 +49,6 @@ public class AdaptiveEntityAdapter implements EntityAdapter {
         this.entityElement = entityElement;
         this.entityMapper = entityMapper;
         this.field = LambdaUtil.getFieldName(func);
-        // 别名
         this.alias = entityMapper.toAlias(field);
         this.valueEntityTypeMap = valueEntityTypeMap;
     }
