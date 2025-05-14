@@ -64,7 +64,6 @@ public class DefaultEntityFactory implements EntityFactory {
     public void setEntityElement(EntityElement entityElement) {
         this.entityElement = entityElement;
         initCtxCopyOptions();
-        initEntityAdapter();
     }
 
     private void initCtxCopyOptions() {
@@ -81,16 +80,13 @@ public class DefaultEntityFactory implements EntityFactory {
         }
     }
 
-    protected void initEntityAdapter() {
-        this.entityAdapter = (persistent) -> reconstituteType;
-    }
-
     public void setEntityMappers(EntityMappers entityMappers, EntityMapper reEntityMapper, EntityMapper deEntityMapper) {
         this.entityMappers = entityMappers;
         this.reEntityMapper = reEntityMapper;
         this.deEntityMapper = deEntityMapper;
         initReCopyOptions();
         initDeCopyOptions();
+        initEntityAdapter();
     }
 
     private void initReCopyOptions() {
@@ -113,6 +109,10 @@ public class DefaultEntityFactory implements EntityFactory {
             FieldMapper fieldMapperByAlias = deEntityMapper.getFieldMapperByAlias(alias);
             return fieldMapperByAlias != null ? fieldMapperByAlias.deconstruct(value) : value;
         });
+    }
+
+    protected void initEntityAdapter() {
+        this.entityAdapter = (persistent) -> reconstituteType;
     }
 
     @Override

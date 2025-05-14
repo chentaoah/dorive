@@ -23,6 +23,7 @@ import cn.hutool.core.lang.func.Func1;
 import cn.hutool.core.lang.func.LambdaUtil;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.factory.EntityAdapter;
+import com.gitee.dorive.core.api.mapper.EntityMapper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,17 +34,23 @@ import java.util.Map;
 public class AdaptiveEntityAdapter implements EntityAdapter {
 
     private EntityElement entityElement;
+    private EntityMapper entityMapper;
     private String field;
     private String alias;
     private Map<Object, Class<?>> valueEntityTypeMap;
 
-    public <T> AdaptiveEntityAdapter(EntityElement entityElement, Func1<T, ?> func, Map<Object, Class<?>> valueEntityTypeMap) {
+    public <T> AdaptiveEntityAdapter(EntityElement entityElement, EntityMapper entityMapper,
+                                     Func1<T, ?> func, Map<Object, Class<?>> valueEntityTypeMap) {
         Assert.notNull(entityElement, "The entityElement cannot be null!");
+        Assert.notNull(entityMapper, "The entityMapper cannot be null!");
         Assert.notNull(func, "The func cannot be null!");
         Assert.notEmpty(valueEntityTypeMap, "The valueEntityTypeMap cannot be empty!");
+
         this.entityElement = entityElement;
+        this.entityMapper = entityMapper;
         this.field = LambdaUtil.getFieldName(func);
-        this.alias = entityElement.toAlias(field);
+        // 别名
+        this.alias = entityMapper.toAlias(field);
         this.valueEntityTypeMap = valueEntityTypeMap;
     }
 
