@@ -223,7 +223,6 @@ public class BinderResolver {
 
     private BindEndpoint newBindEndpoint(BindingDef bindingDef) {
         String bind = bindingDef.getBind();
-        String bindField = bindingDef.getBindField();
 
         CommonRepository rootRepository = repository.getRootRepository();
         EntityElement entityElement = rootRepository.getEntityElement();
@@ -234,12 +233,9 @@ public class BinderResolver {
         Map<String, CommonRepository> repositoryMap = repository.getRepositoryMap();
         CommonRepository belongRepository = repositoryMap.getOrDefault("/" + bind, rootRepository);
         belongRepository.setBound(true);
-        EntityElement belongEntityElement = belongRepository.getEntityElement();
-        String bindFieldAlias = belongEntityElement.toAlias(bindField);
 
         bindEndpoint.setBelongAccessPath(belongRepository.getAccessPath());
         bindEndpoint.setBelongRepository(belongRepository);
-        bindEndpoint.setBindFieldAlias(bindFieldAlias);
         return bindEndpoint;
     }
 

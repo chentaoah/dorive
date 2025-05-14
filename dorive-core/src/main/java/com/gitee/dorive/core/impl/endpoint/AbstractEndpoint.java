@@ -27,11 +27,5 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public abstract class AbstractEndpoint implements Endpoint {
-
     private FieldDefinition fieldDefinition;
-
-    public String getAlias() {
-        return fieldDefinition.getAlias();
-    }
-
 }

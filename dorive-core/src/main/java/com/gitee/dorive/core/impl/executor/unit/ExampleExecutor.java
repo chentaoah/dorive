@@ -30,6 +30,7 @@ import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.ConditionUpdate;
 import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.operation.eop.Update;
+import com.gitee.dorive.core.impl.util.MultiInBuilder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -135,6 +136,16 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
                     Object value = criterion.getValue();
                     if (value instanceof Example) {
                         convert(context, (Example) value);
+                    }
+                } else if (Operator.MULTI_IN.equals(operator)) {
+                    Object value = criterion.getValue();
+                    if (value instanceof MultiInBuilder) {
+                        MultiInBuilder builder = (MultiInBuilder) value;
+                        List<String> properties = builder.getProperties();
+                        properties = entityMapper.toAliases(properties);
+                        builder.setProperties(properties);
+                        criterion.setProperty(builder.buildPropertiesStr());
+                        criterion.setValue(builder.buildValuesStr());
                     }
                 } else {
                     doConvertCriteria(criterion);

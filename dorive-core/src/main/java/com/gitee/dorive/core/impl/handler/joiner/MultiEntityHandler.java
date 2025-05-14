@@ -54,8 +54,8 @@ public class MultiEntityHandler extends AbstractEntityJoiner {
     }
 
     private MultiInBuilder newMultiInBuilder(Context context, List<Object> entities) {
-        List<String> aliases = binders.stream().map(AbstractBinder::getFieldAlias).collect(Collectors.toList());
-        MultiInBuilder multiInBuilder = new MultiInBuilder(aliases, entities.size());
+        List<String> properties = binders.stream().map(AbstractBinder::getFieldName).collect(Collectors.toList());
+        MultiInBuilder multiInBuilder = new MultiInBuilder(properties, entities.size());
 
         for (Object entity : entities) {
             StringBuilder keyBuilder = new StringBuilder();

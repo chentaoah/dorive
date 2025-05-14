@@ -75,20 +75,12 @@ public abstract class AbstractBinder implements Binder {
         return bindingDef.getBindField();
     }
 
-    public String getFieldAlias() {
-        return fieldEndpoint.getAlias();
-    }
-
     public boolean isBindCollection() {
         return bindEndpoint.getFieldDefinition().isCollection();
     }
 
     public String getBelongAccessPath() {
         return bindEndpoint.getBelongAccessPath();
-    }
-
-    public String getBindFieldAlias() {
-        return bindEndpoint.getBindFieldAlias();
     }
 
     public boolean isSameType() {

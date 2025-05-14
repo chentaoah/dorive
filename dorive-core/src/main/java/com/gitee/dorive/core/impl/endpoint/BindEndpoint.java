@@ -25,13 +25,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BindEndpoint extends SpELEndpoint {
-
     private String belongAccessPath;
     private CommonRepository belongRepository;
-    private String bindFieldAlias;
 
     public BindEndpoint(FieldDefinition fieldDefinition, String expression) {
         super(fieldDefinition, expression);
     }
-
 }

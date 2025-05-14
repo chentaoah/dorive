@@ -114,8 +114,8 @@ public class StepwiseQueryHandler extends AbstractQueryUnitQueryHandler {
                         }
 
                     } else {
-                        List<String> aliases = strongBinders.stream().map(AbstractBinder::getBindFieldAlias).collect(Collectors.toList());
-                        MultiInBuilder builder = new MultiInBuilder(aliases, entities.size());
+                        List<String> properties = strongBinders.stream().map(AbstractBinder::getBindField).collect(Collectors.toList());
+                        MultiInBuilder builder = new MultiInBuilder(properties, entities.size());
                         collectFieldValues(context, entities, strongBinders, builder);
                         if (!builder.isEmpty()) {
                             targetExample.getCriteria().add(builder.toCriterion());
