@@ -19,6 +19,10 @@ package com.gitee.dorive.mybatis.impl.querier;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.mapper.EntityMapper;
+import com.gitee.dorive.core.api.mapper.EntityMappers;
+import com.gitee.dorive.mybatis.entity.enums.Mapper;
+import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import com.gitee.dorive.mybatis.api.sql.CountQuerier;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 import com.gitee.dorive.mybatis.entity.common.CountQuery;
@@ -27,6 +31,7 @@ import com.gitee.dorive.mybatis.entity.segment.TableSegment;
 import com.gitee.dorive.mybatis.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.mybatis.impl.segment.SelectSegmentBuilder;
 import com.gitee.dorive.query.api.QueryHandler;
+import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
 import com.gitee.dorive.query.entity.enums.QueryMethod;
@@ -67,7 +72,7 @@ public class SqlCountQuerier implements CountQuerier {
         List<Object> args = selectSegment.getArgs();
 
         // group by
-        List<String> groupBy = queryUnit.toAliases(countQuery.getGroupBy());
+        List<String> groupBy = toAliases(queryUnit, countQuery.getGroupBy());
         String groupByColumns = CollUtil.join(groupBy, ",", tableAlias + ".", null);
         selectSegment.setGroupBy("GROUP BY " + groupByColumns);
 
@@ -87,11 +92,19 @@ public class SqlCountQuerier implements CountQuerier {
         return countMap;
     }
 
+    private List<String> toAliases(QueryUnit queryUnit, List<String> properties) {
+        MergedRepository mergedRepository = queryUnit.getMergedRepository();
+        DefaultRepository defaultRepository = mergedRepository.getDefaultRepository();
+        EntityMappers entityMappers = defaultRepository.getEntityMappers();
+        EntityMapper entityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
+        return entityMapper.toAliases(properties);
+    }
+
     private String buildCountByExp(CountQuery countQuery, QueryUnit queryUnit) {
         TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
         String tableAlias = tableSegment.getTableAlias();
 
-        List<String> countBy = queryUnit.toAliases(countQuery.getCountBy());
+        List<String> countBy = toAliases(queryUnit, countQuery.getCountBy());
         String countByStr = CollUtil.join(countBy, ",',',", tableAlias + ".", null);
 
         StringBuilder countByExp = new StringBuilder();

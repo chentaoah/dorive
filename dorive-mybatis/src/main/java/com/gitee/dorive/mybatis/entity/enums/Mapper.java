@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.enums;
+package com.gitee.dorive.mybatis.entity.enums;
 
 public enum Mapper {
     ENTITY_DATABASE,

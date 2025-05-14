@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.resolver;
+package com.gitee.dorive.mybatis.impl.resolver;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.api.entity.core.EntityElement;
@@ -25,7 +25,7 @@ import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.api.mapper.EntityMappers;
 import com.gitee.dorive.core.api.mapper.FieldMapper;
 import com.gitee.dorive.core.api.mapper.ValueMapper;
-import com.gitee.dorive.core.entity.enums.Mapper;
+import com.gitee.dorive.mybatis.entity.enums.Mapper;
 import com.gitee.dorive.core.impl.mapper.DefaultEntityMapper;
 import com.gitee.dorive.core.impl.mapper.DefaultEntityMappers;
 import com.gitee.dorive.core.impl.mapper.DefaultFieldMapper;
