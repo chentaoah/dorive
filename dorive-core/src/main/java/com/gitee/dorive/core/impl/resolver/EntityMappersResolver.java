@@ -44,9 +44,9 @@ import java.util.*;
 public class EntityMappersResolver {
 
     private EntityElement entityElement;
+    private Map<String, String> aliasPropMapping;
     private String reMapper;
     private String deMapper;
-    private Map<String, String> aliasPropMapping;
 
     public EntityMappers newEntityMappers() {
         List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
@@ -61,8 +61,6 @@ public class EntityMappersResolver {
         int size = fieldDefinitions.size() * 4 / 3 + 1;
         DefaultEntityMapper entityMapper1 = new DefaultEntityMapper(new LinkedHashMap<>(size), new LinkedHashMap<>(size), new LinkedHashMap<>(size));
         DefaultEntityMapper entityMapper2 = new DefaultEntityMapper(new LinkedHashMap<>(size), new LinkedHashMap<>(size), new LinkedHashMap<>(size));
-        mapperEntityMapperMap.put(reMapper, entityMapper1);
-        mapperEntityMapperMap.put(deMapper, entityMapper2);
 
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
             String field = fieldDefinition.getFieldName();
@@ -80,8 +78,19 @@ public class EntityMappersResolver {
             addToEntityMapper(entityMapper2, field, prop, valueMapper);
 
             FieldMapper fieldMapper = new DefaultFieldMapper(field, alias, valueMapper);
-            handleValueObjMapper(valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes, fieldDefinition, isMatch, isValueObj, fieldMapper);
+            if (isValueObj) {
+                valueObjFields.add(fieldMapper);
+                if (isMatch) {
+                    matchedValueObjFields.add(fieldMapper);
+                } else {
+                    unmatchedValueObjFields.add(fieldMapper);
+                }
+                valueObjTypes.add(fieldDefinition.getGenericType());
+            }
         }
+
+        mapperEntityMapperMap.put(reMapper, entityMapper1);
+        mapperEntityMapperMap.put(deMapper, entityMapper2);
 
         return new DefaultEntityMappers(mapperEntityMapperMap, valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes);
     }
@@ -113,19 +122,6 @@ public class EntityMappersResolver {
         FieldMapper fieldMapper = new DefaultFieldMapper(field, alias, valueMapper);
         entityMapper.getFieldFieldMapperMap().put(field, fieldMapper);
         entityMapper.getAliasFieldMapperMap().put(alias, fieldMapper);
-    }
-
-    private void handleValueObjMapper(List<FieldMapper> valueObjFields, List<FieldMapper> matchedValueObjFields, List<FieldMapper> unmatchedValueObjFields, Set<Type> valueObjTypes,
-                                      FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj, FieldMapper fieldMapper) {
-        if (isValueObj) {
-            valueObjFields.add(fieldMapper);
-            if (isMatch) {
-                matchedValueObjFields.add(fieldMapper);
-            } else {
-                unmatchedValueObjFields.add(fieldMapper);
-            }
-            valueObjTypes.add(fieldDefinition.getGenericType());
-        }
     }
 
 }
