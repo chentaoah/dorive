@@ -46,8 +46,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultEntityFactory implements EntityFactory {
 
     private EntityElement entityElement;
-    private Class<?> reconstituteType;
-    private Class<?> deconstructType;
+    private Class<?> reType;
+    private Class<?> deType;
     // 序列化
     private EntityMappers entityMappers;
     private EntityMapper reEntityMapper;
@@ -113,7 +113,7 @@ public class DefaultEntityFactory implements EntityFactory {
     }
 
     protected void initEntityAdapter() {
-        this.entityAdapter = (persistent) -> reconstituteType;
+        this.entityAdapter = (persistent) -> reType;
     }
 
     protected void processEntityAdapter() {
@@ -165,7 +165,7 @@ public class DefaultEntityFactory implements EntityFactory {
     }
 
     public Object deconstruct(Context context, Object entity) {
-        return BeanUtil.toBean(entity, deconstructType, deCopyOptions);
+        return BeanUtil.toBean(entity, deType, deCopyOptions);
     }
 
 }

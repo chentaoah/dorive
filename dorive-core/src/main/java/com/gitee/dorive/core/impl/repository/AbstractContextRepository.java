@@ -200,8 +200,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         if (entityFactory instanceof DefaultEntityFactory) {
             DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
             defaultEntityFactory.setEntityElement(entityElement);
-            defaultEntityFactory.setReconstituteType(entityElement.getGenericType());
-            defaultEntityFactory.setDeconstructType(persistentType);
+            defaultEntityFactory.setReType(entityElement.getGenericType());
+            defaultEntityFactory.setDeType(persistentType);
             defaultEntityFactory.setEntityMappers(entityMappers, reEntityMapper, deEntityMapper);
             defaultEntityFactory.setBoundedContextName(repositoryDef.getBoundedContext());
             defaultEntityFactory.setBoundedContext(getBoundedContext());

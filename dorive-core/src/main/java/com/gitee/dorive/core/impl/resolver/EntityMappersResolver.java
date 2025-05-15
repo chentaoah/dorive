@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.impl.resolver;
+package com.gitee.dorive.core.impl.resolver;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.api.entity.core.EntityElement;
@@ -25,7 +25,6 @@ import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.api.mapper.EntityMappers;
 import com.gitee.dorive.core.api.mapper.FieldMapper;
 import com.gitee.dorive.core.api.mapper.ValueMapper;
-import com.gitee.dorive.mybatis.entity.enums.Mapper;
 import com.gitee.dorive.core.impl.mapper.DefaultEntityMapper;
 import com.gitee.dorive.core.impl.mapper.DefaultEntityMappers;
 import com.gitee.dorive.core.impl.mapper.DefaultFieldMapper;
@@ -45,6 +44,8 @@ import java.util.*;
 public class EntityMappersResolver {
 
     private EntityElement entityElement;
+    private String reMapper;
+    private String deMapper;
     private Map<String, String> aliasPropMapping;
 
     public EntityMappers newEntityMappers() {
@@ -60,8 +61,8 @@ public class EntityMappersResolver {
         int size = fieldDefinitions.size() * 4 / 3 + 1;
         DefaultEntityMapper entityMapper1 = new DefaultEntityMapper(new LinkedHashMap<>(size), new LinkedHashMap<>(size), new LinkedHashMap<>(size));
         DefaultEntityMapper entityMapper2 = new DefaultEntityMapper(new LinkedHashMap<>(size), new LinkedHashMap<>(size), new LinkedHashMap<>(size));
-        mapperEntityMapperMap.put(Mapper.ENTITY_DATABASE.name(), entityMapper1);
-        mapperEntityMapperMap.put(Mapper.ENTITY_POJO.name(), entityMapper2);
+        mapperEntityMapperMap.put(reMapper, entityMapper1);
+        mapperEntityMapperMap.put(deMapper, entityMapper2);
 
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
             String field = fieldDefinition.getFieldName();

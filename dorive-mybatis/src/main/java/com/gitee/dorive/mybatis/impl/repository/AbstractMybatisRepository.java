@@ -31,7 +31,7 @@ import com.gitee.dorive.core.impl.executor.unit.ExampleExecutor;
 import com.gitee.dorive.core.impl.executor.unit.FactoryExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
-import com.gitee.dorive.mybatis.impl.resolver.EntityMappersResolver;
+import com.gitee.dorive.core.impl.resolver.EntityMappersResolver;
 import com.gitee.dorive.mybatis.api.sql.CountQuerier;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 import com.gitee.dorive.mybatis.entity.common.CountQuery;
@@ -71,11 +71,14 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
         OperationFactory operationFactory = new OperationFactory(entityElement);
         this.entityStoreInfo = resolveEntityStoreInfo(getRepositoryDef());
 
-        EntityMappersResolver entityMappersResolver = new EntityMappersResolver(entityElement, entityStoreInfo.getAliasPropMapping());
+        String reMapper = Mapper.ENTITY_DATABASE.name();
+        String deMapper = Mapper.ENTITY_POJO.name();
+
+        EntityMappersResolver entityMappersResolver = new EntityMappersResolver(entityElement, reMapper, deMapper, entityStoreInfo.getAliasPropMapping());
         this.entityMappers = entityMappersResolver.newEntityMappers();
 
-        EntityMapper reEntityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
-        EntityMapper deEntityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_POJO.name());
+        EntityMapper reEntityMapper = entityMappers.getEntityMapper(reMapper);
+        EntityMapper deEntityMapper = entityMappers.getEntityMapper(deMapper);
         EntityFactory entityFactory = newEntityFactory(entityElement, entityStoreInfo.getPojoClass(), entityMappers, reEntityMapper, deEntityMapper);
 
         Executor executor = newExecutor(entityElement, entityStoreInfo);
