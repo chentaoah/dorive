@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.mapper;
 
 import com.gitee.dorive.core.api.mapper.FieldMapper;
-import com.gitee.dorive.core.api.mapper.ValueMapper;
+import com.gitee.dorive.core.api.mapper.Converter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,15 +29,15 @@ import lombok.Setter;
 public class DefaultFieldMapper implements FieldMapper {
     private String field;
     private String alias;
-    private ValueMapper valueMapper;
+    private Converter converter;
 
     @Override
     public Object reconstitute(Object value) {
-        return valueMapper == null ? value : valueMapper.reconstitute(value);
+        return converter == null ? value : converter.reconstitute(value);
     }
 
     @Override
     public Object deconstruct(Object value) {
-        return valueMapper == null ? value : valueMapper.deconstruct(value);
+        return converter == null ? value : converter.deconstruct(value);
     }
 }

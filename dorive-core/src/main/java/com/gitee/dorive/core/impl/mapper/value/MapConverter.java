@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.mapper.value;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.core.api.mapper.ValueMapper;
+import com.gitee.dorive.core.api.mapper.Converter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +26,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class MapConverter implements ValueMapper {
+public class MapConverter implements Converter {
 
     private Class<?> entityClass;
 

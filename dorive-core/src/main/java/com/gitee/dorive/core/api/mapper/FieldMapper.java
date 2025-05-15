@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.api.mapper;
 
-public interface FieldMapper extends ValueMapper {
+public interface FieldMapper extends Converter {
 
     String getField();
 

@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.mapper.value;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.api.entity.core.FieldDefinition;
 import com.gitee.dorive.api.entity.core.def.FieldDef;
-import com.gitee.dorive.core.api.mapper.ValueMapper;
+import com.gitee.dorive.core.api.mapper.Converter;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +32,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class MapExpConverter implements ValueMapper {
+public class MapExpConverter implements Converter {
 
     private FieldDefinition fieldDefinition;
     private Map<Object, Object> reMapping = Collections.emptyMap();

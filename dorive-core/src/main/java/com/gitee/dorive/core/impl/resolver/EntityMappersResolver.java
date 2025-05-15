@@ -24,7 +24,7 @@ import com.gitee.dorive.api.entity.core.def.FieldDef;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.api.mapper.EntityMappers;
 import com.gitee.dorive.core.api.mapper.FieldMapper;
-import com.gitee.dorive.core.api.mapper.ValueMapper;
+import com.gitee.dorive.core.api.mapper.Converter;
 import com.gitee.dorive.core.impl.mapper.DefaultEntityMapper;
 import com.gitee.dorive.core.impl.mapper.DefaultEntityMappers;
 import com.gitee.dorive.core.impl.mapper.DefaultFieldMapper;
@@ -72,12 +72,12 @@ public class EntityMappersResolver {
 
             FieldDef fieldDef = fieldDefinition.getFieldDef();
             boolean isValueObj = fieldDef != null && fieldDef.isValueObj();
-            ValueMapper valueMapper = newValueMapper(fieldDefinition, isMatch, isValueObj);
+            Converter converter = newConverter(fieldDefinition, isMatch, isValueObj);
 
-            addToEntityMapper(entityMapper1, field, alias, valueMapper);
-            addToEntityMapper(entityMapper2, field, prop, valueMapper);
+            addToEntityMapper(entityMapper1, field, alias, converter);
+            addToEntityMapper(entityMapper2, field, prop, converter);
 
-            FieldMapper fieldMapper = new DefaultFieldMapper(field, alias, valueMapper);
+            FieldMapper fieldMapper = new DefaultFieldMapper(field, alias, converter);
             if (isValueObj) {
                 valueObjFields.add(fieldMapper);
                 if (isMatch) {
@@ -95,12 +95,12 @@ public class EntityMappersResolver {
         return new DefaultEntityMappers(mapperEntityMapperMap, valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes);
     }
 
-    private ValueMapper newValueMapper(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {
+    private Converter newConverter(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {
         FieldDef fieldDef = fieldDefinition.getFieldDef();
         if (fieldDef != null) {
             Class<?> converterClass = fieldDef.getConverter();
             if (converterClass != Object.class) {
-                return (ValueMapper) ReflectUtil.newInstance(converterClass);
+                return (Converter) ReflectUtil.newInstance(converterClass);
 
             } else if (isValueObj) {
                 Class<?> genericType = fieldDefinition.getGenericType();
@@ -117,9 +117,9 @@ public class EntityMappersResolver {
         return null;
     }
 
-    private void addToEntityMapper(DefaultEntityMapper entityMapper, String field, String alias, ValueMapper valueMapper) {
+    private void addToEntityMapper(DefaultEntityMapper entityMapper, String field, String alias, Converter converter) {
         entityMapper.getFieldAliasMapping().put(field, alias);
-        FieldMapper fieldMapper = new DefaultFieldMapper(field, alias, valueMapper);
+        FieldMapper fieldMapper = new DefaultFieldMapper(field, alias, converter);
         entityMapper.getFieldFieldMapperMap().put(field, fieldMapper);
         entityMapper.getAliasFieldMapperMap().put(alias, fieldMapper);
     }

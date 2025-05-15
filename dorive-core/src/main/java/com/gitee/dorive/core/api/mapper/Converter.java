@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.api.mapper;
 
-public interface ValueMapper {
+public interface Converter {
 
     Object reconstitute(Object value);
 
