@@ -26,6 +26,7 @@ import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.api.mapper.EntityMappers;
+import com.gitee.dorive.core.impl.resolver.EntityFactoryResolver;
 import com.gitee.dorive.mybatis.entity.enums.Mapper;
 import com.gitee.dorive.core.impl.executor.unit.ExampleExecutor;
 import com.gitee.dorive.core.impl.executor.unit.FactoryExecutor;
@@ -79,7 +80,10 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
 
         EntityMapper reEntityMapper = entityMappers.getEntityMapper(reMapper);
         EntityMapper deEntityMapper = entityMappers.getEntityMapper(deMapper);
-        EntityFactory entityFactory = newEntityFactory(entityElement, entityStoreInfo.getPojoClass(), entityMappers, reEntityMapper, deEntityMapper);
+
+        EntityFactoryResolver entityFactoryResolver = new EntityFactoryResolver(
+                this, entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(), entityMappers, reEntityMapper, deEntityMapper);
+        EntityFactory entityFactory = entityFactoryResolver.newEntityFactory();
 
         Executor executor = newExecutor(entityElement, entityStoreInfo);
         executor = new UnionExecutor(executor, sqlRunner, entityStoreInfo);

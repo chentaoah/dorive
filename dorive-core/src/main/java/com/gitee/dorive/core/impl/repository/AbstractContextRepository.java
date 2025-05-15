@@ -32,17 +32,11 @@ import com.gitee.dorive.core.api.common.RepositoryPostProcessor;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.EntityOpHandler;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.api.factory.EntityFactory;
-import com.gitee.dorive.core.api.mapper.EntityMapper;
-import com.gitee.dorive.core.api.mapper.EntityMappers;
-import com.gitee.dorive.core.api.mapper.FieldMapper;
 import com.gitee.dorive.core.config.RepositoryContext;
 import com.gitee.dorive.core.impl.context.AdaptiveMatcher;
 import com.gitee.dorive.core.impl.executor.ContextExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.factory.OrderByFactory;
-import com.gitee.dorive.core.impl.factory.entity.DefaultEntityFactory;
-import com.gitee.dorive.core.impl.factory.entity.ValueObjEntityFactory;
 import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
 import com.gitee.dorive.core.impl.handler.DelegatedEntityHandler;
 import com.gitee.dorive.core.impl.handler.eo.BatchEntityOpHandler;
@@ -184,29 +178,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
         Assert.notNull(newRepositoryClass, "No type of repository found! type: {}", genericType.getName());
         entityDef.setRepository(newRepositoryClass);
-    }
-
-    protected EntityFactory newEntityFactory(EntityElement entityElement, Class<?> persistentType,
-                                             EntityMappers entityMappers, EntityMapper reEntityMapper, EntityMapper deEntityMapper) {
-        RepositoryDef repositoryDef = getRepositoryDef();
-        Class<?> factoryClass = repositoryDef.getFactory();
-        EntityFactory entityFactory;
-        if (factoryClass == Object.class) {
-            List<FieldMapper> valueObjFields = entityMappers.getValueObjFields();
-            entityFactory = valueObjFields.isEmpty() ? new DefaultEntityFactory() : new ValueObjEntityFactory();
-        } else {
-            entityFactory = (EntityFactory) getApplicationContext().getBean(factoryClass);
-        }
-        if (entityFactory instanceof DefaultEntityFactory) {
-            DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
-            defaultEntityFactory.setEntityElement(entityElement);
-            defaultEntityFactory.setReType(entityElement.getGenericType());
-            defaultEntityFactory.setDeType(persistentType);
-            defaultEntityFactory.setEntityMappers(entityMappers, reEntityMapper, deEntityMapper);
-            defaultEntityFactory.setBoundedContextName(repositoryDef.getBoundedContext());
-            defaultEntityFactory.setBoundedContext(getBoundedContext());
-        }
-        return entityFactory;
     }
 
     protected AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository) {
