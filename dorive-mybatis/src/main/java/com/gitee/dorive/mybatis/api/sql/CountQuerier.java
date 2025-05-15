@@ -18,7 +18,7 @@
 package com.gitee.dorive.mybatis.api.sql;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.mybatis.entity.common.CountQuery;
+import com.gitee.dorive.mybatis.entity.sql.CountQuery;
 
 import java.util.Map;
 

@@ -25,7 +25,7 @@ import com.gitee.dorive.mybatis.entity.enums.Mapper;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import com.gitee.dorive.mybatis.api.sql.CountQuerier;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
-import com.gitee.dorive.mybatis.entity.common.CountQuery;
+import com.gitee.dorive.mybatis.entity.sql.CountQuery;
 import com.gitee.dorive.mybatis.entity.segment.SelectSegment;
 import com.gitee.dorive.mybatis.entity.segment.TableSegment;
 import com.gitee.dorive.mybatis.impl.repository.AbstractMybatisRepository;
