@@ -34,7 +34,7 @@ import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
-import com.gitee.dorive.query.entity.enums.QueryMethod;
+import com.gitee.dorive.query.entity.enums.QueryMode;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -59,7 +59,7 @@ public class SqlCountQuerier implements CountQuerier {
         Object query = countQuery.getQuery();
         QueryContext queryContext = new QueryContext(context, query.getClass(), ResultType.COUNT);
 
-        context.setOption(QueryMethod.class, QueryMethod.SQL_BUILD);
+        context.setOption(QueryMode.class, QueryMode.SQL_BUILD);
         queryHandler.handle(queryContext, query);
 
         QueryUnit queryUnit = queryContext.getQueryUnit();

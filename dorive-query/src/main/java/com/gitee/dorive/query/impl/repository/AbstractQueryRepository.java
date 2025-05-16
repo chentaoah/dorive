@@ -27,7 +27,7 @@ import com.gitee.dorive.event.impl.repository.AbstractEventRepository;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.api.QueryRepository;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.enums.QueryMethod;
+import com.gitee.dorive.query.entity.enums.QueryMode;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.impl.handler.*;
 import com.gitee.dorive.query.impl.handler.StepwiseQueryHandler;
@@ -63,7 +63,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
             this.queryTypeResolver.resolve();
         }
 
-        Map<QueryMethod, QueryHandler> queryHandlerMap = new LinkedHashMap<>(4 * 4 / 3 + 1);
+        Map<QueryMode, QueryHandler> queryHandlerMap = new LinkedHashMap<>(4 * 4 / 3 + 1);
         registryQueryHandlers(queryHandlerMap);
         QueryHandler queryHandler = new AdaptiveQueryHandler(queryHandlerMap);
         queryHandler = new SimpleQueryHandler(queryHandler);
@@ -73,8 +73,8 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         this.queryHandler = queryHandler;
     }
 
-    protected void registryQueryHandlers(Map<QueryMethod, QueryHandler> queryHandlerMap) {
-        queryHandlerMap.put(QueryMethod.STEPWISE, new QueryUnitQueryHandler(new StepwiseQueryHandler()));
+    protected void registryQueryHandlers(Map<QueryMode, QueryHandler> queryHandlerMap) {
+        queryHandlerMap.put(QueryMode.STEPWISE, new QueryUnitQueryHandler(new StepwiseQueryHandler()));
     }
 
     @Override

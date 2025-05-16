@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.query.entity.enums;
 
-public enum QueryMethod {
+public enum QueryMode {
     STEPWISE,
     SQL_BUILD,
     SQL_EXECUTE,
