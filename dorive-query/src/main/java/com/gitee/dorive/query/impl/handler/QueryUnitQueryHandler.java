@@ -20,6 +20,7 @@ package com.gitee.dorive.query.impl.handler;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.query.api.QueryHandler;
+import com.gitee.dorive.query.api.QueryUnitHandler;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
@@ -30,37 +31,34 @@ import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
-public abstract class AbstractQueryUnitQueryHandler implements QueryHandler {
+public class QueryUnitQueryHandler implements QueryHandler {
+
+    private final QueryHandler queryHandler;
 
     @Override
     public void handle(QueryContext queryContext, Object query) {
-        Map<String, QueryUnit> queryUnitMap = newQueryUnitMap(queryContext);
-        queryContext.setQueryUnitMap(queryUnitMap);
-        queryContext.setQueryUnit(queryUnitMap.get("/"));
-        doHandle(queryContext, query);
+        if (queryHandler instanceof QueryUnitHandler) {
+            Map<String, QueryUnit> queryUnitMap = newQueryUnitMap(queryContext, (QueryUnitHandler) queryHandler);
+            queryContext.setQueryUnitMap(queryUnitMap);
+            queryContext.setQueryUnit(queryUnitMap.get("/"));
+        }
+        if (queryHandler != null) {
+            queryHandler.handle(queryContext, query);
+        }
     }
 
-    private Map<String, QueryUnit> newQueryUnitMap(QueryContext queryContext) {
+    private Map<String, QueryUnit> newQueryUnitMap(QueryContext queryContext, QueryUnitHandler queryUnitHandler) {
         Map<String, Example> exampleMap = queryContext.getExampleMap();
-        List<MergedRepository> mergedRepositories = getMergedRepositories(queryContext);
+        List<MergedRepository> mergedRepositories = queryUnitHandler.getMergedRepositories(queryContext);
         Map<String, QueryUnit> queryUnitMap = new LinkedHashMap<>(mergedRepositories.size() * 4 / 3 + 1);
         for (MergedRepository mergedRepository : mergedRepositories) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             Example example = exampleMap.computeIfAbsent(absoluteAccessPath, key -> new InnerExample());
             QueryUnit queryUnit = new QueryUnit(mergedRepository, example, false, null);
-            queryUnit = processQueryUnit(queryContext, queryUnitMap, queryUnit);
+            queryUnit = queryUnitHandler.processQueryUnit(queryContext, queryUnitMap, queryUnit);
             queryUnitMap.put(absoluteAccessPath, queryUnit);
         }
         return queryUnitMap;
     }
 
-    protected List<MergedRepository> getMergedRepositories(QueryContext queryContext) {
-        return queryContext.getQueryConfig().getMergedRepositories();
-    }
-
-    protected QueryUnit processQueryUnit(QueryContext queryContext, Map<String, QueryUnit> queryUnitMap, QueryUnit queryUnit) {
-        return queryUnit;
-    }
-
-    protected abstract void doHandle(QueryContext queryContext, Object query);
 }

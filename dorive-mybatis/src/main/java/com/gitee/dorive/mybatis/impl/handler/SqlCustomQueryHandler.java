@@ -50,7 +50,7 @@ public class SqlCustomQueryHandler extends SqlBuildQueryHandler {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected void doHandle(QueryContext queryContext, Object query) {
+    public void handle(QueryContext queryContext, Object query) {
         Context context = queryContext.getContext();
         String primaryKey = queryContext.getPrimaryKey();
         String method = queryContext.getMethod();

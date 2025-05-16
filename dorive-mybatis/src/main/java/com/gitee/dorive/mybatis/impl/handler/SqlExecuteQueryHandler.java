@@ -53,7 +53,7 @@ public class SqlExecuteQueryHandler extends SqlBuildQueryHandler {
     }
 
     @Override
-    protected void doHandle(QueryContext queryContext, Object query) {
+    public void handle(QueryContext queryContext, Object query) {
         ResultType resultType = queryContext.getResultType();
         String primaryKey = queryContext.getPrimaryKey();
         Example example = queryContext.getExample();

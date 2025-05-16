@@ -22,9 +22,11 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.AbstractBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.util.MultiInBuilder;
+import com.gitee.dorive.query.api.QueryHandler;
+import com.gitee.dorive.query.api.QueryUnitHandler;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
@@ -32,15 +34,15 @@ import com.gitee.dorive.query.entity.QueryUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class StepwiseQueryHandler extends AbstractQueryUnitQueryHandler {
+public class StepwiseQueryHandler implements QueryUnitHandler, QueryHandler {
 
     @Override
-    protected List<MergedRepository> getMergedRepositories(QueryContext queryContext) {
+    public List<MergedRepository> getMergedRepositories(QueryContext queryContext) {
         return queryContext.getQueryConfig().getReversedMergedRepositories();
     }
 
     @Override
-    protected void doHandle(QueryContext queryContext, Object query) {
+    public void handle(QueryContext queryContext, Object query) {
         Context context = queryContext.getContext();
         Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
         queryUnitMap.forEach((accessPath, queryUnit) -> {

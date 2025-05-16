@@ -44,6 +44,7 @@ import com.gitee.dorive.mybatis.impl.handler.SqlExecuteQueryHandler;
 import com.gitee.dorive.mybatis.impl.querier.SqlCountQuerier;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.enums.QueryMethod;
+import com.gitee.dorive.query.impl.handler.QueryUnitQueryHandler;
 import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -104,9 +105,9 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
     protected void registryQueryHandlers(Map<QueryMethod, QueryHandler> queryHandlerMap) {
         super.registryQueryHandlers(queryHandlerMap);
         EntityMapper entityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
-        queryHandlerMap.put(QueryMethod.SQL_BUILD, new SqlBuildQueryHandler(this));
-        queryHandlerMap.put(QueryMethod.SQL_EXECUTE, new SqlExecuteQueryHandler(this, sqlRunner, entityMapper));
-        queryHandlerMap.put(QueryMethod.SQL_CUSTOM, new SqlCustomQueryHandler(this, entityStoreInfo));
+        queryHandlerMap.put(QueryMethod.SQL_BUILD, new QueryUnitQueryHandler(new SqlBuildQueryHandler(this)));
+        queryHandlerMap.put(QueryMethod.SQL_EXECUTE, new QueryUnitQueryHandler(new SqlExecuteQueryHandler(this, sqlRunner, entityMapper)));
+        queryHandlerMap.put(QueryMethod.SQL_CUSTOM, new QueryUnitQueryHandler(new SqlCustomQueryHandler(this, entityStoreInfo)));
     }
 
     @Override

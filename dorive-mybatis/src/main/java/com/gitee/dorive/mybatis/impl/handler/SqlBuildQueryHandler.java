@@ -22,11 +22,12 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.mybatis.impl.segment.SegmentResolver;
+import com.gitee.dorive.query.api.QueryHandler;
+import com.gitee.dorive.query.api.QueryUnitHandler;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
-import com.gitee.dorive.query.impl.handler.AbstractQueryUnitQueryHandler;
 import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
-import com.gitee.dorive.mybatis.impl.segment.SegmentResolver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,12 +38,12 @@ import java.util.Map;
 @Getter
 @Setter
 @AllArgsConstructor
-public class SqlBuildQueryHandler extends AbstractQueryUnitQueryHandler {
+public class SqlBuildQueryHandler implements QueryUnitHandler, QueryHandler {
 
     private final AbstractQueryRepository<?, ?> repository;
 
     @Override
-    protected QueryUnit processQueryUnit(QueryContext queryContext, Map<String, QueryUnit> queryUnitMap, QueryUnit queryUnit) {
+    public QueryUnit processQueryUnit(QueryContext queryContext, Map<String, QueryUnit> queryUnitMap, QueryUnit queryUnit) {
         processExample(queryContext, queryUnit);
         processAttachment(queryContext, queryUnitMap, queryUnit);
         return queryUnit;
@@ -58,7 +59,7 @@ public class SqlBuildQueryHandler extends AbstractQueryUnitQueryHandler {
     }
 
     @Override
-    protected void doHandle(QueryContext queryContext, Object query) {
+    public void handle(QueryContext queryContext, Object query) {
         // ignore
     }
 
