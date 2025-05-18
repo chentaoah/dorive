@@ -21,7 +21,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -32,7 +32,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ValueFilterEntityHandler implements EntityHandler {
 
-    private CommonRepository repository;
+    private ProxyRepository repository;
     private EntityHandler entityHandler;
 
     @Override

@@ -19,7 +19,7 @@ package com.gitee.dorive.query.entity;
 
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,7 +38,7 @@ public class MergedRepository {
     // 绝对路径
     private String absoluteAccessPath;
     // 定义仓储
-    private CommonRepository definedRepository;
+    private ProxyRepository definedRepository;
     // absoluteAccessPath ==> StrongBinder
     private Map<String, List<StrongBinder>> mergedStrongBindersMap;
     // absoluteAccessPath ==> ValueRouteBinder
@@ -46,7 +46,7 @@ public class MergedRepository {
     // 绑定路径
     private Set<String> boundAccessPaths;
     // 执行仓储
-    private CommonRepository executedRepository;
+    private ProxyRepository executedRepository;
     // 真正执行仓储
     private DefaultRepository defaultRepository;
     // 序列号

@@ -18,7 +18,7 @@
 package com.gitee.dorive.mybatis.impl.segment;
 
 import com.gitee.dorive.core.api.context.Selector;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
@@ -46,7 +46,7 @@ public class SelectSegmentBuilder {
         Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
         for (QueryUnit queryUnit : queryUnitMap.values()) {
             MergedRepository mergedRepository = queryUnit.getMergedRepository();
-            CommonRepository definedRepository = mergedRepository.getDefinedRepository();
+            ProxyRepository definedRepository = mergedRepository.getDefinedRepository();
             boolean isMatch = definedRepository.matches(selector);
             if (isMatch) {
                 TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();

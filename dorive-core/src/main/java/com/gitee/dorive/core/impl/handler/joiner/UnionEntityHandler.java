@@ -24,7 +24,7 @@ import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.executor.UnionExample;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,7 +36,7 @@ import java.util.Map;
 @Setter
 public class UnionEntityHandler extends AbstractEntityJoiner {
 
-    public UnionEntityHandler(List<Object> entities, CommonRepository repository) {
+    public UnionEntityHandler(List<Object> entities, ProxyRepository repository) {
         super(entities, repository);
     }
 

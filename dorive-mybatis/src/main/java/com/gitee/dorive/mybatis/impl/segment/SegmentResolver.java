@@ -28,7 +28,7 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.ValueFilterBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.util.CriterionUtils;
 import com.gitee.dorive.mybatis.api.sql.Segment;
@@ -90,7 +90,7 @@ public class SegmentResolver {
 
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
 
-        CommonRepository definedRepository = mergedRepository.getDefinedRepository();
+        ProxyRepository definedRepository = mergedRepository.getDefinedRepository();
         Map<String, List<StrongBinder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
         Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
         EntityMapper entityMapper = getEntityMapper(mergedRepository);

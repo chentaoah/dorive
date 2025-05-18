@@ -21,7 +21,7 @@ import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.core.api.context.Options;
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.enums.MatcherType;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,10 +36,10 @@ import java.util.Set;
 @Setter
 public class AdaptiveMatcher implements Matcher {
 
-    private CommonRepository repository;
+    private ProxyRepository repository;
     private Map<MatcherType, Matcher> matcherTypeMatcherMap = new LinkedHashMap<>(6);
 
-    public AdaptiveMatcher(CommonRepository repository) {
+    public AdaptiveMatcher(ProxyRepository repository) {
         this.repository = repository;
         this.matcherTypeMatcherMap.put(MatcherType.NONE, options -> false);
         this.matcherTypeMatcherMap.put(MatcherType.ROOT, options -> repository.isRoot());

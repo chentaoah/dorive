@@ -22,7 +22,7 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,7 +35,7 @@ public class SingleEntityHandler extends AbstractEntityJoiner {
 
     private StrongBinder binder;
 
-    public SingleEntityHandler(List<Object> entities, CommonRepository repository) {
+    public SingleEntityHandler(List<Object> entities, ProxyRepository repository) {
         super(entities, repository);
         this.binder = repository.getRootStrongBinders().get(0);
     }

@@ -22,7 +22,7 @@ import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.impl.binder.AbstractBinder;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.util.MultiInBuilder;
 import com.gitee.dorive.query.api.QueryHandler;
@@ -52,10 +52,10 @@ public class StepwiseQueryHandler implements QueryUnitHandler, QueryHandler {
             Example example = queryUnit.getExample();
             boolean abandoned = queryUnit.isAbandoned();
 
-            CommonRepository definedRepository = mergedRepository.getDefinedRepository();
+            ProxyRepository definedRepository = mergedRepository.getDefinedRepository();
             Map<String, List<StrongBinder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
             Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
-            CommonRepository executedRepository = mergedRepository.getExecutedRepository();
+            ProxyRepository executedRepository = mergedRepository.getExecutedRepository();
 
             BinderResolver binderResolver = definedRepository.getBinderResolver();
 

@@ -26,7 +26,7 @@ import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.impl.binder.WeakBinder;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,9 +36,9 @@ import java.util.List;
 @Setter
 public abstract class AbstractEntityJoiner extends ObjectsJoiner implements EntityHandler {
 
-    protected CommonRepository repository;
+    protected ProxyRepository repository;
 
-    public AbstractEntityJoiner(List<Object> entities, CommonRepository repository) {
+    public AbstractEntityJoiner(List<Object> entities, ProxyRepository repository) {
         super(entities, repository.isCollection());
         this.repository = repository;
     }

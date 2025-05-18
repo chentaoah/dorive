@@ -23,7 +23,7 @@ import com.gitee.dorive.core.entity.enums.JoinType;
 import com.gitee.dorive.core.impl.handler.joiner.MultiEntityHandler;
 import com.gitee.dorive.core.impl.handler.joiner.SingleEntityHandler;
 import com.gitee.dorive.core.impl.handler.joiner.UnionEntityHandler;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -33,7 +33,7 @@ import java.util.List;
 @AllArgsConstructor
 public class AdaptiveEntityHandler implements EntityHandler {
 
-    private CommonRepository repository;
+    private ProxyRepository repository;
 
     @Override
     public long handle(Context context, List<Object> entities) {

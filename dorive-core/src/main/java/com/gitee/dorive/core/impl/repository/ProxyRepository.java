@@ -41,7 +41,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class CommonRepository extends AbstractProxyRepository implements Matcher {
+public class ProxyRepository extends AbstractProxyRepository implements Matcher {
 
     private String accessPath;
     private boolean root;

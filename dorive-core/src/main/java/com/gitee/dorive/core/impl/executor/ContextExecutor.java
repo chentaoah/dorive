@@ -26,7 +26,7 @@ import com.gitee.dorive.core.entity.operation.EntityOp;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -49,7 +49,7 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler, 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Assert.isTrue(!query.isEmpty(), "The query cannot be empty!");
-        CommonRepository rootRepository = repository.getRootRepository();
+        ProxyRepository rootRepository = repository.getRootRepository();
         if (rootRepository.matches(context) || query.isIncludeRoot()) {
             Result<Object> result = rootRepository.executeQuery(context, query);
             List<Object> entities = result.getRecords();

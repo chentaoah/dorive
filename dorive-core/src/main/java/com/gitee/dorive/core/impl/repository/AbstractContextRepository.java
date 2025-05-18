@@ -61,10 +61,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     private BoundedContext boundedContext;
 
     private RepositoryDef repositoryDef;
-    private Map<String, CommonRepository> repositoryMap = new LinkedHashMap<>();
-    private CommonRepository rootRepository;
-    private List<CommonRepository> subRepositories = new ArrayList<>();
-    private List<CommonRepository> orderedRepositories = new ArrayList<>();
+    private Map<String, ProxyRepository> repositoryMap = new LinkedHashMap<>();
+    private ProxyRepository rootRepository;
+    private List<ProxyRepository> subRepositories = new ArrayList<>();
+    private List<ProxyRepository> orderedRepositories = new ArrayList<>();
     private DerivedRepositoryResolver derivedRepositoryResolver;
 
     @Override
@@ -94,7 +94,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         for (EntityElement entityElement : entityElements) {
             String accessPath = entityElement.getAccessPath();
-            CommonRepository repository = newRepository(entityElement);
+            ProxyRepository repository = newRepository(entityElement);
             repositoryMap.put(accessPath, repository);
             if (repository.isRoot()) {
                 rootRepository = repository;
@@ -126,7 +126,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
     }
 
-    private CommonRepository newRepository(EntityElement entityElement) {
+    private ProxyRepository newRepository(EntityElement entityElement) {
         resetEntityDef(entityElement);
 
         OrderByDef orderByDef = entityElement.getOrderByDef();
@@ -147,7 +147,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         binderResolver.resolve(entityElement);
         OrderByFactory orderByFactory = orderByDef == null ? null : new OrderByFactory(orderByDef);
 
-        CommonRepository repositoryWrapper = new CommonRepository();
+        ProxyRepository repositoryWrapper = new ProxyRepository();
         repositoryWrapper.setEntityElement(entityElement);
         repositoryWrapper.setOperationFactory(operationFactory);
         repositoryWrapper.setProxyRepository(repository);
