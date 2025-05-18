@@ -199,12 +199,14 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected Executor newExecutor() {
         EntityHandler entityHandler = newEntityHandler();
         EntityOpHandler entityOpHandler = newEntityOpHandler();
+
         derivedRepositoryResolver = new DerivedRepositoryResolver(this);
         derivedRepositoryResolver.resolve();
         if (derivedRepositoryResolver.hasDerived()) {
             entityHandler = new DelegatedEntityHandler(this, derivedRepositoryResolver.getEntityHandlerMap(entityHandler));
             entityOpHandler = new DelegatedEntityOpHandler(this, derivedRepositoryResolver.getEntityOpHandlerMap(entityOpHandler));
         }
+
         return new ContextExecutor(this, entityHandler, entityOpHandler);
     }
 
