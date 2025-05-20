@@ -15,33 +15,36 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler.joiner;
+package com.gitee.dorive.core.impl.joiner;
 
+import com.gitee.dorive.core.api.executor.EntityJoiner;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
 @Data
-public abstract class ObjectsJoiner {
+public abstract class HashMapEntityJoiner implements EntityJoiner {
+
+    private boolean collection;
     private List<Object> entities;
     private int initialCapacity;
     private Map<Integer, String> hashCodeKeyMap;
     private Set<String> keys;
     private Map<String, Object> keyObjectMap;
-    private boolean collection;
-    private int averageSize;
+    private int collectionSize;
 
-    public ObjectsJoiner(List<Object> entities, boolean collection) {
+    public HashMapEntityJoiner(boolean collection, List<Object> entities) {
+        this.collection = collection;
         this.entities = entities;
         this.initialCapacity = entities.size() * 4 / 3 + 1;
         this.hashCodeKeyMap = new HashMap<>(initialCapacity);
         this.keys = new HashSet<>(initialCapacity);
         this.keyObjectMap = new HashMap<>(initialCapacity);
-        this.collection = collection;
-        this.averageSize = 10;
+        this.collectionSize = 10;
     }
 
+    @Override
     public void addLeft(Object entity, String key) {
         if (entity != null && StringUtils.isNotBlank(key)) {
             hashCodeKeyMap.put(System.identityHashCode(entity), key);
@@ -49,24 +52,26 @@ public abstract class ObjectsJoiner {
         }
     }
 
+    public String getLeftKey(Object entity) {
+        return entity != null ? hashCodeKeyMap.get(System.identityHashCode(entity)) : null;
+    }
+
+    @Override
+    public boolean containsKey(String key) {
+        return keys.contains(key);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public void addRight(String key, Object entity) {
         if (StringUtils.isNotBlank(key) && entity != null) {
             if (collection) {
-                Collection<Object> collection = (Collection<Object>) keyObjectMap.computeIfAbsent(key, k -> new ArrayList<>(averageSize));
+                Collection<Object> collection = (Collection<Object>) keyObjectMap.computeIfAbsent(key, k -> new ArrayList<>(collectionSize));
                 collection.add(entity);
             } else {
                 keyObjectMap.putIfAbsent(key, entity);
             }
         }
-    }
-
-    public String getLeftKey(Object entity) {
-        return entity != null ? hashCodeKeyMap.get(System.identityHashCode(entity)) : null;
-    }
-
-    public boolean containsKey(String key) {
-        return keys.contains(key);
     }
 
     public Object getRight(String key) {
@@ -77,15 +82,20 @@ public abstract class ObjectsJoiner {
         return hashCodeKeyMap == null || hashCodeKeyMap.isEmpty() || keyObjectMap == null || keyObjectMap.isEmpty();
     }
 
-    public void join() {
-        if (!isEmpty()) {
-            for (Object entity : entities) {
-                String key = getLeftKey(entity);
-                if (key != null) {
-                    Object object = getRight(key);
-                    if (entity != null || object != null) {
-                        doJoin(entity, object);
-                    }
+    @Override
+    public void join(List<Object> entities) {
+        if (entities == null || entities.isEmpty()) {
+            return;
+        }
+        if (isEmpty()) {
+            return;
+        }
+        for (Object entity : entities) {
+            String key = getLeftKey(entity);
+            if (key != null) {
+                Object object = getRight(key);
+                if (entity != null || object != null) {
+                    doJoin(entity, object);
                 }
             }
         }

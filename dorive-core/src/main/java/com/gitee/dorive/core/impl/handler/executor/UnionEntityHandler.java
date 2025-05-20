@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler.joiner;
+package com.gitee.dorive.core.impl.handler.executor;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.executor.EntityJoiner;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
@@ -34,10 +35,10 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class UnionEntityHandler extends AbstractEntityJoiner {
+public class UnionEntityHandler extends AbstractEntityHandler {
 
-    public UnionEntityHandler(List<Object> entities, ProxyRepository repository) {
-        super(entities, repository);
+    public UnionEntityHandler(ProxyRepository repository, EntityJoiner entityJoiner) {
+        super(repository, entityJoiner);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class UnionEntityHandler extends AbstractEntityJoiner {
             String row = Integer.toString(index + 1);
             example.setSelectSuffix(row + " as $row");
             unionExample.addExample(example);
-            addLeft(entity, row);
+            entityJoiner.addLeft(entity, row);
         }
         return unionExample;
     }
@@ -94,10 +95,10 @@ public class UnionEntityHandler extends AbstractEntityJoiner {
                 List<String> rows = (List<String>) resultMap.get("$rows");
                 if (rows != null) {
                     for (String eachRow : rows) {
-                        addRight(eachRow, entity);
+                        entityJoiner.addRight(eachRow, entity);
                     }
                 } else if (row != null) {
-                    addRight(row.toString(), entity);
+                    entityJoiner.addRight(row.toString(), entity);
                 }
             }
         }

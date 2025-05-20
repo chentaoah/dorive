@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler.joiner;
+package com.gitee.dorive.core.impl.handler.executor;
 
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.executor.EntityJoiner;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
@@ -31,12 +32,12 @@ import java.util.List;
 
 @Getter
 @Setter
-public class SingleEntityHandler extends AbstractEntityJoiner {
+public class SingleEntityHandler extends AbstractEntityHandler {
 
     private StrongBinder binder;
 
-    public SingleEntityHandler(List<Object> entities, ProxyRepository repository) {
-        super(entities, repository);
+    public SingleEntityHandler(ProxyRepository repository, EntityJoiner entityJoiner) {
+        super(repository, entityJoiner);
         this.binder = repository.getRootStrongBinders().get(0);
     }
 
@@ -63,10 +64,10 @@ public class SingleEntityHandler extends AbstractEntityJoiner {
             boundValue = binder.input(context, boundValue);
             if (boundValue != null) {
                 String key = boundValue.toString();
-                if (!containsKey(key)) {
+                if (!entityJoiner.containsKey(key)) {
                     boundValues.add(boundValue);
                 }
-                addLeft(entity, key);
+                entityJoiner.addLeft(entity, key);
             }
         }
         return boundValues;
@@ -79,7 +80,7 @@ public class SingleEntityHandler extends AbstractEntityJoiner {
             Object fieldValue = binder.getFieldValue(context, entity);
             if (fieldValue != null) {
                 String key = fieldValue.toString();
-                addRight(key, entity);
+                entityJoiner.addRight(key, entity);
             }
         }
     }

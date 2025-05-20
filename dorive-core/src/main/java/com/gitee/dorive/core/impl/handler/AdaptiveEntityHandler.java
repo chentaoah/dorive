@@ -19,10 +19,12 @@ package com.gitee.dorive.core.impl.handler;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.core.api.executor.EntityJoiner;
 import com.gitee.dorive.core.entity.enums.JoinType;
-import com.gitee.dorive.core.impl.handler.joiner.MultiEntityHandler;
-import com.gitee.dorive.core.impl.handler.joiner.SingleEntityHandler;
-import com.gitee.dorive.core.impl.handler.joiner.UnionEntityHandler;
+import com.gitee.dorive.core.impl.handler.executor.MultiEntityHandler;
+import com.gitee.dorive.core.impl.handler.executor.SingleEntityHandler;
+import com.gitee.dorive.core.impl.handler.executor.UnionEntityHandler;
+import com.gitee.dorive.core.impl.joiner.DefaultEntityJoiner;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,20 +39,21 @@ public class AdaptiveEntityHandler implements EntityHandler {
 
     @Override
     public long handle(Context context, List<Object> entities) {
-        EntityHandler entityHandler = newEntityHandler(entities);
+        EntityJoiner entityJoiner = new DefaultEntityJoiner(repository, entities);
+        EntityHandler entityHandler = newEntityHandler(entityJoiner);
         return entityHandler != null ? entityHandler.handle(context, entities) : 0L;
     }
 
-    private EntityHandler newEntityHandler(List<Object> entities) {
+    private EntityHandler newEntityHandler(EntityJoiner entityJoiner) {
         JoinType joinType = repository.getJoinType();
         if (joinType == JoinType.SINGLE) {
-            return new SingleEntityHandler(entities, repository);
+            return new SingleEntityHandler(repository, entityJoiner);
 
         } else if (joinType == JoinType.MULTI) {
-            return new MultiEntityHandler(entities, repository);
+            return new MultiEntityHandler(repository, entityJoiner);
 
         } else if (joinType == JoinType.UNION) {
-            return new UnionEntityHandler(entities, repository);
+            return new UnionEntityHandler(repository, entityJoiner);
         }
         return null;
     }

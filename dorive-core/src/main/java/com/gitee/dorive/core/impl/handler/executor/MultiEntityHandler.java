@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler.joiner;
+package com.gitee.dorive.core.impl.handler.executor;
 
 import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.core.api.executor.EntityJoiner;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
@@ -33,12 +34,12 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class MultiEntityHandler extends AbstractEntityJoiner {
+public class MultiEntityHandler extends AbstractEntityHandler {
 
     private List<StrongBinder> binders;
 
-    public MultiEntityHandler(List<Object> entities, ProxyRepository repository) {
-        super(entities, repository);
+    public MultiEntityHandler(ProxyRepository repository, EntityJoiner entityJoiner) {
+        super(repository, entityJoiner);
         this.binders = repository.getRootStrongBinders();
     }
 
@@ -75,10 +76,10 @@ public class MultiEntityHandler extends AbstractEntityJoiner {
             if (keyBuilder != null && keyBuilder.length() > 0) {
                 keyBuilder.deleteCharAt(keyBuilder.length() - 1);
                 String key = keyBuilder.toString();
-                if (containsKey(key)) {
+                if (entityJoiner.containsKey(key)) {
                     multiInBuilder.clearLast();
                 }
-                addLeft(entity, key);
+                entityJoiner.addLeft(entity, key);
             }
         }
 
@@ -103,7 +104,7 @@ public class MultiEntityHandler extends AbstractEntityJoiner {
             if (keyBuilder != null && keyBuilder.length() > 0) {
                 keyBuilder.deleteCharAt(keyBuilder.length() - 1);
                 String key = keyBuilder.toString();
-                addRight(key, entity);
+                entityJoiner.addRight(key, entity);
             }
         }
     }

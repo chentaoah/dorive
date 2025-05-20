@@ -15,18 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler.joiner;
+package com.gitee.dorive.core.impl.handler.executor;
 
-import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.core.api.executor.EntityJoiner;
 import com.gitee.dorive.core.entity.executor.Example;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.impl.binder.WeakBinder;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
-import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
+import com.gitee.dorive.core.impl.resolver.BinderResolver;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,14 +35,11 @@ import java.util.List;
 
 @Getter
 @Setter
-public abstract class AbstractEntityJoiner extends ObjectsJoiner implements EntityHandler {
+@AllArgsConstructor
+public abstract class AbstractEntityHandler implements EntityHandler {
 
-    protected ProxyRepository repository;
-
-    public AbstractEntityJoiner(List<Object> entities, ProxyRepository repository) {
-        super(entities, repository.isCollection());
-        this.repository = repository;
-    }
+    protected final ProxyRepository repository;
+    protected final EntityJoiner entityJoiner;
 
     @Override
     public long handle(Context context, List<Object> entities) {
@@ -51,9 +49,9 @@ public abstract class AbstractEntityJoiner extends ObjectsJoiner implements Enti
             Query query = operationFactory.buildQueryByExample(example);
             query.includeRoot();
             Result<Object> result = repository.executeQuery(context, query);
-            setAverageSize(result.getRecords().size() / entities.size() + 1);
+            entityJoiner.setCollectionSize(result.getRecords().size() / entities.size() + 1);
             handleResult(context, result);
-            join();
+            entityJoiner.join(entities);
             return result.getCount();
         }
         return 0L;
@@ -71,15 +69,6 @@ public abstract class AbstractEntityJoiner extends ObjectsJoiner implements Enti
                 }
             }
             binderResolver.appendFilterValue(context, example);
-        }
-    }
-
-    @Override
-    protected void doJoin(Object entity, Object object) {
-        EntityElement entityElement = repository.getEntityElement();
-        Object value = entityElement.getValue(entity);
-        if (value == null) {
-            entityElement.setValue(entity, object);
         }
     }
 
