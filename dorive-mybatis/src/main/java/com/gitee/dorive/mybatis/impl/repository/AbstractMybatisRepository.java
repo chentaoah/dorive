@@ -26,17 +26,17 @@ import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.factory.EntityFactory;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.api.mapper.EntityMappers;
-import com.gitee.dorive.core.impl.resolver.EntityFactoryResolver;
-import com.gitee.dorive.mybatis.entity.enums.Mapper;
 import com.gitee.dorive.core.impl.executor.unit.ExampleExecutor;
 import com.gitee.dorive.core.impl.executor.unit.FactoryExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
+import com.gitee.dorive.core.impl.resolver.EntityFactoryResolver;
 import com.gitee.dorive.core.impl.resolver.EntityMappersResolver;
 import com.gitee.dorive.mybatis.api.sql.CountQuerier;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
-import com.gitee.dorive.mybatis.entity.sql.CountQuery;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
+import com.gitee.dorive.mybatis.entity.enums.Mapper;
+import com.gitee.dorive.mybatis.entity.sql.CountQuery;
 import com.gitee.dorive.mybatis.impl.executor.UnionExecutor;
 import com.gitee.dorive.mybatis.impl.handler.SqlBuildQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlCustomQueryHandler;
@@ -44,7 +44,6 @@ import com.gitee.dorive.mybatis.impl.handler.SqlExecuteQueryHandler;
 import com.gitee.dorive.mybatis.impl.querier.SqlCountQuerier;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.enums.QueryMode;
-import com.gitee.dorive.query.impl.handler.QueryUnitQueryHandler;
 import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -105,9 +104,9 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
     protected void registryQueryHandlers(Map<QueryMode, QueryHandler> queryHandlerMap) {
         super.registryQueryHandlers(queryHandlerMap);
         EntityMapper entityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
-        queryHandlerMap.put(QueryMode.SQL_BUILD, new QueryUnitQueryHandler(new SqlBuildQueryHandler(this)));
-        queryHandlerMap.put(QueryMode.SQL_EXECUTE, new QueryUnitQueryHandler(new SqlExecuteQueryHandler(this, sqlRunner, entityMapper)));
-        queryHandlerMap.put(QueryMode.SQL_CUSTOM, new QueryUnitQueryHandler(new SqlCustomQueryHandler(this, entityStoreInfo)));
+        queryHandlerMap.put(QueryMode.SQL_BUILD, new SqlBuildQueryHandler(this));
+        queryHandlerMap.put(QueryMode.SQL_EXECUTE, new SqlExecuteQueryHandler(this, sqlRunner, entityMapper));
+        queryHandlerMap.put(QueryMode.SQL_CUSTOM, new SqlCustomQueryHandler(this, entityStoreInfo));
     }
 
     @Override

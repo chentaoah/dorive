@@ -23,10 +23,9 @@ import com.gitee.dorive.core.entity.executor.InnerExample;
 import com.gitee.dorive.core.entity.executor.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.mybatis.impl.segment.SegmentResolver;
-import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.query.api.QueryUnitHandler;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
+import com.gitee.dorive.query.impl.handler.executor.AbstractQueryUnitQueryHandler;
 import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,7 +37,7 @@ import java.util.Map;
 @Getter
 @Setter
 @AllArgsConstructor
-public class SqlBuildQueryHandler implements QueryUnitHandler, QueryHandler {
+public class SqlBuildQueryHandler extends AbstractQueryUnitQueryHandler {
 
     private final AbstractQueryRepository<?, ?> repository;
 
@@ -59,7 +58,7 @@ public class SqlBuildQueryHandler implements QueryUnitHandler, QueryHandler {
     }
 
     @Override
-    public void handle(QueryContext queryContext, Object query) {
+    public void doHandle(QueryContext queryContext, Object query) {
         // ignore
     }
 

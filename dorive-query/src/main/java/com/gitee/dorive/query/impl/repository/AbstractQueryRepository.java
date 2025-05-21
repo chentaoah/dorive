@@ -30,7 +30,7 @@ import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.enums.QueryMode;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import com.gitee.dorive.query.impl.handler.*;
-import com.gitee.dorive.query.impl.handler.StepwiseQueryHandler;
+import com.gitee.dorive.query.impl.handler.executor.StepwiseQueryHandler;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
 import lombok.Getter;
@@ -74,7 +74,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     }
 
     protected void registryQueryHandlers(Map<QueryMode, QueryHandler> queryHandlerMap) {
-        queryHandlerMap.put(QueryMode.STEPWISE, new QueryUnitQueryHandler(new StepwiseQueryHandler()));
+        queryHandlerMap.put(QueryMode.STEPWISE, new StepwiseQueryHandler());
     }
 
     @Override

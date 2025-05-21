@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.handler;
+package com.gitee.dorive.query.impl.handler.executor;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.entity.executor.Example;
@@ -25,8 +25,6 @@ import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.util.MultiInBuilder;
-import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.query.api.QueryUnitHandler;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
@@ -34,7 +32,7 @@ import com.gitee.dorive.query.entity.QueryUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class StepwiseQueryHandler implements QueryUnitHandler, QueryHandler {
+public class StepwiseQueryHandler extends AbstractQueryUnitQueryHandler {
 
     @Override
     public List<MergedRepository> getMergedRepositories(QueryContext queryContext) {
@@ -42,7 +40,7 @@ public class StepwiseQueryHandler implements QueryUnitHandler, QueryHandler {
     }
 
     @Override
-    public void handle(QueryContext queryContext, Object query) {
+    public void doHandle(QueryContext queryContext, Object query) {
         Context context = queryContext.getContext();
         Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
         queryUnitMap.forEach((accessPath, queryUnit) -> {
