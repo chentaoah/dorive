@@ -15,9 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.entity.common;
+package com.gitee.dorive.api.api.common;
 
-import java.util.Properties;
+import java.net.URL;
+import java.util.Map;
 
-public class BoundedContext extends Properties {
+public interface BoundedContext extends Map<Object, Object> {
+
+    Object setResource(String name, URL url);
+
+    URL getResource(String name);
+
+    Object setProperty(String key, String value);
+
+    String getProperty(String key);
+
 }

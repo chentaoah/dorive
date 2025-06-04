@@ -15,10 +15,27 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.api.api.common;
+package com.gitee.dorive.api.entity.common;
 
-public interface BoundedContextAware {
+import com.gitee.dorive.api.api.common.BoundedContext;
 
-    void setBoundedContext(BoundedContext boundedContext);
+import java.net.URL;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class DefaultBoundedContext extends Properties implements BoundedContext {
+
+    private final Map<String, URL> nameUrlMap = new ConcurrentHashMap<>();
+
+    @Override
+    public Object setResource(String name, URL url) {
+        return nameUrlMap.put(name, url);
+    }
+
+    @Override
+    public URL getResource(String name) {
+        return nameUrlMap.get(name);
+    }
 
 }

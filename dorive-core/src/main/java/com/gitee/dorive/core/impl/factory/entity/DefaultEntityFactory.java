@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.factory.entity;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
-import com.gitee.dorive.api.entity.common.BoundedContext;
+import com.gitee.dorive.api.api.common.BoundedContext;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.PropertyDefinition;
 import com.gitee.dorive.api.entity.core.def.PropertyDef;
