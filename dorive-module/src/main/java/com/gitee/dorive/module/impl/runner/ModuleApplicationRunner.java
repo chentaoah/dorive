@@ -29,7 +29,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import java.net.URL;
 import java.util.List;
 
 @Getter
@@ -56,19 +55,23 @@ public class ModuleApplicationRunner implements ApplicationContextAware, Applica
                     BoundedContext boundedContext = (BoundedContext) bean;
                     List<String> requires = moduleDefinition.getRequires();
                     List<String> provides = moduleDefinition.getProvides();
-                    checkResources(boundedContext, requires);
-                    checkResources(boundedContext, provides);
+                    List<String> notifies = moduleDefinition.getNotifies();
+                    List<String> waits = moduleDefinition.getWaits();
+                    checkQualifiedName(boundedContext, requires);
+                    checkQualifiedName(boundedContext, provides);
+                    checkQualifiedName(boundedContext, notifies);
+                    checkQualifiedName(boundedContext, waits);
                 }
             }
         }
     }
 
-    private void checkResources(BoundedContext boundedContext, List<String> names) {
+    private void checkQualifiedName(BoundedContext boundedContext, List<String> names) {
         if (names != null) {
             for (String name : names) {
-                URL resource = boundedContext.getResource(name);
-                if (resource == null) {
-                    throw new RuntimeException("The resource does not exist! name: " + name);
+                String qualifiedName = boundedContext.getQualifiedName(name);
+                if (qualifiedName == null) {
+                    throw new RuntimeException("Cannot find the qualified name for this name! name: " + name);
                 }
             }
         }

@@ -17,14 +17,13 @@
 
 package com.gitee.dorive.api.api.common;
 
-import java.net.URL;
 import java.util.Map;
 
 public interface BoundedContext extends Map<Object, Object> {
 
-    Object setResource(String name, URL url);
+    void setQualifiedName(String name, String qualifiedName);
 
-    URL getResource(String name);
+    String getQualifiedName(String name);
 
     Object setProperty(String key, String value);
 

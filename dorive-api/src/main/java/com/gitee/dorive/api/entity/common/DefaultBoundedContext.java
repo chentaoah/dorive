@@ -19,23 +19,22 @@ package com.gitee.dorive.api.entity.common;
 
 import com.gitee.dorive.api.api.common.BoundedContext;
 
-import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultBoundedContext extends Properties implements BoundedContext {
 
-    private final Map<String, URL> nameUrlMap = new ConcurrentHashMap<>();
+    private final Map<String, String> nameQualifiedNameMap = new ConcurrentHashMap<>();
 
     @Override
-    public Object setResource(String name, URL url) {
-        return nameUrlMap.put(name, url);
+    public void setQualifiedName(String name, String qualifiedName) {
+        nameQualifiedNameMap.put(name, qualifiedName);
     }
 
     @Override
-    public URL getResource(String name) {
-        return nameUrlMap.get(name);
+    public String getQualifiedName(String name) {
+        return nameQualifiedNameMap.get(name);
     }
 
 }
