@@ -71,7 +71,7 @@ public class ModuleApplicationRunner implements ApplicationContextAware, Applica
             for (String name : names) {
                 String qualifiedName = boundedContext.getQualifiedName(name);
                 if (qualifiedName == null) {
-                    throw new RuntimeException("Cannot find the qualified name for this name! name: " + name);
+                    throw new RuntimeException("Cannot find the qualified name in the bounded context! name: " + name);
                 }
             }
         }
