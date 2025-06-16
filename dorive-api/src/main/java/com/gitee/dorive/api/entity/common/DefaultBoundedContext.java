@@ -19,22 +19,7 @@ package com.gitee.dorive.api.entity.common;
 
 import com.gitee.dorive.api.api.common.BoundedContext;
 
-import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultBoundedContext extends Properties implements BoundedContext {
-
-    private final Map<String, String> nameQualifiedNameMap = new ConcurrentHashMap<>();
-
-    @Override
-    public void setQualifiedName(String name, String qualifiedName) {
-        nameQualifiedNameMap.put(name, qualifiedName);
-    }
-
-    @Override
-    public String getQualifiedName(String name) {
-        return nameQualifiedNameMap.get(name);
-    }
-
 }

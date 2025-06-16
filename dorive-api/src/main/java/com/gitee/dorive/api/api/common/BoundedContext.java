@@ -21,10 +21,6 @@ import java.util.Map;
 
 public interface BoundedContext extends Map<Object, Object> {
 
-    void setQualifiedName(String name, String qualifiedName);
-
-    String getQualifiedName(String name);
-
     Object setProperty(String key, String value);
 
     String getProperty(String key);
