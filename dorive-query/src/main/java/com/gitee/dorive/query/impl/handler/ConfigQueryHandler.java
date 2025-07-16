@@ -44,7 +44,6 @@ public class ConfigQueryHandler implements QueryHandler {
 
         queryContext.setQueryConfig(queryConfig);
         queryContext.setPrimaryKey(queryConfig.getPrimaryKey());
-        queryContext.setPrimaryKeyAlias(queryConfig.getPrimaryKeyAlias());
         queryContext.setMethod(queryConfig.getMethod());
 
         if (queryHandler != null) {

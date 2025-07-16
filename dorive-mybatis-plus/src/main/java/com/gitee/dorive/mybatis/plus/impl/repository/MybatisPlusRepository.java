@@ -26,24 +26,12 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.def.RepositoryDef;
-import com.gitee.dorive.core.api.common.ImplFactory;
 import com.gitee.dorive.core.api.common.MethodInvoker;
-import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.entity.common.EntityStoreInfo;
-import com.gitee.dorive.mybatis.plus.impl.executor.MybatisPlusExecutor;
+import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
+import com.gitee.dorive.mybatis.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.mybatis.plus.impl.DefaultMethodInvoker;
-import com.gitee.dorive.sql.impl.handler.SqlCustomQueryHandler;
-import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.query.entity.enums.QueryMethod;
-import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
-import com.gitee.dorive.sql.api.CountQuerier;
-import com.gitee.dorive.sql.api.SqlRunner;
-import com.gitee.dorive.sql.entity.common.CountQuery;
-import com.gitee.dorive.sql.impl.executor.UnionExecutor;
-import com.gitee.dorive.sql.impl.handler.SqlBuildQueryHandler;
-import com.gitee.dorive.sql.impl.handler.SqlExecuteQueryHandler;
-import com.gitee.dorive.sql.impl.querier.SqlCountQuerier;
+import com.gitee.dorive.mybatis.plus.impl.executor.MybatisPlusExecutor;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -59,19 +47,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Setter
-public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> implements CountQuerier {
-
-    private SqlRunner sqlRunner;
-    private EntityStoreInfo entityStoreInfo;
-    private CountQuerier countQuerier;
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
-        this.sqlRunner = implFactory.getInstance(SqlRunner.class);
-        super.afterPropertiesSet();
-        this.countQuerier = new SqlCountQuerier(this, getQueryHandler(), this.sqlRunner);
-    }
+public class MybatisPlusRepository<E, PK> extends AbstractMybatisRepository<E, PK> {
 
     @Override
     protected EntityStoreInfo resolveEntityStoreInfo(RepositoryDef repositoryDef) {
@@ -96,11 +72,10 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
         TableInfo tableInfo = TableInfoHelper.getTableInfo(pojoClass);
         Assert.notNull(tableInfo, "The table info cannot be null! data source: {}", mapperClass);
         assert tableInfo != null;
-        this.entityStoreInfo = newEntityStoreInfo(mapperClass, mapper, pojoClass, tableInfo);
-        return entityStoreInfo;
+        return newEntityStoreInfo(mapperClass, mapper, pojoClass, tableInfo);
     }
 
-    private EntityStoreInfo newEntityStoreInfo(Class<?> mapperClass, Object mapper, Class<?> pojoClass, TableInfo tableInfo) {
+    protected EntityStoreInfo newEntityStoreInfo(Class<?> mapperClass, Object mapper, Class<?> pojoClass, TableInfo tableInfo) {
         String tableName = tableInfo.getTableName();
         String keyProperty = tableInfo.getKeyProperty();
         String keyColumn = tableInfo.getKeyColumn();
@@ -136,21 +111,7 @@ public class MybatisPlusRepository<E, PK> extends AbstractRefRepository<E, PK> i
 
     @Override
     protected Executor newExecutor(EntityElement entityElement, EntityStoreInfo entityStoreInfo) {
-        Executor executor = new MybatisPlusExecutor(entityElement.getEntityDef(), entityElement, entityStoreInfo);
-        return new UnionExecutor(executor, sqlRunner, entityStoreInfo);
-    }
-
-    @Override
-    protected void registryQueryHandlers(Map<QueryMethod, QueryHandler> queryHandlerMap) {
-        super.registryQueryHandlers(queryHandlerMap);
-        queryHandlerMap.put(QueryMethod.SQL_BUILD, new SqlBuildQueryHandler(this));
-        queryHandlerMap.put(QueryMethod.SQL_EXECUTE, new SqlExecuteQueryHandler(this, sqlRunner));
-        queryHandlerMap.put(QueryMethod.SQL_CUSTOM, new SqlCustomQueryHandler(this, entityStoreInfo));
-    }
-
-    @Override
-    public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
-        return countQuerier.selectCountMap(context, countQuery);
+        return new MybatisPlusExecutor(entityElement.getEntityDef(), entityElement, entityStoreInfo);
     }
 
 }

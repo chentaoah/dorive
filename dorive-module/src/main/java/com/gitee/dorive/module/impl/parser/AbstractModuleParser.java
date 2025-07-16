@@ -84,7 +84,7 @@ public abstract class AbstractModuleParser implements ModuleParser {
                     Attributes mainAttributes = manifest.getMainAttributes();
                     String moduleName = mainAttributes.getValue("Dorive-Module");
                     if (moduleName != null) {
-                        ModuleDefinition moduleDefinition = new ModuleDefinition(resource, manifest);
+                        ModuleDefinition moduleDefinition = new ModuleDefinition(manifest);
                         nameModuleDefinitionMap.put(moduleName, moduleDefinition);
                         uriModuleDefinitionMap.put(uriForMatch, moduleDefinition);
                         // For test.

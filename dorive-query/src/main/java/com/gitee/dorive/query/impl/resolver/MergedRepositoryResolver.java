@@ -22,7 +22,7 @@ import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
 import com.gitee.dorive.core.impl.repository.AbstractRepository;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
@@ -45,11 +45,11 @@ public class MergedRepositoryResolver {
     }
 
     public void resolve() {
-        for (CommonRepository repository : repository.getRepositoryMap().values()) {
+        for (ProxyRepository repository : repository.getRepositoryMap().values()) {
             String accessPath = repository.getAccessPath();
             BinderResolver binderResolver = repository.getBinderResolver();
 
-            CommonRepository executedRepository = repository;
+            ProxyRepository executedRepository = repository;
             AbstractRepository<Object, Object> abstractRepository = repository.getProxyRepository();
             AbstractQueryRepository<?, ?> abstractQueryRepository = null;
             if (abstractRepository instanceof AbstractQueryRepository) {
@@ -80,7 +80,7 @@ public class MergedRepositoryResolver {
     }
 
     private void addMergedRepository(MergedRepository mergedRepository) {
-        CommonRepository executedRepository = mergedRepository.getExecutedRepository();
+        ProxyRepository executedRepository = mergedRepository.getExecutedRepository();
         mergedRepository.setDefaultRepository((DefaultRepository) executedRepository.getProxyRepository());
         mergedRepository.setSequence(mergedRepositoryMap.size() + 1);
         mergedRepository.setAlias("t" + mergedRepository.getSequence());

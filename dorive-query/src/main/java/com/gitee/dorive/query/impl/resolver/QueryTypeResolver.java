@@ -23,7 +23,7 @@ import com.gitee.dorive.api.entity.query.QueryDefinition;
 import com.gitee.dorive.api.entity.query.QueryFieldDefinition;
 import com.gitee.dorive.api.entity.query.def.QueryFieldDef;
 import com.gitee.dorive.api.impl.query.QueryDefinitionResolver;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryConfig;
 import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
@@ -68,7 +68,7 @@ public class QueryTypeResolver {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
         for (MergedRepository mergedRepository : mergedRepositoryMap.values()) {
-            CommonRepository repository = mergedRepository.getExecutedRepository();
+            ProxyRepository repository = mergedRepository.getExecutedRepository();
             if (repository.isBound() && accessPaths.add(mergedRepository.getAbsoluteAccessPath())) {
                 mergedRepositories.add(mergedRepository);
             }
@@ -106,7 +106,7 @@ public class QueryTypeResolver {
         MergedRepository mergedRepository = mergedRepositoryMap.get(belongTo);
         Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
 
-        CommonRepository repository = mergedRepository.getExecutedRepository();
+        ProxyRepository repository = mergedRepository.getExecutedRepository();
         Assert.isTrue(repository.hasField(field), "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",
                 queryFieldDefinition.getField(), repository.getEntityClass(), field);
 

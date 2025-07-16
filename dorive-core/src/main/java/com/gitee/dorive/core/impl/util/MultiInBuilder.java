@@ -31,14 +31,14 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = false)
 public class MultiInBuilder {
 
-    private List<String> aliases;
+    private List<String> properties;
     private int size;
     private int count;
     private List<Object> values;
 
-    public MultiInBuilder(List<String> aliases, int count) {
-        this.aliases = aliases;
-        this.size = aliases.size();
+    public MultiInBuilder(List<String> properties, int count) {
+        this.properties = properties;
+        this.size = properties.size();
         this.count = count;
         this.values = new ArrayList<>(count * size);
     }
@@ -68,18 +68,25 @@ public class MultiInBuilder {
     }
 
     public Criterion toCriterion() {
-        String property = StrUtil.join(",", aliases);
+        String propertiesStr = StrUtil.join(",", properties);
+        return new Criterion(propertiesStr, Operator.MULTI_IN, this);
+    }
+
+    public String buildPropertiesStr() {
+        return StrUtil.join(",", properties);
+    }
+
+    public String buildValuesStr() {
         StringBuilder builder = new StringBuilder();
         int page = values.size() / size;
         for (int current = 1; current <= page; current++) {
             List<Object> subValues = values.subList((current - 1) * size, current * size);
             builder.append(buildValuesStr(subValues));
         }
-        String valuesStr = StrUtil.removeSuffix(builder, ",");
-        return new Criterion(property, Operator.MULTI_IN, valuesStr);
+        return StrUtil.removeSuffix(builder, ",");
     }
 
-    public String buildValuesStr(List<Object> values) {
+    private String buildValuesStr(List<Object> values) {
         return values.stream()
                 .map(value -> CriterionUtils.doGetValue(null, value))
                 .collect(Collectors.joining(",", "(", "),"));

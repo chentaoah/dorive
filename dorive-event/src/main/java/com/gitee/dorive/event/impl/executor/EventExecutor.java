@@ -22,7 +22,7 @@ import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.operation.EntityOp;
 import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.impl.executor.AbstractProxyExecutor;
+import com.gitee.dorive.core.impl.executor.unit.AbstractProxyExecutor;
 import com.gitee.dorive.event.entity.BaseEvent;
 import com.gitee.dorive.event.impl.factory.EventFactory;
 import lombok.Getter;

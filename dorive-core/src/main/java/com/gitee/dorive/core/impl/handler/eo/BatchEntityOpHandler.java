@@ -28,7 +28,7 @@ import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.core.impl.util.CollectionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -61,7 +61,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
 
     private int executeInsert(Context context, EntityOp entityOp) {
         int totalCount = 0;
-        for (CommonRepository repository : this.repository.getOrderedRepositories()) {
+        for (ProxyRepository repository : this.repository.getOrderedRepositories()) {
             boolean isRoot = repository.isRoot();
             if (isRoot) {
                 totalCount += executeRoot(repository, context, entityOp);
@@ -92,7 +92,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
 
     private int executeUpdateOrDelete(Context context, EntityOp entityOp) {
         int totalCount = 0;
-        for (CommonRepository repository : this.repository.getOrderedRepositories()) {
+        for (ProxyRepository repository : this.repository.getOrderedRepositories()) {
             boolean isRoot = repository.isRoot();
             if (isRoot) {
                 totalCount += executeRoot(repository, context, entityOp);
@@ -117,7 +117,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
 
     private int executeInsertOrUpdate(Context context, EntityOp entityOp) {
         int totalCount = 0;
-        for (CommonRepository repository : this.repository.getOrderedRepositories()) {
+        for (ProxyRepository repository : this.repository.getOrderedRepositories()) {
             boolean isRoot = repository.isRoot();
             if (isRoot) {
                 totalCount += executeRoot(repository, context, entityOp);
@@ -147,7 +147,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
         return totalCount;
     }
 
-    private int executeRoot(CommonRepository repository, Context context, EntityOp entityOp) {
+    private int executeRoot(ProxyRepository repository, Context context, EntityOp entityOp) {
         if (entityOp.isNotIgnoreRoot()) {
             if (repository.matches(context) || entityOp.isIncludeRoot()) {
                 return repository.execute(context, entityOp);
@@ -156,7 +156,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
         return 0;
     }
 
-    private List<?> getEntities(CommonRepository repository, Object rootEntity) {
+    private List<?> getEntities(ProxyRepository repository, Object rootEntity) {
         EntityElement entityElement = repository.getEntityElement();
         Object targetEntity = entityElement.getValue(rootEntity);
         if (targetEntity != null) {

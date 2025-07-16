@@ -37,7 +37,7 @@ import com.gitee.dorive.core.impl.endpoint.BindEndpoint;
 import com.gitee.dorive.core.impl.endpoint.FieldEndpoint;
 import com.gitee.dorive.core.impl.processor.SpELProcessor;
 import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
@@ -223,23 +223,19 @@ public class BinderResolver {
 
     private BindEndpoint newBindEndpoint(BindingDef bindingDef) {
         String bind = bindingDef.getBind();
-        String bindField = bindingDef.getBindField();
 
-        CommonRepository rootRepository = repository.getRootRepository();
+        ProxyRepository rootRepository = repository.getRootRepository();
         EntityElement entityElement = rootRepository.getEntityElement();
         FieldDefinition fieldDefinition = entityElement.getFieldDefinition(bind);
         Assert.notNull(fieldDefinition, "The bound property chain cannot be null! bind: {}", bind);
         BindEndpoint bindEndpoint = new BindEndpoint(fieldDefinition, "#entity." + bind);
 
-        Map<String, CommonRepository> repositoryMap = repository.getRepositoryMap();
-        CommonRepository belongRepository = repositoryMap.getOrDefault("/" + bind, rootRepository);
+        Map<String, ProxyRepository> repositoryMap = repository.getRepositoryMap();
+        ProxyRepository belongRepository = repositoryMap.getOrDefault("/" + bind, rootRepository);
         belongRepository.setBound(true);
-        EntityElement belongEntityElement = belongRepository.getEntityElement();
-        String bindFieldAlias = belongEntityElement.toAlias(bindField);
 
         bindEndpoint.setBelongAccessPath(belongRepository.getAccessPath());
         bindEndpoint.setBelongRepository(belongRepository);
-        bindEndpoint.setBindFieldAlias(bindFieldAlias);
         return bindEndpoint;
     }
 

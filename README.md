@@ -106,7 +106,7 @@ Maven引入：
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-spring-boot-starter</artifactId>
-    <version>3.5.2</version>
+    <version>3.5.3</version>
 </dependency>
 ```
 

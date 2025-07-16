@@ -47,14 +47,24 @@ public class ModuleLauncher {
     }
 
     private String findMavenRepositoryPath() {
+        String mavenRepositoryPath = null;
+
         String mavenHome = System.getenv("MAVEN_HOME");
         if (StringUtils.isNotBlank(mavenHome)) {
-            return mavenHome + File.separator + "repository";
+            mavenRepositoryPath = mavenHome + File.separator + "repository";
         }
+        if (FileUtil.exist(mavenRepositoryPath)) {
+            return mavenRepositoryPath;
+        }
+
         String userHome = System.getProperty("user.home");
         if (StringUtils.isNotBlank(userHome)) {
-            return userHome + File.separator + ".m2" + File.separator + "repository";
+            mavenRepositoryPath = userHome + File.separator + ".m2" + File.separator + "repository";
         }
+        if (FileUtil.exist(mavenRepositoryPath)) {
+            return mavenRepositoryPath;
+        }
+
         return null;
     }
 

@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.handler;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.core.impl.repository.CommonRepository;
+import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -29,7 +29,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ContextMatchEntityHandler implements EntityHandler {
 
-    private CommonRepository repository;
+    private ProxyRepository repository;
     private EntityHandler entityHandler;
 
     @Override

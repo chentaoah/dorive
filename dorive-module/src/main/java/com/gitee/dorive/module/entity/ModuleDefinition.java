@@ -24,7 +24,6 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.module.impl.util.NameUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +35,6 @@ import static com.gitee.dorive.module.impl.parser.AbstractModuleParser.PATH_MATC
 
 @Data
 public class ModuleDefinition {
-    private Resource resource;
     private String originId;
     private String organization;
     private String project;
@@ -56,13 +54,10 @@ public class ModuleDefinition {
     private String tablePrefix;
     private String requestPrefix;
 
-    public ModuleDefinition(Resource resource, Manifest manifest) {
-        Assert.notNull(resource, "The resource can not be null!");
+    public ModuleDefinition(Manifest manifest) {
         Assert.notNull(manifest, "The manifest can not be null!");
 
-        this.resource = resource;
         Attributes mainAttributes = manifest.getMainAttributes();
-
         String originId = mainAttributes.getValue("Dorive-Origin-Id");
         String organization = mainAttributes.getValue("Dorive-Organization");
         String project = mainAttributes.getValue("Dorive-Project");

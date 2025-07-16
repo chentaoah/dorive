@@ -49,32 +49,4 @@ public class EntityElement extends FieldEntityDefinition {
     public void setPrimaryKey(Object entity, Object value) {
         ReflectUtil.setFieldValue(entity, getPrimaryKey(), value);
     }
-
-    public String toAlias(String field) {
-        return fieldAliasMapping.getOrDefault(field, field);
-    }
-
-    public List<String> toAliases(List<String> fields) {
-        if (fields != null && !fields.isEmpty()) {
-            List<String> aliases = new ArrayList<>(fields.size());
-            for (String field : fields) {
-                String alias = toAlias(field);
-                aliases.add(alias);
-            }
-            return aliases;
-        }
-        return fields;
-    }
-
-    public Set<String> toAliases(Set<String> fields) {
-        if (fields != null && !fields.isEmpty()) {
-            Set<String> aliases = new LinkedHashSet<>(fields.size() * 4 / 3 + 1);
-            for (String field : fields) {
-                String alias = toAlias(field);
-                aliases.add(alias);
-            }
-            return aliases;
-        }
-        return fields;
-    }
 }
