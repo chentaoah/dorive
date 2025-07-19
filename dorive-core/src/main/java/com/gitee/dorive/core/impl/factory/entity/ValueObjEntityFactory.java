@@ -24,13 +24,12 @@ import cn.hutool.core.convert.TypeConverter;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.json.JSONUtil;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.api.mapper.EntityMappers;
 import com.gitee.dorive.core.api.mapper.FieldMapper;
+import com.gitee.dorive.core.impl.util.TypeUtils;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -60,17 +59,24 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     }
 
     private void setReCopyOptions() {
-        // 如果是值对象，则跳过hutool的类型转换
         EntityMappers entityMappers = getEntityMappers();
         getReCopyOptions().setConverter(((targetType, value) -> {
             if (value == null) {
                 return null;
             }
             if (value instanceof String) {
-                if (targetType instanceof ParameterizedType) {
-                    targetType = ((ParameterizedType) targetType).getActualTypeArguments()[0];
+                // 以下情况，不再使用hutool的类型转换（toString）
+                Class<?> rawType = TypeUtils.getRawType(targetType);
+                if (rawType == null) {
+                    throw new RuntimeException("The rawType is null!");
                 }
-                if (entityMappers.isValueObjType(targetType)) {
+                if (Collection.class.isAssignableFrom(rawType)) {
+                    return value;
+                }
+                if (Map.class.isAssignableFrom(rawType)) {
+                    return value;
+                }
+                if (entityMappers.isValueObjType(rawType)) {
                     return value;
                 }
             }
@@ -79,17 +85,20 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     }
 
     private void setDeCopyOptions() {
-        // 如果是值对象，则跳过hutool的类型转换
         EntityMappers entityMappers = getEntityMappers();
         getDeCopyOptions().setConverter(((targetType, value) -> {
             if (value == null) {
                 return null;
             }
             if (targetType == String.class) {
-                // 运行时类型擦除，若优化需重写hutool逻辑
+                // 以下情况，不再使用hutool的类型转换（toString）
                 if (value instanceof Collection) {
-                    return JSONUtil.toJsonStr(value);
+                    return value;
                 }
+                if (value instanceof Map) {
+                    return value;
+                }
+                // 注意：值对象的子类实例，不会进入该分支
                 if (entityMappers.isValueObjType(value.getClass())) {
                     return value;
                 }
