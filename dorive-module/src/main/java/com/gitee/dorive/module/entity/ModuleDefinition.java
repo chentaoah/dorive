@@ -23,6 +23,7 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.module.impl.util.NameUtils;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.jar.Manifest;
 import static com.gitee.dorive.module.impl.parser.AbstractModuleParser.PATH_MATCHER;
 
 @Data
+@NoArgsConstructor
 public class ModuleDefinition {
     private String origin;
     private String organization;
