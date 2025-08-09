@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.core.impl.mapper.value;
 
+import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
 import com.gitee.dorive.core.api.mapper.Converter;
 import lombok.AllArgsConstructor;
@@ -28,11 +29,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class JsonConverter implements Converter {
 
+    private static JSONConfig jsonConfig = JSONConfig.create().setIgnoreNullValue(false);
     private Class<?> entityClass;
 
     @Override
     public Object reconstitute(Object value) {
-        return JSONUtil.toBean((String) value, entityClass);
+        return JSONUtil.toBean((String) value, jsonConfig, entityClass);
     }
 
     @Override
