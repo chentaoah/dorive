@@ -35,7 +35,7 @@ import static com.gitee.dorive.module.impl.parser.AbstractModuleParser.PATH_MATC
 
 @Data
 public class ModuleDefinition {
-    private String originId;
+    private String origin;
     private String organization;
     private String project;
     private String domain;
@@ -58,7 +58,7 @@ public class ModuleDefinition {
         Assert.notNull(manifest, "The manifest can not be null!");
 
         Attributes mainAttributes = manifest.getMainAttributes();
-        String originId = mainAttributes.getValue("Dorive-Origin-Id");
+        String origin = mainAttributes.getValue("Dorive-Origin");
         String organization = mainAttributes.getValue("Dorive-Organization");
         String project = mainAttributes.getValue("Dorive-Project");
         String domain = mainAttributes.getValue("Dorive-Domain");
@@ -79,7 +79,7 @@ public class ModuleDefinition {
         String tablePrefix = mainAttributes.getValue("Dorive-Table-Prefix");
         String requestPrefix = mainAttributes.getValue("Dorive-Request-Prefix");
 
-        this.originId = filterValue(originId);
+        this.origin = filterValue(origin);
         this.organization = filterValue(organization);
         this.project = filterValue(project);
         this.domain = filterValue(domain);
