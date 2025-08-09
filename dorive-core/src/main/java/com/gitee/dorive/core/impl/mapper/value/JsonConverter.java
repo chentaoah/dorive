@@ -34,12 +34,12 @@ public class JsonConverter implements Converter {
 
     @Override
     public Object reconstitute(Object value) {
-        return JSONUtil.toBean((String) value, jsonConfig, entityClass);
+        return JSONUtil.toBean((String) value, entityClass);
     }
 
     @Override
     public Object deconstruct(Object value) {
-        return JSONUtil.toJsonStr(value);
+        return JSONUtil.toJsonStr(value, jsonConfig);
     }
 
 }
