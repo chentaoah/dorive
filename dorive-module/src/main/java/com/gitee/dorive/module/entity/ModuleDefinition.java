@@ -182,7 +182,7 @@ public class ModuleDefinition {
         }
     }
 
-    public List<String> getProfiles() {
+    public List<String> getActiveProfiles() {
         List<String> activeProfiles = Collections.emptyList();
         if (profiles != null && !profiles.isEmpty()) {
             activeProfiles = new ArrayList<>(profiles);
