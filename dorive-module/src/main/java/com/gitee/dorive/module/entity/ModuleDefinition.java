@@ -48,6 +48,7 @@ public class ModuleDefinition {
     private List<String> tags;
     private List<String> profiles;
     private List<String> configs;
+    private List<String> globalValues;
     private List<String> exports;
     private List<String> requires;
     private List<String> provides;
@@ -73,6 +74,7 @@ public class ModuleDefinition {
 
         String profiles = mainAttributes.getValue("Dorive-Profiles");
         String configs = mainAttributes.getValue("Dorive-Configs");
+        String globalValues = mainAttributes.getValue("Dorive-Global-Values");
         String exports = mainAttributes.getValue("Dorive-Exports");
         String requires = mainAttributes.getValue("Dorive-Requires");
         String provides = mainAttributes.getValue("Dorive-Provides");
@@ -94,6 +96,7 @@ public class ModuleDefinition {
 
         this.profiles = filterValues(profiles);
         this.configs = filterValues(configs);
+        this.globalValues = filterValues(globalValues);
         this.exports = filterValues(exports);
         this.requires = filterValues(requires);
         this.provides = filterValues(provides);
@@ -132,6 +135,11 @@ public class ModuleDefinition {
             packages.add(NameUtils.toPackage(project));
         }
         return StrUtil.join(".", packages) + ".**";
+    }
+
+    public boolean isGlobalValues(Class<?> clazz) {
+        String className = clazz.getName();
+        return CollUtil.findOne(globalValues, export -> PATH_MATCHER.match(export, className)) != null;
     }
 
     public boolean isExposed(Class<?> clazz) {

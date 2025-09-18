@@ -40,7 +40,7 @@ public class ModuleContextAnnotationAutowireCandidateResolver extends ContextAnn
             Class<?> declaringClass = (Class<?>) ReflectUtil.getFieldValue(descriptor, "declaringClass");
             if (declaringClass != null && moduleParser.isUnderScanPackage(declaringClass.getName())) {
                 ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(declaringClass);
-                if (moduleDefinition != null) {
+                if (moduleDefinition != null && !moduleDefinition.isGlobalValues(declaringClass)) {
                     String strValue = (String) value;
                     if (strValue.startsWith("${") && strValue.endsWith("}")) {
                         strValue = StrUtil.removePrefix(strValue, "${");
