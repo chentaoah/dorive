@@ -15,31 +15,25 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.mapper.value;
+package com.gitee.dorive.core.impl.util;
 
-import cn.hutool.json.JSONConfig;
-import cn.hutool.json.JSONUtil;
-import com.gitee.dorive.core.api.mapper.Converter;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
-@Getter
-@Setter
-@AllArgsConstructor
-public class JsonConverter implements Converter {
+public class TypeUtils {
 
-    private static JSONConfig jsonConfig = JSONConfig.create().setIgnoreNullValue(false);
-    private Class<?> entityClass;
+    public static Class<?> getRawType(Type type) {
+        if (type instanceof Class<?>) {
+            return (Class<?>) type;
 
-    @Override
-    public Object reconstitute(Object value) {
-        return JSONUtil.toBean((String) value, entityClass);
-    }
-
-    @Override
-    public Object deconstruct(Object value) {
-        return JSONUtil.toJsonStr(value, jsonConfig);
+        } else if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            Type rawType = parameterizedType.getRawType();
+            if (rawType instanceof Class<?>) {
+                return (Class<?>) rawType;
+            }
+        }
+        return null;
     }
 
 }

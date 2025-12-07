@@ -55,7 +55,7 @@ public class SpringModularApplication {
             if (mainClass != null) {
                 sources.add(mainClass);
             }
-            profiles.addAll(moduleDefinition.getProfiles());
+            profiles.addAll(moduleDefinition.getActiveProfiles());
             properties.put(moduleDefinition.getModulePathKey(), moduleDefinition.getModulePathValue());
         }
 

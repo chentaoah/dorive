@@ -23,6 +23,7 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.module.impl.util.NameUtils;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -34,8 +35,9 @@ import java.util.jar.Manifest;
 import static com.gitee.dorive.module.impl.parser.AbstractModuleParser.PATH_MATCHER;
 
 @Data
+@NoArgsConstructor
 public class ModuleDefinition {
-    private String originId;
+    private String origin;
     private String organization;
     private String project;
     private String domain;
@@ -46,6 +48,7 @@ public class ModuleDefinition {
     private List<String> tags;
     private List<String> profiles;
     private List<String> configs;
+    private List<String> globalValues;
     private List<String> exports;
     private List<String> requires;
     private List<String> provides;
@@ -58,7 +61,7 @@ public class ModuleDefinition {
         Assert.notNull(manifest, "The manifest can not be null!");
 
         Attributes mainAttributes = manifest.getMainAttributes();
-        String originId = mainAttributes.getValue("Dorive-Origin-Id");
+        String origin = mainAttributes.getValue("Dorive-Origin");
         String organization = mainAttributes.getValue("Dorive-Organization");
         String project = mainAttributes.getValue("Dorive-Project");
         String domain = mainAttributes.getValue("Dorive-Domain");
@@ -71,6 +74,7 @@ public class ModuleDefinition {
 
         String profiles = mainAttributes.getValue("Dorive-Profiles");
         String configs = mainAttributes.getValue("Dorive-Configs");
+        String globalValues = mainAttributes.getValue("Dorive-Global-Values");
         String exports = mainAttributes.getValue("Dorive-Exports");
         String requires = mainAttributes.getValue("Dorive-Requires");
         String provides = mainAttributes.getValue("Dorive-Provides");
@@ -79,7 +83,7 @@ public class ModuleDefinition {
         String tablePrefix = mainAttributes.getValue("Dorive-Table-Prefix");
         String requestPrefix = mainAttributes.getValue("Dorive-Request-Prefix");
 
-        this.originId = filterValue(originId);
+        this.origin = filterValue(origin);
         this.organization = filterValue(organization);
         this.project = filterValue(project);
         this.domain = filterValue(domain);
@@ -92,6 +96,7 @@ public class ModuleDefinition {
 
         this.profiles = filterValues(profiles);
         this.configs = filterValues(configs);
+        this.globalValues = filterValues(globalValues);
         this.exports = filterValues(exports);
         this.requires = filterValues(requires);
         this.provides = filterValues(provides);
@@ -130,6 +135,11 @@ public class ModuleDefinition {
             packages.add(NameUtils.toPackage(project));
         }
         return StrUtil.join(".", packages) + ".**";
+    }
+
+    public boolean isGlobalValues(Class<?> clazz) {
+        String className = clazz.getName();
+        return CollUtil.findOne(globalValues, export -> PATH_MATCHER.match(export, className)) != null;
     }
 
     public boolean isExposed(Class<?> clazz) {
@@ -180,7 +190,7 @@ public class ModuleDefinition {
         }
     }
 
-    public List<String> getProfiles() {
+    public List<String> getActiveProfiles() {
         List<String> activeProfiles = Collections.emptyList();
         if (profiles != null && !profiles.isEmpty()) {
             activeProfiles = new ArrayList<>(profiles);
