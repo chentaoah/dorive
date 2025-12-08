@@ -29,18 +29,8 @@
     </scm>
 
     <modules>
-        <module>dorive-api</module>
-        <module>dorive-module</module>
-        <module>dorive-test</module>
-        <module>dorive-core</module>
-        <module>dorive-event</module>
-        <module>dorive-query</module>
-        <module>dorive-ref</module>
-        <module>dorive-mybatis</module>
-        <module>dorive-mybatis-plus</module>
-        <module>dorive-web</module>
-        <module>dorive-autoconfigure</module>
-        <module>dorive-spring-boot-starter</module>
+        <module>dorive-base</module>
+        <module>dorive-launcher</module>
     </modules>
 
     <properties>
