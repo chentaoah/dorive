@@ -27,6 +27,11 @@
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-binder</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
             <artifactId>dorive-executor</artifactId>
             <version>${project.version}</version>
         </dependency>
