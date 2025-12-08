@@ -15,5 +15,45 @@
             <artifactId>dorive-base</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-aggregate</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-repository</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-executor</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-factory</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-joiner</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-event</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-mybatis</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-mybatis-plus</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

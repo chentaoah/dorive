@@ -30,6 +30,14 @@
 
     <modules>
         <module>dorive-base</module>
+        <module>dorive-aggregate</module>
+        <module>dorive-repository</module>
+        <module>dorive-executor</module>
+        <module>dorive-factory</module>
+        <module>dorive-joiner</module>
+        <module>dorive-event</module>
+        <module>dorive-mybatis</module>
+        <module>dorive-mybatis-plus</module>
         <module>dorive-launcher</module>
     </modules>
 
