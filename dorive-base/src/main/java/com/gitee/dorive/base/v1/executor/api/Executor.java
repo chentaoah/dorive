@@ -15,13 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.api;
+package com.gitee.dorive.base.v1.executor.api;
 
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
+import com.gitee.dorive.base.v1.core.entity.op.Operation;
+import com.gitee.dorive.base.v1.core.entity.cop.Query;
 
-public interface ExampleConverter {
+public interface Executor {
 
-    void convert(Context context, Example example);
+    Result<Object> executeQuery(Context context, Query query);
+
+    long executeCount(Context context, Query query);
+
+    int execute(Context context, Operation operation);
 
 }

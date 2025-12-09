@@ -21,7 +21,7 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.executor.v1.api.Executor;
+import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.repository.v1.api.Repository;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;

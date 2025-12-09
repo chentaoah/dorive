@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.executor.unit;
+package com.gitee.dorive.factory.v1.impl.executor;
 
 import com.gitee.dorive.base.v1.common.constant.Operator;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
@@ -24,10 +24,10 @@ import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.UnionExample;
-import com.gitee.dorive.executor.v1.api.ExampleConverter;
+import com.gitee.dorive.factory.v1.api.ExampleConverter;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.executor.v1.api.Executor;
-import com.gitee.dorive.executor.v1.impl.executor.AbstractProxyExecutor;
+import com.gitee.dorive.base.v1.executor.api.Executor;
+import com.gitee.dorive.base.v1.executor.impl.AbstractProxyExecutor;
 import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.FieldMapper;
 import com.gitee.dorive.base.v1.core.entity.op.Condition;
@@ -35,7 +35,7 @@ import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.cop.ConditionUpdate;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
-import com.gitee.dorive.core.impl.util.MultiInBuilder;
+import com.gitee.dorive.factory.v1.util.MultiInBuilder;
 import lombok.Getter;
 import lombok.Setter;
 

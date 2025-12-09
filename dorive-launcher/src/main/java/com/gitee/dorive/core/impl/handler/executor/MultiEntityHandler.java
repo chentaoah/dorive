@@ -25,7 +25,7 @@ import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.binder.v1.impl.binder.AbstractBinder;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
-import com.gitee.dorive.core.impl.util.MultiInBuilder;
+import com.gitee.dorive.factory.v1.util.MultiInBuilder;
 import lombok.Getter;
 import lombok.Setter;
 

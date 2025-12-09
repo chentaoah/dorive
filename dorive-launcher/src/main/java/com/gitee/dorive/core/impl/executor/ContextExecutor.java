@@ -27,7 +27,7 @@ import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
-import com.gitee.dorive.executor.v1.impl.executor.AbstractExecutor;
+import com.gitee.dorive.base.v1.executor.impl.AbstractExecutor;
 import lombok.Getter;
 import lombok.Setter;
 

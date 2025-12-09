@@ -31,7 +31,7 @@ import com.gitee.dorive.aggregate.v1.util.ReflectUtils;
 import com.gitee.dorive.base.v1.common.api.RepositoryPostProcessor;
 import com.gitee.dorive.executor.v1.api.EntityHandler;
 import com.gitee.dorive.executor.v1.api.EntityOpHandler;
-import com.gitee.dorive.executor.v1.api.Executor;
+import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.core.config.RepositoryContext;
 import com.gitee.dorive.executor.v1.impl.context.AdaptiveMatcher;
 import com.gitee.dorive.core.impl.executor.ContextExecutor;

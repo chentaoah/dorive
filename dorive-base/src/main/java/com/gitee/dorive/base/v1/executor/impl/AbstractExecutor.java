@@ -15,19 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.api;
+package com.gitee.dorive.base.v1.executor.impl;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.base.v1.core.entity.op.Operation;
-import com.gitee.dorive.base.v1.core.entity.cop.Query;
+import com.gitee.dorive.base.v1.executor.api.Executor;
+import lombok.Getter;
+import lombok.Setter;
 
-public interface Executor {
-
-    Result<Object> executeQuery(Context context, Query query);
-
-    long executeCount(Context context, Query query);
-
-    int execute(Context context, Operation operation);
-
+@Getter
+@Setter
+public abstract class AbstractExecutor implements Executor {
 }

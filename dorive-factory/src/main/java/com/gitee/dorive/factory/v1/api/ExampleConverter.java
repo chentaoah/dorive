@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.impl.executor;
+package com.gitee.dorive.factory.v1.api;
 
-import com.gitee.dorive.executor.v1.api.Executor;
-import lombok.Getter;
-import lombok.Setter;
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
 
-@Getter
-@Setter
-public abstract class AbstractExecutor implements Executor {
+public interface ExampleConverter {
+
+    void convert(Context context, Example example);
+
 }

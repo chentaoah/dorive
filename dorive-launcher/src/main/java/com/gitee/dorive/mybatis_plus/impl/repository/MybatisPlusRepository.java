@@ -27,7 +27,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.api.MethodInvoker;
-import com.gitee.dorive.executor.v1.api.Executor;
+import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.mybatis.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.mybatis_plus.impl.DefaultMethodInvoker;

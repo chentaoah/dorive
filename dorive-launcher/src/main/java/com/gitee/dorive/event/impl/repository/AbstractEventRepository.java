@@ -20,7 +20,7 @@ package com.gitee.dorive.event.impl.repository;
 import cn.hutool.core.util.ArrayUtil;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.executor.v1.api.Executor;
+import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
 import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
