@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.aggregate.v1.util;
+package com.gitee.dorive.base.v1.core.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;

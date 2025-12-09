@@ -27,7 +27,7 @@ import com.gitee.dorive.base.v1.common.entity.EntityDefinition;
 import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
 import com.gitee.dorive.base.v1.common.entity.FieldEntityDefinition;
 import com.gitee.dorive.base.v1.common.entity.PropertyDefinition;
-import com.gitee.dorive.aggregate.v1.util.ReflectUtils;
+import com.gitee.dorive.base.v1.core.util.ReflectUtils;
 import com.gitee.dorive.base.v1.common.def.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

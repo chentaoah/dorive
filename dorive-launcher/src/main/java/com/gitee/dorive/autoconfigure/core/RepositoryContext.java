@@ -18,7 +18,7 @@
 package com.gitee.dorive.autoconfigure.core;
 
 import cn.hutool.core.util.ClassUtil;
-import com.gitee.dorive.aggregate.v1.util.ReflectUtils;
+import com.gitee.dorive.base.v1.core.util.ReflectUtils;
 import com.gitee.dorive.base.v1.common.api.RepositoryPostProcessor;
 import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
 import org.apache.commons.lang3.StringUtils;

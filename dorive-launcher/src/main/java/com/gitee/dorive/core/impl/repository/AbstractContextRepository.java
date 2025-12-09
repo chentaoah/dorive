@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.repository;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.aggregate.v1.impl.EntityDefinitionResolver;
 import com.gitee.dorive.aggregate.v1.impl.EntityElementResolver;
-import com.gitee.dorive.aggregate.v1.util.ReflectUtils;
+import com.gitee.dorive.base.v1.core.util.ReflectUtils;
 import com.gitee.dorive.autoconfigure.core.RepositoryContext;
 import com.gitee.dorive.base.v1.common.api.BoundedContext;
 import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
