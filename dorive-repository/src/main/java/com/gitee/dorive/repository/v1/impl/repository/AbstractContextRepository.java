@@ -197,9 +197,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     protected Executor newExecutor() {
         // 从上下文获取工厂
         RepositoryBuilder repositoryBuilder = applicationContext.getBean(RepositoryBuilder.class);
-        ExecutorFactory executorFactory = applicationContext.getBean(ExecutorFactory.class);
         EntityHandlerFactory entityHandlerFactory = applicationContext.getBean(EntityHandlerFactory.class);
         EntityOpHandlerFactory entityOpHandlerFactory = applicationContext.getBean(EntityOpHandlerFactory.class);
+        ExecutorFactory executorFactory = applicationContext.getBean(ExecutorFactory.class);
         // 处理器
         EntityHandler entityHandler = newEntityHandler(repositoryBuilder);
         EntityOpHandler entityOpHandler = newEntityOpHandler(repositoryBuilder);
