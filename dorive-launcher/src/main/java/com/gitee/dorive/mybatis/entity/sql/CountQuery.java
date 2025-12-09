@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.mybatis.entity.sql;
 
-import com.gitee.dorive.core.api.context.Selector;
+import com.gitee.dorive.executor.v1.api.Selector;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

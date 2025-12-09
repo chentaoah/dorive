@@ -19,12 +19,12 @@ package com.gitee.dorive.core.impl.executor;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.core.api.executor.EntityOpHandler;
-import com.gitee.dorive.core.entity.executor.Result;
-import com.gitee.dorive.core.entity.operation.EntityOp;
-import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.cop.Query;
+import com.gitee.dorive.executor.v1.api.EntityHandler;
+import com.gitee.dorive.executor.v1.api.EntityOpHandler;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
+import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
+import com.gitee.dorive.base.v1.core.entity.op.Operation;
+import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.Getter;

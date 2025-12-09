@@ -18,13 +18,13 @@
 package com.gitee.dorive.core.impl.handler;
 
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.core.api.executor.EntityHandler;
-import com.gitee.dorive.core.api.executor.EntityJoiner;
+import com.gitee.dorive.executor.v1.api.EntityHandler;
+import com.gitee.dorive.joiner.v1.api.EntityJoiner;
 import com.gitee.dorive.base.v1.core.enums.JoinType;
 import com.gitee.dorive.core.impl.handler.executor.MultiEntityHandler;
 import com.gitee.dorive.core.impl.handler.executor.SingleEntityHandler;
 import com.gitee.dorive.core.impl.handler.executor.UnionEntityHandler;
-import com.gitee.dorive.core.impl.joiner.DefaultEntityJoiner;
+import com.gitee.dorive.joiner.v1.impl.DefaultEntityJoiner;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,7 +39,7 @@ public class AdaptiveEntityHandler implements EntityHandler {
 
     @Override
     public long handle(Context context, List<Object> entities) {
-        EntityJoiner entityJoiner = new DefaultEntityJoiner(repository, entities);
+        EntityJoiner entityJoiner = new DefaultEntityJoiner(repository.isCollection(), repository.getEntityElement(), entities);
         EntityHandler entityHandler = newEntityHandler(entityJoiner);
         return entityHandler != null ? entityHandler.handle(context, entities) : 0L;
     }

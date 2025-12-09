@@ -21,7 +21,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.gitee.dorive.base.v1.common.constant.Operator;
 import com.gitee.dorive.base.v1.common.api.ImplFactory;
-import com.gitee.dorive.base.v1.core.api.SqlFormat;
+import com.gitee.dorive.base.v1.common.api.SqlFormat;
 import com.gitee.dorive.base.v1.core.entity.Criterion;
 
 import java.util.Collection;

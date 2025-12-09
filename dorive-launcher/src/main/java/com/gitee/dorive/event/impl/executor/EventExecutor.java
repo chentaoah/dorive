@@ -19,9 +19,9 @@ package com.gitee.dorive.event.impl.executor;
 
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.entity.operation.EntityOp;
-import com.gitee.dorive.core.entity.operation.Operation;
+import com.gitee.dorive.executor.v1.api.Executor;
+import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
+import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.core.impl.executor.unit.AbstractProxyExecutor;
 import com.gitee.dorive.event.entity.BaseEvent;
 import com.gitee.dorive.event.impl.factory.EventFactory;

@@ -22,10 +22,10 @@ import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.repository.v1.api.ListableRepository;
 import com.gitee.dorive.base.v1.core.entity.Example;
-import com.gitee.dorive.core.entity.operation.Operation;
-import com.gitee.dorive.core.entity.operation.eop.Delete;
-import com.gitee.dorive.core.entity.operation.eop.Insert;
-import com.gitee.dorive.core.entity.operation.eop.Update;
+import com.gitee.dorive.base.v1.core.entity.op.Operation;
+import com.gitee.dorive.base.v1.core.entity.eop.Delete;
+import com.gitee.dorive.base.v1.core.entity.eop.Insert;
+import com.gitee.dorive.base.v1.core.entity.eop.Update;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.util.ExampleUtils;
 

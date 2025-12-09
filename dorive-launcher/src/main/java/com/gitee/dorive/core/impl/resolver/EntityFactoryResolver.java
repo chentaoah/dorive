@@ -19,12 +19,12 @@ package com.gitee.dorive.core.impl.resolver;
 
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
-import com.gitee.dorive.core.api.factory.EntityFactory;
-import com.gitee.dorive.core.api.mapper.EntityMapper;
-import com.gitee.dorive.core.api.mapper.EntityMappers;
-import com.gitee.dorive.core.api.mapper.FieldMapper;
-import com.gitee.dorive.core.impl.factory.entity.DefaultEntityFactory;
-import com.gitee.dorive.core.impl.factory.entity.ValueObjEntityFactory;
+import com.gitee.dorive.factory.v1.api.EntityFactory;
+import com.gitee.dorive.factory.v1.api.EntityMapper;
+import com.gitee.dorive.factory.v1.api.EntityMappers;
+import com.gitee.dorive.factory.v1.api.FieldMapper;
+import com.gitee.dorive.factory.v1.impl.factory.DefaultEntityFactory;
+import com.gitee.dorive.factory.v1.impl.factory.ValueObjEntityFactory;
 import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;

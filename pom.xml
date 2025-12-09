@@ -35,6 +35,7 @@
         <module>dorive-binder</module>
         <module>dorive-executor</module>
         <module>dorive-factory</module>
+        <module>dorive-mapper</module>
         <module>dorive-joiner</module>
         <module>dorive-event</module>
         <module>dorive-mybatis</module>

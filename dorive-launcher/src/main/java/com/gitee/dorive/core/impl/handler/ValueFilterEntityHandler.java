@@ -18,7 +18,7 @@
 package com.gitee.dorive.core.impl.handler;
 
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.executor.v1.api.EntityHandler;
 import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;

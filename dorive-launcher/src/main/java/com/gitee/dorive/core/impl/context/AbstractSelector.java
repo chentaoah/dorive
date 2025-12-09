@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.impl.context;
 
-import com.gitee.dorive.core.api.context.Selector;
+import com.gitee.dorive.executor.v1.api.Selector;
 import com.gitee.dorive.core.entity.context.AbstractOptions;
 import com.gitee.dorive.base.v1.core.enums.MatcherType;
 

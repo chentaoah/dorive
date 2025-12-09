@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.ref.impl.repository;
 
-import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.executor.v1.api.EntityHandler;
 import com.gitee.dorive.ref.impl.injector.RefInjector;
 
 public abstract class AbstractRefRepository<E, PK> extends AbstractInnerRepository<E, PK> {

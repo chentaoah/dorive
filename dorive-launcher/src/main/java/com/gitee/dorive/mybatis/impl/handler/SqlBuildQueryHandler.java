@@ -21,7 +21,7 @@ import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.Example;
 import com.gitee.dorive.base.v1.core.entity.InnerExample;
 import com.gitee.dorive.base.v1.core.entity.Page;
-import com.gitee.dorive.core.entity.executor.Result;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.mybatis.impl.segment.SegmentResolver;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;

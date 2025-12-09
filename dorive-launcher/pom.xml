@@ -42,6 +42,11 @@
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-mapper</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
             <artifactId>dorive-joiner</artifactId>
             <version>${project.version}</version>
         </dependency>

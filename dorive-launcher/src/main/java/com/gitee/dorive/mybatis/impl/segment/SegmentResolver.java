@@ -19,8 +19,8 @@ package com.gitee.dorive.mybatis.impl.segment;
 
 import com.gitee.dorive.base.v1.common.constant.Operator;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.core.api.mapper.EntityMapper;
-import com.gitee.dorive.core.api.mapper.EntityMappers;
+import com.gitee.dorive.factory.v1.api.EntityMapper;
+import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.base.v1.core.entity.Criterion;
 import com.gitee.dorive.base.v1.core.entity.Example;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;

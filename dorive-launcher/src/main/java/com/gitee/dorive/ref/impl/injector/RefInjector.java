@@ -18,7 +18,7 @@
 package com.gitee.dorive.ref.impl.injector;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.core.api.executor.EntityHandler;
+import com.gitee.dorive.executor.v1.api.EntityHandler;
 import com.gitee.dorive.ref.api.Ref;
 import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
 import lombok.Data;

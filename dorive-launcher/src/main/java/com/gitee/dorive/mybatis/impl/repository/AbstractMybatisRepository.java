@@ -19,13 +19,13 @@ package com.gitee.dorive.mybatis.impl.repository;
 
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
-import com.gitee.dorive.core.api.common.ExampleConverter;
+import com.gitee.dorive.executor.v1.api.ExampleConverter;
 import com.gitee.dorive.base.v1.common.api.ImplFactory;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.core.api.executor.Executor;
-import com.gitee.dorive.core.api.factory.EntityFactory;
-import com.gitee.dorive.core.api.mapper.EntityMapper;
-import com.gitee.dorive.core.api.mapper.EntityMappers;
+import com.gitee.dorive.executor.v1.api.Executor;
+import com.gitee.dorive.factory.v1.api.EntityFactory;
+import com.gitee.dorive.factory.v1.api.EntityMapper;
+import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.core.impl.executor.unit.ExampleExecutor;
 import com.gitee.dorive.core.impl.executor.unit.FactoryExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;

@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.query.entity;
 
-import com.gitee.dorive.core.api.common.ExampleConverter;
+import com.gitee.dorive.executor.v1.api.ExampleConverter;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.Example;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
