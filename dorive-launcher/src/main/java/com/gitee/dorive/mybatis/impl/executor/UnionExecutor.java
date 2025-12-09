@@ -19,16 +19,12 @@ package com.gitee.dorive.mybatis.impl.executor;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.base.v1.core.entity.Criterion;
-import com.gitee.dorive.base.v1.core.entity.Example;
-import com.gitee.dorive.base.v1.core.entity.OrderBy;
-import com.gitee.dorive.base.v1.core.entity.Page;
+import com.gitee.dorive.base.v1.core.entity.qry.*;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.executor.v1.api.Executor;
-import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
-import com.gitee.dorive.core.impl.executor.unit.AbstractProxyExecutor;
+import com.gitee.dorive.executor.v1.impl.executor.AbstractProxyExecutor;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import lombok.Getter;

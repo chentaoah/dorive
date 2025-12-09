@@ -31,7 +31,7 @@ import com.gitee.dorive.core.impl.executor.unit.FactoryExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import com.gitee.dorive.core.impl.resolver.EntityFactoryResolver;
-import com.gitee.dorive.core.impl.resolver.EntityMappersResolver;
+import com.gitee.dorive.factory.v1.impl.resolver.EntityMappersResolver;
 import com.gitee.dorive.mybatis.api.sql.CountQuerier;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;

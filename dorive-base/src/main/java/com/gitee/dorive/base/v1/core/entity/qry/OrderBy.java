@@ -15,43 +15,24 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.context;
+package com.gitee.dorive.base.v1.core.entity.qry;
 
-import com.gitee.dorive.base.v1.core.api.Options;
+import cn.hutool.core.util.StrUtil;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-public abstract class AbstractOptions implements Options {
+public class OrderBy {
 
-    private Map<Class<?>, Object> options = new ConcurrentHashMap<>(4);
-
-    public AbstractOptions(Options options) {
-        this.options.putAll(options.getOptions());
-    }
+    private List<String> properties;
+    private String sort;
 
     @Override
-    public <T> void setOption(Class<T> type, T value) {
-        options.put(type, value);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getOption(Class<T> type) {
-        return (T) options.get(type);
-    }
-
-    @Override
-    public void removeOption(Class<?> type) {
-        options.remove(type);
+    public String toString() {
+        return "ORDER BY " + StrUtil.join(",", properties) + " " + sort.toUpperCase();
     }
 
 }

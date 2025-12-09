@@ -33,7 +33,7 @@ import com.gitee.dorive.executor.v1.api.EntityHandler;
 import com.gitee.dorive.executor.v1.api.EntityOpHandler;
 import com.gitee.dorive.executor.v1.api.Executor;
 import com.gitee.dorive.core.config.RepositoryContext;
-import com.gitee.dorive.core.impl.context.AdaptiveMatcher;
+import com.gitee.dorive.executor.v1.impl.context.AdaptiveMatcher;
 import com.gitee.dorive.core.impl.executor.ContextExecutor;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.factory.OrderByFactory;
@@ -157,7 +157,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         repositoryWrapper.setBinderResolver(binderResolver);
         repositoryWrapper.setOrderByFactory(orderByFactory);
         repositoryWrapper.setBound(false);
-        repositoryWrapper.setMatcher(new AdaptiveMatcher(repositoryWrapper));
+        repositoryWrapper.setMatcher(new AdaptiveMatcher(repositoryWrapper.getName(), repositoryWrapper.isRoot()));
         return repositoryWrapper;
     }
 

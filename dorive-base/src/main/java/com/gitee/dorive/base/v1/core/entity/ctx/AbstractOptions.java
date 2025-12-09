@@ -15,21 +15,43 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.core.entity;
+package com.gitee.dorive.base.v1.core.entity.ctx;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.gitee.dorive.base.v1.core.api.Options;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-public class InnerExample extends Example {
+@AllArgsConstructor
+public abstract class AbstractOptions implements Options {
 
-    public InnerExample(List<Criterion> criteria) {
-        super(criteria);
+    private Map<Class<?>, Object> options = new ConcurrentHashMap<>(4);
+
+    public AbstractOptions(Options options) {
+        this.options.putAll(options.getOptions());
+    }
+
+    @Override
+    public <T> void setOption(Class<T> type, T value) {
+        options.put(type, value);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T getOption(Class<T> type) {
+        return (T) options.get(type);
+    }
+
+    @Override
+    public void removeOption(Class<?> type) {
+        options.remove(type);
     }
 
 }

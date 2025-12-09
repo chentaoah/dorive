@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.core.enums;
+package com.gitee.dorive.base.v1.common.enums;
 
-public enum RootControl {
-    UNCONTROLLED,
-    INCLUDE_ROOT,
-    IGNORE_ROOT
+public enum MatcherType {
+    NONE,
+    ROOT,
+    ALL,
+    SELECTOR
 }

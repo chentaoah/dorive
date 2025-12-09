@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.handler.executor;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.executor.v1.api.EntityHandler;
 import com.gitee.dorive.joiner.v1.api.EntityJoiner;
-import com.gitee.dorive.base.v1.core.entity.Example;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.binder.v1.impl.binder.WeakBinder;

@@ -15,31 +15,28 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.impl.value;
+package com.gitee.dorive.base.v1.core.entity.qry;
 
-import cn.hutool.json.JSONConfig;
-import cn.hutool.json.JSONUtil;
-import com.gitee.dorive.factory.v1.api.Converter;
+import com.gitee.dorive.base.v1.core.util.CriterionUtils;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
-public class JsonConverter implements Converter {
+public class Criterion {
 
-    private static JSONConfig jsonConfig = JSONConfig.create().setIgnoreNullValue(false);
-    private Class<?> entityClass;
+    private String property;
+    private String operator;
+    private Object value;
 
-    @Override
-    public Object reconstitute(Object value) {
-        return JSONUtil.toBean((String) value, entityClass);
+    public Criterion(String property, String operator) {
+        this.property = property;
+        this.operator = operator;
     }
 
     @Override
-    public Object deconstruct(Object value) {
-        return JSONUtil.toJsonStr(value, jsonConfig);
+    public String toString() {
+        return CriterionUtils.toString(this);
     }
 
 }

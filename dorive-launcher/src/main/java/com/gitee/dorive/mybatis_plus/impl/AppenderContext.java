@@ -20,9 +20,9 @@ package com.gitee.dorive.mybatis_plus.impl;
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.gitee.dorive.base.v1.common.constant.Operator;
-import com.gitee.dorive.base.v1.core.entity.Criterion;
-import com.gitee.dorive.base.v1.core.entity.Example;
-import com.gitee.dorive.base.v1.core.entity.OrderBy;
+import com.gitee.dorive.base.v1.core.entity.qry.Criterion;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
 import com.gitee.dorive.mybatis_plus.api.CriterionAppender;
 
 import java.util.Collection;

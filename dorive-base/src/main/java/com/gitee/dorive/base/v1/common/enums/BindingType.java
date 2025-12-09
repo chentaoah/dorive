@@ -15,13 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.executor;
+package com.gitee.dorive.base.v1.common.enums;
 
-import com.gitee.dorive.executor.v1.api.Executor;
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public abstract class AbstractExecutor implements Executor {
+public enum BindingType {
+    STRONG,
+    WEAK,
+    VALUE_ROUTE,
+    VALUE_FILTER
 }

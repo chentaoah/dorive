@@ -15,28 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.core.entity;
+package com.gitee.dorive.executor.v1.impl.executor;
 
-import com.gitee.dorive.base.v1.core.util.CriterionUtils;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.gitee.dorive.executor.v1.api.Executor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
-public class Criterion {
-
-    private String property;
-    private String operator;
-    private Object value;
-
-    public Criterion(String property, String operator) {
-        this.property = property;
-        this.operator = operator;
-    }
-
-    @Override
-    public String toString() {
-        return CriterionUtils.toString(this);
-    }
-
+@Getter
+@Setter
+public abstract class AbstractExecutor implements Executor {
 }

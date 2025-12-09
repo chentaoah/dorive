@@ -15,17 +15,33 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.context;
+package com.gitee.dorive.base.v1.core.entity.qry;
 
-import com.gitee.dorive.executor.v1.api.Selector;
-import com.gitee.dorive.core.entity.context.AbstractOptions;
-import com.gitee.dorive.base.v1.core.enums.MatcherType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public abstract class AbstractSelector extends AbstractOptions implements Selector {
+import java.util.Collections;
+import java.util.List;
 
-    public AbstractSelector() {
-        setOption(MatcherType.class, MatcherType.SELECTOR);
-        setOption(Selector.class, this);
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Page<T> {
+
+    private long total = 0;
+    private long current = 1;
+    private long size = 10;
+    private List<T> records = Collections.emptyList();
+
+    public Page(long current, long size) {
+        this.current = current;
+        this.size = size;
+    }
+
+    @Override
+    public String toString() {
+        return "LIMIT " + (current - 1) * size + "," + size;
     }
 
 }

@@ -18,9 +18,9 @@
 package com.gitee.dorive.mybatis.impl.handler;
 
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.Example;
-import com.gitee.dorive.base.v1.core.entity.InnerExample;
-import com.gitee.dorive.base.v1.core.entity.Page;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
+import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.mybatis.impl.segment.SegmentResolver;
 import com.gitee.dorive.query.entity.QueryContext;

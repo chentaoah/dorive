@@ -15,29 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.impl.value;
+package com.gitee.dorive.base.v1.common.enums;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.factory.v1.api.Converter;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-@AllArgsConstructor
-public class MapConverter implements Converter {
-
-    private Class<?> entityClass;
-
-    @Override
-    public Object reconstitute(Object value) {
-        return BeanUtil.toBean(value, entityClass);
-    }
-
-    @Override
-    public Object deconstruct(Object value) {
-        return BeanUtil.beanToMap(value);
-    }
-
+public enum JoinType {
+    UNKNOWN,
+    SINGLE,
+    MULTI,
+    UNION
 }

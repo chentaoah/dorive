@@ -19,10 +19,10 @@ package com.gitee.dorive.ref.impl.repository;
 
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.core.entity.context.DefaultContext;
-import com.gitee.dorive.base.v1.core.entity.Example;
-import com.gitee.dorive.base.v1.core.entity.InnerExample;
-import com.gitee.dorive.base.v1.core.entity.Page;
+import com.gitee.dorive.base.v1.core.entity.ctx.DefaultContext;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
+import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.core.impl.util.ExampleUtils;
 import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
 

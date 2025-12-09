@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.base.v1.core.api;
 
-import com.gitee.dorive.base.v1.core.enums.MatcherType;
-import com.gitee.dorive.base.v1.core.impl.EnumOptions;
+import com.gitee.dorive.base.v1.common.enums.MatcherType;
+import com.gitee.dorive.base.v1.core.entity.ctx.EnumOptions;
 
 import java.util.Map;
 

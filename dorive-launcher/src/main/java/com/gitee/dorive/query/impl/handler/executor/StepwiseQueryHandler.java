@@ -18,7 +18,7 @@
 package com.gitee.dorive.query.impl.handler.executor;
 
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.Example;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.binder.v1.impl.binder.AbstractBinder;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
 import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;

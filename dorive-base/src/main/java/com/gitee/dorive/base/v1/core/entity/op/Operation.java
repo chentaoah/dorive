@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.base.v1.core.entity.op;
 
-import com.gitee.dorive.base.v1.core.enums.RootControl;
+import com.gitee.dorive.base.v1.common.enums.RootControl;
 import lombok.Data;
 
 /**

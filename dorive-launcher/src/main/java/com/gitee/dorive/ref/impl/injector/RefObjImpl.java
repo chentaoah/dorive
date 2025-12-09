@@ -20,7 +20,7 @@ package com.gitee.dorive.ref.impl.injector;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.executor.v1.api.EntityHandler;
-import com.gitee.dorive.core.entity.context.DefaultContext;
+import com.gitee.dorive.base.v1.core.entity.ctx.DefaultContext;
 import com.gitee.dorive.core.impl.repository.AbstractRepository;
 import com.gitee.dorive.ref.api.RefObj;
 import lombok.AllArgsConstructor;

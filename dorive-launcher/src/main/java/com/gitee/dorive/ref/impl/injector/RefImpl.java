@@ -19,7 +19,7 @@ package com.gitee.dorive.ref.impl.injector;
 
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.executor.v1.api.EntityHandler;
-import com.gitee.dorive.base.v1.core.entity.Page;
+import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.core.impl.repository.AbstractProxyRepository;
 import com.gitee.dorive.ref.api.Ref;
 import com.gitee.dorive.ref.api.RefObj;

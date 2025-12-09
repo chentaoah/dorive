@@ -15,11 +15,21 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.core.enums;
+package com.gitee.dorive.base.v1.core.entity.ctx;
 
-public enum BindingType {
-    STRONG,
-    WEAK,
-    VALUE_ROUTE,
-    VALUE_FILTER
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.api.Options;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+public class DefaultContext extends AbstractContext {
+
+    public DefaultContext(Options options) {
+        super(options);
+    }
+
+    public DefaultContext(Context context) {
+        super(context);
+    }
+
 }

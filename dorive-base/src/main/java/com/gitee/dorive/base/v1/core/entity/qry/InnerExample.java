@@ -15,29 +15,21 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.impl.value;
+package com.gitee.dorive.base.v1.core.entity.qry;
 
-import cn.hutool.json.JSONUtil;
-import com.gitee.dorive.factory.v1.api.Converter;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
-@AllArgsConstructor
-public class JsonArrayConverter implements Converter {
+import java.util.List;
 
-    private Class<?> entityClass;
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class InnerExample extends Example {
 
-    @Override
-    public Object reconstitute(Object value) {
-        return JSONUtil.toList((String) value, entityClass);
-    }
-
-    @Override
-    public Object deconstruct(Object value) {
-        return JSONUtil.toJsonStr(value);
+    public InnerExample(List<Criterion> criteria) {
+        super(criteria);
     }
 
 }

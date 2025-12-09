@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.util;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.base.v1.common.constant.Operator;
-import com.gitee.dorive.base.v1.core.entity.Criterion;
+import com.gitee.dorive.base.v1.core.entity.qry.Criterion;
 import com.gitee.dorive.base.v1.core.util.CriterionUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

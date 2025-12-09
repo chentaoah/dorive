@@ -15,24 +15,29 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.core.entity;
+package com.gitee.dorive.factory.v1.impl.converter;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import com.gitee.dorive.factory.v1.api.Converter;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
-
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
-public class OrderBy {
+public class JsonArrayConverter implements Converter {
 
-    private List<String> properties;
-    private String sort;
+    private Class<?> entityClass;
 
     @Override
-    public String toString() {
-        return "ORDER BY " + StrUtil.join(",", properties) + " " + sort.toUpperCase();
+    public Object reconstitute(Object value) {
+        return JSONUtil.toList((String) value, entityClass);
+    }
+
+    @Override
+    public Object deconstruct(Object value) {
+        return JSONUtil.toJsonStr(value);
     }
 
 }

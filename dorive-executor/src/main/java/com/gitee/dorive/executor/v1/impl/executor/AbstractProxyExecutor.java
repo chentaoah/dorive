@@ -15,33 +15,39 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.core.entity;
+package com.gitee.dorive.executor.v1.impl.executor;
 
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.cop.Query;
+import com.gitee.dorive.base.v1.core.entity.op.Operation;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
+import com.gitee.dorive.executor.v1.api.Executor;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.Collections;
-import java.util.List;
-
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Page<T> {
+public abstract class AbstractProxyExecutor extends AbstractExecutor {
 
-    private long total = 0;
-    private long current = 1;
-    private long size = 10;
-    private List<T> records = Collections.emptyList();
+    private Executor executor;
 
-    public Page(long current, long size) {
-        this.current = current;
-        this.size = size;
+    @Override
+    public Result<Object> executeQuery(Context context, Query query) {
+        return executor.executeQuery(context, query);
     }
 
     @Override
-    public String toString() {
-        return "LIMIT " + (current - 1) * size + "," + size;
+    public long executeCount(Context context, Query query) {
+        return executor.executeCount(context, query);
+    }
+
+    @Override
+    public int execute(Context context, Operation operation) {
+        return executor.execute(context, operation);
     }
 
 }

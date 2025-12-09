@@ -15,40 +15,31 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.executor.unit;
+package com.gitee.dorive.factory.v1.impl.converter;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.executor.v1.api.Executor;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.base.v1.core.entity.op.Operation;
-import com.gitee.dorive.base.v1.core.entity.cop.Query;
-import com.gitee.dorive.core.impl.executor.AbstractExecutor;
+import cn.hutool.json.JSONConfig;
+import cn.hutool.json.JSONUtil;
+import com.gitee.dorive.factory.v1.api.Converter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public abstract class AbstractProxyExecutor extends AbstractExecutor {
+public class JsonConverter implements Converter {
 
-    private Executor executor;
+    private static JSONConfig jsonConfig = JSONConfig.create().setIgnoreNullValue(false);
+    private Class<?> entityClass;
 
     @Override
-    public Result<Object> executeQuery(Context context, Query query) {
-        return executor.executeQuery(context, query);
+    public Object reconstitute(Object value) {
+        return JSONUtil.toBean((String) value, entityClass);
     }
 
     @Override
-    public long executeCount(Context context, Query query) {
-        return executor.executeCount(context, query);
-    }
-
-    @Override
-    public int execute(Context context, Operation operation) {
-        return executor.execute(context, operation);
+    public Object deconstruct(Object value) {
+        return JSONUtil.toJsonStr(value, jsonConfig);
     }
 
 }

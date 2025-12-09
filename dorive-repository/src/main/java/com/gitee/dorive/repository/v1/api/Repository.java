@@ -18,8 +18,8 @@
 package com.gitee.dorive.repository.v1.api;
 
 import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.core.entity.Example;
-import com.gitee.dorive.base.v1.core.entity.Page;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.core.entity.qry.Page;
 
 import java.util.List;
 

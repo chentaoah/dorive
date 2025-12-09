@@ -15,21 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.entity.context;
+package com.gitee.dorive.base.v1.common.enums;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.api.Options;
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
-public class DefaultContext extends AbstractContext {
-
-    public DefaultContext(Options options) {
-        super(options);
-    }
-
-    public DefaultContext(Context context) {
-        super(context);
-    }
-
+public enum RootControl {
+    UNCONTROLLED,
+    INCLUDE_ROOT,
+    IGNORE_ROOT
 }

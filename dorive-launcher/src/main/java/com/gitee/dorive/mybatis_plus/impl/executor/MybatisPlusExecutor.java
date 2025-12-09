@@ -27,8 +27,8 @@ import com.gitee.dorive.base.v1.common.constant.Sort;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.def.EntityDef;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.Example;
-import com.gitee.dorive.base.v1.core.entity.OrderBy;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.op.Condition;
 import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
@@ -39,7 +39,7 @@ import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.eop.Delete;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
-import com.gitee.dorive.core.impl.executor.AbstractExecutor;
+import com.gitee.dorive.executor.v1.impl.executor.AbstractExecutor;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.mybatis_plus.api.EasyBaseMapper;
 import com.gitee.dorive.mybatis_plus.enums.InsertMethod;
@@ -87,7 +87,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         Example example = query.getExample();
         if (example != null) {
             QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
-            com.gitee.dorive.base.v1.core.entity.Page<Object> page = example.getPage();
+            com.gitee.dorive.base.v1.core.entity.qry.Page<Object> page = example.getPage();
             if (page != null) {
                 Page<Map<String, Object>> queryPage = baseMapper.selectMapsPage(new Page<>(page.getCurrent(), page.getSize()), queryWrapper);
                 page.setTotal(queryPage.getTotal());

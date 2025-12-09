@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.context;
+package com.gitee.dorive.executor.v1.impl.context;
 
-import com.gitee.dorive.executor.v1.api.Matcher;
+import com.gitee.dorive.base.v1.common.enums.MatcherType;
 import com.gitee.dorive.base.v1.core.api.Options;
+import com.gitee.dorive.executor.v1.api.Matcher;
 import com.gitee.dorive.executor.v1.api.Selector;
-import com.gitee.dorive.base.v1.core.enums.MatcherType;
-import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,13 +35,13 @@ import java.util.Set;
 @Setter
 public class AdaptiveMatcher implements Matcher {
 
-    private ProxyRepository repository;
+    private String name;
     private Map<MatcherType, Matcher> matcherTypeMatcherMap = new LinkedHashMap<>(6);
 
-    public AdaptiveMatcher(ProxyRepository repository) {
-        this.repository = repository;
+    public AdaptiveMatcher(String name, boolean root) {
+        this.name = name;
         this.matcherTypeMatcherMap.put(MatcherType.NONE, options -> false);
-        this.matcherTypeMatcherMap.put(MatcherType.ROOT, options -> repository.isRoot());
+        this.matcherTypeMatcherMap.put(MatcherType.ROOT, options -> root);
         this.matcherTypeMatcherMap.put(MatcherType.ALL, options -> true);
         this.matcherTypeMatcherMap.put(MatcherType.SELECTOR, new SelectorMatcher());
     }
@@ -65,7 +64,6 @@ public class AdaptiveMatcher implements Matcher {
             Selector selector = options.getOption(Selector.class);
             if (selector != null) {
                 Set<String> names = selector.getNames();
-                String name = repository.getName();
                 return names.contains(name);
             }
             return false;

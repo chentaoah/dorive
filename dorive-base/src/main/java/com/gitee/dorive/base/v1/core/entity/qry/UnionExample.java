@@ -15,11 +15,34 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.core.enums;
+package com.gitee.dorive.base.v1.core.entity.qry;
 
-public enum MatcherType {
-    NONE,
-    ROOT,
-    ALL,
-    SELECTOR
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class UnionExample extends Example {
+
+    private List<Example> examples = new ArrayList<>();
+
+    @Override
+    public boolean isEmpty() {
+        return examples.isEmpty();
+    }
+
+    @Override
+    public boolean isNotEmpty() {
+        return !examples.isEmpty();
+    }
+
+    public void addExample(Example example) {
+        examples.add(example);
+    }
+
 }
