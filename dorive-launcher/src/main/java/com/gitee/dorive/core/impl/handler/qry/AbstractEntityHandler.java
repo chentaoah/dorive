@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler.executor;
+package com.gitee.dorive.core.impl.handler.qry;
 
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.executor.v1.api.EntityHandler;
