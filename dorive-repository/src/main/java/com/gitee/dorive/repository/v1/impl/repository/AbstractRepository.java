@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.repository;
+package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
@@ -28,7 +28,7 @@ import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
-import com.gitee.dorive.executor.v1.impl.factory.OperationFactory;
+import com.gitee.dorive.repository.v1.impl.factory.OperationFactory;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -24,7 +24,7 @@ import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.binder.v1.impl.binder.WeakBinder;
-import com.gitee.dorive.executor.v1.impl.factory.OperationFactory;
+import com.gitee.dorive.repository.v1.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import lombok.AllArgsConstructor;

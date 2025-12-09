@@ -33,6 +33,7 @@ import com.gitee.dorive.base.v1.core.entity.eop.Update;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
 import com.gitee.dorive.executor.v1.impl.factory.OrderByFactory;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractProxyRepository;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -20,7 +20,7 @@ package com.gitee.dorive.query.impl.resolver;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
 import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
-import com.gitee.dorive.core.impl.repository.AbstractRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;

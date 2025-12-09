@@ -19,6 +19,7 @@ package com.gitee.dorive.core.impl.repository;
 
 import com.gitee.dorive.factory.v1.api.ExampleConverter;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

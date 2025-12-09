@@ -19,7 +19,7 @@ package com.gitee.dorive.web.impl.service;
 
 import com.gitee.dorive.aggregate.v1.util.ReflectUtils;
 import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.core.config.RepositoryContext;
+import com.gitee.dorive.autoconfigure.core.RepositoryContext;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.web.entity.ResObject;

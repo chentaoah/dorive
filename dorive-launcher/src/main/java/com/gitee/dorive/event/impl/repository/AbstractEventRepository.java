@@ -27,7 +27,7 @@ import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
 import com.gitee.dorive.core.impl.repository.AbstractGenericRepository;
-import com.gitee.dorive.core.impl.repository.AbstractRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import com.gitee.dorive.event.entity.BaseEvent;
 import com.gitee.dorive.event.entity.ExecutorEvent;

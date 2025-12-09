@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.config;
+package com.gitee.dorive.autoconfigure.core;
 
 import cn.hutool.core.util.ClassUtil;
 import com.gitee.dorive.aggregate.v1.util.ReflectUtils;
