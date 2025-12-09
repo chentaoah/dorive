@@ -18,7 +18,7 @@
 package com.gitee.dorive.api.entity.query.def;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.api.annotation.query.QueryField;
+import com.gitee.dorive.base.v1.common.annotation.QueryField;
 import lombok.Data;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 

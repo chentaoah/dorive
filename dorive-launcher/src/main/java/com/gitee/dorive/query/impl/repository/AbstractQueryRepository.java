@@ -19,13 +19,13 @@ package com.gitee.dorive.query.impl.repository;
 
 import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Options;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.base.v1.core.api.Options;
+import com.gitee.dorive.base.v1.core.entity.Example;
+import com.gitee.dorive.base.v1.core.entity.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.event.impl.repository.AbstractEventRepository;
 import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.query.api.QueryRepository;
+import com.gitee.dorive.repository.v1.api.repository.QueryRepository;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.enums.QueryMode;
 import com.gitee.dorive.query.entity.enums.ResultType;

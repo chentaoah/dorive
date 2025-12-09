@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.ref.api;
 
-import com.gitee.dorive.core.api.context.Options;
+import com.gitee.dorive.base.v1.core.api.Options;
 
 public interface RefObj {
 

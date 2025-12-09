@@ -18,9 +18,9 @@
 package com.gitee.dorive.mybatis_plus.entity;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.gitee.dorive.api.constant.core.Operator;
-import com.gitee.dorive.core.entity.executor.Criterion;
-import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.base.v1.common.constant.Operator;
+import com.gitee.dorive.base.v1.core.entity.Criterion;
+import com.gitee.dorive.base.v1.core.entity.Example;
 import com.gitee.dorive.mybatis_plus.impl.util.LambdaUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

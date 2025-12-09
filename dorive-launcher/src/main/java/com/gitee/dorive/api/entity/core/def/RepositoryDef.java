@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.api.entity.core.def;
 
-import com.gitee.dorive.api.annotation.core.Repository;
+import com.gitee.dorive.base.v1.common.annotation.Repository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

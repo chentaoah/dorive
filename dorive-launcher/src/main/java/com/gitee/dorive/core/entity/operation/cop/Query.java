@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.entity.operation.cop;
 
-import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.base.v1.core.entity.Example;
 import com.gitee.dorive.core.entity.operation.Condition;
 import lombok.Getter;
 import lombok.Setter;

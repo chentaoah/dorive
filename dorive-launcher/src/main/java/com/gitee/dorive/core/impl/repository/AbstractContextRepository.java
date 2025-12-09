@@ -18,8 +18,8 @@
 package com.gitee.dorive.core.impl.repository;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.api.api.common.BoundedContext;
-import com.gitee.dorive.api.api.common.BoundedContextAware;
+import com.gitee.dorive.base.v1.common.api.BoundedContext;
+import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
 import com.gitee.dorive.api.entity.core.EntityDefinition;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.def.EntityDef;

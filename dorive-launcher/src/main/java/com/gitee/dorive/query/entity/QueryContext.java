@@ -18,7 +18,7 @@
 package com.gitee.dorive.query.entity;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.base.v1.core.entity.Example;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.query.entity.enums.ResultType;
 import lombok.Getter;

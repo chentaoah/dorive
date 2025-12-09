@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.query.impl.handler.executor;
 
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.InnerExample;
+import com.gitee.dorive.base.v1.core.entity.Example;
+import com.gitee.dorive.base.v1.core.entity.InnerExample;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryContext;

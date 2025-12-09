@@ -20,7 +20,7 @@ package com.gitee.dorive.mybatis.impl.repository;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.def.RepositoryDef;
 import com.gitee.dorive.core.api.common.ExampleConverter;
-import com.gitee.dorive.core.api.common.ImplFactory;
+import com.gitee.dorive.base.v1.common.api.ImplFactory;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.api.factory.EntityFactory;

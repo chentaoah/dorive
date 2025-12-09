@@ -18,7 +18,7 @@
 package com.gitee.dorive.ref.impl.injector;
 
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.api.context.Options;
+import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.entity.context.DefaultContext;
 import com.gitee.dorive.core.impl.repository.AbstractRepository;

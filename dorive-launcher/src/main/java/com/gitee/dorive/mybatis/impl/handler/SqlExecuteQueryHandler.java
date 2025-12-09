@@ -19,9 +19,9 @@ package com.gitee.dorive.mybatis.impl.handler;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.OrderBy;
-import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.base.v1.core.entity.Example;
+import com.gitee.dorive.base.v1.core.entity.OrderBy;
+import com.gitee.dorive.base.v1.core.entity.Page;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 import com.gitee.dorive.mybatis.entity.segment.ArgSegment;

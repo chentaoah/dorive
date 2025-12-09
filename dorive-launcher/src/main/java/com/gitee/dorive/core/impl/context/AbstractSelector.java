@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.context;
 
 import com.gitee.dorive.core.api.context.Selector;
 import com.gitee.dorive.core.entity.context.AbstractOptions;
-import com.gitee.dorive.core.entity.enums.MatcherType;
+import com.gitee.dorive.base.v1.core.enums.MatcherType;
 
 public abstract class AbstractSelector extends AbstractOptions implements Selector {
 

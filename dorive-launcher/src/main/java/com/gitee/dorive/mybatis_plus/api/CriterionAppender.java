@@ -18,7 +18,7 @@
 package com.gitee.dorive.mybatis_plus.api;
 
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
-import com.gitee.dorive.core.entity.executor.Example;
+import com.gitee.dorive.base.v1.core.entity.Example;
 
 public interface CriterionAppender {
 

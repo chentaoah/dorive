@@ -20,7 +20,7 @@ package com.gitee.dorive.core.impl.handler;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.EntityJoiner;
-import com.gitee.dorive.core.entity.enums.JoinType;
+import com.gitee.dorive.base.v1.core.enums.JoinType;
 import com.gitee.dorive.core.impl.handler.executor.MultiEntityHandler;
 import com.gitee.dorive.core.impl.handler.executor.SingleEntityHandler;
 import com.gitee.dorive.core.impl.handler.executor.UnionEntityHandler;

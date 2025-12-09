@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.core.api.context;
 
+import com.gitee.dorive.base.v1.core.api.Options;
+
 import java.util.Map;
 
 public interface Context extends Options {

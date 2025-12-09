@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.core.entity.executor;
 
+import com.gitee.dorive.base.v1.core.entity.Example;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

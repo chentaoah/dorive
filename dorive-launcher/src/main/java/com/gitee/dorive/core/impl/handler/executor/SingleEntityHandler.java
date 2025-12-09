@@ -19,8 +19,8 @@ package com.gitee.dorive.core.impl.handler.executor;
 
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.EntityJoiner;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.InnerExample;
+import com.gitee.dorive.base.v1.core.entity.Example;
+import com.gitee.dorive.base.v1.core.entity.InnerExample;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;

@@ -18,9 +18,9 @@
 package com.gitee.dorive.web.impl.service;
 
 import com.gitee.dorive.api.impl.util.ReflectUtils;
-import com.gitee.dorive.core.api.context.Options;
+import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.core.config.RepositoryContext;
-import com.gitee.dorive.core.entity.executor.Page;
+import com.gitee.dorive.base.v1.core.entity.Page;
 import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.web.entity.ResObject;
 import lombok.Getter;

@@ -20,7 +20,7 @@ package com.gitee.dorive.mybatis_plus.impl;
 import cn.hutool.db.sql.Condition;
 import cn.hutool.db.sql.SqlUtil;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.gitee.dorive.core.api.format.SqlFormat;
+import com.gitee.dorive.base.v1.core.api.SqlFormat;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 
 import java.util.List;

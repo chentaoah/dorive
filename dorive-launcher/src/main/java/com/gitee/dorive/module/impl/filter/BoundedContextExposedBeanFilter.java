@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.module.impl.filter;
 
-import com.gitee.dorive.api.api.common.BoundedContext;
+import com.gitee.dorive.base.v1.common.api.BoundedContext;
 import com.gitee.dorive.module.api.ExposedBeanFilter;
 import com.gitee.dorive.module.entity.ModuleBeanDescriptor;
 import com.gitee.dorive.module.entity.ModuleDefinition;

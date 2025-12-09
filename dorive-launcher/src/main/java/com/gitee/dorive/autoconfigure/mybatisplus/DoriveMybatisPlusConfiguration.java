@@ -20,7 +20,7 @@ package com.gitee.dorive.autoconfigure.mybatisplus;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.gitee.dorive.core.api.common.ImplFactory;
+import com.gitee.dorive.base.v1.common.api.ImplFactory;
 import com.gitee.dorive.mybatis_plus.impl.DefaultImplFactory;
 import com.gitee.dorive.mybatis_plus.impl.injector.EasySqlInjector;
 import org.springframework.boot.SpringApplication;

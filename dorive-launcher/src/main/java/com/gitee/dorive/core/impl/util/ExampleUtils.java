@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.impl.util;
 
-import com.gitee.dorive.core.entity.executor.*;
+import com.gitee.dorive.base.v1.core.entity.*;
 
 import java.util.ArrayList;
 import java.util.List;

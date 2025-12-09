@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.mybatis_plus.impl;
 
-import com.gitee.dorive.core.api.common.ImplFactory;
-import com.gitee.dorive.core.api.format.SqlFormat;
+import com.gitee.dorive.base.v1.common.api.ImplFactory;
+import com.gitee.dorive.base.v1.core.api.SqlFormat;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 
 public class DefaultImplFactory implements ImplFactory {

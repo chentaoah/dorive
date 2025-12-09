@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.core.entity.executor;
 
+import com.gitee.dorive.base.v1.core.entity.Example;
+import com.gitee.dorive.base.v1.core.entity.Page;
 import com.gitee.dorive.core.entity.operation.cop.Query;
 import lombok.Data;
 import lombok.NoArgsConstructor;

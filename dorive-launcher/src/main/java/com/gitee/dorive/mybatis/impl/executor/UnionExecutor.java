@@ -19,6 +19,10 @@ package com.gitee.dorive.mybatis.impl.executor;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.base.v1.core.entity.Criterion;
+import com.gitee.dorive.base.v1.core.entity.Example;
+import com.gitee.dorive.base.v1.core.entity.OrderBy;
+import com.gitee.dorive.base.v1.core.entity.Page;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.*;

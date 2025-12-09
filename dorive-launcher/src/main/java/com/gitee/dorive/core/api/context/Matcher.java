@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.core.api.context;
 
+import com.gitee.dorive.base.v1.core.api.Options;
+
 public interface Matcher {
 
     boolean matches(Options options);

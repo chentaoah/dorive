@@ -23,12 +23,12 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gitee.dorive.api.constant.core.Sort;
+import com.gitee.dorive.base.v1.common.constant.Sort;
 import com.gitee.dorive.api.entity.core.EntityElement;
 import com.gitee.dorive.api.entity.core.def.EntityDef;
 import com.gitee.dorive.core.api.context.Context;
-import com.gitee.dorive.core.entity.executor.Example;
-import com.gitee.dorive.core.entity.executor.OrderBy;
+import com.gitee.dorive.base.v1.core.entity.Example;
+import com.gitee.dorive.base.v1.core.entity.OrderBy;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.Condition;
 import com.gitee.dorive.core.entity.operation.EntityOp;
@@ -87,7 +87,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
         Example example = query.getExample();
         if (example != null) {
             QueryWrapper<Object> queryWrapper = buildQueryWrapper(example);
-            com.gitee.dorive.core.entity.executor.Page<Object> page = example.getPage();
+            com.gitee.dorive.base.v1.core.entity.Page<Object> page = example.getPage();
             if (page != null) {
                 Page<Map<String, Object>> queryPage = baseMapper.selectMapsPage(new Page<>(page.getCurrent(), page.getSize()), queryWrapper);
                 page.setTotal(queryPage.getTotal());

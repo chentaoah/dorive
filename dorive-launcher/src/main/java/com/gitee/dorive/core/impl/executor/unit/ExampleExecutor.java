@@ -17,8 +17,11 @@
 
 package com.gitee.dorive.core.impl.executor.unit;
 
-import com.gitee.dorive.api.constant.core.Operator;
+import com.gitee.dorive.base.v1.common.constant.Operator;
 import com.gitee.dorive.api.entity.core.EntityElement;
+import com.gitee.dorive.base.v1.core.entity.Criterion;
+import com.gitee.dorive.base.v1.core.entity.Example;
+import com.gitee.dorive.base.v1.core.entity.OrderBy;
 import com.gitee.dorive.core.api.common.ExampleConverter;
 import com.gitee.dorive.core.api.context.Context;
 import com.gitee.dorive.core.api.executor.Executor;
