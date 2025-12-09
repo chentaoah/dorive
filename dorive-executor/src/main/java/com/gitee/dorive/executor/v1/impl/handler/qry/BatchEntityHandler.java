@@ -18,6 +18,7 @@
 package com.gitee.dorive.executor.v1.impl.handler.qry;
 
 import cn.hutool.extra.spring.SpringUtil;
+import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityHandlerFactory;
@@ -42,7 +43,8 @@ public class BatchEntityHandler implements EntityHandler {
         this.entityHandlers = new ArrayList<>(subRepositories.size());
         for (RepositoryItem subRepository : subRepositories) {
             EntityHandler entityHandler = entityHandlerFactory.create("AdaptiveEntityHandler", subRepository);
-            if (subRepository.hasValueRouteBinders()) {
+            BinderExecutor binderExecutor = subRepository.getBinderExecutor();
+            if (binderExecutor.hasValueRouteBinders()) {
                 entityHandler = entityHandlerFactory.create("ValueFilterEntityHandler", subRepository, entityHandler);
             }
             entityHandler = new ContextMatchEntityHandler(subRepository, entityHandler);

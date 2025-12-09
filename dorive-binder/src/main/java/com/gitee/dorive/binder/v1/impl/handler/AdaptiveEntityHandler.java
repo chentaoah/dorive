@@ -26,6 +26,7 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.handler.qry.MultiEntityHandler;
 import com.gitee.dorive.binder.v1.impl.handler.qry.SingleEntityHandler;
 import com.gitee.dorive.binder.v1.impl.handler.qry.UnionEntityHandler;
+import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -48,7 +49,8 @@ public class AdaptiveEntityHandler implements EntityHandler {
     }
 
     private EntityHandler newEntityHandler(EntityJoiner entityJoiner) {
-        JoinType joinType = repository.getJoinType();
+        BinderResolver binderResolver = repository.getBinderExecutor();
+        JoinType joinType = binderResolver.getJoinType();
         if (joinType == JoinType.SINGLE) {
             return new SingleEntityHandler(repository, entityJoiner);
 

@@ -18,7 +18,6 @@
 package com.gitee.dorive.base.v1.repository.api;
 
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.common.enums.JoinType;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
@@ -43,10 +42,6 @@ public interface RepositoryItem extends Repository<Object, Object> {
     boolean isAggregated();
 
     <T> T getBinderExecutor();
-
-    JoinType getJoinType();
-
-    boolean hasValueRouteBinders();
 
     void getBoundValue(Context context, Object rootEntity, Collection<?> entities);
 

@@ -18,7 +18,6 @@
 package com.gitee.dorive.repository.v1.impl.repository;
 
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
-import com.gitee.dorive.base.v1.common.enums.JoinType;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Matcher;
 import com.gitee.dorive.base.v1.core.api.Options;
@@ -61,16 +60,6 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
 
     public boolean hasField(String field) {
         return getEntityElement().hasField(field);
-    }
-
-    @Override
-    public JoinType getJoinType() {
-        return binderExecutor.getJoinType();
-    }
-
-    @Override
-    public boolean hasValueRouteBinders() {
-        return binderExecutor.hasValueRouteBinders();
     }
 
     @Override
