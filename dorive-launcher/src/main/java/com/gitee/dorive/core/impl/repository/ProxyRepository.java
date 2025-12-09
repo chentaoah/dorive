@@ -31,7 +31,7 @@ import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.factory.OrderByFactory;
+import com.gitee.dorive.executor.v1.impl.factory.OrderByFactory;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import lombok.Getter;
 import lombok.Setter;

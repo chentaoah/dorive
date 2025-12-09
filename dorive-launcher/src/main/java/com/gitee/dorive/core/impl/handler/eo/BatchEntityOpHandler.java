@@ -26,7 +26,7 @@ import com.gitee.dorive.base.v1.core.entity.eop.Delete;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
-import com.gitee.dorive.core.impl.factory.OperationFactory;
+import com.gitee.dorive.executor.v1.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.core.impl.util.CollectionUtils;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.util;
+package com.gitee.dorive.executor.v1.util;
 
 import com.gitee.dorive.base.v1.core.entity.qry.*;
 
