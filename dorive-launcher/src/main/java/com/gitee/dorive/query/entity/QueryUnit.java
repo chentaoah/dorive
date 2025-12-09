@@ -20,7 +20,7 @@ package com.gitee.dorive.query.entity;
 import com.gitee.dorive.factory.v1.api.ExampleConverter;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.core.impl.repository.DefaultRepository;
+import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

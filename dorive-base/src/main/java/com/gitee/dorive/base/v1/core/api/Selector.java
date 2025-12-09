@@ -15,19 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.repository;
+package com.gitee.dorive.base.v1.core.api;
 
-import com.gitee.dorive.factory.v1.api.ExampleConverter;
-import com.gitee.dorive.factory.v1.api.EntityMappers;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.List;
+import java.util.Set;
 
-@Getter
-@Setter
-@NoArgsConstructor
-public class DefaultRepository extends AbstractRepository<Object, Object> {
-    private EntityMappers entityMappers;
-    private ExampleConverter exampleConverter;
+public interface Selector extends Options {
+
+    Set<String> getNames();
+
+    List<String> select(String name);
+
 }

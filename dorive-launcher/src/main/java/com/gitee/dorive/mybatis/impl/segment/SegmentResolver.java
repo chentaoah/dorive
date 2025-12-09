@@ -26,8 +26,8 @@ import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
 import com.gitee.dorive.binder.v1.impl.binder.ValueFilterBinder;
 import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.core.impl.repository.DefaultRepository;
-import com.gitee.dorive.core.impl.repository.ProxyRepository;
+import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
+import com.gitee.dorive.repository.v1.impl.repository.ProxyRepository;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.base.v1.core.util.CriterionUtils;
 import com.gitee.dorive.mybatis.api.sql.Segment;
@@ -95,7 +95,7 @@ public class SegmentResolver {
         Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
         EntityMapper entityMapper = getEntityMapper(mergedRepository);
 
-        BinderResolver binderResolver = definedRepository.getBinderResolver();
+        BinderResolver binderResolver = (BinderResolver) definedRepository.getBinderExecutor();
         List<ValueFilterBinder> valueFilterBinders = binderResolver.getValueFilterBinders();
 
         List<OnSegment> onSegments = new ArrayList<>(mergedStrongBindersMap.size() + mergedValueRouteBindersMap.size() + valueFilterBinders.size());

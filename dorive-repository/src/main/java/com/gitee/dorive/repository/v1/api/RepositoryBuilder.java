@@ -17,12 +17,16 @@
 
 package com.gitee.dorive.repository.v1.api;
 
+import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
+import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Matcher;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 
 public interface RepositoryBuilder {
+
+    BinderExecutor newBinderExecutor(RepositoryContext repositoryContext, EntityElement entityElement);
 
     Matcher newAdaptiveMatcher(boolean root, String name);
 

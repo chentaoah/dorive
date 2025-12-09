@@ -17,20 +17,18 @@
 
 package com.gitee.dorive.mybatis.impl.repository;
 
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.common.def.RepositoryDef;
-import com.gitee.dorive.factory.v1.api.ExampleConverter;
 import com.gitee.dorive.base.v1.common.api.ImplFactory;
+import com.gitee.dorive.base.v1.common.def.RepositoryDef;
+import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Executor;
+import com.gitee.dorive.core.impl.resolver.EntityFactoryResolver;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
 import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.factory.v1.impl.executor.ExampleExecutor;
 import com.gitee.dorive.factory.v1.impl.executor.FactoryExecutor;
-import com.gitee.dorive.base.v1.core.impl.OperationFactory;
-import com.gitee.dorive.core.impl.repository.DefaultRepository;
-import com.gitee.dorive.core.impl.resolver.EntityFactoryResolver;
 import com.gitee.dorive.factory.v1.impl.resolver.EntityMappersResolver;
 import com.gitee.dorive.mybatis.api.sql.CountQuerier;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
@@ -45,6 +43,7 @@ import com.gitee.dorive.mybatis.impl.querier.SqlCountQuerier;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.enums.QueryMode;
 import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
+import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -95,7 +94,7 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
         repository.setOperationFactory(operationFactory);
         repository.setExecutor(executor);
         repository.setEntityMappers(entityMappers);
-        repository.setExampleConverter((ExampleConverter) executor);
+        repository.setExampleConverter(executor);
         repository.setEntityStoreInfo(entityStoreInfo);
         return repository;
     }

@@ -22,6 +22,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.def.BindingDef;
 import com.gitee.dorive.base.v1.common.def.EntityDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
@@ -45,7 +46,7 @@ import org.springframework.context.ApplicationContext;
 import java.util.*;
 
 @Data
-public class BinderResolver {
+public class BinderResolver implements BinderExecutor {
 
     private RepositoryContext repository;
 
@@ -250,4 +251,41 @@ public class BinderResolver {
         }
     }
 
+    public List<StrongBinder> getRootStrongBinders() {
+        return mergedStrongBindersMap.get("/");
+    }
+
+    @Override
+    public boolean hasValueRouteBinders() {
+        return !getValueRouteBinders().isEmpty();
+    }
+
+    @Override
+    public void getBoundValue(Context context, Object rootEntity, Collection<?> entities) {
+        for (Object entity : entities) {
+            for (StrongBinder strongBinder : getStrongBinders()) {
+                Object fieldValue = strongBinder.getFieldValue(context, entity);
+                if (fieldValue == null) {
+                    Object boundValue = strongBinder.getBoundValue(context, rootEntity);
+                    if (boundValue != null) {
+                        strongBinder.setFieldValue(context, entity, boundValue);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void setBoundId(Context context, Object rootEntity, Object entity) {
+        StrongBinder boundIdBinder = getBoundIdBinder();
+        if (boundIdBinder != null) {
+            Object boundValue = boundIdBinder.getBoundValue(context, rootEntity);
+            if (boundValue == null) {
+                Object primaryKey = boundIdBinder.getFieldValue(context, entity);
+                if (primaryKey != null) {
+                    boundIdBinder.setBoundValue(context, rootEntity, primaryKey);
+                }
+            }
+        }
+    }
 }

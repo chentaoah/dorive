@@ -42,7 +42,7 @@ public class ValueFilterEntityHandler implements EntityHandler {
     }
 
     private List<Object> filterByValueRouteBinders(Context context, List<Object> entities) {
-        BinderResolver binderResolver = repository.getBinderResolver();
+        BinderResolver binderResolver = repository.getBinderExecutor();
         List<ValueRouteBinder> valueRouteBinders = binderResolver.getValueRouteBinders();
         if (valueRouteBinders.isEmpty()) {
             return entities;

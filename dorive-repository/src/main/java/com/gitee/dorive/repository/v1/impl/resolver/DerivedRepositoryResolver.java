@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.resolver;
+package com.gitee.dorive.repository.v1.impl.resolver;
 
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractContextRepository;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
 

@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.repository;
+package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.aggregate.api.EntityResolver;
+import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.api.BoundedContext;
 import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
 import com.gitee.dorive.base.v1.common.api.RepositoryPostProcessor;
@@ -26,15 +27,15 @@ import com.gitee.dorive.base.v1.common.def.EntityDef;
 import com.gitee.dorive.base.v1.common.def.OrderByDef;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.core.api.Matcher;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
 import com.gitee.dorive.base.v1.core.util.ReflectUtils;
 import com.gitee.dorive.base.v1.executor.api.*;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
-import com.gitee.dorive.core.impl.resolver.DerivedRepositoryResolver;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
+import com.gitee.dorive.repository.v1.impl.context.RepositoryContext;
+import com.gitee.dorive.repository.v1.impl.resolver.DerivedRepositoryResolver;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -133,12 +134,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         OperationFactory operationFactory = repository.getOperationFactory();
         boolean isAggregated = repository instanceof AbstractContextRepository;
-        BinderResolver binderResolver = new BinderResolver(this);
-        binderResolver.resolve(entityElement);
         OrderByFactory orderByFactory = orderByDef == null ? null : new OrderByFactory(orderByDef);
 
         // 从上下文获取工厂
         RepositoryBuilder repositoryBuilder = applicationContext.getBean(RepositoryBuilder.class);
+        BinderExecutor binderExecutor = repositoryBuilder.newBinderExecutor(this, entityElement);
 
         ProxyRepository repositoryWrapper = new ProxyRepository();
         repositoryWrapper.setEntityElement(entityElement);
@@ -147,10 +147,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         repositoryWrapper.setAccessPath(accessPath);
         repositoryWrapper.setRoot(isRoot);
         repositoryWrapper.setAggregated(isAggregated);
-        repositoryWrapper.setBinderResolver(binderResolver);
+        repositoryWrapper.setBinderExecutor(binderExecutor);
         repositoryWrapper.setOrderByFactory(orderByFactory);
         repositoryWrapper.setBound(false);
-        repositoryWrapper.setMatcher(repositoryBuilder.newAdaptiveMatcher(repositoryWrapper.isRoot(), repositoryWrapper.getName()));
+        // 匹配器
+        Matcher matcher = repositoryBuilder.newAdaptiveMatcher(repositoryWrapper.isRoot(), repositoryWrapper.getName());
+        repositoryWrapper.setMatcher(matcher);
         return repositoryWrapper;
     }
 

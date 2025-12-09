@@ -15,17 +15,24 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.api;
+package com.gitee.dorive.repository.v1.impl.repository;
 
-import com.gitee.dorive.base.v1.core.api.Options;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.List;
-import java.util.Set;
+@Setter
+@NoArgsConstructor
+public class DefaultRepository extends AbstractRepository<Object, Object> {
+    private Object entityMappers;
+    private Object exampleConverter;
 
-public interface Selector extends Options {
+    @SuppressWarnings("unchecked")
+    public <T> T getEntityMappers() {
+        return (T) entityMappers;
+    }
 
-    Set<String> getNames();
-
-    List<String> select(String name);
-
+    @SuppressWarnings("unchecked")
+    public <T> T getExampleConverter() {
+        return (T) exampleConverter;
+    }
 }

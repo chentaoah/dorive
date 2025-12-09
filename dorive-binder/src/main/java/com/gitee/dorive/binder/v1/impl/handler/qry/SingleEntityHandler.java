@@ -24,6 +24,7 @@ import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
 import com.gitee.dorive.base.v1.executor.api.EntityJoiner;
+import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,7 +39,8 @@ public class SingleEntityHandler extends AbstractEntityHandler {
 
     public SingleEntityHandler(RepositoryItem repository, EntityJoiner entityJoiner) {
         super(repository, entityJoiner);
-        this.binder = (StrongBinder) repository.getRootStrongBinders().get(0);
+        BinderResolver binderResolver = repository.getBinderExecutor();
+        this.binder = binderResolver.getRootStrongBinders().get(0);
     }
 
     @Override

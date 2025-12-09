@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.mybatis.impl.segment;
 
-import com.gitee.dorive.executor.v1.api.Selector;
-import com.gitee.dorive.core.impl.repository.ProxyRepository;
+import com.gitee.dorive.base.v1.core.api.Selector;
+import com.gitee.dorive.repository.v1.impl.repository.ProxyRepository;
 import com.gitee.dorive.mybatis.entity.segment.ArgSegment;
 import com.gitee.dorive.mybatis.entity.segment.SelectSegment;
 import com.gitee.dorive.mybatis.entity.segment.TableJoinSegment;

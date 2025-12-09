@@ -21,7 +21,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
-import com.gitee.dorive.core.impl.repository.DefaultRepository;
+import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
 import com.gitee.dorive.mybatis.api.sql.CountQuerier;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 import com.gitee.dorive.mybatis.entity.enums.Mapper;

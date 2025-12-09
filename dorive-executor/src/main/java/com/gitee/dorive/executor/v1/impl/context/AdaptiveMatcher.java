@@ -20,7 +20,7 @@ package com.gitee.dorive.executor.v1.impl.context;
 import com.gitee.dorive.base.v1.common.enums.MatcherType;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.api.Matcher;
-import com.gitee.dorive.executor.v1.api.Selector;
+import com.gitee.dorive.base.v1.core.api.Selector;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,7 +38,7 @@ public class AdaptiveMatcher implements Matcher {
     private String name;
     private Map<MatcherType, Matcher> matcherTypeMatcherMap = new LinkedHashMap<>(6);
 
-    public AdaptiveMatcher(String name, boolean root) {
+    public AdaptiveMatcher(boolean root, String name) {
         this.name = name;
         this.matcherTypeMatcherMap.put(MatcherType.NONE, options -> false);
         this.matcherTypeMatcherMap.put(MatcherType.ROOT, options -> root);

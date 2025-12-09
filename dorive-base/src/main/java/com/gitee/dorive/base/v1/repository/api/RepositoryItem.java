@@ -27,40 +27,37 @@ import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 
 import java.util.Collection;
-import java.util.List;
 
 public interface RepositoryItem extends Repository<Object, Object> {
-
-    boolean isCollection();
-
-    boolean isRoot();
-
-    boolean isAggregated();
-
-    boolean hasValueRouteBinders();
-
-    boolean matches(Options options);
 
     EntityElement getEntityElement();
 
     OperationFactory getOperationFactory();
 
+    boolean isCollection();
+
     String getAccessPath();
+
+    boolean isRoot();
+
+    boolean isAggregated();
+
+    <T> T getBinderExecutor();
 
     JoinType getJoinType();
 
-    <T> T getBinderResolver();
-
-    <T> List<T> getRootStrongBinders();
-
-    void setBound(boolean bound);
-
-    Result<Object> executeQuery(Context context, Query query);
-
-    int execute(Context context, Operation operation);
+    boolean hasValueRouteBinders();
 
     void getBoundValue(Context context, Object rootEntity, Collection<?> entities);
 
     void setBoundId(Context context, Object rootEntity, Object entity);
+
+    void setBound(boolean bound);
+
+    boolean matches(Options options);
+
+    Result<Object> executeQuery(Context context, Query query);
+
+    int execute(Context context, Operation operation);
 
 }

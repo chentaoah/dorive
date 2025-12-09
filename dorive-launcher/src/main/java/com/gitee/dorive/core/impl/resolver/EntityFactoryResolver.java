@@ -25,7 +25,7 @@ import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.factory.v1.api.FieldMapper;
 import com.gitee.dorive.factory.v1.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.factory.v1.impl.factory.ValueObjEntityFactory;
-import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractContextRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;

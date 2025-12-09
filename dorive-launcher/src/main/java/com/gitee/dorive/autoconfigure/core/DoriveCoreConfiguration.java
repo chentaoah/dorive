@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.autoconfigure.core;
 
-import com.gitee.dorive.core.impl.repository.RepositoryContext;
+import com.gitee.dorive.repository.v1.impl.context.RepositoryContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;

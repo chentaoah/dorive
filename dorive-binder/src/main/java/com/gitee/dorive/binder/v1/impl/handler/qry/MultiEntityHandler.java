@@ -26,6 +26,7 @@ import com.gitee.dorive.binder.v1.impl.binder.AbstractBinder;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
 import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
 import com.gitee.dorive.base.v1.executor.api.EntityJoiner;
+import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -40,7 +41,8 @@ public class MultiEntityHandler extends AbstractEntityHandler {
 
     public MultiEntityHandler(RepositoryItem repository, EntityJoiner entityJoiner) {
         super(repository, entityJoiner);
-        this.binders = repository.getRootStrongBinders();
+        BinderResolver binderResolver = repository.getBinderExecutor();
+        this.binders = binderResolver.getRootStrongBinders();
     }
 
     @Override

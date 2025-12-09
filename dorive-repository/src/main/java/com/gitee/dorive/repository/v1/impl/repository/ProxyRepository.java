@@ -15,26 +15,24 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.repository;
+package com.gitee.dorive.repository.v1.impl.repository;
 
+import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
+import com.gitee.dorive.base.v1.common.enums.JoinType;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.core.api.Matcher;
 import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.executor.v1.api.Selector;
-import com.gitee.dorive.base.v1.common.enums.JoinType;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.base.v1.core.entity.op.Operation;
+import com.gitee.dorive.base.v1.core.api.Selector;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
-import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
+import com.gitee.dorive.base.v1.core.entity.op.Operation;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
-import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractProxyRepository;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -43,11 +41,11 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ProxyRepository extends AbstractProxyRepository implements Matcher, RepositoryItem {
+public class ProxyRepository extends AbstractProxyRepository implements RepositoryItem {
     private String accessPath;
     private boolean root;
     private boolean aggregated;
-    private BinderResolver binderResolver;
+    private BinderExecutor binderExecutor;
     private OrderByFactory orderByFactory;
     private boolean bound;
     private Matcher matcher;
@@ -56,6 +54,7 @@ public class ProxyRepository extends AbstractProxyRepository implements Matcher,
         return getEntityElement().getEntityDef().getName();
     }
 
+    @Override
     public boolean isCollection() {
         return getEntityElement().isCollection();
     }
@@ -64,17 +63,24 @@ public class ProxyRepository extends AbstractProxyRepository implements Matcher,
         return getEntityElement().hasField(field);
     }
 
+    @Override
     public JoinType getJoinType() {
-        return binderResolver.getJoinType();
+        return binderExecutor.getJoinType();
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> List<T> getRootStrongBinders() {
-        return (List<T>) binderResolver.getMergedStrongBindersMap().get("/");
-    }
-
+    @Override
     public boolean hasValueRouteBinders() {
-        return !binderResolver.getValueRouteBinders().isEmpty();
+        return binderExecutor.hasValueRouteBinders();
+    }
+
+    @Override
+    public void getBoundValue(Context context, Object rootEntity, Collection<?> entities) {
+        binderExecutor.getBoundValue(context, rootEntity, entities);
+    }
+
+    @Override
+    public void setBoundId(Context context, Object rootEntity, Object entity) {
+        binderExecutor.setBoundId(context, rootEntity, entity);
     }
 
     @Override
@@ -127,30 +133,4 @@ public class ProxyRepository extends AbstractProxyRepository implements Matcher,
         return super.execute(context, operation);
     }
 
-    public void getBoundValue(Context context, Object rootEntity, Collection<?> entities) {
-        for (Object entity : entities) {
-            for (StrongBinder strongBinder : binderResolver.getStrongBinders()) {
-                Object fieldValue = strongBinder.getFieldValue(context, entity);
-                if (fieldValue == null) {
-                    Object boundValue = strongBinder.getBoundValue(context, rootEntity);
-                    if (boundValue != null) {
-                        strongBinder.setFieldValue(context, entity, boundValue);
-                    }
-                }
-            }
-        }
-    }
-
-    public void setBoundId(Context context, Object rootEntity, Object entity) {
-        StrongBinder boundIdBinder = binderResolver.getBoundIdBinder();
-        if (boundIdBinder != null) {
-            Object boundValue = boundIdBinder.getBoundValue(context, rootEntity);
-            if (boundValue == null) {
-                Object primaryKey = boundIdBinder.getFieldValue(context, entity);
-                if (primaryKey != null) {
-                    boundIdBinder.setBoundValue(context, rootEntity, primaryKey);
-                }
-            }
-        }
-    }
 }

@@ -15,17 +15,21 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.impl.context;
+package com.gitee.dorive.base.v1.binder.api;
 
-import com.gitee.dorive.base.v1.core.api.Selector;
-import com.gitee.dorive.base.v1.core.entity.ctx.AbstractOptions;
-import com.gitee.dorive.base.v1.common.enums.MatcherType;
+import com.gitee.dorive.base.v1.common.enums.JoinType;
+import com.gitee.dorive.base.v1.core.api.Context;
 
-public abstract class AbstractSelector extends AbstractOptions implements Selector {
+import java.util.Collection;
 
-    public AbstractSelector() {
-        setOption(MatcherType.class, MatcherType.SELECTOR);
-        setOption(Selector.class, this);
-    }
+public interface BinderExecutor {
+
+    JoinType getJoinType();
+
+    boolean hasValueRouteBinders();
+
+    void getBoundValue(Context context, Object rootEntity, Collection<?> entities);
+
+    void setBoundId(Context context, Object rootEntity, Object entity);
 
 }
