@@ -18,32 +18,30 @@
 package com.gitee.dorive.core.impl.repository;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.aggregate.v1.impl.EntityDefinitionResolver;
-import com.gitee.dorive.aggregate.v1.impl.EntityElementResolver;
-import com.gitee.dorive.base.v1.core.util.ReflectUtils;
 import com.gitee.dorive.autoconfigure.core.RepositoryContext;
+import com.gitee.dorive.base.v1.aggregate.api.EntityResolver;
 import com.gitee.dorive.base.v1.common.api.BoundedContext;
 import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
 import com.gitee.dorive.base.v1.common.api.RepositoryPostProcessor;
 import com.gitee.dorive.base.v1.common.def.EntityDef;
 import com.gitee.dorive.base.v1.common.def.OrderByDef;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
-import com.gitee.dorive.base.v1.common.entity.EntityDefinition;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.core.impl.OperationFactory;
+import com.gitee.dorive.base.v1.core.util.ReflectUtils;
+import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
-import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
-import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
-import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
-import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
 import com.gitee.dorive.core.impl.resolver.DerivedRepositoryResolver;
-import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.executor.v1.api.EntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.context.AdaptiveMatcher;
 import com.gitee.dorive.executor.v1.impl.executor.ContextExecutor;
 import com.gitee.dorive.executor.v1.impl.factory.OrderByFactory;
-import com.gitee.dorive.base.v1.core.impl.OperationFactory;
+import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
+import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
+import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
+import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -89,11 +87,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Assert.notNull(repositoryDef, "The @Repository does not exist! type: {}", repositoryClass.getName());
         resetBoundedContextIfNecessary();
 
-        EntityDefinitionResolver entityDefinitionResolver = new EntityDefinitionResolver();
-        EntityDefinition entityDefinition = entityDefinitionResolver.resolve(entityClass);
-
-        EntityElementResolver entityElementResolver = new EntityElementResolver();
-        List<EntityElement> entityElements = entityElementResolver.resolve(entityDefinition);
+        EntityResolver entityResolver = applicationContext.getBean(EntityResolver.class);
+        List<EntityElement> entityElements = entityResolver.resolve(entityClass);
 
         for (EntityElement entityElement : entityElements) {
             String accessPath = entityElement.getAccessPath();
