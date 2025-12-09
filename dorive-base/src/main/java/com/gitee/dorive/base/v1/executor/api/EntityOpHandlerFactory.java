@@ -15,13 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.api;
+package com.gitee.dorive.base.v1.executor.api;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
-
-public interface EntityOpHandler {
-
-    long handle(Context context, EntityOp entityOp);
-
+public interface EntityOpHandlerFactory extends GenericFactory<EntityOpHandler> {
 }

@@ -15,12 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.api;
+package com.gitee.dorive.repository.v1.api;
 
-import com.gitee.dorive.base.v1.core.api.Options;
+import com.gitee.dorive.base.v1.core.api.Matcher;
+import com.gitee.dorive.base.v1.executor.api.EntityHandler;
+import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 
-public interface Matcher {
+public interface RepositoryBuilder {
 
-    boolean matches(Options options);
+    Matcher newAdaptiveMatcher(boolean root, String name);
+
+    EntityHandler newEntityHandler(RepositoryContext repositoryContext);
+
+    EntityOpHandler newEntityOpHandler(RepositoryContext repositoryContext);
 
 }

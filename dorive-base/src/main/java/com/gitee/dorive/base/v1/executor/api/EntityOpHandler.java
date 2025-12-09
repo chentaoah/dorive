@@ -15,19 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.impl.repository;
+package com.gitee.dorive.base.v1.executor.api;
 
-import com.gitee.dorive.base.v1.executor.api.EntityHandler;
-import com.gitee.dorive.ref.impl.injector.RefInjector;
-import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
 
-public abstract class AbstractRefRepository<E, PK> extends AbstractInnerRepository<E, PK> {
+public interface EntityOpHandler {
 
-    @Override
-    protected EntityHandler newEntityHandler(RepositoryBuilder repositoryBuilder) {
-        EntityHandler entityHandler = super.newEntityHandler(repositoryBuilder);
-        new RefInjector(this, entityHandler, getEntityClass());
-        return entityHandler;
-    }
+    long handle(Context context, EntityOp entityOp);
 
 }

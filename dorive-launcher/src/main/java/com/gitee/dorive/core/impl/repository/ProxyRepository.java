@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.repository;
 
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.executor.v1.api.Matcher;
+import com.gitee.dorive.base.v1.core.api.Matcher;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.executor.v1.api.Selector;
 import com.gitee.dorive.base.v1.common.enums.JoinType;
@@ -32,7 +32,7 @@ import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
-import com.gitee.dorive.executor.v1.impl.factory.OrderByFactory;
+import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractProxyRepository;
 import lombok.Getter;

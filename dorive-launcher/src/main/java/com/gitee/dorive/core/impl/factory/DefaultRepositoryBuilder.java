@@ -15,19 +15,32 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.impl.repository;
+package com.gitee.dorive.core.impl.factory;
 
+import com.gitee.dorive.base.v1.core.api.Matcher;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
-import com.gitee.dorive.ref.impl.injector.RefInjector;
+import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.executor.v1.impl.context.AdaptiveMatcher;
+import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
+import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 
-public abstract class AbstractRefRepository<E, PK> extends AbstractInnerRepository<E, PK> {
+public class DefaultRepositoryBuilder implements RepositoryBuilder {
 
     @Override
-    protected EntityHandler newEntityHandler(RepositoryBuilder repositoryBuilder) {
-        EntityHandler entityHandler = super.newEntityHandler(repositoryBuilder);
-        new RefInjector(this, entityHandler, getEntityClass());
-        return entityHandler;
+    public Matcher newAdaptiveMatcher(boolean root, String name) {
+        return new AdaptiveMatcher(name, root);
+    }
+
+    @Override
+    public EntityHandler newEntityHandler(RepositoryContext repositoryContext) {
+        return new BatchEntityHandler(repositoryContext);
+    }
+
+    @Override
+    public EntityOpHandler newEntityOpHandler(RepositoryContext repositoryContext) {
+        return new BatchEntityOpHandler(repositoryContext);
     }
 
 }

@@ -25,7 +25,7 @@ import com.gitee.dorive.base.v1.core.entity.eop.Update;
 import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.executor.v1.api.EntityOpHandler;
+import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

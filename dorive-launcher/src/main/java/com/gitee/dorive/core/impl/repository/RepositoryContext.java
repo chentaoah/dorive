@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.autoconfigure.core;
+package com.gitee.dorive.core.impl.repository;
 
 import cn.hutool.core.util.ClassUtil;
-import com.gitee.dorive.base.v1.core.util.ReflectUtils;
 import com.gitee.dorive.base.v1.common.api.RepositoryPostProcessor;
-import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
+import com.gitee.dorive.base.v1.core.util.ReflectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;

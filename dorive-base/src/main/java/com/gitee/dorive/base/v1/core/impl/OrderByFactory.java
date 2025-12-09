@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.impl.factory;
+package com.gitee.dorive.base.v1.core.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.base.v1.common.constant.Sort;
 import com.gitee.dorive.base.v1.common.def.OrderByDef;
 import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
-import com.gitee.dorive.executor.v1.util.ExampleUtils;
+import com.gitee.dorive.base.v1.core.util.ExampleUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 

@@ -15,19 +15,24 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.impl.repository;
+package com.gitee.dorive.core.impl.factory;
 
-import com.gitee.dorive.base.v1.executor.api.EntityHandler;
-import com.gitee.dorive.ref.impl.injector.RefInjector;
-import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
+import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
+import com.gitee.dorive.base.v1.executor.api.EntityOpHandlerFactory;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
 
-public abstract class AbstractRefRepository<E, PK> extends AbstractInnerRepository<E, PK> {
+import java.util.Map;
+
+public class DefaultEntityOpHandlerFactory implements EntityOpHandlerFactory {
 
     @Override
-    protected EntityHandler newEntityHandler(RepositoryBuilder repositoryBuilder) {
-        EntityHandler entityHandler = super.newEntityHandler(repositoryBuilder);
-        new RefInjector(this, entityHandler, getEntityClass());
-        return entityHandler;
+    @SuppressWarnings("unchecked")
+    public EntityOpHandler create(String name, Object... args) {
+        if ("DelegatedEntityOpHandler".equals(name)) {
+            return new DelegatedEntityOpHandler((RepositoryContext) args[0], (Map<Class<?>, EntityOpHandler>) args[1]);
+        }
+        return null;
     }
 
 }

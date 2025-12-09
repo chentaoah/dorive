@@ -17,13 +17,20 @@
 
 package com.gitee.dorive.core.impl.factory;
 
+import com.gitee.dorive.base.v1.executor.api.EntityHandler;
+import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.executor.api.ExecutorFactory;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.executor.v1.impl.executor.ContextExecutor;
 
 public class DefaultExecutorFactory implements ExecutorFactory {
 
     @Override
     public Executor create(String name, Object... args) {
+        if ("ContextExecutor".equals(name)) {
+            return new ContextExecutor((RepositoryContext) args[0], (EntityHandler) args[1], (EntityOpHandler) args[2]);
+        }
         return null;
     }
 

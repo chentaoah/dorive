@@ -21,13 +21,18 @@ import cn.hutool.extra.spring.SpringUtil;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityHandlerFactory;
 import com.gitee.dorive.base.v1.executor.api.EntityJoinerFactory;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.handler.ValueFilterEntityHandler;
 import com.gitee.dorive.binder.v1.impl.handler.AdaptiveEntityHandler;
+import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
+
+import java.util.Map;
 
 public class DefaultEntityHandlerFactory implements EntityHandlerFactory {
 
     @Override
+    @SuppressWarnings("unchecked")
     public EntityHandler create(String name, Object... args) {
         if ("AdaptiveEntityHandler".equals(name)) {
             EntityJoinerFactory entityJoinerFactory = SpringUtil.getBean(EntityJoinerFactory.class);
@@ -35,6 +40,9 @@ public class DefaultEntityHandlerFactory implements EntityHandlerFactory {
         }
         if ("ValueFilterEntityHandler".equals(name)) {
             return new ValueFilterEntityHandler((RepositoryItem) args[0], (EntityHandler) args[1]);
+        }
+        if ("DelegatedEntityHandler".equals(name)) {
+            return new DelegatedEntityHandler((RepositoryContext) args[0], (Map<Class<?>, EntityHandler>) args[1]);
         }
         return null;
     }
