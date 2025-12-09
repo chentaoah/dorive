@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.query.entity;
 
-import com.gitee.dorive.core.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
+import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
+import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.AllArgsConstructor;

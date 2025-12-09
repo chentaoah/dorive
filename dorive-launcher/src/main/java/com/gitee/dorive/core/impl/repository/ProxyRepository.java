@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.impl.repository;
 
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.core.api.context.Matcher;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.core.api.context.Selector;
@@ -30,7 +30,7 @@ import com.gitee.dorive.core.entity.operation.cop.Query;
 import com.gitee.dorive.core.entity.operation.eop.Insert;
 import com.gitee.dorive.core.entity.operation.eop.InsertOrUpdate;
 import com.gitee.dorive.core.entity.operation.eop.Update;
-import com.gitee.dorive.core.impl.binder.StrongBinder;
+import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
 import com.gitee.dorive.core.impl.factory.OrderByFactory;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;
 import lombok.Getter;

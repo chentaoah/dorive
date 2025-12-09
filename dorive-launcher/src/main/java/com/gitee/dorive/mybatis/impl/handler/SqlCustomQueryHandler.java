@@ -19,7 +19,7 @@ package com.gitee.dorive.mybatis.impl.handler;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.core.api.common.MethodInvoker;
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.Example;
 import com.gitee.dorive.base.v1.core.entity.OrderBy;
 import com.gitee.dorive.base.v1.core.entity.Page;

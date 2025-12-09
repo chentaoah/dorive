@@ -23,7 +23,7 @@ import com.gitee.dorive.base.v1.core.entity.Criterion;
 import com.gitee.dorive.base.v1.core.entity.Example;
 import com.gitee.dorive.base.v1.core.entity.OrderBy;
 import com.gitee.dorive.base.v1.core.entity.Page;
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.executor.*;
 import com.gitee.dorive.core.entity.operation.cop.Query;

@@ -19,7 +19,7 @@ package com.gitee.dorive.core.impl.factory;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.base.v1.common.constant.Sort;
-import com.gitee.dorive.api.entity.core.def.OrderByDef;
+import com.gitee.dorive.base.v1.common.def.OrderByDef;
 import com.gitee.dorive.base.v1.core.entity.OrderBy;
 import com.gitee.dorive.core.impl.util.ExampleUtils;
 import lombok.Data;

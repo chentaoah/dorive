@@ -18,8 +18,8 @@
 package com.gitee.dorive.event.impl.repository;
 
 import cn.hutool.core.util.ArrayUtil;
-import com.gitee.dorive.api.entity.core.def.RepositoryDef;
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.base.v1.common.def.RepositoryDef;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.core.api.executor.Executor;
 import com.gitee.dorive.core.entity.operation.EntityOp;
 import com.gitee.dorive.core.entity.operation.Operation;

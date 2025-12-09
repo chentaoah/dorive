@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.impl.factory;
 
-import com.gitee.dorive.api.entity.core.EntityElement;
+import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.Example;
 import com.gitee.dorive.core.entity.operation.NullableFields;

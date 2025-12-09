@@ -18,14 +18,14 @@
 package com.gitee.dorive.mybatis.impl.segment;
 
 import com.gitee.dorive.base.v1.common.constant.Operator;
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.api.mapper.EntityMappers;
 import com.gitee.dorive.base.v1.core.entity.Criterion;
 import com.gitee.dorive.base.v1.core.entity.Example;
-import com.gitee.dorive.core.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.binder.ValueFilterBinder;
-import com.gitee.dorive.core.impl.binder.ValueRouteBinder;
+import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
+import com.gitee.dorive.binder.v1.impl.binder.ValueFilterBinder;
+import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;

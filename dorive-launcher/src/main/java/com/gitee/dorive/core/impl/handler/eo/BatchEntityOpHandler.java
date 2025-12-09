@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.core.impl.handler.eo;
 
-import com.gitee.dorive.api.entity.core.EntityElement;
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.core.api.executor.EntityOpHandler;
 import com.gitee.dorive.core.entity.operation.EntityOp;
 import com.gitee.dorive.core.entity.operation.Operation;

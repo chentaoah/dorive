@@ -24,7 +24,7 @@ import cn.hutool.core.convert.TypeConverter;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.api.mapper.EntityMappers;
 import com.gitee.dorive.core.api.mapper.FieldMapper;

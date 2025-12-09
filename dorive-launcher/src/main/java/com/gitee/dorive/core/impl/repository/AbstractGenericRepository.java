@@ -18,9 +18,9 @@
 package com.gitee.dorive.core.impl.repository;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.repository.v1.api.repository.ListableRepository;
+import com.gitee.dorive.repository.v1.api.ListableRepository;
 import com.gitee.dorive.base.v1.core.entity.Example;
 import com.gitee.dorive.core.entity.operation.Operation;
 import com.gitee.dorive.core.entity.operation.eop.Delete;

@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.api.common;
 
-import com.gitee.dorive.api.entity.core.def.RepositoryDef;
+import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 
 public interface RepositoryPostProcessor {
 

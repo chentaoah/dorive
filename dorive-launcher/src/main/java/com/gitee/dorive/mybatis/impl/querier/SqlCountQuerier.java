@@ -18,7 +18,7 @@
 package com.gitee.dorive.mybatis.impl.querier;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.core.api.mapper.EntityMapper;
 import com.gitee.dorive.core.api.mapper.EntityMappers;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;

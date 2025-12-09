@@ -18,8 +18,8 @@
 package com.gitee.dorive.core.impl.mapper.value;
 
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.api.entity.core.FieldDefinition;
-import com.gitee.dorive.api.entity.core.def.FieldDef;
+import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
+import com.gitee.dorive.base.v1.common.def.FieldDef;
 import com.gitee.dorive.core.api.mapper.Converter;
 import lombok.Getter;
 import lombok.Setter;

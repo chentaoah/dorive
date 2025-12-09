@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.impl.resolver;
 
-import com.gitee.dorive.api.entity.core.def.RepositoryDef;
+import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.EntityOpHandler;
 import com.gitee.dorive.core.api.executor.Executor;

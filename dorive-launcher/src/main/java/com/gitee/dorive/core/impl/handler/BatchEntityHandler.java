@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.impl.handler;
 
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;

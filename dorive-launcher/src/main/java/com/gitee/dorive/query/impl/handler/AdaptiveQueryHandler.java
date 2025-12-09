@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.query.impl.handler;
 
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.enums.QueryMode;

@@ -17,13 +17,13 @@
 
 package com.gitee.dorive.core.impl.handler.executor;
 
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.core.api.executor.EntityHandler;
 import com.gitee.dorive.core.api.executor.EntityJoiner;
 import com.gitee.dorive.base.v1.core.entity.Example;
 import com.gitee.dorive.core.entity.executor.Result;
 import com.gitee.dorive.core.entity.operation.cop.Query;
-import com.gitee.dorive.core.impl.binder.WeakBinder;
+import com.gitee.dorive.binder.v1.impl.binder.WeakBinder;
 import com.gitee.dorive.core.impl.factory.OperationFactory;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.core.impl.resolver.BinderResolver;

@@ -18,11 +18,11 @@
 package com.gitee.dorive.query.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.api.entity.core.def.RepositoryDef;
-import com.gitee.dorive.api.entity.query.QueryDefinition;
-import com.gitee.dorive.api.entity.query.QueryFieldDefinition;
-import com.gitee.dorive.api.entity.query.def.QueryFieldDef;
-import com.gitee.dorive.api.impl.query.QueryDefinitionResolver;
+import com.gitee.dorive.base.v1.common.def.RepositoryDef;
+import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
+import com.gitee.dorive.base.v1.common.entity.QueryFieldDefinition;
+import com.gitee.dorive.base.v1.common.def.QueryFieldDef;
+import com.gitee.dorive.aggregate.v1.impl.QueryDefinitionResolver;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import com.gitee.dorive.query.entity.MergedRepository;
 import com.gitee.dorive.query.entity.QueryConfig;

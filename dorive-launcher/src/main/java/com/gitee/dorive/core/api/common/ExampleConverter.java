@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.core.api.common;
 
-import com.gitee.dorive.core.api.context.Context;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.Example;
 
 public interface ExampleConverter {
