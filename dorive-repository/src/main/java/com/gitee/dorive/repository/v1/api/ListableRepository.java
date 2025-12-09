@@ -18,6 +18,7 @@
 package com.gitee.dorive.repository.v1.api;
 
 import com.gitee.dorive.base.v1.core.api.Options;
+import com.gitee.dorive.base.v1.repository.api.Repository;
 
 import java.util.List;
 

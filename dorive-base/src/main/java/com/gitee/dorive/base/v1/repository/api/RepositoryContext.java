@@ -31,12 +31,12 @@ public interface RepositoryContext {
 
     ApplicationContext getApplicationContext();
 
-    Map<String, RepositoryItem> getRepositoryItemMap();
+    Map<String, RepositoryItem> getRepositoryMap();
 
-    RepositoryItem getRootRepositoryItem();
+    RepositoryItem getRootRepository();
 
-    List<RepositoryItem> getSubRepositoryItems();
+    List<RepositoryItem> getSubRepositories();
 
-    List<RepositoryItem> getOrderedRepositoryItems();
+    List<RepositoryItem> getOrderedRepositories();
 
 }

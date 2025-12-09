@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.repository.v1.api;
+package com.gitee.dorive.base.v1.repository.api;
 
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;

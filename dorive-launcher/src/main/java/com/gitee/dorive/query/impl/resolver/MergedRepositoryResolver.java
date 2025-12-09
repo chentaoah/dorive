@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.query.impl.resolver;
 
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
 import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
@@ -45,7 +46,8 @@ public class MergedRepositoryResolver {
     }
 
     public void resolve() {
-        for (ProxyRepository repository : repository.getRepositoryMap().values()) {
+        for (RepositoryItem repositoryItem : repository.getRepositoryMap().values()) {
+            ProxyRepository repository = (ProxyRepository) repositoryItem;
             String accessPath = repository.getAccessPath();
             BinderResolver binderResolver = repository.getBinderResolver();
 
@@ -54,7 +56,7 @@ public class MergedRepositoryResolver {
             AbstractQueryRepository<?, ?> abstractQueryRepository = null;
             if (abstractRepository instanceof AbstractQueryRepository) {
                 abstractQueryRepository = (AbstractQueryRepository<?, ?>) abstractRepository;
-                executedRepository = abstractQueryRepository.getRootRepository();
+                executedRepository = (ProxyRepository) abstractQueryRepository.getRootRepository();
             }
 
             MergedRepository mergedRepository = new MergedRepository();

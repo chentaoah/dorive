@@ -61,7 +61,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
 
     private int executeInsert(Context context, EntityOp entityOp) {
         int totalCount = 0;
-        for (RepositoryItem repository : this.repository.getOrderedRepositoryItems()) {
+        for (RepositoryItem repository : this.repository.getOrderedRepositories()) {
             boolean isRoot = repository.isRoot();
             if (isRoot) {
                 totalCount += executeRoot(repository, context, entityOp);
@@ -92,7 +92,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
 
     private int executeUpdateOrDelete(Context context, EntityOp entityOp) {
         int totalCount = 0;
-        for (RepositoryItem repository : this.repository.getOrderedRepositoryItems()) {
+        for (RepositoryItem repository : this.repository.getOrderedRepositories()) {
             boolean isRoot = repository.isRoot();
             if (isRoot) {
                 totalCount += executeRoot(repository, context, entityOp);
@@ -117,7 +117,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
 
     private int executeInsertOrUpdate(Context context, EntityOp entityOp) {
         int totalCount = 0;
-        for (RepositoryItem repository : this.repository.getOrderedRepositoryItems()) {
+        for (RepositoryItem repository : this.repository.getOrderedRepositories()) {
             boolean isRoot = repository.isRoot();
             if (isRoot) {
                 totalCount += executeRoot(repository, context, entityOp);

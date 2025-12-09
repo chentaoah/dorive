@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.query.impl.handler;
 
-import com.gitee.dorive.executor.v1.api.Matcher;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
@@ -31,8 +31,8 @@ public class ContextMatchQueryHandler implements QueryHandler {
 
     @Override
     public void handle(QueryContext queryContext, Object query) {
-        Matcher matcher = repository.getRootRepository();
-        if (!matcher.matches(queryContext.getContext())) {
+        RepositoryItem repositoryItem = repository.getRootRepository();
+        if (!repositoryItem.matches(queryContext.getContext())) {
             queryContext.setAbandoned(true);
             return;
         }

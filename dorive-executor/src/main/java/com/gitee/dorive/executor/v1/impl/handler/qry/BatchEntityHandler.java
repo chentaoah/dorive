@@ -38,7 +38,7 @@ public class BatchEntityHandler implements EntityHandler {
         // 获取工厂
         EntityHandlerFactory entityHandlerFactory = SpringUtil.getBean(EntityHandlerFactory.class);
         this.repository = repository;
-        List<RepositoryItem> subRepositories = repository.getSubRepositoryItems();
+        List<RepositoryItem> subRepositories = repository.getSubRepositories();
         this.entityHandlers = new ArrayList<>(subRepositories.size());
         for (RepositoryItem subRepository : subRepositories) {
             EntityHandler entityHandler = entityHandlerFactory.create("AdaptiveEntityHandler", subRepository);

@@ -64,10 +64,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     private BoundedContext boundedContext;
 
     private RepositoryDef repositoryDef;
-    private Map<String, ProxyRepository> repositoryMap = new LinkedHashMap<>();
-    private ProxyRepository rootRepository;
-    private List<ProxyRepository> subRepositories = new ArrayList<>();
-    private List<ProxyRepository> orderedRepositories = new ArrayList<>();
+    private Map<String, RepositoryItem> repositoryMap = new LinkedHashMap<>();
+    private RepositoryItem rootRepository;
+    private List<RepositoryItem> subRepositories = new ArrayList<>();
+    private List<RepositoryItem> orderedRepositories = new ArrayList<>();
     private DerivedRepositoryResolver derivedRepositoryResolver;
 
     @Override
@@ -78,23 +78,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     @Override
     public void setBoundedContext(BoundedContext boundedContext) {
         this.boundedContext = boundedContext;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Map<String, RepositoryItem> getRepositoryItemMap() {
-        return (Map) repositoryMap;
-    }
-
-    @Override
-    public RepositoryItem getRootRepositoryItem() {
-        return rootRepository;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<RepositoryItem> getSubRepositoryItems() {
-        return (List) subRepositories;
     }
 
     @Override
@@ -211,7 +194,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         AbstractRepository<Object, Object> repository = (AbstractRepository<Object, Object>) applicationContext.getBean(repositoryClass);
         if (!entityDef.isAggregate()) {
             AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) repository;
-            return abstractContextRepository.getRootRepository().getProxyRepository();
+            RepositoryItem rootRepository = abstractContextRepository.getRootRepository();
+            if (rootRepository instanceof ProxyRepository) {
+                return ((ProxyRepository) rootRepository).getProxyRepository();
+            }
         }
         return repository;
     }

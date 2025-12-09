@@ -20,6 +20,7 @@ package com.gitee.dorive.core.impl.repository;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.repository.v1.api.ListableRepository;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.op.Operation;
@@ -36,7 +37,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     @Override
     public long selectCountByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        ProxyRepository repository = getRootRepository();
+        RepositoryItem repository = getRootRepository();
         return repository.selectCountByExample(options, example);
     }
 
@@ -45,7 +46,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
         int totalCount = 0;
-        for (ProxyRepository repository : getOrderedRepositories()) {
+        for (RepositoryItem repository : getOrderedRepositories()) {
             if (repository.matches(options)) {
                 totalCount += repository.updateByExample(options, entity, ExampleUtils.clone(example));
             }
@@ -64,7 +65,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
     public int deleteByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         int totalCount = 0;
-        for (ProxyRepository repository : getOrderedRepositories()) {
+        for (RepositoryItem repository : getOrderedRepositories()) {
             if (repository.matches(options)) {
                 totalCount += repository.deleteByExample(options, ExampleUtils.clone(example));
             }

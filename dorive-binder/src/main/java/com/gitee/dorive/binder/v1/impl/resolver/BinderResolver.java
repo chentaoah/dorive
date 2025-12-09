@@ -224,13 +224,13 @@ public class BinderResolver {
     private BindEndpoint newBindEndpoint(BindingDef bindingDef) {
         String bind = bindingDef.getBind();
 
-        RepositoryItem rootRepository = repository.getRootRepositoryItem();
+        RepositoryItem rootRepository = repository.getRootRepository();
         EntityElement entityElement = rootRepository.getEntityElement();
         FieldDefinition fieldDefinition = entityElement.getFieldDefinition(bind);
         Assert.notNull(fieldDefinition, "The bound property chain cannot be null! bind: {}", bind);
         BindEndpoint bindEndpoint = new BindEndpoint(fieldDefinition, "#entity." + bind);
 
-        Map<String, RepositoryItem> repositoryMap = repository.getRepositoryItemMap();
+        Map<String, RepositoryItem> repositoryMap = repository.getRepositoryMap();
         RepositoryItem belongRepository = repositoryMap.getOrDefault("/" + bind, rootRepository);
         belongRepository.setBound(true);
 

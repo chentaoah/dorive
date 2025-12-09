@@ -44,7 +44,6 @@ import java.util.List;
 @Getter
 @Setter
 public class ProxyRepository extends AbstractProxyRepository implements Matcher, RepositoryItem {
-
     private String accessPath;
     private boolean root;
     private boolean aggregated;
@@ -154,5 +153,4 @@ public class ProxyRepository extends AbstractProxyRepository implements Matcher,
             }
         }
     }
-
 }
