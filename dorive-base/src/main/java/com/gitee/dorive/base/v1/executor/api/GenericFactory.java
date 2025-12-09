@@ -15,14 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.api;
+package com.gitee.dorive.base.v1.executor.api;
 
-import com.gitee.dorive.base.v1.core.api.Context;
+public interface GenericFactory<T> {
 
-import java.util.List;
-
-public interface EntityHandler {
-
-    long handle(Context context, List<Object> entities);
+    T create(String name, Object... args);
 
 }

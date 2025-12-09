@@ -15,26 +15,28 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler;
+package com.gitee.dorive.base.v1.repository.api;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.executor.v1.api.EntityHandler;
-import com.gitee.dorive.core.impl.repository.ProxyRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.gitee.dorive.base.v1.core.impl.OperationFactory;
+import org.springframework.context.ApplicationContext;
 
 import java.util.List;
+import java.util.Map;
 
-@Data
-@AllArgsConstructor
-public class ContextMatchEntityHandler implements EntityHandler {
+public interface RepositoryContext {
 
-    private ProxyRepository repository;
-    private EntityHandler entityHandler;
+    OperationFactory getOperationFactory();
 
-    @Override
-    public long handle(Context context, List<Object> entities) {
-        return repository.matches(context) ? entityHandler.handle(context, entities) : 0L;
-    }
+    Class<?> getEntityClass();
+
+    ApplicationContext getApplicationContext();
+
+    Map<String, RepositoryItem> getRepositoryItemMap();
+
+    RepositoryItem getRootRepositoryItem();
+
+    List<RepositoryItem> getSubRepositoryItems();
+
+    List<RepositoryItem> getOrderedRepositoryItems();
 
 }

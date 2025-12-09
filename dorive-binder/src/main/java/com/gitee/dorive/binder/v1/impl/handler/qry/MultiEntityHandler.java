@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler.qry;
+package com.gitee.dorive.binder.v1.impl.handler.qry;
 
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.joiner.v1.api.EntityJoiner;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.binder.AbstractBinder;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.repository.ProxyRepository;
-import com.gitee.dorive.factory.v1.util.MultiInBuilder;
+import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
+import com.gitee.dorive.base.v1.executor.api.EntityJoiner;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,7 +38,7 @@ public class MultiEntityHandler extends AbstractEntityHandler {
 
     private List<StrongBinder> binders;
 
-    public MultiEntityHandler(ProxyRepository repository, EntityJoiner entityJoiner) {
+    public MultiEntityHandler(RepositoryItem repository, EntityJoiner entityJoiner) {
         super(repository, entityJoiner);
         this.binders = repository.getRootStrongBinders();
     }

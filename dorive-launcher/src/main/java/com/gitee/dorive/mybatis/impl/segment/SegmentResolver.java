@@ -28,7 +28,7 @@ import com.gitee.dorive.binder.v1.impl.binder.ValueFilterBinder;
 import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import com.gitee.dorive.core.impl.repository.ProxyRepository;
-import com.gitee.dorive.core.impl.resolver.BinderResolver;
+import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.base.v1.core.util.CriterionUtils;
 import com.gitee.dorive.mybatis.api.sql.Segment;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;

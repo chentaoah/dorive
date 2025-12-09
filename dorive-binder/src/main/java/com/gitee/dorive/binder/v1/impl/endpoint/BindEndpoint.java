@@ -18,6 +18,7 @@
 package com.gitee.dorive.binder.v1.impl.endpoint;
 
 import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +26,7 @@ import lombok.Setter;
 @Setter
 public class BindEndpoint extends SpELEndpoint {
     private String belongAccessPath;
-    private Object belongRepository;
+    private RepositoryItem belongRepository;
 
     public BindEndpoint(FieldDefinition fieldDefinition, String expression) {
         super(fieldDefinition, expression);

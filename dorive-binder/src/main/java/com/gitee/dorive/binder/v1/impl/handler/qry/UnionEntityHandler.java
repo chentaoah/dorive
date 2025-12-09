@@ -15,17 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler.qry;
+package com.gitee.dorive.binder.v1.impl.handler.qry;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.joiner.v1.api.EntityJoiner;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.UnionExample;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.repository.ProxyRepository;
+import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
+import com.gitee.dorive.base.v1.executor.api.EntityJoiner;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,7 +38,7 @@ import java.util.Map;
 @Setter
 public class UnionEntityHandler extends AbstractEntityHandler {
 
-    public UnionEntityHandler(ProxyRepository repository, EntityJoiner entityJoiner) {
+    public UnionEntityHandler(RepositoryItem repository, EntityJoiner entityJoiner) {
         super(repository, entityJoiner);
     }
 
@@ -60,7 +61,8 @@ public class UnionEntityHandler extends AbstractEntityHandler {
 
     private Example newExample(Context context, Object entity) {
         Example example = new InnerExample();
-        List<StrongBinder> binders = repository.getBinderResolver().getStrongBinders();
+        BinderResolver binderResolver = repository.getBinderResolver();
+        List<StrongBinder> binders = binderResolver.getStrongBinders();
         for (StrongBinder binder : binders) {
             Object boundValue = binder.getBoundValue(context, entity);
             boundValue = binder.input(context, boundValue);

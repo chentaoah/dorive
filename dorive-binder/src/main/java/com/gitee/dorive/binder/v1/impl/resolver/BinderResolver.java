@@ -15,29 +15,29 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.resolver;
+package com.gitee.dorive.binder.v1.impl.resolver;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
 import com.gitee.dorive.base.v1.common.def.BindingDef;
 import com.gitee.dorive.base.v1.common.def.EntityDef;
-import com.gitee.dorive.binder.v1.api.Binder;
-import com.gitee.dorive.binder.v1.api.Processor;
-import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
 import com.gitee.dorive.base.v1.common.enums.BindingType;
 import com.gitee.dorive.base.v1.common.enums.JoinType;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.binder.v1.api.Binder;
+import com.gitee.dorive.binder.v1.api.Processor;
 import com.gitee.dorive.binder.v1.impl.binder.*;
 import com.gitee.dorive.binder.v1.impl.endpoint.BindEndpoint;
 import com.gitee.dorive.binder.v1.impl.endpoint.FieldEndpoint;
 import com.gitee.dorive.binder.v1.impl.processor.SpELProcessor;
-import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
-import com.gitee.dorive.core.impl.repository.ProxyRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
@@ -47,7 +47,7 @@ import java.util.*;
 @Data
 public class BinderResolver {
 
-    private AbstractContextRepository<?, ?> repository;
+    private RepositoryContext repository;
 
     private List<Binder> allBinders;
     private List<StrongBinder> strongBinders;
@@ -61,7 +61,7 @@ public class BinderResolver {
     private List<String> selfFields;
     private JoinType joinType;
 
-    public BinderResolver(AbstractContextRepository<?, ?> repository) {
+    public BinderResolver(RepositoryContext repository) {
         this.repository = repository;
     }
 
@@ -224,14 +224,14 @@ public class BinderResolver {
     private BindEndpoint newBindEndpoint(BindingDef bindingDef) {
         String bind = bindingDef.getBind();
 
-        ProxyRepository rootRepository = repository.getRootRepository();
+        RepositoryItem rootRepository = repository.getRootRepositoryItem();
         EntityElement entityElement = rootRepository.getEntityElement();
         FieldDefinition fieldDefinition = entityElement.getFieldDefinition(bind);
         Assert.notNull(fieldDefinition, "The bound property chain cannot be null! bind: {}", bind);
         BindEndpoint bindEndpoint = new BindEndpoint(fieldDefinition, "#entity." + bind);
 
-        Map<String, ProxyRepository> repositoryMap = repository.getRepositoryMap();
-        ProxyRepository belongRepository = repositoryMap.getOrDefault("/" + bind, rootRepository);
+        Map<String, RepositoryItem> repositoryMap = repository.getRepositoryItemMap();
+        RepositoryItem belongRepository = repositoryMap.getOrDefault("/" + bind, rootRepository);
         belongRepository.setBound(true);
 
         bindEndpoint.setBelongAccessPath(belongRepository.getAccessPath());

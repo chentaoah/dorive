@@ -15,18 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.impl.repository;
+package com.gitee.dorive.base.v1.executor.api;
 
-import com.gitee.dorive.base.v1.executor.api.EntityHandler;
-import com.gitee.dorive.ref.impl.injector.RefInjector;
-
-public abstract class AbstractRefRepository<E, PK> extends AbstractInnerRepository<E, PK> {
-
-    @Override
-    protected EntityHandler newEntityHandler() {
-        EntityHandler entityHandler = super.newEntityHandler();
-        new RefInjector(this, entityHandler, getEntityClass());
-        return entityHandler;
-    }
-
+public interface EntityHandlerFactory extends GenericFactory<EntityHandler> {
 }

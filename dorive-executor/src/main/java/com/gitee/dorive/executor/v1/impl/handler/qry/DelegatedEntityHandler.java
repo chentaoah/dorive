@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler;
+package com.gitee.dorive.executor.v1.impl.handler.qry;
 
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.executor.v1.api.EntityHandler;
-import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
+import com.gitee.dorive.base.v1.executor.api.EntityHandler;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -32,7 +32,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class DelegatedEntityHandler implements EntityHandler {
 
-    private final AbstractContextRepository<?, ?> repository;
+    private final RepositoryContext repository;
     private final Map<Class<?>, EntityHandler> entityHandlerMap;
 
     @Override

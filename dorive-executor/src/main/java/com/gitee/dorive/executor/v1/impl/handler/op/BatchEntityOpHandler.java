@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler.op;
+package com.gitee.dorive.executor.v1.impl.handler.op;
 
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.executor.v1.api.EntityOpHandler;
-import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
-import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.eop.Delete;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
-import com.gitee.dorive.repository.v1.impl.factory.OperationFactory;
-import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
-import com.gitee.dorive.core.impl.repository.ProxyRepository;
-import com.gitee.dorive.core.impl.util.CollectionUtils;
+import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
+import com.gitee.dorive.base.v1.core.entity.op.Operation;
+import com.gitee.dorive.base.v1.core.impl.OperationFactory;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.executor.v1.util.CollectionUtils;
+import com.gitee.dorive.executor.v1.api.EntityOpHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -39,7 +39,7 @@ import java.util.List;
 @AllArgsConstructor
 public class BatchEntityOpHandler implements EntityOpHandler {
 
-    private final AbstractContextRepository<?, ?> repository;
+    private final RepositoryContext repository;
 
     @Override
     public long handle(Context context, EntityOp entityOp) {
@@ -61,7 +61,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
 
     private int executeInsert(Context context, EntityOp entityOp) {
         int totalCount = 0;
-        for (ProxyRepository repository : this.repository.getOrderedRepositories()) {
+        for (RepositoryItem repository : this.repository.getOrderedRepositoryItems()) {
             boolean isRoot = repository.isRoot();
             if (isRoot) {
                 totalCount += executeRoot(repository, context, entityOp);
@@ -92,7 +92,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
 
     private int executeUpdateOrDelete(Context context, EntityOp entityOp) {
         int totalCount = 0;
-        for (ProxyRepository repository : this.repository.getOrderedRepositories()) {
+        for (RepositoryItem repository : this.repository.getOrderedRepositoryItems()) {
             boolean isRoot = repository.isRoot();
             if (isRoot) {
                 totalCount += executeRoot(repository, context, entityOp);
@@ -117,7 +117,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
 
     private int executeInsertOrUpdate(Context context, EntityOp entityOp) {
         int totalCount = 0;
-        for (ProxyRepository repository : this.repository.getOrderedRepositories()) {
+        for (RepositoryItem repository : this.repository.getOrderedRepositoryItems()) {
             boolean isRoot = repository.isRoot();
             if (isRoot) {
                 totalCount += executeRoot(repository, context, entityOp);
@@ -147,7 +147,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
         return totalCount;
     }
 
-    private int executeRoot(ProxyRepository repository, Context context, EntityOp entityOp) {
+    private int executeRoot(RepositoryItem repository, Context context, EntityOp entityOp) {
         if (entityOp.isNotIgnoreRoot()) {
             if (repository.matches(context) || entityOp.isIncludeRoot()) {
                 return repository.execute(context, entityOp);
@@ -156,7 +156,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
         return 0;
     }
 
-    private List<?> getEntities(ProxyRepository repository, Object rootEntity) {
+    private List<?> getEntities(RepositoryItem repository, Object rootEntity) {
         EntityElement entityElement = repository.getEntityElement();
         Object targetEntity = entityElement.getValue(rootEntity);
         if (targetEntity != null) {

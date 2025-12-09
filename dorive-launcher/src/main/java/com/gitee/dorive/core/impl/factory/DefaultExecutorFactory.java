@@ -15,20 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.joiner.v1.api;
+package com.gitee.dorive.core.impl.factory;
 
-import java.util.List;
+import com.gitee.dorive.base.v1.executor.api.Executor;
+import com.gitee.dorive.base.v1.executor.api.ExecutorFactory;
 
-public interface EntityJoiner {
+public class DefaultExecutorFactory implements ExecutorFactory {
 
-    void addLeft(Object entity, String key);
-
-    boolean containsKey(String key);
-
-    void addRight(String key, Object entity);
-
-    void setCollectionSize(int size);
-
-    void join(List<Object> entities);
+    @Override
+    public Executor create(String name, Object... args) {
+        return null;
+    }
 
 }

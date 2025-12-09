@@ -26,7 +26,7 @@ import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.eop.Delete;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
-import com.gitee.dorive.repository.v1.impl.factory.OperationFactory;
+import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.executor.v1.util.ExampleUtils;
 
 import java.util.List;
@@ -112,5 +112,4 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         Operation operation = new Delete(entities);
         return execute((Context) options, operation);
     }
-
 }

@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler.qry;
+package com.gitee.dorive.binder.v1.impl.handler.qry;
 
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.executor.v1.api.EntityHandler;
-import com.gitee.dorive.joiner.v1.api.EntityJoiner;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.binder.WeakBinder;
-import com.gitee.dorive.repository.v1.impl.factory.OperationFactory;
-import com.gitee.dorive.core.impl.repository.ProxyRepository;
-import com.gitee.dorive.core.impl.resolver.BinderResolver;
+import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
+import com.gitee.dorive.base.v1.executor.api.EntityHandler;
+import com.gitee.dorive.base.v1.executor.api.EntityJoiner;
+import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,7 +38,7 @@ import java.util.List;
 @AllArgsConstructor
 public abstract class AbstractEntityHandler implements EntityHandler {
 
-    protected final ProxyRepository repository;
+    protected final RepositoryItem repository;
     protected final EntityJoiner entityJoiner;
 
     @Override

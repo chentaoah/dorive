@@ -15,25 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.util;
+package com.gitee.dorive.base.v1.executor.api;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-public class CollectionUtils {
-
-    public static List<?> toList(Object object) {
-        if (object instanceof List) {
-            return (List<?>) object;
-
-        } else if (object instanceof Collection) {
-            return new ArrayList<>((Collection<?>) object);
-
-        } else {
-            return Collections.singletonList(object);
-        }
-    }
-
+public interface EntityJoinerFactory extends GenericFactory<EntityJoiner> {
 }

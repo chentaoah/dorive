@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler.op;
+package com.gitee.dorive.executor.v1.impl.handler.op;
 
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.executor.v1.api.EntityOpHandler;
-import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
 import com.gitee.dorive.base.v1.core.entity.eop.Delete;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
-import com.gitee.dorive.repository.v1.impl.factory.OperationFactory;
-import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
+import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
+import com.gitee.dorive.base.v1.core.impl.OperationFactory;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.executor.v1.api.EntityOpHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -38,7 +38,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class DelegatedEntityOpHandler implements EntityOpHandler {
 
-    private final AbstractContextRepository<?, ?> repository;
+    private final RepositoryContext repository;
     private final Map<Class<?>, EntityOpHandler> entityOpHandlerMap;
 
     @Override

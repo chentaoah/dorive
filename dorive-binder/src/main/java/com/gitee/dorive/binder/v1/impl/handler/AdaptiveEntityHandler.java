@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler;
+package com.gitee.dorive.binder.v1.impl.handler;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.executor.v1.api.EntityHandler;
-import com.gitee.dorive.joiner.v1.api.EntityJoiner;
 import com.gitee.dorive.base.v1.common.enums.JoinType;
-import com.gitee.dorive.core.impl.handler.qry.MultiEntityHandler;
-import com.gitee.dorive.core.impl.handler.qry.SingleEntityHandler;
-import com.gitee.dorive.core.impl.handler.qry.UnionEntityHandler;
-import com.gitee.dorive.joiner.v1.impl.DefaultEntityJoiner;
-import com.gitee.dorive.core.impl.repository.ProxyRepository;
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.executor.api.EntityHandler;
+import com.gitee.dorive.base.v1.executor.api.EntityJoiner;
+import com.gitee.dorive.base.v1.executor.api.EntityJoinerFactory;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.binder.v1.impl.handler.qry.MultiEntityHandler;
+import com.gitee.dorive.binder.v1.impl.handler.qry.SingleEntityHandler;
+import com.gitee.dorive.binder.v1.impl.handler.qry.UnionEntityHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -35,11 +35,14 @@ import java.util.List;
 @AllArgsConstructor
 public class AdaptiveEntityHandler implements EntityHandler {
 
-    private ProxyRepository repository;
+    private final RepositoryItem repository;
+    private final EntityJoinerFactory entityJoinerFactory;
 
     @Override
     public long handle(Context context, List<Object> entities) {
-        EntityJoiner entityJoiner = new DefaultEntityJoiner(repository.isCollection(), repository.getEntityElement(), entities);
+        // 通过工厂构建
+        EntityJoiner entityJoiner = entityJoinerFactory.create("DefaultEntityJoiner",
+                repository.isCollection(), repository.getEntityElement(), entities);
         EntityHandler entityHandler = newEntityHandler(entityJoiner);
         return entityHandler != null ? entityHandler.handle(context, entities) : 0L;
     }

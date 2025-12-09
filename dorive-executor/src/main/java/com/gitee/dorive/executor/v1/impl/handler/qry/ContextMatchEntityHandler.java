@@ -15,18 +15,26 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.impl.repository;
+package com.gitee.dorive.executor.v1.impl.handler.qry;
 
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
-import com.gitee.dorive.ref.impl.injector.RefInjector;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-public abstract class AbstractRefRepository<E, PK> extends AbstractInnerRepository<E, PK> {
+import java.util.List;
+
+@Data
+@AllArgsConstructor
+public class ContextMatchEntityHandler implements EntityHandler {
+
+    private RepositoryItem repository;
+    private EntityHandler entityHandler;
 
     @Override
-    protected EntityHandler newEntityHandler() {
-        EntityHandler entityHandler = super.newEntityHandler();
-        new RefInjector(this, entityHandler, getEntityClass());
-        return entityHandler;
+    public long handle(Context context, List<Object> entities) {
+        return repository.matches(context) ? entityHandler.handle(context, entities) : 0L;
     }
 
 }

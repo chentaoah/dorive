@@ -18,31 +18,32 @@
 package com.gitee.dorive.core.impl.repository;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.base.v1.common.api.BoundedContext;
-import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
-import com.gitee.dorive.base.v1.common.entity.EntityDefinition;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.common.def.EntityDef;
-import com.gitee.dorive.base.v1.common.def.OrderByDef;
-import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.aggregate.v1.impl.EntityDefinitionResolver;
 import com.gitee.dorive.aggregate.v1.impl.EntityElementResolver;
 import com.gitee.dorive.aggregate.v1.util.ReflectUtils;
-import com.gitee.dorive.base.v1.common.api.RepositoryPostProcessor;
-import com.gitee.dorive.executor.v1.api.EntityHandler;
-import com.gitee.dorive.executor.v1.api.EntityOpHandler;
-import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.autoconfigure.core.RepositoryContext;
-import com.gitee.dorive.executor.v1.impl.context.AdaptiveMatcher;
-import com.gitee.dorive.core.impl.executor.ContextExecutor;
-import com.gitee.dorive.repository.v1.impl.factory.OperationFactory;
-import com.gitee.dorive.executor.v1.impl.factory.OrderByFactory;
-import com.gitee.dorive.core.impl.handler.BatchEntityHandler;
-import com.gitee.dorive.core.impl.handler.DelegatedEntityHandler;
-import com.gitee.dorive.core.impl.handler.op.BatchEntityOpHandler;
-import com.gitee.dorive.core.impl.handler.op.DelegatedEntityOpHandler;
-import com.gitee.dorive.core.impl.resolver.BinderResolver;
+import com.gitee.dorive.base.v1.common.api.BoundedContext;
+import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
+import com.gitee.dorive.base.v1.common.api.RepositoryPostProcessor;
+import com.gitee.dorive.base.v1.common.def.EntityDef;
+import com.gitee.dorive.base.v1.common.def.OrderByDef;
+import com.gitee.dorive.base.v1.common.def.RepositoryDef;
+import com.gitee.dorive.base.v1.common.entity.EntityDefinition;
+import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.executor.api.Executor;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
+import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
+import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
+import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
+import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
 import com.gitee.dorive.core.impl.resolver.DerivedRepositoryResolver;
+import com.gitee.dorive.base.v1.executor.api.EntityHandler;
+import com.gitee.dorive.executor.v1.api.EntityOpHandler;
+import com.gitee.dorive.executor.v1.impl.context.AdaptiveMatcher;
+import com.gitee.dorive.executor.v1.impl.executor.ContextExecutor;
+import com.gitee.dorive.executor.v1.impl.factory.OrderByFactory;
+import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -56,7 +57,8 @@ import java.util.*;
 
 @Getter
 @Setter
-public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, BoundedContextAware, InitializingBean {
+public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK>
+        implements ApplicationContextAware, BoundedContextAware, InitializingBean, com.gitee.dorive.base.v1.repository.api.RepositoryContext {
 
     private ApplicationContext applicationContext;
     private BoundedContext boundedContext;
@@ -76,6 +78,23 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     @Override
     public void setBoundedContext(BoundedContext boundedContext) {
         this.boundedContext = boundedContext;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<String, RepositoryItem> getRepositoryItemMap() {
+        return (Map) repositoryMap;
+    }
+
+    @Override
+    public RepositoryItem getRootRepositoryItem() {
+        return rootRepository;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<RepositoryItem> getSubRepositoryItems() {
+        return (List) subRepositories;
     }
 
     @Override

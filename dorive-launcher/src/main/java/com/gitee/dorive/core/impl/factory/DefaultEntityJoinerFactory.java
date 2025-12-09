@@ -15,18 +15,24 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.impl.repository;
+package com.gitee.dorive.core.impl.factory;
 
-import com.gitee.dorive.base.v1.executor.api.EntityHandler;
-import com.gitee.dorive.ref.impl.injector.RefInjector;
+import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.executor.api.EntityJoiner;
+import com.gitee.dorive.base.v1.executor.api.EntityJoinerFactory;
+import com.gitee.dorive.joiner.v1.impl.DefaultEntityJoiner;
 
-public abstract class AbstractRefRepository<E, PK> extends AbstractInnerRepository<E, PK> {
+import java.util.List;
+
+public class DefaultEntityJoinerFactory implements EntityJoinerFactory {
 
     @Override
-    protected EntityHandler newEntityHandler() {
-        EntityHandler entityHandler = super.newEntityHandler();
-        new RefInjector(this, entityHandler, getEntityClass());
-        return entityHandler;
+    @SuppressWarnings("unchecked")
+    public EntityJoiner create(String name, Object... args) {
+        if ("DefaultEntityJoiner".equals(name)) {
+            return new DefaultEntityJoiner((Boolean) args[0], (EntityElement) args[1], (List<Object>) args[2]);
+        }
+        return null;
     }
 
 }

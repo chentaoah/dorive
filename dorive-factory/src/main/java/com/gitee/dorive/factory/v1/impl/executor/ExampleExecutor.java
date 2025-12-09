@@ -35,7 +35,7 @@ import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.cop.ConditionUpdate;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
-import com.gitee.dorive.factory.v1.util.MultiInBuilder;
+import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
 import lombok.Getter;
 import lombok.Setter;
 

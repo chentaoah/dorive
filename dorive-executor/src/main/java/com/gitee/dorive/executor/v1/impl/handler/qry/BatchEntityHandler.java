@@ -15,12 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler;
+package com.gitee.dorive.executor.v1.impl.handler.qry;
 
+import cn.hutool.extra.spring.SpringUtil;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.executor.v1.api.EntityHandler;
-import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
-import com.gitee.dorive.core.impl.repository.ProxyRepository;
+import com.gitee.dorive.base.v1.executor.api.EntityHandler;
+import com.gitee.dorive.base.v1.executor.api.EntityHandlerFactory;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -29,17 +31,19 @@ import java.util.List;
 @Data
 public class BatchEntityHandler implements EntityHandler {
 
-    private final AbstractContextRepository<?, ?> repository;
+    private final RepositoryContext repository;
     private final List<EntityHandler> entityHandlers;
 
-    public BatchEntityHandler(AbstractContextRepository<?, ?> repository) {
+    public BatchEntityHandler(RepositoryContext repository) {
+        // 获取工厂
+        EntityHandlerFactory entityHandlerFactory = SpringUtil.getBean(EntityHandlerFactory.class);
         this.repository = repository;
-        List<ProxyRepository> subRepositories = repository.getSubRepositories();
+        List<RepositoryItem> subRepositories = repository.getSubRepositoryItems();
         this.entityHandlers = new ArrayList<>(subRepositories.size());
-        for (ProxyRepository subRepository : subRepositories) {
-            EntityHandler entityHandler = new AdaptiveEntityHandler(subRepository);
+        for (RepositoryItem subRepository : subRepositories) {
+            EntityHandler entityHandler = entityHandlerFactory.create("AdaptiveEntityHandler", subRepository);
             if (subRepository.hasValueRouteBinders()) {
-                entityHandler = new ValueFilterEntityHandler(subRepository, entityHandler);
+                entityHandler = entityHandlerFactory.create("ValueFilterEntityHandler", subRepository, entityHandler);
             }
             entityHandler = new ContextMatchEntityHandler(subRepository, entityHandler);
             entityHandlers.add(entityHandler);

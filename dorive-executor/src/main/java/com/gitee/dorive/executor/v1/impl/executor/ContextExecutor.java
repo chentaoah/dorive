@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.executor;
+package com.gitee.dorive.executor.v1.impl.executor;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.executor.v1.api.EntityHandler;
-import com.gitee.dorive.executor.v1.api.EntityOpHandler;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
+import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
 import com.gitee.dorive.base.v1.core.entity.op.Operation;
-import com.gitee.dorive.base.v1.core.entity.cop.Query;
-import com.gitee.dorive.core.impl.repository.AbstractContextRepository;
-import com.gitee.dorive.core.impl.repository.ProxyRepository;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.executor.impl.AbstractExecutor;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.base.v1.executor.api.EntityHandler;
+import com.gitee.dorive.executor.v1.api.EntityOpHandler;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,11 +37,11 @@ import java.util.List;
 @Setter
 public class ContextExecutor extends AbstractExecutor implements EntityHandler, EntityOpHandler {
 
-    private final AbstractContextRepository<?, ?> repository;
+    private final RepositoryContext repository;
     private final EntityHandler entityHandler;
     private final EntityOpHandler entityOpHandler;
 
-    public ContextExecutor(AbstractContextRepository<?, ?> repository, EntityHandler entityHandler, EntityOpHandler entityOpHandler) {
+    public ContextExecutor(RepositoryContext repository, EntityHandler entityHandler, EntityOpHandler entityOpHandler) {
         this.repository = repository;
         this.entityHandler = entityHandler;
         this.entityOpHandler = entityOpHandler;
@@ -50,7 +50,7 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler, 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Assert.isTrue(!query.isEmpty(), "The query cannot be empty!");
-        ProxyRepository rootRepository = repository.getRootRepository();
+        RepositoryItem rootRepository = repository.getRootRepositoryItem();
         if (rootRepository.matches(context) || query.isIncludeRoot()) {
             Result<Object> result = rootRepository.executeQuery(context, query);
             List<Object> entities = result.getRecords();

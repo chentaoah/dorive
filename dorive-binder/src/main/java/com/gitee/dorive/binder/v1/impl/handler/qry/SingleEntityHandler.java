@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.handler.qry;
+package com.gitee.dorive.binder.v1.impl.handler.qry;
 
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.joiner.v1.api.EntityJoiner;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
-import com.gitee.dorive.core.impl.repository.ProxyRepository;
+import com.gitee.dorive.base.v1.executor.api.EntityJoiner;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,9 +36,9 @@ public class SingleEntityHandler extends AbstractEntityHandler {
 
     private StrongBinder binder;
 
-    public SingleEntityHandler(ProxyRepository repository, EntityJoiner entityJoiner) {
+    public SingleEntityHandler(RepositoryItem repository, EntityJoiner entityJoiner) {
         super(repository, entityJoiner);
-        this.binder = repository.getRootStrongBinders().get(0);
+        this.binder = (StrongBinder) repository.getRootStrongBinders().get(0);
     }
 
     @Override

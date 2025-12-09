@@ -28,7 +28,7 @@ import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.factory.v1.impl.executor.ExampleExecutor;
 import com.gitee.dorive.factory.v1.impl.executor.FactoryExecutor;
-import com.gitee.dorive.repository.v1.impl.factory.OperationFactory;
+import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.core.impl.repository.DefaultRepository;
 import com.gitee.dorive.core.impl.resolver.EntityFactoryResolver;
 import com.gitee.dorive.factory.v1.impl.resolver.EntityMappersResolver;
