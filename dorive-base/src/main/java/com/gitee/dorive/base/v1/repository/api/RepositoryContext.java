@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.base.v1.repository.api;
 
+import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import org.springframework.context.ApplicationContext;
 
@@ -30,6 +31,8 @@ public interface RepositoryContext {
     Class<?> getEntityClass();
 
     ApplicationContext getApplicationContext();
+
+    RepositoryDef getRepositoryDef();
 
     Map<String, RepositoryItem> getRepositoryMap();
 

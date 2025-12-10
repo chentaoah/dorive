@@ -18,24 +18,14 @@
 package com.gitee.dorive.mybatis.impl.repository;
 
 import com.gitee.dorive.base.v1.common.api.ImplFactory;
-import com.gitee.dorive.base.v1.common.def.RepositoryDef;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.impl.OperationFactory;
-import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.core.impl.resolver.EntityFactoryResolver;
-import com.gitee.dorive.factory.v1.api.EntityFactory;
 import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
-import com.gitee.dorive.factory.v1.impl.executor.ExampleExecutor;
-import com.gitee.dorive.factory.v1.impl.executor.FactoryExecutor;
-import com.gitee.dorive.factory.v1.impl.resolver.EntityMappersResolver;
 import com.gitee.dorive.mybatis.api.sql.CountQuerier;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.mybatis.entity.enums.Mapper;
 import com.gitee.dorive.mybatis.entity.sql.CountQuery;
-import com.gitee.dorive.mybatis.impl.executor.UnionExecutor;
 import com.gitee.dorive.mybatis.impl.handler.SqlBuildQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlCustomQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlExecuteQueryHandler;
@@ -43,7 +33,6 @@ import com.gitee.dorive.mybatis.impl.querier.SqlCountQuerier;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.enums.QueryMode;
 import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
-import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -52,7 +41,6 @@ import java.util.Map;
 @Getter
 @Setter
 public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefRepository<E, PK> implements CountQuerier {
-
     private SqlRunner sqlRunner;
     private EntityStoreInfo entityStoreInfo;
     private EntityMappers entityMappers;
@@ -64,39 +52,6 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
         this.sqlRunner = implFactory.getInstance(SqlRunner.class);
         super.afterPropertiesSet();
         this.countQuerier = new SqlCountQuerier(this, getQueryHandler(), sqlRunner);
-    }
-
-    @Override
-    protected DefaultRepository doNewRepository(EntityElement entityElement) {
-        OperationFactory operationFactory = new OperationFactory(entityElement);
-        this.entityStoreInfo = resolveEntityStoreInfo(getRepositoryDef());
-
-        String reMapper = Mapper.ENTITY_DATABASE.name();
-        String deMapper = Mapper.ENTITY_POJO.name();
-
-        EntityMappersResolver entityMappersResolver = new EntityMappersResolver(entityElement, entityStoreInfo.getAliasPropMapping(), reMapper, deMapper);
-        this.entityMappers = entityMappersResolver.newEntityMappers();
-
-        EntityMapper reEntityMapper = entityMappers.getEntityMapper(reMapper);
-        EntityMapper deEntityMapper = entityMappers.getEntityMapper(deMapper);
-
-        EntityFactoryResolver entityFactoryResolver = new EntityFactoryResolver(
-                this, entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(), entityMappers, reEntityMapper, deEntityMapper);
-        EntityFactory entityFactory = entityFactoryResolver.newEntityFactory();
-
-        Executor executor = newExecutor(entityElement, entityStoreInfo);
-        executor = new UnionExecutor(executor, sqlRunner, entityStoreInfo);
-        executor = new FactoryExecutor(executor, entityElement, entityStoreInfo.getIdProperty(), entityFactory);
-        executor = new ExampleExecutor(executor, entityElement, reEntityMapper);
-
-        DefaultStoreRepository repository = new DefaultStoreRepository();
-        repository.setEntityElement(entityElement);
-        repository.setOperationFactory(operationFactory);
-        repository.setExecutor(executor);
-        repository.setEntityMappers(entityMappers);
-        repository.setExampleConverter(executor);
-        repository.setEntityStoreInfo(entityStoreInfo);
-        return repository;
     }
 
     @Override
@@ -112,9 +67,4 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
     public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
         return countQuerier.selectCountMap(context, countQuery);
     }
-
-    protected abstract EntityStoreInfo resolveEntityStoreInfo(RepositoryDef repositoryDef);
-
-    protected abstract Executor newExecutor(EntityElement entityElement, EntityStoreInfo entityStoreInfo);
-
 }

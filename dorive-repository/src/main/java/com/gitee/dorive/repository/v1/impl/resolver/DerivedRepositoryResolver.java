@@ -21,6 +21,7 @@ import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractContextRepository;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
@@ -31,10 +32,10 @@ import java.util.Map;
 @Data
 public class DerivedRepositoryResolver {
 
-    private AbstractContextRepository<?, ?> repository;
+    private RepositoryContext repository;
     private Map<Class<?>, AbstractContextRepository<?, ?>> classRepositoryMap;
 
-    public DerivedRepositoryResolver(AbstractContextRepository<?, ?> repository) {
+    public DerivedRepositoryResolver(RepositoryContext repository) {
         this.repository = repository;
     }
 

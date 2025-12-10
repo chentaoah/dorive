@@ -20,23 +20,22 @@ package com.gitee.dorive.event.impl.repository;
 import cn.hutool.core.util.ArrayUtil;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
-import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractGenericRepository;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
-import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
+import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
+import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.event.entity.BaseEvent;
 import com.gitee.dorive.event.entity.ExecutorEvent;
 import com.gitee.dorive.event.entity.RepositoryEvent;
-import com.gitee.dorive.event.impl.executor.EventExecutor;
 import com.gitee.dorive.event.impl.factory.EventFactory;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractGenericRepository;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepository<E, PK> {
-
     private boolean enableExecutorEvent;
     private boolean enableRepositoryEvent;
 
@@ -47,16 +46,6 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
         Class<?>[] events = repositoryDef.getEvents();
         enableExecutorEvent = ArrayUtil.contains(events, ExecutorEvent.class);
         enableRepositoryEvent = ArrayUtil.contains(events, RepositoryEvent.class);
-    }
-
-    @Override
-    protected AbstractRepository<Object, Object> processRepository(AbstractRepository<Object, Object> repository) {
-        if (enableExecutorEvent && repository instanceof DefaultRepository) {
-            Executor executor = repository.getExecutor();
-            executor = new EventExecutor(executor, getApplicationContext(), repository.getEntityElement());
-            repository.setExecutor(executor);
-        }
-        return repository;
     }
 
     @Override
@@ -88,5 +77,4 @@ public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepo
             getApplicationContext().publishEvent(baseEvent);
         }
     }
-
 }

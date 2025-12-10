@@ -22,13 +22,19 @@ import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Matcher;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
+import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
 
 public interface RepositoryBuilder {
+
+    AbstractRepository<Object, Object> newRepository(RepositoryContext repositoryContext, EntityElement entityElement);
 
     BinderExecutor newBinderExecutor(RepositoryContext repositoryContext, EntityElement entityElement);
 
     Matcher newAdaptiveMatcher(boolean root, String name);
+
+    Executor newExecutor(RepositoryContext repositoryContext);
 
     EntityHandler newEntityHandler(RepositoryContext repositoryContext);
 

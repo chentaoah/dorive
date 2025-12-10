@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class RepositoryContext implements BeanFactoryPostProcessor {
+public class RepositoryGlobalContext implements BeanFactoryPostProcessor {
 
     private static final Map<Class<?>, Class<?>> ENTITY_REPOSITORY_MAP = new ConcurrentHashMap<>();
     private static final List<RepositoryPostProcessor> REPOSITORY_POST_PROCESSORS = new ArrayList<>();

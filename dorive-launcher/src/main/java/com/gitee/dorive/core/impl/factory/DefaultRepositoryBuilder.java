@@ -17,19 +17,52 @@
 
 package com.gitee.dorive.core.impl.factory;
 
+import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Matcher;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
+import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
+import com.gitee.dorive.event.impl.executor.EventExecutor;
+import com.gitee.dorive.event.impl.repository.AbstractEventRepository;
 import com.gitee.dorive.executor.v1.impl.context.AdaptiveMatcher;
+import com.gitee.dorive.executor.v1.impl.executor.ContextExecutor;
 import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
+import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
+import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
+import com.gitee.dorive.mybatis_plus.impl.repository.MybatisPlusRepository;
+import com.gitee.dorive.ref.impl.injector.RefInjector;
+import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
+import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
+import com.gitee.dorive.repository.v1.impl.resolver.DerivedRepositoryResolver;
 
 public class DefaultRepositoryBuilder implements RepositoryBuilder {
+
+    @Override
+    public AbstractRepository<Object, Object> newRepository(RepositoryContext repositoryContext, EntityElement entityElement) {
+        AbstractRepository<Object, Object> repository = null;
+        // mybatis-plus
+        if (repositoryContext instanceof MybatisPlusRepository) {
+            repository = new MybatisPlusRepositoryBuilder((MybatisPlusRepository<?, ?>) repositoryContext).newRepository(entityElement);
+        }
+        // 事件
+        if (repositoryContext instanceof AbstractEventRepository) {
+            AbstractEventRepository<?, ?> eventRepository = (AbstractEventRepository<?, ?>) repositoryContext;
+            if (eventRepository.isEnableExecutorEvent() && repository instanceof DefaultRepository) {
+                Executor executor = repository.getExecutor();
+                executor = new EventExecutor(executor, eventRepository.getApplicationContext(), repository.getEntityElement());
+                repository.setExecutor(executor);
+            }
+        }
+        Assert.notNull(repository, "Unsupported repository type!");
+        return repository;
+    }
 
     @Override
     public BinderExecutor newBinderExecutor(RepositoryContext repositoryContext, EntityElement entityElement) {
@@ -44,8 +77,28 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     }
 
     @Override
+    public Executor newExecutor(RepositoryContext repository) {
+        // 处理器
+        EntityHandler entityHandler = newEntityHandler(repository);
+        EntityOpHandler entityOpHandler = newEntityOpHandler(repository);
+        // 委托
+        DerivedRepositoryResolver repositoryResolver = new DerivedRepositoryResolver(repository);
+        repositoryResolver.resolve();
+        if (repositoryResolver.hasDerived()) {
+            entityHandler = new DelegatedEntityHandler(repository, repositoryResolver.getEntityHandlerMap(entityHandler));
+            entityOpHandler = new DelegatedEntityOpHandler(repository, repositoryResolver.getEntityOpHandlerMap(entityOpHandler));
+        }
+        // 创建上下文执行器
+        return new ContextExecutor(repository, entityHandler, entityOpHandler);
+    }
+
+    @Override
     public EntityHandler newEntityHandler(RepositoryContext repositoryContext) {
-        return new BatchEntityHandler(repositoryContext);
+        EntityHandler entityHandler = new BatchEntityHandler(repositoryContext);
+        if (repositoryContext instanceof AbstractRefRepository) {
+            new RefInjector((AbstractRefRepository<?, ?>) repositoryContext, entityHandler, repositoryContext.getEntityClass());
+        }
+        return entityHandler;
     }
 
     @Override

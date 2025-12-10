@@ -19,7 +19,7 @@ package com.gitee.dorive.web.impl.service;
 
 import com.gitee.dorive.base.v1.core.util.ReflectUtils;
 import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.repository.v1.impl.context.RepositoryContext;
+import com.gitee.dorive.repository.v1.impl.context.RepositoryGlobalContext;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.web.entity.ResObject;
@@ -49,7 +49,7 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
     @SuppressWarnings("unchecked")
     public void afterPropertiesSet() {
         Class<?> entityClass = ReflectUtils.getFirstTypeArgument(getClass());
-        Class<?> repositoryClass = RepositoryContext.findRepositoryClass(entityClass);
+        Class<?> repositoryClass = RepositoryGlobalContext.findRepositoryClass(entityClass);
         this.repository = (AbstractQueryRepository<E, Object>) applicationContext.getBean(repositoryClass);
     }
 

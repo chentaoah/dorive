@@ -19,11 +19,11 @@ package com.gitee.dorive.autoconfigure.core;
 
 import com.gitee.dorive.base.v1.executor.api.EntityHandlerFactory;
 import com.gitee.dorive.base.v1.executor.api.EntityJoinerFactory;
-import com.gitee.dorive.base.v1.executor.api.EntityOpHandlerFactory;
-import com.gitee.dorive.base.v1.executor.api.ExecutorFactory;
-import com.gitee.dorive.core.impl.factory.*;
+import com.gitee.dorive.core.impl.factory.DefaultEntityHandlerFactory;
+import com.gitee.dorive.core.impl.factory.DefaultEntityJoinerFactory;
+import com.gitee.dorive.core.impl.factory.DefaultRepositoryBuilder;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
-import com.gitee.dorive.repository.v1.impl.context.RepositoryContext;
+import com.gitee.dorive.repository.v1.impl.context.RepositoryGlobalContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -32,19 +32,14 @@ import org.springframework.core.annotation.Order;
 @Configuration
 public class DoriveCoreConfiguration {
 
-    @Bean("RepositoryContextV3")
-    public static RepositoryContext repositoryContext() {
-        return new RepositoryContext();
+    @Bean("RepositoryGlobalContextV3")
+    public static RepositoryGlobalContext repositoryGlobalContext() {
+        return new RepositoryGlobalContext();
     }
 
     @Bean("RepositoryBuilderV3")
     public static RepositoryBuilder repositoryBuilder() {
         return new DefaultRepositoryBuilder();
-    }
-
-    @Bean("ExecutorFactoryV3")
-    public static ExecutorFactory executorFactory() {
-        return new DefaultExecutorFactory();
     }
 
     @Bean("EntityHandlerFactoryV3")
@@ -55,11 +50,6 @@ public class DoriveCoreConfiguration {
     @Bean("EntityJoinerFactoryV3")
     public static EntityJoinerFactory entityJoinerFactory() {
         return new DefaultEntityJoinerFactory();
-    }
-
-    @Bean("EntityOpHandlerFactoryV3")
-    public static EntityOpHandlerFactory entityOpHandlerFactory() {
-        return new DefaultEntityOpHandlerFactory();
     }
 
 }
