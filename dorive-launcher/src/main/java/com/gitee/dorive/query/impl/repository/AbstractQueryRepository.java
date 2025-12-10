@@ -17,64 +17,45 @@
 
 package com.gitee.dorive.query.impl.repository;
 
-import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractEventRepository;
 import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.repository.v1.api.QueryRepository;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.enums.QueryMode;
 import com.gitee.dorive.query.entity.enums.ResultType;
-import com.gitee.dorive.query.impl.handler.*;
-import com.gitee.dorive.query.impl.handler.executor.StepwiseQueryHandler;
-import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
-import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
+import com.gitee.dorive.repository.v1.api.QueryRepository;
+import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractEventRepository;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
 public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryRepository<E, PK> {
-
-    private MergedRepositoryResolver mergedRepositoryResolver;
-    private QueryTypeResolver queryTypeResolver;
+    private Object mergedRepositoryResolver;
+    private Object queryTypeResolver;
     private QueryHandler queryHandler;
+
+    @SuppressWarnings("unchecked")
+    public <T> T getMergedRepositoryResolver() {
+        return (T) mergedRepositoryResolver;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getQueryTypeResolver() {
+        return (T) queryTypeResolver;
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-
-        RepositoryDef repositoryDef = getRepositoryDef();
-        Class<?>[] queries = repositoryDef.getQueries();
-
-        this.mergedRepositoryResolver = new MergedRepositoryResolver(this);
-        this.mergedRepositoryResolver.resolve();
-        if (queries != null && queries.length > 0) {
-            this.queryTypeResolver = new QueryTypeResolver(this);
-            this.queryTypeResolver.resolve();
-        }
-
-        Map<QueryMode, QueryHandler> queryHandlerMap = new LinkedHashMap<>(4 * 4 / 3 + 1);
-        registryQueryHandlers(queryHandlerMap);
-        QueryHandler queryHandler = new AdaptiveQueryHandler(queryHandlerMap);
-        queryHandler = new SimpleQueryHandler(queryHandler);
-        queryHandler = new ContextMatchQueryHandler(this, queryHandler);
-        queryHandler = new ExampleQueryHandler(queryHandler);
-        queryHandler = new ConfigQueryHandler(this, queryHandler);
-        this.queryHandler = queryHandler;
-    }
-
-    protected void registryQueryHandlers(Map<QueryMode, QueryHandler> queryHandlerMap) {
-        queryHandlerMap.put(QueryMode.STEPWISE, new StepwiseQueryHandler());
+        RepositoryBuilder repositoryBuilder = getRepositoryBuilder();
+        repositoryBuilder.buildQueryRepository(this);
     }
 
     @Override

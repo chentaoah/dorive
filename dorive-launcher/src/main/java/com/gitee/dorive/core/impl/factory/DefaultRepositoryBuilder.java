@@ -19,6 +19,7 @@ package com.gitee.dorive.core.impl.factory;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
+import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Matcher;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
@@ -26,21 +27,38 @@ import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
-import com.gitee.dorive.repository.v1.impl.executor.EventExecutor;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractEventRepository;
 import com.gitee.dorive.executor.v1.impl.context.AdaptiveMatcher;
 import com.gitee.dorive.executor.v1.impl.executor.ContextExecutor;
 import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
+import com.gitee.dorive.factory.v1.api.EntityMapper;
+import com.gitee.dorive.factory.v1.api.EntityMappers;
+import com.gitee.dorive.mybatis.entity.enums.Mapper;
+import com.gitee.dorive.mybatis.impl.handler.SqlBuildQueryHandler;
+import com.gitee.dorive.mybatis.impl.handler.SqlCustomQueryHandler;
+import com.gitee.dorive.mybatis.impl.handler.SqlExecuteQueryHandler;
+import com.gitee.dorive.mybatis.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.mybatis_plus.impl.repository.MybatisPlusRepository;
+import com.gitee.dorive.query.api.QueryHandler;
+import com.gitee.dorive.query.entity.enums.QueryMode;
+import com.gitee.dorive.query.impl.handler.*;
+import com.gitee.dorive.query.impl.handler.executor.StepwiseQueryHandler;
+import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
+import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
+import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
 import com.gitee.dorive.ref.impl.injector.RefInjector;
 import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
+import com.gitee.dorive.repository.v1.impl.executor.EventExecutor;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractEventRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
 import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
 import com.gitee.dorive.repository.v1.impl.resolver.DerivedRepositoryResolver;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class DefaultRepositoryBuilder implements RepositoryBuilder {
 
@@ -104,6 +122,45 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     @Override
     public EntityOpHandler newEntityOpHandler(RepositoryContext repositoryContext) {
         return new BatchEntityOpHandler(repositoryContext);
+    }
+
+    @Override
+    public void buildQueryRepository(RepositoryContext repositoryContext) {
+        // 查询
+        if (repositoryContext instanceof AbstractQueryRepository) {
+            AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
+
+            RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
+            Class<?>[] queries = repositoryDef.getQueries();
+
+            MergedRepositoryResolver mergedRepositoryResolver = new MergedRepositoryResolver(repository);
+            mergedRepositoryResolver.resolve();
+            repository.setMergedRepositoryResolver(mergedRepositoryResolver);
+
+            if (queries != null && queries.length > 0) {
+                QueryTypeResolver queryTypeResolver = new QueryTypeResolver(repository);
+                queryTypeResolver.resolve();
+                repository.setQueryTypeResolver(queryTypeResolver);
+            }
+
+            Map<QueryMode, QueryHandler> queryHandlerMap = new LinkedHashMap<>(4 * 4 / 3 + 1);
+            queryHandlerMap.put(QueryMode.STEPWISE, new StepwiseQueryHandler());
+            if (repositoryContext instanceof AbstractMybatisRepository) {
+                AbstractMybatisRepository<?, ?> mybatisRepository = (AbstractMybatisRepository<?, ?>) repository;
+                EntityMappers entityMappers = mybatisRepository.getEntityMappers();
+                EntityMapper entityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
+                queryHandlerMap.put(QueryMode.SQL_BUILD, new SqlBuildQueryHandler(repository));
+                queryHandlerMap.put(QueryMode.SQL_EXECUTE, new SqlExecuteQueryHandler(repository, mybatisRepository.getSqlRunner(), entityMapper));
+                queryHandlerMap.put(QueryMode.SQL_CUSTOM, new SqlCustomQueryHandler(repository, mybatisRepository.getEntityStoreInfo()));
+            }
+
+            QueryHandler queryHandler = new AdaptiveQueryHandler(queryHandlerMap);
+            queryHandler = new SimpleQueryHandler(queryHandler);
+            queryHandler = new ContextMatchQueryHandler(repository, queryHandler);
+            queryHandler = new ExampleQueryHandler(queryHandler);
+            queryHandler = new ConfigQueryHandler(repository, queryHandler);
+            repository.setQueryHandler(queryHandler);
+        }
     }
 
 }

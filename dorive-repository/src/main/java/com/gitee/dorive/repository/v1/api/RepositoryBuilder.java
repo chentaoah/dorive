@@ -40,4 +40,6 @@ public interface RepositoryBuilder {
 
     EntityOpHandler newEntityOpHandler(RepositoryContext repositoryContext);
 
+    void buildQueryRepository(RepositoryContext repositoryContext);
+
 }

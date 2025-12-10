@@ -19,19 +19,12 @@ package com.gitee.dorive.mybatis.impl.repository;
 
 import com.gitee.dorive.base.v1.common.api.ImplFactory;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.mybatis.api.sql.CountQuerier;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
-import com.gitee.dorive.mybatis.entity.enums.Mapper;
 import com.gitee.dorive.mybatis.entity.sql.CountQuery;
-import com.gitee.dorive.mybatis.impl.handler.SqlBuildQueryHandler;
-import com.gitee.dorive.mybatis.impl.handler.SqlCustomQueryHandler;
-import com.gitee.dorive.mybatis.impl.handler.SqlExecuteQueryHandler;
 import com.gitee.dorive.mybatis.impl.querier.SqlCountQuerier;
-import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.query.entity.enums.QueryMode;
 import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,15 +45,6 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
         this.sqlRunner = implFactory.getInstance(SqlRunner.class);
         super.afterPropertiesSet();
         this.countQuerier = new SqlCountQuerier(this, getQueryHandler(), sqlRunner);
-    }
-
-    @Override
-    protected void registryQueryHandlers(Map<QueryMode, QueryHandler> queryHandlerMap) {
-        super.registryQueryHandlers(queryHandlerMap);
-        EntityMapper entityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
-        queryHandlerMap.put(QueryMode.SQL_BUILD, new SqlBuildQueryHandler(this));
-        queryHandlerMap.put(QueryMode.SQL_EXECUTE, new SqlExecuteQueryHandler(this, sqlRunner, entityMapper));
-        queryHandlerMap.put(QueryMode.SQL_CUSTOM, new SqlCustomQueryHandler(this, entityStoreInfo));
     }
 
     @Override
