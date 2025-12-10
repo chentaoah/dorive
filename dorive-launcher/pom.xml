@@ -47,7 +47,7 @@
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-event</artifactId>
+            <artifactId>dorive-query</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
