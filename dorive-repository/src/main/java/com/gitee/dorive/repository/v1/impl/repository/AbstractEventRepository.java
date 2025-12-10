@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.impl.repository;
+package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.util.ArrayUtil;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
@@ -25,11 +25,10 @@ import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
 import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
 import com.gitee.dorive.base.v1.core.entity.op.Operation;
-import com.gitee.dorive.event.entity.BaseEvent;
-import com.gitee.dorive.event.entity.ExecutorEvent;
-import com.gitee.dorive.event.entity.RepositoryEvent;
-import com.gitee.dorive.event.impl.factory.EventFactory;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractGenericRepository;
+import com.gitee.dorive.repository.v1.entity.event.BaseEvent;
+import com.gitee.dorive.repository.v1.entity.event.ExecutorEvent;
+import com.gitee.dorive.repository.v1.entity.event.RepositoryEvent;
+import com.gitee.dorive.repository.v1.impl.factory.EventFactory;
 import lombok.Getter;
 import lombok.Setter;
 

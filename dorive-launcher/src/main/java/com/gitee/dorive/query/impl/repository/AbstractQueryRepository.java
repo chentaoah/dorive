@@ -23,7 +23,7 @@ import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.event.impl.repository.AbstractEventRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractEventRepository;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.repository.v1.api.QueryRepository;
 import com.gitee.dorive.query.entity.QueryContext;

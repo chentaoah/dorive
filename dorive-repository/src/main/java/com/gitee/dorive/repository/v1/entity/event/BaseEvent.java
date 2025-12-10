@@ -15,15 +15,37 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.entity;
+package com.gitee.dorive.repository.v1.entity.event;
 
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.core.ResolvableType;
+import org.springframework.core.ResolvableTypeProvider;
+
+import java.util.List;
 
 @Getter
 @Setter
-public class ExecutorEvent<T> extends BaseEvent<T> {
-    public ExecutorEvent(Object source) {
+public abstract class BaseEvent<T> extends ApplicationEvent implements ResolvableTypeProvider {
+    private boolean root;
+    private Class<?> entityClass;
+    private Context context;
+    private EntityOp entityOp;
+
+    public BaseEvent(Object source) {
         super(source);
+    }
+
+    @Override
+    public ResolvableType getResolvableType() {
+        return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(entityClass));
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<T> getEntities() {
+        return (List<T>) entityOp.getEntities();
     }
 }
