@@ -27,7 +27,7 @@ import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.mybatis.entity.sql.CountQuery;
 import com.gitee.dorive.mybatis.impl.querier.SqlCountQuerier;
 import com.gitee.dorive.query.impl.repository.DefaultQueryExecutor;
-import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractRefRepository;
 import lombok.Getter;
 import lombok.Setter;
 

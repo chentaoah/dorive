@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.impl.injector;
+package com.gitee.dorive.repository.v1.impl.injector;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
-import com.gitee.dorive.ref.api.Ref;
-import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
+import com.gitee.dorive.repository.v1.api.Ref;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractRefRepository;
 import lombok.Data;
 
 import java.lang.reflect.Field;

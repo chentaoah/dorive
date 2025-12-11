@@ -15,7 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.impl.repository;
+package com.gitee.dorive.repository.v1.api;
 
-public abstract class AbstractRefRepository<E, PK> extends AbstractInnerRepository<E, PK> {
+import com.gitee.dorive.repository.v1.impl.repository.AbstractRefRepository;
+
+public interface Ref<E> extends QueryRepository<E, Object> {
+
+    <R extends AbstractRefRepository<?, ?>> R get();
+
+    RefObj forObj(E obj);
+
 }

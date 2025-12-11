@@ -15,16 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.api;
+package com.gitee.dorive.repository.v1.impl.repository;
 
-import com.gitee.dorive.base.v1.core.api.Options;
-
-public interface RefObj {
-
-    long select(Options options);
-
-    int insertOrUpdate(Options options);
-
-    int delete(Options options);
-
+public abstract class AbstractRefRepository<E, PK> extends AbstractInnerRepository<E, PK> {
 }

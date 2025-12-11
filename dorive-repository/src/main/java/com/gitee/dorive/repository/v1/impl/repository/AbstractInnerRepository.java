@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.impl.repository;
+package com.gitee.dorive.repository.v1.impl.repository;
 
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
@@ -24,7 +24,6 @@ import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.core.util.ExampleUtils;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 
 import java.util.List;
 

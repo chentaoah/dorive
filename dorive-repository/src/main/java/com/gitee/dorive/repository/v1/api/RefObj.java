@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.ref.api;
+package com.gitee.dorive.repository.v1.api;
 
-import com.gitee.dorive.repository.v1.api.QueryRepository;
-import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
+import com.gitee.dorive.base.v1.core.api.Options;
 
-public interface Ref<E> extends QueryRepository<E, Object> {
+public interface RefObj {
 
-    <R extends AbstractRefRepository<?, ?>> R get();
+    long select(Options options);
 
-    RefObj forObj(E obj);
+    int insertOrUpdate(Options options);
+
+    int delete(Options options);
 
 }
