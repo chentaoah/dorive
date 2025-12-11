@@ -15,25 +15,24 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.handler;
+package com.gitee.dorive.query.v1.impl.handler;
 
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.query.v1.api.QueryHandler;
+import com.gitee.dorive.query.v1.entity.QueryContext;
 import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
-public class ContextMatchQueryHandler implements QueryHandler {
+import java.util.Map;
 
-    private final AbstractQueryRepository<?, ?> repository;
+@AllArgsConstructor
+public class SimpleQueryHandler implements QueryHandler {
+
     private final QueryHandler queryHandler;
 
     @Override
     public void handle(QueryContext queryContext, Object query) {
-        RepositoryItem repositoryItem = repository.getRootRepository();
-        if (!repositoryItem.matches(queryContext.getContext())) {
-            queryContext.setAbandoned(true);
+        Map<String, Example> exampleMap = queryContext.getExampleMap();
+        if (exampleMap.size() == 1 && exampleMap.containsKey("/")) {
             return;
         }
         if (queryHandler != null) {

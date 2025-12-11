@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.handler;
+package com.gitee.dorive.query.v1.impl.handler;
 
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.query.v1.api.QueryHandler;
+import com.gitee.dorive.query.v1.entity.QueryContext;
 import com.gitee.dorive.query.v1.enums.QueryMode;
 import org.apache.commons.lang3.StringUtils;
 

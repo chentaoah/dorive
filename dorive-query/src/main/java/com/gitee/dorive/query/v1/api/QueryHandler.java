@@ -15,24 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.repository.v1.impl.repository;
+package com.gitee.dorive.query.v1.api;
 
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.gitee.dorive.query.v1.entity.QueryContext;
 
-@Setter
-@NoArgsConstructor
-public class DefaultRepository extends AbstractRepository<Object, Object> {
-    private Object entityMappers;
-    private Object exampleConverter;
+public interface QueryHandler {
 
-    @SuppressWarnings("unchecked")
-    public <T> T getEntityMappers() {
-        return (T) entityMappers;
-    }
+    void handle(QueryContext queryContext, Object query);
 
-    @SuppressWarnings("unchecked")
-    public <T> T getExampleConverter() {
-        return (T) exampleConverter;
-    }
 }

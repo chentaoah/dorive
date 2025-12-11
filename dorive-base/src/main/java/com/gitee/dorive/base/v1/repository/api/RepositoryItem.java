@@ -24,16 +24,23 @@ import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 
 import java.util.Collection;
 
-public interface RepositoryItem extends Repository<Object, Object> {
+public interface RepositoryItem extends Repository<Object, Object>, Properties {
 
     EntityElement getEntityElement();
 
     OperationFactory getOperationFactory();
 
+    AbstractRepository<Object, Object> getProxyRepository();
+
     boolean isCollection();
+
+    Class<?> getEntityClass();
+
+    boolean hasField(String field);
 
     String getAccessPath();
 
@@ -48,6 +55,8 @@ public interface RepositoryItem extends Repository<Object, Object> {
     void setBoundId(Context context, Object rootEntity, Object entity);
 
     void setBound(boolean bound);
+
+    boolean isBound();
 
     boolean matches(Options options);
 

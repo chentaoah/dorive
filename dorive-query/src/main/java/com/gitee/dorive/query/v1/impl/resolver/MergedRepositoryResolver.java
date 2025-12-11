@@ -15,18 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.resolver;
+package com.gitee.dorive.query.v1.impl.resolver;
 
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
 import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractContextRepository;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
-import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
-import com.gitee.dorive.repository.v1.impl.repository.ProxyRepository;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
-import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
+import com.gitee.dorive.query.v1.entity.MergedRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,34 +33,33 @@ import java.util.*;
 @Data
 public class MergedRepositoryResolver {
 
-    private AbstractContextRepository<?, ?> repository;
+    private RepositoryContext repository;
     // absoluteAccessPath ==> MergedRepository
     private Map<String, MergedRepository> mergedRepositoryMap = new LinkedHashMap<>();
     // name ==> MergedRepository
     private Map<String, MergedRepository> nameMergedRepositoryMap = new LinkedHashMap<>();
 
-    public MergedRepositoryResolver(AbstractContextRepository<?, ?> repository) {
+    public MergedRepositoryResolver(RepositoryContext repository) {
         this.repository = repository;
     }
 
     public void resolve() {
         for (RepositoryItem repositoryItem : repository.getRepositoryMap().values()) {
-            ProxyRepository repository = (ProxyRepository) repositoryItem;
-            String accessPath = repository.getAccessPath();
-            BinderResolver binderResolver = (BinderResolver) repository.getBinderExecutor();
+            String accessPath = repositoryItem.getAccessPath();
+            BinderResolver binderResolver = repositoryItem.getBinderExecutor();
 
-            ProxyRepository executedRepository = repository;
-            AbstractRepository<Object, Object> abstractRepository = repository.getProxyRepository();
-            AbstractQueryRepository<?, ?> abstractQueryRepository = null;
-            if (abstractRepository instanceof AbstractQueryRepository) {
-                abstractQueryRepository = (AbstractQueryRepository<?, ?>) abstractRepository;
-                executedRepository = (ProxyRepository) abstractQueryRepository.getRootRepository();
+            RepositoryItem executedRepository = repositoryItem;
+            AbstractRepository<Object, Object> abstractRepository = repositoryItem.getProxyRepository();
+            RepositoryContext abstractQueryRepository = null;
+            if (abstractRepository instanceof RepositoryContext) {
+                abstractQueryRepository = (RepositoryContext) abstractRepository;
+                executedRepository = abstractQueryRepository.getRootRepository();
             }
 
             MergedRepository mergedRepository = new MergedRepository();
             mergedRepository.setLastAccessPath("");
             mergedRepository.setAbsoluteAccessPath(accessPath);
-            mergedRepository.setDefinedRepository(repository);
+            mergedRepository.setDefinedRepository(repositoryItem);
             mergedRepository.setMergedStrongBindersMap(new LinkedHashMap<>(binderResolver.getMergedStrongBindersMap()));
             mergedRepository.setMergedValueRouteBindersMap(new LinkedHashMap<>(binderResolver.getMergedValueRouteBindersMap()));
 
@@ -82,7 +79,7 @@ public class MergedRepositoryResolver {
     }
 
     private void addMergedRepository(MergedRepository mergedRepository) {
-        ProxyRepository executedRepository = mergedRepository.getExecutedRepository();
+        RepositoryItem executedRepository = mergedRepository.getExecutedRepository();
         mergedRepository.setDefaultRepository((DefaultRepository) executedRepository.getProxyRepository());
         mergedRepository.setSequence(mergedRepositoryMap.size() + 1);
         mergedRepository.setAlias("t" + mergedRepository.getSequence());
@@ -96,8 +93,8 @@ public class MergedRepositoryResolver {
         }
     }
 
-    private void mergeRepository(String accessPath, AbstractQueryRepository<?, ?> repository) {
-        MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
+    private void mergeRepository(String accessPath, RepositoryContext repository) {
+        MergedRepositoryResolver mergedRepositoryResolver = repository.getProperty(MergedRepositoryResolver.class);
         for (MergedRepository mergedRepository : mergedRepositoryResolver.getMergedRepositoryMap().values()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
             if ("/".equals(absoluteAccessPath)) {

@@ -24,7 +24,7 @@ import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 
 public interface RepositoryBuilder {
 

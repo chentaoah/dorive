@@ -23,6 +23,6 @@ import java.util.List;
 
 public interface EntityResolver {
 
-    List<EntityElement> resolve(Class<?> entityClass);
+    List<EntityElement> resolve(Class<?> entityType);
 
 }

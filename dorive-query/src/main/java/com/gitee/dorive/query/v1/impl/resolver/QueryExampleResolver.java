@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.resolver;
+package com.gitee.dorive.query.v1.impl.resolver;
 
 import cn.hutool.core.convert.Convert;
 import com.gitee.dorive.base.v1.common.constant.Operator;

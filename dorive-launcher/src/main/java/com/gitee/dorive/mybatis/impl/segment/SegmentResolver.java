@@ -19,27 +19,27 @@ package com.gitee.dorive.mybatis.impl.segment;
 
 import com.gitee.dorive.base.v1.common.constant.Operator;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.factory.v1.api.EntityMapper;
-import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.base.v1.core.entity.qry.Criterion;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.core.util.CriterionUtils;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
 import com.gitee.dorive.binder.v1.impl.binder.ValueFilterBinder;
 import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
-import com.gitee.dorive.repository.v1.impl.repository.ProxyRepository;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
-import com.gitee.dorive.base.v1.core.util.CriterionUtils;
+import com.gitee.dorive.factory.v1.api.EntityMapper;
+import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.mybatis.api.sql.Segment;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.mybatis.entity.enums.Mapper;
 import com.gitee.dorive.mybatis.entity.segment.*;
 import com.gitee.dorive.mybatis.impl.repository.DefaultStoreRepository;
-import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.QueryUnit;
+import com.gitee.dorive.query.v1.entity.MergedRepository;
+import com.gitee.dorive.query.v1.entity.QueryContext;
+import com.gitee.dorive.query.v1.entity.QueryUnit;
+import com.gitee.dorive.query.v1.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
-import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -84,18 +84,18 @@ public class SegmentResolver {
     }
 
     private List<OnSegment> newOnSegments() {
-        MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
+        MergedRepositoryResolver mergedRepositoryResolver = repository.getProperty(MergedRepositoryResolver.class);
         Context context = queryContext.getContext();
         MergedRepository mergedRepository = queryUnit.getMergedRepository();
 
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
 
-        ProxyRepository definedRepository = mergedRepository.getDefinedRepository();
+        RepositoryItem definedRepository = mergedRepository.getDefinedRepository();
         Map<String, List<StrongBinder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
         Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
         EntityMapper entityMapper = getEntityMapper(mergedRepository);
 
-        BinderResolver binderResolver = (BinderResolver) definedRepository.getBinderExecutor();
+        BinderResolver binderResolver = definedRepository.getBinderExecutor();
         List<ValueFilterBinder> valueFilterBinders = binderResolver.getValueFilterBinders();
 
         List<OnSegment> onSegments = new ArrayList<>(mergedStrongBindersMap.size() + mergedValueRouteBindersMap.size() + valueFilterBinders.size());
@@ -133,7 +133,7 @@ public class SegmentResolver {
 
     private EntityMapper getEntityMapper(MergedRepository mergedRepository) {
         DefaultRepository defaultRepository = mergedRepository.getDefaultRepository();
-        EntityMappers entityMappers = defaultRepository.getEntityMappers();
+        EntityMappers entityMappers = defaultRepository.getProperty(EntityMappers.class);
         return entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
     }
 

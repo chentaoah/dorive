@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.mybatis.impl.repository;
 
-import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
+import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

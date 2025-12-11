@@ -15,34 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.repository.api;
+package com.gitee.dorive.base.v1.repository.impl;
 
-import com.gitee.dorive.base.v1.common.def.RepositoryDef;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.core.impl.OperationFactory;
-import org.springframework.context.ApplicationContext;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.List;
-import java.util.Map;
-
-public interface RepositoryContext extends Properties {
-
-    EntityElement getEntityElement();
-
-    OperationFactory getOperationFactory();
-
-    Class<?> getEntityClass();
-
-    ApplicationContext getApplicationContext();
-
-    RepositoryDef getRepositoryDef();
-
-    Map<String, RepositoryItem> getRepositoryMap();
-
-    RepositoryItem getRootRepository();
-
-    List<RepositoryItem> getSubRepositories();
-
-    List<RepositoryItem> getOrderedRepositories();
-
+@Setter
+@NoArgsConstructor
+public class DefaultRepository extends AbstractRepository<Object, Object> {
 }

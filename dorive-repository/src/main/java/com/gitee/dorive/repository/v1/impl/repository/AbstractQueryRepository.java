@@ -30,19 +30,7 @@ import java.util.List;
 @Getter
 @Setter
 public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryRepository<E, PK> {
-    private Object mergedRepositoryResolver;
-    private Object queryTypeResolver;
     private QueryExecutor queryExecutor;
-
-    @SuppressWarnings("unchecked")
-    public <T> T getMergedRepositoryResolver() {
-        return (T) mergedRepositoryResolver;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T getQueryTypeResolver() {
-        return (T) queryTypeResolver;
-    }
 
     @Override
     public void afterPropertiesSet() throws Exception {

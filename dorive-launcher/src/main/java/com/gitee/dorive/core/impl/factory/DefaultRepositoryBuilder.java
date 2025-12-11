@@ -25,8 +25,10 @@ import com.gitee.dorive.base.v1.core.api.Matcher;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.repository.api.Repository;
+import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.executor.v1.impl.context.AdaptiveMatcher;
 import com.gitee.dorive.executor.v1.impl.executor.ContextExecutor;
@@ -41,25 +43,18 @@ import com.gitee.dorive.mybatis.impl.handler.SqlBuildQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlCustomQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlExecuteQueryHandler;
 import com.gitee.dorive.mybatis.impl.querier.SqlCountQuerier;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
-import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
-import com.gitee.dorive.base.v1.query.api.QueryExecutor;
-import com.gitee.dorive.query.api.QueryHandler;
+import com.gitee.dorive.query.v1.api.QueryHandler;
+import com.gitee.dorive.query.v1.impl.handler.executor.StepwiseQueryHandler;
+import com.gitee.dorive.query.v1.impl.executor.DefaultQueryExecutor;
+import com.gitee.dorive.query.v1.impl.handler.*;
+import com.gitee.dorive.query.v1.impl.resolver.MergedRepositoryResolver;
+import com.gitee.dorive.query.v1.impl.resolver.QueryTypeResolver;
 import com.gitee.dorive.query.v1.enums.QueryMode;
-import com.gitee.dorive.query.impl.handler.*;
-import com.gitee.dorive.query.impl.handler.executor.StepwiseQueryHandler;
 import com.gitee.dorive.repository.v1.api.CountQuerier;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
-import com.gitee.dorive.query.impl.repository.DefaultQueryExecutor;
-import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
-import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
-import com.gitee.dorive.repository.v1.impl.injector.RefInjector;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractRefRepository;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.impl.executor.EventExecutor;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractEventRepository;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
-import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
+import com.gitee.dorive.repository.v1.impl.injector.RefInjector;
+import com.gitee.dorive.repository.v1.impl.repository.*;
 import com.gitee.dorive.repository.v1.impl.resolver.DerivedRepositoryResolver;
 
 import java.util.LinkedHashMap;
@@ -141,12 +136,12 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
 
             MergedRepositoryResolver mergedRepositoryResolver = new MergedRepositoryResolver(repository);
             mergedRepositoryResolver.resolve();
-            repository.setMergedRepositoryResolver(mergedRepositoryResolver);
+            repository.setProperty(MergedRepositoryResolver.class, mergedRepositoryResolver);
 
             if (queries != null && queries.length > 0) {
                 QueryTypeResolver queryTypeResolver = new QueryTypeResolver(repository);
                 queryTypeResolver.resolve();
-                repository.setQueryTypeResolver(queryTypeResolver);
+                repository.setProperty(QueryTypeResolver.class, queryTypeResolver);
             }
 
             Map<QueryMode, QueryHandler> queryHandlerMap = new LinkedHashMap<>(4 * 4 / 3 + 1);
@@ -165,7 +160,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             queryHandler = new ContextMatchQueryHandler(repository, queryHandler);
             queryHandler = new ExampleQueryHandler(queryHandler);
             queryHandler = new ConfigQueryHandler(repository, queryHandler);
-            QueryExecutor queryExecutor = new DefaultQueryExecutor(queryHandler, (Repository<Object, Object>) repository);
+            QueryExecutor queryExecutor = new DefaultQueryExecutor(queryHandler, (AbstractRepository<Object, Object>) repository);
             repository.setQueryExecutor(queryExecutor);
         }
     }

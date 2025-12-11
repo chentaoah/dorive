@@ -29,6 +29,8 @@ import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Executor;
+import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.core.impl.resolver.EntityFactoryResolver;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
 import com.gitee.dorive.factory.v1.api.EntityMapper;
@@ -43,7 +45,6 @@ import com.gitee.dorive.mybatis.impl.repository.DefaultStoreRepository;
 import com.gitee.dorive.mybatis_plus.impl.DefaultMethodInvoker;
 import com.gitee.dorive.mybatis_plus.impl.executor.MybatisPlusExecutor;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -93,8 +94,8 @@ public class MybatisPlusRepositoryBuilder {
         defaultRepository.setEntityElement(entityElement);
         defaultRepository.setOperationFactory(operationFactory);
         defaultRepository.setExecutor(executor);
-        defaultRepository.setEntityMappers(entityMappers);
-        defaultRepository.setExampleConverter(executor);
+        defaultRepository.setProperty(EntityMappers.class, entityMappers);
+        defaultRepository.setProperty(ExampleConverter.class, (ExampleConverter) executor);
         defaultRepository.setEntityStoreInfo(entityStoreInfo);
         return defaultRepository;
     }

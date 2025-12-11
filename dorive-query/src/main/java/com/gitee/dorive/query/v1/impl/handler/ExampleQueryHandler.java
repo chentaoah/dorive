@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.handler;
+package com.gitee.dorive.query.v1.impl.handler;
 
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.query.entity.QueryConfig;
-import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.impl.resolver.QueryExampleResolver;
+import com.gitee.dorive.query.v1.api.QueryHandler;
+import com.gitee.dorive.query.v1.entity.QueryConfig;
+import com.gitee.dorive.query.v1.entity.QueryContext;
+import com.gitee.dorive.query.v1.impl.resolver.QueryExampleResolver;
 import lombok.AllArgsConstructor;
 
 import java.util.Map;

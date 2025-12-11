@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.entity;
+package com.gitee.dorive.query.v1.entity;
 
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
 import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
-import com.gitee.dorive.repository.v1.impl.repository.ProxyRepository;
+import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,7 +38,7 @@ public class MergedRepository {
     // 绝对路径
     private String absoluteAccessPath;
     // 定义仓储
-    private ProxyRepository definedRepository;
+    private RepositoryItem definedRepository;
     // absoluteAccessPath ==> StrongBinder
     private Map<String, List<StrongBinder>> mergedStrongBindersMap;
     // absoluteAccessPath ==> ValueRouteBinder
@@ -46,7 +46,7 @@ public class MergedRepository {
     // 绑定路径
     private Set<String> boundAccessPaths;
     // 执行仓储
-    private ProxyRepository executedRepository;
+    private RepositoryItem executedRepository;
     // 真正执行仓储
     private DefaultRepository defaultRepository;
     // 序列号

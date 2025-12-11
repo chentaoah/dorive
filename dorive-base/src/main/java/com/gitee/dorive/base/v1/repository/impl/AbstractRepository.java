@@ -15,20 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.repository.v1.impl.repository;
+package com.gitee.dorive.base.v1.repository.impl;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.repository.api.Repository;
+import com.gitee.dorive.base.v1.core.entity.cop.Query;
+import com.gitee.dorive.base.v1.core.entity.op.Operation;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.base.v1.core.entity.op.Operation;
-import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
+import com.gitee.dorive.base.v1.executor.api.Executor;
+import com.gitee.dorive.base.v1.repository.api.Repository;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,7 +36,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public abstract class AbstractRepository<E, PK> implements Repository<E, PK>, Executor {
+public abstract class AbstractRepository<E, PK> extends AbstractProperties implements Repository<E, PK>, Executor {
 
     private EntityElement entityElement;
     private OperationFactory operationFactory;

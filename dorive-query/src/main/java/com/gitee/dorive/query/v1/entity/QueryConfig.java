@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.entity;
+package com.gitee.dorive.query.v1.entity;
 
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
-import com.gitee.dorive.query.impl.resolver.QueryExampleResolver;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.query.v1.impl.resolver.QueryExampleResolver;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class QueryConfig {
-    private AbstractQueryRepository<?, ?> repository;
+    private RepositoryContext repository;
     private QueryExampleResolver queryExampleResolver;
     private List<MergedRepository> mergedRepositories;
     private List<MergedRepository> reversedMergedRepositories;

@@ -26,9 +26,9 @@ import java.util.List;
 public class DefaultEntityResolver implements EntityResolver {
 
     @Override
-    public List<EntityElement> resolve(Class<?> entityClass) {
+    public List<EntityElement> resolve(Class<?> entityType) {
         EntityDefinitionResolver entityDefinitionResolver = new EntityDefinitionResolver();
-        EntityDefinition entityDefinition = entityDefinitionResolver.resolve(entityClass);
+        EntityDefinition entityDefinition = entityDefinitionResolver.resolve(entityType);
         EntityElementResolver entityElementResolver = new EntityElementResolver();
         return entityElementResolver.resolve(entityDefinition);
     }

@@ -15,34 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.repository.api;
+package com.gitee.dorive.base.v1.aggregate.api;
 
-import com.gitee.dorive.base.v1.common.def.RepositoryDef;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.core.impl.OperationFactory;
-import org.springframework.context.ApplicationContext;
+import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
 
-import java.util.List;
-import java.util.Map;
+public interface QueryResolver {
 
-public interface RepositoryContext extends Properties {
-
-    EntityElement getEntityElement();
-
-    OperationFactory getOperationFactory();
-
-    Class<?> getEntityClass();
-
-    ApplicationContext getApplicationContext();
-
-    RepositoryDef getRepositoryDef();
-
-    Map<String, RepositoryItem> getRepositoryMap();
-
-    RepositoryItem getRootRepository();
-
-    List<RepositoryItem> getSubRepositories();
-
-    List<RepositoryItem> getOrderedRepositories();
+    QueryDefinition resolve(Class<?> queryType);
 
 }

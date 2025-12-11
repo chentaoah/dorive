@@ -21,7 +21,7 @@ import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.core.entity.ctx.DefaultContext;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.repository.v1.api.RefObj;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -15,29 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.handler;
+package com.gitee.dorive.aggregate.v1.impl;
 
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.query.entity.QueryContext;
-import lombok.AllArgsConstructor;
+import com.gitee.dorive.base.v1.aggregate.api.QueryResolver;
+import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
 
-import java.util.Map;
-
-@AllArgsConstructor
-public class SimpleQueryHandler implements QueryHandler {
-
-    private final QueryHandler queryHandler;
+public class DefaultQueryResolver implements QueryResolver {
 
     @Override
-    public void handle(QueryContext queryContext, Object query) {
-        Map<String, Example> exampleMap = queryContext.getExampleMap();
-        if (exampleMap.size() == 1 && exampleMap.containsKey("/")) {
-            return;
-        }
-        if (queryHandler != null) {
-            queryHandler.handle(queryContext, query);
-        }
+    public QueryDefinition resolve(Class<?> queryType) {
+        QueryDefinitionResolver queryDefinitionResolver = new QueryDefinitionResolver();
+        return queryDefinitionResolver.resolve(queryType);
     }
 
 }

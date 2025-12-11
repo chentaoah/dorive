@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.handler.executor;
+package com.gitee.dorive.query.v1.impl.handler.executor;
 
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
-import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.QueryUnit;
+import com.gitee.dorive.query.v1.api.QueryHandler;
+import com.gitee.dorive.query.v1.entity.MergedRepository;
+import com.gitee.dorive.query.v1.entity.QueryContext;
+import com.gitee.dorive.query.v1.entity.QueryUnit;
 
 import java.util.LinkedHashMap;
 import java.util.List;

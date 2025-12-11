@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.api;
+package com.gitee.dorive.base.v1.repository.api;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
+public interface Properties {
 
-public interface ExampleConverter {
+    <T> void setProperty(Class<T> type, T instance);
 
-    void convert(Context context, Example example);
+    <T> T getProperty(Class<T> type);
+
+    <T> T tryGetProperty(Class<T> type);
 
 }

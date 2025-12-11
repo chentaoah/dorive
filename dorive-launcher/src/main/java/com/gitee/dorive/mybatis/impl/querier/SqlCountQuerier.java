@@ -21,7 +21,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
-import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
+import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.repository.v1.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.mybatis.entity.enums.Mapper;
@@ -30,10 +30,10 @@ import com.gitee.dorive.mybatis.entity.segment.TableSegment;
 import com.gitee.dorive.repository.v1.entity.sql.CountQuery;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.mybatis.impl.segment.SelectSegmentBuilder;
-import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.QueryUnit;
+import com.gitee.dorive.query.v1.api.QueryHandler;
+import com.gitee.dorive.query.v1.entity.MergedRepository;
+import com.gitee.dorive.query.v1.entity.QueryContext;
+import com.gitee.dorive.query.v1.entity.QueryUnit;
 import com.gitee.dorive.query.v1.enums.QueryMode;
 import com.gitee.dorive.query.v1.enums.ResultType;
 import lombok.AllArgsConstructor;
@@ -95,7 +95,7 @@ public class SqlCountQuerier implements CountQuerier {
     private List<String> toAliases(QueryUnit queryUnit, List<String> properties) {
         MergedRepository mergedRepository = queryUnit.getMergedRepository();
         DefaultRepository defaultRepository = mergedRepository.getDefaultRepository();
-        EntityMappers entityMappers = defaultRepository.getEntityMappers();
+        EntityMappers entityMappers = defaultRepository.getProperty(EntityMappers.class);
         EntityMapper entityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
         return entityMapper.toAliases(properties);
     }

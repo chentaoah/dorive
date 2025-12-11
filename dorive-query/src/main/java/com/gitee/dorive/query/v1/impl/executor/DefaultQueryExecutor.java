@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.repository;
+package com.gitee.dorive.query.v1.impl.executor;
 
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
-import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
-import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.query.v1.api.QueryHandler;
+import com.gitee.dorive.query.v1.entity.QueryContext;
 import com.gitee.dorive.query.v1.enums.ResultType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,7 +38,7 @@ import java.util.List;
 public class DefaultQueryExecutor implements QueryExecutor {
 
     private final QueryHandler queryHandler;
-    private final Repository<Object, Object> repository;
+    private final AbstractRepository<Object, Object> repository;
 
     @Override
     public List<Object> selectByQuery(Options options, Object query) {

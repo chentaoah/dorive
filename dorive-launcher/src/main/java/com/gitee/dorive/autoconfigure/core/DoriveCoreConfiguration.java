@@ -17,6 +17,10 @@
 
 package com.gitee.dorive.autoconfigure.core;
 
+import com.gitee.dorive.aggregate.v1.impl.DefaultEntityResolver;
+import com.gitee.dorive.aggregate.v1.impl.DefaultQueryResolver;
+import com.gitee.dorive.base.v1.aggregate.api.EntityResolver;
+import com.gitee.dorive.base.v1.aggregate.api.QueryResolver;
 import com.gitee.dorive.base.v1.executor.api.EntityHandlerFactory;
 import com.gitee.dorive.base.v1.executor.api.EntityJoinerFactory;
 import com.gitee.dorive.core.impl.factory.DefaultEntityHandlerFactory;
@@ -31,6 +35,16 @@ import org.springframework.core.annotation.Order;
 @Order(-100)
 @Configuration
 public class DoriveCoreConfiguration {
+
+    @Bean("EntityResolverV3")
+    public static EntityResolver entityResolver() {
+        return new DefaultEntityResolver();
+    }
+
+    @Bean("QueryResolverV3")
+    public static QueryResolver queryResolver() {
+        return new DefaultQueryResolver();
+    }
 
     @Bean("RepositoryGlobalContextV3")
     public static RepositoryGlobalContext repositoryGlobalContext() {

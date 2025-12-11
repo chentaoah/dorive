@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.handler;
+package com.gitee.dorive.query.v1.impl.handler;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.query.api.QueryHandler;
-import com.gitee.dorive.query.entity.QueryConfig;
-import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
-import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.query.v1.api.QueryHandler;
+import com.gitee.dorive.query.v1.entity.QueryConfig;
+import com.gitee.dorive.query.v1.entity.QueryContext;
+import com.gitee.dorive.query.v1.impl.resolver.QueryTypeResolver;
 import lombok.AllArgsConstructor;
 
 import java.util.Map;
@@ -30,14 +30,14 @@ import java.util.Map;
 @AllArgsConstructor
 public class ConfigQueryHandler implements QueryHandler {
 
-    private final AbstractQueryRepository<?, ?> repository;
+    private final RepositoryContext repository;
     private final QueryHandler queryHandler;
 
     @Override
     public void handle(QueryContext queryContext, Object query) {
         Class<?> queryType = queryContext.getQueryType();
 
-        QueryTypeResolver queryTypeResolver = repository.getQueryTypeResolver();
+        QueryTypeResolver queryTypeResolver = repository.getProperty(QueryTypeResolver.class);
         Map<Class<?>, QueryConfig> classQueryConfigMap = queryTypeResolver.getClassQueryConfigMap();
         QueryConfig queryConfig = classQueryConfigMap.get(queryType);
         Assert.notNull(queryConfig, "No query config found!");

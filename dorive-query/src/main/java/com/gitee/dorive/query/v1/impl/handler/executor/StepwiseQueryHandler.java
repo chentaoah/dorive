@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.handler.executor;
+package com.gitee.dorive.query.v1.impl.handler.executor;
 
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.binder.AbstractBinder;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
 import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.repository.v1.impl.repository.ProxyRepository;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
-import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
-import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.QueryUnit;
+import com.gitee.dorive.query.v1.entity.MergedRepository;
+import com.gitee.dorive.query.v1.entity.QueryContext;
+import com.gitee.dorive.query.v1.entity.QueryUnit;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,12 +50,12 @@ public class StepwiseQueryHandler extends AbstractQueryUnitQueryHandler {
             Example example = queryUnit.getExample();
             boolean abandoned = queryUnit.isAbandoned();
 
-            ProxyRepository definedRepository = mergedRepository.getDefinedRepository();
+            RepositoryItem definedRepository = mergedRepository.getDefinedRepository();
             Map<String, List<StrongBinder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
             Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
-            ProxyRepository executedRepository = mergedRepository.getExecutedRepository();
+            RepositoryItem executedRepository = mergedRepository.getExecutedRepository();
 
-            BinderResolver binderResolver = (BinderResolver) definedRepository.getBinderExecutor();
+            BinderResolver binderResolver = definedRepository.getBinderExecutor();
 
             if (!abandoned) {
                 abandoned = determineAbandon(queryUnitMap, mergedValueRouteBindersMap.keySet());

@@ -15,18 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.impl.resolver;
+package com.gitee.dorive.query.v1.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.extra.spring.SpringUtil;
+import com.gitee.dorive.base.v1.aggregate.api.QueryResolver;
+import com.gitee.dorive.base.v1.common.def.QueryFieldDef;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
 import com.gitee.dorive.base.v1.common.entity.QueryFieldDefinition;
-import com.gitee.dorive.base.v1.common.def.QueryFieldDef;
-import com.gitee.dorive.aggregate.v1.impl.QueryDefinitionResolver;
-import com.gitee.dorive.repository.v1.impl.repository.ProxyRepository;
-import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.entity.QueryConfig;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.query.v1.entity.MergedRepository;
+import com.gitee.dorive.query.v1.entity.QueryConfig;
 import lombok.Data;
 
 import java.util.*;
@@ -35,10 +36,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 public class QueryTypeResolver {
 
-    private AbstractQueryRepository<?, ?> repository;
+    private RepositoryContext repository;
     private Map<Class<?>, QueryConfig> classQueryConfigMap = new ConcurrentHashMap<>();
 
-    public QueryTypeResolver(AbstractQueryRepository<?, ?> repository) {
+    public QueryTypeResolver(RepositoryContext repository) {
         this.repository = repository;
     }
 
@@ -51,8 +52,8 @@ public class QueryTypeResolver {
     }
 
     private void resolveQueryClass(Class<?> queryClass) {
-        QueryDefinitionResolver queryDefinitionResolver = new QueryDefinitionResolver();
-        QueryDefinition queryDefinition = queryDefinitionResolver.resolve(queryClass);
+        QueryResolver queryResolver = SpringUtil.getBean(QueryResolver.class);
+        QueryDefinition queryDefinition = queryResolver.resolve(queryClass);
         QueryExampleResolver queryExampleResolver = new QueryExampleResolver(queryDefinition);
 
         Set<String> accessPaths = new HashSet<>();
@@ -65,10 +66,10 @@ public class QueryTypeResolver {
         }
 
         // 添加绑定的且未添加到集合的仓储
-        MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
+        MergedRepositoryResolver mergedRepositoryResolver = repository.getProperty(MergedRepositoryResolver.class);
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
         for (MergedRepository mergedRepository : mergedRepositoryMap.values()) {
-            ProxyRepository repository = mergedRepository.getExecutedRepository();
+            RepositoryItem repository = mergedRepository.getExecutedRepository();
             if (repository.isBound() && accessPaths.add(mergedRepository.getAbsoluteAccessPath())) {
                 mergedRepositories.add(mergedRepository);
             }
@@ -88,7 +89,7 @@ public class QueryTypeResolver {
     }
 
     private MergedRepository resetQueryField(QueryFieldDefinition queryFieldDefinition) {
-        MergedRepositoryResolver mergedRepositoryResolver = repository.getMergedRepositoryResolver();
+        MergedRepositoryResolver mergedRepositoryResolver = repository.getProperty(MergedRepositoryResolver.class);
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
         Map<String, MergedRepository> nameMergedRepositoryMap = mergedRepositoryResolver.getNameMergedRepositoryMap();
 
@@ -106,7 +107,7 @@ public class QueryTypeResolver {
         MergedRepository mergedRepository = mergedRepositoryMap.get(belongTo);
         Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
 
-        ProxyRepository repository = mergedRepository.getExecutedRepository();
+        RepositoryItem repository = mergedRepository.getExecutedRepository();
         Assert.isTrue(repository.hasField(field), "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",
                 queryFieldDefinition.getField(), repository.getEntityClass(), field);
 

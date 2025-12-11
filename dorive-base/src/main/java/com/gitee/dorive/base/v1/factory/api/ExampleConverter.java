@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.api;
+package com.gitee.dorive.base.v1.factory.api;
 
-import com.gitee.dorive.query.entity.QueryContext;
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
 
-public interface QueryHandler {
+public interface ExampleConverter {
 
-    void handle(QueryContext queryContext, Object query);
+    void convert(Context context, Example example);
 
 }

@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.entity;
+package com.gitee.dorive.query.v1.entity;
 
-import com.gitee.dorive.factory.v1.api.ExampleConverter;
+import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
+import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,7 +41,7 @@ public class QueryUnit {
     public void convertExample(QueryContext queryContext) {
         Context context = queryContext.getContext();
         DefaultRepository defaultRepository = mergedRepository.getDefaultRepository();
-        ExampleConverter exampleConverter = defaultRepository.getExampleConverter();
+        ExampleConverter exampleConverter = defaultRepository.getProperty(ExampleConverter.class);
         exampleConverter.convert(context, example);
     }
 }
