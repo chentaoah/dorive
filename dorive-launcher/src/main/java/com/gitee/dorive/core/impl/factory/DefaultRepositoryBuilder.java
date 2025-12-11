@@ -38,6 +38,7 @@ import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
 import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
+import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.mybatis.entity.enums.Mapper;
 import com.gitee.dorive.mybatis.impl.handler.SqlBuildQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlCustomQueryHandler;
@@ -148,11 +149,11 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             queryHandlerMap.put(QueryMode.STEPWISE, new StepwiseQueryHandler());
             if (repositoryContext instanceof AbstractMybatisRepository) {
                 AbstractMybatisRepository<?, ?> mybatisRepository = (AbstractMybatisRepository<?, ?>) repository;
-                EntityMappers entityMappers = mybatisRepository.getEntityMappers();
+                EntityMappers entityMappers = mybatisRepository.getProperty(EntityMappers.class);
                 EntityMapper entityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
                 queryHandlerMap.put(QueryMode.SQL_BUILD, new SqlBuildQueryHandler(repository));
                 queryHandlerMap.put(QueryMode.SQL_EXECUTE, new SqlExecuteQueryHandler(repository, mybatisRepository.getSqlRunner(), entityMapper));
-                queryHandlerMap.put(QueryMode.SQL_CUSTOM, new SqlCustomQueryHandler(repository, mybatisRepository.getEntityStoreInfo()));
+                queryHandlerMap.put(QueryMode.SQL_CUSTOM, new SqlCustomQueryHandler(repository, mybatisRepository.getProperty(EntityStoreInfo.class)));
             }
 
             QueryHandler queryHandler = new AdaptiveQueryHandler(queryHandlerMap);

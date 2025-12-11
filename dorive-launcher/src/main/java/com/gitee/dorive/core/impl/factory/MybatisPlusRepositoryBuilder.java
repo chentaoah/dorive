@@ -69,14 +69,14 @@ public class MybatisPlusRepositoryBuilder {
         OperationFactory operationFactory = new OperationFactory(entityElement);
 
         EntityStoreInfo entityStoreInfo = resolveEntityStoreInfo(repository.getRepositoryDef());
-        repository.setEntityStoreInfo(entityStoreInfo);
+        repository.setProperty(EntityStoreInfo.class, entityStoreInfo);
 
         String reMapper = Mapper.ENTITY_DATABASE.name();
         String deMapper = Mapper.ENTITY_POJO.name();
 
         EntityMappersResolver entityMappersResolver = new EntityMappersResolver(entityElement, entityStoreInfo.getAliasPropMapping(), reMapper, deMapper);
         EntityMappers entityMappers = entityMappersResolver.newEntityMappers();
-        repository.setEntityMappers(entityMappers);
+        repository.setProperty(EntityMappers.class, entityMappers);
 
         EntityMapper reEntityMapper = entityMappers.getEntityMapper(reMapper);
         EntityMapper deEntityMapper = entityMappers.getEntityMapper(deMapper);

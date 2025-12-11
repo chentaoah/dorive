@@ -32,19 +32,7 @@ import java.util.Map;
 @Setter
 public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefRepository<E, PK> implements CountQuerier {
     private SqlRunner sqlRunner;
-    private Object entityStoreInfo;
-    private Object entityMappers;
     private CountQuerier countQuerier;
-
-    @SuppressWarnings("unchecked")
-    public <T> T getEntityStoreInfo() {
-        return (T) entityStoreInfo;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T getEntityMappers() {
-        return (T) entityMappers;
-    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
