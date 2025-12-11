@@ -26,7 +26,7 @@ import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.query.entity.QueryContext;
 import com.gitee.dorive.query.entity.QueryUnit;
-import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import lombok.Getter;
 import lombok.Setter;
 

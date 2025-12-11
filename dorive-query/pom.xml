@@ -12,7 +12,7 @@
     <dependencies>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-base</artifactId>
+            <artifactId>dorive-binder</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

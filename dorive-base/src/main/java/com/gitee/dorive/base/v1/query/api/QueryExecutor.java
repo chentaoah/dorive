@@ -15,11 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.entity.enums;
+package com.gitee.dorive.base.v1.query.api;
 
-public enum QueryMode {
-    STEPWISE,
-    SQL_BUILD,
-    SQL_EXECUTE,
-    SQL_CUSTOM,
+import com.gitee.dorive.base.v1.core.api.Options;
+import com.gitee.dorive.base.v1.core.entity.qry.Page;
+
+import java.util.List;
+
+public interface QueryExecutor {
+
+    List<Object> selectByQuery(Options options, Object query);
+
+    Page<Object> selectPageByQuery(Options options, Object query);
+
+    long selectCountByQuery(Options options, Object query);
+
 }

@@ -21,7 +21,7 @@ import com.gitee.dorive.base.v1.core.util.ReflectUtils;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryGlobalContext;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
-import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.web.entity.ResObject;
 import lombok.Getter;
 import lombok.Setter;

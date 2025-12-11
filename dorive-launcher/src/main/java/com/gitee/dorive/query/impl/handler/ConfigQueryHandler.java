@@ -21,7 +21,7 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryConfig;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.query.impl.resolver.QueryTypeResolver;
 import lombok.AllArgsConstructor;
 

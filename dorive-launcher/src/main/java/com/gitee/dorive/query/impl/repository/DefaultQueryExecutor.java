@@ -22,45 +22,26 @@ import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
+import com.gitee.dorive.base.v1.repository.api.Repository;
+import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.entity.QueryContext;
-import com.gitee.dorive.query.entity.enums.ResultType;
-import com.gitee.dorive.repository.v1.api.QueryRepository;
-import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractEventRepository;
-import lombok.Getter;
-import lombok.Setter;
+import com.gitee.dorive.query.v1.enums.ResultType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.util.Collections;
 import java.util.List;
 
-@Getter
-@Setter
-public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryRepository<E, PK> {
-    private Object mergedRepositoryResolver;
-    private Object queryTypeResolver;
-    private QueryHandler queryHandler;
+@Data
+@AllArgsConstructor
+public class DefaultQueryExecutor implements QueryExecutor {
 
-    @SuppressWarnings("unchecked")
-    public <T> T getMergedRepositoryResolver() {
-        return (T) mergedRepositoryResolver;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T getQueryTypeResolver() {
-        return (T) queryTypeResolver;
-    }
+    private final QueryHandler queryHandler;
+    private final Repository<Object, Object> repository;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
-        RepositoryBuilder repositoryBuilder = getRepositoryBuilder();
-        repositoryBuilder.buildQueryRepository(this);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<E> selectByQuery(Options options, Object query) {
+    public List<Object> selectByQuery(Options options, Object query) {
         QueryContext queryContext = new QueryContext((Context) options, query.getClass(), ResultType.DATA);
         queryHandler.handle(queryContext, query);
 
@@ -72,14 +53,13 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
             return Collections.emptyList();
         }
         if (result != null) {
-            return (List<E>) result.getRecords();
+            return result.getRecords();
         }
-        return selectByExample(context, example);
+        return repository.selectByExample(context, example);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Page<E> selectPageByQuery(Options options, Object query) {
+    public Page<Object> selectPageByQuery(Options options, Object query) {
         QueryContext queryContext = new QueryContext((Context) options, query.getClass(), ResultType.COUNT_AND_DATA);
         queryHandler.handle(queryContext, query);
 
@@ -88,12 +68,12 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         Result<Object> result = queryContext.getResult();
 
         if (queryContext.isAbandoned()) {
-            return (Page<E>) example.getPage();
+            return example.getPage();
         }
         if (result != null) {
-            return (Page<E>) result.getPage();
+            return result.getPage();
         }
-        return selectPageByExample(context, example);
+        return repository.selectPageByExample(context, example);
     }
 
     @Override
@@ -111,6 +91,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         if (result != null) {
             return result.getCount();
         }
-        return selectCountByExample(context, example);
+        return repository.selectCountByExample(context, example);
     }
+
 }

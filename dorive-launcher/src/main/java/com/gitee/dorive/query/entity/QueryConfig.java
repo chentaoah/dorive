@@ -18,7 +18,7 @@
 package com.gitee.dorive.query.entity;
 
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.query.impl.resolver.QueryExampleResolver;
 import lombok.Data;
 

@@ -19,12 +19,14 @@ package com.gitee.dorive.mybatis.impl.repository;
 
 import com.gitee.dorive.base.v1.common.api.ImplFactory;
 import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.mybatis.api.sql.CountQuerier;
 import com.gitee.dorive.mybatis.api.sql.SqlRunner;
 import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
 import com.gitee.dorive.mybatis.entity.sql.CountQuery;
 import com.gitee.dorive.mybatis.impl.querier.SqlCountQuerier;
+import com.gitee.dorive.query.impl.repository.DefaultQueryExecutor;
 import com.gitee.dorive.ref.impl.repository.AbstractRefRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,7 +46,10 @@ public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefReposi
         ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
         this.sqlRunner = implFactory.getInstance(SqlRunner.class);
         super.afterPropertiesSet();
-        this.countQuerier = new SqlCountQuerier(this, getQueryHandler(), sqlRunner);
+        QueryExecutor queryExecutor = getQueryExecutor();
+        if (queryExecutor instanceof DefaultQueryExecutor) {
+            this.countQuerier = new SqlCountQuerier(this, ((DefaultQueryExecutor) queryExecutor).getQueryHandler(), sqlRunner);
+        }
     }
 
     @Override

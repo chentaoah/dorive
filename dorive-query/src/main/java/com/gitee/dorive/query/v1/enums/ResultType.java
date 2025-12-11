@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.entity.enums;
+package com.gitee.dorive.query.v1.enums;
 
 public enum ResultType {
     COUNT_AND_DATA,

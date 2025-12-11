@@ -26,7 +26,7 @@ import com.gitee.dorive.repository.v1.impl.repository.DefaultRepository;
 import com.gitee.dorive.repository.v1.impl.repository.ProxyRepository;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.query.entity.MergedRepository;
-import com.gitee.dorive.query.impl.repository.AbstractQueryRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
