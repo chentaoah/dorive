@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.api.sql;
+package com.gitee.dorive.repository.v1.api;
 
-import java.util.List;
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.repository.v1.entity.sql.CountQuery;
+
 import java.util.Map;
 
-public interface SqlRunner {
+public interface CountQuerier {
 
-    long selectCount(String sql, Object... args);
-
-    List<Map<String, Object>> selectList(String sql, Object... args);
+    Map<String, Long> selectCountMap(Context context, CountQuery countQuery);
 
 }

@@ -15,15 +15,31 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.api.sql;
+package com.gitee.dorive.repository.v1.entity.sql;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.mybatis.entity.sql.CountQuery;
+import com.gitee.dorive.base.v1.core.api.Selector;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
-public interface CountQuerier {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CountQuery {
+    private Object query;
+    private boolean distinct = true;
+    private Selector selector;
+    private List<String> countBy;
+    private List<String> groupBy;
 
-    Map<String, Long> selectCountMap(Context context, CountQuery countQuery);
-
+    public CountQuery(Object query, String countBy, String groupBy) {
+        this.query = query;
+        this.countBy = Collections.singletonList(countBy);
+        this.groupBy = Collections.singletonList(groupBy);
+    }
 }

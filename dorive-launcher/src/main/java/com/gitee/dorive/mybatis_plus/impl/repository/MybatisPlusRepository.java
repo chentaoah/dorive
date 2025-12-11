@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.mybatis_plus.impl.repository;
 
-import com.gitee.dorive.mybatis.impl.repository.AbstractMybatisRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import lombok.Getter;
 import lombok.Setter;
 

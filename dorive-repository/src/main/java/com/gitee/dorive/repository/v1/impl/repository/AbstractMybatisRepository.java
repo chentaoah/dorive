@@ -15,19 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.impl.repository;
+package com.gitee.dorive.repository.v1.impl.repository;
 
 import com.gitee.dorive.base.v1.common.api.ImplFactory;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.query.api.QueryExecutor;
-import com.gitee.dorive.factory.v1.api.EntityMappers;
-import com.gitee.dorive.mybatis.api.sql.CountQuerier;
-import com.gitee.dorive.mybatis.api.sql.SqlRunner;
-import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
-import com.gitee.dorive.mybatis.entity.sql.CountQuery;
-import com.gitee.dorive.mybatis.impl.querier.SqlCountQuerier;
-import com.gitee.dorive.query.impl.repository.DefaultQueryExecutor;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractRefRepository;
+import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
+import com.gitee.dorive.repository.v1.api.CountQuerier;
+import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
+import com.gitee.dorive.repository.v1.entity.sql.CountQuery;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,19 +32,27 @@ import java.util.Map;
 @Setter
 public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefRepository<E, PK> implements CountQuerier {
     private SqlRunner sqlRunner;
-    private EntityStoreInfo entityStoreInfo;
-    private EntityMappers entityMappers;
+    private Object entityStoreInfo;
+    private Object entityMappers;
     private CountQuerier countQuerier;
+
+    @SuppressWarnings("unchecked")
+    public <T> T getEntityStoreInfo() {
+        return (T) entityStoreInfo;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getEntityMappers() {
+        return (T) entityMappers;
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
         this.sqlRunner = implFactory.getInstance(SqlRunner.class);
         super.afterPropertiesSet();
-        QueryExecutor queryExecutor = getQueryExecutor();
-        if (queryExecutor instanceof DefaultQueryExecutor) {
-            this.countQuerier = new SqlCountQuerier(this, ((DefaultQueryExecutor) queryExecutor).getQueryHandler(), sqlRunner);
-        }
+        RepositoryBuilder repositoryBuilder = getRepositoryBuilder();
+        repositoryBuilder.buildMybatisRepository(this);
     }
 
     @Override

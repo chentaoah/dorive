@@ -23,7 +23,7 @@ import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.mybatis.api.sql.SqlRunner;
+import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.mybatis.entity.segment.ArgSegment;
 import com.gitee.dorive.mybatis.entity.segment.SelectSegment;
 import com.gitee.dorive.mybatis.entity.segment.TableSegment;

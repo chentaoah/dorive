@@ -40,13 +40,15 @@ import com.gitee.dorive.mybatis.entity.enums.Mapper;
 import com.gitee.dorive.mybatis.impl.handler.SqlBuildQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlCustomQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlExecuteQueryHandler;
-import com.gitee.dorive.mybatis.impl.repository.AbstractMybatisRepository;
+import com.gitee.dorive.mybatis.impl.querier.SqlCountQuerier;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.mybatis_plus.impl.repository.MybatisPlusRepository;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.v1.enums.QueryMode;
 import com.gitee.dorive.query.impl.handler.*;
 import com.gitee.dorive.query.impl.handler.executor.StepwiseQueryHandler;
+import com.gitee.dorive.repository.v1.api.CountQuerier;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.query.impl.repository.DefaultQueryExecutor;
 import com.gitee.dorive.query.impl.resolver.MergedRepositoryResolver;
@@ -165,6 +167,18 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             queryHandler = new ConfigQueryHandler(repository, queryHandler);
             QueryExecutor queryExecutor = new DefaultQueryExecutor(queryHandler, (Repository<Object, Object>) repository);
             repository.setQueryExecutor(queryExecutor);
+        }
+    }
+
+    @Override
+    public void buildMybatisRepository(RepositoryContext repositoryContext) {
+        if (repositoryContext instanceof AbstractMybatisRepository) {
+            AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
+            QueryExecutor queryExecutor = repository.getQueryExecutor();
+            if (queryExecutor instanceof DefaultQueryExecutor) {
+                CountQuerier countQuerier = new SqlCountQuerier(repository, ((DefaultQueryExecutor) queryExecutor).getQueryHandler(), repository.getSqlRunner());
+                repository.setCountQuerier(countQuerier);
+            }
         }
     }
 

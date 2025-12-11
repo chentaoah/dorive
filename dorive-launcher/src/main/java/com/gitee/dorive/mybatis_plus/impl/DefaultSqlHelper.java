@@ -21,7 +21,7 @@ import cn.hutool.db.sql.Condition;
 import cn.hutool.db.sql.SqlUtil;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.gitee.dorive.base.v1.common.api.SqlFormat;
-import com.gitee.dorive.mybatis.api.sql.SqlRunner;
+import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 
 import java.util.List;
 import java.util.Map;
