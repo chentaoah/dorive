@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.impl.segment;
+package com.gitee.dorive.mybatis.v1.impl.segment;
 
 import com.gitee.dorive.base.v1.core.api.Selector;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.mybatis.entity.segment.ArgSegment;
-import com.gitee.dorive.mybatis.entity.segment.SelectSegment;
-import com.gitee.dorive.mybatis.entity.segment.TableJoinSegment;
-import com.gitee.dorive.mybatis.entity.segment.TableSegment;
+import com.gitee.dorive.mybatis.v1.entity.segment.ArgSegment;
+import com.gitee.dorive.mybatis.v1.entity.segment.SelectSegment;
+import com.gitee.dorive.mybatis.v1.entity.segment.TableJoinSegment;
+import com.gitee.dorive.mybatis.v1.entity.segment.TableSegment;
 import com.gitee.dorive.query.v1.entity.MergedRepository;
 import com.gitee.dorive.query.v1.entity.QueryContext;
 import com.gitee.dorive.query.v1.entity.QueryUnit;

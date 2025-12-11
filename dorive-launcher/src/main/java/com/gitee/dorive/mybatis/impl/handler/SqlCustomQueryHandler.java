@@ -23,7 +23,7 @@ import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
-import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
+import com.gitee.dorive.mybatis.v1.entity.EntityStoreInfo;
 import com.gitee.dorive.query.v1.entity.QueryContext;
 import com.gitee.dorive.query.v1.entity.QueryUnit;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;

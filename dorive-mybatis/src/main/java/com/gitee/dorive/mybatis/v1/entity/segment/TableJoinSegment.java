@@ -15,7 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.api.sql;
+package com.gitee.dorive.mybatis.v1.entity.segment;
 
-public interface Segment {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class TableJoinSegment extends TableSegment {
+    private List<OnSegment> onSegments;
 }

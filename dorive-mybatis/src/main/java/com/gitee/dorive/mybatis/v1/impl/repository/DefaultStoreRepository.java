@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.entity.segment;
+package com.gitee.dorive.mybatis.v1.impl.repository;
 
+import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
+import com.gitee.dorive.mybatis.v1.entity.EntityStoreInfo;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ArgSegment extends ExprSegment {
-
-    public ArgSegment(String leftExpr, String operator, String rightExpr) {
-        super(leftExpr, operator, rightExpr);
-    }
-
+@NoArgsConstructor
+public class DefaultStoreRepository extends DefaultRepository {
+    private EntityStoreInfo entityStoreInfo;
 }

@@ -15,26 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.entity.common;
+package com.gitee.dorive.mybatis.v1.api;
 
-import com.gitee.dorive.base.v1.common.api.MethodInvoker;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-import java.util.Map;
-
-@Data
-@AllArgsConstructor
-public class EntityStoreInfo {
-    private Class<?> mapperClass;
-    private Object mapper;
-    private Class<?> pojoClass;
-    private String tableName;
-    private String idProperty;
-    private String idColumn;
-    private Map<String, String> propAliasMappingWithoutPk;
-    private Map<String, String> propAliasMapping;
-    private Map<String, String> aliasPropMapping;
-    private String selectColumns;
-    private Map<String, MethodInvoker> selectMethodMap;
+public interface Segment {
 }

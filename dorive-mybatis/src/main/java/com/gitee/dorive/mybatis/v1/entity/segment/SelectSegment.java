@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.entity.segment;
+package com.gitee.dorive.mybatis.v1.entity.segment;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlBuilder;
-import com.gitee.dorive.mybatis.api.sql.Segment;
+import com.gitee.dorive.mybatis.v1.api.Segment;
 import lombok.Data;
 
 import java.util.ArrayList;

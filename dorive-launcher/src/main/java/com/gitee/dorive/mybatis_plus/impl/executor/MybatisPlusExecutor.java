@@ -40,7 +40,7 @@ import com.gitee.dorive.base.v1.core.entity.eop.Delete;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
 import com.gitee.dorive.base.v1.executor.impl.AbstractExecutor;
-import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
+import com.gitee.dorive.mybatis.v1.entity.EntityStoreInfo;
 import com.gitee.dorive.mybatis_plus.api.EasyBaseMapper;
 import com.gitee.dorive.mybatis_plus.enums.InsertMethod;
 import com.gitee.dorive.mybatis_plus.impl.AppenderContext;

@@ -15,19 +15,26 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.entity.segment;
+package com.gitee.dorive.mybatis.v1.entity;
 
+import com.gitee.dorive.base.v1.common.api.MethodInvoker;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-import java.util.List;
+import java.util.Map;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-public class TableJoinSegment extends TableSegment {
-    private List<OnSegment> onSegments;
+public class EntityStoreInfo {
+    private Class<?> mapperClass;
+    private Object mapper;
+    private Class<?> pojoClass;
+    private String tableName;
+    private String idProperty;
+    private String idColumn;
+    private Map<String, String> propAliasMappingWithoutPk;
+    private Map<String, String> propAliasMapping;
+    private Map<String, String> aliasPropMapping;
+    private String selectColumns;
+    private Map<String, MethodInvoker> selectMethodMap;
 }

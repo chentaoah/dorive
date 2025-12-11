@@ -15,9 +15,29 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.entity.enums;
+package com.gitee.dorive.mybatis.v1.entity.segment;
 
-public enum Mapper {
-    ENTITY_DATABASE,
-    ENTITY_POJO
+import com.gitee.dorive.mybatis.v1.api.Segment;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class ExprSegment implements Segment {
+
+    private String leftExpr;
+    private String operator;
+    private String rightExpr;
+
+    @Override
+    public String toString() {
+        if (rightExpr != null) {
+            return leftExpr + " " + operator + " " + rightExpr;
+        } else {
+            return leftExpr + " " + operator;
+        }
+    }
+
 }

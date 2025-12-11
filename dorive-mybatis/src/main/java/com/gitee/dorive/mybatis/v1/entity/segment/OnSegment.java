@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.entity.segment;
+package com.gitee.dorive.mybatis.v1.entity.segment;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class OnValueSegment extends OnSegment {
+public class OnSegment extends ExprSegment {
 
-    public OnValueSegment(String leftExpr, String operator, String rightExpr) {
+    public OnSegment(String leftExpr, String operator, String rightExpr) {
         super(leftExpr, operator, rightExpr);
     }
 

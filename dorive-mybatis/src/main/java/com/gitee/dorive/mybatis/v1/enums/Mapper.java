@@ -15,17 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.impl.repository;
+package com.gitee.dorive.mybatis.v1.enums;
 
-import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
-import com.gitee.dorive.mybatis.entity.common.EntityStoreInfo;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@NoArgsConstructor
-public class DefaultStoreRepository extends DefaultRepository {
-    private EntityStoreInfo entityStoreInfo;
+public enum Mapper {
+    ENTITY_DATABASE,
+    ENTITY_POJO
 }
