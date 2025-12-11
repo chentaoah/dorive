@@ -42,7 +42,7 @@ import com.gitee.dorive.mybatis.impl.handler.SqlCustomQueryHandler;
 import com.gitee.dorive.mybatis.impl.handler.SqlExecuteQueryHandler;
 import com.gitee.dorive.mybatis.impl.querier.SqlCountQuerier;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
-import com.gitee.dorive.mybatis_plus.impl.repository.MybatisPlusRepository;
+import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.query.api.QueryHandler;
 import com.gitee.dorive.query.v1.enums.QueryMode;

@@ -42,7 +42,7 @@ import com.gitee.dorive.mybatis.impl.executor.UnionExecutor;
 import com.gitee.dorive.mybatis.impl.repository.DefaultStoreRepository;
 import com.gitee.dorive.mybatis_plus.impl.DefaultMethodInvoker;
 import com.gitee.dorive.mybatis_plus.impl.executor.MybatisPlusExecutor;
-import com.gitee.dorive.mybatis_plus.impl.repository.MybatisPlusRepository;
+import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;

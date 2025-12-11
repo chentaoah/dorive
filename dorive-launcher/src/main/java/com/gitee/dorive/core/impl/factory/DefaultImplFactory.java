@@ -15,13 +15,25 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis_plus.impl.repository;
+package com.gitee.dorive.core.impl.factory;
 
-import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
-import lombok.Getter;
-import lombok.Setter;
+import com.gitee.dorive.base.v1.common.api.ImplFactory;
+import com.gitee.dorive.base.v1.common.api.SqlFormat;
+import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
+import com.gitee.dorive.mybatis_plus.impl.DefaultSqlHelper;
 
-@Getter
-@Setter
-public class MybatisPlusRepository<E, PK> extends AbstractMybatisRepository<E, PK> {
+public class DefaultImplFactory implements ImplFactory {
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T getInstance(Class<T> clazz, Object... args) {
+        if (clazz == SqlFormat.class) {
+            return (T) new DefaultSqlHelper();
+
+        } else if (clazz == SqlRunner.class) {
+            return (T) new DefaultSqlHelper();
+        }
+        return null;
+    }
+
 }
