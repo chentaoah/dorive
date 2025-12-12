@@ -20,9 +20,9 @@ public class Test {
         Set<String> filenames2 = new LinkedHashSet<>();
         resolve(inputPath2, filenames2);
 
-        filenames1.removeAll(filenames2);
+        filenames2.removeAll(filenames1);
         System.out.println("==================== 差集 ======================");
-        for (String filename : filenames1) {
+        for (String filename : filenames2) {
             System.out.println(filename);
         }
     }
