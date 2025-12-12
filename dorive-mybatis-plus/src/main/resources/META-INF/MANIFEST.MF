@@ -1,11 +1,11 @@
 Dorive-Origin: null
 Dorive-Organization: com.gitee
 Dorive-Project: dorive
-Dorive-Domain: launcher
+Dorive-Domain: mybatis_plus
 Dorive-Subdomain: null
-Dorive-Module: dorive-launcher
+Dorive-Module: dorive-mybatis_plus
 Dorive-Version: v1
-Dorive-Type: launcher
+Dorive-Type: biz
 Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null

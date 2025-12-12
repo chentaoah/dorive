@@ -1,5 +1,5 @@
 Dorive-Origin: null
-Dorive-Organization: null
+Dorive-Organization: com.gitee
 Dorive-Project: dorive
 Dorive-Domain: base
 Dorive-Subdomain: null

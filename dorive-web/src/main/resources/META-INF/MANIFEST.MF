@@ -1,11 +1,11 @@
 Dorive-Origin: null
 Dorive-Organization: com.gitee
 Dorive-Project: dorive
-Dorive-Domain: launcher
+Dorive-Domain: web
 Dorive-Subdomain: null
-Dorive-Module: dorive-launcher
+Dorive-Module: dorive-web
 Dorive-Version: v1
-Dorive-Type: launcher
+Dorive-Type: biz
 Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
