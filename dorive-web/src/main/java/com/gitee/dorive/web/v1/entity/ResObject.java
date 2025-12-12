@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.web.entity;
+package com.gitee.dorive.web.v1.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;

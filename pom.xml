@@ -41,6 +41,7 @@
         <module>dorive-mybatis-plus</module>
         <module>dorive-module</module>
         <module>dorive-module-test</module>
+        <module>dorive-web</module>
         <module>dorive-launcher</module>
     </modules>
 

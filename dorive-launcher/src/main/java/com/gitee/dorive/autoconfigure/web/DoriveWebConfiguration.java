@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.autoconfigure.web;
 
-import com.gitee.dorive.web.impl.advice.ParameterControllerAdvice;
-import com.gitee.dorive.web.impl.banner.BannerPrinter;
+import com.gitee.dorive.web.v1.impl.advice.ParameterControllerAdvice;
+import com.gitee.dorive.web.v1.impl.banner.BannerPrinter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;

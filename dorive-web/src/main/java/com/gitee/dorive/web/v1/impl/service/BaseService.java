@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.web.impl.service;
+package com.gitee.dorive.web.v1.impl.service;
 
 import com.gitee.dorive.base.v1.core.util.ReflectUtils;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryGlobalContext;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
-import com.gitee.dorive.web.entity.ResObject;
+import com.gitee.dorive.web.v1.entity.ResObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.BeansException;

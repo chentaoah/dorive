@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.web.impl.banner;
+package com.gitee.dorive.web.v1.impl.banner;
 
 import org.springframework.beans.factory.InitializingBean;
 
