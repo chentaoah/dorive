@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.test.impl;
+package com.gitee.dorive.module_test.v1.impl;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.module.v1.impl.SpringModularApplication;
