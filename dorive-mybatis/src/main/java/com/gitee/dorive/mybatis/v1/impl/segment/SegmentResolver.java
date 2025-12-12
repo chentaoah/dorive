@@ -39,7 +39,6 @@ import com.gitee.dorive.mybatis.v1.entity.segment.OnValueSegment;
 import com.gitee.dorive.mybatis.v1.entity.segment.TableJoinSegment;
 import com.gitee.dorive.mybatis.v1.entity.segment.TableSegment;
 import com.gitee.dorive.mybatis.v1.enums.Mapper;
-import com.gitee.dorive.mybatis.v1.impl.repository.DefaultStoreRepository;
 import com.gitee.dorive.query.v1.entity.MergedRepository;
 import com.gitee.dorive.query.v1.entity.QueryContext;
 import com.gitee.dorive.query.v1.entity.QueryUnit;
@@ -65,8 +64,8 @@ public class SegmentResolver {
 
     public Segment resolve() {
         MergedRepository mergedRepository = queryUnit.getMergedRepository();
-        DefaultStoreRepository defaultStoreRepository = (DefaultStoreRepository) mergedRepository.getDefaultRepository();
-        EntityStoreInfo entityStoreInfo = defaultStoreRepository.getEntityStoreInfo();
+        DefaultRepository defaultRepository = mergedRepository.getDefaultRepository();
+        EntityStoreInfo entityStoreInfo = defaultRepository.getProperty(EntityStoreInfo.class);
         String tableName = entityStoreInfo.getTableName();
         return newTableSegment(tableName);
     }

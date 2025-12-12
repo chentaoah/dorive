@@ -31,6 +31,7 @@ import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.launcher.v1.impl.resolver.EntityFactoryResolver;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
 import com.gitee.dorive.factory.v1.api.EntityMapper;
@@ -41,7 +42,6 @@ import com.gitee.dorive.factory.v1.impl.resolver.EntityMappersResolver;
 import com.gitee.dorive.mybatis.v1.entity.EntityStoreInfo;
 import com.gitee.dorive.mybatis.v1.enums.Mapper;
 import com.gitee.dorive.mybatis.v1.impl.executor.UnionExecutor;
-import com.gitee.dorive.mybatis.v1.impl.repository.DefaultStoreRepository;
 import com.gitee.dorive.mybatis_plus.v1.impl.common.DefaultMethodInvoker;
 import com.gitee.dorive.mybatis_plus.v1.impl.executor.MybatisPlusExecutor;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
@@ -90,13 +90,13 @@ public class MybatisPlusRepositoryBuilder {
         executor = new FactoryExecutor(executor, entityElement, entityStoreInfo.getIdProperty(), entityFactory);
         executor = new ExampleExecutor(executor, entityElement, reEntityMapper);
 
-        DefaultStoreRepository defaultRepository = new DefaultStoreRepository();
+        DefaultRepository defaultRepository = new DefaultRepository();
         defaultRepository.setEntityElement(entityElement);
         defaultRepository.setOperationFactory(operationFactory);
         defaultRepository.setExecutor(executor);
         defaultRepository.setProperty(EntityMappers.class, entityMappers);
         defaultRepository.setProperty(ExampleConverter.class, (ExampleConverter) executor);
-        defaultRepository.setEntityStoreInfo(entityStoreInfo);
+        defaultRepository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         return defaultRepository;
     }
 
