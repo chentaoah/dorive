@@ -15,25 +15,26 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.factory;
+package com.gitee.dorive.module.v1.impl.util;
 
-import com.gitee.dorive.base.v1.common.api.ImplFactory;
-import com.gitee.dorive.base.v1.common.api.SqlFormat;
-import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
-import com.gitee.dorive.mybatis_plus.v1.impl.common.DefaultSqlHelper;
+import org.springframework.util.PropertyPlaceholderHelper;
 
-public class DefaultImplFactory implements ImplFactory {
+public class PlaceholderUtils {
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getInstance(Class<T> clazz, Object... args) {
-        if (clazz == SqlFormat.class) {
-            return (T) new DefaultSqlHelper();
+    private static final PropertyPlaceholderHelper PROPERTY_PLACEHOLDER_HELPER =
+            new PropertyPlaceholderHelper("${", "}");
 
-        } else if (clazz == SqlRunner.class) {
-            return (T) new DefaultSqlHelper();
+    public static boolean contains(String strValue) {
+        int startIndex = strValue.indexOf("${");
+        if (startIndex != -1) {
+            int endIndex = strValue.indexOf("}", startIndex);
+            return endIndex != -1 && startIndex < endIndex;
         }
-        return null;
+        return false;
+    }
+
+    public static String replace(String strValue, PropertyPlaceholderHelper.PlaceholderResolver resolver) {
+        return PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders(strValue, resolver);
     }
 
 }

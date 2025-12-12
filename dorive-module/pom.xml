@@ -8,11 +8,11 @@
         <artifactId>dorive</artifactId>
         <version>3.5.4</version>
     </parent>
-    <artifactId>dorive-mybatis-plus</artifactId>
+    <artifactId>dorive-module</artifactId>
     <dependencies>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-mybatis</artifactId>
+            <artifactId>dorive-base</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

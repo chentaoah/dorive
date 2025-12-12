@@ -18,8 +18,8 @@
 package com.gitee.dorive.test.impl;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.module.impl.SpringModularApplication;
-import com.gitee.dorive.module.impl.factory.ModuleDefaultListableBeanFactory;
+import com.gitee.dorive.module.v1.impl.SpringModularApplication;
+import com.gitee.dorive.module.v1.impl.factory.ModuleDefaultListableBeanFactory;
 import org.springframework.boot.ApplicationContextFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;

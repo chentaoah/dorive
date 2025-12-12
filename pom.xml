@@ -39,6 +39,7 @@
         <module>dorive-query</module>
         <module>dorive-mybatis</module>
         <module>dorive-mybatis-plus</module>
+        <module>dorive-module</module>
         <module>dorive-launcher</module>
     </modules>
 

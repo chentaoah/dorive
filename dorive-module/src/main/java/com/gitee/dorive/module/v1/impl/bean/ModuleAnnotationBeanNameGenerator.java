@@ -15,25 +15,28 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.factory;
+package com.gitee.dorive.module.v1.impl.bean;
 
-import com.gitee.dorive.base.v1.common.api.ImplFactory;
-import com.gitee.dorive.base.v1.common.api.SqlFormat;
-import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
-import com.gitee.dorive.mybatis_plus.v1.impl.common.DefaultSqlHelper;
+import com.gitee.dorive.module.v1.api.ModuleParser;
+import com.gitee.dorive.module.v1.impl.parser.DefaultModuleParser;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 
-public class DefaultImplFactory implements ImplFactory {
+@Getter
+@Setter
+public class ModuleAnnotationBeanNameGenerator extends AnnotationBeanNameGenerator {
+
+    private ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getInstance(Class<T> clazz, Object... args) {
-        if (clazz == SqlFormat.class) {
-            return (T) new DefaultSqlHelper();
-
-        } else if (clazz == SqlRunner.class) {
-            return (T) new DefaultSqlHelper();
+    protected String buildDefaultBeanName(BeanDefinition definition) {
+        String beanClassName = definition.getBeanClassName();
+        if (beanClassName != null && moduleParser.isUnderScanPackage(beanClassName)) {
+            return beanClassName;
         }
-        return null;
+        return super.buildDefaultBeanName(definition);
     }
 
 }

@@ -15,25 +15,19 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.factory;
+package com.gitee.dorive.module.v1.entity;
 
-import com.gitee.dorive.base.v1.common.api.ImplFactory;
-import com.gitee.dorive.base.v1.common.api.SqlFormat;
-import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
-import com.gitee.dorive.mybatis_plus.v1.impl.common.DefaultSqlHelper;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.springframework.lang.Nullable;
 
-public class DefaultImplFactory implements ImplFactory {
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getInstance(Class<T> clazz, Object... args) {
-        if (clazz == SqlFormat.class) {
-            return (T) new DefaultSqlHelper();
-
-        } else if (clazz == SqlRunner.class) {
-            return (T) new DefaultSqlHelper();
-        }
-        return null;
-    }
-
+@Data
+@AllArgsConstructor
+public class ModuleBeanDescriptor {
+    private ModuleDefinition moduleDefinition;
+    @Nullable
+    private String beanName;
+    @Nullable
+    private Class<?> factoryBeanType;
+    private Class<?> beanType;
 }

@@ -15,25 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.factory;
+package com.gitee.dorive.module.v1.api;
 
-import com.gitee.dorive.base.v1.common.api.ImplFactory;
-import com.gitee.dorive.base.v1.common.api.SqlFormat;
-import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
-import com.gitee.dorive.mybatis_plus.v1.impl.common.DefaultSqlHelper;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
-public class DefaultImplFactory implements ImplFactory {
+public interface BeanNameEditor {
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getInstance(Class<T> clazz, Object... args) {
-        if (clazz == SqlFormat.class) {
-            return (T) new DefaultSqlHelper();
-
-        } else if (clazz == SqlRunner.class) {
-            return (T) new DefaultSqlHelper();
-        }
-        return null;
-    }
+    String resetBeanName(String beanName, BeanDefinition beanDefinition, BeanDefinitionRegistry registry);
 
 }

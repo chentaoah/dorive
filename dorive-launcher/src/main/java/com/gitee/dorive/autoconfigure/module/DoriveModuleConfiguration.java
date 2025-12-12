@@ -17,10 +17,10 @@
 
 package com.gitee.dorive.autoconfigure.module;
 
-import com.gitee.dorive.module.impl.environment.ModuleRequestMappingHandlerMapping;
-import com.gitee.dorive.module.impl.filter.BoundedContextExposedBeanFilter;
-import com.gitee.dorive.module.impl.inject.BoundedContextBeanPostProcessor;
-import com.gitee.dorive.module.impl.inject.ModuleAutowiredBeanPostProcessor;
+import com.gitee.dorive.module.v1.impl.environment.ModuleRequestMappingHandlerMapping;
+import com.gitee.dorive.module.v1.impl.filter.BoundedContextExposedBeanFilter;
+import com.gitee.dorive.module.v1.impl.inject.BoundedContextBeanPostProcessor;
+import com.gitee.dorive.module.v1.impl.inject.ModuleAutowiredBeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;

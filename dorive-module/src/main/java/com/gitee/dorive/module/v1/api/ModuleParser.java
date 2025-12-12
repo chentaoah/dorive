@@ -15,25 +15,30 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.factory;
+package com.gitee.dorive.module.v1.api;
 
-import com.gitee.dorive.base.v1.common.api.ImplFactory;
-import com.gitee.dorive.base.v1.common.api.SqlFormat;
-import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
-import com.gitee.dorive.mybatis_plus.v1.impl.common.DefaultSqlHelper;
+import com.gitee.dorive.module.v1.entity.ModuleDefinition;
 
-public class DefaultImplFactory implements ImplFactory {
+import java.net.URI;
+import java.util.List;
+import java.util.Set;
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getInstance(Class<T> clazz, Object... args) {
-        if (clazz == SqlFormat.class) {
-            return (T) new DefaultSqlHelper();
+public interface ModuleParser {
 
-        } else if (clazz == SqlRunner.class) {
-            return (T) new DefaultSqlHelper();
-        }
-        return null;
-    }
+    void parse();
+
+    Set<String> getModuleNames();
+
+    ModuleDefinition getModuleDefinition(String name);
+
+    List<ModuleDefinition> getModuleDefinitions();
+
+    boolean isUnderScanPackage(String className);
+
+    ModuleDefinition findModuleDefinition(URI uri);
+
+    ModuleDefinition findModuleDefinition(Class<?> clazz);
+
+    ModuleDefinition findModuleDefinitionByConfigName(String configName);
 
 }
