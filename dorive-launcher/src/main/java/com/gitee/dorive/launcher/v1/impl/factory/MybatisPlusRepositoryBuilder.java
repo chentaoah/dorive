@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.factory;
+package com.gitee.dorive.launcher.v1.impl.factory;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
@@ -31,7 +31,7 @@ import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
-import com.gitee.dorive.core.impl.resolver.EntityFactoryResolver;
+import com.gitee.dorive.launcher.v1.impl.resolver.EntityFactoryResolver;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
 import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;

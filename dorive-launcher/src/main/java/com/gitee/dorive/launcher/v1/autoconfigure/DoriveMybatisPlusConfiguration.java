@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.autoconfigure.mybatisplus;
+package com.gitee.dorive.launcher.v1.autoconfigure;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.gitee.dorive.base.v1.common.api.ImplFactory;
-import com.gitee.dorive.core.impl.factory.DefaultImplFactory;
+import com.gitee.dorive.launcher.v1.impl.factory.DefaultImplFactory;
 import com.gitee.dorive.mybatis_plus.v1.impl.injector.EasySqlInjector;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

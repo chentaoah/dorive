@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.autoconfigure.module;
+package com.gitee.dorive.launcher.v1.autoconfigure;
 
 import com.gitee.dorive.module.v1.impl.environment.ModuleRequestMappingHandlerMapping;
 import com.gitee.dorive.module.v1.impl.filter.BoundedContextExposedBeanFilter;

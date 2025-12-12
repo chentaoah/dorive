@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.core.impl.factory;
+package com.gitee.dorive.launcher.v1.impl.factory;
 
 import cn.hutool.extra.spring.SpringUtil;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;

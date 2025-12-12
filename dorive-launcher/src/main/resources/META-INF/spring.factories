@@ -1,10 +1,10 @@
 # EnvironmentPostProcessor
 org.springframework.boot.env.EnvironmentPostProcessor=\
 com.gitee.dorive.module.v1.impl.environment.ModuleEnvironmentPostProcessor,\
-com.gitee.dorive.autoconfigure.mybatisplus.DoriveMybatisPlusConfiguration
+com.gitee.dorive.launcher.v1.autoconfigure.DoriveMybatisPlusConfiguration
 # Configuration
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.gitee.dorive.autoconfigure.module.DoriveModuleConfiguration,\
-com.gitee.dorive.autoconfigure.core.DoriveCoreConfiguration,\
-com.gitee.dorive.autoconfigure.mybatisplus.DoriveMybatisPlusConfiguration,\
-com.gitee.dorive.autoconfigure.web.DoriveWebConfiguration
+com.gitee.dorive.launcher.v1.autoconfigure.DoriveModuleConfiguration,\
+com.gitee.dorive.launcher.v1.autoconfigure.DoriveCoreConfiguration,\
+com.gitee.dorive.launcher.v1.autoconfigure.DoriveMybatisPlusConfiguration,\
+com.gitee.dorive.launcher.v1.autoconfigure.DoriveWebConfiguration

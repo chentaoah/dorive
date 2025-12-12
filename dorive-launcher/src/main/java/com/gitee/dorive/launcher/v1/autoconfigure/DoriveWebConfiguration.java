@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.autoconfigure.web;
+package com.gitee.dorive.launcher.v1.autoconfigure;
 
 import com.gitee.dorive.web.v1.impl.advice.ParameterControllerAdvice;
 import com.gitee.dorive.web.v1.impl.banner.BannerPrinter;
