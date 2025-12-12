@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.impl.segment;
+package com.gitee.dorive.mybatis.v1.impl.segment;
 
 import com.gitee.dorive.base.v1.common.constant.Operator;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Criterion;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.util.CriterionUtils;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
@@ -32,14 +33,17 @@ import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.mybatis.v1.api.Segment;
 import com.gitee.dorive.mybatis.v1.entity.EntityStoreInfo;
-import com.gitee.dorive.mybatis.v1.entity.segment.*;
+import com.gitee.dorive.mybatis.v1.entity.segment.ArgSegment;
+import com.gitee.dorive.mybatis.v1.entity.segment.OnSegment;
+import com.gitee.dorive.mybatis.v1.entity.segment.OnValueSegment;
+import com.gitee.dorive.mybatis.v1.entity.segment.TableJoinSegment;
+import com.gitee.dorive.mybatis.v1.entity.segment.TableSegment;
 import com.gitee.dorive.mybatis.v1.enums.Mapper;
 import com.gitee.dorive.mybatis.v1.impl.repository.DefaultStoreRepository;
 import com.gitee.dorive.query.v1.entity.MergedRepository;
 import com.gitee.dorive.query.v1.entity.QueryContext;
 import com.gitee.dorive.query.v1.entity.QueryUnit;
 import com.gitee.dorive.query.v1.impl.resolver.MergedRepositoryResolver;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,7 +58,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class SegmentResolver {
 
-    private AbstractQueryRepository<?, ?> repository;
+    private RepositoryContext repository;
     private QueryContext queryContext;
     private Map<String, QueryUnit> queryUnitMap;
     private QueryUnit queryUnit;

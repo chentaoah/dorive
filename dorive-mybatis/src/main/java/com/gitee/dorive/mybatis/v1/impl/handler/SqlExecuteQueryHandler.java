@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.impl.handler;
+package com.gitee.dorive.mybatis.v1.impl.handler;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.factory.v1.api.EntityMapper;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.mybatis.v1.entity.segment.ArgSegment;
 import com.gitee.dorive.mybatis.v1.entity.segment.SelectSegment;
 import com.gitee.dorive.mybatis.v1.entity.segment.TableSegment;
@@ -31,7 +32,6 @@ import com.gitee.dorive.mybatis.v1.impl.segment.SelectSegmentBuilder;
 import com.gitee.dorive.query.v1.entity.QueryContext;
 import com.gitee.dorive.query.v1.entity.QueryUnit;
 import com.gitee.dorive.query.v1.enums.ResultType;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -46,7 +46,7 @@ public class SqlExecuteQueryHandler extends SqlBuildQueryHandler {
     private final SqlRunner sqlRunner;
     private final EntityMapper entityMapper;
 
-    public SqlExecuteQueryHandler(AbstractQueryRepository<?, ?> repository, SqlRunner sqlRunner, EntityMapper entityMapper) {
+    public SqlExecuteQueryHandler(RepositoryContext repository, SqlRunner sqlRunner, EntityMapper entityMapper) {
         super(repository);
         this.sqlRunner = sqlRunner;
         this.entityMapper = entityMapper;

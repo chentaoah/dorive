@@ -15,22 +15,24 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.impl.handler;
+package com.gitee.dorive.mybatis.v1.impl.handler;
 
 import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.mybatis.impl.segment.SegmentResolver;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.mybatis.v1.impl.segment.SegmentResolver;
 import com.gitee.dorive.query.v1.entity.QueryContext;
 import com.gitee.dorive.query.v1.entity.QueryUnit;
 import com.gitee.dorive.query.v1.impl.handler.executor.AbstractQueryUnitQueryHandler;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +41,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class SqlBuildQueryHandler extends AbstractQueryUnitQueryHandler {
 
-    private final AbstractQueryRepository<?, ?> repository;
+    private final RepositoryContext repository;
 
     @Override
     public QueryUnit processQueryUnit(QueryContext queryContext, Map<String, QueryUnit> queryUnitMap, QueryUnit queryUnit) {
@@ -68,7 +70,10 @@ public class SqlBuildQueryHandler extends AbstractQueryUnitQueryHandler {
         String primaryKey = queryContext.getPrimaryKey();
         Example example = queryContext.getExample();
 
-        List<Object> entities = (List<Object>) repository.selectByExample(context, new InnerExample().in(primaryKey, ids));
+        List<Object> entities = Collections.emptyList();
+        if (repository instanceof AbstractRepository) {
+            entities = ((AbstractRepository<Object, Object>) repository).selectByExample(context, new InnerExample().in(primaryKey, ids));
+        }
 
         Page<Object> page = example.getPage();
         if (page != null) {

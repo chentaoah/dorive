@@ -12,6 +12,11 @@
     <dependencies>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-factory</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
             <artifactId>dorive-query</artifactId>
             <version>${project.version}</version>
         </dependency>

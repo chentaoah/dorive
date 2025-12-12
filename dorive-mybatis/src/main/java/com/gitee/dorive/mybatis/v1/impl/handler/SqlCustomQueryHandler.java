@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.impl.handler;
+package com.gitee.dorive.mybatis.v1.impl.handler;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.common.api.MethodInvoker;
@@ -23,10 +23,10 @@ import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.mybatis.v1.entity.EntityStoreInfo;
 import com.gitee.dorive.query.v1.entity.QueryContext;
 import com.gitee.dorive.query.v1.entity.QueryUnit;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -40,7 +40,7 @@ public class SqlCustomQueryHandler extends SqlBuildQueryHandler {
 
     private final EntityStoreInfo entityStoreInfo;
 
-    public SqlCustomQueryHandler(AbstractQueryRepository<?, ?> repository, EntityStoreInfo entityStoreInfo) {
+    public SqlCustomQueryHandler(RepositoryContext repository, EntityStoreInfo entityStoreInfo) {
         super(repository);
         this.entityStoreInfo = entityStoreInfo;
     }
