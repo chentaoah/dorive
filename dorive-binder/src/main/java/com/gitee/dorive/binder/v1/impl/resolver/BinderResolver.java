@@ -250,8 +250,9 @@ public class BinderResolver implements BinderExecutor {
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Binder> getValueFilterBinders() {
-        return new ArrayList<>(valueFilterBinders);
+        return (List) valueFilterBinders;
     }
 
     @Override
