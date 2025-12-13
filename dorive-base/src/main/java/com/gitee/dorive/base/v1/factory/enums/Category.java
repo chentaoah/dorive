@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.v1.enums;
+package com.gitee.dorive.base.v1.factory.enums;
 
-public enum Mapper {
+public enum Category {
     ENTITY_DATABASE,
     ENTITY_POJO
 }

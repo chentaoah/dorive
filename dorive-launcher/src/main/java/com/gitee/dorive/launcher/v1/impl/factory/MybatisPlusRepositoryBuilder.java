@@ -24,23 +24,24 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
+import com.gitee.dorive.base.v1.factory.api.TranslatorManager;
+import com.gitee.dorive.base.v1.factory.enums.Category;
+import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
-import com.gitee.dorive.launcher.v1.impl.resolver.EntityFactoryResolver;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
 import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.factory.v1.impl.executor.ExampleExecutor;
 import com.gitee.dorive.factory.v1.impl.executor.FactoryExecutor;
 import com.gitee.dorive.factory.v1.impl.resolver.EntityMappersResolver;
+import com.gitee.dorive.launcher.v1.impl.resolver.EntityFactoryResolver;
 import com.gitee.dorive.mybatis.v1.entity.EntityStoreInfo;
-import com.gitee.dorive.mybatis.v1.enums.Mapper;
 import com.gitee.dorive.mybatis.v1.impl.executor.UnionExecutor;
 import com.gitee.dorive.mybatis_plus.v1.impl.common.DefaultMethodInvoker;
 import com.gitee.dorive.mybatis_plus.v1.impl.executor.MybatisPlusExecutor;
@@ -71,12 +72,16 @@ public class MybatisPlusRepositoryBuilder {
         EntityStoreInfo entityStoreInfo = resolveEntityStoreInfo(repository.getRepositoryDef());
         repository.setProperty(EntityStoreInfo.class, entityStoreInfo);
 
-        String reMapper = Mapper.ENTITY_DATABASE.name();
-        String deMapper = Mapper.ENTITY_POJO.name();
+        String reMapper = Category.ENTITY_DATABASE.name();
+        String deMapper = Category.ENTITY_POJO.name();
 
         EntityMappersResolver entityMappersResolver = new EntityMappersResolver(entityElement, entityStoreInfo.getAliasPropMapping(), reMapper, deMapper);
         EntityMappers entityMappers = entityMappersResolver.newEntityMappers();
         repository.setProperty(EntityMappers.class, entityMappers);
+
+        // 命名转换器管理
+        TranslatorManager translatorManager = entityMappers::getEntityMapper;
+        repository.setProperty(TranslatorManager.class, translatorManager);
 
         EntityMapper reEntityMapper = entityMappers.getEntityMapper(reMapper);
         EntityMapper deEntityMapper = entityMappers.getEntityMapper(deMapper);
@@ -95,6 +100,7 @@ public class MybatisPlusRepositoryBuilder {
         defaultRepository.setOperationFactory(operationFactory);
         defaultRepository.setExecutor(executor);
         defaultRepository.setProperty(EntityMappers.class, entityMappers);
+        defaultRepository.setProperty(TranslatorManager.class, translatorManager);
         defaultRepository.setProperty(ExampleConverter.class, (ExampleConverter) executor);
         defaultRepository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         return defaultRepository;

@@ -24,7 +24,7 @@ import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.repository.v1.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
-import com.gitee.dorive.mybatis.v1.enums.Mapper;
+import com.gitee.dorive.base.v1.factory.enums.Category;
 import com.gitee.dorive.mybatis.v1.entity.segment.SelectSegment;
 import com.gitee.dorive.mybatis.v1.entity.segment.TableSegment;
 import com.gitee.dorive.repository.v1.entity.sql.CountQuery;
@@ -96,7 +96,7 @@ public class SqlCountQuerier implements CountQuerier {
         MergedRepository mergedRepository = queryUnit.getMergedRepository();
         DefaultRepository defaultRepository = mergedRepository.getDefaultRepository();
         EntityMappers entityMappers = defaultRepository.getProperty(EntityMappers.class);
-        EntityMapper entityMapper = entityMappers.getEntityMapper(Mapper.ENTITY_DATABASE.name());
+        EntityMapper entityMapper = entityMappers.getEntityMapper(Category.ENTITY_DATABASE.name());
         return entityMapper.toAliases(properties);
     }
 

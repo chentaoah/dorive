@@ -22,9 +22,9 @@ import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
+import com.gitee.dorive.base.v1.factory.api.Translator;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.mybatis.v1.entity.segment.ArgSegment;
 import com.gitee.dorive.mybatis.v1.entity.segment.SelectSegment;
 import com.gitee.dorive.mybatis.v1.entity.segment.TableSegment;
@@ -44,12 +44,12 @@ import java.util.Map;
 public class SqlExecuteQueryHandler extends SqlBuildQueryHandler {
 
     private final SqlRunner sqlRunner;
-    private final EntityMapper entityMapper;
+    private final Translator translator;
 
-    public SqlExecuteQueryHandler(RepositoryContext repository, SqlRunner sqlRunner, EntityMapper entityMapper) {
+    public SqlExecuteQueryHandler(RepositoryContext repository, SqlRunner sqlRunner, Translator translator) {
         super(repository);
         this.sqlRunner = sqlRunner;
-        this.entityMapper = entityMapper;
+        this.translator = translator;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class SqlExecuteQueryHandler extends SqlBuildQueryHandler {
         QueryUnit queryUnit = queryContext.getQueryUnit();
         boolean needCount = queryContext.isNeedCount();
 
-        String primaryKeyAlias = entityMapper.toAlias(primaryKey);
+        String primaryKeyAlias = translator.toAlias(primaryKey);
 
         OrderBy orderBy = example.getOrderBy();
         Page<Object> page = example.getPage();
