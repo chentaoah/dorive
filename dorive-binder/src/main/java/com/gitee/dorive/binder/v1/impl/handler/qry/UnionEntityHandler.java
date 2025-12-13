@@ -18,15 +18,15 @@
 package com.gitee.dorive.binder.v1.impl.handler.qry;
 
 import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.entity.qry.UnionExample;
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
-import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.base.v1.executor.api.EntityJoiner;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -62,8 +62,8 @@ public class UnionEntityHandler extends AbstractEntityHandler {
     private Example newExample(Context context, Object entity) {
         Example example = new InnerExample();
         BinderResolver binderResolver = (BinderResolver) repository.getBinderExecutor();
-        List<StrongBinder> binders = binderResolver.getStrongBinders();
-        for (StrongBinder binder : binders) {
+        List<Binder> binders = binderResolver.getStrongBinders();
+        for (Binder binder : binders) {
             Object boundValue = binder.getBoundValue(context, entity);
             boundValue = binder.input(context, boundValue);
             if (boundValue instanceof Collection) {

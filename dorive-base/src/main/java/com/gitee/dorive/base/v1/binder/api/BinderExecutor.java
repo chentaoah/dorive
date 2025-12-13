@@ -27,17 +27,17 @@ import java.util.Map;
 
 public interface BinderExecutor {
 
-    List<String> getSelfFields();
-
-    JoinType getJoinType();
-
-    boolean hasValueRouteBinders();
-
     List<Binder> getValueFilterBinders();
 
     Map<String, List<Binder>> getMergedStrongBindersMap();
 
     Map<String, List<Binder>> getMergedValueRouteBindersMap();
+
+    List<String> getSelfFields();
+
+    JoinType getJoinType();
+
+    boolean hasValueRouteBinders();
 
     void appendFilterValue(Context context, Example example);
 

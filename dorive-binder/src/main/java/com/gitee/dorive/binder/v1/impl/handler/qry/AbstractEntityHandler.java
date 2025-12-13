@@ -17,16 +17,16 @@
 
 package com.gitee.dorive.binder.v1.impl.handler.qry;
 
+import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.binder.v1.impl.binder.WeakBinder;
-import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
+import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityJoiner;
-import com.gitee.dorive.base.v1.core.impl.OperationFactory;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,8 +60,8 @@ public abstract class AbstractEntityHandler implements EntityHandler {
     protected void appendFilterCriteria(Context context, Example example) {
         if (example != null && !example.isEmpty()) {
             BinderResolver binderResolver = (BinderResolver) repository.getBinderExecutor();
-            List<WeakBinder> weakBinders = binderResolver.getWeakBinders();
-            for (WeakBinder weakBinder : weakBinders) {
+            List<Binder> weakBinders = binderResolver.getWeakBinders();
+            for (Binder weakBinder : weakBinders) {
                 Object boundValue = weakBinder.input(context, null);
                 if (boundValue != null) {
                     String fieldName = weakBinder.getFieldName();

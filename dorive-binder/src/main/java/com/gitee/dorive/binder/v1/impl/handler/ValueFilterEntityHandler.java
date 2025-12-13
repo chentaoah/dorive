@@ -17,11 +17,11 @@
 
 package com.gitee.dorive.binder.v1.impl.handler;
 
+import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -43,14 +43,14 @@ public class ValueFilterEntityHandler implements EntityHandler {
 
     private List<Object> filterByValueRouteBinders(Context context, List<Object> entities) {
         BinderResolver binderResolver = (BinderResolver) repository.getBinderExecutor();
-        List<ValueRouteBinder> valueRouteBinders = binderResolver.getValueRouteBinders();
+        List<Binder> valueRouteBinders = binderResolver.getValueRouteBinders();
         if (valueRouteBinders.isEmpty()) {
             return entities;
         }
         List<Object> subEntities = new ArrayList<>(entities.size());
         for (Object entity : entities) {
             boolean isValueEqual = true;
-            for (ValueRouteBinder valueRouteBinder : valueRouteBinders) {
+            for (Binder valueRouteBinder : valueRouteBinders) {
                 Object fieldValue = valueRouteBinder.getFieldValue(context, null);
                 Object boundValue = valueRouteBinder.getBoundValue(context, entity);
                 boundValue = valueRouteBinder.input(context, boundValue);

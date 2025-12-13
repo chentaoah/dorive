@@ -17,15 +17,14 @@
 
 package com.gitee.dorive.binder.v1.impl.handler.qry;
 
+import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.binder.v1.impl.binder.AbstractBinder;
-import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
-import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
 import com.gitee.dorive.base.v1.executor.api.EntityJoiner;
+import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,7 +36,7 @@ import java.util.stream.Collectors;
 @Setter
 public class MultiEntityHandler extends AbstractEntityHandler {
 
-    private List<StrongBinder> binders;
+    private List<Binder> binders;
 
     public MultiEntityHandler(RepositoryItem repository, EntityJoiner entityJoiner) {
         super(repository, entityJoiner);
@@ -57,12 +56,12 @@ public class MultiEntityHandler extends AbstractEntityHandler {
     }
 
     private MultiInBuilder newMultiInBuilder(Context context, List<Object> entities) {
-        List<String> properties = binders.stream().map(AbstractBinder::getFieldName).collect(Collectors.toList());
+        List<String> properties = binders.stream().map(Binder::getFieldName).collect(Collectors.toList());
         MultiInBuilder multiInBuilder = new MultiInBuilder(properties, entities.size());
 
         for (Object entity : entities) {
             StringBuilder keyBuilder = new StringBuilder();
-            for (StrongBinder binder : binders) {
+            for (Binder binder : binders) {
                 Object boundValue = binder.getBoundValue(context, entity);
                 boundValue = binder.input(context, boundValue);
                 if (boundValue != null) {
@@ -93,7 +92,7 @@ public class MultiEntityHandler extends AbstractEntityHandler {
         List<Object> records = result.getRecords();
         for (Object entity : records) {
             StringBuilder keyBuilder = new StringBuilder();
-            for (StrongBinder binder : binders) {
+            for (Binder binder : binders) {
                 Object fieldValue = binder.getFieldValue(context, entity);
                 if (fieldValue != null) {
                     String key = fieldValue.toString();

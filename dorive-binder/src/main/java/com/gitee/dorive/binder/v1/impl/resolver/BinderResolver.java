@@ -49,16 +49,15 @@ import java.util.*;
 public class BinderResolver implements BinderExecutor {
 
     private RepositoryContext repository;
-
     private List<Binder> allBinders;
-    private List<StrongBinder> strongBinders;
-    private List<WeakBinder> weakBinders;
-    private List<ValueRouteBinder> valueRouteBinders;
-    private List<ValueFilterBinder> valueFilterBinders;
+    private List<Binder> strongBinders;
+    private List<Binder> weakBinders;
+    private List<Binder> valueRouteBinders;
+    private List<Binder> valueFilterBinders;
     // 决定了关联查询具体使用哪种实现
-    private Map<String, List<StrongBinder>> mergedStrongBindersMap;
-    private Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap;
-    private StrongBinder boundIdBinder;
+    private Map<String, List<Binder>> mergedStrongBindersMap;
+    private Map<String, List<Binder>> mergedValueRouteBindersMap;
+    private Binder boundIdBinder;
     private List<String> selfFields;
     private JoinType joinType;
 
@@ -96,7 +95,7 @@ public class BinderResolver implements BinderExecutor {
                 valueRouteBinders.add(valueRouteBinder);
 
                 String belongAccessPath = valueRouteBinder.getBelongAccessPath();
-                List<ValueRouteBinder> valueRouteBinders = mergedValueRouteBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
+                List<Binder> valueRouteBinders = mergedValueRouteBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
                 valueRouteBinders.add(valueRouteBinder);
                 continue;
             }
@@ -113,7 +112,7 @@ public class BinderResolver implements BinderExecutor {
                 strongBinders.add(strongBinder);
 
                 String belongAccessPath = strongBinder.getBelongAccessPath();
-                List<StrongBinder> strongBinders = mergedStrongBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
+                List<Binder> strongBinders = mergedStrongBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
                 strongBinders.add(strongBinder);
 
                 if (strongBinder.isSameType() && primaryKey.equals(field)) {
@@ -141,8 +140,8 @@ public class BinderResolver implements BinderExecutor {
         selfFields = Collections.unmodifiableList(selfFields);
 
         if (mergedStrongBindersMap.size() == 1 && mergedStrongBindersMap.containsKey("/")) {
-            List<StrongBinder> binders = mergedStrongBindersMap.get("/");
-            boolean hasCollection = CollUtil.findOne(binders, AbstractBinder::isBindCollection) != null;
+            List<Binder> binders = mergedStrongBindersMap.get("/");
+            boolean hasCollection = CollUtil.findOne(binders, b -> ((AbstractBinder) b).isBindCollection()) != null;
             if (!hasCollection) {
                 joinType = binders.size() == 1 ? JoinType.SINGLE : JoinType.MULTI;
             }
@@ -240,7 +239,7 @@ public class BinderResolver implements BinderExecutor {
         return bindEndpoint;
     }
 
-    public List<StrongBinder> getRootStrongBinders() {
+    public List<Binder> getRootStrongBinders() {
         return mergedStrongBindersMap.get("/");
     }
 
@@ -250,26 +249,8 @@ public class BinderResolver implements BinderExecutor {
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Binder> getValueFilterBinders() {
-        return (List) valueFilterBinders;
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public Map<String, List<Binder>> getMergedStrongBindersMap() {
-        return mergedStrongBindersMap.entrySet().stream().collect(HashMap::new, (map, entry) -> map.put(entry.getKey(), (List) entry.getValue()), HashMap::putAll);
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public Map<String, List<Binder>> getMergedValueRouteBindersMap() {
-        return mergedValueRouteBindersMap.entrySet().stream().collect(HashMap::new, (map, entry) -> map.put(entry.getKey(), (List) entry.getValue()), HashMap::putAll);
-    }
-
-    @Override
     public void appendFilterValue(Context context, Example example) {
-        for (ValueFilterBinder valueFilterBinder : valueFilterBinders) {
+        for (Binder valueFilterBinder : valueFilterBinders) {
             Object boundValue = valueFilterBinder.getBoundValue(context, null);
             boundValue = valueFilterBinder.input(context, boundValue);
             if (boundValue != null) {
@@ -282,7 +263,7 @@ public class BinderResolver implements BinderExecutor {
     @Override
     public void getBoundValue(Context context, Object rootEntity, Collection<?> entities) {
         for (Object entity : entities) {
-            for (StrongBinder strongBinder : getStrongBinders()) {
+            for (Binder strongBinder : getStrongBinders()) {
                 Object fieldValue = strongBinder.getFieldValue(context, entity);
                 if (fieldValue == null) {
                     Object boundValue = strongBinder.getBoundValue(context, rootEntity);
@@ -296,7 +277,7 @@ public class BinderResolver implements BinderExecutor {
 
     @Override
     public void setBoundId(Context context, Object rootEntity, Object entity) {
-        StrongBinder boundIdBinder = getBoundIdBinder();
+        Binder boundIdBinder = getBoundIdBinder();
         if (boundIdBinder != null) {
             Object boundValue = boundIdBinder.getBoundValue(context, rootEntity);
             if (boundValue == null) {
