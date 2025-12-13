@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.common.api;
+package com.gitee.dorive.repository.v1.api;
 
-public interface SqlFormat {
+import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 
-    Object concatLike(Object value);
+public interface RepositoryPostProcessor {
 
-    String sqlParam(Object obj);
+    void postProcessRepositoryDef(Class<?> repositoryClass, Class<?> entityClass, RepositoryDef repositoryDef);
 
 }

@@ -98,7 +98,7 @@ public class SegmentResolver {
         Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
         EntityMapper entityMapper = getEntityMapper(mergedRepository);
 
-        BinderResolver binderResolver = definedRepository.getBinderExecutor();
+        BinderResolver binderResolver = (BinderResolver) definedRepository.getBinderExecutor();
         List<ValueFilterBinder> valueFilterBinders = binderResolver.getValueFilterBinders();
 
         List<OnSegment> onSegments = new ArrayList<>(mergedStrongBindersMap.size() + mergedValueRouteBindersMap.size() + valueFilterBinders.size());

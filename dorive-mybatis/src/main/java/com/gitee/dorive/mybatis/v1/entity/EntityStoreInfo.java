@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.mybatis.v1.entity;
 
-import com.gitee.dorive.base.v1.common.api.MethodInvoker;
+import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

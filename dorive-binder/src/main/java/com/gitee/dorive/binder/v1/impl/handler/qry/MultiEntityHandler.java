@@ -41,7 +41,7 @@ public class MultiEntityHandler extends AbstractEntityHandler {
 
     public MultiEntityHandler(RepositoryItem repository, EntityJoiner entityJoiner) {
         super(repository, entityJoiner);
-        BinderResolver binderResolver = repository.getBinderExecutor();
+        BinderResolver binderResolver = (BinderResolver) repository.getBinderExecutor();
         this.binders = binderResolver.getRootStrongBinders();
     }
 

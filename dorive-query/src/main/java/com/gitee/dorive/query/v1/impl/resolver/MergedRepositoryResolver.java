@@ -46,7 +46,7 @@ public class MergedRepositoryResolver {
     public void resolve() {
         for (RepositoryItem repositoryItem : repository.getRepositoryMap().values()) {
             String accessPath = repositoryItem.getAccessPath();
-            BinderResolver binderResolver = repositoryItem.getBinderExecutor();
+            BinderResolver binderResolver = (BinderResolver) repositoryItem.getBinderExecutor();
 
             RepositoryItem executedRepository = repositoryItem;
             AbstractRepository<Object, Object> abstractRepository = repositoryItem.getProxyRepository();

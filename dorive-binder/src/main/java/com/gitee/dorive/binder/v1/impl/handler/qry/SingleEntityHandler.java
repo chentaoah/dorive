@@ -39,7 +39,7 @@ public class SingleEntityHandler extends AbstractEntityHandler {
 
     public SingleEntityHandler(RepositoryItem repository, EntityJoiner entityJoiner) {
         super(repository, entityJoiner);
-        BinderResolver binderResolver = repository.getBinderExecutor();
+        BinderResolver binderResolver = (BinderResolver) repository.getBinderExecutor();
         this.binder = binderResolver.getRootStrongBinders().get(0);
     }
 

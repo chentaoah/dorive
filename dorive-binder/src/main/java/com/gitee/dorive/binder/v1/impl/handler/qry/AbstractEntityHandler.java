@@ -59,7 +59,7 @@ public abstract class AbstractEntityHandler implements EntityHandler {
 
     protected void appendFilterCriteria(Context context, Example example) {
         if (example != null && !example.isEmpty()) {
-            BinderResolver binderResolver = repository.getBinderExecutor();
+            BinderResolver binderResolver = (BinderResolver) repository.getBinderExecutor();
             List<WeakBinder> weakBinders = binderResolver.getWeakBinders();
             for (WeakBinder weakBinder : weakBinders) {
                 Object boundValue = weakBinder.input(context, null);

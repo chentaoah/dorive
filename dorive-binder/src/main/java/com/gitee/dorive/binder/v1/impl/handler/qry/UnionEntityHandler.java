@@ -61,7 +61,7 @@ public class UnionEntityHandler extends AbstractEntityHandler {
 
     private Example newExample(Context context, Object entity) {
         Example example = new InnerExample();
-        BinderResolver binderResolver = repository.getBinderExecutor();
+        BinderResolver binderResolver = (BinderResolver) repository.getBinderExecutor();
         List<StrongBinder> binders = binderResolver.getStrongBinders();
         for (StrongBinder binder : binders) {
             Object boundValue = binder.getBoundValue(context, entity);

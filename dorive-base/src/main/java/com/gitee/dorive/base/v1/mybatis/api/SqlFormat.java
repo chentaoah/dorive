@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.common.api;
+package com.gitee.dorive.base.v1.mybatis.api;
 
-import java.util.Map;
+public interface SqlFormat {
 
-public interface MethodInvoker {
+    Object concatLike(Object value);
 
-    Object invoke(Map<String, Object> params);
+    String sqlParam(Object obj);
 
 }

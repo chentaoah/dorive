@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.base.v1.repository.api;
 
+import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
@@ -48,7 +49,7 @@ public interface RepositoryItem extends Repository<Object, Object>, Properties {
 
     boolean isAggregated();
 
-    <T> T getBinderExecutor();
+    BinderExecutor getBinderExecutor();
 
     void getBoundValue(Context context, Object rootEntity, Collection<?> entities);
 

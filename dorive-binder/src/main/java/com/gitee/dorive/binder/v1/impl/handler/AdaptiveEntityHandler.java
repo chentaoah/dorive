@@ -49,7 +49,7 @@ public class AdaptiveEntityHandler implements EntityHandler {
     }
 
     private EntityHandler newEntityHandler(EntityJoiner entityJoiner) {
-        BinderResolver binderResolver = repository.getBinderExecutor();
+        BinderResolver binderResolver = (BinderResolver) repository.getBinderExecutor();
         JoinType joinType = binderResolver.getJoinType();
         if (joinType == JoinType.SINGLE) {
             return new SingleEntityHandler(repository, entityJoiner);

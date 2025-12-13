@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.common.api;
+package com.gitee.dorive.base.v1.mybatis.api;
 
-import com.gitee.dorive.base.v1.common.def.RepositoryDef;
+import java.util.Map;
 
-public interface RepositoryPostProcessor {
+public interface MethodInvoker {
 
-    void postProcessRepositoryDef(Class<?> repositoryClass, Class<?> entityClass, RepositoryDef repositoryDef);
+    Object invoke(Map<String, Object> params);
 
 }

@@ -55,7 +55,7 @@ public class StepwiseQueryHandler extends AbstractQueryUnitQueryHandler {
             Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
             RepositoryItem executedRepository = mergedRepository.getExecutedRepository();
 
-            BinderResolver binderResolver = definedRepository.getBinderExecutor();
+            BinderResolver binderResolver = (BinderResolver) definedRepository.getBinderExecutor();
 
             if (!abandoned) {
                 abandoned = determineAbandon(queryUnitMap, mergedValueRouteBindersMap.keySet());
