@@ -66,7 +66,7 @@ public class SqlCountQuerier implements CountQuerier {
         TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
         String tableAlias = tableSegment.getTableAlias();
 
-        SelectSegmentBuilder selectSegmentBuilder = new SelectSegmentBuilder(queryContext);
+        SelectSegmentBuilder selectSegmentBuilder = new SelectSegmentBuilder(repository, queryContext);
         List<QueryUnit> queryUnits = selectSegmentBuilder.select(countQuery.getSelector());
         SelectSegment selectSegment = selectSegmentBuilder.build();
         List<Object> args = selectSegment.getArgs();

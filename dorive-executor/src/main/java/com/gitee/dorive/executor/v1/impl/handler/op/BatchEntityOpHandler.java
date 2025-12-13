@@ -67,7 +67,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
                 totalCount += executeRoot(repository, context, entityOp);
                 continue;
             }
-            boolean isMatch = repository.matches(context);
+            boolean isMatch = this.repository.matches(context, repository);
             boolean isAggregated = repository.isAggregated();
             if (!isMatch && !isAggregated) continue;
 
@@ -98,7 +98,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
                 totalCount += executeRoot(repository, context, entityOp);
                 continue;
             }
-            boolean isMatch = repository.matches(context);
+            boolean isMatch = this.repository.matches(context, repository);
             boolean isAggregated = repository.isAggregated();
             if (!isMatch && !isAggregated) continue;
 
@@ -123,7 +123,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
                 totalCount += executeRoot(repository, context, entityOp);
                 continue;
             }
-            boolean isMatch = repository.matches(context);
+            boolean isMatch = this.repository.matches(context, repository);
             boolean isAggregated = repository.isAggregated();
             if (!isMatch && !isAggregated) continue;
 
@@ -149,7 +149,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
 
     private int executeRoot(RepositoryItem repository, Context context, EntityOp entityOp) {
         if (entityOp.isNotIgnoreRoot()) {
-            if (repository.matches(context) || entityOp.isIncludeRoot()) {
+            if (this.repository.matches(context, repository) || entityOp.isIncludeRoot()) {
                 return repository.execute(context, entityOp);
             }
         }

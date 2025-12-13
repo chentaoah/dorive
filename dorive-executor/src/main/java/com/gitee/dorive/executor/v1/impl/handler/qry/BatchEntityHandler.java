@@ -47,7 +47,7 @@ public class BatchEntityHandler implements EntityHandler {
             if (binderExecutor.hasValueRouteBinders()) {
                 entityHandler = entityHandlerFactory.create("ValueFilterEntityHandler", subRepository, entityHandler);
             }
-            entityHandler = new ContextMatchEntityHandler(subRepository, entityHandler);
+            entityHandler = new ContextMatchEntityHandler(repository, subRepository, entityHandler);
             entityHandlers.add(entityHandler);
         }
     }

@@ -32,7 +32,7 @@ public class ContextMatchQueryHandler implements QueryHandler {
     @Override
     public void handle(QueryContext queryContext, Object query) {
         RepositoryItem repositoryItem = repository.getRootRepository();
-        if (!repositoryItem.matches(queryContext.getContext())) {
+        if (!repository.matches(queryContext.getContext(), repositoryItem)) {
             queryContext.setAbandoned(true);
             return;
         }

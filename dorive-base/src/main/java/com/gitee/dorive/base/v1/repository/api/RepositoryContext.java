@@ -19,6 +19,7 @@ package com.gitee.dorive.base.v1.repository.api;
 
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import org.springframework.context.ApplicationContext;
 
@@ -44,5 +45,7 @@ public interface RepositoryContext extends Properties {
     List<RepositoryItem> getSubRepositories();
 
     List<RepositoryItem> getOrderedRepositories();
+
+    boolean matches(Options options, RepositoryItem repositoryItem);
 
 }

@@ -18,6 +18,7 @@
 package com.gitee.dorive.mybatis.v1.impl.segment;
 
 import com.gitee.dorive.base.v1.core.api.Selector;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.mybatis.v1.entity.segment.ArgSegment;
 import com.gitee.dorive.mybatis.v1.entity.segment.SelectSegment;
@@ -35,9 +36,11 @@ import java.util.Map;
 @Data
 public class SelectSegmentBuilder {
 
+    private RepositoryContext repositoryContext;
     private QueryContext queryContext;
 
-    public SelectSegmentBuilder(QueryContext queryContext) {
+    public SelectSegmentBuilder(RepositoryContext repositoryContext, QueryContext queryContext) {
+        this.repositoryContext = repositoryContext;
         this.queryContext = queryContext;
     }
 
@@ -47,7 +50,7 @@ public class SelectSegmentBuilder {
         for (QueryUnit queryUnit : queryUnitMap.values()) {
             MergedRepository mergedRepository = queryUnit.getMergedRepository();
             RepositoryItem definedRepository = mergedRepository.getDefinedRepository();
-            boolean isMatch = definedRepository.matches(selector);
+            boolean isMatch = repositoryContext.matches(selector, definedRepository);
             if (isMatch) {
                 TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
                 tableSegment.setJoin(true);

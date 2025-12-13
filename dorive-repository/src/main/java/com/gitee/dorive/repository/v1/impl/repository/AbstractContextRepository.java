@@ -22,19 +22,21 @@ import com.gitee.dorive.base.v1.aggregate.api.EntityResolver;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.api.BoundedContext;
 import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
-import com.gitee.dorive.repository.v1.api.RepositoryPostProcessor;
 import com.gitee.dorive.base.v1.common.def.EntityDef;
 import com.gitee.dorive.base.v1.common.def.OrderByDef;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
 import com.gitee.dorive.base.v1.core.util.ReflectUtils;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
+import com.gitee.dorive.repository.v1.api.RepositoryPostProcessor;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryGlobalContext;
 import lombok.Getter;
 import lombok.Setter;
@@ -148,7 +150,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         proxyRepository.setBinderExecutor(binderExecutor);
         proxyRepository.setOrderByFactory(orderByFactory);
         proxyRepository.setBound(false);
-        proxyRepository.setMatcher(repositoryBuilder.newAdaptiveMatcher(proxyRepository.isRoot(), proxyRepository.getName()));
         return proxyRepository;
     }
 
@@ -186,4 +187,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         return repository;
     }
 
+    @Override
+    public boolean matches(Options options, RepositoryItem repositoryItem) {
+        RepositoryMatcher repositoryMatcher = options.getOption(RepositoryMatcher.class);
+        return repositoryMatcher != null && repositoryMatcher.matches(repositoryItem);
+    }
 }

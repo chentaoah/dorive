@@ -20,7 +20,6 @@ package com.gitee.dorive.base.v1.repository.api;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
@@ -36,6 +35,8 @@ public interface RepositoryItem extends Repository<Object, Object>, Properties {
     OperationFactory getOperationFactory();
 
     AbstractRepository<Object, Object> getProxyRepository();
+
+    String getName();
 
     boolean isCollection();
 
@@ -58,8 +59,6 @@ public interface RepositoryItem extends Repository<Object, Object>, Properties {
     void setBound(boolean bound);
 
     boolean isBound();
-
-    boolean matches(Options options);
 
     Result<Object> executeQuery(Context context, Query query);
 

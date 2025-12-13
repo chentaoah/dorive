@@ -65,7 +65,7 @@ public class SqlExecuteQueryHandler extends SqlBuildQueryHandler {
         OrderBy orderBy = example.getOrderBy();
         Page<Object> page = example.getPage();
 
-        SelectSegmentBuilder selectSegmentBuilder = new SelectSegmentBuilder(queryContext);
+        SelectSegmentBuilder selectSegmentBuilder = new SelectSegmentBuilder(getRepository(), queryContext);
         SelectSegment selectSegment = selectSegmentBuilder.build();
 
         TableSegment tableSegment = selectSegment.getTableSegment();

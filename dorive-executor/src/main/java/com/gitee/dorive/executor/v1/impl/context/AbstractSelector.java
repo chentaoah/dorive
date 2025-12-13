@@ -19,13 +19,11 @@ package com.gitee.dorive.executor.v1.impl.context;
 
 import com.gitee.dorive.base.v1.core.api.Selector;
 import com.gitee.dorive.base.v1.core.entity.ctx.AbstractOptions;
-import com.gitee.dorive.base.v1.common.enums.MatcherType;
+import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
+import com.gitee.dorive.base.v1.repository.impl.matcher.SelectorRepositoryMatcher;
 
 public abstract class AbstractSelector extends AbstractOptions implements Selector {
-
     public AbstractSelector() {
-        setOption(MatcherType.class, MatcherType.SELECTOR);
-        setOption(Selector.class, this);
+        setOption(RepositoryMatcher.class, new SelectorRepositoryMatcher(this));
     }
-
 }

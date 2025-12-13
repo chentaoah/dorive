@@ -15,11 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.common.enums;
+package com.gitee.dorive.base.v1.repository.impl.matcher;
 
-public enum MatcherType {
-    NONE,
-    ROOT,
-    ALL,
-    SELECTOR
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
+
+public class RootRepositoryMatcher implements RepositoryMatcher {
+    @Override
+    public boolean matches(RepositoryItem repositoryItem) {
+        return repositoryItem.isRoot();
+    }
 }

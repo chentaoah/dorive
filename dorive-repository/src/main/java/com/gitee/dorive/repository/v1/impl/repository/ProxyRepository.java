@@ -19,8 +19,6 @@ package com.gitee.dorive.repository.v1.impl.repository;
 
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.api.Matcher;
-import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.api.Selector;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
@@ -32,6 +30,8 @@ import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
+import com.gitee.dorive.base.v1.repository.impl.matcher.SelectorRepositoryMatcher;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -47,8 +47,8 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
     private BinderExecutor binderExecutor;
     private OrderByFactory orderByFactory;
     private boolean bound;
-    private Matcher matcher;
 
+    @Override
     public String getName() {
         return getEntityElement().getEntityDef().getName();
     }
@@ -73,14 +73,10 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
     }
 
     @Override
-    public boolean matches(Options options) {
-        return matcher.matches(options);
-    }
-
-    @Override
     public Result<Object> executeQuery(Context context, Query query) {
-        Selector selector = context.getOption(Selector.class);
-        if (selector != null) {
+        RepositoryMatcher repositoryMatcher = context.getOption(RepositoryMatcher.class);
+        if (repositoryMatcher instanceof SelectorRepositoryMatcher) {
+            Selector selector = ((SelectorRepositoryMatcher) repositoryMatcher).getSelector();
             List<String> properties = selector.select(getName());
             if (properties != null && !properties.isEmpty()) {
                 Object primaryKey = query.getPrimaryKey();

@@ -17,15 +17,19 @@
 
 package com.gitee.dorive.base.v1.core.api;
 
-import com.gitee.dorive.base.v1.common.enums.MatcherType;
 import com.gitee.dorive.base.v1.core.entity.ctx.EnumOptions;
+import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
+import com.gitee.dorive.base.v1.repository.impl.matcher.AllRepositoryMatcher;
+import com.gitee.dorive.base.v1.repository.impl.matcher.NoneRepositoryMatcher;
+import com.gitee.dorive.base.v1.repository.impl.matcher.RootRepositoryMatcher;
 
 import java.util.Map;
 
 public interface Options {
 
-    Options ROOT = new EnumOptions(MatcherType.class, MatcherType.ROOT);
-    Options ALL = new EnumOptions(MatcherType.class, MatcherType.ALL);
+    Options NONE = new EnumOptions(RepositoryMatcher.class, new NoneRepositoryMatcher());
+    Options ROOT = new EnumOptions(RepositoryMatcher.class, new RootRepositoryMatcher());
+    Options ALL = new EnumOptions(RepositoryMatcher.class, new AllRepositoryMatcher());
 
     Map<Class<?>, Object> getOptions();
 

@@ -15,28 +15,26 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.impl.handler.qry;
+package com.gitee.dorive.base.v1.repository.impl.matcher;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.core.api.Selector;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.executor.api.EntityHandler;
+import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
-public class ContextMatchEntityHandler implements EntityHandler {
+public class SelectorRepositoryMatcher implements RepositoryMatcher {
 
-    private RepositoryContext repositoryContext;
-    private RepositoryItem repository;
-    private EntityHandler entityHandler;
+    private final Selector selector;
 
     @Override
-    public long handle(Context context, List<Object> entities) {
-        return repositoryContext.matches(context, repository) ? entityHandler.handle(context, entities) : 0L;
+    public boolean matches(RepositoryItem repositoryItem) {
+        if (selector != null) {
+            return selector.getNames().contains(repositoryItem.getName());
+        }
+        return false;
     }
 
 }

@@ -47,7 +47,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         Assert.notNull(example, "The example cannot be null!");
         int totalCount = 0;
         for (RepositoryItem repository : getOrderedRepositories()) {
-            if (repository.matches(options)) {
+            if (matches(options, repository)) {
                 totalCount += repository.updateByExample(options, entity, ExampleUtils.clone(example));
             }
         }
@@ -66,7 +66,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRe
         Assert.notNull(example, "The example cannot be null!");
         int totalCount = 0;
         for (RepositoryItem repository : getOrderedRepositories()) {
-            if (repository.matches(options)) {
+            if (matches(options, repository)) {
                 totalCount += repository.deleteByExample(options, ExampleUtils.clone(example));
             }
         }

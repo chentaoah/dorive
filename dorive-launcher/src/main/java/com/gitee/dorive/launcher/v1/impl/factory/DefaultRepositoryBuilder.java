@@ -21,7 +21,6 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.core.api.Matcher;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
@@ -31,7 +30,6 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
-import com.gitee.dorive.executor.v1.impl.context.AdaptiveMatcher;
 import com.gitee.dorive.executor.v1.impl.executor.ContextExecutor;
 import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
@@ -88,11 +86,6 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         BinderResolver binderResolver = new BinderResolver(repositoryContext);
         binderResolver.resolve(entityElement);
         return binderResolver;
-    }
-
-    @Override
-    public Matcher newAdaptiveMatcher(boolean root, String name) {
-        return new AdaptiveMatcher(root, name);
     }
 
     @Override
