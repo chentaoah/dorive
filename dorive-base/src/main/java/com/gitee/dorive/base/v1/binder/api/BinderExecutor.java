@@ -19,14 +19,27 @@ package com.gitee.dorive.base.v1.binder.api;
 
 import com.gitee.dorive.base.v1.common.enums.JoinType;
 import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public interface BinderExecutor {
+
+    List<String> getSelfFields();
 
     JoinType getJoinType();
 
     boolean hasValueRouteBinders();
+
+    List<Binder> getValueFilterBinders();
+
+    Map<String, List<Binder>> getMergedStrongBindersMap();
+
+    Map<String, List<Binder>> getMergedValueRouteBindersMap();
+
+    void appendFilterValue(Context context, Example example);
 
     void getBoundValue(Context context, Object rootEntity, Collection<?> entities);
 

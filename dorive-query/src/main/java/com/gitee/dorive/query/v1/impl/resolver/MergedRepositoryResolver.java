@@ -17,13 +17,12 @@
 
 package com.gitee.dorive.query.v1.impl.resolver;
 
+import com.gitee.dorive.base.v1.binder.api.Binder;
+import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
-import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
-import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.query.v1.entity.MergedRepository;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +45,7 @@ public class MergedRepositoryResolver {
     public void resolve() {
         for (RepositoryItem repositoryItem : repository.getRepositoryMap().values()) {
             String accessPath = repositoryItem.getAccessPath();
-            BinderResolver binderResolver = (BinderResolver) repositoryItem.getBinderExecutor();
+            BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
 
             RepositoryItem executedRepository = repositoryItem;
             AbstractRepository<Object, Object> abstractRepository = repositoryItem.getProxyRepository();
@@ -60,8 +59,8 @@ public class MergedRepositoryResolver {
             mergedRepository.setLastAccessPath("");
             mergedRepository.setAbsoluteAccessPath(accessPath);
             mergedRepository.setDefinedRepository(repositoryItem);
-            mergedRepository.setMergedStrongBindersMap(new LinkedHashMap<>(binderResolver.getMergedStrongBindersMap()));
-            mergedRepository.setMergedValueRouteBindersMap(new LinkedHashMap<>(binderResolver.getMergedValueRouteBindersMap()));
+            mergedRepository.setMergedStrongBindersMap(new LinkedHashMap<>(binderExecutor.getMergedStrongBindersMap()));
+            mergedRepository.setMergedValueRouteBindersMap(new LinkedHashMap<>(binderExecutor.getMergedValueRouteBindersMap()));
 
             Set<String> boundAccessPaths = new LinkedHashSet<>(8);
             boundAccessPaths.addAll(mergedRepository.getMergedStrongBindersMap().keySet());
@@ -105,13 +104,13 @@ public class MergedRepositoryResolver {
             newMergedRepository.setAbsoluteAccessPath(accessPath + mergedRepository.getAbsoluteAccessPath());
             newMergedRepository.setDefinedRepository(mergedRepository.getDefinedRepository());
 
-            Map<String, List<StrongBinder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
-            Map<String, List<StrongBinder>> newMergedStrongBindersMap = new LinkedHashMap<>(mergedStrongBindersMap.size() * 4 / 3 + 1);
+            Map<String, List<Binder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
+            Map<String, List<Binder>> newMergedStrongBindersMap = new LinkedHashMap<>(mergedStrongBindersMap.size() * 4 / 3 + 1);
             mergedStrongBindersMap.forEach((k, v) -> newMergedStrongBindersMap.put(mergeAccessPath(accessPath, k), v));
             newMergedRepository.setMergedStrongBindersMap(newMergedStrongBindersMap);
 
-            Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
-            Map<String, List<ValueRouteBinder>> newMergedValueRouteBindersMap = new LinkedHashMap<>(mergedValueRouteBindersMap.size() * 4 / 3 + 1);
+            Map<String, List<Binder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
+            Map<String, List<Binder>> newMergedValueRouteBindersMap = new LinkedHashMap<>(mergedValueRouteBindersMap.size() * 4 / 3 + 1);
             mergedValueRouteBindersMap.forEach((k, v) -> newMergedValueRouteBindersMap.put(mergeAccessPath(accessPath, k), v));
             newMergedRepository.setMergedValueRouteBindersMap(newMergedValueRouteBindersMap);
 

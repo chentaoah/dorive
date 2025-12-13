@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.mybatis.v1.impl.segment;
 
+import com.gitee.dorive.base.v1.binder.api.Binder;
+import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.constant.Operator;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Criterion;
@@ -28,10 +30,6 @@ import com.gitee.dorive.base.v1.factory.enums.Category;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
-import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
-import com.gitee.dorive.binder.v1.impl.binder.ValueFilterBinder;
-import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.mybatis.v1.api.Segment;
 import com.gitee.dorive.mybatis.v1.entity.EntityStoreInfo;
 import com.gitee.dorive.mybatis.v1.entity.segment.*;
@@ -90,18 +88,18 @@ public class SegmentResolver {
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
 
         RepositoryItem definedRepository = mergedRepository.getDefinedRepository();
-        Map<String, List<StrongBinder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
-        Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
+        Map<String, List<Binder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
+        Map<String, List<Binder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
         Translator translator = getTranslator(mergedRepository);
 
-        BinderResolver binderResolver = (BinderResolver) definedRepository.getBinderExecutor();
-        List<ValueFilterBinder> valueFilterBinders = binderResolver.getValueFilterBinders();
+        BinderExecutor binderExecutor = definedRepository.getBinderExecutor();
+        List<Binder> valueFilterBinders = binderExecutor.getValueFilterBinders();
 
         List<OnSegment> onSegments = new ArrayList<>(mergedStrongBindersMap.size() + mergedValueRouteBindersMap.size() + valueFilterBinders.size());
         mergedStrongBindersMap.forEach((absoluteAccessPath, strongBinders) -> {
             MergedRepository targetMergedRepository = mergedRepositoryMap.get(absoluteAccessPath);
             Translator targetTranslator = getTranslator(targetMergedRepository);
-            for (StrongBinder strongBinder : strongBinders) {
+            for (Binder strongBinder : strongBinders) {
                 String leftExpr = mergedRepository.getAlias() + "." + translator.toAlias(strongBinder.getFieldName());
                 String operator = "=";
                 String rightExpr = targetMergedRepository.getAlias() + "." + targetTranslator.toAlias(strongBinder.getBindField());
@@ -112,7 +110,7 @@ public class SegmentResolver {
         mergedValueRouteBindersMap.forEach((absoluteAccessPath, valueRouteBinders) -> {
             MergedRepository targetMergedRepository = mergedRepositoryMap.get(absoluteAccessPath);
             Translator targetTranslator = getTranslator(targetMergedRepository);
-            for (ValueRouteBinder valueRouteBinder : valueRouteBinders) {
+            for (Binder valueRouteBinder : valueRouteBinders) {
                 String leftExpr = targetMergedRepository.getAlias() + "." + targetTranslator.toAlias(valueRouteBinder.getBindField());
                 String operator = "=";
                 String rightExpr = CriterionUtils.sqlParam(valueRouteBinder.getFieldValue(context, null));
@@ -120,7 +118,7 @@ public class SegmentResolver {
                 onSegments.add(onValueSegment);
             }
         });
-        for (ValueFilterBinder valueFilterBinder : valueFilterBinders) {
+        for (Binder valueFilterBinder : valueFilterBinders) {
             String leftExpr = mergedRepository.getAlias() + "." + translator.toAlias(valueFilterBinder.getFieldName());
             String operator = "=";
             String rightExpr = CriterionUtils.sqlParam(valueFilterBinder.getBoundValue(context, null));

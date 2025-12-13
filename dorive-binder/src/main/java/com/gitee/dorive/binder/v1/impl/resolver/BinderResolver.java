@@ -22,7 +22,9 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
+import com.gitee.dorive.base.v1.binder.api.Processor;
 import com.gitee.dorive.base.v1.common.def.BindingDef;
 import com.gitee.dorive.base.v1.common.def.EntityDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
@@ -33,8 +35,6 @@ import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.binder.v1.api.Binder;
-import com.gitee.dorive.binder.v1.api.Processor;
 import com.gitee.dorive.binder.v1.impl.binder.*;
 import com.gitee.dorive.binder.v1.impl.endpoint.BindEndpoint;
 import com.gitee.dorive.binder.v1.impl.endpoint.FieldEndpoint;
@@ -240,6 +240,33 @@ public class BinderResolver implements BinderExecutor {
         return bindEndpoint;
     }
 
+    public List<StrongBinder> getRootStrongBinders() {
+        return mergedStrongBindersMap.get("/");
+    }
+
+    @Override
+    public boolean hasValueRouteBinders() {
+        return !getValueRouteBinders().isEmpty();
+    }
+
+    @Override
+    public List<Binder> getValueFilterBinders() {
+        return new ArrayList<>(valueFilterBinders);
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Map<String, List<Binder>> getMergedStrongBindersMap() {
+        return mergedStrongBindersMap.entrySet().stream().collect(HashMap::new, (map, entry) -> map.put(entry.getKey(), (List) entry.getValue()), HashMap::putAll);
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Map<String, List<Binder>> getMergedValueRouteBindersMap() {
+        return mergedValueRouteBindersMap.entrySet().stream().collect(HashMap::new, (map, entry) -> map.put(entry.getKey(), (List) entry.getValue()), HashMap::putAll);
+    }
+
+    @Override
     public void appendFilterValue(Context context, Example example) {
         for (ValueFilterBinder valueFilterBinder : valueFilterBinders) {
             Object boundValue = valueFilterBinder.getBoundValue(context, null);
@@ -249,15 +276,6 @@ public class BinderResolver implements BinderExecutor {
                 example.eq(fieldName, boundValue);
             }
         }
-    }
-
-    public List<StrongBinder> getRootStrongBinders() {
-        return mergedStrongBindersMap.get("/");
-    }
-
-    @Override
-    public boolean hasValueRouteBinders() {
-        return !getValueRouteBinders().isEmpty();
     }
 
     @Override

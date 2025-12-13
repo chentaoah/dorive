@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.binder.v1.api;
+package com.gitee.dorive.base.v1.binder.api;
 
-import com.gitee.dorive.binder.v1.impl.endpoint.BindEndpoint;
-import com.gitee.dorive.binder.v1.impl.endpoint.FieldEndpoint;
+import com.gitee.dorive.base.v1.core.api.Context;
 
-public interface Binder extends Processor {
+public interface Processor {
 
-    FieldEndpoint getFieldEndpoint();
+    Object input(Context context, Object value);
 
-    BindEndpoint getBindEndpoint();
+    Object output(Context context, Object value);
 
 }

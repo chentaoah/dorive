@@ -17,14 +17,12 @@
 
 package com.gitee.dorive.query.v1.impl.handler.executor;
 
+import com.gitee.dorive.base.v1.binder.api.Binder;
+import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.binder.v1.impl.binder.AbstractBinder;
-import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
-import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
-import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.query.v1.entity.MergedRepository;
 import com.gitee.dorive.query.v1.entity.QueryContext;
 import com.gitee.dorive.query.v1.entity.QueryUnit;
@@ -51,11 +49,11 @@ public class StepwiseQueryHandler extends AbstractQueryUnitQueryHandler {
             boolean abandoned = queryUnit.isAbandoned();
 
             RepositoryItem definedRepository = mergedRepository.getDefinedRepository();
-            Map<String, List<StrongBinder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
-            Map<String, List<ValueRouteBinder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
+            Map<String, List<Binder>> mergedStrongBindersMap = mergedRepository.getMergedStrongBindersMap();
+            Map<String, List<Binder>> mergedValueRouteBindersMap = mergedRepository.getMergedValueRouteBindersMap();
             RepositoryItem executedRepository = mergedRepository.getExecutedRepository();
 
-            BinderResolver binderResolver = (BinderResolver) definedRepository.getBinderExecutor();
+            BinderExecutor binderExecutor = definedRepository.getBinderExecutor();
 
             if (!abandoned) {
                 abandoned = determineAbandon(queryUnitMap, mergedValueRouteBindersMap.keySet());
@@ -69,8 +67,8 @@ public class StepwiseQueryHandler extends AbstractQueryUnitQueryHandler {
                 entities = Collections.emptyList();
 
             } else if (example.isNotEmpty()) {
-                example.select(binderResolver.getSelfFields());
-                binderResolver.appendFilterValue(context, example);
+                example.select(binderExecutor.getSelfFields());
+                binderExecutor.appendFilterValue(context, example);
                 entities = executedRepository.selectByExample(context, example);
 
             } else {
@@ -81,7 +79,7 @@ public class StepwiseQueryHandler extends AbstractQueryUnitQueryHandler {
                 QueryUnit targetQueryUnit = queryUnitMap.get(absoluteAccessPath);
                 if (targetQueryUnit != null) {
                     Example targetExample = targetQueryUnit.getExample();
-                    for (ValueRouteBinder valueRouteBinder : valueRouteBinders) {
+                    for (Binder valueRouteBinder : valueRouteBinders) {
                         Object fieldValue = valueRouteBinder.getFieldValue(context, null);
                         if (fieldValue != null) {
                             String boundName = valueRouteBinder.getBindField();
@@ -100,7 +98,7 @@ public class StepwiseQueryHandler extends AbstractQueryUnitQueryHandler {
                     }
                     Example targetExample = targetQueryUnit.getExample();
                     if (strongBinders.size() == 1) {
-                        StrongBinder strongBinder = strongBinders.get(0);
+                        Binder strongBinder = strongBinders.get(0);
                         List<Object> fieldValues = collectFieldValues(context, entities, strongBinder);
                         if (!fieldValues.isEmpty()) {
                             String boundName = strongBinder.getBindField();
@@ -114,7 +112,7 @@ public class StepwiseQueryHandler extends AbstractQueryUnitQueryHandler {
                         }
 
                     } else {
-                        List<String> properties = strongBinders.stream().map(AbstractBinder::getBindField).collect(Collectors.toList());
+                        List<String> properties = strongBinders.stream().map(Binder::getBindField).collect(Collectors.toList());
                         MultiInBuilder builder = new MultiInBuilder(properties, entities.size());
                         collectFieldValues(context, entities, strongBinders, builder);
                         if (!builder.isEmpty()) {
@@ -140,7 +138,7 @@ public class StepwiseQueryHandler extends AbstractQueryUnitQueryHandler {
         return false;
     }
 
-    private List<Object> collectFieldValues(Context context, List<Object> entities, StrongBinder strongBinder) {
+    private List<Object> collectFieldValues(Context context, List<Object> entities, Binder strongBinder) {
         List<Object> fieldValues = new ArrayList<>(entities.size());
         for (Object entity : entities) {
             Object fieldValue = strongBinder.getFieldValue(context, entity);
@@ -152,9 +150,9 @@ public class StepwiseQueryHandler extends AbstractQueryUnitQueryHandler {
         return fieldValues;
     }
 
-    private void collectFieldValues(Context context, List<Object> entities, List<StrongBinder> strongBinders, MultiInBuilder builder) {
+    private void collectFieldValues(Context context, List<Object> entities, List<Binder> strongBinders, MultiInBuilder builder) {
         for (Object entity : entities) {
-            for (StrongBinder strongBinder : strongBinders) {
+            for (Binder strongBinder : strongBinders) {
                 Object fieldValue = strongBinder.getFieldValue(context, entity);
                 if (fieldValue != null) {
                     fieldValue = strongBinder.output(context, fieldValue);
