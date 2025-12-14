@@ -89,16 +89,16 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         for (EntityElement entityElement : entityElements) {
             String accessPath = entityElement.getAccessPath();
-            ProxyRepository repository = newRepository(entityElement);
-            repositoryMap.put(accessPath, repository);
-            if (repository.isRoot()) {
-                rootRepository = repository;
+            RepositoryItem repositoryItem = newRepositoryItem(entityElement);
+            repositoryMap.put(accessPath, repositoryItem);
+            if (repositoryItem.isRoot()) {
+                rootRepository = repositoryItem;
             } else {
-                subRepositories.add(repository);
+                subRepositories.add(repositoryItem);
             }
-            orderedRepositories.add(repository);
+            orderedRepositories.add(repositoryItem);
         }
-        orderedRepositories.sort(Comparator.comparingInt(repository -> repository.getEntityElement().getEntityDef().getPriority()));
+        orderedRepositories.sort(Comparator.comparingInt(repositoryItem -> repositoryItem.getEntityElement().getEntityDef().getPriority()));
 
         setEntityElement(rootRepository.getEntityElement());
         setOperationFactory(rootRepository.getOperationFactory());
@@ -121,7 +121,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
     }
 
-    private ProxyRepository newRepository(EntityElement entityElement) {
+    private RepositoryItem newRepositoryItem(EntityElement entityElement) {
         resetEntityDef(entityElement);
 
         OrderByDef orderByDef = entityElement.getOrderByDef();
