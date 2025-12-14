@@ -37,7 +37,7 @@ import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.api.RepositoryPostProcessor;
-import com.gitee.dorive.repository.v1.impl.context.RepositoryGlobalContext;
+import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -107,7 +107,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     protected void prepareRepositoryDef(Class<?> repositoryClass, Class<?> entityClass) {
         this.repositoryDef = RepositoryDef.fromElement(repositoryClass);
-        for (RepositoryPostProcessor postProcessor : RepositoryGlobalContext.getRepositoryPostProcessors()) {
+        for (RepositoryPostProcessor postProcessor : RepositoryRegister.getRepositoryPostProcessors()) {
             postProcessor.postProcessRepositoryDef(repositoryClass, entityClass, repositoryDef);
         }
     }
@@ -166,7 +166,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         if (entityElement.isRoot()) {
             newRepositoryClass = DefaultRepository.class;
         } else {
-            newRepositoryClass = RepositoryGlobalContext.findRepositoryClass(genericType);
+            newRepositoryClass = RepositoryRegister.findRepositoryClass(genericType);
         }
         Assert.notNull(newRepositoryClass, "No type of repository found! type: {}", genericType.getName());
         entityDef.setRepository(newRepositoryClass);

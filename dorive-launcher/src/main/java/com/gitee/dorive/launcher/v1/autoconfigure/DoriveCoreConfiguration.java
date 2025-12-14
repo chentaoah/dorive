@@ -27,7 +27,7 @@ import com.gitee.dorive.launcher.v1.impl.factory.DefaultEntityHandlerFactory;
 import com.gitee.dorive.launcher.v1.impl.factory.DefaultEntityJoinerFactory;
 import com.gitee.dorive.launcher.v1.impl.factory.DefaultRepositoryBuilder;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
-import com.gitee.dorive.repository.v1.impl.context.RepositoryGlobalContext;
+import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -46,9 +46,9 @@ public class DoriveCoreConfiguration {
         return new DefaultQueryResolver();
     }
 
-    @Bean("RepositoryGlobalContextV3")
-    public static RepositoryGlobalContext repositoryGlobalContext() {
-        return new RepositoryGlobalContext();
+    @Bean("RepositoryRegisterV3")
+    public static RepositoryRegister repositoryGlobalContext() {
+        return new RepositoryRegister();
     }
 
     @Bean("RepositoryBuilderV3")
