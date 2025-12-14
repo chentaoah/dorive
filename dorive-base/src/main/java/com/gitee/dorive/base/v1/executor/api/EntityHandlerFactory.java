@@ -17,5 +17,7 @@
 
 package com.gitee.dorive.base.v1.executor.api;
 
+import com.gitee.dorive.base.v1.common.api.GenericFactory;
+
 public interface EntityHandlerFactory extends GenericFactory<EntityHandler> {
 }

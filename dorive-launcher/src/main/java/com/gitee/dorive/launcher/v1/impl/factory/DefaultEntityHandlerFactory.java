@@ -20,7 +20,7 @@ package com.gitee.dorive.launcher.v1.impl.factory;
 import cn.hutool.extra.spring.SpringUtil;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityHandlerFactory;
-import com.gitee.dorive.base.v1.executor.api.EntityJoinerFactory;
+import com.gitee.dorive.base.v1.joiner.api.EntityJoinerFactory;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.binder.v1.impl.handler.ValueFilterEntityHandler;

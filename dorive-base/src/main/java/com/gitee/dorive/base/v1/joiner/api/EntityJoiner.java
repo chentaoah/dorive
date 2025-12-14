@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.executor.api;
+package com.gitee.dorive.base.v1.joiner.api;
 
-public interface EntityJoinerFactory extends GenericFactory<EntityJoiner> {
+import java.util.List;
+
+public interface EntityJoiner {
+
+    void addLeft(Object entity, String key);
+
+    boolean containsKey(String key);
+
+    void addRight(String key, Object entity);
+
+    void setCollectionSize(int size);
+
+    void join(List<Object> entities);
+
 }

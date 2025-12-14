@@ -15,20 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.executor.api;
+package com.gitee.dorive.base.v1.common.api;
 
-import java.util.List;
+public interface GenericFactory<T> {
 
-public interface EntityJoiner {
-
-    void addLeft(Object entity, String key);
-
-    boolean containsKey(String key);
-
-    void addRight(String key, Object entity);
-
-    void setCollectionSize(int size);
-
-    void join(List<Object> entities);
+    T create(String name, Object... args);
 
 }

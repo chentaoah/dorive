@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.executor.api;
+package com.gitee.dorive.base.v1.joiner.api;
 
-public interface GenericFactory<T> {
+import com.gitee.dorive.base.v1.common.api.GenericFactory;
 
-    T create(String name, Object... args);
-
+public interface EntityJoinerFactory extends GenericFactory<EntityJoiner> {
 }

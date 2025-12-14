@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.joiner.v1.impl;
 
-import com.gitee.dorive.base.v1.executor.api.EntityJoiner;
+import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
