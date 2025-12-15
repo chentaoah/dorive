@@ -31,7 +31,7 @@ public class DefaultEntityJoinerV2 implements EntityJoinerV2 {
                                   List<T> entities2, Function<T, String> keyGen2,
                                   boolean collection, BiConsumer<S, Object> setter) {
         // 目标
-        Map<String, Object> keyObjectMap = new HashMap<>();
+        Map<String, Object> keyObjectMap = new HashMap<>(entities2.size() * 4 / 3 + 1);
         for (T entity2 : entities2) {
             String key2 = keyGen2.apply(entity2);
             if (collection) {
