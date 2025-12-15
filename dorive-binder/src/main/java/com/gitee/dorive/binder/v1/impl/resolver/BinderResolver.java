@@ -250,6 +250,21 @@ public class BinderResolver implements BinderExecutor {
     }
 
     @Override
+    public void appendFilterCriteria(Context context, Example example) {
+        if (example == null || example.isEmpty()) {
+            return;
+        }
+        for (Binder weakBinder : weakBinders) {
+            Object boundValue = weakBinder.input(context, null);
+            if (boundValue != null) {
+                String fieldName = weakBinder.getFieldName();
+                example.eq(fieldName, boundValue);
+            }
+        }
+        appendFilterValue(context, example);
+    }
+
+    @Override
     public void appendFilterValue(Context context, Example example) {
         for (Binder valueFilterBinder : valueFilterBinders) {
             Object boundValue = valueFilterBinder.getBoundValue(context, null);

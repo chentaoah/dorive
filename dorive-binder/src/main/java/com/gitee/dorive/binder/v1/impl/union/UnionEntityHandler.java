@@ -78,7 +78,7 @@ public class UnionEntityHandler extends AbstractEntityHandler {
                 break;
             }
         }
-        appendFilterCriteria(context, example);
+        binderResolver.appendFilterCriteria(context, example);
         return example;
     }
 

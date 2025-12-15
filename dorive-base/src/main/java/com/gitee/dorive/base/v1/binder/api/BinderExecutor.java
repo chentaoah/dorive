@@ -41,6 +41,8 @@ public interface BinderExecutor {
 
     boolean hasValueRouteBinders();
 
+    void appendFilterCriteria(Context context, Example example);
+
     void appendFilterValue(Context context, Example example);
 
     void getBoundValue(Context context, Object rootEntity, Collection<?> entities);
