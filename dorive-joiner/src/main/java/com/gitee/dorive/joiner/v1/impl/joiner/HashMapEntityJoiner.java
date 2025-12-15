@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.joiner.v1.impl;
+package com.gitee.dorive.joiner.v1.impl.joiner;
 
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import lombok.Data;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.joiner.v1.impl;
+package com.gitee.dorive.joiner.v1.impl.joiner;
 
 import com.gitee.dorive.base.v1.joiner.api.EntityJoinerV2;
 
@@ -35,19 +35,24 @@ public class DefaultEntityJoinerV2 implements EntityJoinerV2 {
         Map<String, Object> keyObjectMap = new HashMap<>(entities2.size() * 4 / 3 + 1);
         for (T entity2 : entities2) {
             String key2 = keyGen2.apply(entity2);
-            if (collection) {
-                Collection<Object> existCollection = (Collection<Object>) keyObjectMap.computeIfAbsent(key2, k -> new ArrayList<>(collectionSize));
-                existCollection.add(entity2);
-            } else {
-                keyObjectMap.putIfAbsent(key2, entity2);
+            if (key2 != null) {
+                if (collection) {
+                    Collection<Object> existCollection = (Collection<Object>) keyObjectMap.computeIfAbsent(key2,
+                            k -> new ArrayList<>(collectionSize));
+                    existCollection.add(entity2);
+                } else {
+                    keyObjectMap.putIfAbsent(key2, entity2);
+                }
             }
         }
         // 源头
         for (S entity1 : entities1) {
             String key1 = keyGen1.apply(entity1);
-            Object object = keyObjectMap.get(key1);
-            if (object != null) {
-                setter.accept(entity1, object);
+            if (key1 != null) {
+                Object object = keyObjectMap.get(key1);
+                if (object != null) {
+                    setter.accept(entity1, object);
+                }
             }
         }
     }

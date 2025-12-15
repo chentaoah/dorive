@@ -20,7 +20,7 @@ package com.gitee.dorive.launcher.v1.impl.factory;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoinerFactory;
-import com.gitee.dorive.joiner.v1.impl.DefaultEntityJoiner;
+import com.gitee.dorive.joiner.v1.impl.joiner.DefaultEntityJoiner;
 
 import java.util.List;
 
