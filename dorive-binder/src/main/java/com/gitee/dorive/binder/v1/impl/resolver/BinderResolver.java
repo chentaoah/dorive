@@ -239,6 +239,7 @@ public class BinderResolver implements BinderExecutor {
         return bindEndpoint;
     }
 
+    @Override
     public List<Binder> getRootStrongBinders() {
         return mergedStrongBindersMap.get("/");
     }

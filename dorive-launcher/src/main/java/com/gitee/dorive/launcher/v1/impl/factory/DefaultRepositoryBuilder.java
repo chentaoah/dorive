@@ -25,8 +25,10 @@ import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.enums.Category;
+import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
@@ -37,6 +39,7 @@ import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
 import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
+import com.gitee.dorive.joiner.v1.impl.joiner.DefaultEntityJoiner;
 import com.gitee.dorive.launcher.v1.impl.querier.SqlCountQuerier;
 import com.gitee.dorive.mybatis.v1.entity.EntityStoreInfo;
 import com.gitee.dorive.mybatis.v1.impl.handler.SqlBuildQueryHandler;
@@ -86,6 +89,11 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         BinderResolver binderResolver = new BinderResolver(repositoryContext);
         binderResolver.resolve(entityElement);
         return binderResolver;
+    }
+
+    @Override
+    public EntityJoiner newEntityJoiner(RepositoryItem repositoryItem) {
+        return new DefaultEntityJoiner(repositoryItem);
     }
 
     @Override

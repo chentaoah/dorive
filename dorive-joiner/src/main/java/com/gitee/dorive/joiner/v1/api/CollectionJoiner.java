@@ -15,9 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.joiner.api;
+package com.gitee.dorive.joiner.v1.api;
 
-import com.gitee.dorive.base.v1.common.api.GenericFactory;
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
-public interface EntityJoinerFactory extends GenericFactory<EntityJoiner> {
+public interface CollectionJoiner {
+
+    <S, T> void joinAndSet(List<S> entities1, Function<S, String> keyGen1,
+                           List<T> entities2, Function<T, String> keyGen2,
+                           boolean collection, BiConsumer<S, Object> setter);
+
 }

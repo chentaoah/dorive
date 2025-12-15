@@ -30,6 +30,7 @@ import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
 import com.gitee.dorive.base.v1.core.util.ReflectUtils;
+import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
@@ -150,6 +151,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         proxyRepository.setBinderExecutor(binderExecutor);
         proxyRepository.setOrderByFactory(orderByFactory);
         proxyRepository.setBound(false);
+
+        // 连接器
+        EntityJoiner entityJoiner = repositoryBuilder.newEntityJoiner(proxyRepository);
+        proxyRepository.setProperty(EntityJoiner.class, entityJoiner);
+
         return proxyRepository;
     }
 

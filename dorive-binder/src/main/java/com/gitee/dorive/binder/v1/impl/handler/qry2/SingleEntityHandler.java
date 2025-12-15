@@ -15,14 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.binder.v1.impl.handler.qry;
+package com.gitee.dorive.binder.v1.impl.handler.qry2;
 
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
-import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import lombok.Getter;
@@ -37,8 +35,8 @@ public class SingleEntityHandler extends AbstractEntityHandler {
 
     private Binder binder;
 
-    public SingleEntityHandler(RepositoryItem repository, EntityJoiner entityJoiner) {
-        super(repository, entityJoiner);
+    public SingleEntityHandler(RepositoryItem repository) {
+        super(repository);
         BinderResolver binderResolver = (BinderResolver) repository.getBinderExecutor();
         this.binder = binderResolver.getRootStrongBinders().get(0);
     }
@@ -55,7 +53,6 @@ public class SingleEntityHandler extends AbstractEntityHandler {
                 example.in(fieldName, boundValues);
             }
         }
-        appendFilterCriteria(context, example);
         return example;
     }
 
@@ -65,26 +62,10 @@ public class SingleEntityHandler extends AbstractEntityHandler {
             Object boundValue = binder.getBoundValue(context, entity);
             boundValue = binder.input(context, boundValue);
             if (boundValue != null) {
-                String key = boundValue.toString();
-                if (!entityJoiner.containsKey(key)) {
-                    boundValues.add(boundValue);
-                }
-                entityJoiner.addLeft(entity, key);
+                boundValues.add(boundValue);
             }
         }
         return boundValues;
-    }
-
-    @Override
-    protected void handleResult(Context context, Result<Object> result) {
-        List<Object> records = result.getRecords();
-        for (Object entity : records) {
-            Object fieldValue = binder.getFieldValue(context, entity);
-            if (fieldValue != null) {
-                String key = fieldValue.toString();
-                entityJoiner.addRight(key, entity);
-            }
-        }
     }
 
 }

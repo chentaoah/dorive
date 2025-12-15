@@ -17,18 +17,12 @@
 
 package com.gitee.dorive.base.v1.joiner.api;
 
+import com.gitee.dorive.base.v1.core.api.Context;
+
 import java.util.List;
 
 public interface EntityJoiner {
 
-    void addLeft(Object entity, String key);
-
-    boolean containsKey(String key);
-
-    void addRight(String key, Object entity);
-
-    void setCollectionSize(int size);
-
-    void join(List<Object> entities);
+    void join(Context context, List<Object> entities1, List<Object> entities2);
 
 }

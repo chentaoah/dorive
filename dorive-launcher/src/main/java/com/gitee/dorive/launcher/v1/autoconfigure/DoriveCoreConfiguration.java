@@ -22,9 +22,7 @@ import com.gitee.dorive.aggregate.v1.impl.DefaultQueryResolver;
 import com.gitee.dorive.base.v1.aggregate.api.EntityResolver;
 import com.gitee.dorive.base.v1.aggregate.api.QueryResolver;
 import com.gitee.dorive.base.v1.executor.api.EntityHandlerFactory;
-import com.gitee.dorive.base.v1.joiner.api.EntityJoinerFactory;
 import com.gitee.dorive.launcher.v1.impl.factory.DefaultEntityHandlerFactory;
-import com.gitee.dorive.launcher.v1.impl.factory.DefaultEntityJoinerFactory;
 import com.gitee.dorive.launcher.v1.impl.factory.DefaultRepositoryBuilder;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
@@ -59,11 +57,6 @@ public class DoriveCoreConfiguration {
     @Bean("EntityHandlerFactoryV3")
     public static EntityHandlerFactory entityHandlerFactory() {
         return new DefaultEntityHandlerFactory();
-    }
-
-    @Bean("EntityJoinerFactoryV3")
-    public static EntityJoinerFactory entityJoinerFactory() {
-        return new DefaultEntityJoinerFactory();
     }
 
 }

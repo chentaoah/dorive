@@ -17,13 +17,13 @@
 
 package com.gitee.dorive.joiner.v1.impl.joiner;
 
-import com.gitee.dorive.base.v1.joiner.api.EntityJoinerV2;
+import com.gitee.dorive.joiner.v1.api.CollectionJoiner;
 
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public class DefaultEntityJoinerV2 implements EntityJoinerV2 {
+public class DefaultCollectionJoiner implements CollectionJoiner {
 
     @Override
     @SuppressWarnings("unchecked")

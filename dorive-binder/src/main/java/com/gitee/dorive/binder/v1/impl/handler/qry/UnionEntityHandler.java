@@ -24,8 +24,8 @@ import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.entity.qry.UnionExample;
-import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.binder.v1.impl.joiner.KeyValueJoiner;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,8 +38,8 @@ import java.util.Map;
 @Setter
 public class UnionEntityHandler extends AbstractEntityHandler {
 
-    public UnionEntityHandler(RepositoryItem repository, EntityJoiner entityJoiner) {
-        super(repository, entityJoiner);
+    public UnionEntityHandler(RepositoryItem repository, KeyValueJoiner keyValueJoiner) {
+        super(repository, keyValueJoiner);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class UnionEntityHandler extends AbstractEntityHandler {
             String row = Integer.toString(index + 1);
             example.setSelectSuffix(row + " as $row");
             unionExample.addExample(example);
-            entityJoiner.addLeft(entity, row);
+            keyValueJoiner.addLeft(entity, row);
         }
         return unionExample;
     }
@@ -97,10 +97,10 @@ public class UnionEntityHandler extends AbstractEntityHandler {
                 List<String> rows = (List<String>) resultMap.get("$rows");
                 if (rows != null) {
                     for (String eachRow : rows) {
-                        entityJoiner.addRight(eachRow, entity);
+                        keyValueJoiner.addRight(eachRow, entity);
                     }
                 } else if (row != null) {
-                    entityJoiner.addRight(row.toString(), entity);
+                    keyValueJoiner.addRight(row.toString(), entity);
                 }
             }
         }

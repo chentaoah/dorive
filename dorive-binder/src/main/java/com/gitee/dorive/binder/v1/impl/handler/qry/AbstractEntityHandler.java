@@ -24,8 +24,8 @@ import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
-import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.binder.v1.impl.joiner.KeyValueJoiner;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,7 +39,7 @@ import java.util.List;
 public abstract class AbstractEntityHandler implements EntityHandler {
 
     protected final RepositoryItem repository;
-    protected final EntityJoiner entityJoiner;
+    protected final KeyValueJoiner keyValueJoiner;
 
     @Override
     public long handle(Context context, List<Object> entities) {
@@ -49,9 +49,9 @@ public abstract class AbstractEntityHandler implements EntityHandler {
             Query query = operationFactory.buildQueryByExample(example);
             query.includeRoot();
             Result<Object> result = repository.executeQuery(context, query);
-            entityJoiner.setCollectionSize(result.getRecords().size() / entities.size() + 1);
+            keyValueJoiner.setCollectionSize(result.getRecords().size() / entities.size() + 1);
             handleResult(context, result);
-            entityJoiner.join(entities);
+            keyValueJoiner.join(entities);
             return result.getCount();
         }
         return 0L;

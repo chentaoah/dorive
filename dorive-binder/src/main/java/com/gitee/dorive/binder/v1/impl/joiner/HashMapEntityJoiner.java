@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.joiner.v1.impl.joiner;
+package com.gitee.dorive.binder.v1.impl.joiner;
 
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import lombok.Data;
@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 
 @Data
-public abstract class HashMapEntityJoiner implements EntityJoiner {
+public abstract class HashMapEntityJoiner {
 
     private boolean collection;
     private List<Object> entities;
@@ -44,7 +44,6 @@ public abstract class HashMapEntityJoiner implements EntityJoiner {
         this.collectionSize = 10;
     }
 
-    @Override
     public void addLeft(Object entity, String key) {
         if (entity != null && StringUtils.isNotBlank(key)) {
             hashCodeKeyMap.put(System.identityHashCode(entity), key);
@@ -56,12 +55,10 @@ public abstract class HashMapEntityJoiner implements EntityJoiner {
         return entity != null ? hashCodeKeyMap.get(System.identityHashCode(entity)) : null;
     }
 
-    @Override
     public boolean containsKey(String key) {
         return keys.contains(key);
     }
 
-    @Override
     @SuppressWarnings("unchecked")
     public void addRight(String key, Object entity) {
         if (StringUtils.isNotBlank(key) && entity != null) {
@@ -82,7 +79,6 @@ public abstract class HashMapEntityJoiner implements EntityJoiner {
         return hashCodeKeyMap == null || hashCodeKeyMap.isEmpty() || keyObjectMap == null || keyObjectMap.isEmpty();
     }
 
-    @Override
     public void join(List<Object> entities) {
         if (entities == null || entities.isEmpty()) {
             return;

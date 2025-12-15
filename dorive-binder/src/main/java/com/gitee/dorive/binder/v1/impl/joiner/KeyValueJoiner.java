@@ -15,24 +15,26 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.launcher.v1.impl.factory;
+package com.gitee.dorive.binder.v1.impl.joiner;
 
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
-import com.gitee.dorive.base.v1.joiner.api.EntityJoinerFactory;
-import com.gitee.dorive.joiner.v1.impl.joiner.DefaultEntityJoiner;
 
 import java.util.List;
 
-public class DefaultEntityJoinerFactory implements EntityJoinerFactory {
+public class KeyValueJoiner extends HashMapEntityJoiner {
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public EntityJoiner create(String name, Object... args) {
-        if ("DefaultEntityJoiner".equals(name)) {
-            return new DefaultEntityJoiner((Boolean) args[0], (EntityElement) args[1], (List<Object>) args[2]);
-        }
-        return null;
+    protected final EntityElement entityElement;
+
+    public KeyValueJoiner(boolean collection, EntityElement entityElement, List<Object> entities) {
+        super(collection, entities);
+        this.entityElement = entityElement;
     }
 
+    @Override
+    protected void doJoin(Object entity, Object object) {
+        Object value = entityElement.getValue(entity);
+        if (value == null) {
+            entityElement.setValue(entity, object);
+        }
+    }
 }

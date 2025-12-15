@@ -37,6 +37,8 @@ public interface BinderExecutor {
 
     JoinType getJoinType();
 
+    List<Binder> getRootStrongBinders();
+
     boolean hasValueRouteBinders();
 
     void appendFilterValue(Context context, Example example);

@@ -17,10 +17,8 @@
 
 package com.gitee.dorive.launcher.v1.impl.factory;
 
-import cn.hutool.extra.spring.SpringUtil;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityHandlerFactory;
-import com.gitee.dorive.base.v1.joiner.api.EntityJoinerFactory;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.binder.v1.impl.handler.ValueFilterEntityHandler;
@@ -30,8 +28,7 @@ public class DefaultEntityHandlerFactory implements EntityHandlerFactory {
     @Override
     public EntityHandler create(String name, Object... args) {
         if ("AdaptiveEntityHandler".equals(name)) {
-            EntityJoinerFactory entityJoinerFactory = SpringUtil.getBean(EntityJoinerFactory.class);
-            return new AdaptiveEntityHandler((RepositoryItem) args[0], entityJoinerFactory);
+            return new AdaptiveEntityHandler((RepositoryItem) args[0]);
         }
         if ("ValueFilterEntityHandler".equals(name)) {
             return new ValueFilterEntityHandler((RepositoryItem) args[0], (EntityHandler) args[1]);
