@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.binder.v1.impl.joiner;
+package com.gitee.dorive.binder.v1.impl.union;
 
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import lombok.Data;
@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 
 @Data
-public abstract class HashMapEntityJoiner {
+public abstract class HashMapJoiner {
 
     private boolean collection;
     private List<Object> entities;
@@ -34,7 +34,7 @@ public abstract class HashMapEntityJoiner {
     private Map<String, Object> keyObjectMap;
     private int collectionSize;
 
-    public HashMapEntityJoiner(boolean collection, List<Object> entities) {
+    public HashMapJoiner(boolean collection, List<Object> entities) {
         this.collection = collection;
         this.entities = entities;
         this.initialCapacity = entities.size() * 4 / 3 + 1;

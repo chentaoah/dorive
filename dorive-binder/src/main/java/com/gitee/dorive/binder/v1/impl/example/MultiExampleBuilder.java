@@ -15,32 +15,25 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.binder.v1.impl.handler.qry2;
+package com.gitee.dorive.binder.v1.impl.example;
 
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
-import lombok.Getter;
-import lombok.Setter;
+import com.gitee.dorive.binder.v1.api.ExampleBuilder;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter
-@Setter
-public class MultiEntityHandler extends AbstractEntityHandler {
+@Data
+@AllArgsConstructor
+public class MultiExampleBuilder implements ExampleBuilder {
 
-    private List<Binder> binders;
-
-    public MultiEntityHandler(RepositoryItem repository) {
-        super(repository);
-        BinderResolver binderResolver = (BinderResolver) repository.getBinderExecutor();
-        this.binders = binderResolver.getRootStrongBinders();
-    }
+    private final List<Binder> binders;
 
     @Override
     public Example newExample(Context context, List<Object> entities) {

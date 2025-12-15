@@ -22,10 +22,8 @@ import com.gitee.dorive.base.v1.common.enums.JoinType;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.binder.v1.impl.handler.qry2.MultiEntityHandler;
-import com.gitee.dorive.binder.v1.impl.handler.qry2.SingleEntityHandler;
-import com.gitee.dorive.binder.v1.impl.handler.qry.UnionEntityHandler;
-import com.gitee.dorive.binder.v1.impl.joiner.KeyValueJoiner;
+import com.gitee.dorive.binder.v1.impl.union.UnionEntityHandler;
+import com.gitee.dorive.binder.v1.impl.union.KeyValueJoiner;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -41,14 +39,12 @@ public class AdaptiveEntityHandler implements EntityHandler {
     public long handle(Context context, List<Object> entities) {
         BinderExecutor binderExecutor = repository.getBinderExecutor();
         JoinType joinType = binderExecutor.getJoinType();
-        if (joinType == JoinType.SINGLE) {
-            return new SingleEntityHandler(repository).handle(context, entities);
-
-        } else if (joinType == JoinType.MULTI) {
-            return new MultiEntityHandler(repository).handle(context, entities);
+        if (joinType == JoinType.SINGLE || joinType == JoinType.MULTI) {
+            EntityHandler entityHandler = repository.getProperty(EntityHandler.class);
+            return entityHandler.handle(context, entities);
 
         } else if (joinType == JoinType.UNION) {
-            KeyValueJoiner keyValueJoiner = new KeyValueJoiner(repository.isCollection(), repository.getEntityElement(), entities);
+            KeyValueJoiner keyValueJoiner = new KeyValueJoiner(repository, entities);
             return new UnionEntityHandler(repository, keyValueJoiner).handle(context, entities);
         }
         return 0L;

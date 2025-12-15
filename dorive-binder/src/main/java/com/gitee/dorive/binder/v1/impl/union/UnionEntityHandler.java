@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.binder.v1.impl.handler.qry;
+package com.gitee.dorive.binder.v1.impl.union;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.Binder;
@@ -25,7 +25,6 @@ import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.entity.qry.UnionExample;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.binder.v1.impl.joiner.KeyValueJoiner;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import lombok.Getter;
 import lombok.Setter;

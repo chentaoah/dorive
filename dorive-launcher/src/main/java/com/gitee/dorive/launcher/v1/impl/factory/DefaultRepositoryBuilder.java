@@ -21,6 +21,7 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.common.enums.JoinType;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
@@ -31,6 +32,10 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
+import com.gitee.dorive.binder.v1.api.ExampleBuilder;
+import com.gitee.dorive.binder.v1.impl.example.MultiExampleBuilder;
+import com.gitee.dorive.binder.v1.impl.example.SingleExampleBuilder;
+import com.gitee.dorive.binder.v1.impl.handler.DefaultEntityHandler;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.executor.v1.impl.executor.ContextExecutor;
 import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
@@ -92,8 +97,26 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     }
 
     @Override
-    public EntityJoiner newEntityJoiner(RepositoryItem repositoryItem) {
-        return new DefaultEntityJoiner(repositoryItem);
+    public void buildRepositoryItem(RepositoryItem repositoryItem) {
+        // 条件构建器
+        BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
+        JoinType joinType = binderExecutor.getJoinType();
+        ExampleBuilder exampleBuilder = null;
+        if (joinType == JoinType.SINGLE) {
+            exampleBuilder = new SingleExampleBuilder(binderExecutor.getRootStrongBinders().get(0));
+
+        } else if (joinType == JoinType.MULTI) {
+            exampleBuilder = new MultiExampleBuilder(binderExecutor.getRootStrongBinders());
+        }
+        repositoryItem.setProperty(ExampleBuilder.class, exampleBuilder);
+
+        // 连接器
+        EntityJoiner entityJoiner = new DefaultEntityJoiner(repositoryItem);
+        repositoryItem.setProperty(EntityJoiner.class, entityJoiner);
+
+        // 处理器
+        EntityHandler entityHandler = new DefaultEntityHandler(repositoryItem);
+        repositoryItem.setProperty(EntityHandler.class, entityHandler);
     }
 
     @Override

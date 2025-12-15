@@ -22,7 +22,6 @@ import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
@@ -33,7 +32,7 @@ public interface RepositoryBuilder {
 
     BinderExecutor newBinderExecutor(RepositoryContext repositoryContext, EntityElement entityElement);
 
-    EntityJoiner newEntityJoiner(RepositoryItem repositoryItem);
+    void buildRepositoryItem(RepositoryItem repositoryItem);
 
     Executor newExecutor(RepositoryContext repositoryContext);
 

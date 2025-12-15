@@ -151,11 +151,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         proxyRepository.setBinderExecutor(binderExecutor);
         proxyRepository.setOrderByFactory(orderByFactory);
         proxyRepository.setBound(false);
-
-        // 连接器
-        EntityJoiner entityJoiner = repositoryBuilder.newEntityJoiner(proxyRepository);
-        proxyRepository.setProperty(EntityJoiner.class, entityJoiner);
-
+        repositoryBuilder.buildRepositoryItem(proxyRepository);
         return proxyRepository;
     }
 
