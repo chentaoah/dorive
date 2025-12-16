@@ -33,6 +33,8 @@ public @interface QueryField {
     @AliasFor("value")
     String belongTo() default "/";
 
+    Class<?> entity() default Object.class;
+
     String field() default "";
 
     String operator() default "=";

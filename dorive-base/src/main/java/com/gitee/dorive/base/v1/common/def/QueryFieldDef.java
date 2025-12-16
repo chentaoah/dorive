@@ -28,6 +28,7 @@ import java.util.Map;
 @Data
 public class QueryFieldDef {
     private String belongTo;
+    private Class<?> entity;
     private String field;
     private String operator;
 
