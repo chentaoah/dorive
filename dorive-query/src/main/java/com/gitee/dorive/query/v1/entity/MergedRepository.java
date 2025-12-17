@@ -54,6 +54,10 @@ public class MergedRepository {
     private String alias;
 
     public String getName() {
-        return definedRepository.getEntityElement().getEntityDef().getName();
+        return definedRepository.getName();
+    }
+
+    public Class<?> getEntityClass() {
+        return definedRepository.getEntityClass();
     }
 }

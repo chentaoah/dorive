@@ -92,12 +92,21 @@ public class QueryTypeResolver {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getProperty(MergedRepositoryResolver.class);
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
         Map<String, MergedRepository> nameMergedRepositoryMap = mergedRepositoryResolver.getNameMergedRepositoryMap();
+        Map<Class<?>, MergedRepository> classMergedRepositoryMap = mergedRepositoryResolver.getClassMergedRepositoryMap();
 
         QueryFieldDef queryFieldDef = queryFieldDefinition.getQueryFieldDef();
         String belongTo = queryFieldDef.getBelongTo();
+        Class<?> entity = queryFieldDef.getEntity();
         String field = queryFieldDef.getField();
 
-        if (!belongTo.startsWith("/")) {
+        // 路径 > 类型 > 名称
+        if ("/".equals(belongTo) && entity != Object.class) {
+            MergedRepository mergedRepository = classMergedRepositoryMap.get(entity);
+            Assert.notNull(mergedRepository, "No merged repository found! entity: {}", entity.getName());
+            belongTo = mergedRepository.getAbsoluteAccessPath();
+            queryFieldDef.setBelongTo(belongTo);
+
+        } else if (!belongTo.startsWith("/")) {
             MergedRepository mergedRepository = nameMergedRepositoryMap.get(belongTo);
             Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
             belongTo = mergedRepository.getAbsoluteAccessPath();

@@ -37,6 +37,8 @@ public class MergedRepositoryResolver {
     private Map<String, MergedRepository> mergedRepositoryMap = new LinkedHashMap<>();
     // name ==> MergedRepository
     private Map<String, MergedRepository> nameMergedRepositoryMap = new LinkedHashMap<>();
+    // class ==> MergedRepository
+    private Map<Class<?>, MergedRepository> classMergedRepositoryMap = new LinkedHashMap<>();
 
     public MergedRepositoryResolver(RepositoryContext repository) {
         this.repository = repository;
@@ -90,6 +92,9 @@ public class MergedRepositoryResolver {
         if (StringUtils.isNotBlank(name)) {
             nameMergedRepositoryMap.putIfAbsent(name, mergedRepository);
         }
+
+        Class<?> entityClass = mergedRepository.getEntityClass();
+        classMergedRepositoryMap.putIfAbsent(entityClass, mergedRepository);
     }
 
     private void mergeRepository(String accessPath, RepositoryContext repository) {

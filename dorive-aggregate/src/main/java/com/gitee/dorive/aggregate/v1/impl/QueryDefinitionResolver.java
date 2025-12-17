@@ -98,12 +98,6 @@ public class QueryDefinitionResolver {
         QueryFieldDefinition queryFieldDefinition = new QueryFieldDefinition(field);
         QueryFieldDef queryFieldDef = QueryFieldDef.fromElement(field);
         if (queryFieldDef != null) {
-            // 实体名称
-            String belongTo = queryFieldDef.getBelongTo();
-            Class<?> entity = queryFieldDef.getEntity();
-            if ("/".equals(belongTo) && entity != Object.class) {
-                queryFieldDef.setBelongTo(entity.getSimpleName());
-            }
             // 字段名称
             String fieldName = queryFieldDef.getField();
             queryFieldDef.setField(StringUtils.isNotBlank(fieldName) ? fieldName : field.getName());
@@ -111,6 +105,7 @@ public class QueryDefinitionResolver {
         } else {
             queryFieldDef = new QueryFieldDef();
             queryFieldDef.setBelongTo("/");
+            queryFieldDef.setEntity(Object.class);
             queryFieldDef.setField(field.getName());
             queryFieldDef.setOperator("=");
         }
