@@ -22,10 +22,17 @@ import com.gitee.dorive.base.v1.core.entity.ctx.AbstractOptions;
 import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
 import com.gitee.dorive.base.v1.repository.impl.matcher.SelectorRepositoryMatcher;
 
+import java.util.List;
+
 public abstract class AbstractSelector extends AbstractOptions implements Selector {
 
     public AbstractSelector() {
         setOption(RepositoryMatcher.class, new SelectorRepositoryMatcher(this));
+    }
+
+    @Override
+    public List<String> select(String name) {
+        return null;
     }
 
 }

@@ -17,12 +17,27 @@
 
 package com.gitee.dorive.executor.v1.impl.context;
 
-import java.util.Arrays;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-public class TypeSelector extends NameSelector {
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class TypeSelector extends AbstractSelector {
+
+    private Set<Class<?>> types;
 
     public TypeSelector(Class<?>... types) {
-        super(Arrays.stream(types).map(Class::getSimpleName).toArray(String[]::new));
+        this.types = Arrays.stream(types).collect(Collectors.toSet());
+    }
+
+    @Override
+    public boolean matches(RepositoryItem repositoryItem) {
+        return types.contains(repositoryItem.getEntityClass());
     }
 
 }
