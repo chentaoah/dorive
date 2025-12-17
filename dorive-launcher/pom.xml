@@ -52,6 +52,11 @@
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-query2</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
             <artifactId>dorive-mybatis</artifactId>
             <version>${project.version}</version>
         </dependency>

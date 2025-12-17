@@ -37,6 +37,7 @@
         <module>dorive-factory</module>
         <module>dorive-joiner</module>
         <module>dorive-query</module>
+        <module>dorive-query2</module>
         <module>dorive-mybatis</module>
         <module>dorive-mybatis-plus</module>
         <module>dorive-module</module>
