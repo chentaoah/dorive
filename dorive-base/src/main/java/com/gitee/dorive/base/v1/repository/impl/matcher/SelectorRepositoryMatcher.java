@@ -32,7 +32,7 @@ public class SelectorRepositoryMatcher implements RepositoryMatcher {
     @Override
     public boolean matches(RepositoryItem repositoryItem) {
         if (selector != null) {
-            return selector.getNames().contains(repositoryItem.getName());
+            return selector.matches(repositoryItem);
         }
         return false;
     }

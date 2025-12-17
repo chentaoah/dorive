@@ -23,7 +23,9 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
 import com.gitee.dorive.base.v1.repository.impl.matcher.SelectorRepositoryMatcher;
 
 public abstract class AbstractSelector extends AbstractOptions implements Selector {
+
     public AbstractSelector() {
         setOption(RepositoryMatcher.class, new SelectorRepositoryMatcher(this));
     }
+
 }

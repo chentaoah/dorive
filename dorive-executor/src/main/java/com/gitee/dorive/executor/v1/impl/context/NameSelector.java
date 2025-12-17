@@ -18,6 +18,7 @@
 package com.gitee.dorive.executor.v1.impl.context;
 
 import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -54,8 +55,8 @@ public class NameSelector extends AbstractSelector {
     }
 
     @Override
-    public Set<String> getNames() {
-        return names;
+    public boolean matches(RepositoryItem repositoryItem) {
+        return names.contains(repositoryItem.getName());
     }
 
     @Override

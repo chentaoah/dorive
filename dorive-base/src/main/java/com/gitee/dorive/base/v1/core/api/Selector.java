@@ -17,12 +17,11 @@
 
 package com.gitee.dorive.base.v1.core.api;
 
+import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
+
 import java.util.List;
-import java.util.Set;
 
-public interface Selector extends Options {
-
-    Set<String> getNames();
+public interface Selector extends Options, RepositoryMatcher {
 
     List<String> select(String name);
 
