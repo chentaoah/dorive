@@ -54,14 +54,14 @@ public class QueryExampleResolver {
             Object fieldValue = queryFieldDefinition.getFieldValue(query);
             if (fieldValue != null) {
                 QueryFieldDef queryFieldDef = queryFieldDefinition.getQueryFieldDef();
-                String belongTo = queryFieldDef.getBelongTo();
+                String path = queryFieldDef.getPath();
                 String fieldName = queryFieldDef.getField();
                 String operator = queryFieldDef.getOperator();
                 if (OperatorV2.NULL_SWITCH.equals(operator) && fieldValue instanceof Boolean) {
                     operator = (Boolean) fieldValue ? Operator.IS_NULL : Operator.IS_NOT_NULL;
                     fieldValue = null;
                 }
-                Example example = exampleMap.computeIfAbsent(belongTo, key -> new InnerExample());
+                Example example = exampleMap.computeIfAbsent(path, key -> new InnerExample());
                 example.getCriteria().add(new Criterion(fieldName, operator, fieldValue));
             }
         }

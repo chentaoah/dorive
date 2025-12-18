@@ -29,6 +29,7 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.query.v1.entity.MergedRepository;
 import com.gitee.dorive.query.v1.entity.QueryConfig;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -95,26 +96,30 @@ public class QueryTypeResolver {
         Map<Class<?>, MergedRepository> classMergedRepositoryMap = mergedRepositoryResolver.getClassMergedRepositoryMap();
 
         QueryFieldDef queryFieldDef = queryFieldDefinition.getQueryFieldDef();
-        String belongTo = queryFieldDef.getBelongTo();
+        String path = queryFieldDef.getPath();
         Class<?> entity = queryFieldDef.getEntity();
+        String name = queryFieldDef.getName();
         String field = queryFieldDef.getField();
 
         // 路径 > 类型 > 名称
-        if ("/".equals(belongTo) && entity != Object.class) {
-            MergedRepository mergedRepository = classMergedRepositoryMap.get(entity);
-            Assert.notNull(mergedRepository, "No merged repository found! entity: {}", entity.getName());
-            belongTo = mergedRepository.getAbsoluteAccessPath();
-            queryFieldDef.setBelongTo(belongTo);
+        if (StringUtils.isBlank(path)) {
+            MergedRepository mergedRepository = null;
+            if (entity != Object.class) {
+                mergedRepository = classMergedRepositoryMap.get(entity);
+                Assert.notNull(mergedRepository, "No merged repository found! entity: {}", entity.getName());
 
-        } else if (!belongTo.startsWith("/")) {
-            MergedRepository mergedRepository = nameMergedRepositoryMap.get(belongTo);
-            Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
-            belongTo = mergedRepository.getAbsoluteAccessPath();
-            queryFieldDef.setBelongTo(belongTo);
+            } else if (StringUtils.isNotBlank(name)) {
+                mergedRepository = nameMergedRepositoryMap.get(name);
+                Assert.notNull(mergedRepository, "No merged repository found! name: {}", name);
+            }
+            if (mergedRepository != null) {
+                path = mergedRepository.getAbsoluteAccessPath();
+                queryFieldDef.setPath(path);
+            }
         }
 
-        MergedRepository mergedRepository = mergedRepositoryMap.get(belongTo);
-        Assert.notNull(mergedRepository, "No merged repository found! belongTo: {}", belongTo);
+        MergedRepository mergedRepository = mergedRepositoryMap.get(path);
+        Assert.notNull(mergedRepository, "No merged repository found! path: {}", path);
 
         RepositoryItem repository = mergedRepository.getExecutedRepository();
         Assert.isTrue(repository.hasField(field), "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",

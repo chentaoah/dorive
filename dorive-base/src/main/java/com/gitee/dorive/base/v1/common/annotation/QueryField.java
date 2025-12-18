@@ -27,13 +27,15 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface QueryField {
 
-    @AliasFor("belongTo")
-    String value() default "/";
+    @AliasFor("name")
+    String value() default "";
 
-    @AliasFor("value")
-    String belongTo() default "/";
+    String path() default "";
 
     Class<?> entity() default Object.class;
+
+    @AliasFor("value")
+    String name() default "";
 
     String field() default "";
 

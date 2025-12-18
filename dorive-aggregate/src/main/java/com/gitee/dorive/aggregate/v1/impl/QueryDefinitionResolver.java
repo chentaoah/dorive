@@ -98,14 +98,22 @@ public class QueryDefinitionResolver {
         QueryFieldDefinition queryFieldDefinition = new QueryFieldDefinition(field);
         QueryFieldDef queryFieldDef = QueryFieldDef.fromElement(field);
         if (queryFieldDef != null) {
-            // 字段名称
+            String path = queryFieldDef.getPath();
+            Class<?> entity = queryFieldDef.getEntity();
+            String name = queryFieldDef.getName();
             String fieldName = queryFieldDef.getField();
+            // 兜底配置
+            if (StringUtils.isBlank(path) && entity == Object.class && StringUtils.isBlank(name)) {
+                queryFieldDef.setPath("/");
+            }
+            // 字段名称
             queryFieldDef.setField(StringUtils.isNotBlank(fieldName) ? fieldName : field.getName());
 
         } else {
             queryFieldDef = new QueryFieldDef();
-            queryFieldDef.setBelongTo("/");
+            queryFieldDef.setPath("/");
             queryFieldDef.setEntity(Object.class);
+            queryFieldDef.setName("");
             queryFieldDef.setField(field.getName());
             queryFieldDef.setOperator("=");
         }
