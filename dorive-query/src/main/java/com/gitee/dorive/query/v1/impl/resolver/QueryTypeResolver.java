@@ -92,8 +92,8 @@ public class QueryTypeResolver {
     private MergedRepository resetQueryField(QueryFieldDefinition queryFieldDefinition) {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getProperty(MergedRepositoryResolver.class);
         Map<String, MergedRepository> mergedRepositoryMap = mergedRepositoryResolver.getMergedRepositoryMap();
-        Map<String, MergedRepository> nameMergedRepositoryMap = mergedRepositoryResolver.getNameMergedRepositoryMap();
         Map<Class<?>, MergedRepository> classMergedRepositoryMap = mergedRepositoryResolver.getClassMergedRepositoryMap();
+        Map<String, MergedRepository> nameMergedRepositoryMap = mergedRepositoryResolver.getNameMergedRepositoryMap();
 
         QueryFieldDef queryFieldDef = queryFieldDefinition.getQueryFieldDef();
         String path = queryFieldDef.getPath();
