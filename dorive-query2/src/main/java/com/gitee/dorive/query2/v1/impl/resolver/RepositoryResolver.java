@@ -20,6 +20,7 @@ package com.gitee.dorive.query2.v1.impl.resolver;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.query2.v1.entity.RepositoryNode;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,17 +34,19 @@ public class RepositoryResolver {
 
     private List<RepositoryContext> repositoryContexts = new ArrayList<>();
     // path ==> RepositoryContext
-    private Map<String, RepositoryContext> pathRepositoryContextMap = new LinkedHashMap<>();
+    private Map<String, RepositoryNode> pathRepositoryNodeMap = new LinkedHashMap<>();
     // class ==> paths
     private Map<Class<?>, List<String>> classPathsMap = new LinkedHashMap<>();
     // name ==> paths
     private Map<String, List<String>> namePathsMap = new LinkedHashMap<>();
 
     public void resolve(RepositoryContext repositoryContext) {
-        doResolve("", Object.class, "", repositoryContext);
+        doResolve("", Object.class, "", null, null, repositoryContext);
     }
 
-    private void doResolve(String lastPath, Class<?> lastEntityClass, String lastName, RepositoryContext repositoryContext) {
+    private void doResolve(String lastPath, Class<?> lastEntityClass, String lastName,
+                           RepositoryNode lastRepositoryNode, String lastAccessPath,
+                           RepositoryContext repositoryContext) {
         repositoryContexts.add(repositoryContext);
 
         RepositoryItem rootRepository = repositoryContext.getRootRepository();
@@ -51,14 +54,25 @@ public class RepositoryResolver {
         Class<?> entityClass = lastEntityClass != Object.class ? lastEntityClass : rootRepository.getEntityClass();
         String name = StringUtils.isNotBlank(lastName) ? lastName : rootRepository.getName();
 
-        pathRepositoryContextMap.putIfAbsent(path, repositoryContext);
+        RepositoryNode repositoryNode = new RepositoryNode();
+        repositoryNode.setParent(lastRepositoryNode);
+        repositoryNode.setLastAccessPath(lastAccessPath);
+        repositoryNode.setRepository(repositoryContext);
+        repositoryNode.setChildren(new ArrayList<>(8));
+        if (lastRepositoryNode != null) {
+            lastRepositoryNode.getChildren().add(repositoryNode);
+        }
+
+        pathRepositoryNodeMap.putIfAbsent(path, repositoryNode);
         classPathsMap.computeIfAbsent(entityClass, k -> new ArrayList<>(4)).add(path);
         namePathsMap.computeIfAbsent(name, k -> new ArrayList<>(4)).add(path);
 
         for (RepositoryItem repositoryItem : repositoryContext.getSubRepositories()) {
             AbstractRepository<Object, Object> abstractRepository = repositoryItem.getProxyRepository();
             if (abstractRepository instanceof RepositoryContext) {
-                doResolve(lastPath + repositoryItem.getAccessPath(), repositoryContext.getEntityClass(), repositoryItem.getName(), (RepositoryContext) abstractRepository);
+                doResolve(lastPath + repositoryItem.getAccessPath(), repositoryItem.getEntityClass(), repositoryItem.getName(),
+                        repositoryNode, repositoryItem.getAccessPath(),
+                        (RepositoryContext) abstractRepository);
             }
         }
     }
