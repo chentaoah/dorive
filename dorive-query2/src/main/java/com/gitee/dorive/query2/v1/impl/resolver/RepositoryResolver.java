@@ -34,9 +34,9 @@ public class RepositoryResolver {
     private List<RepositoryContext> repositoryContexts = new ArrayList<>();
     // path ==> RepositoryContext
     private Map<String, RepositoryContext> pathRepositoryContextMap = new LinkedHashMap<>();
-    // class ==> path
+    // class ==> paths
     private Map<Class<?>, List<String>> classPathsMap = new LinkedHashMap<>();
-    // name ==> path
+    // name ==> paths
     private Map<String, List<String>> namePathsMap = new LinkedHashMap<>();
 
     public void resolve(RepositoryContext repositoryContext) {
@@ -52,10 +52,8 @@ public class RepositoryResolver {
         String name = StringUtils.isNotBlank(lastName) ? lastName : rootRepository.getName();
 
         pathRepositoryContextMap.putIfAbsent(path, repositoryContext);
-        List<String> existPaths1 = classPathsMap.computeIfAbsent(entityClass, k -> new ArrayList<>(4));
-        existPaths1.add(path);
-        List<String> existPaths2 = namePathsMap.computeIfAbsent(name, k -> new ArrayList<>(4));
-        existPaths2.add(path);
+        classPathsMap.computeIfAbsent(entityClass, k -> new ArrayList<>(4)).add(path);
+        namePathsMap.computeIfAbsent(name, k -> new ArrayList<>(4)).add(path);
 
         for (RepositoryItem repositoryItem : repositoryContext.getSubRepositories()) {
             AbstractRepository<Object, Object> abstractRepository = repositoryItem.getProxyRepository();
