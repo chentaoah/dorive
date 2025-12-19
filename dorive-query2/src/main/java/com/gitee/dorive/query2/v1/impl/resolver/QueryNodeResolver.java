@@ -32,15 +32,15 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Data
-public class QueryTypeResolver {
+public class QueryNodeResolver {
 
-    private final RepositoryContext repositoryContext;
-    private Map<Class<?>, QueryResolver> classQueryConfigMap = new ConcurrentHashMap<>();
+    private RepositoryContext repositoryContext;
+    private List<QueryNode> queryNodes;
+    private List<QueryNode> reversedQueryNodes;
 
-    public QueryTypeResolver(RepositoryContext repositoryContext) {
+    public QueryNodeResolver(RepositoryContext repositoryContext) {
         this.repositoryContext = repositoryContext;
     }
 
@@ -63,19 +63,16 @@ public class QueryTypeResolver {
                 queryNode.getQueryFields().add(queryField);
             }
         }
+
         // 重新排序
         List<QueryNode> queryNodes = new ArrayList<>(queryNodeMap.values());
         queryNodes.sort(Comparator.comparing(q -> q.getRepositoryNode().getSequence()));
+        this.queryNodes = queryNodes;
+
         // 反转顺序
         List<QueryNode> reversedRepositoryNodes = new ArrayList<>(queryNodes);
         Collections.reverse(reversedRepositoryNodes);
-
-        QueryResolver queryResolver1 = new QueryResolver();
-        queryResolver1.setRepositoryContext(repositoryContext);
-        queryResolver1.setQueryNodes(queryNodes);
-        queryResolver1.setReversedQueryNodes(reversedRepositoryNodes);
-        queryResolver1.setExampleResolver(new ExampleResolver(queryDefinition));
-        classQueryConfigMap.put(queryClass, queryResolver1);
+        this.reversedQueryNodes = reversedRepositoryNodes;
     }
 
     private List<RepositoryNode> resetQueryField(QueryFieldDefinition queryFieldDefinition) {
@@ -109,7 +106,7 @@ public class QueryTypeResolver {
             RepositoryNode repositoryNode = pathRepositoryNodeMap.get(eachPath);
             Assert.notNull(repositoryNode, "No merged repository found! path: {}", eachPath);
 
-            RepositoryContext repositoryContext = repositoryNode.getRepositoryContext();
+            RepositoryContext repositoryContext = repositoryNode.getRepository();
             EntityElement entityElement = repositoryContext.getEntityElement();
             Assert.isTrue(entityElement.hasField(field), "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",
                     queryFieldDefinition.getField(), repositoryContext.getEntityClass(), field);

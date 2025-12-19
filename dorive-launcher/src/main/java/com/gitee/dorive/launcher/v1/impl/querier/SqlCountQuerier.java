@@ -34,7 +34,7 @@ import com.gitee.dorive.query.v1.api.QueryHandler;
 import com.gitee.dorive.query.v1.entity.MergedRepository;
 import com.gitee.dorive.query.v1.entity.QueryContext;
 import com.gitee.dorive.query.v1.entity.QueryUnit;
-import com.gitee.dorive.query.v1.enums.QueryMode;
+import com.gitee.dorive.base.v1.query.enums.QueryMode;
 import com.gitee.dorive.query.v1.enums.ResultType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -15,13 +15,31 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query2.v1.api;
+package com.gitee.dorive.query2.v1.impl.resolver;
 
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.query.enums.QueryMode;
+import com.gitee.dorive.query2.v1.api.QueryResolver;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-public interface QueryHandler {
+import java.util.Map;
 
-    Example handle(Context context, Object query);
+@Data
+@AllArgsConstructor
+public class AdaptiveQueryResolver implements QueryResolver {
+
+    private final Map<QueryMode, QueryResolver> queryResolverMap;
+
+    @Override
+    public Example newExample(Context context, Object query) {
+        QueryMode queryMode = context.getOption(QueryMode.class);
+        if (queryMode == null) {
+            queryMode = QueryMode.STEPWISE;
+        }
+        QueryResolver queryResolver = queryResolverMap.get(queryMode);
+        return queryResolver.newExample(context, query);
+    }
 
 }

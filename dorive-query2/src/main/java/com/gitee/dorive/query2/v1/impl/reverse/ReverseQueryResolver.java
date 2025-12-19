@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query2.v1.impl.resolver;
+package com.gitee.dorive.query2.v1.impl.reverse;
 
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.query2.v1.api.QueryResolver;
 import com.gitee.dorive.query2.v1.entity.QueryNode;
 import com.gitee.dorive.query2.v1.entity.RepositoryNode;
-import com.gitee.dorive.query2.v1.impl.reverse.ReverseQuerier;
+import com.gitee.dorive.query2.v1.impl.resolver.ExampleResolver;
 import lombok.Data;
 
 import java.util.LinkedHashMap;
@@ -31,13 +32,12 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class QueryResolver {
-    private RepositoryContext repositoryContext;
-    private List<QueryNode> queryNodes;
+public class ReverseQueryResolver implements QueryResolver {
     private List<QueryNode> reversedQueryNodes;
     private ExampleResolver exampleResolver;
 
-    public Example reverseResolve(Context context, Object query) {
+    @Override
+    public Example newExample(Context context, Object query) {
         Map<RepositoryNode, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
         Example rootExample = null;
 
@@ -46,7 +46,7 @@ public class QueryResolver {
             RepositoryNode parent = repositoryNode.getParent();
             String lastAccessPath = repositoryNode.getLastAccessPath();
             String path = repositoryNode.getPath();
-            RepositoryContext repositoryContext = repositoryNode.getRepositoryContext();
+            RepositoryContext repositoryContext = repositoryNode.getRepository();
 
             Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryNode);
             Example example;
@@ -73,5 +73,4 @@ public class QueryResolver {
 
         return rootExample;
     }
-
 }

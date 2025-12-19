@@ -30,6 +30,6 @@ public class RepositoryNode {
     private String lastAccessPath;
     private String path;
     private Integer sequence;
-    private RepositoryContext repositoryContext;
+    private RepositoryContext repository;
     private List<RepositoryNode> children;
 }

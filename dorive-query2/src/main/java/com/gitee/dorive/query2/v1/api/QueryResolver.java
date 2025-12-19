@@ -15,28 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query2.v1.impl.reverse;
+package com.gitee.dorive.query2.v1.api;
 
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.query2.v1.api.QueryHandler;
-import com.gitee.dorive.query2.v1.impl.resolver.RepositoryResolver;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
-@Data
-@AllArgsConstructor
-public class ReverseQueryHandler implements QueryHandler {
+public interface QueryResolver {
 
-    private final RepositoryContext repositoryContext;
-
-    @Override
-    public Example handle(Context context, Object query) {
-        RepositoryResolver repositoryResolver = repositoryContext.getProperty(RepositoryResolver.class);
-
-
-        return null;
-    }
+    Example newExample(Context context, Object query);
 
 }

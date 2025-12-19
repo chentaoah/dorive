@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.v1.enums;
+package com.gitee.dorive.base.v1.query.enums;
 
 public enum QueryMode {
     STEPWISE,

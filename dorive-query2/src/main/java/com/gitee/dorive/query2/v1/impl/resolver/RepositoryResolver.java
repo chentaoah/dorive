@@ -57,7 +57,7 @@ public class RepositoryResolver {
         repositoryNode.setLastAccessPath(lastAccessPath);
         repositoryNode.setPath(path);
         repositoryNode.setSequence(repositoryNodes.size() + 1);
-        repositoryNode.setRepositoryContext(repositoryContext);
+        repositoryNode.setRepository(repositoryContext);
         repositoryNode.setChildren(new ArrayList<>(8));
         if (lastRepositoryNode != null) {
             lastRepositoryNode.getChildren().add(repositoryNode);
