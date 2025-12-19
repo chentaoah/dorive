@@ -32,13 +32,15 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 public class QueryNodeResolver {
 
     private RepositoryContext repositoryContext;
-    private List<QueryNode> queryNodes;
-    private List<QueryNode> reversedQueryNodes;
+    private Map<Class<?>, List<QueryNode>> classQueryNodesMap = new ConcurrentHashMap<>();
+    private Map<Class<?>, List<QueryNode>> classReversedQueryNodesMap = new ConcurrentHashMap<>();
+    private Map<Class<?>, ExampleResolver> classExampleResolverMap = new ConcurrentHashMap<>();
 
     public QueryNodeResolver(RepositoryContext repositoryContext) {
         this.repositoryContext = repositoryContext;
@@ -47,8 +49,10 @@ public class QueryNodeResolver {
     public void resolve() {
         RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
         Class<?>[] queries = repositoryDef.getQueries();
-        for (Class<?> queryClass : queries) {
-            resolveQueryClass(queryClass);
+        if (queries != null && queries.length > 0) {
+            for (Class<?> queryClass : queries) {
+                resolveQueryClass(queryClass);
+            }
         }
     }
 
@@ -68,12 +72,14 @@ public class QueryNodeResolver {
         // 重新排序
         List<QueryNode> queryNodes = new ArrayList<>(queryNodeMap.values());
         queryNodes.sort(Comparator.comparing(q -> q.getRepositoryNode().getSequence()));
-        this.queryNodes = queryNodes;
+        classQueryNodesMap.put(queryClass, queryNodes);
 
         // 反转顺序
         List<QueryNode> reversedQueryNodes = new ArrayList<>(queryNodes);
         Collections.reverse(reversedQueryNodes);
-        this.reversedQueryNodes = reversedQueryNodes;
+        classReversedQueryNodesMap.put(queryClass, reversedQueryNodes);
+
+        classExampleResolverMap.put(queryClass, new ExampleResolver(queryDefinition));
     }
 
     private List<RepositoryNode> resetQueryField(QueryFieldDefinition queryFieldDefinition) {

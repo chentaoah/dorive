@@ -27,6 +27,7 @@ import com.gitee.dorive.query2.v1.entity.RepositoryNode;
 import com.gitee.dorive.query2.v1.impl.resolver.ExampleResolver;
 import com.gitee.dorive.query2.v1.impl.resolver.QueryNodeResolver;
 import com.gitee.dorive.query2.v1.impl.reverse.ReverseQuerier;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.LinkedHashMap;
@@ -34,17 +35,24 @@ import java.util.List;
 import java.util.Map;
 
 @Data
+@AllArgsConstructor
 public class ReverseQueryResolver implements QueryResolver {
 
-    private QueryNodeResolver queryNodeResolver;
-    private ExampleResolver exampleResolver;
+    private final QueryNodeResolver queryNodeResolver;
 
     @Override
     public Example newExample(Context context, Object query) {
+        Class<?> queryClass = query.getClass();
+
+        Map<Class<?>, List<QueryNode>> classReversedQueryNodesMap = queryNodeResolver.getClassReversedQueryNodesMap();
+        Map<Class<?>, ExampleResolver> classExampleResolverMap = queryNodeResolver.getClassExampleResolverMap();
+
+        List<QueryNode> reversedQueryNodes = classReversedQueryNodesMap.get(queryClass);
+        ExampleResolver exampleResolver = classExampleResolverMap.get(queryClass);
+
         Map<RepositoryNode, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
         Example rootExample = null;
 
-        List<QueryNode> reversedQueryNodes = queryNodeResolver.getReversedQueryNodes();
         for (QueryNode queryNode : reversedQueryNodes) {
             RepositoryNode repositoryNode = queryNode.getRepositoryNode();
             RepositoryNode parent = repositoryNode.getParent();
