@@ -70,9 +70,9 @@ public class QueryNodeResolver {
         this.queryNodes = queryNodes;
 
         // 反转顺序
-        List<QueryNode> reversedRepositoryNodes = new ArrayList<>(queryNodes);
-        Collections.reverse(reversedRepositoryNodes);
-        this.reversedQueryNodes = reversedRepositoryNodes;
+        List<QueryNode> reversedQueryNodes = new ArrayList<>(queryNodes);
+        Collections.reverse(reversedQueryNodes);
+        this.reversedQueryNodes = reversedQueryNodes;
     }
 
     private List<RepositoryNode> resetQueryField(QueryFieldDefinition queryFieldDefinition) {
