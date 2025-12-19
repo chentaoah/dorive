@@ -15,19 +15,28 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query2.v1.entity;
+package com.gitee.dorive.query2.v1.impl.reverse;
 
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.query2.v1.api.ExampleBuilder;
+import com.gitee.dorive.query2.v1.impl.resolver.RepositoryResolver;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class RepositoryNode {
-    private RepositoryNode parent;
-    private String lastAccessPath;
-    private String path;
-    private Integer sequence;
-    private RepositoryContext repository;
-    private List<RepositoryNode> children;
+@AllArgsConstructor
+public class ReverseExampleBuilder implements ExampleBuilder {
+
+    private final RepositoryContext repositoryContext;
+
+    @Override
+    public Example newExample(Context context, Object query) {
+        RepositoryResolver repositoryResolver = repositoryContext.getProperty(RepositoryResolver.class);
+
+
+        return null;
+    }
+
 }

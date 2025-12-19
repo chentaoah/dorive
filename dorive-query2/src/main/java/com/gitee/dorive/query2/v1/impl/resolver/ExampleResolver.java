@@ -36,7 +36,7 @@ import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class QueryExampleResolver {
+public class ExampleResolver {
 
     private QueryDefinition queryDefinition;
 

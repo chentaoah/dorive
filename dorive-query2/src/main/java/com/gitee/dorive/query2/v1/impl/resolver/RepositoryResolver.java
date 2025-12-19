@@ -32,8 +32,8 @@ import java.util.Map;
 @Data
 public class RepositoryResolver {
 
-    private List<RepositoryContext> repositoryContexts = new ArrayList<>();
-    // path ==> RepositoryContext
+    private List<RepositoryNode> repositoryNodes = new ArrayList<>();
+    // path ==> RepositoryNode
     private Map<String, RepositoryNode> pathRepositoryNodeMap = new LinkedHashMap<>();
     // class ==> paths
     private Map<Class<?>, List<String>> classPathsMap = new LinkedHashMap<>();
@@ -47,8 +47,6 @@ public class RepositoryResolver {
     private void doResolve(String lastPath, Class<?> lastEntityClass, String lastName,
                            RepositoryNode lastRepositoryNode, String lastAccessPath,
                            RepositoryContext repositoryContext) {
-        repositoryContexts.add(repositoryContext);
-
         RepositoryItem rootRepository = repositoryContext.getRootRepository();
         String path = StringUtils.isNotBlank(lastPath) ? lastPath : rootRepository.getAccessPath();
         Class<?> entityClass = lastEntityClass != Object.class ? lastEntityClass : rootRepository.getEntityClass();
@@ -57,12 +55,15 @@ public class RepositoryResolver {
         RepositoryNode repositoryNode = new RepositoryNode();
         repositoryNode.setParent(lastRepositoryNode);
         repositoryNode.setLastAccessPath(lastAccessPath);
+        repositoryNode.setPath(path);
+        repositoryNode.setSequence(repositoryNodes.size() + 1);
         repositoryNode.setRepository(repositoryContext);
         repositoryNode.setChildren(new ArrayList<>(8));
         if (lastRepositoryNode != null) {
             lastRepositoryNode.getChildren().add(repositoryNode);
         }
 
+        repositoryNodes.add(repositoryNode);
         pathRepositoryNodeMap.putIfAbsent(path, repositoryNode);
         classPathsMap.computeIfAbsent(entityClass, k -> new ArrayList<>(4)).add(path);
         namePathsMap.computeIfAbsent(name, k -> new ArrayList<>(4)).add(path);

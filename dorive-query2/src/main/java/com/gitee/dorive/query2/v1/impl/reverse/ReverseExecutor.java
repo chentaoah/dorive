@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query2.v1.impl.executor;
+package com.gitee.dorive.query2.v1.impl.reverse;
 
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
@@ -43,7 +43,7 @@ public class ReverseExecutor {
         this.reverseSubRepositoryItems = repositoryItems;
     }
 
-    public Example execute(Context context, Map<String, Example> exampleMap) {
+    public Example executeQuery(Context context, Map<String, Example> exampleMap) {
         for (RepositoryItem repositoryItem : reverseSubRepositoryItems) {
             // 获取查询条件
             String accessPath = repositoryItem.getAccessPath();

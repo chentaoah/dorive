@@ -17,17 +17,29 @@
 
 package com.gitee.dorive.query2.v1.entity;
 
+import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.query2.v1.impl.resolver.ExampleResolver;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class RepositoryNode {
-    private RepositoryNode parent;
-    private String lastAccessPath;
-    private String path;
-    private Integer sequence;
-    private RepositoryContext repository;
-    private List<RepositoryNode> children;
+public class QueryConfig {
+    private RepositoryContext repositoryContext;
+    private ExampleResolver exampleResolver;
+    private List<RepositoryNode> repositoryNodes;
+    private List<RepositoryNode> reversedRepositoryNodes;
+
+    public EntityElement getEntityElement() {
+        return repositoryContext.getEntityElement();
+    }
+
+    public String getPrimaryKey() {
+        return getEntityElement().getPrimaryKey();
+    }
+
+    public String getMethod() {
+        return exampleResolver.getQueryDefinition().getQueryDef().getMethod();
+    }
 }

@@ -15,19 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query2.v1.entity;
+package com.gitee.dorive.query2.v1.api;
 
-import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import lombok.Data;
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
 
-import java.util.List;
+public interface ExampleBuilder {
 
-@Data
-public class RepositoryNode {
-    private RepositoryNode parent;
-    private String lastAccessPath;
-    private String path;
-    private Integer sequence;
-    private RepositoryContext repository;
-    private List<RepositoryNode> children;
+    Example newExample(Context context, Object query);
+
 }
