@@ -20,15 +20,13 @@ package com.gitee.dorive.base.v1.repository.api;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.cop.Query;
-import com.gitee.dorive.base.v1.core.entity.op.Operation;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
+import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 
 import java.util.Collection;
 
-public interface RepositoryItem extends Repository<Object, Object>, Properties {
+public interface RepositoryItem extends Repository<Object, Object>, Executor, Properties {
 
     EntityElement getEntityElement();
 
@@ -59,9 +57,5 @@ public interface RepositoryItem extends Repository<Object, Object>, Properties {
     void setBound(boolean bound);
 
     boolean isBound();
-
-    Result<Object> executeQuery(Context context, Query query);
-
-    int execute(Context context, Operation operation);
 
 }

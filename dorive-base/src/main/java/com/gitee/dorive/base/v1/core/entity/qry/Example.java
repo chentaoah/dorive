@@ -32,6 +32,7 @@ import java.util.function.Consumer;
 @NoArgsConstructor
 public class Example {
 
+    private boolean abandoned = false;
     private List<String> selectProps;
     private String selectSuffix;
     private List<Criterion> criteria = new ArrayList<>(4);
