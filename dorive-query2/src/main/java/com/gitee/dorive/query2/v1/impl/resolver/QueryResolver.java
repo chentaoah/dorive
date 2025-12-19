@@ -28,6 +28,7 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.query2.v1.entity.QueryConfig;
 import com.gitee.dorive.query2.v1.entity.RepositoryNode;
 import lombok.Data;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -86,15 +87,15 @@ public class QueryResolver {
         Map<String, List<String>> namePathsMap = repositoryResolver.getNamePathsMap();
 
         QueryFieldDef queryFieldDef = queryFieldDefinition.getQueryFieldDef();
-        String path = queryFieldDef.getPath();
+        String[] path = queryFieldDef.getPath();
         Class<?> entity = queryFieldDef.getEntity();
         String name = queryFieldDef.getName();
         String field = queryFieldDef.getField();
 
         // 路径 > 类型 > 名称
         List<String> paths = Collections.emptyList();
-        if (StringUtils.isNotBlank(path)) {
-            paths = Collections.singletonList(path);
+        if (ArrayUtils.isNotEmpty(path)) {
+            paths = Arrays.asList(path);
 
         } else if (entity != Object.class) {
             paths = classPathsMap.get(entity);
