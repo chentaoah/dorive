@@ -24,6 +24,7 @@ import com.gitee.dorive.base.v1.common.entity.QueryFieldDefinition;
 import com.gitee.dorive.base.v1.common.def.QueryDef;
 import com.gitee.dorive.base.v1.common.def.QueryFieldDef;
 import com.gitee.dorive.base.v1.core.util.ReflectUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
@@ -98,20 +99,20 @@ public class QueryDefinitionResolver {
         QueryFieldDefinition queryFieldDefinition = new QueryFieldDefinition(field);
         QueryFieldDef queryFieldDef = QueryFieldDef.fromElement(field);
         if (queryFieldDef != null) {
-            String path = queryFieldDef.getPath();
+            String[] path = queryFieldDef.getPath();
             Class<?> entity = queryFieldDef.getEntity();
             String name = queryFieldDef.getName();
             String fieldName = queryFieldDef.getField();
             // 兜底配置
-            if (StringUtils.isBlank(path) && entity == Object.class && StringUtils.isBlank(name)) {
-                queryFieldDef.setPath("/");
+            if (ArrayUtils.isEmpty(path) && entity == Object.class && StringUtils.isBlank(name)) {
+                queryFieldDef.setPath(new String[]{"/"});
             }
             // 字段名称
             queryFieldDef.setField(StringUtils.isNotBlank(fieldName) ? fieldName : field.getName());
 
         } else {
             queryFieldDef = new QueryFieldDef();
-            queryFieldDef.setPath("/");
+            queryFieldDef.setPath(new String[]{"/"});
             queryFieldDef.setEntity(Object.class);
             queryFieldDef.setName("");
             queryFieldDef.setField(field.getName());

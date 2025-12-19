@@ -29,6 +29,7 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.query.v1.entity.MergedRepository;
 import com.gitee.dorive.query.v1.entity.QueryConfig;
 import lombok.Data;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -96,7 +97,7 @@ public class QueryTypeResolver {
         Map<String, MergedRepository> nameMergedRepositoryMap = mergedRepositoryResolver.getNameMergedRepositoryMap();
 
         QueryFieldDef queryFieldDef = queryFieldDefinition.getQueryFieldDef();
-        String path = queryFieldDef.getPath();
+        String path = ArrayUtils.isNotEmpty(queryFieldDef.getPath()) ? queryFieldDef.getPath()[0] : "";
         Class<?> entity = queryFieldDef.getEntity();
         String name = queryFieldDef.getName();
         String field = queryFieldDef.getField();
@@ -114,7 +115,7 @@ public class QueryTypeResolver {
             }
             if (mergedRepository != null) {
                 path = mergedRepository.getAbsoluteAccessPath();
-                queryFieldDef.setPath(path);
+                queryFieldDef.setPath(new String[]{path});
             }
         }
 

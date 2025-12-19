@@ -54,15 +54,17 @@ public class ExampleResolver {
             Object fieldValue = queryFieldDefinition.getFieldValue(query);
             if (fieldValue != null) {
                 QueryFieldDef queryFieldDef = queryFieldDefinition.getQueryFieldDef();
-                String path = queryFieldDef.getPath();
-                String fieldName = queryFieldDef.getField();
-                String operator = queryFieldDef.getOperator();
-                if (OperatorV2.NULL_SWITCH.equals(operator) && fieldValue instanceof Boolean) {
-                    operator = (Boolean) fieldValue ? Operator.IS_NULL : Operator.IS_NOT_NULL;
-                    fieldValue = null;
+                String[] path = queryFieldDef.getPath();
+                for (String eachPath : path) {
+                    String fieldName = queryFieldDef.getField();
+                    String operator = queryFieldDef.getOperator();
+                    if (OperatorV2.NULL_SWITCH.equals(operator) && fieldValue instanceof Boolean) {
+                        operator = (Boolean) fieldValue ? Operator.IS_NULL : Operator.IS_NOT_NULL;
+                        fieldValue = null;
+                    }
+                    Example example = exampleMap.computeIfAbsent(eachPath, key -> new InnerExample());
+                    example.getCriteria().add(new Criterion(fieldName, operator, fieldValue));
                 }
-                Example example = exampleMap.computeIfAbsent(path, key -> new InnerExample());
-                example.getCriteria().add(new Criterion(fieldName, operator, fieldValue));
             }
         }
         return exampleMap;

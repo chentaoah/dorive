@@ -27,7 +27,7 @@ import java.util.Map;
 
 @Data
 public class QueryFieldDef {
-    private String path;
+    private String[] path;
     private Class<?> entity;
     private String name;
     private String field;

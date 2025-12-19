@@ -54,7 +54,7 @@ public class QueryExampleResolver {
             Object fieldValue = queryFieldDefinition.getFieldValue(query);
             if (fieldValue != null) {
                 QueryFieldDef queryFieldDef = queryFieldDefinition.getQueryFieldDef();
-                String path = queryFieldDef.getPath();
+                String path = queryFieldDef.getPath()[0];
                 String fieldName = queryFieldDef.getField();
                 String operator = queryFieldDef.getOperator();
                 if (OperatorV2.NULL_SWITCH.equals(operator) && fieldValue instanceof Boolean) {

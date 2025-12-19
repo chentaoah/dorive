@@ -30,7 +30,7 @@ public @interface QueryField {
     @AliasFor("name")
     String value() default "";
 
-    String path() default "";
+    String[] path() default {};
 
     Class<?> entity() default Object.class;
 
