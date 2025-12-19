@@ -31,12 +31,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
-public class ReverseExecutor {
+public class ReverseQuerier {
 
     private final RepositoryContext repositoryContext;
     private final List<RepositoryItem> reverseSubRepositoryItems;
 
-    public ReverseExecutor(RepositoryContext repositoryContext) {
+    public ReverseQuerier(RepositoryContext repositoryContext) {
         this.repositoryContext = repositoryContext;
         List<RepositoryItem> repositoryItems = new ArrayList<>(repositoryContext.getSubRepositories());
         Collections.reverse(repositoryItems);

@@ -17,108 +17,61 @@
 
 package com.gitee.dorive.query2.v1.impl.resolver;
 
-import cn.hutool.core.lang.Assert;
-import cn.hutool.extra.spring.SpringUtil;
-import com.gitee.dorive.base.v1.common.def.QueryFieldDef;
-import com.gitee.dorive.base.v1.common.def.RepositoryDef;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
-import com.gitee.dorive.base.v1.common.entity.QueryFieldDefinition;
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.query2.v1.entity.QueryConfig;
+import com.gitee.dorive.query2.v1.entity.QueryNode;
 import com.gitee.dorive.query2.v1.entity.RepositoryNode;
+import com.gitee.dorive.query2.v1.impl.reverse.ReverseQuerier;
 import lombok.Data;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 public class QueryResolver {
+    private RepositoryContext repositoryContext;
+    private List<QueryNode> queryNodes;
+    private List<QueryNode> reversedQueryNodes;
+    private ExampleResolver exampleResolver;
 
-    private final RepositoryContext repositoryContext;
-    private Map<Class<?>, QueryConfig> classQueryConfigMap = new ConcurrentHashMap<>();
+    public Example reverseResolve(Context context, Object query) {
+        Map<RepositoryNode, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
+        Example rootExample = null;
 
-    public QueryResolver(RepositoryContext repositoryContext) {
-        this.repositoryContext = repositoryContext;
-    }
+        for (QueryNode queryNode : reversedQueryNodes) {
+            RepositoryNode repositoryNode = queryNode.getRepositoryNode();
+            RepositoryNode parent = repositoryNode.getParent();
+            String lastAccessPath = repositoryNode.getLastAccessPath();
+            String path = repositoryNode.getPath();
+            RepositoryContext repositoryContext = repositoryNode.getRepositoryContext();
 
-    public void resolve() {
-        RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
-        Class<?>[] queries = repositoryDef.getQueries();
-        for (Class<?> queryClass : queries) {
-            resolveQueryClass(queryClass);
-        }
-    }
+            Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryNode);
+            Example example;
+            if (exampleMap != null) {
+                ReverseQuerier reverseQuerier = repositoryContext.getProperty(ReverseQuerier.class);
+                example = reverseQuerier.executeQuery(context, exampleMap);
+            } else {
+                example = new InnerExample();
+            }
+            queryNode.appendCriteria(query, example);
 
-    private void resolveQueryClass(Class<?> queryClass) {
-        com.gitee.dorive.base.v1.aggregate.api.QueryResolver queryResolver = SpringUtil.getBean(com.gitee.dorive.base.v1.aggregate.api.QueryResolver.class);
-        QueryDefinition queryDefinition = queryResolver.resolve(queryClass);
+            Map<String, Example> parentExampleMap = nodeExampleMapMap.computeIfAbsent(parent, k -> new LinkedHashMap<>(8));
+            parentExampleMap.put(lastAccessPath, example);
 
-        ExampleResolver exampleResolver = new ExampleResolver(queryDefinition);
-
-        List<RepositoryNode> repositoryNodes = new ArrayList<>();
-        for (QueryFieldDefinition queryFieldDefinition : queryDefinition.getQueryFieldDefinitions()) {
-            for (RepositoryNode repositoryNode : resetQueryField(queryFieldDefinition)) {
-                if (!repositoryNodes.contains(repositoryNode)) {
-                    repositoryNodes.add(repositoryNode);
-                }
+            if ("/".equals(path)) {
+                rootExample = example;
             }
         }
-        // 重新排序
-        repositoryNodes.sort(Comparator.comparing(RepositoryNode::getSequence));
-        // 反转顺序
-        List<RepositoryNode> reversedRepositoryNodes = new ArrayList<>(repositoryNodes);
-        Collections.reverse(reversedRepositoryNodes);
 
-        QueryConfig queryConfig = new QueryConfig();
-        queryConfig.setRepositoryContext(repositoryContext);
-        queryConfig.setExampleResolver(exampleResolver);
-        queryConfig.setRepositoryNodes(repositoryNodes);
-        queryConfig.setReversedRepositoryNodes(reversedRepositoryNodes);
-        classQueryConfigMap.put(queryClass, queryConfig);
-    }
-
-    private List<RepositoryNode> resetQueryField(QueryFieldDefinition queryFieldDefinition) {
-        RepositoryResolver repositoryResolver = repositoryContext.getProperty(RepositoryResolver.class);
-        Map<String, RepositoryNode> pathRepositoryNodeMap = repositoryResolver.getPathRepositoryNodeMap();
-        Map<Class<?>, List<String>> classPathsMap = repositoryResolver.getClassPathsMap();
-        Map<String, List<String>> namePathsMap = repositoryResolver.getNamePathsMap();
-
-        QueryFieldDef queryFieldDef = queryFieldDefinition.getQueryFieldDef();
-        String[] path = queryFieldDef.getPath();
-        Class<?> entity = queryFieldDef.getEntity();
-        String name = queryFieldDef.getName();
-        String field = queryFieldDef.getField();
-
-        // 路径 > 类型 > 名称
-        List<String> paths = Collections.emptyList();
-        if (ArrayUtils.isNotEmpty(path)) {
-            paths = Arrays.asList(path);
-
-        } else if (entity != Object.class) {
-            paths = classPathsMap.get(entity);
-            Assert.notEmpty(paths, "No merged repository found! entity: {}", entity.getName());
-
-        } else if (StringUtils.isNotBlank(name)) {
-            paths = namePathsMap.get(name);
-            Assert.notEmpty(paths, "No merged repository found! name: {}", name);
+        if (rootExample != null) {
+            rootExample.setOrderBy(exampleResolver.newOrderBy(query));
+            rootExample.setPage(exampleResolver.newPage(query));
         }
 
-        List<RepositoryNode> repositoryNodes = new ArrayList<>();
-        for (String eachPath : paths) {
-            RepositoryNode repositoryNode = pathRepositoryNodeMap.get(eachPath);
-            Assert.notNull(repositoryNode, "No merged repository found! path: {}", eachPath);
-
-            RepositoryContext repositoryContext = repositoryNode.getRepository();
-            EntityElement entityElement = repositoryContext.getEntityElement();
-            Assert.isTrue(entityElement.hasField(field), "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",
-                    queryFieldDefinition.getField(), repositoryContext.getEntityClass(), field);
-
-            repositoryNodes.add(repositoryNode);
-        }
-        return repositoryNodes;
+        return rootExample;
     }
 
 }
