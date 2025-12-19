@@ -58,6 +58,7 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
         return getEntityElement().isCollection();
     }
 
+    @Override
     public boolean hasField(String field) {
         return getEntityElement().hasField(field);
     }
