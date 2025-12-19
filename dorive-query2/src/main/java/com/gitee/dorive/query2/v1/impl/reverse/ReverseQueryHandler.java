@@ -20,19 +20,19 @@ package com.gitee.dorive.query2.v1.impl.reverse;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.query2.v1.api.ExampleBuilder;
+import com.gitee.dorive.query2.v1.api.QueryHandler;
 import com.gitee.dorive.query2.v1.impl.resolver.RepositoryResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ReverseExampleBuilder implements ExampleBuilder {
+public class ReverseQueryHandler implements QueryHandler {
 
     private final RepositoryContext repositoryContext;
 
     @Override
-    public Example newExample(Context context, Object query) {
+    public Example handle(Context context, Object query) {
         RepositoryResolver repositoryResolver = repositoryContext.getProperty(RepositoryResolver.class);
 
 

@@ -20,8 +20,8 @@ package com.gitee.dorive.query2.v1.api;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 
-public interface ExampleBuilder {
+public interface QueryHandler {
 
-    Example newExample(Context context, Object query);
+    Example handle(Context context, Object query);
 
 }

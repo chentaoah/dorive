@@ -23,7 +23,7 @@ import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
-import com.gitee.dorive.query2.v1.api.ExampleBuilder;
+import com.gitee.dorive.query2.v1.api.QueryHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -34,12 +34,12 @@ import java.util.List;
 @AllArgsConstructor
 public class DefaultQueryExecutor implements QueryExecutor {
 
-    private final ExampleBuilder exampleBuilder;
+    private final QueryHandler queryHandler;
     private final AbstractRepository<Object, Object> repository;
 
     @Override
     public List<Object> selectByQuery(Options options, Object query) {
-        Example example = exampleBuilder.newExample((Context) options, query);
+        Example example = queryHandler.handle((Context) options, query);
         if (example.isAbandoned()) {
             return Collections.emptyList();
         }
@@ -48,7 +48,7 @@ public class DefaultQueryExecutor implements QueryExecutor {
 
     @Override
     public Page<Object> selectPageByQuery(Options options, Object query) {
-        Example example = exampleBuilder.newExample((Context) options, query);
+        Example example = queryHandler.handle((Context) options, query);
         if (example.isAbandoned()) {
             return example.getPage();
         }
@@ -57,7 +57,7 @@ public class DefaultQueryExecutor implements QueryExecutor {
 
     @Override
     public long selectCountByQuery(Options options, Object query) {
-        Example example = exampleBuilder.newExample((Context) options, query);
+        Example example = queryHandler.handle((Context) options, query);
         if (example.isAbandoned()) {
             return 0L;
         }
