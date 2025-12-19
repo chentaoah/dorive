@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class RepositoryResolver {
+public class RepositoryNodeResolver {
 
     private List<RepositoryNode> repositoryNodes = new ArrayList<>();
     // path ==> RepositoryNode

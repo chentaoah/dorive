@@ -77,10 +77,10 @@ public class QueryNodeResolver {
     }
 
     private List<RepositoryNode> resetQueryField(QueryFieldDefinition queryFieldDefinition) {
-        RepositoryResolver repositoryResolver = repositoryContext.getProperty(RepositoryResolver.class);
-        Map<String, RepositoryNode> pathRepositoryNodeMap = repositoryResolver.getPathRepositoryNodeMap();
-        Map<Class<?>, List<String>> classPathsMap = repositoryResolver.getClassPathsMap();
-        Map<String, List<String>> namePathsMap = repositoryResolver.getNamePathsMap();
+        RepositoryNodeResolver repositoryNodeResolver = repositoryContext.getProperty(RepositoryNodeResolver.class);
+        Map<String, RepositoryNode> pathRepositoryNodeMap = repositoryNodeResolver.getPathRepositoryNodeMap();
+        Map<Class<?>, List<String>> classPathsMap = repositoryNodeResolver.getClassPathsMap();
+        Map<String, List<String>> namePathsMap = repositoryNodeResolver.getNamePathsMap();
 
         QueryFieldDef queryFieldDef = queryFieldDefinition.getQueryFieldDef();
         String[] path = queryFieldDef.getPath();

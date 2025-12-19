@@ -42,6 +42,8 @@ public interface RepositoryBuilder {
 
     void buildQueryRepository(RepositoryContext repositoryContext);
 
+    void buildQueryRepository2(RepositoryContext repositoryContext);
+
     void buildMybatisRepository(RepositoryContext repositoryContext);
 
 }

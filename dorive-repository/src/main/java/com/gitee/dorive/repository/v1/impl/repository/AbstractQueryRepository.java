@@ -31,12 +31,14 @@ import java.util.List;
 @Setter
 public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryRepository<E, PK> {
     private QueryExecutor queryExecutor;
+    private QueryExecutor queryExecutor2;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
         RepositoryBuilder repositoryBuilder = getRepositoryBuilder();
         repositoryBuilder.buildQueryRepository(this);
+        repositoryBuilder.buildQueryRepository2(this);
     }
 
     @Override

@@ -58,6 +58,11 @@ import com.gitee.dorive.query.v1.impl.handler.*;
 import com.gitee.dorive.query.v1.impl.handler.executor.StepwiseQueryHandler;
 import com.gitee.dorive.query.v1.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.v1.impl.resolver.QueryTypeResolver;
+import com.gitee.dorive.query2.v1.api.QueryResolver;
+import com.gitee.dorive.query2.v1.impl.core.AdaptiveQueryResolver;
+import com.gitee.dorive.query2.v1.impl.core.ReverseQueryResolver;
+import com.gitee.dorive.query2.v1.impl.resolver.QueryNodeResolver;
+import com.gitee.dorive.query2.v1.impl.resolver.RepositoryNodeResolver;
 import com.gitee.dorive.repository.v1.api.CountQuerier;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.impl.executor.EventExecutor;
@@ -184,6 +189,35 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             queryHandler = new ConfigQueryHandler(repository, queryHandler);
             QueryExecutor queryExecutor = new DefaultQueryExecutor(queryHandler, (AbstractRepository<Object, Object>) repository);
             repository.setQueryExecutor(queryExecutor);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void buildQueryRepository2(RepositoryContext repositoryContext) {
+        // 查询
+        if (repositoryContext instanceof AbstractQueryRepository) {
+            AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
+
+            RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
+            Class<?>[] queries = repositoryDef.getQueries();
+
+            RepositoryNodeResolver repositoryNodeResolver = new RepositoryNodeResolver();
+            repositoryNodeResolver.resolve(repository);
+            repository.setProperty(RepositoryNodeResolver.class, repositoryNodeResolver);
+
+            if (queries != null && queries.length > 0) {
+                QueryNodeResolver queryNodeResolver = new QueryNodeResolver(repository);
+                queryNodeResolver.resolve();
+                repository.setProperty(QueryNodeResolver.class, queryNodeResolver);
+            }
+
+            Map<QueryMode, QueryResolver> queryResolverMap = new LinkedHashMap<>(4 * 4 / 3 + 1);
+            queryResolverMap.put(QueryMode.STEPWISE, new ReverseQueryResolver());
+
+            QueryResolver queryResolver = new AdaptiveQueryResolver(queryResolverMap);
+            QueryExecutor queryExecutor = new com.gitee.dorive.query2.v1.impl.executor.DefaultQueryExecutor(queryResolver, (AbstractRepository<Object, Object>) repository);
+            repository.setQueryExecutor2(queryExecutor);
         }
     }
 
