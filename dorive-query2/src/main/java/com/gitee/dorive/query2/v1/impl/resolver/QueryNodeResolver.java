@@ -58,7 +58,8 @@ public class QueryNodeResolver {
 
         Map<RepositoryNode, QueryNode> queryNodeMap = new LinkedHashMap<>();
         for (QueryFieldDefinition queryField : queryDefinition.getQueryFieldDefinitions()) {
-            for (RepositoryNode repositoryNode : resetQueryField(queryField)) {
+            List<RepositoryNode> repositoryNodes = resetQueryField(queryField);
+            for (RepositoryNode repositoryNode : repositoryNodes) {
                 QueryNode queryNode = queryNodeMap.computeIfAbsent(repositoryNode, k -> new QueryNode(repositoryNode, new ArrayList<>()));
                 queryNode.getQueryFields().add(queryField);
             }
