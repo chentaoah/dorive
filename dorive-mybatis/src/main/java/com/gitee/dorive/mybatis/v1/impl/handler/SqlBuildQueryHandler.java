@@ -72,7 +72,9 @@ public class SqlBuildQueryHandler extends AbstractQueryUnitQueryHandler {
 
         List<Object> entities = Collections.emptyList();
         if (repository instanceof AbstractRepository) {
-            entities = ((AbstractRepository<Object, Object>) repository).selectByExample(context, new InnerExample().in(primaryKey, ids));
+            Example newExample = new InnerExample().in(primaryKey, ids);
+            newExample.setOrderBy(example.getOrderBy());
+            entities = ((AbstractRepository<Object, Object>) repository).selectByExample(context, newExample);
         }
 
         Page<Object> page = example.getPage();
