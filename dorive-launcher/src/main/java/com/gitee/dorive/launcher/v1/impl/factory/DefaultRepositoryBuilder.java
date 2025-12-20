@@ -214,7 +214,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             repository.setProperty(ReverseQuerier.class, reverseQuerier);
 
             Map<QueryMode, QueryResolver> queryResolverMap = new LinkedHashMap<>(4 * 4 / 3 + 1);
-            queryResolverMap.put(QueryMode.STEPWISE, new ReverseQueryResolver(queryConfigResolver));
+            queryResolverMap.put(QueryMode.STEPWISE, new ReverseQueryResolver(repository, queryConfigResolver));
 
             QueryResolver queryResolver = new AdaptiveQueryResolver(queryResolverMap);
             QueryExecutor queryExecutor = new com.gitee.dorive.query2.v1.impl.executor.DefaultQueryExecutor(queryResolver, (AbstractRepository<Object, Object>) repository);
