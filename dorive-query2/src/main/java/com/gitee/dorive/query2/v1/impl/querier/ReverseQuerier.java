@@ -73,7 +73,7 @@ public class ReverseQuerier {
             } else if (example.isNotEmpty()) {
                 example.select(binderExecutor.getSelfFields());
                 binderExecutor.appendFilterValue(context, example);
-                entities = repositoryItem.selectByExample(new DefaultContext(Options.ROOT), example);
+                entities = repositoryItem.selectByExample(new DefaultContext(Options.ROOT, context), example);
 
             } else {
                 continue;

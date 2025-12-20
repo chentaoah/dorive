@@ -32,4 +32,8 @@ public class DefaultContext extends AbstractContext {
         super(context);
     }
 
+    public DefaultContext(Options options, Context context) {
+        super(options, context);
+    }
+
 }

@@ -44,6 +44,11 @@ public abstract class AbstractContext extends AbstractOptions implements Context
         this.attachments.putAll(context.getAttachments());
     }
 
+    public AbstractContext(Options options, Context context) {
+        super(options);
+        this.attachments.putAll(context.getAttachments());
+    }
+
     @Override
     public void setAttachment(String name, Object value) {
         attachments.put(name, value);
