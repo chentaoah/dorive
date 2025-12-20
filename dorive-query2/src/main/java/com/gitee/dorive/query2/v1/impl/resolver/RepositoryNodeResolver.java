@@ -76,10 +76,14 @@ public class RepositoryNodeResolver {
                 subRepository = abstractRepository.getProperty(RepositoryContext.class);
             }
             if (subRepository != null) {
-                doResolve(path + repositoryItem.getAccessPath(), repositoryItem.getEntityClass(), repositoryItem.getName(),
+                doResolve(getPath(path) + repositoryItem.getAccessPath(), repositoryItem.getEntityClass(), repositoryItem.getName(),
                         repositoryNode, repositoryItem.getAccessPath(), subRepository);
             }
         }
+    }
+
+    private String getPath(String path) {
+        return "/".equals(path) ? "" : path;
     }
 
 }
