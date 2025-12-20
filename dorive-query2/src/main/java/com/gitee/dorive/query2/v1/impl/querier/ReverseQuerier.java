@@ -79,8 +79,8 @@ public class ReverseQuerier {
                 continue;
             }
             // 条件
-            mergedValueRouteBindersMap.forEach((absoluteAccessPath, valueRouteBinders) -> {
-                Example targetExample = exampleMap.computeIfAbsent(absoluteAccessPath, k -> new InnerExample());
+            mergedValueRouteBindersMap.forEach((targetAccessPath, valueRouteBinders) -> {
+                Example targetExample = exampleMap.computeIfAbsent(targetAccessPath, k -> new InnerExample());
                 for (Binder valueRouteBinder : valueRouteBinders) {
                     Object fieldValue = valueRouteBinder.getFieldValue(context, null);
                     if (fieldValue != null) {
@@ -90,8 +90,8 @@ public class ReverseQuerier {
                 }
             });
             // 条件
-            mergedStrongBindersMap.forEach((absoluteAccessPath, strongBinders) -> {
-                Example targetExample = exampleMap.computeIfAbsent(absoluteAccessPath, k -> new InnerExample());
+            mergedStrongBindersMap.forEach((targetAccessPath, strongBinders) -> {
+                Example targetExample = exampleMap.computeIfAbsent(targetAccessPath, k -> new InnerExample());
                 if (entities.isEmpty()) {
                     targetExample.setAbandoned(true);
                     return;
