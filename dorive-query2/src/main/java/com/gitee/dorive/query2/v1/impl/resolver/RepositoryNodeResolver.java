@@ -40,8 +40,8 @@ public class RepositoryNodeResolver {
     // name ==> paths
     private Map<String, List<String>> namePathsMap = new LinkedHashMap<>();
 
-    public void resolve(RepositoryContext repositoryContext) {
-        doResolve("", Object.class, "", null, null, repositoryContext);
+    public void resolve(RepositoryContext repository) {
+        doResolve("", Object.class, "", null, null, repository);
     }
 
     private void doResolve(String path, Class<?> entityClass, String name,
