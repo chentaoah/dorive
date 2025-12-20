@@ -59,8 +59,8 @@ public class ReverseQueryResolver implements QueryResolver {
             String lastAccessPath = repositoryNode.getLastAccessPath();
             RepositoryContext repository = repositoryNode.getRepository();
 
-            Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryNode);
             Example example;
+            Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryNode);
             if (exampleMap != null) {
                 ReverseQuerier reverseQuerier = repository.getProperty(ReverseQuerier.class);
                 example = reverseQuerier.executeQuery(context, exampleMap);
