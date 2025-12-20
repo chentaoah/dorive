@@ -61,6 +61,7 @@ import com.gitee.dorive.query.v1.impl.resolver.QueryTypeResolver;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
 import com.gitee.dorive.query2.v1.impl.core.AdaptiveQueryResolver;
 import com.gitee.dorive.query2.v1.impl.core.ReverseQueryResolver;
+import com.gitee.dorive.query2.v1.impl.querier.ReverseQuerier;
 import com.gitee.dorive.query2.v1.impl.resolver.QueryConfigResolver;
 import com.gitee.dorive.query2.v1.impl.resolver.RepositoryNodeResolver;
 import com.gitee.dorive.repository.v1.api.CountQuerier;
@@ -202,10 +203,15 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             RepositoryNodeResolver repositoryNodeResolver = new RepositoryNodeResolver();
             repositoryNodeResolver.resolve(repository);
             repository.setProperty(RepositoryNodeResolver.class, repositoryNodeResolver);
+
             // 查询对象解析器
             QueryConfigResolver queryConfigResolver = new QueryConfigResolver(repository);
             queryConfigResolver.resolve();
             repository.setProperty(QueryConfigResolver.class, queryConfigResolver);
+
+            // 逆向查询器
+            ReverseQuerier reverseQuerier = new ReverseQuerier(repository);
+            repository.setProperty(ReverseQuerier.class, reverseQuerier);
 
             Map<QueryMode, QueryResolver> queryResolverMap = new LinkedHashMap<>(4 * 4 / 3 + 1);
             queryResolverMap.put(QueryMode.STEPWISE, new ReverseQueryResolver(queryConfigResolver));

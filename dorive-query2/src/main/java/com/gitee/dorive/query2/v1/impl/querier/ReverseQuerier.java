@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query2.v1.impl.reverse;
+package com.gitee.dorive.query2.v1.impl.querier;
 
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
