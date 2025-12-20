@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.query2.v1.impl.core;
 
+import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
@@ -43,10 +44,8 @@ public class ReverseQueryResolver implements QueryResolver {
 
     @Override
     public Example newExample(Context context, Object query) {
-        Class<?> queryClass = query.getClass();
-
-        Map<Class<?>, QueryConfig> classQueryConfigMap = queryConfigResolver.getClassQueryConfigMap();
-        QueryConfig queryConfig = classQueryConfigMap.get(queryClass);
+        QueryConfig queryConfig = queryConfigResolver.findQueryConfig(query.getClass());
+        Assert.notNull(queryConfig, "No query config found!");
         List<QueryNode> reversedQueryNodes = queryConfig.getReversedQueryNodes();
         ExampleResolver exampleResolver = queryConfig.getExampleResolver();
 

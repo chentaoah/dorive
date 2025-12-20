@@ -35,6 +35,9 @@ public class QueryNode {
     private List<QueryFieldDefinition> queryFields;
 
     public void appendCriteria(Object query, Example example) {
+        if (queryFields == null || queryFields.isEmpty()) {
+            return;
+        }
         for (QueryFieldDefinition queryField : queryFields) {
             Object fieldValue = queryField.getFieldValue(query);
             if (fieldValue != null) {

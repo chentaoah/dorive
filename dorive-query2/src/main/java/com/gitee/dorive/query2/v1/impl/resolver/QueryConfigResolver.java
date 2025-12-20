@@ -142,4 +142,8 @@ public class QueryConfigResolver {
         return repositoryNodes;
     }
 
+    public QueryConfig findQueryConfig(Class<?> queryClass) {
+        return classQueryConfigMap.get(queryClass);
+    }
+
 }
