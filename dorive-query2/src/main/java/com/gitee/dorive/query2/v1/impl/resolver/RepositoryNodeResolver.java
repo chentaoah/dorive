@@ -44,23 +44,23 @@ public class RepositoryNodeResolver {
         doResolve("", Object.class, "", null, null, repositoryContext);
     }
 
-    private void doResolve(String lastPath, Class<?> lastEntityClass, String lastName,
-                           RepositoryNode lastRepositoryNode, String lastAccessPath,
-                           RepositoryContext repositoryContext) {
-        RepositoryItem rootRepository = repositoryContext.getRootRepository();
-        String path = StringUtils.isNotBlank(lastPath) ? lastPath : rootRepository.getAccessPath();
-        Class<?> entityClass = lastEntityClass != Object.class ? lastEntityClass : rootRepository.getEntityClass();
-        String name = StringUtils.isNotBlank(lastName) ? lastName : rootRepository.getName();
+    private void doResolve(String path, Class<?> entityClass, String name,
+                           RepositoryNode parent, String lastAccessPath,
+                           RepositoryContext repository) {
+        RepositoryItem rootRepository = repository.getRootRepository();
+        path = StringUtils.isNotBlank(path) ? path : rootRepository.getAccessPath();
+        entityClass = entityClass != Object.class ? entityClass : rootRepository.getEntityClass();
+        name = StringUtils.isNotBlank(name) ? name : rootRepository.getName();
 
         RepositoryNode repositoryNode = new RepositoryNode();
-        repositoryNode.setParent(lastRepositoryNode);
+        repositoryNode.setParent(parent);
         repositoryNode.setLastAccessPath(lastAccessPath);
         repositoryNode.setPath(path);
         repositoryNode.setSequence(repositoryNodes.size() + 1);
-        repositoryNode.setRepository(repositoryContext);
+        repositoryNode.setRepository(repository);
         repositoryNode.setChildren(new ArrayList<>(8));
-        if (lastRepositoryNode != null) {
-            lastRepositoryNode.getChildren().add(repositoryNode);
+        if (parent != null) {
+            parent.getChildren().add(repositoryNode);
         }
 
         repositoryNodes.add(repositoryNode);
@@ -68,7 +68,7 @@ public class RepositoryNodeResolver {
         classPathsMap.computeIfAbsent(entityClass, k -> new ArrayList<>(4)).add(path);
         namePathsMap.computeIfAbsent(name, k -> new ArrayList<>(4)).add(path);
 
-        for (RepositoryItem repositoryItem : repositoryContext.getSubRepositories()) {
+        for (RepositoryItem repositoryItem : repository.getSubRepositories()) {
             RepositoryContext subRepositoryContext;
             AbstractRepository<Object, Object> abstractRepository = repositoryItem.getProxyRepository();
             if (abstractRepository instanceof RepositoryContext) {
@@ -77,7 +77,7 @@ public class RepositoryNodeResolver {
                 subRepositoryContext = abstractRepository.getProperty(RepositoryContext.class);
             }
             if (subRepositoryContext != null) {
-                doResolve(lastPath + repositoryItem.getAccessPath(), repositoryItem.getEntityClass(), repositoryItem.getName(),
+                doResolve(path + repositoryItem.getAccessPath(), repositoryItem.getEntityClass(), repositoryItem.getName(),
                         repositoryNode, repositoryItem.getAccessPath(),
                         subRepositoryContext);
             }
