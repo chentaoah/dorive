@@ -69,11 +69,17 @@ public class RepositoryNodeResolver {
         namePathsMap.computeIfAbsent(name, k -> new ArrayList<>(4)).add(path);
 
         for (RepositoryItem repositoryItem : repositoryContext.getSubRepositories()) {
+            RepositoryContext subRepositoryContext;
             AbstractRepository<Object, Object> abstractRepository = repositoryItem.getProxyRepository();
             if (abstractRepository instanceof RepositoryContext) {
+                subRepositoryContext = (RepositoryContext) abstractRepository;
+            } else {
+                subRepositoryContext = abstractRepository.getProperty(RepositoryContext.class);
+            }
+            if (subRepositoryContext != null) {
                 doResolve(lastPath + repositoryItem.getAccessPath(), repositoryItem.getEntityClass(), repositoryItem.getName(),
                         repositoryNode, repositoryItem.getAccessPath(),
-                        (RepositoryContext) abstractRepository);
+                        subRepositoryContext);
             }
         }
     }
