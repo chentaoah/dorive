@@ -32,6 +32,7 @@ import lombok.Data;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -91,6 +92,8 @@ public class QueryConfigResolver {
         Map<String, List<String>> namePathsMap = repositoryNodeResolver.getNamePathsMap();
 
         QueryFieldDef queryFieldDef = queryFieldDefinition.getQueryFieldDef();
+        Field javaField = queryFieldDefinition.getField();
+
         String[] path = queryFieldDef.getPath();
         Class<?> entity = queryFieldDef.getEntity();
         String name = queryFieldDef.getName();
@@ -118,8 +121,10 @@ public class QueryConfigResolver {
 
             RepositoryContext repositoryContext = repositoryNode.getRepository();
             EntityElement entityElement = repositoryContext.getEntityElement();
-            Assert.isTrue(entityElement.hasField(field), "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",
-                    queryFieldDefinition.getField(), repositoryContext.getEntityClass(), field);
+            Class<?> entityClass = repositoryContext.getEntityClass();
+            Assert.isTrue(entityElement.hasField(field),
+                    "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",
+                    javaField, entityClass, field);
 
             repositoryNodes.add(repositoryNode);
         }
