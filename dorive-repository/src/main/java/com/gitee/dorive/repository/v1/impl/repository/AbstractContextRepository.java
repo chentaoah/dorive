@@ -30,7 +30,6 @@ import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
 import com.gitee.dorive.base.v1.core.util.ReflectUtils;
-import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
@@ -132,6 +131,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         AbstractRepository<Object, Object> repository;
         if (isRoot) {
             repository = repositoryBuilder.newRepository(this, entityElement);
+            repository.setProperty(RepositoryContext.class, this);
         } else {
             repository = doGetRepository(entityElement);
         }
