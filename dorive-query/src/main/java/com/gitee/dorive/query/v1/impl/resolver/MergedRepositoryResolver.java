@@ -101,6 +101,7 @@ public class MergedRepositoryResolver {
         MergedRepositoryResolver mergedRepositoryResolver = repository.getProperty(MergedRepositoryResolver.class);
         for (MergedRepository mergedRepository : mergedRepositoryResolver.getMergedRepositoryMap().values()) {
             String absoluteAccessPath = mergedRepository.getAbsoluteAccessPath();
+            // 筛除根节点
             if ("/".equals(absoluteAccessPath)) {
                 continue;
             }
