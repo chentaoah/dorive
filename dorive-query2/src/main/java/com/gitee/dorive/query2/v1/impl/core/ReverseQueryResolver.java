@@ -57,23 +57,22 @@ public class ReverseQueryResolver implements QueryResolver {
             RepositoryNode repositoryNode = queryNode.getRepositoryNode();
             RepositoryNode parent = repositoryNode.getParent();
             String lastAccessPath = repositoryNode.getLastAccessPath();
-            String path = repositoryNode.getPath();
-            RepositoryContext repositoryContext = repositoryNode.getRepository();
+            RepositoryContext repository = repositoryNode.getRepository();
 
             Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryNode);
             Example example;
             if (exampleMap != null) {
-                ReverseQuerier reverseQuerier = repositoryContext.getProperty(ReverseQuerier.class);
+                ReverseQuerier reverseQuerier = repository.getProperty(ReverseQuerier.class);
                 example = reverseQuerier.executeQuery(context, exampleMap);
             } else {
                 example = new InnerExample();
             }
             queryNode.appendCriteria(query, example);
 
-            Map<String, Example> parentExampleMap = nodeExampleMapMap.computeIfAbsent(parent, k -> new LinkedHashMap<>(8));
-            parentExampleMap.put(lastAccessPath, example);
-
-            if ("/".equals(path)) {
+            if (parent != null) {
+                Map<String, Example> parentExampleMap = nodeExampleMapMap.computeIfAbsent(parent, k -> new LinkedHashMap<>(8));
+                parentExampleMap.put(lastAccessPath, example);
+            } else {
                 rootExample = example;
             }
         }
