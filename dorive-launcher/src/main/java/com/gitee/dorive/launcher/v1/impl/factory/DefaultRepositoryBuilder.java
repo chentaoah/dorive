@@ -200,8 +200,8 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         if (repositoryContext instanceof AbstractQueryRepository) {
             AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
             // 仓储解析器
-            RepositoryNodeResolver repositoryNodeResolver = new RepositoryNodeResolver();
-            repositoryNodeResolver.resolve(repository);
+            RepositoryNodeResolver repositoryNodeResolver = new RepositoryNodeResolver(repository);
+            repositoryNodeResolver.resolve();
             repository.setProperty(RepositoryNodeResolver.class, repositoryNodeResolver);
 
             // 查询对象解析器

@@ -32,6 +32,8 @@ import java.util.Map;
 @Data
 public class RepositoryNodeResolver {
 
+    private RepositoryContext repository;
+    // all
     private List<RepositoryNode> repositoryNodes = new ArrayList<>();
     // path ==> RepositoryNode
     private Map<String, RepositoryNode> pathRepositoryNodeMap = new LinkedHashMap<>();
@@ -40,7 +42,11 @@ public class RepositoryNodeResolver {
     // name ==> paths
     private Map<String, List<String>> namePathsMap = new LinkedHashMap<>();
 
-    public void resolve(RepositoryContext repository) {
+    public RepositoryNodeResolver(RepositoryContext repository) {
+        this.repository = repository;
+    }
+
+    public void resolve() {
         doResolve("", Object.class, "", null, null, repository);
     }
 
