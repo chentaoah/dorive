@@ -61,7 +61,7 @@ import com.gitee.dorive.query.v1.impl.resolver.QueryTypeResolver;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
 import com.gitee.dorive.query2.v1.impl.core.AdaptiveQueryResolver;
 import com.gitee.dorive.query2.v1.impl.core.ReverseQueryResolver;
-import com.gitee.dorive.query2.v1.impl.resolver.QueryNodeResolver;
+import com.gitee.dorive.query2.v1.impl.resolver.QueryConfigResolver;
 import com.gitee.dorive.query2.v1.impl.resolver.RepositoryNodeResolver;
 import com.gitee.dorive.repository.v1.api.CountQuerier;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
@@ -198,20 +198,17 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         // 查询
         if (repositoryContext instanceof AbstractQueryRepository) {
             AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
-
-            RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
-            Class<?>[] queries = repositoryDef.getQueries();
-
+            // 仓储解析器
             RepositoryNodeResolver repositoryNodeResolver = new RepositoryNodeResolver();
             repositoryNodeResolver.resolve(repository);
             repository.setProperty(RepositoryNodeResolver.class, repositoryNodeResolver);
-
-            QueryNodeResolver queryNodeResolver = new QueryNodeResolver(repository);
-            queryNodeResolver.resolve();
-            repository.setProperty(QueryNodeResolver.class, queryNodeResolver);
+            // 查询对象解析器
+            QueryConfigResolver queryConfigResolver = new QueryConfigResolver(repository);
+            queryConfigResolver.resolve();
+            repository.setProperty(QueryConfigResolver.class, queryConfigResolver);
 
             Map<QueryMode, QueryResolver> queryResolverMap = new LinkedHashMap<>(4 * 4 / 3 + 1);
-            queryResolverMap.put(QueryMode.STEPWISE, new ReverseQueryResolver(queryNodeResolver));
+            queryResolverMap.put(QueryMode.STEPWISE, new ReverseQueryResolver(queryConfigResolver));
 
             QueryResolver queryResolver = new AdaptiveQueryResolver(queryResolverMap);
             QueryExecutor queryExecutor = new com.gitee.dorive.query2.v1.impl.executor.DefaultQueryExecutor(queryResolver, (AbstractRepository<Object, Object>) repository);

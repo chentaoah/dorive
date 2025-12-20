@@ -25,6 +25,7 @@ import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
 import com.gitee.dorive.base.v1.common.entity.QueryFieldDefinition;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.query2.v1.entity.QueryConfig;
 import com.gitee.dorive.query2.v1.entity.QueryNode;
 import com.gitee.dorive.query2.v1.entity.RepositoryNode;
 import lombok.Data;
@@ -35,14 +36,12 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Data
-public class QueryNodeResolver {
+public class QueryConfigResolver {
 
     private RepositoryContext repositoryContext;
-    private Map<Class<?>, List<QueryNode>> classQueryNodesMap = new ConcurrentHashMap<>();
-    private Map<Class<?>, List<QueryNode>> classReversedQueryNodesMap = new ConcurrentHashMap<>();
-    private Map<Class<?>, ExampleResolver> classExampleResolverMap = new ConcurrentHashMap<>();
+    private Map<Class<?>, QueryConfig> classQueryConfigMap = new ConcurrentHashMap<>();
 
-    public QueryNodeResolver(RepositoryContext repositoryContext) {
+    public QueryConfigResolver(RepositoryContext repositoryContext) {
         this.repositoryContext = repositoryContext;
     }
 
@@ -72,14 +71,17 @@ public class QueryNodeResolver {
         // 重新排序
         List<QueryNode> queryNodes = new ArrayList<>(queryNodeMap.values());
         queryNodes.sort(Comparator.comparing(q -> q.getRepositoryNode().getSequence()));
-        classQueryNodesMap.put(queryClass, queryNodes);
-
         // 反转顺序
         List<QueryNode> reversedQueryNodes = new ArrayList<>(queryNodes);
         Collections.reverse(reversedQueryNodes);
-        classReversedQueryNodesMap.put(queryClass, reversedQueryNodes);
+        // 条件
+        ExampleResolver exampleResolver = new ExampleResolver(queryDefinition);
 
-        classExampleResolverMap.put(queryClass, new ExampleResolver(queryDefinition));
+        QueryConfig queryConfig = new QueryConfig();
+        queryConfig.setQueryNodes(queryNodes);
+        queryConfig.setReversedQueryNodes(reversedQueryNodes);
+        queryConfig.setExampleResolver(exampleResolver);
+        classQueryConfigMap.put(queryClass, queryConfig);
     }
 
     private List<RepositoryNode> resetQueryField(QueryFieldDefinition queryFieldDefinition) {

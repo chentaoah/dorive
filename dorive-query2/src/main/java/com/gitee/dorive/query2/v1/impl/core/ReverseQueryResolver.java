@@ -22,10 +22,11 @@ import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
+import com.gitee.dorive.query2.v1.entity.QueryConfig;
 import com.gitee.dorive.query2.v1.entity.QueryNode;
 import com.gitee.dorive.query2.v1.entity.RepositoryNode;
 import com.gitee.dorive.query2.v1.impl.resolver.ExampleResolver;
-import com.gitee.dorive.query2.v1.impl.resolver.QueryNodeResolver;
+import com.gitee.dorive.query2.v1.impl.resolver.QueryConfigResolver;
 import com.gitee.dorive.query2.v1.impl.reverse.ReverseQuerier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,17 +39,16 @@ import java.util.Map;
 @AllArgsConstructor
 public class ReverseQueryResolver implements QueryResolver {
 
-    private final QueryNodeResolver queryNodeResolver;
+    private final QueryConfigResolver queryConfigResolver;
 
     @Override
     public Example newExample(Context context, Object query) {
         Class<?> queryClass = query.getClass();
 
-        Map<Class<?>, List<QueryNode>> classReversedQueryNodesMap = queryNodeResolver.getClassReversedQueryNodesMap();
-        Map<Class<?>, ExampleResolver> classExampleResolverMap = queryNodeResolver.getClassExampleResolverMap();
-
-        List<QueryNode> reversedQueryNodes = classReversedQueryNodesMap.get(queryClass);
-        ExampleResolver exampleResolver = classExampleResolverMap.get(queryClass);
+        Map<Class<?>, QueryConfig> classQueryConfigMap = queryConfigResolver.getClassQueryConfigMap();
+        QueryConfig queryConfig = classQueryConfigMap.get(queryClass);
+        List<QueryNode> reversedQueryNodes = queryConfig.getReversedQueryNodes();
+        ExampleResolver exampleResolver = queryConfig.getExampleResolver();
 
         Map<RepositoryNode, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
         Example rootExample = null;
