@@ -20,6 +20,7 @@ package com.gitee.dorive.query2.v1.impl.querier;
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
@@ -71,7 +72,7 @@ public class ReverseQuerier {
             } else if (example.isNotEmpty()) {
                 example.select(binderExecutor.getSelfFields());
                 binderExecutor.appendFilterValue(context, example);
-                entities = repositoryItem.selectByExample(context, example);
+                entities = repositoryItem.selectByExample(Options.ROOT, example);
 
             } else {
                 continue;
