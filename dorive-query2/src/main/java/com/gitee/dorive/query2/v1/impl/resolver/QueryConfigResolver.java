@@ -69,6 +69,17 @@ public class QueryConfigResolver {
             }
         }
 
+        // 向上遍历
+        for (RepositoryNode repositoryNode : queryNodeMap.keySet()) {
+            RepositoryNode parent = repositoryNode.getParent();
+            while (parent != null) {
+                if (!queryNodeMap.containsKey(parent)) {
+                    queryNodeMap.put(parent, new QueryNode(parent, new ArrayList<>()));
+                }
+                parent = parent.getParent();
+            }
+        }
+
         // 重新排序
         List<QueryNode> queryNodes = new ArrayList<>(queryNodeMap.values());
         queryNodes.sort(Comparator.comparing(q -> q.getRepositoryNode().getSequence()));
