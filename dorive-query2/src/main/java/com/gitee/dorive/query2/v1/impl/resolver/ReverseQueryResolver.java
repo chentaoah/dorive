@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query2.v1.impl.core;
+package com.gitee.dorive.query2.v1.impl.resolver;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.core.api.Context;
@@ -27,8 +27,6 @@ import com.gitee.dorive.query2.v1.api.QueryResolver;
 import com.gitee.dorive.query2.v1.entity.QueryConfig;
 import com.gitee.dorive.query2.v1.entity.QueryNode;
 import com.gitee.dorive.query2.v1.entity.RepositoryNode;
-import com.gitee.dorive.query2.v1.impl.resolver.ExampleResolver;
-import com.gitee.dorive.query2.v1.impl.resolver.QueryConfigResolver;
 import com.gitee.dorive.query2.v1.impl.querier.ReverseQuerier;
 import lombok.AllArgsConstructor;
 import lombok.Data;

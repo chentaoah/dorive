@@ -59,8 +59,8 @@ import com.gitee.dorive.query.v1.impl.handler.executor.StepwiseQueryHandler;
 import com.gitee.dorive.query.v1.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.v1.impl.resolver.QueryTypeResolver;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
-import com.gitee.dorive.query2.v1.impl.core.AdaptiveQueryResolver;
-import com.gitee.dorive.query2.v1.impl.core.ReverseQueryResolver;
+import com.gitee.dorive.query2.v1.impl.executor.DefaultQueryExecutor2;
+import com.gitee.dorive.query2.v1.impl.resolver.ReverseQueryResolver;
 import com.gitee.dorive.query2.v1.impl.querier.ReverseQuerier;
 import com.gitee.dorive.query2.v1.impl.resolver.QueryConfigResolver;
 import com.gitee.dorive.query2.v1.impl.resolver.RepositoryNodeResolver;
@@ -213,11 +213,9 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             ReverseQuerier reverseQuerier = new ReverseQuerier(repository);
             repository.setProperty(ReverseQuerier.class, reverseQuerier);
 
-            Map<QueryMode, QueryResolver> queryResolverMap = new LinkedHashMap<>(4 * 4 / 3 + 1);
-            queryResolverMap.put(QueryMode.STEPWISE, new ReverseQueryResolver(repository, queryConfigResolver));
-
-            QueryResolver queryResolver = new AdaptiveQueryResolver(queryResolverMap);
-            QueryExecutor queryExecutor = new com.gitee.dorive.query2.v1.impl.executor.DefaultQueryExecutor(queryResolver, (AbstractRepository<Object, Object>) repository);
+            // 查询执行器
+            QueryResolver queryResolver = new ReverseQueryResolver(repository, queryConfigResolver);
+            QueryExecutor queryExecutor = new DefaultQueryExecutor2(queryResolver, (AbstractRepository<Object, Object>) repository);
             repository.setQueryExecutor2(queryExecutor);
         }
     }

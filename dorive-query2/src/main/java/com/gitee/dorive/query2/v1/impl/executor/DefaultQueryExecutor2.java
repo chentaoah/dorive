@@ -32,7 +32,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class DefaultQueryExecutor implements QueryExecutor {
+public class DefaultQueryExecutor2 implements QueryExecutor {
 
     private final QueryResolver queryResolver;
     private final AbstractRepository<Object, Object> repository;

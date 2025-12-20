@@ -20,6 +20,7 @@ package com.gitee.dorive.repository.v1.impl.repository;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
+import com.gitee.dorive.base.v1.query.enums.QueryMode;
 import com.gitee.dorive.repository.v1.api.QueryRepository;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import lombok.Getter;
@@ -44,17 +45,27 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     @SuppressWarnings("unchecked")
     public List<E> selectByQuery(Options options, Object query) {
-        return (List<E>) queryExecutor.selectByQuery(options, query);
+        return (List<E>) adaptive(options).selectByQuery(options, query);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByQuery(Options options, Object query) {
-        return (Page<E>) queryExecutor.selectPageByQuery(options, query);
+        return (Page<E>) adaptive(options).selectPageByQuery(options, query);
     }
 
     @Override
     public long selectCountByQuery(Options options, Object query) {
-        return queryExecutor.selectCountByQuery(options, query);
+        return adaptive(options).selectCountByQuery(options, query);
     }
+
+    private QueryExecutor adaptive(Options options) {
+        QueryMode queryMode = options.getOption(QueryMode.class);
+        if (queryMode == QueryMode.REVERSE_STEPWISE) {
+            return queryExecutor2;
+        } else {
+            return queryExecutor;
+        }
+    }
+
 }
