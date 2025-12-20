@@ -109,6 +109,7 @@ public class QueryConfigResolver {
             paths = namePathsMap.get(name);
             Assert.notEmpty(paths, "No merged repository found! name: {}", name);
         }
+        queryFieldDef.setPath(paths.toArray(new String[0]));
 
         List<RepositoryNode> repositoryNodes = new ArrayList<>();
         for (String eachPath : paths) {
