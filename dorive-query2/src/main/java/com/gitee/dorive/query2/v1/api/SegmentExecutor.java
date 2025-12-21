@@ -15,12 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.query.enums;
+package com.gitee.dorive.query2.v1.api;
 
-public enum QueryMode {
-    STEPWISE,
-    SQL_BUILD,
-    SQL_EXECUTE,
-    SQL_CUSTOM,
-    STEPWISE2,
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.query2.v1.entity.segment.RepositoryJoin;
+
+import java.util.List;
+import java.util.Map;
+
+public interface SegmentExecutor {
+
+    List<Object> executeQuery(Map<RepositoryContext, String> repositoryAliasMap, RepositoryContext rootRepository,
+                              List<RepositoryJoin> repositoryJoins, Map<RepositoryContext, Example> repositoryExampleMap);
+
 }

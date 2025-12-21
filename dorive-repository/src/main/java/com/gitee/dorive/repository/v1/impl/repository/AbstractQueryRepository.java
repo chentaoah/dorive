@@ -61,7 +61,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
     private QueryExecutor adaptive(Options options) {
         QueryMode queryMode = options.getOption(QueryMode.class);
-        if (queryMode == QueryMode.REVERSE_STEPWISE) {
+        if (queryMode == QueryMode.STEPWISE2) {
             return queryExecutor2;
         } else {
             return queryExecutor;

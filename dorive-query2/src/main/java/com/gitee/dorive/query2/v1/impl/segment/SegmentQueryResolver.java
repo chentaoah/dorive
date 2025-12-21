@@ -18,12 +18,14 @@
 package com.gitee.dorive.query2.v1.impl.segment;
 
 import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
+import com.gitee.dorive.query2.v1.api.SegmentExecutor;
 import com.gitee.dorive.query2.v1.entity.QueryConfig;
 import com.gitee.dorive.query2.v1.entity.QueryNode;
 import com.gitee.dorive.query2.v1.entity.RepositoryNode;
@@ -33,10 +35,7 @@ import com.gitee.dorive.query2.v1.impl.core.QueryConfigResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -52,8 +51,8 @@ public class SegmentQueryResolver implements QueryResolver {
         List<QueryNode> reversedQueryNodes = queryConfig.getReversedQueryNodes();
         ExampleResolver exampleResolver = queryConfig.getExampleResolver();
 
-        RepositoryItem rootRepository = repositoryContext.getRootRepository();
-        if (!repositoryContext.matches(context, rootRepository)) {
+        RepositoryItem repositoryItem = repositoryContext.getRootRepository();
+        if (!repositoryContext.matches(context, repositoryItem)) {
             Example rootExample = new InnerExample();
             rootExample.setAbandoned(true);
             rootExample.setOrderBy(exampleResolver.newOrderBy(query));
@@ -66,6 +65,7 @@ public class SegmentQueryResolver implements QueryResolver {
         Map<RepositoryContext, Example> repositoryExampleMap = new LinkedHashMap<>(8);
 
         Map<RepositoryNode, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
+        RepositoryContext rootRepository = null;
         Example rootExample = null;
 
         for (QueryNode queryNode : reversedQueryNodes) {
@@ -99,6 +99,7 @@ public class SegmentQueryResolver implements QueryResolver {
                     parentExampleMap.put(lastAccessPath, example);
                 }
             } else {
+                rootRepository = repository;
                 rootExample = example;
             }
         }
@@ -106,6 +107,17 @@ public class SegmentQueryResolver implements QueryResolver {
         if (rootExample != null) {
             rootExample.setOrderBy(exampleResolver.newOrderBy(query));
             rootExample.setPage(exampleResolver.newPage(query));
+        }
+
+        if (rootRepository != null) {
+            Collections.reverse(repositoryJoins);
+            SegmentExecutor segmentExecutor = rootRepository.getProperty(SegmentExecutor.class);
+            List<Object> ids = segmentExecutor.executeQuery(repositoryAliasMap, rootRepository, repositoryJoins, repositoryExampleMap);
+            EntityElement entityElement = rootRepository.getEntityElement();
+            String primaryKey = entityElement.getPrimaryKey();
+            rootExample.in(primaryKey, ids);
+            // 清除分页
+            rootExample.setPage(null);
         }
 
         return rootExample;
