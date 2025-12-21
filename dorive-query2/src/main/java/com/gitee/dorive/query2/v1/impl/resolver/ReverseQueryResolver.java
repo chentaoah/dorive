@@ -49,8 +49,8 @@ public class ReverseQueryResolver implements QueryResolver {
         List<QueryNode> reversedQueryNodes = queryConfig.getReversedQueryNodes();
         ExampleResolver exampleResolver = queryConfig.getExampleResolver();
 
-        RepositoryItem repositoryItem = repositoryContext.getRootRepository();
-        if (!repositoryContext.matches(context, repositoryItem)) {
+        RepositoryItem rootRepository = repositoryContext.getRootRepository();
+        if (!repositoryContext.matches(context, rootRepository)) {
             Example rootExample = new InnerExample();
             rootExample.setAbandoned(true);
             rootExample.setOrderBy(exampleResolver.newOrderBy(query));
