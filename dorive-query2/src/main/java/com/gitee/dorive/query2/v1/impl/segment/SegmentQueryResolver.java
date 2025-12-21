@@ -83,8 +83,8 @@ public class SegmentQueryResolver implements QueryResolver {
             Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryNode);
             if (exampleMap != null) {
                 RepositoryJoinResolver repositoryJoinResolver = repository.getProperty(RepositoryJoinResolver.class);
-                List<RepositoryJoin> repositoryJoinInfos1 = repositoryJoinResolver.resolve(context, exampleMap.keySet());
-                repositoryJoins.addAll(repositoryJoinInfos1);
+                List<RepositoryJoin> joins = repositoryJoinResolver.resolve(context, exampleMap.keySet());
+                repositoryJoins.addAll(joins);
             }
 
             // 筛选条件
