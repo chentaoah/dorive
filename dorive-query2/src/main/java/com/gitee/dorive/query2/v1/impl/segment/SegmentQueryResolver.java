@@ -61,7 +61,6 @@ public class SegmentQueryResolver implements QueryResolver {
             return rootExample;
         }
 
-        int count = reversedQueryNodes.size();
         Map<RepositoryContext, String> repositoryAliasMap = new LinkedHashMap<>(8);
         List<RepositoryJoin> repositoryJoins = new ArrayList<>();
         Map<RepositoryContext, Example> repositoryExampleMap = new LinkedHashMap<>(8);
@@ -76,7 +75,7 @@ public class SegmentQueryResolver implements QueryResolver {
             RepositoryContext repository = repositoryNode.getRepository();
 
             // 别名
-            String alias = "t" + count--;
+            String alias = "t" + repositoryNode.getSequence();
             repositoryAliasMap.put(repository, alias);
 
             // 如果被激活，则解析连接条件
