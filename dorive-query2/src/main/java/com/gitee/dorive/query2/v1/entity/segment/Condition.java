@@ -17,11 +17,14 @@
 
 package com.gitee.dorive.query2.v1.entity.segment;
 
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import lombok.Data;
 
 @Data
 public class Condition {
-    private String source;
-    private String target;
+    private RepositoryContext source;
+    private String sourceField;
+    private RepositoryContext target;
+    private String targetField;
     private String literal;
 }

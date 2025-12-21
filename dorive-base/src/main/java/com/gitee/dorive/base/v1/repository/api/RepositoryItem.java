@@ -34,6 +34,8 @@ public interface RepositoryItem extends Repository<Object, Object>, Executor, Pr
 
     AbstractRepository<Object, Object> getProxyRepository();
 
+    RepositoryContext getRepositoryContext();
+
     String getName();
 
     boolean isCollection();

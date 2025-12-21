@@ -24,7 +24,6 @@ import java.util.List;
 
 @Data
 public class RepositoryJoin {
-    private RepositoryContext source;
-    private RepositoryContext target;
+    private RepositoryContext joiner;
     private List<Condition> conditions;
 }

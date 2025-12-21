@@ -19,7 +19,6 @@ package com.gitee.dorive.query2.v1.impl.core;
 
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.query2.v1.entity.RepositoryNode;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -74,13 +73,7 @@ public class RepositoryNodeResolver {
         namePathsMap.computeIfAbsent(name, k -> new ArrayList<>(4)).add(path);
 
         for (RepositoryItem repositoryItem : repository.getSubRepositories()) {
-            RepositoryContext subRepository;
-            AbstractRepository<Object, Object> abstractRepository = repositoryItem.getProxyRepository();
-            if (abstractRepository instanceof RepositoryContext) {
-                subRepository = (RepositoryContext) abstractRepository;
-            } else {
-                subRepository = abstractRepository.getProperty(RepositoryContext.class);
-            }
+            RepositoryContext subRepository = repositoryItem.getRepositoryContext();
             if (subRepository != null) {
                 doResolve(getPath(path) + repositoryItem.getAccessPath(), repositoryItem.getEntityClass(), repositoryItem.getName(),
                         repositoryNode, repositoryItem.getAccessPath(), subRepository);

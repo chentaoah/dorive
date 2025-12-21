@@ -17,16 +17,85 @@
 
 package com.gitee.dorive.query2.v1.impl.segment;
 
+import com.gitee.dorive.base.v1.binder.api.Binder;
+import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.util.CriterionUtils;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.query2.v1.entity.segment.Condition;
 import com.gitee.dorive.query2.v1.entity.segment.RepositoryJoin;
+import lombok.Data;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+@Data
 public class RepositoryJoinResolver {
 
+    private final RepositoryContext repositoryContext;
+    private final List<RepositoryItem> reverseSubRepositoryItems;
+
+    public RepositoryJoinResolver(RepositoryContext repositoryContext) {
+        this.repositoryContext = repositoryContext;
+        List<RepositoryItem> repositoryItems = new ArrayList<>(repositoryContext.getSubRepositories());
+        Collections.reverse(repositoryItems);
+        this.reverseSubRepositoryItems = repositoryItems;
+    }
+
     public List<RepositoryJoin> resolve(Context context, Set<String> accessPaths) {
-        return null;
+        Map<String, RepositoryItem> repositoryMap = repositoryContext.getRepositoryMap();
+        List<RepositoryJoin> repositoryJoins = new ArrayList<>(accessPaths.size());
+        for (RepositoryItem repositoryItem : reverseSubRepositoryItems) {
+            // 获取查询条件
+            String accessPath = repositoryItem.getAccessPath();
+            if (!accessPaths.contains(accessPath)) {
+                continue;
+            }
+            // 仓储
+            RepositoryContext repositoryContext = repositoryItem.getRepositoryContext();
+            // 连接
+            RepositoryJoin repositoryJoin = new RepositoryJoin();
+            repositoryJoin.setJoiner(repositoryContext);
+            // 获取绑定关系
+            BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
+            Map<String, List<Binder>> mergedStrongBindersMap = binderExecutor.getMergedStrongBindersMap();
+            Map<String, List<Binder>> mergedValueRouteBindersMap = binderExecutor.getMergedValueRouteBindersMap();
+            List<Binder> valueFilterBinders = binderExecutor.getValueFilterBinders();
+            // 连接条件
+            List<Condition> conditions = new ArrayList<>(mergedStrongBindersMap.size() + mergedValueRouteBindersMap.size() + valueFilterBinders.size());
+            mergedStrongBindersMap.forEach((absoluteAccessPath, strongBinders) -> {
+                RepositoryItem targetRepositoryItem = repositoryMap.get(absoluteAccessPath);
+                RepositoryContext targetRepositoryContext = targetRepositoryItem.getRepositoryContext();
+                for (Binder strongBinder : strongBinders) {
+                    Condition condition = new Condition();
+                    condition.setSource(repositoryContext);
+                    condition.setSourceField(strongBinder.getFieldName());
+                    condition.setTarget(targetRepositoryContext);
+                    condition.setTargetField(strongBinder.getBindField());
+                    conditions.add(condition);
+                }
+            });
+            mergedValueRouteBindersMap.forEach((absoluteAccessPath, valueRouteBinders) -> {
+                RepositoryItem targetRepositoryItem = repositoryMap.get(absoluteAccessPath);
+                RepositoryContext targetRepositoryContext = targetRepositoryItem.getRepositoryContext();
+                for (Binder valueRouteBinder : valueRouteBinders) {
+                    Condition condition = new Condition();
+                    condition.setSource(targetRepositoryContext);
+                    condition.setSourceField(valueRouteBinder.getBindField());
+                    condition.setLiteral(CriterionUtils.sqlParam(valueRouteBinder.getFieldValue(context, null)));
+                    conditions.add(condition);
+                }
+            });
+            for (Binder valueFilterBinder : valueFilterBinders) {
+                Condition condition = new Condition();
+                condition.setSource(repositoryContext);
+                condition.setSourceField(valueFilterBinder.getFieldName());
+                condition.setLiteral(CriterionUtils.sqlParam(valueFilterBinder.getBoundValue(context, null)));
+                conditions.add(condition);
+            }
+            repositoryJoin.setConditions(conditions);
+        }
+        return repositoryJoins;
     }
 
 }

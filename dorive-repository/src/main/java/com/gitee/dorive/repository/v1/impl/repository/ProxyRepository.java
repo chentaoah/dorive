@@ -29,8 +29,10 @@ import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.matcher.SelectorRepositoryMatcher;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,6 +49,16 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
     private BinderExecutor binderExecutor;
     private OrderByFactory orderByFactory;
     private boolean bound;
+
+    @Override
+    public RepositoryContext getRepositoryContext() {
+        AbstractRepository<Object, Object> abstractRepository = getProxyRepository();
+        if (abstractRepository instanceof RepositoryContext) {
+            return (RepositoryContext) abstractRepository;
+        } else {
+            return abstractRepository.getProperty(RepositoryContext.class);
+        }
+    }
 
     @Override
     public String getName() {
