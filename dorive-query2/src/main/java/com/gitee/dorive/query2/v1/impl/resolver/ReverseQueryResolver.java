@@ -80,8 +80,10 @@ public class ReverseQueryResolver implements QueryResolver {
             queryNode.appendCriteria(query, example);
 
             if (parent != null) {
-                Map<String, Example> parentExampleMap = nodeExampleMapMap.computeIfAbsent(parent, k -> new LinkedHashMap<>(8));
-                parentExampleMap.put(lastAccessPath, example);
+                if (example != null && !example.isEmpty()) {
+                    Map<String, Example> parentExampleMap = nodeExampleMapMap.computeIfAbsent(parent, k -> new LinkedHashMap<>(8));
+                    parentExampleMap.put(lastAccessPath, example);
+                }
             } else {
                 rootExample = example;
             }

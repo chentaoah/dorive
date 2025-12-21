@@ -50,7 +50,7 @@ public class ReverseQuerier {
             // 获取查询条件
             String accessPath = repositoryItem.getAccessPath();
             Example example = exampleMap.get(accessPath);
-            if (example == null) {
+            if (example == null || example.isEmpty()) {
                 continue;
             }
             // 获取绑定关系
