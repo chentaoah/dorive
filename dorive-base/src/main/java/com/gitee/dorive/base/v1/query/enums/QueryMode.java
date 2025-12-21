@@ -19,8 +19,8 @@ package com.gitee.dorive.base.v1.query.enums;
 
 public enum QueryMode {
     STEPWISE,
-    REVERSE_STEPWISE,
     SQL_BUILD,
     SQL_EXECUTE,
     SQL_CUSTOM,
+    REVERSE_STEPWISE,
 }
