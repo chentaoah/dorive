@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query2.v1.impl.resolver;
+package com.gitee.dorive.query2.v1.impl.segment;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.core.api.Context;
@@ -27,19 +27,20 @@ import com.gitee.dorive.query2.v1.api.QueryResolver;
 import com.gitee.dorive.query2.v1.entity.QueryConfig;
 import com.gitee.dorive.query2.v1.entity.QueryNode;
 import com.gitee.dorive.query2.v1.entity.RepositoryNode;
+import com.gitee.dorive.query2.v1.entity.segment.RepositoryJoin;
 import com.gitee.dorive.query2.v1.impl.core.ExampleResolver;
 import com.gitee.dorive.query2.v1.impl.core.QueryConfigResolver;
-import com.gitee.dorive.query2.v1.impl.querier.ReverseQuerier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class ReverseQueryResolver implements QueryResolver {
+public class SegmentQueryResolver implements QueryResolver {
 
     private final RepositoryContext repositoryContext;
     private final QueryConfigResolver queryConfigResolver;
@@ -60,6 +61,11 @@ public class ReverseQueryResolver implements QueryResolver {
             return rootExample;
         }
 
+        int count = reversedQueryNodes.size();
+        Map<RepositoryContext, String> repositoryAliasMap = new LinkedHashMap<>(8);
+        List<RepositoryJoin> repositoryJoins = new ArrayList<>();
+        Map<String, Example> aliasExampleMap = new LinkedHashMap<>(8);
+
         Map<RepositoryNode, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
         Example rootExample = null;
 
@@ -69,18 +75,27 @@ public class ReverseQueryResolver implements QueryResolver {
             String lastAccessPath = repositoryNode.getLastAccessPath();
             RepositoryContext repository = repositoryNode.getRepository();
 
+            // 别名
+            String alias = "t" + count--;
+            repositoryAliasMap.put(repository, alias);
+
+            // 如果被激活，则解析连接条件
             Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryNode);
-            Example example;
             if (exampleMap != null) {
-                ReverseQuerier reverseQuerier = repository.getProperty(ReverseQuerier.class);
-                example = reverseQuerier.executeQuery(context, exampleMap);
-            } else {
-                example = new InnerExample();
+                RepositoryJoinResolver repositoryJoinResolver = repository.getProperty(RepositoryJoinResolver.class);
+                List<RepositoryJoin> repositoryJoinInfos1 = repositoryJoinResolver.resolve(context, exampleMap.keySet());
+                repositoryJoins.addAll(repositoryJoinInfos1);
             }
+
+            // 筛选条件
+            Example example = new InnerExample();
             queryNode.appendCriteria(query, example);
+            if (!example.isEmpty()) {
+                aliasExampleMap.put(alias, example);
+            }
 
             if (parent != null) {
-                if (example != null && !example.isEmpty()) {
+                if (!example.isEmpty()) {
                     Map<String, Example> parentExampleMap = nodeExampleMapMap.computeIfAbsent(parent, k -> new LinkedHashMap<>(8));
                     parentExampleMap.put(lastAccessPath, example);
                 }

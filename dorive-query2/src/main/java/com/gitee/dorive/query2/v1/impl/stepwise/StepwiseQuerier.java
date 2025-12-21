@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query2.v1.impl.querier;
+package com.gitee.dorive.query2.v1.impl.stepwise;
 
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
@@ -33,12 +33,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
-public class ReverseQuerier {
+public class StepwiseQuerier {
 
     private final RepositoryContext repositoryContext;
     private final List<RepositoryItem> reverseSubRepositoryItems;
 
-    public ReverseQuerier(RepositoryContext repositoryContext) {
+    public StepwiseQuerier(RepositoryContext repositoryContext) {
         this.repositoryContext = repositoryContext;
         List<RepositoryItem> repositoryItems = new ArrayList<>(repositoryContext.getSubRepositories());
         Collections.reverse(repositoryItems);
