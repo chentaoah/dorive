@@ -20,10 +20,12 @@ package com.gitee.dorive.query2.v1.impl.segment;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
-import com.gitee.dorive.base.v1.query.enums.ResultType;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
+import com.gitee.dorive.query2.v1.api.SegmentExecutor;
+import com.gitee.dorive.query2.v1.entity.executor.SegmentInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -34,29 +36,39 @@ import java.util.List;
 public class SegmentQueryExecutor implements QueryExecutor {
 
     private final QueryResolver queryResolver;
+    private final SegmentExecutor segmentExecutor;
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<Object> selectByQuery(Options options, Object query) {
-        options.setOption(ResultType.class, ResultType.DATA);
-        Result<Object> result = (Result<Object>) queryResolver.resolve((Context) options, query);
+        SegmentInfo segmentInfo = (SegmentInfo) queryResolver.resolve((Context) options, query);
+        segmentExecutor.buildSelectColumns(segmentInfo);
+        segmentExecutor.buildOrderByAndPage(segmentInfo);
+        Result<Object> result = segmentExecutor.executeQuery(segmentInfo);
         return result.getRecords();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Page<Object> selectPageByQuery(Options options, Object query) {
-        options.setOption(ResultType.class, ResultType.COUNT_AND_DATA);
-        Result<Object> result = (Result<Object>) queryResolver.resolve((Context) options, query);
+        SegmentInfo segmentInfo = (SegmentInfo) queryResolver.resolve((Context) options, query);
+        segmentExecutor.buildSelectColumns(segmentInfo);
+        long count = segmentExecutor.executeCount(segmentInfo);
+        if (count == 0L) {
+            Example example = segmentInfo.getExample();
+            Page<Object> page = example.getPage();
+            if (page != null) {
+                page.setTotal(count);
+            }
+        }
+        segmentExecutor.buildOrderByAndPage(segmentInfo);
+        Result<Object> result = segmentExecutor.executeQuery(segmentInfo);
         return result.getPage();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public long selectCountByQuery(Options options, Object query) {
-        options.setOption(ResultType.class, ResultType.COUNT);
-        Result<Object> result = (Result<Object>) queryResolver.resolve((Context) options, query);
-        return result.getCount();
+        SegmentInfo segmentInfo = (SegmentInfo) queryResolver.resolve((Context) options, query);
+        segmentExecutor.buildSelectColumns(segmentInfo);
+        return segmentExecutor.executeCount(segmentInfo);
     }
 
 }
