@@ -43,6 +43,7 @@ public class SegmentQueryResolver implements QueryResolver {
 
     private final RepositoryContext repositoryContext;
     private final QueryConfigResolver queryConfigResolver;
+    private final SegmentResolver segmentResolver;
 
     @Override
     public Object resolve(Context context, Object query) {
@@ -114,7 +115,6 @@ public class SegmentQueryResolver implements QueryResolver {
         }
 
         Collections.reverse(repositoryJoins);
-        SegmentResolver segmentResolver = rootRepository.getProperty(SegmentResolver.class);
         Object segment = segmentResolver.resolve(repositoryAliasMap, repositoryJoins, repositoryExampleMap, rootRepository, rootExample);
 
         SegmentInfo segmentInfo = new SegmentInfo();

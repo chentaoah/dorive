@@ -28,6 +28,7 @@ import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.enums.Category;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
+import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.query.enums.QueryMode;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
@@ -48,10 +49,11 @@ import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.joiner.v1.impl.joiner.DefaultEntityJoiner;
 import com.gitee.dorive.launcher.v1.impl.querier.SqlCountQuerier;
-import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.mybatis.v1.impl.handler.SqlBuildQueryHandler;
 import com.gitee.dorive.mybatis.v1.impl.handler.SqlCustomQueryHandler;
 import com.gitee.dorive.mybatis.v1.impl.handler.SqlExecuteQueryHandler;
+import com.gitee.dorive.mybatis2.v1.impl.segment.DefaultSegmentExecutor;
+import com.gitee.dorive.mybatis2.v1.impl.segment.DefaultSegmentResolver;
 import com.gitee.dorive.query.v1.api.QueryHandler;
 import com.gitee.dorive.query.v1.impl.executor.DefaultQueryExecutor;
 import com.gitee.dorive.query.v1.impl.handler.*;
@@ -59,11 +61,16 @@ import com.gitee.dorive.query.v1.impl.handler.executor.StepwiseQueryHandler;
 import com.gitee.dorive.query.v1.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.v1.impl.resolver.QueryTypeResolver;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
-import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQueryExecutor;
-import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQueryResolver;
-import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQuerier;
+import com.gitee.dorive.query2.v1.api.SegmentExecutor;
+import com.gitee.dorive.query2.v1.api.SegmentResolver;
 import com.gitee.dorive.query2.v1.impl.core.QueryConfigResolver;
 import com.gitee.dorive.query2.v1.impl.core.RepositoryNodeResolver;
+import com.gitee.dorive.query2.v1.impl.segment.RepositoryJoinResolver;
+import com.gitee.dorive.query2.v1.impl.segment.SegmentQueryExecutor;
+import com.gitee.dorive.query2.v1.impl.segment.SegmentQueryResolver;
+import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQuerier;
+import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQueryExecutor;
+import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQueryResolver;
 import com.gitee.dorive.repository.v1.api.CountQuerier;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.impl.executor.EventExecutor;
@@ -216,6 +223,36 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             // 查询执行器
             QueryResolver queryResolver = new StepwiseQueryResolver(repository, queryConfigResolver);
             QueryExecutor queryExecutor = new StepwiseQueryExecutor(queryResolver, (AbstractRepository<Object, Object>) repository);
+            repository.setQueryExecutor2(queryExecutor);
+        }
+    }
+
+    @Override
+    public void buildQueryRepository3(RepositoryContext repositoryContext) {
+        // 查询
+        if (repositoryContext instanceof AbstractMybatisRepository) {
+            AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
+
+            // 查询对象解析器
+            QueryConfigResolver queryConfigResolver = repository.getProperty(QueryConfigResolver.class);
+
+            // 连接解析器
+            RepositoryJoinResolver repositoryJoinResolver = new RepositoryJoinResolver(repository);
+            repository.setProperty(RepositoryJoinResolver.class, repositoryJoinResolver);
+
+            EntityElement entityElement = repositoryContext.getEntityElement();
+            String primaryKey = entityElement.getPrimaryKey();
+
+            EntityMappers entityMappers = repository.getProperty(EntityMappers.class);
+            EntityMapper entityMapper = entityMappers.getEntityMapper(Category.ENTITY_DATABASE.name());
+            String primaryKeyAlias = entityMapper.toAlias(primaryKey);
+
+            SegmentResolver segmentResolver = new DefaultSegmentResolver();
+            SegmentExecutor segmentExecutor = new DefaultSegmentExecutor(primaryKey, primaryKeyAlias, repository.getSqlRunner(), repository);
+
+            // 查询执行器
+            QueryResolver queryResolver = new SegmentQueryResolver(repository, queryConfigResolver, segmentResolver);
+            QueryExecutor queryExecutor = new SegmentQueryExecutor(queryResolver, segmentExecutor);
             repository.setQueryExecutor2(queryExecutor);
         }
     }

@@ -23,4 +23,5 @@ public enum QueryMode {
     SQL_EXECUTE,
     SQL_CUSTOM,
     STEPWISE2,
+    SQL_EXECUTE2,
 }

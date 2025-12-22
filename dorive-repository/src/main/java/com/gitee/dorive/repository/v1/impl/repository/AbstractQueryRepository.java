@@ -33,6 +33,7 @@ import java.util.List;
 public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryRepository<E, PK> {
     private QueryExecutor queryExecutor;
     private QueryExecutor queryExecutor2;
+    private QueryExecutor queryExecutor3;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -40,6 +41,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         RepositoryBuilder repositoryBuilder = getRepositoryBuilder();
         repositoryBuilder.buildQueryRepository(this);
         repositoryBuilder.buildQueryRepository2(this);
+        repositoryBuilder.buildQueryRepository3(this);
     }
 
     @Override
@@ -63,6 +65,10 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         QueryMode queryMode = options.getOption(QueryMode.class);
         if (queryMode == QueryMode.STEPWISE2) {
             return queryExecutor2;
+
+        } else if (queryMode == QueryMode.SQL_EXECUTE2) {
+            return queryExecutor3;
+
         } else {
             return queryExecutor;
         }
