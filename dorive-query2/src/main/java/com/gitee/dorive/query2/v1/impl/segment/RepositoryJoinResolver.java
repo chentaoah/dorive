@@ -43,6 +43,9 @@ public class RepositoryJoinResolver {
     }
 
     public List<RepositoryJoin> resolve(Context context, Set<String> accessPaths) {
+        accessPaths = new LinkedHashSet<>(accessPaths);
+        Set<String> finalAccessPaths = accessPaths;
+
         Map<String, RepositoryItem> repositoryMap = repositoryContext.getRepositoryMap();
         List<RepositoryJoin> repositoryJoins = new ArrayList<>(accessPaths.size());
         for (RepositoryItem repositoryItem : reverseSubRepositoryItems) {
@@ -63,8 +66,9 @@ public class RepositoryJoinResolver {
             List<Binder> valueFilterBinders = binderExecutor.getValueFilterBinders();
             // 连接条件
             List<Condition> conditions = new ArrayList<>(mergedStrongBindersMap.size() + mergedValueRouteBindersMap.size() + valueFilterBinders.size());
-            mergedStrongBindersMap.forEach((absoluteAccessPath, strongBinders) -> {
-                RepositoryItem targetRepositoryItem = repositoryMap.get(absoluteAccessPath);
+            mergedStrongBindersMap.forEach((targetAccessPath, strongBinders) -> {
+                finalAccessPaths.add(targetAccessPath);
+                RepositoryItem targetRepositoryItem = repositoryMap.get(targetAccessPath);
                 RepositoryContext targetRepositoryContext = targetRepositoryItem.getRepositoryContext();
                 for (Binder strongBinder : strongBinders) {
                     Condition condition = new Condition();
@@ -75,8 +79,9 @@ public class RepositoryJoinResolver {
                     conditions.add(condition);
                 }
             });
-            mergedValueRouteBindersMap.forEach((absoluteAccessPath, valueRouteBinders) -> {
-                RepositoryItem targetRepositoryItem = repositoryMap.get(absoluteAccessPath);
+            mergedValueRouteBindersMap.forEach((targetAccessPath, valueRouteBinders) -> {
+                finalAccessPaths.add(targetAccessPath);
+                RepositoryItem targetRepositoryItem = repositoryMap.get(targetAccessPath);
                 RepositoryContext targetRepositoryContext = targetRepositoryItem.getRepositoryContext();
                 for (Binder valueRouteBinder : valueRouteBinders) {
                     Condition condition = new Condition();
