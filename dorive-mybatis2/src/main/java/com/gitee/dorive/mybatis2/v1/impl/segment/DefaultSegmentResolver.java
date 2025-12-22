@@ -34,6 +34,7 @@ import com.gitee.dorive.query2.v1.entity.segment.Condition;
 import com.gitee.dorive.query2.v1.entity.segment.RepositoryJoin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -101,9 +102,7 @@ public class DefaultSegmentResolver implements SegmentResolver {
             TableJoinSegment tableJoinSegment = new TableJoinSegment(newOnSegments(repositoryAliasMap, repositoryJoin));
             tableJoinSegment.setTableName(tableName);
             tableJoinSegment.setTableAlias(tableAlias);
-            if (example != null) {
-                tableJoinSegment.setArgSegments(newArgSegments(tableAlias, example, args));
-            }
+            tableJoinSegment.setArgSegments(newArgSegments(tableAlias, example, args));
         }
         return tableJoinSegments;
     }
@@ -141,6 +140,9 @@ public class DefaultSegmentResolver implements SegmentResolver {
     }
 
     private List<ArgSegment> newArgSegments(String tableAlias, Example example, List<Object> args) {
+        if (example == null) {
+            return Collections.emptyList();
+        }
         List<ArgSegment> argSegments = new ArrayList<>(example.getCriteria().size());
         for (Criterion criterion : example.getCriteria()) {
             String property = criterion.getProperty();
