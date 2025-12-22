@@ -25,7 +25,7 @@ import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
 import com.gitee.dorive.query2.v1.api.SegmentExecutor;
-import com.gitee.dorive.query2.v1.entity.executor.SegmentInfo;
+import com.gitee.dorive.query2.v1.entity.segment.SegmentInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

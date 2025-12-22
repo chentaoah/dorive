@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query2.v1.entity.executor;
+package com.gitee.dorive.query2.v1.entity.segment;
 
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import lombok.Data;

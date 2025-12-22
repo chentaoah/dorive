@@ -28,7 +28,7 @@ import com.gitee.dorive.query2.v1.api.SegmentResolver;
 import com.gitee.dorive.query2.v1.entity.QueryConfig;
 import com.gitee.dorive.query2.v1.entity.QueryNode;
 import com.gitee.dorive.query2.v1.entity.RepositoryNode;
-import com.gitee.dorive.query2.v1.entity.executor.SegmentInfo;
+import com.gitee.dorive.query2.v1.entity.segment.SegmentInfo;
 import com.gitee.dorive.query2.v1.entity.segment.RepositoryJoin;
 import com.gitee.dorive.query2.v1.impl.core.ExampleResolver;
 import com.gitee.dorive.query2.v1.impl.core.QueryConfigResolver;

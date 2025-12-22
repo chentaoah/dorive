@@ -19,7 +19,7 @@ package com.gitee.dorive.query2.v1.api;
 
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.query2.v1.entity.executor.SegmentInfo;
+import com.gitee.dorive.query2.v1.entity.segment.SegmentInfo;
 
 public interface SegmentExecutor {
 
