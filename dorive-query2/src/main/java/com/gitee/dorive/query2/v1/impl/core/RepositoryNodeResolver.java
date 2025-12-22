@@ -40,6 +40,8 @@ public class RepositoryNodeResolver {
     private Map<Class<?>, List<String>> classPathsMap = new LinkedHashMap<>();
     // name ==> paths
     private Map<String, List<String>> namePathsMap = new LinkedHashMap<>();
+    // RepositoryContext ==> RepositoryNode
+    private Map<RepositoryContext, RepositoryNode> repoRepositoryNodeMap = new LinkedHashMap<>();
 
     public RepositoryNodeResolver(RepositoryContext repository) {
         this.repository = repository;
@@ -71,6 +73,7 @@ public class RepositoryNodeResolver {
         pathRepositoryNodeMap.putIfAbsent(path, repositoryNode);
         classPathsMap.computeIfAbsent(entityClass, k -> new ArrayList<>(4)).add(path);
         namePathsMap.computeIfAbsent(name, k -> new ArrayList<>(4)).add(path);
+        repoRepositoryNodeMap.put(repository, repositoryNode);
 
         for (RepositoryItem repositoryItem : repository.getSubRepositories()) {
             RepositoryContext subRepository = repositoryItem.getRepositoryContext();
@@ -83,6 +86,10 @@ public class RepositoryNodeResolver {
 
     private String getPath(String path) {
         return "/".equals(path) ? "" : path;
+    }
+
+    public RepositoryNode findRepositoryNode(RepositoryContext repository) {
+        return repoRepositoryNodeMap.get(repository);
     }
 
 }

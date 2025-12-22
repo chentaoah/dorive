@@ -32,6 +32,7 @@ import com.gitee.dorive.query2.v1.entity.segment.SegmentInfo;
 import com.gitee.dorive.query2.v1.entity.segment.RepositoryJoin;
 import com.gitee.dorive.query2.v1.impl.core.ExampleResolver;
 import com.gitee.dorive.query2.v1.impl.core.QueryConfigResolver;
+import com.gitee.dorive.query2.v1.impl.core.RepositoryNodeResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -42,6 +43,7 @@ import java.util.*;
 public class SegmentQueryResolver implements QueryResolver {
 
     private final RepositoryContext repositoryContext;
+    private final RepositoryNodeResolver repositoryNodeResolver;
     private final QueryConfigResolver queryConfigResolver;
     private final SegmentResolver segmentResolver;
 
@@ -85,6 +87,15 @@ public class SegmentQueryResolver implements QueryResolver {
                 RepositoryJoinResolver repositoryJoinResolver = repository.getProperty(RepositoryJoinResolver.class);
                 List<RepositoryJoin> joins = repositoryJoinResolver.resolve(context, exampleMap.keySet());
                 repositoryJoins.addAll(joins);
+                // 额外分配别名和筛选条件
+                for (RepositoryJoin join : joins) {
+                    RepositoryContext joiner = join.getJoiner();
+                    if (!repositoryAliasMap.containsKey(joiner)) {
+                        RepositoryNode joinRepositoryNode = repositoryNodeResolver.findRepositoryNode(joiner);
+                        repositoryAliasMap.put(joiner, "t" + joinRepositoryNode.getSequence());
+                        repositoryExampleMap.put(joiner, new InnerExample());
+                    }
+                }
             }
 
             // 筛选条件

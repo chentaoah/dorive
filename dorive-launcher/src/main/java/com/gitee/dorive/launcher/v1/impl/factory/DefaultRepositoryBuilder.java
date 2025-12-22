@@ -233,6 +233,8 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         if (repositoryContext instanceof AbstractMybatisRepository) {
             AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
 
+            // 仓储解析器
+            RepositoryNodeResolver repositoryNodeResolver = repository.getProperty(RepositoryNodeResolver.class);
             // 查询对象解析器
             QueryConfigResolver queryConfigResolver = repository.getProperty(QueryConfigResolver.class);
 
@@ -251,7 +253,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             SegmentExecutor segmentExecutor = new DefaultSegmentExecutor(primaryKey, primaryKeyAlias, repository.getSqlRunner(), repository);
 
             // 查询执行器
-            QueryResolver queryResolver = new SegmentQueryResolver(repository, queryConfigResolver, segmentResolver);
+            QueryResolver queryResolver = new SegmentQueryResolver(repository, repositoryNodeResolver, queryConfigResolver, segmentResolver);
             QueryExecutor queryExecutor = new SegmentQueryExecutor(queryResolver, segmentExecutor);
             repository.setQueryExecutor3(queryExecutor);
         }
