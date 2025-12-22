@@ -60,10 +60,13 @@ public class SegmentQueryExecutor implements QueryExecutor {
             Page<Object> page = example.getPage();
             if (page != null) {
                 page.setTotal(count);
+                if (count == 0L) {
+                    return page;
+                }
             }
-            if (count == 0L) {
-                return page;
-            }
+        }
+        if (count == 0L) {
+            return new Page<>();
         }
         segmentExecutor.buildOrderByAndPage(segmentInfo);
         Result<Object> result = segmentExecutor.executeQuery(context, segmentInfo);
