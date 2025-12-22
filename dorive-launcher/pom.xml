@@ -62,6 +62,11 @@
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-mybatis2</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
             <artifactId>dorive-mybatis-plus</artifactId>
             <version>${project.version}</version>
         </dependency>
