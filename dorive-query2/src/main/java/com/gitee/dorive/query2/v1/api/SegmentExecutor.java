@@ -27,7 +27,9 @@ import java.util.Map;
 public interface SegmentExecutor {
 
     List<Object> executeQuery(Map<RepositoryContext, String> repositoryAliasMap,
-                              RepositoryContext rootRepository, List<RepositoryJoin> repositoryJoins,
-                              Example rootExample, Map<RepositoryContext, Example> repositoryExampleMap);
+                              List<RepositoryJoin> repositoryJoins,
+                              Map<RepositoryContext, Example> repositoryExampleMap,
+                              RepositoryContext rootRepository,
+                              Example rootExample);
 
 }

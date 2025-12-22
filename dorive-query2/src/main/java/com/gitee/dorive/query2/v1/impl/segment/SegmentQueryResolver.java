@@ -112,7 +112,7 @@ public class SegmentQueryResolver implements QueryResolver {
         if (rootRepository != null) {
             Collections.reverse(repositoryJoins);
             SegmentExecutor segmentExecutor = rootRepository.getProperty(SegmentExecutor.class);
-            List<Object> ids = segmentExecutor.executeQuery(repositoryAliasMap, rootRepository, repositoryJoins, rootExample, repositoryExampleMap);
+            List<Object> ids = segmentExecutor.executeQuery(repositoryAliasMap, repositoryJoins, repositoryExampleMap, rootRepository, rootExample);
             EntityElement entityElement = rootRepository.getEntityElement();
             String primaryKey = entityElement.getPrimaryKey();
             rootExample.in(primaryKey, ids);
