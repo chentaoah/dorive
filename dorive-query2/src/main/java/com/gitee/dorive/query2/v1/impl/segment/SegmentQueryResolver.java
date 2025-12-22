@@ -21,15 +21,17 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
+import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
 import com.gitee.dorive.query2.v1.api.SegmentResolver;
 import com.gitee.dorive.query2.v1.entity.QueryConfig;
 import com.gitee.dorive.query2.v1.entity.QueryNode;
 import com.gitee.dorive.query2.v1.entity.RepositoryNode;
-import com.gitee.dorive.query2.v1.entity.segment.SegmentInfo;
 import com.gitee.dorive.query2.v1.entity.segment.RepositoryJoin;
+import com.gitee.dorive.query2.v1.entity.segment.SegmentInfo;
 import com.gitee.dorive.query2.v1.impl.core.ExampleResolver;
 import com.gitee.dorive.query2.v1.impl.core.QueryConfigResolver;
 import com.gitee.dorive.query2.v1.impl.core.RepositoryNodeResolver;
@@ -123,6 +125,8 @@ public class SegmentQueryResolver implements QueryResolver {
             return null;
         }
 
+        // 转化筛选条件
+        convertExamples(context, repositoryExampleMap);
         Collections.reverse(repositoryJoins);
         Object segment = segmentResolver.resolve(repositoryAliasMap, repositoryJoins, repositoryExampleMap, rootRepository, rootExample);
 
@@ -130,5 +134,14 @@ public class SegmentQueryResolver implements QueryResolver {
         segmentInfo.setSegment(segment);
         segmentInfo.setExample(rootExample);
         return segmentInfo;
+    }
+
+    private void convertExamples(Context context, Map<RepositoryContext, Example> repositoryExampleMap) {
+        repositoryExampleMap.forEach(((repository, example) -> {
+            RepositoryItem rootRepository = repository.getRootRepository();
+            DefaultRepository defaultRepository = (DefaultRepository) rootRepository.getProxyRepository();
+            ExampleConverter exampleConverter = defaultRepository.getProperty(ExampleConverter.class);
+            exampleConverter.convert(context, example);
+        }));
     }
 }
