@@ -99,6 +99,7 @@ public class RepositoryJoinResolver {
                 conditions.add(condition);
             }
             repositoryJoin.setConditions(conditions);
+            repositoryJoins.add(repositoryJoin);
         }
         return repositoryJoins;
     }
