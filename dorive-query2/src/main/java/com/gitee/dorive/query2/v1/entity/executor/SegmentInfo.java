@@ -22,6 +22,6 @@ import lombok.Data;
 
 @Data
 public class SegmentInfo {
-    private Example example;
     private Object segment;
+    private Example example;
 }

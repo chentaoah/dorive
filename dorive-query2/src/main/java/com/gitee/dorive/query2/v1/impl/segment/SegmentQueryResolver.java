@@ -28,6 +28,7 @@ import com.gitee.dorive.query2.v1.api.SegmentResolver;
 import com.gitee.dorive.query2.v1.entity.QueryConfig;
 import com.gitee.dorive.query2.v1.entity.QueryNode;
 import com.gitee.dorive.query2.v1.entity.RepositoryNode;
+import com.gitee.dorive.query2.v1.entity.executor.SegmentInfo;
 import com.gitee.dorive.query2.v1.entity.segment.RepositoryJoin;
 import com.gitee.dorive.query2.v1.impl.core.ExampleResolver;
 import com.gitee.dorive.query2.v1.impl.core.QueryConfigResolver;
@@ -114,6 +115,11 @@ public class SegmentQueryResolver implements QueryResolver {
 
         Collections.reverse(repositoryJoins);
         SegmentResolver segmentResolver = rootRepository.getProperty(SegmentResolver.class);
-        return segmentResolver.resolve(repositoryAliasMap, repositoryJoins, repositoryExampleMap, rootRepository, rootExample);
+        Object segment = segmentResolver.resolve(repositoryAliasMap, repositoryJoins, repositoryExampleMap, rootRepository, rootExample);
+
+        SegmentInfo segmentInfo = new SegmentInfo();
+        segmentInfo.setSegment(segment);
+        segmentInfo.setExample(rootExample);
+        return segmentInfo;
     }
 }
