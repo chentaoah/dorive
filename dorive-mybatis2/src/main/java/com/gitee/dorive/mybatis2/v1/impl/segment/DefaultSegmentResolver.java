@@ -62,7 +62,7 @@ public class DefaultSegmentResolver implements SegmentResolver {
         selectSegment.setTableSegment(tableSegment);
         // left join table
         selectSegment.getTableJoinSegments().addAll(tableJoinSegments);
-        // where a = {0}
+        // where column = {0}
         List<ArgSegment> argSegments = selectSegment.getArgSegments();
         argSegments.addAll(tableSegment.getArgSegments());
         for (TableJoinSegment tableJoinSegment : tableJoinSegments) {
