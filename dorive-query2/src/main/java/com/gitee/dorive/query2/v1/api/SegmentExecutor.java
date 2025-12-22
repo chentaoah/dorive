@@ -29,7 +29,7 @@ public interface SegmentExecutor {
     List<Object> executeQuery(Map<RepositoryContext, String> repositoryAliasMap,
                               List<RepositoryJoin> repositoryJoins,
                               Map<RepositoryContext, Example> repositoryExampleMap,
-                              RepositoryContext rootRepository,
-                              Example rootExample);
+                              RepositoryContext repositoryContext,
+                              Example example);
 
 }

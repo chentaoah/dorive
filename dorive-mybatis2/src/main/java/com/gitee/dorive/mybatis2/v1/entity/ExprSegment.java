@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.mybatis2.v1.entity;
 
-import com.gitee.dorive.mybatis2.v1.api.Segment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +24,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ExprSegment implements Segment {
+public class ExprSegment {
 
     private String leftExpr;
     private String operator;

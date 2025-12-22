@@ -19,7 +19,6 @@ package com.gitee.dorive.mybatis2.v1.entity;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlBuilder;
-import com.gitee.dorive.mybatis2.v1.api.Segment;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Data
-public class SelectSegment implements Segment {
+public class SelectSegment {
 
     private boolean distinct;
     private List<String> selectColumns = Collections.emptyList();

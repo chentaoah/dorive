@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.mybatis2.v1.entity;
 
-import com.gitee.dorive.mybatis2.v1.api.Segment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,11 +28,10 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TableSegment implements Segment {
+public class TableSegment {
 
     private String tableName;
     private String tableAlias;
-    private boolean join;
     private List<ArgSegment> argSegments;
 
     @Override
