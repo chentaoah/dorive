@@ -31,7 +31,7 @@ import com.gitee.dorive.mybatis.v1.entity.TableSegment;
 import com.gitee.dorive.mybatis.v1.impl.segment.SelectSegmentBuilder;
 import com.gitee.dorive.query.v1.entity.QueryContext;
 import com.gitee.dorive.query.v1.entity.QueryUnit;
-import com.gitee.dorive.query.v1.enums.ResultType;
+import com.gitee.dorive.base.v1.query.enums.ResultType;
 import lombok.Getter;
 import lombok.Setter;
 

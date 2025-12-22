@@ -26,7 +26,7 @@ import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.query.v1.api.QueryHandler;
 import com.gitee.dorive.query.v1.entity.QueryContext;
-import com.gitee.dorive.query.v1.enums.ResultType;
+import com.gitee.dorive.base.v1.query.enums.ResultType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

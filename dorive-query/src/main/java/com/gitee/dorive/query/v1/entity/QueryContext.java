@@ -20,7 +20,7 @@ package com.gitee.dorive.query.v1.entity;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.query.v1.enums.ResultType;
+import com.gitee.dorive.base.v1.query.enums.ResultType;
 import lombok.Getter;
 import lombok.Setter;
 

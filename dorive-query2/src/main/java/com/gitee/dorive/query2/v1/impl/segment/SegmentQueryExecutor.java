@@ -22,6 +22,7 @@ import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
+import com.gitee.dorive.base.v1.query.enums.ResultType;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,6 +38,7 @@ public class SegmentQueryExecutor implements QueryExecutor {
     @Override
     @SuppressWarnings("unchecked")
     public List<Object> selectByQuery(Options options, Object query) {
+        options.setOption(ResultType.class, ResultType.DATA);
         Result<Object> result = (Result<Object>) queryResolver.resolve((Context) options, query);
         return result.getRecords();
     }
@@ -44,6 +46,7 @@ public class SegmentQueryExecutor implements QueryExecutor {
     @Override
     @SuppressWarnings("unchecked")
     public Page<Object> selectPageByQuery(Options options, Object query) {
+        options.setOption(ResultType.class, ResultType.COUNT_AND_DATA);
         Result<Object> result = (Result<Object>) queryResolver.resolve((Context) options, query);
         return result.getPage();
     }
@@ -51,6 +54,7 @@ public class SegmentQueryExecutor implements QueryExecutor {
     @Override
     @SuppressWarnings("unchecked")
     public long selectCountByQuery(Options options, Object query) {
+        options.setOption(ResultType.class, ResultType.COUNT);
         Result<Object> result = (Result<Object>) queryResolver.resolve((Context) options, query);
         return result.getCount();
     }
