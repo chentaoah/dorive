@@ -69,16 +69,15 @@ public class DefaultSegmentExecutor implements SegmentExecutor {
 
     @Override
     public void buildOrderByAndPage(SegmentInfo segmentInfo) {
-        Example example = segmentInfo.getExample();
         SelectSegment selectSegment = (SelectSegment) segmentInfo.getSegment();
-
-        OrderBy orderBy = example.getOrderBy();
-        Page<Object> page = example.getPage();
+        Example example = segmentInfo.getExample();
 
         List<String> selectColumns = selectSegment.getSelectColumns();
         TableSegment tableSegment = selectSegment.getTableSegment();
-
         String tableAlias = tableSegment.getTableAlias();
+
+        OrderBy orderBy = example.getOrderBy();
+        Page<Object> page = example.getPage();
 
         if (orderBy != null) {
             for (String property : orderBy.getProperties()) {
@@ -95,8 +94,8 @@ public class DefaultSegmentExecutor implements SegmentExecutor {
 
     @Override
     public Result<Object> executeQuery(Context context, SegmentInfo segmentInfo) {
-        Example example = segmentInfo.getExample();
         SelectSegment selectSegment = (SelectSegment) segmentInfo.getSegment();
+        Example example = segmentInfo.getExample();
 
         String selectSql = selectSegment.selectSql();
         String fromWhereSql = selectSegment.fromWhereSql();
