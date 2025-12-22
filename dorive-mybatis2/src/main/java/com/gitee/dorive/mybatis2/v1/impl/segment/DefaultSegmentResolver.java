@@ -101,7 +101,9 @@ public class DefaultSegmentResolver implements SegmentResolver {
             TableJoinSegment tableJoinSegment = new TableJoinSegment(newOnSegments(repositoryAliasMap, repositoryJoin));
             tableJoinSegment.setTableName(tableName);
             tableJoinSegment.setTableAlias(tableAlias);
-            tableJoinSegment.setArgSegments(newArgSegments(tableAlias, example, args));
+            if (example != null) {
+                tableJoinSegment.setArgSegments(newArgSegments(tableAlias, example, args));
+            }
         }
         return tableJoinSegments;
     }
