@@ -95,7 +95,7 @@ public class SegmentQueryResolver implements QueryResolver {
             }
 
             if (parent != null) {
-                if (!example.isEmpty()) {
+                if (exampleMap != null || !example.isEmpty()) {
                     Map<String, Example> parentExampleMap = nodeExampleMapMap.computeIfAbsent(parent, k -> new LinkedHashMap<>(8));
                     parentExampleMap.put(lastAccessPath, example);
                 }
