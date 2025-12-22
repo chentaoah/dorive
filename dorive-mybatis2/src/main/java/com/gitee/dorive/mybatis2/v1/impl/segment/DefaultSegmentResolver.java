@@ -58,13 +58,17 @@ public class DefaultSegmentResolver implements SegmentResolver {
         List<TableJoinSegment> tableJoinSegments = newTableJoinSegments(repositoryAliasMap, repositoryJoins, repositoryExampleMap, args);
 
         SelectSegment selectSegment = new SelectSegment();
+        // from table
         selectSegment.setTableSegment(tableSegment);
+        // left join table
         selectSegment.getTableJoinSegments().addAll(tableJoinSegments);
+        // where a = {0}
         List<ArgSegment> argSegments = selectSegment.getArgSegments();
         argSegments.addAll(tableSegment.getArgSegments());
         for (TableJoinSegment tableJoinSegment : tableJoinSegments) {
             argSegments.addAll(tableJoinSegment.getArgSegments());
         }
+        // [1, 2, 3]
         selectSegment.setArgs(args);
         return selectSegment;
     }
