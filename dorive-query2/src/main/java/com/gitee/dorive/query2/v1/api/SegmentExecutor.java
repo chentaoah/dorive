@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.query2.v1.api;
 
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.query2.v1.entity.executor.SegmentInfo;
 
@@ -24,10 +25,10 @@ public interface SegmentExecutor {
 
     void buildSelectColumns(SegmentInfo segmentInfo);
 
+    long executeCount(SegmentInfo segmentInfo);
+
     void buildOrderByAndPage(SegmentInfo segmentInfo);
 
-    Result<Object> executeQuery(SegmentInfo segmentInfo);
-
-    long executeCount(SegmentInfo segmentInfo);
+    Result<Object> executeQuery(Context context, SegmentInfo segmentInfo);
 
 }

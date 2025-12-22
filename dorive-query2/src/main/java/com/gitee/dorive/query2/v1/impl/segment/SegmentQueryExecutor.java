@@ -40,27 +40,33 @@ public class SegmentQueryExecutor implements QueryExecutor {
 
     @Override
     public List<Object> selectByQuery(Options options, Object query) {
-        SegmentInfo segmentInfo = (SegmentInfo) queryResolver.resolve((Context) options, query);
+        Context context = (Context) options;
+        SegmentInfo segmentInfo = (SegmentInfo) queryResolver.resolve(context, query);
         segmentExecutor.buildSelectColumns(segmentInfo);
         segmentExecutor.buildOrderByAndPage(segmentInfo);
-        Result<Object> result = segmentExecutor.executeQuery(segmentInfo);
+        Result<Object> result = segmentExecutor.executeQuery(context, segmentInfo);
         return result.getRecords();
     }
 
     @Override
     public Page<Object> selectPageByQuery(Options options, Object query) {
-        SegmentInfo segmentInfo = (SegmentInfo) queryResolver.resolve((Context) options, query);
+        Context context = (Context) options;
+        SegmentInfo segmentInfo = (SegmentInfo) queryResolver.resolve(context, query);
         segmentExecutor.buildSelectColumns(segmentInfo);
+        // 查询总数
         long count = segmentExecutor.executeCount(segmentInfo);
-        if (count == 0L) {
-            Example example = segmentInfo.getExample();
+        Example example = segmentInfo.getExample();
+        if (example != null) {
             Page<Object> page = example.getPage();
             if (page != null) {
                 page.setTotal(count);
             }
+            if (count == 0L) {
+                return page;
+            }
         }
         segmentExecutor.buildOrderByAndPage(segmentInfo);
-        Result<Object> result = segmentExecutor.executeQuery(segmentInfo);
+        Result<Object> result = segmentExecutor.executeQuery(context, segmentInfo);
         return result.getPage();
     }
 
