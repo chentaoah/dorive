@@ -253,7 +253,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             // 查询执行器
             QueryResolver queryResolver = new SegmentQueryResolver(repository, queryConfigResolver, segmentResolver);
             QueryExecutor queryExecutor = new SegmentQueryExecutor(queryResolver, segmentExecutor);
-            repository.setQueryExecutor2(queryExecutor);
+            repository.setQueryExecutor3(queryExecutor);
         }
     }
 
