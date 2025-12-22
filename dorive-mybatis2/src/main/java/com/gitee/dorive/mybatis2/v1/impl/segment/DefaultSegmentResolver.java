@@ -103,6 +103,7 @@ public class DefaultSegmentResolver implements SegmentResolver {
             tableJoinSegment.setTableName(tableName);
             tableJoinSegment.setTableAlias(tableAlias);
             tableJoinSegment.setArgSegments(newArgSegments(tableAlias, example, args));
+            tableJoinSegments.add(tableJoinSegment);
         }
         return tableJoinSegments;
     }
