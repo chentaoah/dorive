@@ -15,53 +15,44 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query2.v1.impl.executor;
+package com.gitee.dorive.query2.v1.impl.segment;
 
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.Collections;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class DefaultQueryExecutor2 implements QueryExecutor {
+public class SegmentQueryExecutor implements QueryExecutor {
 
     private final QueryResolver queryResolver;
-    private final AbstractRepository<Object, Object> repository;
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Object> selectByQuery(Options options, Object query) {
-        Example example = queryResolver.newExample((Context) options, query);
-        if (example.isAbandoned()) {
-            return Collections.emptyList();
-        }
-        return repository.selectByExample(options, example);
+        Result<Object> result = (Result<Object>) queryResolver.resolve((Context) options, query);
+        return result.getRecords();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Page<Object> selectPageByQuery(Options options, Object query) {
-        Example example = queryResolver.newExample((Context) options, query);
-        if (example.isAbandoned()) {
-            return example.getPage();
-        }
-        return repository.selectPageByExample(options, example);
+        Result<Object> result = (Result<Object>) queryResolver.resolve((Context) options, query);
+        return result.getPage();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public long selectCountByQuery(Options options, Object query) {
-        Example example = queryResolver.newExample((Context) options, query);
-        if (example.isAbandoned()) {
-            return 0L;
-        }
-        return repository.selectCountByExample(options, example);
+        Result<Object> result = (Result<Object>) queryResolver.resolve((Context) options, query);
+        return result.getCount();
     }
 
 }

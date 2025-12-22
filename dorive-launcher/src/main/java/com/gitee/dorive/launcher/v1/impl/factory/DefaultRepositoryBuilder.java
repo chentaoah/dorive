@@ -59,7 +59,7 @@ import com.gitee.dorive.query.v1.impl.handler.executor.StepwiseQueryHandler;
 import com.gitee.dorive.query.v1.impl.resolver.MergedRepositoryResolver;
 import com.gitee.dorive.query.v1.impl.resolver.QueryTypeResolver;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
-import com.gitee.dorive.query2.v1.impl.executor.DefaultQueryExecutor2;
+import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQueryExecutor;
 import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQueryResolver;
 import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQuerier;
 import com.gitee.dorive.query2.v1.impl.core.QueryConfigResolver;
@@ -215,7 +215,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
 
             // 查询执行器
             QueryResolver queryResolver = new StepwiseQueryResolver(repository, queryConfigResolver);
-            QueryExecutor queryExecutor = new DefaultQueryExecutor2(queryResolver, (AbstractRepository<Object, Object>) repository);
+            QueryExecutor queryExecutor = new StepwiseQueryExecutor(queryResolver, (AbstractRepository<Object, Object>) repository);
             repository.setQueryExecutor2(queryExecutor);
         }
     }

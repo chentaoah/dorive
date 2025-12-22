@@ -44,7 +44,7 @@ public class StepwiseQueryResolver implements QueryResolver {
     private final QueryConfigResolver queryConfigResolver;
 
     @Override
-    public Example newExample(Context context, Object query) {
+    public Object resolve(Context context, Object query) {
         QueryConfig queryConfig = queryConfigResolver.findQueryConfig(query.getClass());
         Assert.notNull(queryConfig, "No query config found!");
         List<QueryNode> reversedQueryNodes = queryConfig.getReversedQueryNodes();
