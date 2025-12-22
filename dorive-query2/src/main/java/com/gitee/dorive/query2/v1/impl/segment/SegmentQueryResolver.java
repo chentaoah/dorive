@@ -18,14 +18,13 @@
 package com.gitee.dorive.query2.v1.impl.segment;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
-import com.gitee.dorive.query2.v1.api.SegmentExecutor;
+import com.gitee.dorive.query2.v1.api.SegmentResolver;
 import com.gitee.dorive.query2.v1.entity.QueryConfig;
 import com.gitee.dorive.query2.v1.entity.QueryNode;
 import com.gitee.dorive.query2.v1.entity.RepositoryNode;
@@ -109,17 +108,12 @@ public class SegmentQueryResolver implements QueryResolver {
             rootExample.setPage(exampleResolver.newPage(query));
         }
 
-        if (rootRepository != null) {
-            Collections.reverse(repositoryJoins);
-            SegmentExecutor segmentExecutor = rootRepository.getProperty(SegmentExecutor.class);
-            List<Object> ids = segmentExecutor.executeQuery(repositoryAliasMap, repositoryJoins, repositoryExampleMap, rootRepository, rootExample);
-            EntityElement entityElement = rootRepository.getEntityElement();
-            String primaryKey = entityElement.getPrimaryKey();
-            rootExample.in(primaryKey, ids);
-            // 清除分页
-            rootExample.setPage(null);
+        if (rootRepository == null) {
+            return null;
         }
 
-        return rootExample;
+        Collections.reverse(repositoryJoins);
+        SegmentResolver segmentResolver = rootRepository.getProperty(SegmentResolver.class);
+        return segmentResolver.resolve(repositoryAliasMap, repositoryJoins, repositoryExampleMap, rootRepository, rootExample);
     }
 }

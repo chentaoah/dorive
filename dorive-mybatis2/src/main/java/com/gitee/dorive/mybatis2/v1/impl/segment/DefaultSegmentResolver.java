@@ -29,7 +29,7 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.mybatis2.v1.entity.*;
-import com.gitee.dorive.query2.v1.api.SegmentExecutor;
+import com.gitee.dorive.query2.v1.api.SegmentResolver;
 import com.gitee.dorive.query2.v1.entity.segment.Condition;
 import com.gitee.dorive.query2.v1.entity.segment.RepositoryJoin;
 
@@ -37,14 +37,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultSegmentExecutor implements SegmentExecutor {
+public class DefaultSegmentResolver implements SegmentResolver {
 
     @Override
-    public List<Object> executeQuery(Map<RepositoryContext, String> repositoryAliasMap,
-                                     List<RepositoryJoin> repositoryJoins,
-                                     Map<RepositoryContext, Example> repositoryExampleMap,
-                                     RepositoryContext repositoryContext,
-                                     Example example) {
+    public Object resolve(Map<RepositoryContext, String> repositoryAliasMap,
+                          List<RepositoryJoin> repositoryJoins,
+                          Map<RepositoryContext, Example> repositoryExampleMap,
+                          RepositoryContext repositoryContext,
+                          Example example) {
         EntityStoreInfo entityStoreInfo = getEntityStoreInfo(repositoryContext);
         String tableName = entityStoreInfo.getTableName();
         String tableAlias = repositoryAliasMap.get(repositoryContext);
@@ -66,9 +66,7 @@ public class DefaultSegmentExecutor implements SegmentExecutor {
             argSegments.addAll(tableJoinSegment.getArgSegments());
         }
         selectSegment.setArgs(args);
-
-
-        return null;
+        return selectSegment;
     }
 
     private EntityStoreInfo getEntityStoreInfo(RepositoryContext repositoryContext) {

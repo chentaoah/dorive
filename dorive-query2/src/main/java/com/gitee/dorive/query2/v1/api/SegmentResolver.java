@@ -24,12 +24,12 @@ import com.gitee.dorive.query2.v1.entity.segment.RepositoryJoin;
 import java.util.List;
 import java.util.Map;
 
-public interface SegmentExecutor {
+public interface SegmentResolver {
 
-    List<Object> executeQuery(Map<RepositoryContext, String> repositoryAliasMap,
-                              List<RepositoryJoin> repositoryJoins,
-                              Map<RepositoryContext, Example> repositoryExampleMap,
-                              RepositoryContext repositoryContext,
-                              Example example);
+    Object resolve(Map<RepositoryContext, String> repositoryAliasMap,
+                   List<RepositoryJoin> repositoryJoins,
+                   Map<RepositoryContext, Example> repositoryExampleMap,
+                   RepositoryContext repositoryContext,
+                   Example example);
 
 }
