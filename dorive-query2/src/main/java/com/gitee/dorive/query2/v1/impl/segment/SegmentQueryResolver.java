@@ -90,9 +90,7 @@ public class SegmentQueryResolver implements QueryResolver {
             // 筛选条件
             Example example = new InnerExample();
             queryNode.appendCriteria(query, example);
-            if (!example.isEmpty()) {
-                repositoryExampleMap.put(repository, example);
-            }
+            repositoryExampleMap.put(repository, example);
 
             if (parent != null) {
                 if (exampleMap != null || !example.isEmpty()) {
