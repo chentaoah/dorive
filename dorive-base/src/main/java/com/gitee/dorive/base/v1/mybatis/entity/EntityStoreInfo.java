@@ -15,17 +15,26 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.v1.entity.segment;
+package com.gitee.dorive.base.v1.mybatis.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@Getter
-@Setter
-public class OnValueSegment extends OnSegment {
+import java.util.Map;
 
-    public OnValueSegment(String leftExpr, String operator, String rightExpr) {
-        super(leftExpr, operator, rightExpr);
-    }
-
+@Data
+@AllArgsConstructor
+public class EntityStoreInfo {
+    private Class<?> mapperClass;
+    private Object mapper;
+    private Class<?> pojoClass;
+    private String tableName;
+    private String idProperty;
+    private String idColumn;
+    private Map<String, String> propAliasMappingWithoutPk;
+    private Map<String, String> propAliasMapping;
+    private Map<String, String> aliasPropMapping;
+    private String selectColumns;
+    private Map<String, MethodInvoker> selectMethodMap;
 }

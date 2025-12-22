@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.v1.entity.segment;
+package com.gitee.dorive.mybatis.v1.entity;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlBuilder;

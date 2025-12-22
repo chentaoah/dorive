@@ -15,19 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis.v1.entity.segment;
+package com.gitee.dorive.mybatis.v1.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class TableJoinSegment extends TableSegment {
-    private List<OnSegment> onSegments;
+public class OnValueSegment extends OnSegment {
+
+    public OnValueSegment(String leftExpr, String operator, String rightExpr) {
+        super(leftExpr, operator, rightExpr);
+    }
+
 }

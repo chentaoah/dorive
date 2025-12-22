@@ -17,24 +17,28 @@
 
 package com.gitee.dorive.mybatis.v1.entity;
 
-import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
+import com.gitee.dorive.mybatis.v1.api.Segment;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.Map;
+import java.util.List;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
-public class EntityStoreInfo {
-    private Class<?> mapperClass;
-    private Object mapper;
-    private Class<?> pojoClass;
+public class TableSegment implements Segment {
+
     private String tableName;
-    private String idProperty;
-    private String idColumn;
-    private Map<String, String> propAliasMappingWithoutPk;
-    private Map<String, String> propAliasMapping;
-    private Map<String, String> aliasPropMapping;
-    private String selectColumns;
-    private Map<String, MethodInvoker> selectMethodMap;
+    private String tableAlias;
+    private boolean join;
+    private List<ArgSegment> argSegments;
+
+    @Override
+    public String toString() {
+        return tableName + " " + tableAlias;
+    }
+
 }

@@ -48,7 +48,7 @@ import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.joiner.v1.impl.joiner.DefaultEntityJoiner;
 import com.gitee.dorive.launcher.v1.impl.querier.SqlCountQuerier;
-import com.gitee.dorive.mybatis.v1.entity.EntityStoreInfo;
+import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.mybatis.v1.impl.handler.SqlBuildQueryHandler;
 import com.gitee.dorive.mybatis.v1.impl.handler.SqlCustomQueryHandler;
 import com.gitee.dorive.mybatis.v1.impl.handler.SqlExecuteQueryHandler;
