@@ -74,6 +74,8 @@ public class StepwiseQuerier {
                 example.select(binderExecutor.getSelfFields());
                 binderExecutor.appendFilterValue(context, example);
                 entities = repositoryItem.selectByExample(new DefaultContext(Options.ROOT, context), example);
+                List<Object> list = (List<Object>) context.getAttachment("test2");
+                list.add(repositoryItem.getEntityClass().getSimpleName());
 
             } else {
                 continue;

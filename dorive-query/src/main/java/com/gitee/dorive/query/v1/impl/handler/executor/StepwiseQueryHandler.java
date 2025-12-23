@@ -70,6 +70,8 @@ public class StepwiseQueryHandler extends AbstractQueryUnitQueryHandler {
                 example.select(binderExecutor.getSelfFields());
                 binderExecutor.appendFilterValue(context, example);
                 entities = executedRepository.selectByExample(context, example);
+                List<Object> list = (List<Object>) context.getAttachment("test1");
+                list.add(executedRepository.getEntityClass().getSimpleName());
 
             } else {
                 return;

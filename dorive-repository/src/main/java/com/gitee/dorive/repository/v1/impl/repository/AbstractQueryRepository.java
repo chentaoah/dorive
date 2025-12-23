@@ -30,6 +30,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,9 +57,19 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     @SuppressWarnings("unchecked")
     public List<E> selectByQuery(Options options, Object query) {
+        List<String> test1 = new ArrayList<>();
+        List<String> test2 = new ArrayList<>();
+        ((Context) options).setAttachment("test1", test1);
+        ((Context) options).setAttachment("test2", test2);
+
         QueryExecutor adaptive = adaptive(options, query);
         List<E> result = (List<E>) adaptive.selectByQuery(options, query);
 
+        if (adaptive == queryExecutor2) {
+            options.setOption(QueryMode.class, QueryMode.STEPWISE);
+            queryExecutor.selectByQuery(options, query);
+            Assert.isTrue(Objects.equals(test1, test2), "not equals");
+        }
         if (adaptive == queryExecutor3) {
             options.setOption(QueryMode.class, QueryMode.SQL_EXECUTE);
             queryExecutor.selectByQuery(options, query);
@@ -76,9 +87,19 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByQuery(Options options, Object query) {
+        List<String> test1 = new ArrayList<>();
+        List<String> test2 = new ArrayList<>();
+        ((Context) options).setAttachment("test1", test1);
+        ((Context) options).setAttachment("test2", test2);
+
         QueryExecutor adaptive = adaptive(options, query);
         Page<E> page = (Page<E>) adaptive.selectPageByQuery(options, query);
 
+        if (adaptive == queryExecutor2) {
+            options.setOption(QueryMode.class, QueryMode.STEPWISE);
+            queryExecutor.selectPageByQuery(options, query);
+            Assert.isTrue(Objects.equals(test1, test2), "not equals");
+        }
         if (adaptive == queryExecutor3) {
             options.setOption(QueryMode.class, QueryMode.SQL_EXECUTE);
             queryExecutor.selectPageByQuery(options, query);
@@ -95,9 +116,19 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
     @Override
     public long selectCountByQuery(Options options, Object query) {
+        List<String> test1 = new ArrayList<>();
+        List<String> test2 = new ArrayList<>();
+        ((Context) options).setAttachment("test1", test1);
+        ((Context) options).setAttachment("test2", test2);
+
         QueryExecutor adaptive = adaptive(options, query);
         long l = adaptive.selectCountByQuery(options, query);
 
+        if (adaptive == queryExecutor2) {
+            options.setOption(QueryMode.class, QueryMode.STEPWISE);
+            queryExecutor.selectCountByQuery(options, query);
+            Assert.isTrue(Objects.equals(test1, test2), "not equals");
+        }
         if (adaptive == queryExecutor3) {
             options.setOption(QueryMode.class, QueryMode.SQL_EXECUTE);
             queryExecutor.selectCountByQuery(options, query);
@@ -119,7 +150,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
             if (StringUtils.isNotBlank(method)) {
                 queryMode = QueryMode.SQL_CUSTOM;
             } else {
-                queryMode = QueryMode.SQL_EXECUTE2;
+                queryMode = QueryMode.STEPWISE2;
             }
         }
         // 上下文未匹配
