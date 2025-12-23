@@ -150,7 +150,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
             if (StringUtils.isNotBlank(method)) {
                 queryMode = QueryMode.SQL_CUSTOM;
             } else {
-                queryMode = QueryMode.STEPWISE2;
+                queryMode = QueryMode.SQL_EXECUTE2;
             }
         }
         // 上下文未匹配
