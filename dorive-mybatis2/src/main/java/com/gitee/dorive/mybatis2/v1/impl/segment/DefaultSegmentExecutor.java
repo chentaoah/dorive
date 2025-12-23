@@ -104,6 +104,7 @@ public class DefaultSegmentExecutor implements SegmentExecutor {
 
         // 查询主键
         String sql = selectSql + fromWhereSql + selectSegment.lastSql();
+        context.setAttachment("sql2", sql);
         List<Map<String, Object>> resultMaps = sqlRunner.selectList(sql, args.toArray());
         List<Object> ids = CollUtil.map(resultMaps, map -> map.get(primaryKeyAlias), true);
 

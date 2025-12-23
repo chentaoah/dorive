@@ -18,6 +18,7 @@
 package com.gitee.dorive.mybatis.v1.impl.handler;
 
 import cn.hutool.core.collection.CollUtil;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
@@ -120,6 +121,9 @@ public class SqlExecuteQueryHandler extends SqlBuildQueryHandler {
 
         // 查询主键
         String sql = selectSql + fromWhereSql + selectSegment.lastSql();
+        Context context = queryContext.getContext();
+        context.setAttachment("sql1", sql);
+
         List<Map<String, Object>> resultMaps = sqlRunner.selectList(sql, args.toArray());
         List<Object> ids = CollUtil.map(resultMaps, map -> map.get(primaryKeyAlias), true);
         if (!ids.isEmpty()) {

@@ -19,6 +19,7 @@ package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
@@ -31,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -54,18 +56,60 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     @SuppressWarnings("unchecked")
     public List<E> selectByQuery(Options options, Object query) {
-        return (List<E>) adaptive(options, query).selectByQuery(options, query);
+        QueryExecutor adaptive = adaptive(options, query);
+        List<E> result = (List<E>) adaptive.selectByQuery(options, query);
+
+        if (adaptive == queryExecutor3) {
+            options.setOption(QueryMode.class, QueryMode.SQL_EXECUTE);
+            queryExecutor.selectByQuery(options, query);
+            Object ignore = ((Context) options).getAttachment("ignore");
+            if (ignore == null) {
+                Object attachment1 = ((Context) options).getAttachment("sql1");
+                Object attachment2 = ((Context) options).getAttachment("sql2");
+                Assert.isTrue(Objects.equals(attachment1, attachment2), "not equals");
+            }
+        }
+
+        return result;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByQuery(Options options, Object query) {
-        return (Page<E>) adaptive(options, query).selectPageByQuery(options, query);
+        QueryExecutor adaptive = adaptive(options, query);
+        Page<E> page = (Page<E>) adaptive.selectPageByQuery(options, query);
+
+        if (adaptive == queryExecutor3) {
+            options.setOption(QueryMode.class, QueryMode.SQL_EXECUTE);
+            queryExecutor.selectPageByQuery(options, query);
+            Object ignore = ((Context) options).getAttachment("ignore");
+            if (ignore == null) {
+                Object attachment1 = ((Context) options).getAttachment("sql1");
+                Object attachment2 = ((Context) options).getAttachment("sql2");
+                Assert.isTrue(Objects.equals(attachment1, attachment2), "not equals");
+            }
+        }
+
+        return page;
     }
 
     @Override
     public long selectCountByQuery(Options options, Object query) {
-        return adaptive(options, query).selectCountByQuery(options, query);
+        QueryExecutor adaptive = adaptive(options, query);
+        long l = adaptive.selectCountByQuery(options, query);
+
+        if (adaptive == queryExecutor3) {
+            options.setOption(QueryMode.class, QueryMode.SQL_EXECUTE);
+            queryExecutor.selectCountByQuery(options, query);
+            Object ignore = ((Context) options).getAttachment("ignore");
+            if (ignore == null) {
+                Object attachment1 = ((Context) options).getAttachment("sql1");
+                Object attachment2 = ((Context) options).getAttachment("sql2");
+                Assert.isTrue(Objects.equals(attachment1, attachment2), "not equals");
+            }
+        }
+
+        return l;
     }
 
     private QueryExecutor adaptive(Options options, Object query) {

@@ -33,6 +33,7 @@ public class SimpleQueryHandler implements QueryHandler {
     public void handle(QueryContext queryContext, Object query) {
         Map<String, Example> exampleMap = queryContext.getExampleMap();
         if (exampleMap.size() == 1 && exampleMap.containsKey("/")) {
+            queryContext.getContext().setAttachment("ignore", true);
             return;
         }
         if (queryHandler != null) {
