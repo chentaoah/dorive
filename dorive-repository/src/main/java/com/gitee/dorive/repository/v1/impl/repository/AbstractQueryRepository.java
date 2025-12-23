@@ -32,6 +32,7 @@ import java.util.List;
 @Setter
 public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryRepository<E, PK> {
     private QueryExecutor queryExecutor;
+    private QueryExecutor queryExecutor1;
     private QueryExecutor queryExecutor2;
     private QueryExecutor queryExecutor3;
 
@@ -40,6 +41,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
         super.afterPropertiesSet();
         RepositoryBuilder repositoryBuilder = getRepositoryBuilder();
         repositoryBuilder.buildQueryRepository(this);
+        repositoryBuilder.buildQueryRepository1(this);
         repositoryBuilder.buildQueryRepository2(this);
         repositoryBuilder.buildQueryRepository3(this);
     }
@@ -63,6 +65,13 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
     private QueryExecutor adaptive(Options options) {
         QueryMode queryMode = options.getOption(QueryMode.class);
+        if (queryMode == null) {
+            queryMode = QueryMode.SQL_EXECUTE2;
+        }
+        // 上下文未匹配
+        if (!matches(options, getRootRepository())) {
+            return queryExecutor1;
+        }
         if (queryMode == QueryMode.STEPWISE2) {
             return queryExecutor2;
 

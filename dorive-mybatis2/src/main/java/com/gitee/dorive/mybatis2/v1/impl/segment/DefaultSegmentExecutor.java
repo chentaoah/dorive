@@ -19,13 +19,13 @@ package com.gitee.dorive.mybatis2.v1.impl.segment;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
-import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.mybatis2.v1.entity.SelectSegment;
 import com.gitee.dorive.mybatis2.v1.entity.TableSegment;
 import com.gitee.dorive.query2.v1.api.SegmentExecutor;
@@ -34,6 +34,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class DefaultSegmentExecutor implements SegmentExecutor {
     private final String primaryKey;
     private final String primaryKeyAlias;
     private final SqlRunner sqlRunner;
-    private final Executor executor;
+    private final AbstractRepository<Object, Object> repository;
 
     @Override
     public void buildSelectColumns(SegmentInfo segmentInfo) {
@@ -105,11 +106,22 @@ public class DefaultSegmentExecutor implements SegmentExecutor {
         String sql = selectSql + fromWhereSql + selectSegment.lastSql();
         List<Map<String, Object>> resultMaps = sqlRunner.selectList(sql, args.toArray());
         List<Object> ids = CollUtil.map(resultMaps, map -> map.get(primaryKeyAlias), true);
+
+        // 查询实体
+        List<Object> entities = Collections.emptyList();
         if (!ids.isEmpty()) {
-            example.in(primaryKey, ids);
+            Example newExample = new InnerExample().in(primaryKey, ids);
+            newExample.setOrderBy(example.getOrderBy());
+            entities = repository.selectByExample(context, newExample);
         }
-        example.setPage(null);
-        return executor.executeQuery(context, new Query(example));
+
+        Page<Object> page = example.getPage();
+        if (page != null) {
+            page.setRecords(entities);
+            return new Result<>(page);
+        } else {
+            return new Result<>(entities);
+        }
     }
 
 }

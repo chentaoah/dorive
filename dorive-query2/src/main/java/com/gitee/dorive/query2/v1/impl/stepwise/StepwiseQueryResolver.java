@@ -22,7 +22,6 @@ import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
 import com.gitee.dorive.query2.v1.entity.QueryConfig;
 import com.gitee.dorive.query2.v1.entity.QueryNode;
@@ -49,15 +48,6 @@ public class StepwiseQueryResolver implements QueryResolver {
         Assert.notNull(queryConfig, "No query config found!");
         List<QueryNode> reversedQueryNodes = queryConfig.getReversedQueryNodes();
         ExampleResolver exampleResolver = queryConfig.getExampleResolver();
-
-        RepositoryItem rootRepository = repositoryContext.getRootRepository();
-        if (!repositoryContext.matches(context, rootRepository)) {
-            Example rootExample = new InnerExample();
-            rootExample.setAbandoned(true);
-            rootExample.setOrderBy(exampleResolver.newOrderBy(query));
-            rootExample.setPage(exampleResolver.newPage(query));
-            return rootExample;
-        }
 
         Map<RepositoryNode, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
         Example rootExample = null;

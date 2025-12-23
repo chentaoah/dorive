@@ -56,15 +56,6 @@ public class SegmentQueryResolver implements QueryResolver {
         List<QueryNode> reversedQueryNodes = queryConfig.getReversedQueryNodes();
         ExampleResolver exampleResolver = queryConfig.getExampleResolver();
 
-        RepositoryItem repositoryItem = repositoryContext.getRootRepository();
-        if (!repositoryContext.matches(context, repositoryItem)) {
-            Example rootExample = new InnerExample();
-            rootExample.setAbandoned(true);
-            rootExample.setOrderBy(exampleResolver.newOrderBy(query));
-            rootExample.setPage(exampleResolver.newPage(query));
-            return rootExample;
-        }
-
         Map<RepositoryContext, String> repositoryAliasMap = new LinkedHashMap<>(8);
         List<RepositoryJoin> repositoryJoins = new ArrayList<>();
         Map<RepositoryContext, Example> repositoryExampleMap = new LinkedHashMap<>(8);
