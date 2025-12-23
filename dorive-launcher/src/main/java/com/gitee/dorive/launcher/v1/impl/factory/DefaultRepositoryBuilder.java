@@ -217,6 +217,9 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             queryConfigResolver.resolve();
             repository.setProperty(QueryConfigResolver.class, queryConfigResolver);
 
+            // 设置查询对象类型与定义的映射关系
+            repository.setClassQueryDefinitionMap(queryConfigResolver.getClassQueryDefinitionMap());
+
             // 上下文未匹配查询执行器
             QueryExecutor queryExecutor = new ContextMismatchQueryExecutor(queryConfigResolver);
             repository.setQueryExecutor1(queryExecutor);

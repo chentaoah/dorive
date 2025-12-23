@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.repository.v1.impl.repository;
 
+import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
@@ -25,12 +27,15 @@ import com.gitee.dorive.repository.v1.api.QueryRepository;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
 public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryRepository<E, PK> {
+    private Map<Class<?>, QueryDefinition> classQueryDefinitionMap;
     private QueryExecutor queryExecutor;
     private QueryExecutor queryExecutor1;
     private QueryExecutor queryExecutor2;
@@ -49,24 +54,29 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     @Override
     @SuppressWarnings("unchecked")
     public List<E> selectByQuery(Options options, Object query) {
-        return (List<E>) adaptive(options).selectByQuery(options, query);
+        return (List<E>) adaptive(options, query).selectByQuery(options, query);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByQuery(Options options, Object query) {
-        return (Page<E>) adaptive(options).selectPageByQuery(options, query);
+        return (Page<E>) adaptive(options, query).selectPageByQuery(options, query);
     }
 
     @Override
     public long selectCountByQuery(Options options, Object query) {
-        return adaptive(options).selectCountByQuery(options, query);
+        return adaptive(options, query).selectCountByQuery(options, query);
     }
 
-    private QueryExecutor adaptive(Options options) {
+    private QueryExecutor adaptive(Options options, Object query) {
         QueryMode queryMode = options.getOption(QueryMode.class);
         if (queryMode == null) {
-            queryMode = QueryMode.SQL_EXECUTE2;
+            String method = getMethod(query);
+            if (StringUtils.isNotBlank(method)) {
+                queryMode = QueryMode.SQL_CUSTOM;
+            } else {
+                queryMode = QueryMode.SQL_EXECUTE2;
+            }
         }
         // 上下文未匹配
         if (!matches(options, getRootRepository())) {
@@ -77,10 +87,14 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
         } else if (queryMode == QueryMode.SQL_EXECUTE2) {
             return queryExecutor3;
-
-        } else {
-            return queryExecutor;
         }
+        return queryExecutor;
+    }
+
+    private String getMethod(Object query) {
+        QueryDefinition queryDefinition = classQueryDefinitionMap.get(query.getClass());
+        Assert.notNull(queryDefinition, "No query definition found!");
+        return queryDefinition.getQueryDef().getMethod();
     }
 
 }

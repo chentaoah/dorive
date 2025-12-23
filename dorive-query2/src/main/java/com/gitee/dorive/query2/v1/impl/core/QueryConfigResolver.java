@@ -40,6 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class QueryConfigResolver {
 
     private RepositoryContext repositoryContext;
+    private Map<Class<?>, QueryDefinition> classQueryDefinitionMap = new ConcurrentHashMap<>();
     private Map<Class<?>, QueryConfig> classQueryConfigMap = new ConcurrentHashMap<>();
 
     public QueryConfigResolver(RepositoryContext repositoryContext) {
@@ -59,6 +60,7 @@ public class QueryConfigResolver {
     private void resolveQueryClass(Class<?> queryClass) {
         com.gitee.dorive.base.v1.aggregate.api.QueryResolver queryResolver = SpringUtil.getBean(com.gitee.dorive.base.v1.aggregate.api.QueryResolver.class);
         QueryDefinition queryDefinition = queryResolver.resolve(queryClass);
+        classQueryDefinitionMap.put(queryClass, queryDefinition);
 
         Map<RepositoryNode, QueryNode> queryNodeMap = new LinkedHashMap<>();
         for (QueryFieldDefinition queryField : queryDefinition.getQueryFieldDefinitions()) {
