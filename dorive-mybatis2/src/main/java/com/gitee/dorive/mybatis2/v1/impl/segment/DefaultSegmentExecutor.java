@@ -96,12 +96,9 @@ public class DefaultSegmentExecutor implements SegmentExecutor {
         SelectSegment selectSegment = (SelectSegment) segmentInfo.getSegment();
         Example example = segmentInfo.getExample();
 
-        String selectSql = selectSegment.selectSql();
-        String fromWhereSql = selectSegment.fromWhereSql();
-        List<Object> args = selectSegment.getArgs();
-
         // 查询主键
-        String sql = selectSql + fromWhereSql + selectSegment.lastSql();
+        String sql = selectSegment.selectSql() + selectSegment.fromWhereSql() + selectSegment.lastSql();
+        List<Object> args = selectSegment.getArgs();
         List<Map<String, Object>> resultMaps = sqlRunner.selectList(sql, args.toArray());
         List<Object> ids = CollUtil.map(resultMaps, map -> map.get(primaryKeyAlias), true);
 
