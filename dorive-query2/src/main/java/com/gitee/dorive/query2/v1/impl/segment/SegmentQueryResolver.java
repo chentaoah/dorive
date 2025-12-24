@@ -47,6 +47,7 @@ public class SegmentQueryResolver implements QueryResolver {
 
     private final RepositoryNodeResolver repositoryNodeResolver;
     private final QueryConfigResolver queryConfigResolver;
+    private final RepositoryJoinResolver repositoryJoinResolver;
     private final SegmentResolver segmentResolver;
 
     @Override
@@ -86,7 +87,6 @@ public class SegmentQueryResolver implements QueryResolver {
             // 如果被激活，则解析连接条件
             Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryNode);
             if (exampleMap != null) {
-                RepositoryJoinResolver repositoryJoinResolver = repositoryContext.getProperty(RepositoryJoinResolver.class);
                 List<RepositoryJoin> joins = repositoryJoinResolver.resolve(context, exampleMap.keySet());
                 repositoryJoins.addAll(joins);
                 // 额外分配别名和筛选条件

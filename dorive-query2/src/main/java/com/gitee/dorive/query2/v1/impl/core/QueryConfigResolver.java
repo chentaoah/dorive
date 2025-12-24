@@ -45,9 +45,10 @@ public class QueryConfigResolver {
 
     public QueryConfigResolver(RepositoryContext repositoryContext) {
         this.repositoryContext = repositoryContext;
+        resolve();
     }
 
-    public void resolve() {
+    private void resolve() {
         RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
         Class<?>[] queries = repositoryDef.getQueries();
         if (queries != null && queries.length > 0) {

@@ -45,15 +45,12 @@ public class RepositoryNodeResolver {
 
     public RepositoryNodeResolver(RepositoryContext repositoryContext) {
         this.repositoryContext = repositoryContext;
+        resolve("", Object.class, "", null, null, null, repositoryContext);
     }
 
-    public void resolve() {
-        doResolve("", Object.class, "", null, null, null, repositoryContext);
-    }
-
-    private void doResolve(String path, Class<?> entityClass, String name,
-                           RepositoryNode parent, String lastAccessPath,
-                           RepositoryItem lastRepositoryItem, RepositoryContext repositoryContext) {
+    private void resolve(String path, Class<?> entityClass, String name,
+                         RepositoryNode parent, String lastAccessPath,
+                         RepositoryItem lastRepositoryItem, RepositoryContext repositoryContext) {
         RepositoryItem rootRepository = repositoryContext.getRootRepository();
         path = StringUtils.isNotBlank(path) ? path : rootRepository.getAccessPath();
         entityClass = entityClass != Object.class ? entityClass : rootRepository.getEntityClass();
@@ -80,7 +77,7 @@ public class RepositoryNodeResolver {
         for (RepositoryItem repositoryItem : repositoryContext.getSubRepositories()) {
             RepositoryContext subRepositoryContext = repositoryItem.getRepositoryContext();
             if (subRepositoryContext != null) {
-                doResolve(getPath(path) + repositoryItem.getAccessPath(), repositoryItem.getEntityClass(), repositoryItem.getName(),
+                resolve(getPath(path) + repositoryItem.getAccessPath(), repositoryItem.getEntityClass(), repositoryItem.getName(),
                         repositoryNode, repositoryItem.getAccessPath(),
                         repositoryItem, subRepositoryContext);
             }

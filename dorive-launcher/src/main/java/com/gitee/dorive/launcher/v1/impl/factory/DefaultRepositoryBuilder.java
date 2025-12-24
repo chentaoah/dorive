@@ -26,7 +26,7 @@ import com.gitee.dorive.base.v1.common.enums.JoinType;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.factory.enums.Category;
+import com.gitee.dorive.base.v1.factory.api.Translator;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
@@ -46,8 +46,6 @@ import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
-import com.gitee.dorive.factory.v1.api.EntityMapper;
-import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.joiner.v1.impl.joiner.DefaultEntityJoiner;
 import com.gitee.dorive.mybatis.v1.impl.handler.SqlBuildQueryHandler;
 import com.gitee.dorive.mybatis.v1.impl.handler.SqlCustomQueryHandler;
@@ -84,6 +82,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * RepositoryContext's properties:
+ * EntityStoreInfo、EntityMappers、TranslatorManager、Translator、
+ * MergedRepositoryResolver、QueryTypeResolver、
+ * RepositoryNodeResolver、QueryConfigResolver、StepwiseQuerier
+ * <p>
+ * DefaultRepository's properties:
+ * EntityStoreInfo、EntityMappers、TranslatorManager、Translator、ExampleConverter、RepositoryContext
+ * <p>
+ * RepositoryItem's properties:
+ * ExampleBuilder、EntityJoiner、EntityHandler
+ */
 public class DefaultRepositoryBuilder implements RepositoryBuilder {
 
     @Override
@@ -185,10 +195,9 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             queryHandlerMap.put(QueryMode.STEPWISE, new StepwiseQueryHandler());
             if (repositoryContext instanceof AbstractMybatisRepository) {
                 AbstractMybatisRepository<?, ?> mybatisRepository = (AbstractMybatisRepository<?, ?>) repository;
-                EntityMappers entityMappers = mybatisRepository.getProperty(EntityMappers.class);
-                EntityMapper entityMapper = entityMappers.getEntityMapper(Category.ENTITY_DATABASE.name());
+                Translator translator = mybatisRepository.getProperty(Translator.class);
                 queryHandlerMap.put(QueryMode.SQL_BUILD, new SqlBuildQueryHandler(repository));
-                queryHandlerMap.put(QueryMode.SQL_EXECUTE, new SqlExecuteQueryHandler(repository, mybatisRepository.getSqlRunner(), entityMapper));
+                queryHandlerMap.put(QueryMode.SQL_EXECUTE, new SqlExecuteQueryHandler(repository, mybatisRepository.getSqlRunner(), translator));
                 queryHandlerMap.put(QueryMode.SQL_CUSTOM, new SqlCustomQueryHandler(repository, mybatisRepository.getProperty(EntityStoreInfo.class)));
             }
 
@@ -209,11 +218,9 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
             // 仓储解析器
             RepositoryNodeResolver repositoryNodeResolver = new RepositoryNodeResolver(repository);
-            repositoryNodeResolver.resolve();
             repository.setProperty(RepositoryNodeResolver.class, repositoryNodeResolver);
             // 查询对象解析器
             QueryConfigResolver queryConfigResolver = new QueryConfigResolver(repository);
-            queryConfigResolver.resolve();
             repository.setProperty(QueryConfigResolver.class, queryConfigResolver);
             // 设置查询对象类型与定义的映射关系
             repository.setClassQueryDefinitionMap(queryConfigResolver.getClassQueryDefinitionMap());
@@ -253,19 +260,17 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             QueryConfigResolver queryConfigResolver = repository.getProperty(QueryConfigResolver.class);
             // 连接解析器
             RepositoryJoinResolver repositoryJoinResolver = new RepositoryJoinResolver(repository);
-            repository.setProperty(RepositoryJoinResolver.class, repositoryJoinResolver);
 
             EntityElement entityElement = repositoryContext.getEntityElement();
             String primaryKey = entityElement.getPrimaryKey();
 
-            EntityMappers entityMappers = repository.getProperty(EntityMappers.class);
-            EntityMapper entityMapper = entityMappers.getEntityMapper(Category.ENTITY_DATABASE.name());
-            String primaryKeyAlias = entityMapper.toAlias(primaryKey);
+            Translator translator = repository.getProperty(Translator.class);
+            String primaryKeyAlias = translator.toAlias(primaryKey);
 
             SegmentResolver segmentResolver = new DefaultSegmentResolver();
             SegmentExecutor segmentExecutor = new DefaultSegmentExecutor(primaryKey, primaryKeyAlias, repository.getSqlRunner(), (AbstractRepository<Object, Object>) repository);
             // 查询执行器
-            QueryResolver queryResolver = new SegmentQueryResolver(repositoryNodeResolver, queryConfigResolver, segmentResolver);
+            QueryResolver queryResolver = new SegmentQueryResolver(repositoryNodeResolver, queryConfigResolver, repositoryJoinResolver, segmentResolver);
             QueryExecutor queryExecutor = new SegmentQueryExecutor(queryResolver, segmentExecutor);
             repository.setQueryExecutor3(queryExecutor);
         }

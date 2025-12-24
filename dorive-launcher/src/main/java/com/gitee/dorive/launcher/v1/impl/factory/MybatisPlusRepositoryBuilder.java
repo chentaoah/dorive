@@ -101,11 +101,11 @@ public class MybatisPlusRepositoryBuilder {
         defaultRepository.setEntityElement(entityElement);
         defaultRepository.setOperationFactory(operationFactory);
         defaultRepository.setExecutor(executor);
+        defaultRepository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         defaultRepository.setProperty(EntityMappers.class, entityMappers);
         defaultRepository.setProperty(TranslatorManager.class, translatorManager);
         defaultRepository.setProperty(Translator.class, translatorManager.getTranslator(Category.ENTITY_DATABASE.name()));
         defaultRepository.setProperty(ExampleConverter.class, (ExampleConverter) executor);
-        defaultRepository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         return defaultRepository;
     }
 
