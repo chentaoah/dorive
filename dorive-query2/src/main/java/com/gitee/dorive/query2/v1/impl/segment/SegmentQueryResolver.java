@@ -25,7 +25,6 @@ import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.query2.v1.api.QueryResolver;
 import com.gitee.dorive.query2.v1.api.SegmentResolver;
 import com.gitee.dorive.query2.v1.entity.QueryConfig;
@@ -125,20 +124,11 @@ public class SegmentQueryResolver implements QueryResolver {
         }
 
         // 转化筛选条件
-        convertExamples(context, repositoryExampleMap);
+        repositoryExampleMap.forEach(((repository, eachExample) -> repository.getProperty(ExampleConverter.class).convert(context, eachExample)));
         Collections.reverse(repositoryJoins);
         Object segment = segmentResolver.resolve(repositoryAliasMap, repositoryJoins, repositoryExampleMap, segmentInfo.getRepository(), example);
         segmentInfo.setSegment(segment);
 
         return segmentInfo;
-    }
-
-    private void convertExamples(Context context, Map<RepositoryContext, Example> repositoryExampleMap) {
-        repositoryExampleMap.forEach(((repository, example) -> {
-            RepositoryItem rootRepository = repository.getRootRepository();
-            DefaultRepository defaultRepository = (DefaultRepository) rootRepository.getProxyRepository();
-            ExampleConverter exampleConverter = defaultRepository.getProperty(ExampleConverter.class);
-            exampleConverter.convert(context, example);
-        }));
     }
 }

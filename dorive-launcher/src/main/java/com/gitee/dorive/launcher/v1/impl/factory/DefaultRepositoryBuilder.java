@@ -84,7 +84,7 @@ import java.util.Map;
 
 /**
  * RepositoryContext's properties:
- * EntityStoreInfo、EntityMappers、TranslatorManager、Translator、
+ * EntityStoreInfo、EntityMappers、TranslatorManager、Translator、ExampleConverter
  * MergedRepositoryResolver、QueryTypeResolver、
  * RepositoryNodeResolver、QueryConfigResolver、StepwiseQuerier
  * <p>
