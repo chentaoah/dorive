@@ -65,6 +65,7 @@ import com.gitee.dorive.query2.v1.api.SegmentExecutor;
 import com.gitee.dorive.query2.v1.api.SegmentResolver;
 import com.gitee.dorive.query2.v1.impl.core.QueryConfigResolver;
 import com.gitee.dorive.query2.v1.impl.core.RepositoryNodeResolver;
+import com.gitee.dorive.query2.v1.impl.custom.CustomQueryExecutor;
 import com.gitee.dorive.query2.v1.impl.fallback.ContextMismatchQueryExecutor;
 import com.gitee.dorive.query2.v1.impl.segment.RepositoryJoinResolver;
 import com.gitee.dorive.query2.v1.impl.segment.SegmentQueryExecutor;
@@ -162,7 +163,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void buildQueryRepository(RepositoryContext repositoryContext) {
+    public void buildQueryExecutor(RepositoryContext repositoryContext) {
         // 查询
         if (repositoryContext instanceof AbstractQueryRepository) {
             AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
@@ -202,24 +203,20 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     }
 
     @Override
-    public void buildQueryRepository1(RepositoryContext repositoryContext) {
+    public void buildQueryExecutor1(RepositoryContext repositoryContext) {
         // 查询
         if (repositoryContext instanceof AbstractQueryRepository) {
             AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
-
             // 仓储解析器
             RepositoryNodeResolver repositoryNodeResolver = new RepositoryNodeResolver(repository);
             repositoryNodeResolver.resolve();
             repository.setProperty(RepositoryNodeResolver.class, repositoryNodeResolver);
-
             // 查询对象解析器
             QueryConfigResolver queryConfigResolver = new QueryConfigResolver(repository);
             queryConfigResolver.resolve();
             repository.setProperty(QueryConfigResolver.class, queryConfigResolver);
-
             // 设置查询对象类型与定义的映射关系
             repository.setClassQueryDefinitionMap(queryConfigResolver.getClassQueryDefinitionMap());
-
             // 上下文未匹配查询执行器
             QueryExecutor queryExecutor = new ContextMismatchQueryExecutor(queryConfigResolver);
             repository.setQueryExecutor1(queryExecutor);
@@ -228,18 +225,15 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void buildQueryRepository2(RepositoryContext repositoryContext) {
+    public void buildQueryExecutor2(RepositoryContext repositoryContext) {
         // 查询
         if (repositoryContext instanceof AbstractQueryRepository) {
             AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
-
             // 查询对象解析器
             QueryConfigResolver queryConfigResolver = repository.getProperty(QueryConfigResolver.class);
-
             // 逆向查询器
             StepwiseQuerier stepwiseQuerier = new StepwiseQuerier(repository);
             repository.setProperty(StepwiseQuerier.class, stepwiseQuerier);
-
             // 查询执行器
             QueryResolver queryResolver = new StepwiseQueryResolver(repository, queryConfigResolver);
             QueryExecutor queryExecutor = new StepwiseQueryExecutor(queryResolver, (AbstractRepository<Object, Object>) repository);
@@ -249,16 +243,14 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void buildQueryRepository3(RepositoryContext repositoryContext) {
+    public void buildQueryExecutor3(RepositoryContext repositoryContext) {
         // 查询
         if (repositoryContext instanceof AbstractMybatisRepository) {
             AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
-
             // 仓储解析器
             RepositoryNodeResolver repositoryNodeResolver = repository.getProperty(RepositoryNodeResolver.class);
             // 查询对象解析器
             QueryConfigResolver queryConfigResolver = repository.getProperty(QueryConfigResolver.class);
-
             // 连接解析器
             RepositoryJoinResolver repositoryJoinResolver = new RepositoryJoinResolver(repository);
             repository.setProperty(RepositoryJoinResolver.class, repositoryJoinResolver);
@@ -272,11 +264,29 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
 
             SegmentResolver segmentResolver = new DefaultSegmentResolver();
             SegmentExecutor segmentExecutor = new DefaultSegmentExecutor(primaryKey, primaryKeyAlias, repository.getSqlRunner(), (AbstractRepository<Object, Object>) repository);
-
             // 查询执行器
             QueryResolver queryResolver = new SegmentQueryResolver(repository, repositoryNodeResolver, queryConfigResolver, segmentResolver);
             QueryExecutor queryExecutor = new SegmentQueryExecutor(queryResolver, segmentExecutor);
             repository.setQueryExecutor3(queryExecutor);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void buildQueryExecutor4(RepositoryContext repositoryContext) {
+        // 查询
+        if (repositoryContext instanceof AbstractMybatisRepository) {
+            AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
+            // 查询对象解析器
+            QueryConfigResolver queryConfigResolver = repository.getProperty(QueryConfigResolver.class);
+            // 主键
+            EntityElement entityElement = repositoryContext.getEntityElement();
+            String primaryKey = entityElement.getPrimaryKey();
+            // 数据库信息
+            EntityStoreInfo entityStoreInfo = repository.getProperty(EntityStoreInfo.class);
+            // 查询执行器
+            QueryExecutor queryExecutor = new CustomQueryExecutor(queryConfigResolver, primaryKey, entityStoreInfo, (AbstractRepository<Object, Object>) repository);
+            repository.setQueryExecutor4(queryExecutor);
         }
     }
 

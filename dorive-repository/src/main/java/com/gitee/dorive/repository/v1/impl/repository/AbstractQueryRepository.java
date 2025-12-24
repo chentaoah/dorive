@@ -18,6 +18,7 @@
 package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.base.v1.common.def.QueryDef;
 import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
@@ -40,43 +41,40 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
     private QueryExecutor queryExecutor1;
     private QueryExecutor queryExecutor2;
     private QueryExecutor queryExecutor3;
+    private QueryExecutor queryExecutor4;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
         RepositoryBuilder repositoryBuilder = getRepositoryBuilder();
-        repositoryBuilder.buildQueryRepository(this);
-        repositoryBuilder.buildQueryRepository1(this);
-        repositoryBuilder.buildQueryRepository2(this);
-        repositoryBuilder.buildQueryRepository3(this);
+        repositoryBuilder.buildQueryExecutor(this);
+        repositoryBuilder.buildQueryExecutor1(this);
+        repositoryBuilder.buildQueryExecutor2(this);
+        repositoryBuilder.buildQueryExecutor3(this);
+        repositoryBuilder.buildQueryExecutor4(this);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<E> selectByQuery(Options options, Object query) {
-        return (List<E>) adaptive(options, query).selectByQuery(options, query);
+        return (List<E>) adaptive(options, query, false).selectByQuery(options, query);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Page<E> selectPageByQuery(Options options, Object query) {
-        return (Page<E>) adaptive(options, query).selectPageByQuery(options, query);
+        return (Page<E>) adaptive(options, query, false).selectPageByQuery(options, query);
     }
 
     @Override
     public long selectCountByQuery(Options options, Object query) {
-        return adaptive(options, query).selectCountByQuery(options, query);
+        return adaptive(options, query, true).selectCountByQuery(options, query);
     }
 
-    private QueryExecutor adaptive(Options options, Object query) {
+    private QueryExecutor adaptive(Options options, Object query, boolean count) {
         QueryMode queryMode = options.getOption(QueryMode.class);
         if (queryMode == null) {
-            String method = getMethod(query);
-            if (StringUtils.isNotBlank(method)) {
-                queryMode = QueryMode.SQL_CUSTOM;
-            } else {
-                queryMode = QueryMode.SQL_EXECUTE2;
-            }
+            queryMode = isCustomMethod(query, count) ? QueryMode.SQL_CUSTOM2 : QueryMode.SQL_EXECUTE2;
         }
         // 上下文未匹配
         if (!matches(options, getRootRepository())) {
@@ -87,14 +85,19 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractEventReposi
 
         } else if (queryMode == QueryMode.SQL_EXECUTE2) {
             return queryExecutor3;
+
+        } else if (queryMode == QueryMode.SQL_CUSTOM2) {
+            return queryExecutor4;
         }
         return queryExecutor;
     }
 
-    private String getMethod(Object query) {
+    private boolean isCustomMethod(Object query, boolean count) {
         QueryDefinition queryDefinition = classQueryDefinitionMap.get(query.getClass());
         Assert.notNull(queryDefinition, "No query definition found!");
-        return queryDefinition.getQueryDef().getMethod();
+        QueryDef queryDef = queryDefinition.getQueryDef();
+        return (StringUtils.isNotBlank(queryDef.getMethod()) && !count)
+                || (StringUtils.isNotBlank(queryDef.getCountMethod()) && count);
     }
 
 }

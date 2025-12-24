@@ -40,13 +40,15 @@ public interface RepositoryBuilder {
 
     EntityOpHandler newEntityOpHandler(RepositoryContext repositoryContext);
 
-    void buildQueryRepository(RepositoryContext repositoryContext);
+    void buildQueryExecutor(RepositoryContext repositoryContext);
 
-    void buildQueryRepository1(RepositoryContext repositoryContext);
+    void buildQueryExecutor1(RepositoryContext repositoryContext);
 
-    void buildQueryRepository2(RepositoryContext repositoryContext);
+    void buildQueryExecutor2(RepositoryContext repositoryContext);
 
-    void buildQueryRepository3(RepositoryContext repositoryContext);
+    void buildQueryExecutor3(RepositoryContext repositoryContext);
+
+    void buildQueryExecutor4(RepositoryContext repositoryContext);
 
     void buildMybatisRepository(RepositoryContext repositoryContext);
 

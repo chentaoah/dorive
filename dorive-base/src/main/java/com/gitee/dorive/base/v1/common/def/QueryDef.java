@@ -26,6 +26,7 @@ import java.lang.reflect.AnnotatedElement;
 @Data
 public class QueryDef {
     private String method;
+    private String countMethod;
     private String[] ignoreFields;
     private String sortByField;
     private String orderField;
@@ -37,6 +38,7 @@ public class QueryDef {
         if (query != null) {
             QueryDef queryDef = new QueryDef();
             queryDef.setMethod(query.method());
+            queryDef.setCountMethod(query.countMethod());
             queryDef.setIgnoreFields(query.ignoreFields());
             queryDef.setSortByField(query.sortByField());
             queryDef.setOrderField(query.orderField());

@@ -27,6 +27,8 @@ public @interface Query {
 
     String method() default "";
 
+    String countMethod() default "";
+
     String[] ignoreFields() default {};
 
     String sortByField() default "sortBy";
