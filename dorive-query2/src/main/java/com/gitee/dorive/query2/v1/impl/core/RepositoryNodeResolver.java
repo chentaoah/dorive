@@ -31,7 +31,7 @@ import java.util.Map;
 @Data
 public class RepositoryNodeResolver {
 
-    private RepositoryContext repository;
+    private RepositoryContext repositoryContext;
     // all
     private List<RepositoryNode> repositoryNodes = new ArrayList<>();
     // path ==> RepositoryNode
@@ -43,17 +43,18 @@ public class RepositoryNodeResolver {
     // RepositoryContext ==> RepositoryNode
     private Map<RepositoryContext, RepositoryNode> repoRepositoryNodeMap = new LinkedHashMap<>();
 
-    public RepositoryNodeResolver(RepositoryContext repository) {
-        this.repository = repository;
+    public RepositoryNodeResolver(RepositoryContext repositoryContext) {
+        this.repositoryContext = repositoryContext;
     }
 
     public void resolve() {
-        doResolve("", Object.class, "", null, null, repository);
+        doResolve("", Object.class, "", null, null, null, repositoryContext);
     }
 
     private void doResolve(String path, Class<?> entityClass, String name,
-                           RepositoryNode parent, String lastAccessPath, RepositoryContext repository) {
-        RepositoryItem rootRepository = repository.getRootRepository();
+                           RepositoryNode parent, String lastAccessPath,
+                           RepositoryItem lastRepositoryItem, RepositoryContext repositoryContext) {
+        RepositoryItem rootRepository = repositoryContext.getRootRepository();
         path = StringUtils.isNotBlank(path) ? path : rootRepository.getAccessPath();
         entityClass = entityClass != Object.class ? entityClass : rootRepository.getEntityClass();
         name = StringUtils.isNotBlank(name) ? name : rootRepository.getName();
@@ -61,9 +62,10 @@ public class RepositoryNodeResolver {
         RepositoryNode repositoryNode = new RepositoryNode();
         repositoryNode.setParent(parent);
         repositoryNode.setLastAccessPath(lastAccessPath);
+        repositoryNode.setLastRepositoryItem(lastRepositoryItem);
         repositoryNode.setPath(path);
         repositoryNode.setSequence(repositoryNodes.size() + 1);
-        repositoryNode.setRepository(repository);
+        repositoryNode.setRepositoryContext(repositoryContext);
         repositoryNode.setChildren(new ArrayList<>(8));
         if (parent != null) {
             parent.getChildren().add(repositoryNode);
@@ -73,13 +75,14 @@ public class RepositoryNodeResolver {
         pathRepositoryNodeMap.putIfAbsent(path, repositoryNode);
         classPathsMap.computeIfAbsent(entityClass, k -> new ArrayList<>(4)).add(path);
         namePathsMap.computeIfAbsent(name, k -> new ArrayList<>(4)).add(path);
-        repoRepositoryNodeMap.put(repository, repositoryNode);
+        repoRepositoryNodeMap.put(repositoryContext, repositoryNode);
 
-        for (RepositoryItem repositoryItem : repository.getSubRepositories()) {
-            RepositoryContext subRepository = repositoryItem.getRepositoryContext();
-            if (subRepository != null) {
+        for (RepositoryItem repositoryItem : repositoryContext.getSubRepositories()) {
+            RepositoryContext subRepositoryContext = repositoryItem.getRepositoryContext();
+            if (subRepositoryContext != null) {
                 doResolve(getPath(path) + repositoryItem.getAccessPath(), repositoryItem.getEntityClass(), repositoryItem.getName(),
-                        repositoryNode, repositoryItem.getAccessPath(), subRepository);
+                        repositoryNode, repositoryItem.getAccessPath(),
+                        repositoryItem, subRepositoryContext);
             }
         }
     }
@@ -88,8 +91,8 @@ public class RepositoryNodeResolver {
         return "/".equals(path) ? "" : path;
     }
 
-    public RepositoryNode findRepositoryNode(RepositoryContext repository) {
-        return repoRepositoryNodeMap.get(repository);
+    public RepositoryNode findRepositoryNode(RepositoryContext repositoryContext) {
+        return repoRepositoryNodeMap.get(repositoryContext);
     }
 
 }

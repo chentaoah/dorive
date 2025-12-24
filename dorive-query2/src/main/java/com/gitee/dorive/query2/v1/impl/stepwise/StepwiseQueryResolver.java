@@ -56,12 +56,12 @@ public class StepwiseQueryResolver implements QueryResolver {
             RepositoryNode repositoryNode = queryNode.getRepositoryNode();
             RepositoryNode parent = repositoryNode.getParent();
             String lastAccessPath = repositoryNode.getLastAccessPath();
-            RepositoryContext repository = repositoryNode.getRepository();
+            RepositoryContext repositoryContext = repositoryNode.getRepositoryContext();
 
             Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryNode);
             Example example;
             if (exampleMap != null) {
-                StepwiseQuerier stepwiseQuerier = repository.getProperty(StepwiseQuerier.class);
+                StepwiseQuerier stepwiseQuerier = repositoryContext.getProperty(StepwiseQuerier.class);
                 example = stepwiseQuerier.executeQuery(context, exampleMap);
             } else {
                 example = new InnerExample();

@@ -19,6 +19,7 @@ package com.gitee.dorive.query2.v1.impl.segment;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.api.Selector;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
@@ -51,6 +52,10 @@ public class SegmentQueryResolver implements QueryResolver {
 
     @Override
     public Object resolve(Context context, Object query) {
+        Selector selector = context.getOption(Selector.class);
+        RepositoryContext selectedRepository = null;
+        String selectRepositoryAlias = null;
+
         QueryConfig queryConfig = queryConfigResolver.findQueryConfig(query.getClass());
         Assert.notNull(queryConfig, "No query config found!");
         List<QueryNode> reversedQueryNodes = queryConfig.getReversedQueryNodes();
@@ -68,16 +73,24 @@ public class SegmentQueryResolver implements QueryResolver {
             RepositoryNode repositoryNode = queryNode.getRepositoryNode();
             RepositoryNode parent = repositoryNode.getParent();
             String lastAccessPath = repositoryNode.getLastAccessPath();
-            RepositoryContext repository = repositoryNode.getRepository();
+            RepositoryItem lastRepositoryItem = repositoryNode.getLastRepositoryItem();
+            RepositoryContext repositoryContext = repositoryNode.getRepositoryContext();
 
             // 别名
             String alias = "t" + repositoryNode.getSequence();
-            repositoryAliasMap.put(repository, alias);
+            repositoryAliasMap.put(repositoryContext, alias);
+
+            // 选取
+            RepositoryItem repositoryItem = lastRepositoryItem != null ? lastRepositoryItem : repositoryContext.getRootRepository();
+            if (selector != null && selector.matches(repositoryItem)) {
+                selectedRepository = repositoryContext;
+                selectRepositoryAlias = alias;
+            }
 
             // 如果被激活，则解析连接条件
             Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryNode);
             if (exampleMap != null) {
-                RepositoryJoinResolver repositoryJoinResolver = repository.getProperty(RepositoryJoinResolver.class);
+                RepositoryJoinResolver repositoryJoinResolver = repositoryContext.getProperty(RepositoryJoinResolver.class);
                 List<RepositoryJoin> joins = repositoryJoinResolver.resolve(context, exampleMap.keySet());
                 repositoryJoins.addAll(joins);
                 // 额外分配别名和筛选条件
@@ -94,7 +107,7 @@ public class SegmentQueryResolver implements QueryResolver {
             // 筛选条件
             Example example = new InnerExample();
             queryNode.appendCriteria(query, example);
-            repositoryExampleMap.put(repository, example);
+            repositoryExampleMap.put(repositoryContext, example);
 
             if (parent != null) {
                 if (exampleMap != null || !example.isEmpty()) {
@@ -102,7 +115,7 @@ public class SegmentQueryResolver implements QueryResolver {
                     parentExampleMap.put(lastAccessPath, example);
                 }
             } else {
-                rootRepository = repository;
+                rootRepository = repositoryContext;
                 rootExample = example;
             }
         }
@@ -124,6 +137,8 @@ public class SegmentQueryResolver implements QueryResolver {
         SegmentInfo segmentInfo = new SegmentInfo();
         segmentInfo.setSegment(segment);
         segmentInfo.setExample(rootExample);
+        segmentInfo.setRepository(selectedRepository);
+        segmentInfo.setRepositoryAlias(selectRepositoryAlias);
         return segmentInfo;
     }
 

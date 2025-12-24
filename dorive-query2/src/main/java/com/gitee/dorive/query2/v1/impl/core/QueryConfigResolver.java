@@ -132,7 +132,7 @@ public class QueryConfigResolver {
             RepositoryNode repositoryNode = pathRepositoryNodeMap.get(eachPath);
             Assert.notNull(repositoryNode, "No merged repository found! path: {}", eachPath);
 
-            RepositoryContext repositoryContext = repositoryNode.getRepository();
+            RepositoryContext repositoryContext = repositoryNode.getRepositoryContext();
             EntityElement entityElement = repositoryContext.getEntityElement();
             Class<?> entityClass = repositoryContext.getEntityClass();
             Assert.isTrue(entityElement.hasField(field),

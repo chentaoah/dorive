@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.repository.v1.api;
+package com.gitee.dorive.base.v1.mybatis.api;
 
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.repository.v1.entity.sql.CountQuery;
+import com.gitee.dorive.base.v1.mybatis.entity.CountQuery;
 
 import java.util.Map;
 

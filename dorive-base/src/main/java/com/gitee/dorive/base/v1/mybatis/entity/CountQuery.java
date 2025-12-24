@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.repository.v1.entity.sql;
+package com.gitee.dorive.base.v1.mybatis.entity;
 
 import com.gitee.dorive.base.v1.core.api.Selector;
 import lombok.AllArgsConstructor;

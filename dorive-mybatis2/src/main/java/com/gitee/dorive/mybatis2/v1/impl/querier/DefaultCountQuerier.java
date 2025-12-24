@@ -15,70 +15,70 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.launcher.v1.impl.querier;
+package com.gitee.dorive.mybatis2.v1.impl.querier;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.factory.v1.api.EntityMapper;
-import com.gitee.dorive.factory.v1.api.EntityMappers;
-import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
+import com.gitee.dorive.base.v1.core.api.Selector;
+import com.gitee.dorive.base.v1.core.entity.ctx.DefaultContext;
+import com.gitee.dorive.base.v1.factory.api.Translator;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
-import com.gitee.dorive.base.v1.factory.enums.Category;
-import com.gitee.dorive.mybatis.v1.entity.SelectSegment;
-import com.gitee.dorive.mybatis.v1.entity.TableSegment;
 import com.gitee.dorive.base.v1.mybatis.entity.CountQuery;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
-import com.gitee.dorive.mybatis.v1.impl.segment.SelectSegmentBuilder;
-import com.gitee.dorive.query.v1.api.QueryHandler;
-import com.gitee.dorive.query.v1.entity.MergedRepository;
-import com.gitee.dorive.query.v1.entity.QueryContext;
-import com.gitee.dorive.query.v1.entity.QueryUnit;
-import com.gitee.dorive.base.v1.query.enums.QueryMode;
-import com.gitee.dorive.base.v1.query.enums.ResultType;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.mybatis2.v1.entity.SelectSegment;
+import com.gitee.dorive.mybatis2.v1.entity.TableSegment;
+import com.gitee.dorive.query2.v1.api.QueryResolver;
+import com.gitee.dorive.query2.v1.entity.segment.SegmentInfo;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
-public class SqlCountQuerier implements CountQuerier {
+public class DefaultCountQuerier implements CountQuerier {
 
-    private final AbstractMybatisRepository<?, ?> repository;
-    private final QueryHandler queryHandler;
+    private final RepositoryContext repository;
+    private final QueryResolver queryResolver;
     private final SqlRunner sqlRunner;
 
     @Override
     public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
-        Object query = countQuery.getQuery();
-        QueryContext queryContext = new QueryContext(context, query.getClass(), ResultType.COUNT);
+        Selector selector = countQuery.getSelector();
+        if (selector != null) {
+            context = new DefaultContext(context);
+            context.setOption(Selector.class, selector);
+        }
 
-        context.setOption(QueryMode.class, QueryMode.SQL_BUILD);
-        queryHandler.handle(queryContext, query);
+        SegmentInfo segmentInfo = (SegmentInfo) queryResolver.resolve(context, countQuery.getQuery());
+        SelectSegment selectSegment = (SelectSegment) segmentInfo.getSegment();
+        RepositoryContext selectedRepository = (RepositoryContext) segmentInfo.getRepository();
+        String selectRepositoryAlias = segmentInfo.getRepositoryAlias();
 
-        QueryUnit queryUnit = queryContext.getQueryUnit();
-        TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
-        String tableAlias = tableSegment.getTableAlias();
-
-        SelectSegmentBuilder selectSegmentBuilder = new SelectSegmentBuilder(repository, queryContext);
-        List<QueryUnit> queryUnits = selectSegmentBuilder.select(countQuery.getSelector());
-        SelectSegment selectSegment = selectSegmentBuilder.build();
+        TableSegment tableSegment = selectSegment.getTableSegment();
         List<Object> args = selectSegment.getArgs();
 
+        String tableAlias = tableSegment.getTableAlias();
+
         // group by
-        List<String> groupBy = toAliases(queryUnit, countQuery.getGroupBy());
+        Translator translator = repository.getProperty(Translator.class);
+        List<String> groupBy = toAliases(translator, countQuery.getGroupBy());
         String groupByColumns = CollUtil.join(groupBy, ",", tableAlias + ".", null);
         selectSegment.setGroupBy("GROUP BY " + groupByColumns);
 
         // count by
-        QueryUnit selectQueryUnit = queryUnits != null && !queryUnits.isEmpty() ? queryUnits.get(0) : queryUnit;
-        String countByExp = buildCountByExp(countQuery, selectQueryUnit);
+        if (selectedRepository != null) {
+            translator = selectedRepository.getProperty(Translator.class);
+            tableAlias = selectRepositoryAlias;
+        }
+        List<String> countBy = toAliases(translator, countQuery.getCountBy());
+        String countByStr = CollUtil.join(countBy, ",',',", tableAlias + ".", null);
+        String countByExp = buildCountByExp(countQuery, countBy, countByStr);
 
         // select columns
         List<String> selectColumns = new ArrayList<>(2);
@@ -92,21 +92,11 @@ public class SqlCountQuerier implements CountQuerier {
         return countMap;
     }
 
-    private List<String> toAliases(QueryUnit queryUnit, List<String> properties) {
-        MergedRepository mergedRepository = queryUnit.getMergedRepository();
-        DefaultRepository defaultRepository = mergedRepository.getDefaultRepository();
-        EntityMappers entityMappers = defaultRepository.getProperty(EntityMappers.class);
-        EntityMapper entityMapper = entityMappers.getEntityMapper(Category.ENTITY_DATABASE.name());
-        return entityMapper.toAliases(properties);
+    private List<String> toAliases(Translator translator, List<String> properties) {
+        return properties.stream().map(translator::toAlias).collect(Collectors.toList());
     }
 
-    private String buildCountByExp(CountQuery countQuery, QueryUnit queryUnit) {
-        TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
-        String tableAlias = tableSegment.getTableAlias();
-
-        List<String> countBy = toAliases(queryUnit, countQuery.getCountBy());
-        String countByStr = CollUtil.join(countBy, ",',',", tableAlias + ".", null);
-
+    private String buildCountByExp(CountQuery countQuery, List<String> countBy, String countByStr) {
         StringBuilder countByExp = new StringBuilder();
         if (countQuery.isDistinct()) {
             countByExp.append("DISTINCT ");

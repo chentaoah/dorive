@@ -24,4 +24,6 @@ import lombok.Data;
 public class SegmentInfo {
     private Object segment;
     private Example example;
+    private Object repository;
+    private String repositoryAlias;
 }

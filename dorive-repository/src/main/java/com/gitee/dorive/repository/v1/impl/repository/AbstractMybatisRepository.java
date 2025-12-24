@@ -20,9 +20,9 @@ package com.gitee.dorive.repository.v1.impl.repository;
 import com.gitee.dorive.base.v1.common.api.ImplFactory;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
-import com.gitee.dorive.repository.v1.api.CountQuerier;
+import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
-import com.gitee.dorive.repository.v1.entity.sql.CountQuery;
+import com.gitee.dorive.base.v1.mybatis.entity.CountQuery;
 import lombok.Getter;
 import lombok.Setter;
 

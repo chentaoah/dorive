@@ -29,6 +29,7 @@ import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
+import com.gitee.dorive.base.v1.factory.api.Translator;
 import com.gitee.dorive.base.v1.factory.api.TranslatorManager;
 import com.gitee.dorive.base.v1.factory.enums.Category;
 import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
@@ -82,6 +83,7 @@ public class MybatisPlusRepositoryBuilder {
         // 命名转换器管理
         TranslatorManager translatorManager = entityMappers::getEntityMapper;
         repository.setProperty(TranslatorManager.class, translatorManager);
+        repository.setProperty(Translator.class, translatorManager.getTranslator(Category.ENTITY_DATABASE.name()));
 
         EntityMapper reEntityMapper = entityMappers.getEntityMapper(reMapper);
         EntityMapper deEntityMapper = entityMappers.getEntityMapper(deMapper);
@@ -101,6 +103,7 @@ public class MybatisPlusRepositoryBuilder {
         defaultRepository.setExecutor(executor);
         defaultRepository.setProperty(EntityMappers.class, entityMappers);
         defaultRepository.setProperty(TranslatorManager.class, translatorManager);
+        defaultRepository.setProperty(Translator.class, translatorManager.getTranslator(Category.ENTITY_DATABASE.name()));
         defaultRepository.setProperty(ExampleConverter.class, (ExampleConverter) executor);
         defaultRepository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         return defaultRepository;

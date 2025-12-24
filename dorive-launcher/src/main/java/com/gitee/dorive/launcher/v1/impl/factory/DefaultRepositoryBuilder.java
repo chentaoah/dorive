@@ -28,6 +28,7 @@ import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.enums.Category;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
+import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.query.enums.QueryMode;
@@ -48,10 +49,10 @@ import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
 import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.joiner.v1.impl.joiner.DefaultEntityJoiner;
-import com.gitee.dorive.launcher.v1.impl.querier.SqlCountQuerier;
 import com.gitee.dorive.mybatis.v1.impl.handler.SqlBuildQueryHandler;
 import com.gitee.dorive.mybatis.v1.impl.handler.SqlCustomQueryHandler;
 import com.gitee.dorive.mybatis.v1.impl.handler.SqlExecuteQueryHandler;
+import com.gitee.dorive.mybatis2.v1.impl.querier.DefaultCountQuerier;
 import com.gitee.dorive.mybatis2.v1.impl.segment.DefaultSegmentExecutor;
 import com.gitee.dorive.mybatis2.v1.impl.segment.DefaultSegmentResolver;
 import com.gitee.dorive.query.v1.api.QueryHandler;
@@ -73,7 +74,6 @@ import com.gitee.dorive.query2.v1.impl.segment.SegmentQueryResolver;
 import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQuerier;
 import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQueryExecutor;
 import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQueryResolver;
-import com.gitee.dorive.repository.v1.api.CountQuerier;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.impl.executor.EventExecutor;
 import com.gitee.dorive.repository.v1.impl.injector.RefInjector;
@@ -294,9 +294,10 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     public void buildMybatisRepository(RepositoryContext repositoryContext) {
         if (repositoryContext instanceof AbstractMybatisRepository) {
             AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
-            QueryExecutor queryExecutor = repository.getQueryExecutor();
-            if (queryExecutor instanceof DefaultQueryExecutor) {
-                CountQuerier countQuerier = new SqlCountQuerier(repository, ((DefaultQueryExecutor) queryExecutor).getQueryHandler(), repository.getSqlRunner());
+            QueryExecutor queryExecutor = repository.getQueryExecutor3();
+            if (queryExecutor instanceof SegmentQueryExecutor) {
+                QueryResolver queryResolver = ((SegmentQueryExecutor) queryExecutor).getQueryResolver();
+                CountQuerier countQuerier = new DefaultCountQuerier(repository, queryResolver, repository.getSqlRunner());
                 repository.setCountQuerier(countQuerier);
             }
         }

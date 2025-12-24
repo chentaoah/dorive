@@ -18,6 +18,7 @@
 package com.gitee.dorive.query2.v1.entity;
 
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,8 +29,9 @@ import java.util.List;
 public class RepositoryNode {
     private RepositoryNode parent;
     private String lastAccessPath;
+    private RepositoryItem lastRepositoryItem;
     private String path;
     private Integer sequence;
-    private RepositoryContext repository;
+    private RepositoryContext repositoryContext;
     private List<RepositoryNode> children;
 }
