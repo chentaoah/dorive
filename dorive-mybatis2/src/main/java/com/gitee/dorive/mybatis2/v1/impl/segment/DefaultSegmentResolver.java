@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.mybatis2.v1.impl.segment;
 
+import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.common.constant.Operator;
 import com.gitee.dorive.base.v1.core.entity.qry.Criterion;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
@@ -103,21 +104,16 @@ public class DefaultSegmentResolver implements SegmentResolver {
             String sourceTableAlias = repositoryAliasMap.get(source);
             String sourceFieldAlias = source.getProperty(Translator.class).toAlias(sourceField);
             String leftExpr = sourceTableAlias + "." + sourceFieldAlias;
-            String operator = "=";
 
-            OnSegment onSegment = null;
+            String rightExpr = literal;
             if (target != null) {
                 String targetTableAlias = repositoryAliasMap.get(target);
                 String targetFieldAlias = target.getProperty(Translator.class).toAlias(targetField);
-                String rightExpr = targetTableAlias + "." + targetFieldAlias;
-                onSegment = new OnSegment(leftExpr, operator, rightExpr);
+                rightExpr = targetTableAlias + "." + targetFieldAlias;
+            }
+            Assert.notNull(rightExpr, "The rightExpr cannot be null!");
 
-            } else if (literal != null) {
-                onSegment = new OnValueSegment(leftExpr, operator, literal);
-            }
-            if (onSegment != null) {
-                onSegments.add(onSegment);
-            }
+            onSegments.add(new OnSegment(leftExpr, "=", rightExpr));
         }
         return onSegments;
     }
