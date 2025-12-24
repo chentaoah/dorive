@@ -57,8 +57,8 @@ public class DefaultCountQuerier implements CountQuerier {
 
         SegmentInfo segmentInfo = (SegmentInfo) queryResolver.resolve(context, countQuery.getQuery());
         SelectSegment selectSegment = (SelectSegment) segmentInfo.getSegment();
-        RepositoryContext selectedRepository = (RepositoryContext) segmentInfo.getRepository();
-        String selectRepositoryAlias = segmentInfo.getRepositoryAlias();
+        RepositoryContext selectedRepository = segmentInfo.getSelectedRepository();
+        String selectedRepositoryAlias = segmentInfo.getSelectedRepositoryAlias();
 
         TableSegment tableSegment = selectSegment.getTableSegment();
         List<Object> args = selectSegment.getArgs();
@@ -74,7 +74,7 @@ public class DefaultCountQuerier implements CountQuerier {
         // count by
         if (selectedRepository != null) {
             translator = selectedRepository.getProperty(Translator.class);
-            tableAlias = selectRepositoryAlias;
+            tableAlias = selectedRepositoryAlias;
         }
         List<String> countBy = toAliases(translator, countQuery.getCountBy());
         String countByStr = CollUtil.join(countBy, ",',',", tableAlias + ".", null);

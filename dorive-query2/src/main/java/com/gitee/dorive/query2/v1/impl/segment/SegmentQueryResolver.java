@@ -54,7 +54,7 @@ public class SegmentQueryResolver implements QueryResolver {
     public Object resolve(Context context, Object query) {
         Selector selector = context.getOption(Selector.class);
         RepositoryContext selectedRepository = null;
-        String selectRepositoryAlias = null;
+        String selectedRepositoryAlias = null;
 
         QueryConfig queryConfig = queryConfigResolver.findQueryConfig(query.getClass());
         Assert.notNull(queryConfig, "No query config found!");
@@ -84,7 +84,7 @@ public class SegmentQueryResolver implements QueryResolver {
             RepositoryItem repositoryItem = lastRepositoryItem != null ? lastRepositoryItem : repositoryContext.getRootRepository();
             if (selector != null && selector.matches(repositoryItem)) {
                 selectedRepository = repositoryContext;
-                selectRepositoryAlias = alias;
+                selectedRepositoryAlias = alias;
             }
 
             // 如果被激活，则解析连接条件
@@ -136,9 +136,10 @@ public class SegmentQueryResolver implements QueryResolver {
 
         SegmentInfo segmentInfo = new SegmentInfo();
         segmentInfo.setSegment(segment);
+        segmentInfo.setRepository(rootRepository);
         segmentInfo.setExample(rootExample);
-        segmentInfo.setRepository(selectedRepository);
-        segmentInfo.setRepositoryAlias(selectRepositoryAlias);
+        segmentInfo.setSelectedRepository(selectedRepository);
+        segmentInfo.setSelectedRepositoryAlias(selectedRepositoryAlias);
         return segmentInfo;
     }
 

@@ -18,12 +18,14 @@
 package com.gitee.dorive.query2.v1.entity.segment;
 
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import lombok.Data;
 
 @Data
 public class SegmentInfo {
     private Object segment;
+    private RepositoryContext repository;
     private Example example;
-    private Object repository;
-    private String repositoryAlias;
+    private RepositoryContext selectedRepository;
+    private String selectedRepositoryAlias;
 }
