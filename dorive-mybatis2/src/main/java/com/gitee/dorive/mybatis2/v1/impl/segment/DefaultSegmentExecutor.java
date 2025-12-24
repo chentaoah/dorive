@@ -61,10 +61,8 @@ public class DefaultSegmentExecutor implements SegmentExecutor {
     @Override
     public long executeCount(SegmentInfo segmentInfo) {
         SelectSegment selectSegment = (SelectSegment) segmentInfo.getSegment();
-        String selectSql = selectSegment.selectSql();
-        String fromWhereSql = selectSegment.fromWhereSql();
+        String countSql = selectSegment.selectSql() + selectSegment.fromWhereSql();
         List<Object> args = selectSegment.getArgs();
-        String countSql = selectSql + fromWhereSql;
         return sqlRunner.selectCount("SELECT COUNT(*) AS total FROM (" + countSql + ") c", args.toArray());
     }
 
