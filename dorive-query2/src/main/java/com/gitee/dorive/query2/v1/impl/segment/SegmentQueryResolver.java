@@ -45,7 +45,6 @@ import java.util.*;
 @AllArgsConstructor
 public class SegmentQueryResolver implements QueryResolver {
 
-    private final RepositoryContext repositoryContext;
     private final RepositoryNodeResolver repositoryNodeResolver;
     private final QueryConfigResolver queryConfigResolver;
     private final SegmentResolver segmentResolver;

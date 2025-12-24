@@ -39,7 +39,6 @@ import java.util.Map;
 @AllArgsConstructor
 public class StepwiseQueryResolver implements QueryResolver {
 
-    private final RepositoryContext repositoryContext;
     private final QueryConfigResolver queryConfigResolver;
 
     @Override

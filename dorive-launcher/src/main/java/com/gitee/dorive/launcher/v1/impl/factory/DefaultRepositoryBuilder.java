@@ -235,7 +235,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             StepwiseQuerier stepwiseQuerier = new StepwiseQuerier(repository);
             repository.setProperty(StepwiseQuerier.class, stepwiseQuerier);
             // 查询执行器
-            QueryResolver queryResolver = new StepwiseQueryResolver(repository, queryConfigResolver);
+            QueryResolver queryResolver = new StepwiseQueryResolver(queryConfigResolver);
             QueryExecutor queryExecutor = new StepwiseQueryExecutor(queryResolver, (AbstractRepository<Object, Object>) repository);
             repository.setQueryExecutor2(queryExecutor);
         }
@@ -265,7 +265,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             SegmentResolver segmentResolver = new DefaultSegmentResolver();
             SegmentExecutor segmentExecutor = new DefaultSegmentExecutor(primaryKey, primaryKeyAlias, repository.getSqlRunner(), (AbstractRepository<Object, Object>) repository);
             // 查询执行器
-            QueryResolver queryResolver = new SegmentQueryResolver(repository, repositoryNodeResolver, queryConfigResolver, segmentResolver);
+            QueryResolver queryResolver = new SegmentQueryResolver(repositoryNodeResolver, queryConfigResolver, segmentResolver);
             QueryExecutor queryExecutor = new SegmentQueryExecutor(queryResolver, segmentExecutor);
             repository.setQueryExecutor3(queryExecutor);
         }
