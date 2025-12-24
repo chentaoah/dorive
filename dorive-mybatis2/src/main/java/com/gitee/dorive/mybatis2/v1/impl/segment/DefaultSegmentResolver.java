@@ -22,12 +22,8 @@ import com.gitee.dorive.base.v1.core.entity.qry.Criterion;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.util.CriterionUtils;
 import com.gitee.dorive.base.v1.factory.api.Translator;
-import com.gitee.dorive.base.v1.factory.api.TranslatorManager;
-import com.gitee.dorive.base.v1.factory.enums.Category;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.mybatis2.v1.entity.*;
 import com.gitee.dorive.query2.v1.api.SegmentResolver;
 import com.gitee.dorive.query2.v1.entity.segment.Condition;
@@ -45,7 +41,7 @@ public class DefaultSegmentResolver implements SegmentResolver {
                           Map<RepositoryContext, Example> repositoryExampleMap,
                           RepositoryContext repositoryContext,
                           Example example) {
-        EntityStoreInfo entityStoreInfo = getEntityStoreInfo(repositoryContext);
+        EntityStoreInfo entityStoreInfo = repositoryContext.getProperty(EntityStoreInfo.class);
         String tableName = entityStoreInfo.getTableName();
         String tableAlias = repositoryAliasMap.get(repositoryContext);
         List<Object> args = new ArrayList<>();
@@ -73,19 +69,6 @@ public class DefaultSegmentResolver implements SegmentResolver {
         return selectSegment;
     }
 
-    private EntityStoreInfo getEntityStoreInfo(RepositoryContext repositoryContext) {
-        RepositoryItem rootRepository = repositoryContext.getRootRepository();
-        DefaultRepository defaultRepository = (DefaultRepository) rootRepository.getProxyRepository();
-        return defaultRepository.getProperty(EntityStoreInfo.class);
-    }
-
-    private Translator getTranslator(RepositoryContext repositoryContext) {
-        RepositoryItem rootRepository = repositoryContext.getRootRepository();
-        DefaultRepository defaultRepository = (DefaultRepository) rootRepository.getProxyRepository();
-        TranslatorManager translatorManager = defaultRepository.getProperty(TranslatorManager.class);
-        return translatorManager.getTranslator(Category.ENTITY_DATABASE.name());
-    }
-
     private List<TableJoinSegment> newTableJoinSegments(Map<RepositoryContext, String> repositoryAliasMap,
                                                         List<RepositoryJoin> repositoryJoins,
                                                         Map<RepositoryContext, Example> repositoryExampleMap,
@@ -93,7 +76,7 @@ public class DefaultSegmentResolver implements SegmentResolver {
         List<TableJoinSegment> tableJoinSegments = new ArrayList<>(repositoryJoins.size());
         for (RepositoryJoin repositoryJoin : repositoryJoins) {
             RepositoryContext joiner = repositoryJoin.getJoiner();
-            EntityStoreInfo entityStoreInfo = getEntityStoreInfo(joiner);
+            EntityStoreInfo entityStoreInfo = joiner.getProperty(EntityStoreInfo.class);
             String tableName = entityStoreInfo.getTableName();
             String tableAlias = repositoryAliasMap.get(joiner);
             Example example = repositoryExampleMap.get(joiner);
@@ -118,14 +101,14 @@ public class DefaultSegmentResolver implements SegmentResolver {
             String literal = condition.getLiteral();
 
             String sourceTableAlias = repositoryAliasMap.get(source);
-            String sourceFieldAlias = getTranslator(source).toAlias(sourceField);
+            String sourceFieldAlias = source.getProperty(Translator.class).toAlias(sourceField);
             String leftExpr = sourceTableAlias + "." + sourceFieldAlias;
             String operator = "=";
 
             OnSegment onSegment = null;
             if (target != null) {
                 String targetTableAlias = repositoryAliasMap.get(target);
-                String targetFieldAlias = getTranslator(target).toAlias(targetField);
+                String targetFieldAlias = target.getProperty(Translator.class).toAlias(targetField);
                 String rightExpr = targetTableAlias + "." + targetFieldAlias;
                 onSegment = new OnSegment(leftExpr, operator, rightExpr);
 
