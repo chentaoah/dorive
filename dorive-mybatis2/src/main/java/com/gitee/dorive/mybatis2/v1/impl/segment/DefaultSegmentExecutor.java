@@ -51,9 +51,9 @@ public class DefaultSegmentExecutor implements SegmentExecutor {
     public void buildSelectColumns(SegmentInfo segmentInfo) {
         SelectSegment selectSegment = (SelectSegment) segmentInfo.getSegment();
         selectSegment.setDistinct(true);
+        List<String> selectColumns = new ArrayList<>(2);
         TableSegment tableSegment = selectSegment.getTableSegment();
         String tableAlias = tableSegment.getTableAlias();
-        List<String> selectColumns = new ArrayList<>(2);
         selectColumns.add(tableAlias + "." + primaryKeyAlias);
         selectSegment.setSelectColumns(selectColumns);
     }
