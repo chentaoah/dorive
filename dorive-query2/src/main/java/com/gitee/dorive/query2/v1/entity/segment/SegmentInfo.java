@@ -23,9 +23,9 @@ import lombok.Data;
 
 @Data
 public class SegmentInfo {
-    private Object segment;
-    private RepositoryContext repository;
-    private Example example;
     private RepositoryContext selectedRepository;
     private String selectedRepositoryAlias;
+    private RepositoryContext repository;
+    private Example example;
+    private Object segment;
 }

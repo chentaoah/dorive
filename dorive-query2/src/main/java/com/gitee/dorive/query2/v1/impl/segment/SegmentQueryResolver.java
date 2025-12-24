@@ -53,8 +53,6 @@ public class SegmentQueryResolver implements QueryResolver {
     @Override
     public Object resolve(Context context, Object query) {
         Selector selector = context.getOption(Selector.class);
-        RepositoryContext selectedRepository = null;
-        String selectedRepositoryAlias = null;
 
         QueryConfig queryConfig = queryConfigResolver.findQueryConfig(query.getClass());
         Assert.notNull(queryConfig, "No query config found!");
@@ -66,8 +64,7 @@ public class SegmentQueryResolver implements QueryResolver {
         Map<RepositoryContext, Example> repositoryExampleMap = new LinkedHashMap<>(8);
 
         Map<RepositoryNode, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
-        RepositoryContext rootRepository = null;
-        Example rootExample = null;
+        SegmentInfo segmentInfo = new SegmentInfo();
 
         for (QueryNode queryNode : reversedQueryNodes) {
             RepositoryNode repositoryNode = queryNode.getRepositoryNode();
@@ -83,8 +80,8 @@ public class SegmentQueryResolver implements QueryResolver {
             // 选取
             RepositoryItem repositoryItem = lastRepositoryItem != null ? lastRepositoryItem : repositoryContext.getRootRepository();
             if (selector != null && selector.matches(repositoryItem)) {
-                selectedRepository = repositoryContext;
-                selectedRepositoryAlias = alias;
+                segmentInfo.setSelectedRepository(repositoryContext);
+                segmentInfo.setSelectedRepositoryAlias(alias);
             }
 
             // 如果被激活，则解析连接条件
@@ -115,31 +112,25 @@ public class SegmentQueryResolver implements QueryResolver {
                     parentExampleMap.put(lastAccessPath, example);
                 }
             } else {
-                rootRepository = repositoryContext;
-                rootExample = example;
+                segmentInfo.setRepository(repositoryContext);
+                segmentInfo.setExample(example);
             }
         }
 
-        if (rootExample != null) {
-            rootExample.setOrderBy(exampleResolver.newOrderBy(query));
-            rootExample.setPage(exampleResolver.newPage(query));
-        }
-
-        if (rootRepository == null) {
+        Example example = segmentInfo.getExample();
+        if (example != null) {
+            example.setOrderBy(exampleResolver.newOrderBy(query));
+            example.setPage(exampleResolver.newPage(query));
+        } else {
             return null;
         }
 
         // 转化筛选条件
         convertExamples(context, repositoryExampleMap);
         Collections.reverse(repositoryJoins);
-        Object segment = segmentResolver.resolve(repositoryAliasMap, repositoryJoins, repositoryExampleMap, rootRepository, rootExample);
-
-        SegmentInfo segmentInfo = new SegmentInfo();
+        Object segment = segmentResolver.resolve(repositoryAliasMap, repositoryJoins, repositoryExampleMap, segmentInfo.getRepository(), segmentInfo.getExample());
         segmentInfo.setSegment(segment);
-        segmentInfo.setRepository(rootRepository);
-        segmentInfo.setExample(rootExample);
-        segmentInfo.setSelectedRepository(selectedRepository);
-        segmentInfo.setSelectedRepositoryAlias(selectedRepositoryAlias);
+
         return segmentInfo;
     }
 
