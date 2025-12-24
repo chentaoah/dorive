@@ -128,7 +128,7 @@ public class SegmentQueryResolver implements QueryResolver {
         // 转化筛选条件
         convertExamples(context, repositoryExampleMap);
         Collections.reverse(repositoryJoins);
-        Object segment = segmentResolver.resolve(repositoryAliasMap, repositoryJoins, repositoryExampleMap, segmentInfo.getRepository(), segmentInfo.getExample());
+        Object segment = segmentResolver.resolve(repositoryAliasMap, repositoryJoins, repositoryExampleMap, segmentInfo.getRepository(), example);
         segmentInfo.setSegment(segment);
 
         return segmentInfo;
