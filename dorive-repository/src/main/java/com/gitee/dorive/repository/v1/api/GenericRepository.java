@@ -27,7 +27,7 @@ public interface GenericRepository<E, PK> extends ListableRepository<E, PK> {
 
     E findOne(Example example);
 
-    List<E> findList(Example example);
+    List<E> find(Example example);
 
     List<E> findAll();
 

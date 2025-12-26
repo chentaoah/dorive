@@ -37,7 +37,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractQueryRepo
     }
 
     @Override
-    public List<E> findList(Example example) {
+    public List<E> find(Example example) {
         return selectByExample(Options.ROOT, example);
     }
 
