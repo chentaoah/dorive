@@ -31,12 +31,12 @@ import org.springframework.context.ApplicationContext;
 
 @Getter
 @Setter
-public class EventExecutor extends AbstractProxyExecutor {
+public class ExecutorEventExecutor extends AbstractProxyExecutor {
 
     private ApplicationContext applicationContext;
     private EntityElement entityElement;
 
-    public EventExecutor(Executor executor, ApplicationContext applicationContext, EntityElement entityElement) {
+    public ExecutorEventExecutor(Executor executor, ApplicationContext applicationContext, EntityElement entityElement) {
         super(executor);
         this.applicationContext = applicationContext;
         this.entityElement = entityElement;

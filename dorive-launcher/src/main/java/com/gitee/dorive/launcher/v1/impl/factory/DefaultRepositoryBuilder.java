@@ -73,7 +73,7 @@ import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQuerier;
 import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQueryExecutor;
 import com.gitee.dorive.query2.v1.impl.stepwise.StepwiseQueryResolver;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
-import com.gitee.dorive.repository.v1.impl.executor.EventExecutor;
+import com.gitee.dorive.repository.v1.impl.executor.ExecutorEventExecutor;
 import com.gitee.dorive.repository.v1.impl.injector.RefInjector;
 import com.gitee.dorive.repository.v1.impl.repository.*;
 import com.gitee.dorive.repository.v1.impl.resolver.DerivedRepositoryResolver;
@@ -104,11 +104,11 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             repository = new MybatisPlusRepositoryBuilder((MybatisPlusRepository<?, ?>) repositoryContext).newRepository(entityElement);
         }
         // 事件
-        if (repositoryContext instanceof AbstractEventRepository) {
-            AbstractEventRepository<?, ?> eventRepository = (AbstractEventRepository<?, ?>) repositoryContext;
-            if (eventRepository.isEnableExecutorEvent() && repository instanceof DefaultRepository) {
+        if (repositoryContext instanceof AbstractContextRepository) {
+            AbstractContextRepository<?, ?> contextRepository = (AbstractContextRepository<?, ?>) repositoryContext;
+            if (contextRepository.isEnableExecutorEvent() && repository instanceof DefaultRepository) {
                 Executor executor = repository.getExecutor();
-                executor = new EventExecutor(executor, eventRepository.getApplicationContext(), repository.getEntityElement());
+                executor = new ExecutorEventExecutor(executor, contextRepository.getApplicationContext(), repository.getEntityElement());
                 repository.setExecutor(executor);
             }
         }
@@ -142,19 +142,19 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     }
 
     @Override
-    public Executor newExecutor(RepositoryContext repository) {
+    public Executor newExecutor(RepositoryContext repositoryContext) {
         // 处理器
-        EntityHandler entityHandler = newEntityHandler(repository);
-        EntityOpHandler entityOpHandler = newEntityOpHandler(repository);
+        EntityHandler entityHandler = newEntityHandler(repositoryContext);
+        EntityOpHandler entityOpHandler = newEntityOpHandler(repositoryContext);
         // 委托
-        DerivedRepositoryResolver repositoryResolver = new DerivedRepositoryResolver(repository);
+        DerivedRepositoryResolver repositoryResolver = new DerivedRepositoryResolver(repositoryContext);
         repositoryResolver.resolve();
         if (repositoryResolver.hasDerived()) {
-            entityHandler = new DelegatedEntityHandler(repository, repositoryResolver.getEntityHandlerMap(entityHandler));
-            entityOpHandler = new DelegatedEntityOpHandler(repository, repositoryResolver.getEntityOpHandlerMap(entityOpHandler));
+            entityHandler = new DelegatedEntityHandler(repositoryContext, repositoryResolver.getEntityHandlerMap(entityHandler));
+            entityOpHandler = new DelegatedEntityOpHandler(repositoryContext, repositoryResolver.getEntityOpHandlerMap(entityOpHandler));
         }
         // 创建上下文执行器
-        return new ContextExecutor(repository, entityHandler, entityOpHandler);
+        return new ContextExecutor(repositoryContext, entityHandler, entityOpHandler);
     }
 
     @Override

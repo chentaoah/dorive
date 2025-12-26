@@ -35,7 +35,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public abstract class AbstractQueryRepository<E, PK> extends AbstractEventRepository<E, PK> implements QueryRepository<E, PK> {
+public abstract class AbstractQueryRepository<E, PK> extends AbstractGenericRepository<E, PK> implements QueryRepository<E, PK> {
     private Map<Class<?>, QueryDefinition> classQueryDefinitionMap;
     private QueryExecutor queryExecutor;
     private QueryExecutor queryExecutor1;

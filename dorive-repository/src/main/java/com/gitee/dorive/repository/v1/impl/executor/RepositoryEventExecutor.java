@@ -15,42 +15,40 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.repository.v1.impl.repository;
+package com.gitee.dorive.repository.v1.impl.executor;
 
-import cn.hutool.core.util.ArrayUtil;
-import com.gitee.dorive.base.v1.common.def.RepositoryDef;
+import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
 import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
 import com.gitee.dorive.base.v1.core.entity.op.Operation;
+import com.gitee.dorive.base.v1.executor.api.Executor;
+import com.gitee.dorive.base.v1.executor.impl.AbstractProxyExecutor;
 import com.gitee.dorive.repository.v1.entity.event.BaseEvent;
-import com.gitee.dorive.repository.v1.entity.event.ExecutorEvent;
-import com.gitee.dorive.repository.v1.entity.event.RepositoryEvent;
 import com.gitee.dorive.repository.v1.impl.factory.EventFactory;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.ApplicationContext;
 
 @Getter
 @Setter
-public abstract class AbstractEventRepository<E, PK> extends AbstractGenericRepository<E, PK> {
-    private boolean enableExecutorEvent;
-    private boolean enableRepositoryEvent;
+public class RepositoryEventExecutor extends AbstractProxyExecutor {
 
-    @Override
-    protected void prepareRepositoryDef(Class<?> repositoryClass, Class<?> entityClass) {
-        super.prepareRepositoryDef(repositoryClass, entityClass);
-        RepositoryDef repositoryDef = getRepositoryDef();
-        Class<?>[] events = repositoryDef.getEvents();
-        enableExecutorEvent = ArrayUtil.contains(events, ExecutorEvent.class);
-        enableRepositoryEvent = ArrayUtil.contains(events, RepositoryEvent.class);
+    private ApplicationContext applicationContext;
+    private EntityElement entityElement;
+
+    public RepositoryEventExecutor(Executor executor, ApplicationContext applicationContext, EntityElement entityElement) {
+        super(executor);
+        this.applicationContext = applicationContext;
+        this.entityElement = entityElement;
     }
 
     @Override
     public int execute(Context context, Operation operation) {
         int totalCount = super.execute(context, operation);
-        if (enableRepositoryEvent && totalCount != 0) {
+        if (totalCount != 0) {
             if (operation instanceof InsertOrUpdate) {
                 InsertOrUpdate insertOrUpdate = (InsertOrUpdate) operation;
                 Insert insert = insertOrUpdate.getInsert();

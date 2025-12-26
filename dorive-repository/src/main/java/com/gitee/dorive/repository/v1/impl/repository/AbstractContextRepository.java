@@ -18,6 +18,7 @@
 package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ArrayUtil;
 import com.gitee.dorive.base.v1.aggregate.api.EntityResolver;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.api.BoundedContext;
@@ -30,6 +31,7 @@ import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
 import com.gitee.dorive.base.v1.core.util.ReflectUtils;
+import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
@@ -37,7 +39,10 @@ import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.api.RepositoryPostProcessor;
+import com.gitee.dorive.repository.v1.entity.event.ExecutorEvent;
+import com.gitee.dorive.repository.v1.entity.event.RepositoryEvent;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
+import com.gitee.dorive.repository.v1.impl.executor.RepositoryEventExecutor;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -61,6 +66,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     private RepositoryItem rootRepository;
     private List<RepositoryItem> subRepositories = new ArrayList<>();
     private List<RepositoryItem> orderedRepositories = new ArrayList<>();
+    private boolean enableExecutorEvent = false;
+    private boolean enableRepositoryEvent = false;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -83,6 +90,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         prepareRepositoryDef(repositoryClass, entityClass);
         Assert.notNull(repositoryDef, "The @Repository does not exist! type: {}", repositoryClass.getName());
         resetBoundedContextIfNecessary();
+        determineEnableEventPublish();
 
         EntityResolver entityResolver = applicationContext.getBean(EntityResolver.class);
         List<EntityElement> entityElements = entityResolver.resolve(entityClass);
@@ -102,23 +110,29 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
         setEntityElement(rootRepository.getEntityElement());
         setOperationFactory(rootRepository.getOperationFactory());
-        setExecutor(repositoryBuilder.newExecutor(this));
+        setExecutor(newExecutor());
     }
 
-    protected void prepareRepositoryDef(Class<?> repositoryClass, Class<?> entityClass) {
+    private void prepareRepositoryDef(Class<?> repositoryClass, Class<?> entityClass) {
         this.repositoryDef = RepositoryDef.fromElement(repositoryClass);
         for (RepositoryPostProcessor postProcessor : RepositoryRegister.getRepositoryPostProcessors()) {
             postProcessor.postProcessRepositoryDef(repositoryClass, entityClass, repositoryDef);
         }
     }
 
-    protected void resetBoundedContextIfNecessary() {
+    private void resetBoundedContextIfNecessary() {
         String boundedContextName = repositoryDef.getBoundedContext();
         if (StringUtils.isNotBlank(boundedContextName)) {
             if (applicationContext.containsBean(boundedContextName)) {
                 this.boundedContext = applicationContext.getBean(boundedContextName, BoundedContext.class);
             }
         }
+    }
+
+    private void determineEnableEventPublish() {
+        Class<?>[] events = repositoryDef.getEvents();
+        enableExecutorEvent = ArrayUtil.contains(events, ExecutorEvent.class);
+        enableRepositoryEvent = ArrayUtil.contains(events, RepositoryEvent.class);
     }
 
     private RepositoryItem newRepositoryItem(EntityElement entityElement) {
@@ -187,6 +201,14 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
             }
         }
         return repository;
+    }
+
+    protected Executor newExecutor() {
+        Executor executor = repositoryBuilder.newExecutor(this);
+        if (enableRepositoryEvent) {
+            executor = new RepositoryEventExecutor(executor, applicationContext, getEntityElement());
+        }
+        return executor;
     }
 
     @Override
