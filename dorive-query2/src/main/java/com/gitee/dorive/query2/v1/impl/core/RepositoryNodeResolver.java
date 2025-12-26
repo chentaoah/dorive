@@ -48,11 +48,11 @@ public class RepositoryNodeResolver {
         resolve("", Object.class, "", null, null, null, repositoryContext);
     }
 
-    private void resolve(String path, Class<?> entityClass, String name,
+    private void resolve(String absolutePath, Class<?> entityClass, String name,
                          RepositoryNode parent, String lastAccessPath,
                          RepositoryItem lastRepositoryItem, RepositoryContext repositoryContext) {
         RepositoryItem rootRepository = repositoryContext.getRootRepository();
-        path = StringUtils.isNotBlank(path) ? path : rootRepository.getAccessPath();
+        absolutePath = StringUtils.isNotBlank(absolutePath) ? absolutePath : rootRepository.getAccessPath();
         entityClass = entityClass != Object.class ? entityClass : rootRepository.getEntityClass();
         name = StringUtils.isNotBlank(name) ? name : rootRepository.getName();
 
@@ -60,31 +60,31 @@ public class RepositoryNodeResolver {
         repositoryNode.setParent(parent);
         repositoryNode.setLastAccessPath(lastAccessPath);
         repositoryNode.setLastRepositoryItem(lastRepositoryItem);
-        repositoryNode.setPath(path);
-        repositoryNode.setSequence(repositoryNodes.size() + 1);
+        repositoryNode.setAbsolutePath(absolutePath);
         repositoryNode.setRepositoryContext(repositoryContext);
+        repositoryNode.setSequence(repositoryNodes.size() + 1);
         repositoryNode.setChildren(new ArrayList<>(8));
         if (parent != null) {
             parent.getChildren().add(repositoryNode);
         }
 
         repositoryNodes.add(repositoryNode);
-        pathRepositoryNodeMap.putIfAbsent(path, repositoryNode);
-        classPathsMap.computeIfAbsent(entityClass, k -> new ArrayList<>(4)).add(path);
-        namePathsMap.computeIfAbsent(name, k -> new ArrayList<>(4)).add(path);
+        pathRepositoryNodeMap.putIfAbsent(absolutePath, repositoryNode);
+        classPathsMap.computeIfAbsent(entityClass, k -> new ArrayList<>(4)).add(absolutePath);
+        namePathsMap.computeIfAbsent(name, k -> new ArrayList<>(4)).add(absolutePath);
         repoRepositoryNodeMap.put(repositoryContext, repositoryNode);
 
         for (RepositoryItem repositoryItem : repositoryContext.getSubRepositories()) {
             RepositoryContext subRepositoryContext = repositoryItem.getRepositoryContext();
             if (subRepositoryContext != null) {
-                resolve(getPath(path) + repositoryItem.getAccessPath(), repositoryItem.getEntityClass(), repositoryItem.getName(),
+                resolve(getPathPrefix(absolutePath) + repositoryItem.getAccessPath(), repositoryItem.getEntityClass(), repositoryItem.getName(),
                         repositoryNode, repositoryItem.getAccessPath(),
                         repositoryItem, subRepositoryContext);
             }
         }
     }
 
-    private String getPath(String path) {
+    private String getPathPrefix(String path) {
         return "/".equals(path) ? "" : path;
     }
 
