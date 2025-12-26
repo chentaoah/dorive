@@ -131,8 +131,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     private void determineEnableEventPublish() {
         Class<?>[] events = repositoryDef.getEvents();
-        enableExecutorEvent = ArrayUtil.contains(events, ExecutorEvent.class);
-        enableRepositoryEvent = ArrayUtil.contains(events, RepositoryEvent.class);
+        this.enableExecutorEvent = ArrayUtil.contains(events, ExecutorEvent.class);
+        this.enableRepositoryEvent = ArrayUtil.contains(events, RepositoryEvent.class);
     }
 
     private RepositoryItem newRepositoryItem(EntityElement entityElement) {
