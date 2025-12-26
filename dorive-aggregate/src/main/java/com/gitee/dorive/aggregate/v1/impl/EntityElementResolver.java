@@ -19,11 +19,12 @@ package com.gitee.dorive.aggregate.v1.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.base.v1.common.def.BindingDef;
+import com.gitee.dorive.base.v1.common.def.EntityDef;
 import com.gitee.dorive.base.v1.common.entity.EntityDefinition;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
 import com.gitee.dorive.base.v1.common.entity.FieldEntityDefinition;
-import com.gitee.dorive.base.v1.common.def.BindingDef;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,22 +35,25 @@ public class EntityElementResolver {
 
     public List<EntityElement> resolve(EntityDefinition entityDefinition) {
         List<EntityElement> entityElements = new ArrayList<>();
-
+        // 类
         EntityElement entityElement = resolveElement("/", entityDefinition);
         entityElements.add(entityElement);
-
+        // 字段
         List<FieldEntityDefinition> fieldEntityDefinitions = entityDefinition.getFieldEntityDefinitions();
         for (FieldEntityDefinition fieldEntityDefinition : fieldEntityDefinitions) {
             String fieldName = fieldEntityDefinition.getFieldName();
             EntityElement fieldEntityElement = resolveElement("/" + fieldName, fieldEntityDefinition);
             entityElements.add(fieldEntityElement);
         }
-
         return entityElements;
     }
 
     private EntityElement resolveElement(String accessPath, EntityDefinition entityDefinition) {
         EntityElement entityElement = BeanUtil.copyProperties(entityDefinition, EntityElement.class);
+        // 深拷贝可能被重置的注解定义，以防影响原对象
+        entityElement.setEntityDef(BeanUtil.copyProperties(entityElement.getEntityDef(), EntityDef.class));
+        entityElement.setBindingDefs(BeanUtil.copyToList(entityElement.getBindingDefs(), BindingDef.class));
+
         List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
         List<BindingDef> bindingDefs = entityElement.getBindingDefs();
 

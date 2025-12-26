@@ -48,7 +48,7 @@ import java.util.*;
 @Data
 public class BinderResolver implements BinderExecutor {
 
-    private RepositoryContext repository;
+    private RepositoryContext repositoryContext;
     private List<Binder> allBinders;
     private List<Binder> strongBinders;
     private List<Binder> weakBinders;
@@ -61,8 +61,8 @@ public class BinderResolver implements BinderExecutor {
     private List<String> selfFields;
     private JoinType joinType;
 
-    public BinderResolver(RepositoryContext repository) {
-        this.repository = repository;
+    public BinderResolver(RepositoryContext repositoryContext) {
+        this.repositoryContext = repositoryContext;
     }
 
     public void resolve(EntityElement entityElement) {
@@ -163,11 +163,19 @@ public class BinderResolver implements BinderExecutor {
         if (bind.startsWith("./")) {
             bind = StrUtil.removePrefix(bind, "./");
         }
-        if (StringUtils.isNotBlank(bind) && StringUtils.isNotBlank(expression)) {
-            Assert.notEmpty(bindField, "The bindField of @Binding cannot be empty!");
-        }
-        if (StringUtils.isNotBlank(bind) && StringUtils.isBlank(bindField)) {
-            bindField = bind;
+
+        if (StringUtils.isNotBlank(bind)) {
+            if (StringUtils.isNotBlank(expression) && StringUtils.isBlank(bindField)) {
+                throw new IllegalArgumentException("The bindField of @Binding cannot be empty!");
+
+            } else if (StringUtils.isBlank(expression) && StringUtils.isNotBlank(bindField)) {
+                Map<String, RepositoryItem> repositoryMap = repositoryContext.getRepositoryMap();
+                RepositoryItem repositoryItem = repositoryMap.get("/" + bind);
+                expression = repositoryItem.isCollection() ? "#val.![" + bindField + "]" : "#val." + bindField;
+
+            } else if (StringUtils.isBlank(expression) && StringUtils.isBlank(bindField)) {
+                bindField = bind;
+            }
         }
         if (StringUtils.isNotBlank(expression) && processor == Object.class) {
             processor = SpELProcessor.class;
@@ -211,7 +219,7 @@ public class BinderResolver implements BinderExecutor {
             return new SpELProcessor(bindingDef);
 
         } else {
-            ApplicationContext applicationContext = repository.getApplicationContext();
+            ApplicationContext applicationContext = repositoryContext.getApplicationContext();
             String[] beanNamesForType = applicationContext.getBeanNamesForType(processorClass);
             if (beanNamesForType.length > 0) {
                 return (Processor) applicationContext.getBean(beanNamesForType[0]);
@@ -224,13 +232,13 @@ public class BinderResolver implements BinderExecutor {
     private BindEndpoint newBindEndpoint(BindingDef bindingDef) {
         String bind = bindingDef.getBind();
 
-        RepositoryItem rootRepository = repository.getRootRepository();
+        RepositoryItem rootRepository = repositoryContext.getRootRepository();
         EntityElement entityElement = rootRepository.getEntityElement();
         FieldDefinition fieldDefinition = entityElement.getFieldDefinition(bind);
         Assert.notNull(fieldDefinition, "The bound property chain cannot be null! bind: {}", bind);
         BindEndpoint bindEndpoint = new BindEndpoint(fieldDefinition, "#entity." + bind);
 
-        Map<String, RepositoryItem> repositoryMap = repository.getRepositoryMap();
+        Map<String, RepositoryItem> repositoryMap = repositoryContext.getRepositoryMap();
         RepositoryItem belongRepository = repositoryMap.getOrDefault("/" + bind, rootRepository);
         belongRepository.setBound(true);
 
