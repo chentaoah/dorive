@@ -169,9 +169,10 @@ public class BinderResolver implements BinderExecutor {
                 throw new IllegalArgumentException("The targetField of @Binding cannot be empty!");
 
             } else if (StringUtils.isBlank(expression) && StringUtils.isNotBlank(targetField)) {
-                Map<String, RepositoryItem> repositoryMap = repositoryContext.getRepositoryMap();
-                RepositoryItem repositoryItem = repositoryMap.get("/" + bind);
-                expression = repositoryItem.isCollection() ? "#val.![" + targetField + "]" : "#val." + targetField;
+                RepositoryItem rootRepository = repositoryContext.getRootRepository();
+                EntityElement entityElement = rootRepository.getEntityElement();
+                FieldDefinition fieldDefinition = entityElement.getFieldDefinition(bind);
+                expression = fieldDefinition.isCollection() ? "#val.![" + targetField + "]" : "#val." + targetField;
 
             } else if (StringUtils.isBlank(expression) && StringUtils.isBlank(targetField)) {
                 targetField = bind;
