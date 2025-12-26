@@ -32,7 +32,7 @@ import com.gitee.dorive.base.v1.core.util.ExampleUtils;
 
 import java.util.List;
 
-public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK> implements ListableRepository<E, PK> {
+public abstract class AbstractListableRepository<E, PK> extends AbstractContextRepository<E, PK> implements ListableRepository<E, PK> {
 
     @Override
     public long selectCountByExample(Options options, Example example) {
