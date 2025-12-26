@@ -57,7 +57,7 @@ public abstract class AbstractListableRepository<E, PK> extends AbstractContextR
     @Override
     public int deleteByPrimaryKey(Options options, PK primaryKey) {
         Assert.notNull(primaryKey, "The primary key cannot be null!");
-        E entity = selectByPrimaryKey(options, primaryKey);
+        E entity = selectOneByPrimaryKey(options, primaryKey);
         return delete(options, entity);
     }
 

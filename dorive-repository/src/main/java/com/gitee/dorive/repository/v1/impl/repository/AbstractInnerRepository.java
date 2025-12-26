@@ -30,11 +30,11 @@ import java.util.List;
 public abstract class AbstractInnerRepository<E, PK> extends AbstractGenericRepository<E, PK> {
 
     @Override
-    public E selectByPrimaryKey(Options options, PK primaryKey) {
+    public E selectOneByPrimaryKey(Options options, PK primaryKey) {
         if (!(options instanceof Context)) {
             options = new DefaultContext(options);
         }
-        return super.selectByPrimaryKey(options, primaryKey);
+        return super.selectOneByPrimaryKey(options, primaryKey);
     }
 
     @Override

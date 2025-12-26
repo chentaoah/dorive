@@ -28,7 +28,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractQueryRepo
 
     @Override
     public E findOneById(PK id) {
-        return selectByPrimaryKey(Options.ROOT, id);
+        return selectOneByPrimaryKey(Options.ROOT, id);
     }
 
     @Override

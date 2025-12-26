@@ -55,8 +55,8 @@ public abstract class AbstractProxyRepository extends AbstractRepository<Object,
     }
 
     @Override
-    public Object selectByPrimaryKey(Options options, Object primaryKey) {
-        return proxyRepository.selectByPrimaryKey(options, primaryKey);
+    public Object selectOneByPrimaryKey(Options options, Object primaryKey) {
+        return proxyRepository.selectOneByPrimaryKey(options, primaryKey);
     }
 
     @Override

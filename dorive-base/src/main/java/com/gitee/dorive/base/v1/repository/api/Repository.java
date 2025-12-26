@@ -38,7 +38,7 @@ public interface Repository<E, PK> {
      * @param primaryKey 主键
      * @return 实体
      */
-    E selectByPrimaryKey(Options options, PK primaryKey);
+    E selectOneByPrimaryKey(Options options, PK primaryKey);
 
     /**
      * 根据条件，查询实体

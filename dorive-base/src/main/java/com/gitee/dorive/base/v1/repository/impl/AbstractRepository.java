@@ -48,7 +48,7 @@ public abstract class AbstractRepository<E, PK> extends AbstractProperties imple
 
     @Override
     @SuppressWarnings("unchecked")
-    public E selectByPrimaryKey(Options options, PK primaryKey) {
+    public E selectOneByPrimaryKey(Options options, PK primaryKey) {
         Assert.notNull(primaryKey, "The primary key cannot be null!");
         Query query = operationFactory.buildQueryByPK(primaryKey);
         Result<Object> result = executeQuery((Context) options, query);
