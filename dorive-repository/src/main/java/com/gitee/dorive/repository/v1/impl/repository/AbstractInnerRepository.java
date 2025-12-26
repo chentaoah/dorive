@@ -27,7 +27,7 @@ import com.gitee.dorive.base.v1.core.util.ExampleUtils;
 
 import java.util.List;
 
-public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryRepository<E, PK> {
+public abstract class AbstractInnerRepository<E, PK> extends AbstractGenericRepository<E, PK> {
 
     @Override
     public E selectByPrimaryKey(Options options, PK primaryKey) {
