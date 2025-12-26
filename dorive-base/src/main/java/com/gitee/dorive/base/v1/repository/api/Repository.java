@@ -42,15 +42,6 @@ public interface Repository<E, PK> {
 
     /**
      * 根据条件，查询实体
-     *
-     * @param options 可选项
-     * @param example 条件
-     * @return 实体
-     */
-    List<E> selectByExample(Options options, Example example);
-
-    /**
-     * 根据条件，查询实体
      * 如果存在多条记录，取第一条
      *
      * @param options 可选项
@@ -58,6 +49,15 @@ public interface Repository<E, PK> {
      * @return 实体
      */
     E selectOneByExample(Options options, Example example);
+
+    /**
+     * 根据条件，查询实体
+     *
+     * @param options 可选项
+     * @param example 条件
+     * @return 实体
+     */
+    List<E> selectByExample(Options options, Example example);
 
     /**
      * 根据条件，查询分页

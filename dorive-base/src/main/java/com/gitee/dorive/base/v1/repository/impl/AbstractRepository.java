@@ -56,18 +56,18 @@ public abstract class AbstractRepository<E, PK> extends AbstractProperties imple
     }
 
     @Override
+    public E selectOneByExample(Options options, Example example) {
+        List<E> entities = selectByExample(options, example);
+        return entities != null && !entities.isEmpty() ? entities.get(0) : null;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public List<E> selectByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         Query query = operationFactory.buildQueryByExample(example);
         Result<Object> result = executeQuery((Context) options, query);
         return (List<E>) result.getRecords();
-    }
-
-    @Override
-    public E selectOneByExample(Options options, Example example) {
-        List<E> entities = selectByExample(options, example);
-        return entities != null && !entities.isEmpty() ? entities.get(0) : null;
     }
 
     @Override

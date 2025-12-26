@@ -38,17 +38,6 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractGenericRepo
     }
 
     @Override
-    public List<E> selectByExample(Options options, Example example) {
-        if (!(options instanceof Context)) {
-            options = new DefaultContext(options);
-        }
-        if (!(example instanceof InnerExample)) {
-            example = ExampleUtils.clone(example);
-        }
-        return super.selectByExample(options, example);
-    }
-
-    @Override
     public E selectOneByExample(Options options, Example example) {
         if (!(options instanceof Context)) {
             options = new DefaultContext(options);
@@ -57,6 +46,17 @@ public abstract class AbstractInnerRepository<E, PK> extends AbstractGenericRepo
             example = ExampleUtils.clone(example);
         }
         return super.selectOneByExample(options, example);
+    }
+
+    @Override
+    public List<E> selectByExample(Options options, Example example) {
+        if (!(options instanceof Context)) {
+            options = new DefaultContext(options);
+        }
+        if (!(example instanceof InnerExample)) {
+            example = ExampleUtils.clone(example);
+        }
+        return super.selectByExample(options, example);
     }
 
     @Override
