@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.base.v1.common.annotation;
 
+import org.springframework.core.annotation.AliasFor;
+
 import java.lang.annotation.*;
 
 /**
@@ -57,6 +59,14 @@ public @interface Binding {
     /**
      * 绑定的真实字段
      */
+    @Deprecated
+    @AliasFor("targetField")
     String bindField() default "";
+
+    /**
+     * 绑定的真实字段
+     */
+    @AliasFor("bindField")
+    String targetField() default "";
 
 }

@@ -24,7 +24,7 @@ public interface Binder extends Processor {
 
     BindingDef getBindingDef();
 
-    String getBindField();
+    String getTargetField();
 
     String getFieldName();
 

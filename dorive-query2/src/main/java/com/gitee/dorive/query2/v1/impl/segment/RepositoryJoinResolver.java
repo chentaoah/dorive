@@ -75,7 +75,7 @@ public class RepositoryJoinResolver {
                     condition.setSource(repositoryContext);
                     condition.setSourceField(strongBinder.getFieldName());
                     condition.setTarget(targetRepositoryContext);
-                    condition.setTargetField(strongBinder.getBindField());
+                    condition.setTargetField(strongBinder.getTargetField());
                     conditions.add(condition);
                 }
             });
@@ -86,7 +86,7 @@ public class RepositoryJoinResolver {
                 for (Binder valueRouteBinder : valueRouteBinders) {
                     Condition condition = new Condition();
                     condition.setSource(targetRepositoryContext);
-                    condition.setSourceField(valueRouteBinder.getBindField());
+                    condition.setSourceField(valueRouteBinder.getTargetField());
                     condition.setLiteral(CriterionUtils.sqlParam(valueRouteBinder.getFieldValue(context, null)));
                     conditions.add(condition);
                 }

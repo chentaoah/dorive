@@ -84,7 +84,7 @@ public class StepwiseQuerier {
                 for (Binder valueRouteBinder : valueRouteBinders) {
                     Object fieldValue = valueRouteBinder.getFieldValue(context, null);
                     if (fieldValue != null) {
-                        String boundName = valueRouteBinder.getBindField();
+                        String boundName = valueRouteBinder.getTargetField();
                         targetExample.eq(boundName, fieldValue);
                     }
                 }
@@ -103,7 +103,7 @@ public class StepwiseQuerier {
                         targetExample.setAbandoned(true);
                         return;
                     }
-                    String boundName = strongBinder.getBindField();
+                    String boundName = strongBinder.getTargetField();
                     if (fieldValues.size() == 1) {
                         targetExample.eq(boundName, fieldValues.get(0));
                     } else {
@@ -111,7 +111,7 @@ public class StepwiseQuerier {
                     }
 
                 } else {
-                    List<String> properties = strongBinders.stream().map(Binder::getBindField).collect(Collectors.toList());
+                    List<String> properties = strongBinders.stream().map(Binder::getTargetField).collect(Collectors.toList());
                     MultiInBuilder builder = new MultiInBuilder(properties, entities.size());
                     collectFieldValues(context, entities, strongBinders, builder);
                     if (builder.isEmpty()) {

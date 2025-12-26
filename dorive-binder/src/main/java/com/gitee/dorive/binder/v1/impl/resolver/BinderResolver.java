@@ -154,7 +154,7 @@ public class BinderResolver implements BinderExecutor {
         String bind = StrUtil.trim(bindingDef.getBind());
         String expression = StrUtil.trim(bindingDef.getExpression());
         Class<?> processor = bindingDef.getProcessor();
-        String bindField = StrUtil.trim(bindingDef.getBindField());
+        String targetField = StrUtil.trim(bindingDef.getTargetField());
 
         // 兼容以往版本
         if (bind.startsWith("/")) {
@@ -165,16 +165,16 @@ public class BinderResolver implements BinderExecutor {
         }
 
         if (StringUtils.isNotBlank(bind)) {
-            if (StringUtils.isNotBlank(expression) && StringUtils.isBlank(bindField)) {
-                throw new IllegalArgumentException("The bindField of @Binding cannot be empty!");
+            if (StringUtils.isNotBlank(expression) && StringUtils.isBlank(targetField)) {
+                throw new IllegalArgumentException("The targetField of @Binding cannot be empty!");
 
-            } else if (StringUtils.isBlank(expression) && StringUtils.isNotBlank(bindField)) {
+            } else if (StringUtils.isBlank(expression) && StringUtils.isNotBlank(targetField)) {
                 Map<String, RepositoryItem> repositoryMap = repositoryContext.getRepositoryMap();
                 RepositoryItem repositoryItem = repositoryMap.get("/" + bind);
-                expression = repositoryItem.isCollection() ? "#val.![" + bindField + "]" : "#val." + bindField;
+                expression = repositoryItem.isCollection() ? "#val.![" + targetField + "]" : "#val." + targetField;
 
-            } else if (StringUtils.isBlank(expression) && StringUtils.isBlank(bindField)) {
-                bindField = bind;
+            } else if (StringUtils.isBlank(expression) && StringUtils.isBlank(targetField)) {
+                targetField = bind;
             }
         }
         if (StringUtils.isNotBlank(expression) && processor == Object.class) {
@@ -186,7 +186,7 @@ public class BinderResolver implements BinderExecutor {
         bindingDef.setBind(bind);
         bindingDef.setExpression(expression);
         bindingDef.setProcessor(processor);
-        bindingDef.setBindField(bindField);
+        bindingDef.setTargetField(targetField);
     }
 
     private BindingType determineBindingType(BindingDef bindingDef) {

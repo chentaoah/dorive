@@ -71,8 +71,8 @@ public abstract class AbstractBinder implements Binder {
         return value == null || processor == null ? value : processor.output(context, value);
     }
 
-    public String getBindField() {
-        return bindingDef.getBindField();
+    public String getTargetField() {
+        return bindingDef.getTargetField();
     }
 
     public boolean isBindCollection() {

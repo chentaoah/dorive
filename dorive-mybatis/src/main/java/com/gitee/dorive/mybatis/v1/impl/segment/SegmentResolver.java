@@ -102,7 +102,7 @@ public class SegmentResolver {
             for (Binder strongBinder : strongBinders) {
                 String leftExpr = mergedRepository.getAlias() + "." + translator.toAlias(strongBinder.getFieldName());
                 String operator = "=";
-                String rightExpr = targetMergedRepository.getAlias() + "." + targetTranslator.toAlias(strongBinder.getBindField());
+                String rightExpr = targetMergedRepository.getAlias() + "." + targetTranslator.toAlias(strongBinder.getTargetField());
                 OnSegment onSegment = new OnSegment(leftExpr, operator, rightExpr);
                 onSegments.add(onSegment);
             }
@@ -111,7 +111,7 @@ public class SegmentResolver {
             MergedRepository targetMergedRepository = mergedRepositoryMap.get(absoluteAccessPath);
             Translator targetTranslator = getTranslator(targetMergedRepository);
             for (Binder valueRouteBinder : valueRouteBinders) {
-                String leftExpr = targetMergedRepository.getAlias() + "." + targetTranslator.toAlias(valueRouteBinder.getBindField());
+                String leftExpr = targetMergedRepository.getAlias() + "." + targetTranslator.toAlias(valueRouteBinder.getTargetField());
                 String operator = "=";
                 String rightExpr = CriterionUtils.sqlParam(valueRouteBinder.getFieldValue(context, null));
                 OnValueSegment onValueSegment = new OnValueSegment(leftExpr, operator, rightExpr);
