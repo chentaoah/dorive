@@ -20,7 +20,7 @@ package com.gitee.dorive.repository.v1.impl.injector;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.repository.v1.api.Ref;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractRefRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import lombok.Data;
 
 import java.lang.reflect.Field;
@@ -29,11 +29,11 @@ import java.lang.reflect.Modifier;
 @Data
 public class RefInjector {
 
-    private AbstractRefRepository<?, ?> repository;
+    private AbstractQueryRepository<?, ?> repository;
     private EntityHandler entityHandler;
     private Class<?> entityClass;
 
-    public RefInjector(AbstractRefRepository<?, ?> repository, EntityHandler entityHandler, Class<?> entityClass) {
+    public RefInjector(AbstractQueryRepository<?, ?> repository, EntityHandler entityHandler, Class<?> entityClass) {
         this.repository = repository;
         this.entityHandler = entityHandler;
         this.entityClass = entityClass;
@@ -60,7 +60,7 @@ public class RefInjector {
 
     @SuppressWarnings("unchecked")
     private Ref<Object> newRefImpl() {
-        RefImpl refImpl = new RefImpl((AbstractRefRepository<Object, Object>) repository, entityHandler);
+        RefImpl refImpl = new RefImpl((AbstractQueryRepository<Object, Object>) repository, entityHandler);
         refImpl.setEntityElement(repository.getEntityElement());
         refImpl.setOperationFactory(repository.getOperationFactory());
         refImpl.setExecutor(repository.getExecutor());

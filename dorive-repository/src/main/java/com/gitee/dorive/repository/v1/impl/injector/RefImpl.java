@@ -18,12 +18,12 @@
 package com.gitee.dorive.repository.v1.impl.injector;
 
 import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractProxyRepository;
+import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.repository.v1.api.Ref;
 import com.gitee.dorive.repository.v1.api.RefObj;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractRefRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractProxyRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -33,10 +33,10 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class RefImpl extends AbstractProxyRepository implements Ref<Object> {
 
-    private AbstractRefRepository<Object, Object> repository;
+    private AbstractQueryRepository<Object, Object> repository;
     private EntityHandler entityHandler;
 
-    public RefImpl(AbstractRefRepository<Object, Object> repository, EntityHandler entityHandler) {
+    public RefImpl(AbstractQueryRepository<Object, Object> repository, EntityHandler entityHandler) {
         super(repository);
         this.repository = repository;
         this.entityHandler = entityHandler;
@@ -79,7 +79,7 @@ public class RefImpl extends AbstractProxyRepository implements Ref<Object> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <R extends AbstractRefRepository<?, ?>> R get() {
+    public <R extends AbstractQueryRepository<?, ?>> R get() {
         return (R) repository;
     }
 

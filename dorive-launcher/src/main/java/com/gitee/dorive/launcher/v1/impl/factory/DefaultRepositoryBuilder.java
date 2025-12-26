@@ -160,8 +160,8 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     @Override
     public EntityHandler newEntityHandler(RepositoryContext repositoryContext) {
         EntityHandler entityHandler = new BatchEntityHandler(repositoryContext);
-        if (repositoryContext instanceof AbstractRefRepository) {
-            new RefInjector((AbstractRefRepository<?, ?>) repositoryContext, entityHandler, repositoryContext.getEntityClass());
+        if (repositoryContext instanceof AbstractQueryRepository) {
+            new RefInjector((AbstractQueryRepository<?, ?>) repositoryContext, entityHandler, repositoryContext.getEntityClass());
         }
         return entityHandler;
     }

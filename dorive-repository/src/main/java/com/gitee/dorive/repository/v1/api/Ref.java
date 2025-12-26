@@ -17,11 +17,11 @@
 
 package com.gitee.dorive.repository.v1.api;
 
-import com.gitee.dorive.repository.v1.impl.repository.AbstractRefRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 
 public interface Ref<E> extends QueryRepository<E, Object> {
 
-    <R extends AbstractRefRepository<?, ?>> R get();
+    <R extends AbstractQueryRepository<?, ?>> R get();
 
     RefObj forObj(E obj);
 

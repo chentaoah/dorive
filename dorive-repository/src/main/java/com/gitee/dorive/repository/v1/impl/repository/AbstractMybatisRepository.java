@@ -30,7 +30,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public abstract class AbstractMybatisRepository<E, PK> extends AbstractRefRepository<E, PK> implements CountQuerier {
+public abstract class AbstractMybatisRepository<E, PK> extends AbstractInnerRepository<E, PK> implements CountQuerier {
     private SqlRunner sqlRunner;
     private CountQuerier countQuerier;
 
