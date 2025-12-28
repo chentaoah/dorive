@@ -1,0 +1,86 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.gitee.dorive.mybatis.v1.impl.segment;
+
+import com.gitee.dorive.base.v1.core.api.Selector;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.mybatis.v1.entity.ArgSegment;
+import com.gitee.dorive.mybatis.v1.entity.SelectSegment;
+import com.gitee.dorive.mybatis.v1.entity.TableJoinSegment;
+import com.gitee.dorive.mybatis.v1.entity.TableSegment;
+import com.gitee.dorive.query.v1.entity.MergedRepository;
+import com.gitee.dorive.query.v1.entity.QueryContext;
+import com.gitee.dorive.query.v1.entity.QueryUnit;
+import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@Data
+public class SelectSegmentBuilder {
+
+    private RepositoryContext repositoryContext;
+    private QueryContext queryContext;
+
+    public SelectSegmentBuilder(RepositoryContext repositoryContext, QueryContext queryContext) {
+        this.repositoryContext = repositoryContext;
+        this.queryContext = queryContext;
+    }
+
+    public List<QueryUnit> select(Selector selector) {
+        List<QueryUnit> queryUnits = new ArrayList<>(4);
+        Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
+        for (QueryUnit queryUnit : queryUnitMap.values()) {
+            MergedRepository mergedRepository = queryUnit.getMergedRepository();
+            RepositoryItem definedRepository = mergedRepository.getDefinedRepository();
+            boolean isMatch = repositoryContext.matches(selector, definedRepository);
+            if (isMatch) {
+                TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
+                tableSegment.setJoin(true);
+                queryUnits.add(queryUnit);
+            }
+        }
+        return queryUnits;
+    }
+
+    public SelectSegment build() {
+        SelectSegment selectSegment = new SelectSegment();
+        List<TableJoinSegment> tableJoinSegments = selectSegment.getTableJoinSegments();
+        List<ArgSegment> argSegments = selectSegment.getArgSegments();
+
+        Map<String, QueryUnit> queryUnitMap = queryContext.getQueryUnitMap();
+        for (QueryUnit queryUnit : queryUnitMap.values()) {
+            TableSegment tableSegment = (TableSegment) queryUnit.getAttachment();
+            if (queryUnit.isRoot()) {
+                selectSegment.setTableSegment(tableSegment);
+
+            } else if (tableSegment.isJoin()) {
+                tableJoinSegments.add((TableJoinSegment) tableSegment);
+            }
+            if (tableSegment.isJoin()) {
+                argSegments.addAll(tableSegment.getArgSegments());
+            }
+        }
+        selectSegment.setArgs(queryContext.getArgs());
+
+        return selectSegment;
+    }
+
+}

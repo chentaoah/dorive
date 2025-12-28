@@ -6,13 +6,13 @@
     <parent>
         <groupId>com.gitee.digital-engine</groupId>
         <artifactId>dorive</artifactId>
-        <version>3.5.4</version>
+        <version>3.5.5</version>
     </parent>
     <artifactId>dorive-mybatis</artifactId>
     <dependencies>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-ref</artifactId>
+            <artifactId>dorive-query</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

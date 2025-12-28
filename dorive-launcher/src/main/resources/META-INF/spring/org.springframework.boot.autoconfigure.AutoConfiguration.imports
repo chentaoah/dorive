@@ -1,0 +1,4 @@
+com.gitee.dorive.launcher.v1.autoconfigure.DoriveModuleConfiguration
+com.gitee.dorive.launcher.v1.autoconfigure.DoriveCoreConfiguration
+com.gitee.dorive.launcher.v1.autoconfigure.DoriveMybatisPlusConfiguration
+com.gitee.dorive.launcher.v1.autoconfigure.DoriveWebConfiguration

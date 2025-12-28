@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.gitee.digital-engine</groupId>
         <artifactId>dorive</artifactId>
-        <version>3.5.4</version>
+        <version>3.5.5</version>
     </parent>
     <artifactId>dorive-mybatis-plus</artifactId>
     <dependencies>
@@ -14,10 +14,6 @@
             <groupId>com.gitee.digital-engine</groupId>
             <artifactId>dorive-mybatis</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
     </dependencies>
 </project>
