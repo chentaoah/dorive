@@ -22,10 +22,9 @@ import com.gitee.dorive.module.v1.entity.ModuleDefinition;
 import com.gitee.dorive.module.v1.impl.bean.ModuleAnnotationBeanNameGenerator;
 import com.gitee.dorive.module.v1.impl.factory.ModuleApplicationContextFactory;
 import com.gitee.dorive.module.v1.impl.parser.DefaultModuleParser;
-import org.springframework.beans.factory.support.BeanNameGenerator;
-import org.springframework.boot.ApplicationContextFactory;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.io.DefaultResourceLoader;
 
 import java.util.*;
 
@@ -36,20 +35,18 @@ public class SpringModularApplication {
     }
 
     public static SpringApplicationBuilder build(Class<?> primarySource) {
-        ModuleLauncher.INSTANCE.tryLoadClasspathIdx(primarySource);
+        ClassLoader classLoader = ModuleLauncher.INSTANCE.tryLoadClasspathIdx(primarySource);
 
         Set<Class<?>> sources = new LinkedHashSet<>();
         Set<String> profiles = new LinkedHashSet<>();
         Map<String, Object> properties = new LinkedHashMap<>();
-        BeanNameGenerator beanNameGenerator = new ModuleAnnotationBeanNameGenerator();
-        ApplicationContextFactory applicationContextFactory = new ModuleApplicationContextFactory();
+
+        sources.add(primarySource);
+        properties.put("dorive.module.enable", true);
 
         ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
         moduleParser.parse();
         List<ModuleDefinition> moduleDefinitions = moduleParser.getModuleDefinitions();
-
-        sources.add(primarySource);
-        properties.put("dorive.module.enable", true);
         for (ModuleDefinition moduleDefinition : moduleDefinitions) {
             Class<?> mainClass = moduleDefinition.getMainClass();
             if (mainClass != null) {
@@ -59,11 +56,15 @@ public class SpringModularApplication {
             properties.put(moduleDefinition.getModulePathKey(), moduleDefinition.getModulePathValue());
         }
 
-        return new SpringApplicationBuilder(sources.toArray(new Class[0]))
+        SpringApplicationBuilder builder = new SpringApplicationBuilder(sources.toArray(new Class[0]))
                 .profiles(profiles.toArray(new String[0]))
                 .properties(properties)
-                .beanNameGenerator(beanNameGenerator)
-                .contextFactory(applicationContextFactory);
+                .beanNameGenerator(new ModuleAnnotationBeanNameGenerator())
+                .contextFactory(new ModuleApplicationContextFactory());
+        if (classLoader != null) {
+            builder.resourceLoader(new DefaultResourceLoader(classLoader));
+        }
+        return builder;
     }
 
 }

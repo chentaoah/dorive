@@ -71,20 +71,22 @@ public class ModuleLauncher {
         return null;
     }
 
-    public void tryLoadClasspathIdx(Class<?> source) {
+    public ClassLoader tryLoadClasspathIdx(Class<?> source) {
         URI sourceUri = ClassUtils.toURI(source);
         if (sourceUri == null) {
-            return;
+            return null;
         }
         String sourceUriStr = sourceUri.toString();
         if (!sourceUriStr.endsWith("/target/classes/")) {
-            return;
+            return null;
         }
         loadClasspathIdx(sourceUri);
-        if (!urlsToLoad.isEmpty()) {
-            ClassLoader classLoader = new URLClassLoader(urlsToLoad.toArray(new URL[0]));
-            Thread.currentThread().setContextClassLoader(classLoader);
+        if (urlsToLoad.isEmpty()) {
+            return null;
         }
+        ClassLoader classLoader = new URLClassLoader(urlsToLoad.toArray(new URL[0]));
+        Thread.currentThread().setContextClassLoader(classLoader);
+        return classLoader;
     }
 
     private void loadClasspathIdx(URI targetClassesUri) {
