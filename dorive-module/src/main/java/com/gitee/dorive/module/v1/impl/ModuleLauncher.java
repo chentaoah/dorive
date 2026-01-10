@@ -20,6 +20,7 @@ package com.gitee.dorive.module.v1.impl;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
+import com.gitee.dorive.module.v1.impl.util.ClassLoaderUtils;
 import com.gitee.dorive.module.v1.impl.util.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,10 +29,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ModuleLauncher {
 
@@ -84,9 +82,11 @@ public class ModuleLauncher {
         if (urlsToLoad.isEmpty()) {
             return null;
         }
-        ClassLoader classLoader = new URLClassLoader(urlsToLoad.toArray(new URL[0]));
-        Thread.currentThread().setContextClassLoader(classLoader);
-        return classLoader;
+        ClassLoader appClassLoader = Thread.currentThread().getContextClassLoader();
+        if (appClassLoader instanceof URLClassLoader) {
+            ClassLoaderUtils.loadUrls((URLClassLoader) appClassLoader, urlsToLoad);
+        }
+        return appClassLoader;
     }
 
     private void loadClasspathIdx(URI targetClassesUri) {
