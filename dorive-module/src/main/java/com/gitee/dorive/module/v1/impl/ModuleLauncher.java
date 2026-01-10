@@ -82,11 +82,11 @@ public class ModuleLauncher {
         if (urlsToLoad.isEmpty()) {
             return null;
         }
-        ClassLoader appClassLoader = Thread.currentThread().getContextClassLoader();
-        if (appClassLoader instanceof URLClassLoader) {
-            ClassLoaderUtils.loadUrls((URLClassLoader) appClassLoader, urlsToLoad);
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        if (classLoader instanceof URLClassLoader) {
+            ClassLoaderUtils.loadUrls((URLClassLoader) classLoader, urlsToLoad);
         }
-        return appClassLoader;
+        return classLoader;
     }
 
     private void loadClasspathIdx(URI targetClassesUri) {
