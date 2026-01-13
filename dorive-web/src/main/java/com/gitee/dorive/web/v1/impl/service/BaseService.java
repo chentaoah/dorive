@@ -56,13 +56,13 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> add(Options options, E entity) {
         int count = repository.insert(options, entity);
-        return count > 0 ? ResObject.success() : ResObject.fail();
+        return ResObject.of(count > 0);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> addBatch(Options options, List<E> entities) {
         int count = repository.insertList(options, entities);
-        return count > 0 ? ResObject.success() : ResObject.fail();
+        return ResObject.of(count > 0);
     }
 
     public List<E> list(Options options, Q query) {
@@ -76,19 +76,19 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> edit(Options options, E entity) {
         int count = repository.update(options, entity);
-        return count > 0 ? ResObject.success() : ResObject.fail();
+        return ResObject.of(count > 0);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> editBatch(Options options, List<E> entities) {
         int count = repository.updateList(options, entities);
-        return count > 0 ? ResObject.success() : ResObject.fail();
+        return ResObject.of(count > 0);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> delete(Options options, Integer id) {
         int count = repository.deleteByPrimaryKey(options, id);
-        return count > 0 ? ResObject.success() : ResObject.fail();
+        return ResObject.of(count > 0);
     }
 
 }

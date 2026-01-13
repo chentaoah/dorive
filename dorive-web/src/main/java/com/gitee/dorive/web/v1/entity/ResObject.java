@@ -30,10 +30,10 @@ import lombok.NoArgsConstructor;
 public class ResObject<T> {
 
     public static final int SUCCESS_CODE = 0;
-    public static final int FAIL_CODE = -1;
+    public static final int FAILURE_CODE = -1;
 
     public static final String SUCCESS_MSG = "success";
-    public static final String FAIL_MSG = "fail";
+    public static final String FAILURE_MSG = "failure";
 
     private int code;
     private String message;
@@ -43,24 +43,36 @@ public class ResObject<T> {
         return new ResObject<>(SUCCESS_CODE, SUCCESS_MSG, null);
     }
 
-    public static <T> ResObject<T> fail() {
-        return new ResObject<>(FAIL_CODE, FAIL_MSG, null);
+    public static <T> ResObject<T> failure() {
+        return new ResObject<>(FAILURE_CODE, FAILURE_MSG, null);
     }
 
-    public static <T> ResObject<T> successMsg(String message) {
-        return new ResObject<>(SUCCESS_CODE, message, null);
-    }
-
-    public static <T> ResObject<T> failMsg(String message) {
-        return new ResObject<>(FAIL_CODE, message, null);
-    }
-
-    public static <T> ResObject<T> successData(T data) {
+    public static <T> ResObject<T> success(T data) {
         return new ResObject<>(SUCCESS_CODE, SUCCESS_MSG, data);
     }
 
-    public static <T> ResObject<T> failData(T data) {
-        return new ResObject<>(FAIL_CODE, FAIL_MSG, data);
+    public static <T> ResObject<T> failure(T data) {
+        return new ResObject<>(FAILURE_CODE, FAILURE_MSG, data);
+    }
+
+    public static <T> ResObject<T> success(String message, T data) {
+        return new ResObject<>(SUCCESS_CODE, message, data);
+    }
+
+    public static <T> ResObject<T> failure(String message, T data) {
+        return new ResObject<>(FAILURE_CODE, message, data);
+    }
+
+    public static <T> ResObject<T> successWith(String message) {
+        return new ResObject<>(SUCCESS_CODE, message, null);
+    }
+
+    public static <T> ResObject<T> failWith(String message) {
+        return new ResObject<>(FAILURE_CODE, message, null);
+    }
+
+    public static <T> ResObject<T> of(boolean flag) {
+        return flag ? success() : failure();
     }
 
     @JsonIgnore
@@ -69,8 +81,8 @@ public class ResObject<T> {
     }
 
     @JsonIgnore
-    public boolean isFail() {
-        return code == FAIL_CODE;
+    public boolean isFailure() {
+        return code == FAILURE_CODE;
     }
 
 }
