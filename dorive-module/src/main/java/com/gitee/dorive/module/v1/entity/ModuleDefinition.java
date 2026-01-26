@@ -234,7 +234,8 @@ public class ModuleDefinition {
 
     @Override
     public String toString() {
-        List<String> paths = new ArrayList<>(5);
+        List<String> paths = new ArrayList<>(6);
+        paths.add(String.valueOf(organization));
         paths.add(String.valueOf(project));
         paths.add(String.valueOf(domain));
         paths.add(String.valueOf(subdomain));
