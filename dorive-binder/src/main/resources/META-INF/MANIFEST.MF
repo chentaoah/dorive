@@ -12,7 +12,7 @@ Dorive-Configs: null
 Dorive-Exports: **
 Dorive-Requires: Context, RepositoryItem, RepositoryContext, Query, EntityStoreInfo, FieldDefinition, JoinType,
  InnerExample, EntityElement, Result, EntityDef, UnionExample, AbstractProxyExecutor, Executor, MultiInBuilder,
-  BindingType, Example, EntityJoiner, SqlRunner, BindingDef, OperationFactory
+ BindingType, Example, EntityJoiner, SqlRunner, BindingDef, OperationFactory
 Dorive-Provides: Binder, Processor, BinderExecutor, EntityHandler
 Dorive-Notifies: null
 Dorive-Waits: null
