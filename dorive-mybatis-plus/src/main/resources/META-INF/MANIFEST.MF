@@ -10,8 +10,10 @@ Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
-Dorive-Requires: null
-Dorive-Provides: null
+Dorive-Requires: Operator, OrderBy, Context, Condition, Delete, AbstractExecutor, Query, EntityStoreInfo,
+ ConditionUpdate, Page, EntityOp, EntityElement, Operation, ConditionDelete, Insert, Update, EntityDef,
+ Result, Criterion, Example, Sort
+Dorive-Provides: SqlRunner, MethodInvoker, SqlFormat
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null

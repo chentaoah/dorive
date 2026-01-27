@@ -10,8 +10,8 @@ Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
-Dorive-Requires: null
-Dorive-Provides: null
+Dorive-Requires: Context, RepositoryItem, Binder, BinderExecutor, JoinType, EntityElement
+Dorive-Provides: EntityJoiner
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null

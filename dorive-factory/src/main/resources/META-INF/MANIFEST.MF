@@ -10,8 +10,10 @@ Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
-Dorive-Requires: null
-Dorive-Provides: null
+Dorive-Requires: Operator, Query, PropertyDef, FieldDefinition, ConditionUpdate, Page, EntityOp, EntityElement,
+ Operation, Update, Insert, Result, UnionExample, Executor, Translator, Criterion, MultiInBuilder, Example, Context,
+ OrderBy, Condition, PropertyDefinition, AbstractProxyExecutor, FieldDef, BoundedContext
+Dorive-Provides: ExampleConverter
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null

@@ -10,8 +10,11 @@ Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
-Dorive-Requires: null
-Dorive-Provides: null
+Dorive-Requires: RepositoryItem, Operator, Options, RepositoryContext, Page, EntityElement, InnerExample, Result,
+ Binder, Field, QueryDefinition, BinderExecutor, QueryFieldDef, MultiInBuilder, StringUtils, Example, QueryMode,
+ Sort, Context, QueryResolver, DefaultRepository, QueryFieldDefinition, ResultType, ExampleConverter, RepositoryDef,
+ OperatorV2, AbstractRepository
+Dorive-Provides: QueryExecutor
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null

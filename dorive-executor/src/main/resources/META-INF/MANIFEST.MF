@@ -10,8 +10,10 @@ Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
-Dorive-Requires: null
-Dorive-Provides: null
+Dorive-Requires: RepositoryItem, Context, AbstractExecutor, Delete, RepositoryContext, Query, RepositoryMatcher,
+ EntityOp, EntityElement, Operation, Insert, Update, Result, Field, BinderExecutor, InsertOrUpdate,
+ EntityHandlerFactory, AbstractOptions, SelectorRepositoryMatcher, OperationFactory
+Dorive-Provides: EntityHandler, Selector, EntityOpHandler
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null

@@ -10,8 +10,11 @@ Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
-Dorive-Requires: null
-Dorive-Provides: null
+Dorive-Requires: RepositoryItem, RepositoryContext, TranslatorManager, Category, CountQuery, EntityElement,
+ EntityOpHandler, Binder, Executor, BinderExecutor, Translator, QueryExecutor, EntityJoiner, QueryMode,
+ EntityHandler, MethodInvoker, Context, QueryResolver, DefaultRepository, EntityStoreInfo, JoinType, EntityResolver,
+ ResultType, RepositoryDef, ExampleConverter, AbstractRepository, SqlRunner, SqlFormat, OperationFactory
+Dorive-Provides: ImplFactory, CountQuerier, EntityHandlerFactory
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null

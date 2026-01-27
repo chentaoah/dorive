@@ -11,7 +11,15 @@ Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
 Dorive-Requires: null
-Dorive-Provides: null
+Dorive-Provides: Entity, QueryFieldDefinition, FieldDefinition, FieldEntityDefinition, EntityElement,
+ PropertyDefinition, ReflectUtils, QueryDef, EntityDef, EntityDefinition, QueryDefinition, QueryFieldDef,
+ BindingDef, Property, Context, Query, EntityStoreInfo, JoinType, InnerExample, Result, UnionExample,
+ AbstractProxyExecutor, Executor, MultiInBuilder, BindingType, Example, OperationFactory, AbstractExecutor,
+ Delete, RepositoryMatcher, EntityOp, Operation, Insert, Update, Field, InsertOrUpdate, AbstractOptions,
+ SelectorRepositoryMatcher, Operator, PropertyDef, ConditionUpdate, Page, Translator, Criterion, OrderBy,
+ Condition, FieldDef, BoundedContext, TranslatorManager, Category, CountQuery, QueryMode, DefaultRepository,
+ ResultType, RepositoryDef, AbstractRepository, CriterionUtils, ConditionDelete, Sort, DefaultContext,
+ Options, StringUtils, OperatorV2, ExampleUtils, OrderByDef, OrderByFactory, Repository
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null

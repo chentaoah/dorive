@@ -10,8 +10,10 @@ Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
-Dorive-Requires: null
-Dorive-Provides: null
+Dorive-Requires: Context, RepositoryItem, RepositoryContext, Query, EntityStoreInfo, FieldDefinition, JoinType,
+ InnerExample, EntityElement, Result, EntityDef, UnionExample, AbstractProxyExecutor, Executor, MultiInBuilder,
+  BindingType, Example, EntityJoiner, SqlRunner, BindingDef, OperationFactory
+Dorive-Provides: Binder, Processor, BinderExecutor, EntityHandler
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null
