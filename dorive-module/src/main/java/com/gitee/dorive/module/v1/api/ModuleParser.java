@@ -18,6 +18,7 @@
 package com.gitee.dorive.module.v1.api;
 
 import com.gitee.dorive.module.v1.entity.ModuleDefinition;
+import org.springframework.boot.ApplicationArguments;
 
 import java.net.URI;
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.Set;
 
 public interface ModuleParser {
 
-    void parse();
+    void parse(ApplicationArguments args);
 
     Set<String> getModuleNames();
 

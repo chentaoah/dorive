@@ -22,6 +22,8 @@ import com.gitee.dorive.module.v1.entity.ModuleDefinition;
 import com.gitee.dorive.module.v1.impl.bean.ModuleAnnotationBeanNameGenerator;
 import com.gitee.dorive.module.v1.impl.factory.ModuleApplicationContextFactory;
 import com.gitee.dorive.module.v1.impl.parser.DefaultModuleParser;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -31,12 +33,13 @@ import java.util.*;
 public class SpringModularApplication {
 
     public static ConfigurableApplicationContext run(Class<?> primarySource, String... args) {
-        return build(primarySource).run(args);
+        return build(primarySource, args).run(args);
     }
 
-    public static SpringApplicationBuilder build(Class<?> primarySource) {
+    public static SpringApplicationBuilder build(Class<?> primarySource, String[] args) {
         ClassLoader classLoader = ModuleLauncher.INSTANCE.tryLoadClasspathIdx(primarySource);
 
+        ApplicationArguments arguments = new DefaultApplicationArguments(args);
         Set<Class<?>> sources = new LinkedHashSet<>();
         Set<String> profiles = new LinkedHashSet<>();
         Map<String, Object> properties = new LinkedHashMap<>();
@@ -45,7 +48,7 @@ public class SpringModularApplication {
         properties.put("dorive.module.enable", true);
 
         ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
-        moduleParser.parse();
+        moduleParser.parse(arguments);
         List<ModuleDefinition> moduleDefinitions = moduleParser.getModuleDefinitions();
         for (ModuleDefinition moduleDefinition : moduleDefinitions) {
             Class<?> mainClass = moduleDefinition.getMainClass();

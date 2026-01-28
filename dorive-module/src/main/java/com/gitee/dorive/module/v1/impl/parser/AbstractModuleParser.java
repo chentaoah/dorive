@@ -24,7 +24,9 @@ import com.gitee.dorive.module.v1.entity.ModuleDefinition;
 import com.gitee.dorive.module.v1.impl.util.ClassUtils;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -40,6 +42,7 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Getter
 @Setter
 public abstract class AbstractModuleParser implements ModuleParser {
@@ -52,18 +55,23 @@ public abstract class AbstractModuleParser implements ModuleParser {
     private final List<String> scanPackages = new ArrayList<>();
 
     @Override
-    public void parse() {
-        parseModuleDefinitions();
+    public void parse(ApplicationArguments args) {
+        parseModuleDefinitions(args);
         collectScanPackages();
         checkRequiresAndProvides();
     }
 
-    private void parseModuleDefinitions() {
+    private void parseModuleDefinitions(ApplicationArguments args) {
+        List<String> modes = args.getOptionValues("dorive.mode");
+        boolean debug = modes != null && modes.contains("debug");
         try {
             ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             Resource[] resources = resolver.getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "META-INF/MANIFEST.MF");
             for (Resource resource : resources) {
                 URL url = resource.getURL();
+                if (debug) {
+                    log.info(url.toString());
+                }
                 String protocol = url.getProtocol();
                 URI uriForMatch;
                 if ("file".equals(protocol)) {

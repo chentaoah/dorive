@@ -25,6 +25,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.test.context.SpringBootTestArgsProxy;
 import org.springframework.boot.test.context.SpringBootContextLoader;
 import org.springframework.boot.web.reactive.context.GenericReactiveWebApplicationContext;
 import org.springframework.cglib.proxy.Enhancer;
@@ -41,6 +42,7 @@ public class SpringBootModularContextLoader extends SpringBootContextLoader impl
 
     private MergedContextConfiguration config;
     private Class<?> primarySource;
+    private String[] args;
     private SpringApplication springApplication;
 
     @Override
@@ -56,12 +58,13 @@ public class SpringBootModularContextLoader extends SpringBootContextLoader impl
                 }
             }
         }
+        this.args = SpringBootTestArgsProxy.get(config.getContextCustomizers());
         return super.loadContext(config);
     }
 
     @Override
     protected SpringApplication getSpringApplication() {
-        SpringApplicationBuilder builder = SpringModularApplication.build(primarySource);
+        SpringApplicationBuilder builder = SpringModularApplication.build(primarySource, args);
         this.springApplication = builder.build();
 
         Enhancer enhancer = new Enhancer();
