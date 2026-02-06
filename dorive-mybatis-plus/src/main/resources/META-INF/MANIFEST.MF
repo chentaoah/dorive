@@ -1,8 +1,8 @@
 Dorive-Origin: null
 Dorive-Organization: com.gitee
 Dorive-Project: dorive
-Dorive-Domain: mybatis-plus
-Dorive-Subdomain: null
+Dorive-Domain: mybatis
+Dorive-Subdomain: plus
 Dorive-Module: dorive-mybatis-plus
 Dorive-Version: v1
 Dorive-Type: biz

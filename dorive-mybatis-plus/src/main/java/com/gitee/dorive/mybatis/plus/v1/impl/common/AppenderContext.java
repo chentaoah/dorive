@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis_plus.v1.impl.common;
+package com.gitee.dorive.mybatis.plus.v1.impl.common;
 
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
@@ -23,7 +23,7 @@ import com.gitee.dorive.base.v1.common.constant.Operator;
 import com.gitee.dorive.base.v1.core.entity.qry.Criterion;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
-import com.gitee.dorive.mybatis_plus.v1.api.CriterionAppender;
+import com.gitee.dorive.mybatis.plus.v1.api.CriterionAppender;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,8 +1,8 @@
 Dorive-Origin: null
 Dorive-Organization: com.gitee
 Dorive-Project: dorive
-Dorive-Domain: module-test
-Dorive-Subdomain: null
+Dorive-Domain: module
+Dorive-Subdomain: test
 Dorive-Module: dorive-module-test
 Dorive-Version: v1
 Dorive-Type: biz

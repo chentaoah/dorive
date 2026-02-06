@@ -15,13 +15,8 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis_plus.v1.api;
+package com.gitee.dorive.mybatis.plus.v1.enums;
 
-import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
-
-public interface CriterionAppender {
-
-    void appendCriterion(AbstractWrapper<?, String, ?> wrapper, Example example, String property, Object value);
-
+public enum InsertMethod {
+    BATCH
 }

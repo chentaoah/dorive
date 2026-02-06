@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis_plus.v1.impl.executor;
+package com.gitee.dorive.mybatis.plus.v1.impl.executor;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -41,9 +41,9 @@ import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
 import com.gitee.dorive.base.v1.executor.impl.AbstractExecutor;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
-import com.gitee.dorive.mybatis_plus.v1.api.EasyBaseMapper;
-import com.gitee.dorive.mybatis_plus.v1.enums.InsertMethod;
-import com.gitee.dorive.mybatis_plus.v1.impl.common.AppenderContext;
+import com.gitee.dorive.mybatis.plus.v1.enums.InsertMethod;
+import com.gitee.dorive.mybatis.plus.v1.impl.common.AppenderContext;
+import com.gitee.dorive.mybatis.plus.v1.api.EasyBaseMapper;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

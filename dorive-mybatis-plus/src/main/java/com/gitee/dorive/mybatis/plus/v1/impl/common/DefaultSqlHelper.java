@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis_plus.v1.impl.common;
+package com.gitee.dorive.mybatis.plus.v1.impl.common;
 
 import cn.hutool.db.sql.Condition;
 import cn.hutool.db.sql.SqlUtil;

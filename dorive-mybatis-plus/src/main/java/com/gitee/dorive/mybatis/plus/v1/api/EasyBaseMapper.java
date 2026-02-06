@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.mybatis_plus.v1.api;
+package com.gitee.dorive.mybatis.plus.v1.api;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
