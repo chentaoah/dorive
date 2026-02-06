@@ -44,6 +44,7 @@ public class ModuleDefinition {
     private String subdomain;
     private String name;
     private String version;
+    private String description;
     private String type;
     private List<String> tags;
     private List<String> profiles;
@@ -69,6 +70,7 @@ public class ModuleDefinition {
 
         String name = mainAttributes.getValue("Dorive-Module");
         String version = mainAttributes.getValue("Dorive-Version");
+        String description = mainAttributes.getValue("Dorive-Description");
         String type = mainAttributes.getValue("Dorive-Type");
         String tags = mainAttributes.getValue("Dorive-Tags");
 
@@ -91,6 +93,7 @@ public class ModuleDefinition {
 
         this.name = filterValue(name);
         this.version = filterValue(version);
+        this.description = filterValue(description);
         this.type = filterValue(type);
         this.tags = filterValues(tags);
 
