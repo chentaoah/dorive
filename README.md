@@ -53,10 +53,9 @@ dorive提供了**模块化、模型化**的解决方案，以应对复杂应用�
 
 ### 💡相关资料
 
-- 逻辑架构图：[logic.png](https://gitee.com/digital-engine/dorive/blob/3.5.2/doc/img/logic.png)
-- 物理架构图：[physical.png](https://gitee.com/digital-engine/dorive/blob/3.5.2/doc/img/physical.png)
+- 逻辑架构图：[logic.png](https://gitee.com/digital-engine/dorive/blob/3.5.5/doc/img/logic.png)
+- 物理架构图：[physical.png](https://gitee.com/digital-engine/dorive/blob/3.5.5/doc/img/physical.png)
 - 项目文档：[Gitee wiki](https://gitee.com/digital-engine/dorive/wikis/pages)
-
 - 测试案例：[dorive-example](https://gitee.com/digital-engine/dorive-example)
 
 
