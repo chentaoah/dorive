@@ -15,7 +15,7 @@ dorive提供了**模块化、模型化**的解决方案，以应对复杂应用�
 
 
 
-### ✨痛点
+### ✨解决痛点
 
 #### **1. 开发与演进之痛**
 
@@ -51,7 +51,7 @@ dorive提供了**模块化、模型化**的解决方案，以应对复杂应用�
 
 
 
-### 💡相关资料
+### 📖参考资料
 
 - 逻辑架构图：[logic.png](https://gitee.com/digital-engine/dorive/blob/master/doc/img/logic.png)
 - 物理架构图：[physical.png](https://gitee.com/digital-engine/dorive/blob/master/doc/img/physical.png)
