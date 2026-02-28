@@ -1,0 +1,21 @@
+Dorive-Origin: null
+Dorive-Organization: com.gitee
+Dorive-Project: dorive
+Dorive-Domain: query
+Dorive-Subdomain: null
+Dorive-Module: dorive-query
+Dorive-Version: v1
+Dorive-Type: biz
+Dorive-Tags: null
+Dorive-Profiles: null
+Dorive-Configs: null
+Dorive-Exports: **
+Dorive-Requires: Operator, RepositoryItem, Options, RepositoryContext, Page, EntityElement, InnerExample, Result,
+ Field, QueryDefinition, Binder, QueryFieldDef, BinderExecutor, Criterion, StringUtils, MultiInBuilder, Example,
+ Sort, MethodInvoker, Selector, Context, OrderBy, QueryFieldDefinition, EntityStoreInfo, CriterionUtils,
+ RepositoryDef, ExampleConverter, OperatorV2, AbstractRepository, DefaultContext
+Dorive-Provides: QueryExecutor
+Dorive-Notifies: null
+Dorive-Waits: null
+Dorive-Table-Prefix: null
+Dorive-Request-Prefix: null

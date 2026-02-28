@@ -47,12 +47,12 @@
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-query2</artifactId>
+            <artifactId>dorive-query</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-mybatis2</artifactId>
+            <artifactId>dorive-mybatis</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
