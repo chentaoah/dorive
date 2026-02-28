@@ -15,11 +15,23 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.query.enums;
+package com.gitee.dorive.query.v2.entity;
 
-public enum QueryMode {
-    // 2.0
-    STEPWISE2,
-    SQL_EXECUTE2,
-    SQL_CUSTOM2,
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
+public class RepositoryNode {
+    private RepositoryNode parent;
+    private String lastAccessPath;
+    private RepositoryItem lastRepositoryItem;
+    private String absolutePath;
+    private RepositoryContext repositoryContext;
+    private Integer sequence;
+    private List<RepositoryNode> children;
 }

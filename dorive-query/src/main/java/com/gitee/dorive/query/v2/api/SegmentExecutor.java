@@ -15,11 +15,20 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.query.enums;
+package com.gitee.dorive.query.v2.api;
 
-public enum QueryMode {
-    // 2.0
-    STEPWISE2,
-    SQL_EXECUTE2,
-    SQL_CUSTOM2,
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
+import com.gitee.dorive.query.v2.entity.segment.SegmentInfo;
+
+public interface SegmentExecutor {
+
+    void buildSelectColumns(SegmentInfo segmentInfo);
+
+    long executeCount(SegmentInfo segmentInfo);
+
+    void buildOrderByAndPage(SegmentInfo segmentInfo);
+
+    Result<Object> executeQuery(Context context, SegmentInfo segmentInfo);
+
 }

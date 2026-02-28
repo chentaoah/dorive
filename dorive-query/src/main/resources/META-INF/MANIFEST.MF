@@ -4,7 +4,7 @@ Dorive-Project: dorive
 Dorive-Domain: query
 Dorive-Subdomain: null
 Dorive-Module: dorive-query
-Dorive-Version: v1
+Dorive-Version: v2
 Dorive-Type: biz
 Dorive-Tags: null
 Dorive-Profiles: null

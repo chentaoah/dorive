@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.query.enums;
+package com.gitee.dorive.query.v2.api;
 
-public enum QueryMode {
-    // 2.0
-    STEPWISE2,
-    SQL_EXECUTE2,
-    SQL_CUSTOM2,
+import com.gitee.dorive.base.v1.core.api.Context;
+
+public interface QueryResolver {
+
+    Object resolve(Context context, Object query);
+
 }

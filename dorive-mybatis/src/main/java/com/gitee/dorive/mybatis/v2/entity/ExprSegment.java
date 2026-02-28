@@ -15,11 +15,28 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.query.enums;
+package com.gitee.dorive.mybatis.v2.entity;
 
-public enum QueryMode {
-    // 2.0
-    STEPWISE2,
-    SQL_EXECUTE2,
-    SQL_CUSTOM2,
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class ExprSegment {
+
+    private String leftExpr;
+    private String operator;
+    private String rightExpr;
+
+    @Override
+    public String toString() {
+        if (rightExpr != null) {
+            return leftExpr + " " + operator + " " + rightExpr;
+        } else {
+            return leftExpr + " " + operator;
+        }
+    }
+
 }

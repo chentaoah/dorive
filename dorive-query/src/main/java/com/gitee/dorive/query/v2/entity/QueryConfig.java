@@ -15,11 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.query.enums;
+package com.gitee.dorive.query.v2.entity;
 
-public enum QueryMode {
-    // 2.0
-    STEPWISE2,
-    SQL_EXECUTE2,
-    SQL_CUSTOM2,
+import com.gitee.dorive.query.v2.impl.core.ExampleResolver;
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class QueryConfig {
+    private List<QueryNode> queryNodes;
+    private List<QueryNode> reversedQueryNodes;
+    private ExampleResolver exampleResolver;
 }

@@ -15,11 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.query.enums;
+package com.gitee.dorive.query.v2.entity.segment;
 
-public enum QueryMode {
-    // 2.0
-    STEPWISE2,
-    SQL_EXECUTE2,
-    SQL_CUSTOM2,
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import lombok.Data;
+
+@Data
+public class SegmentInfo {
+    private RepositoryContext selectedRepository;
+    private String selectedRepositoryAlias;
+    private RepositoryContext repository;
+    private Example example;
+    private Object segment;
 }

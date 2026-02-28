@@ -15,11 +15,28 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.query.enums;
+package com.gitee.dorive.mybatis.v2.entity;
 
-public enum QueryMode {
-    // 2.0
-    STEPWISE2,
-    SQL_EXECUTE2,
-    SQL_CUSTOM2,
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class TableSegment {
+
+    private String tableName;
+    private String tableAlias;
+    private List<ArgSegment> argSegments;
+
+    @Override
+    public String toString() {
+        return tableName + " " + tableAlias;
+    }
+
 }

@@ -15,11 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.query.enums;
+package com.gitee.dorive.mybatis.v2.entity;
 
-public enum QueryMode {
-    // 2.0
-    STEPWISE2,
-    SQL_EXECUTE2,
-    SQL_CUSTOM2,
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class OnSegment extends ExprSegment {
+
+    public OnSegment(String leftExpr, String operator, String rightExpr) {
+        super(leftExpr, operator, rightExpr);
+    }
+
 }
