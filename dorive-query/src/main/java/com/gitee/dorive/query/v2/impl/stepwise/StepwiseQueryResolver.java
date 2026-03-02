@@ -26,7 +26,7 @@ import com.gitee.dorive.query.v2.impl.core.ExampleResolver;
 import com.gitee.dorive.query.v2.impl.core.QueryConfigResolver;
 import com.gitee.dorive.query.v2.api.QueryResolver;
 import com.gitee.dorive.query.v2.entity.QueryConfig;
-import com.gitee.dorive.query.v2.entity.QueryNode;
+import com.gitee.dorive.query.v2.entity.QueryRepositoryMapping;
 import com.gitee.dorive.query.v2.entity.RepositoryNode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,14 +45,14 @@ public class StepwiseQueryResolver implements QueryResolver {
     public Object resolve(Context context, Object query) {
         QueryConfig queryConfig = queryConfigResolver.findQueryConfig(query.getClass());
         Assert.notNull(queryConfig, "No query config found!");
-        List<QueryNode> reversedQueryNodes = queryConfig.getReversedQueryNodes();
+        List<QueryRepositoryMapping> reversedQueryRepositoryMappings = queryConfig.getReversedQueryRepositoryMappings();
         ExampleResolver exampleResolver = queryConfig.getExampleResolver();
 
         Map<RepositoryNode, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
         Example rootExample = null;
 
-        for (QueryNode queryNode : reversedQueryNodes) {
-            RepositoryNode repositoryNode = queryNode.getRepositoryNode();
+        for (QueryRepositoryMapping queryRepositoryMapping : reversedQueryRepositoryMappings) {
+            RepositoryNode repositoryNode = queryRepositoryMapping.getRepositoryNode();
             RepositoryNode parent = repositoryNode.getParent();
             String lastAccessPath = repositoryNode.getLastAccessPath();
             RepositoryContext repositoryContext = repositoryNode.getRepositoryContext();
@@ -65,7 +65,7 @@ public class StepwiseQueryResolver implements QueryResolver {
             } else {
                 example = new InnerExample();
             }
-            queryNode.appendCriteria(query, example);
+            queryRepositoryMapping.appendCriteria(query, example);
 
             if (parent != null) {
                 if (example != null && !example.isEmpty()) {

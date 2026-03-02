@@ -30,7 +30,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class QueryNode {
+public class QueryRepositoryMapping {
     private RepositoryNode repositoryNode;
     private List<QueryFieldDefinition> queryFields;
 

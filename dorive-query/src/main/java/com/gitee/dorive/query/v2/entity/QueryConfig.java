@@ -24,7 +24,7 @@ import java.util.List;
 
 @Data
 public class QueryConfig {
-    private List<QueryNode> queryNodes;
-    private List<QueryNode> reversedQueryNodes;
+    private List<QueryRepositoryMapping> queryRepositoryMappings;
+    private List<QueryRepositoryMapping> reversedQueryRepositoryMappings;
     private ExampleResolver exampleResolver;
 }

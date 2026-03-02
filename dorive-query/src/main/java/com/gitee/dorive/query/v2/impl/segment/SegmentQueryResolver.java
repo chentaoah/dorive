@@ -28,7 +28,7 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.query.v2.api.QueryResolver;
 import com.gitee.dorive.query.v2.api.SegmentResolver;
 import com.gitee.dorive.query.v2.entity.QueryConfig;
-import com.gitee.dorive.query.v2.entity.QueryNode;
+import com.gitee.dorive.query.v2.entity.QueryRepositoryMapping;
 import com.gitee.dorive.query.v2.entity.RepositoryNode;
 import com.gitee.dorive.query.v2.entity.segment.RepositoryJoin;
 import com.gitee.dorive.query.v2.entity.segment.SegmentInfo;
@@ -55,7 +55,7 @@ public class SegmentQueryResolver implements QueryResolver {
 
         QueryConfig queryConfig = queryConfigResolver.findQueryConfig(query.getClass());
         Assert.notNull(queryConfig, "No query config found!");
-        List<QueryNode> reversedQueryNodes = queryConfig.getReversedQueryNodes();
+        List<QueryRepositoryMapping> reversedQueryRepositoryMappings = queryConfig.getReversedQueryRepositoryMappings();
         ExampleResolver exampleResolver = queryConfig.getExampleResolver();
 
         Map<RepositoryContext, String> repositoryAliasMap = new LinkedHashMap<>(8);
@@ -65,8 +65,8 @@ public class SegmentQueryResolver implements QueryResolver {
         Map<RepositoryNode, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
         SegmentInfo segmentInfo = new SegmentInfo();
 
-        for (QueryNode queryNode : reversedQueryNodes) {
-            RepositoryNode repositoryNode = queryNode.getRepositoryNode();
+        for (QueryRepositoryMapping queryRepositoryMapping : reversedQueryRepositoryMappings) {
+            RepositoryNode repositoryNode = queryRepositoryMapping.getRepositoryNode();
             RepositoryNode parent = repositoryNode.getParent();
             String lastAccessPath = repositoryNode.getLastAccessPath();
             RepositoryItem lastRepositoryItem = repositoryNode.getLastRepositoryItem();
@@ -101,7 +101,7 @@ public class SegmentQueryResolver implements QueryResolver {
 
             // 筛选条件
             Example example = new InnerExample();
-            queryNode.appendCriteria(query, example);
+            queryRepositoryMapping.appendCriteria(query, example);
             repositoryExampleMap.put(repositoryContext, example);
 
             if (parent != null) {

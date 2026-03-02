@@ -26,7 +26,7 @@ import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
 import com.gitee.dorive.base.v1.common.entity.QueryFieldDefinition;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.query.v2.entity.QueryConfig;
-import com.gitee.dorive.query.v2.entity.QueryNode;
+import com.gitee.dorive.query.v2.entity.QueryRepositoryMapping;
 import com.gitee.dorive.query.v2.entity.RepositoryNode;
 import lombok.Data;
 import org.apache.commons.lang3.ArrayUtils;
@@ -63,38 +63,38 @@ public class QueryConfigResolver {
         QueryDefinition queryDefinition = queryResolver.resolve(queryClass);
         classQueryDefinitionMap.put(queryClass, queryDefinition);
 
-        Map<RepositoryNode, QueryNode> queryNodeMap = new LinkedHashMap<>();
+        Map<RepositoryNode, QueryRepositoryMapping> queryRepositoryMappingMap = new LinkedHashMap<>();
         for (QueryFieldDefinition queryField : queryDefinition.getQueryFieldDefinitions()) {
             List<RepositoryNode> repositoryNodes = resetQueryField(queryField);
             for (RepositoryNode repositoryNode : repositoryNodes) {
-                QueryNode queryNode = queryNodeMap.computeIfAbsent(repositoryNode, k -> new QueryNode(repositoryNode, new ArrayList<>()));
-                queryNode.getQueryFields().add(queryField);
+                QueryRepositoryMapping queryRepositoryMapping = queryRepositoryMappingMap.computeIfAbsent(repositoryNode, k -> new QueryRepositoryMapping(repositoryNode, new ArrayList<>()));
+                queryRepositoryMapping.getQueryFields().add(queryField);
             }
         }
 
         // 向上遍历
-        for (RepositoryNode repositoryNode : queryNodeMap.keySet()) {
+        for (RepositoryNode repositoryNode : queryRepositoryMappingMap.keySet()) {
             RepositoryNode parent = repositoryNode.getParent();
             while (parent != null) {
-                if (!queryNodeMap.containsKey(parent)) {
-                    queryNodeMap.put(parent, new QueryNode(parent, new ArrayList<>()));
+                if (!queryRepositoryMappingMap.containsKey(parent)) {
+                    queryRepositoryMappingMap.put(parent, new QueryRepositoryMapping(parent, new ArrayList<>()));
                 }
                 parent = parent.getParent();
             }
         }
 
         // 重新排序
-        List<QueryNode> queryNodes = new ArrayList<>(queryNodeMap.values());
-        queryNodes.sort(Comparator.comparing(q -> q.getRepositoryNode().getSequence()));
+        List<QueryRepositoryMapping> queryRepositoryMappings = new ArrayList<>(queryRepositoryMappingMap.values());
+        queryRepositoryMappings.sort(Comparator.comparing(q -> q.getRepositoryNode().getSequence()));
         // 反转顺序
-        List<QueryNode> reversedQueryNodes = new ArrayList<>(queryNodes);
-        Collections.reverse(reversedQueryNodes);
+        List<QueryRepositoryMapping> reversedQueryRepositoryMappings = new ArrayList<>(queryRepositoryMappings);
+        Collections.reverse(reversedQueryRepositoryMappings);
         // 条件
         ExampleResolver exampleResolver = new ExampleResolver(queryDefinition);
 
         QueryConfig queryConfig = new QueryConfig();
-        queryConfig.setQueryNodes(queryNodes);
-        queryConfig.setReversedQueryNodes(reversedQueryNodes);
+        queryConfig.setQueryRepositoryMappings(queryRepositoryMappings);
+        queryConfig.setReversedQueryRepositoryMappings(reversedQueryRepositoryMappings);
         queryConfig.setExampleResolver(exampleResolver);
         classQueryConfigMap.put(queryClass, queryConfig);
     }
