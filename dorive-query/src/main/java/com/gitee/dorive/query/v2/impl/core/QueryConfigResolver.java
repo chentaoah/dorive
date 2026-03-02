@@ -27,7 +27,7 @@ import com.gitee.dorive.base.v1.common.entity.QueryFieldDefinition;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.query.v2.entity.QueryConfig;
 import com.gitee.dorive.query.v2.entity.QueryRepositoryMapping;
-import com.gitee.dorive.query.v2.entity.RepositoryNode;
+import com.gitee.dorive.query.v2.entity.RepositoryInfo;
 import lombok.Data;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -63,18 +63,18 @@ public class QueryConfigResolver {
         QueryDefinition queryDefinition = queryResolver.resolve(queryClass);
         classQueryDefinitionMap.put(queryClass, queryDefinition);
 
-        Map<RepositoryNode, QueryRepositoryMapping> queryRepositoryMappingMap = new LinkedHashMap<>();
+        Map<RepositoryInfo, QueryRepositoryMapping> queryRepositoryMappingMap = new LinkedHashMap<>();
         for (QueryFieldDefinition queryField : queryDefinition.getQueryFieldDefinitions()) {
-            List<RepositoryNode> repositoryNodes = resetQueryField(queryField);
-            for (RepositoryNode repositoryNode : repositoryNodes) {
-                QueryRepositoryMapping queryRepositoryMapping = queryRepositoryMappingMap.computeIfAbsent(repositoryNode, k -> new QueryRepositoryMapping(repositoryNode, new ArrayList<>()));
+            List<RepositoryInfo> repositoryInfos = resetQueryField(queryField);
+            for (RepositoryInfo repositoryInfo : repositoryInfos) {
+                QueryRepositoryMapping queryRepositoryMapping = queryRepositoryMappingMap.computeIfAbsent(repositoryInfo, k -> new QueryRepositoryMapping(repositoryInfo, new ArrayList<>()));
                 queryRepositoryMapping.getQueryFields().add(queryField);
             }
         }
 
         // 向上遍历
-        for (RepositoryNode repositoryNode : queryRepositoryMappingMap.keySet()) {
-            RepositoryNode parent = repositoryNode.getParent();
+        for (RepositoryInfo repositoryInfo : queryRepositoryMappingMap.keySet()) {
+            RepositoryInfo parent = repositoryInfo.getParent();
             while (parent != null) {
                 if (!queryRepositoryMappingMap.containsKey(parent)) {
                     queryRepositoryMappingMap.put(parent, new QueryRepositoryMapping(parent, new ArrayList<>()));
@@ -85,7 +85,7 @@ public class QueryConfigResolver {
 
         // 重新排序
         List<QueryRepositoryMapping> queryRepositoryMappings = new ArrayList<>(queryRepositoryMappingMap.values());
-        queryRepositoryMappings.sort(Comparator.comparing(q -> q.getRepositoryNode().getSequence()));
+        queryRepositoryMappings.sort(Comparator.comparing(q -> q.getRepositoryInfo().getSequence()));
         // 反转顺序
         List<QueryRepositoryMapping> reversedQueryRepositoryMappings = new ArrayList<>(queryRepositoryMappings);
         Collections.reverse(reversedQueryRepositoryMappings);
@@ -99,11 +99,11 @@ public class QueryConfigResolver {
         classQueryConfigMap.put(queryClass, queryConfig);
     }
 
-    private List<RepositoryNode> resetQueryField(QueryFieldDefinition queryFieldDefinition) {
-        RepositoryNodeResolver repositoryNodeResolver = repositoryContext.getProperty(RepositoryNodeResolver.class);
-        Map<String, RepositoryNode> pathRepositoryNodeMap = repositoryNodeResolver.getPathRepositoryNodeMap();
-        Map<Class<?>, List<String>> classPathsMap = repositoryNodeResolver.getClassPathsMap();
-        Map<String, List<String>> namePathsMap = repositoryNodeResolver.getNamePathsMap();
+    private List<RepositoryInfo> resetQueryField(QueryFieldDefinition queryFieldDefinition) {
+        RepositoryInfoResolver repositoryInfoResolver = repositoryContext.getProperty(RepositoryInfoResolver.class);
+        Map<String, RepositoryInfo> pathRepositoryInfoMap = repositoryInfoResolver.getPathRepositoryInfoMap();
+        Map<Class<?>, List<String>> classPathsMap = repositoryInfoResolver.getClassPathsMap();
+        Map<String, List<String>> namePathsMap = repositoryInfoResolver.getNamePathsMap();
 
         QueryFieldDef queryFieldDef = queryFieldDefinition.getQueryFieldDef();
         Field javaField = queryFieldDefinition.getField();
@@ -128,21 +128,21 @@ public class QueryConfigResolver {
         }
         queryFieldDef.setPath(paths.toArray(new String[0]));
 
-        List<RepositoryNode> repositoryNodes = new ArrayList<>();
+        List<RepositoryInfo> repositoryInfos = new ArrayList<>();
         for (String eachPath : paths) {
-            RepositoryNode repositoryNode = pathRepositoryNodeMap.get(eachPath);
-            Assert.notNull(repositoryNode, "No merged repository found! path: {}", eachPath);
+            RepositoryInfo repositoryInfo = pathRepositoryInfoMap.get(eachPath);
+            Assert.notNull(repositoryInfo, "No merged repository found! path: {}", eachPath);
 
-            RepositoryContext repositoryContext = repositoryNode.getRepositoryContext();
+            RepositoryContext repositoryContext = repositoryInfo.getRepositoryContext();
             EntityElement entityElement = repositoryContext.getEntityElement();
             Class<?> entityClass = repositoryContext.getEntityClass();
             Assert.isTrue(entityElement.hasField(field),
                     "The field of @Criterion does not exist in the entity! query field: {}, entity: {}, field: {}",
                     javaField, entityClass, field);
 
-            repositoryNodes.add(repositoryNode);
+            repositoryInfos.add(repositoryInfo);
         }
-        return repositoryNodes;
+        return repositoryInfos;
     }
 
     public QueryConfig findQueryConfig(Class<?> queryClass) {

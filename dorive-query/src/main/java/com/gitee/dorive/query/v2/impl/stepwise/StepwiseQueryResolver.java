@@ -27,7 +27,7 @@ import com.gitee.dorive.query.v2.impl.core.QueryConfigResolver;
 import com.gitee.dorive.query.v2.api.QueryResolver;
 import com.gitee.dorive.query.v2.entity.QueryConfig;
 import com.gitee.dorive.query.v2.entity.QueryRepositoryMapping;
-import com.gitee.dorive.query.v2.entity.RepositoryNode;
+import com.gitee.dorive.query.v2.entity.RepositoryInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -48,16 +48,16 @@ public class StepwiseQueryResolver implements QueryResolver {
         List<QueryRepositoryMapping> reversedQueryRepositoryMappings = queryConfig.getReversedQueryRepositoryMappings();
         ExampleResolver exampleResolver = queryConfig.getExampleResolver();
 
-        Map<RepositoryNode, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
+        Map<RepositoryInfo, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
         Example rootExample = null;
 
         for (QueryRepositoryMapping queryRepositoryMapping : reversedQueryRepositoryMappings) {
-            RepositoryNode repositoryNode = queryRepositoryMapping.getRepositoryNode();
-            RepositoryNode parent = repositoryNode.getParent();
-            String lastAccessPath = repositoryNode.getLastAccessPath();
-            RepositoryContext repositoryContext = repositoryNode.getRepositoryContext();
+            RepositoryInfo repositoryInfo = queryRepositoryMapping.getRepositoryInfo();
+            RepositoryInfo parent = repositoryInfo.getParent();
+            String lastAccessPath = repositoryInfo.getLastAccessPath();
+            RepositoryContext repositoryContext = repositoryInfo.getRepositoryContext();
 
-            Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryNode);
+            Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryInfo);
             Example example;
             if (exampleMap != null) {
                 StepwiseQuerier stepwiseQuerier = repositoryContext.getProperty(StepwiseQuerier.class);

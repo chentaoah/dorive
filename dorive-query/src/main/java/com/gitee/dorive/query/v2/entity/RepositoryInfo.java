@@ -26,12 +26,12 @@ import java.util.List;
 
 @Getter
 @Setter
-public class RepositoryNode {
-    private RepositoryNode parent;
+public class RepositoryInfo {
+    private RepositoryInfo parent;
     private String lastAccessPath;
     private RepositoryItem lastRepositoryItem;
     private String absolutePath;
     private RepositoryContext repositoryContext;
     private Integer sequence;
-    private List<RepositoryNode> children;
+    private List<RepositoryInfo> children;
 }

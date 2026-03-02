@@ -52,7 +52,7 @@ import com.gitee.dorive.query.v2.api.QueryResolver;
 import com.gitee.dorive.query.v2.api.SegmentExecutor;
 import com.gitee.dorive.query.v2.api.SegmentResolver;
 import com.gitee.dorive.query.v2.impl.core.QueryConfigResolver;
-import com.gitee.dorive.query.v2.impl.core.RepositoryNodeResolver;
+import com.gitee.dorive.query.v2.impl.core.RepositoryInfoResolver;
 import com.gitee.dorive.query.v2.impl.custom.CustomQueryExecutor;
 import com.gitee.dorive.query.v2.impl.fallback.ContextMismatchQueryExecutor;
 import com.gitee.dorive.query.v2.impl.segment.RepositoryJoinResolver;
@@ -76,7 +76,7 @@ import java.util.List;
  * RepositoryContext's properties:
  * EntityStoreInfo、EntityMappers、TranslatorManager、Translator、ExampleConverter
  * MergedRepositoryResolver、QueryTypeResolver、
- * RepositoryNodeResolver、QueryConfigResolver、StepwiseQuerier
+ * RepositoryInfoResolver、QueryConfigResolver、StepwiseQuerier
  * <p>
  * DefaultRepository's properties:
  * EntityStoreInfo、EntityMappers、TranslatorManager、Translator、ExampleConverter、RepositoryContext
@@ -172,8 +172,8 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         if (repositoryContext instanceof AbstractQueryRepository) {
             AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
             // 仓储解析器
-            RepositoryNodeResolver repositoryNodeResolver = new RepositoryNodeResolver(repository);
-            repository.setProperty(RepositoryNodeResolver.class, repositoryNodeResolver);
+            RepositoryInfoResolver repositoryInfoResolver = new RepositoryInfoResolver(repository);
+            repository.setProperty(RepositoryInfoResolver.class, repositoryInfoResolver);
             // 查询对象解析器
             QueryConfigResolver queryConfigResolver = new QueryConfigResolver(repository);
             repository.setProperty(QueryConfigResolver.class, queryConfigResolver);
@@ -210,7 +210,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         if (repositoryContext instanceof AbstractMybatisRepository) {
             AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
             // 仓储解析器
-            RepositoryNodeResolver repositoryNodeResolver = repository.getProperty(RepositoryNodeResolver.class);
+            RepositoryInfoResolver repositoryInfoResolver = repository.getProperty(RepositoryInfoResolver.class);
             // 查询对象解析器
             QueryConfigResolver queryConfigResolver = repository.getProperty(QueryConfigResolver.class);
             // 连接解析器
@@ -225,7 +225,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             SegmentResolver segmentResolver = new DefaultSegmentResolver();
             SegmentExecutor segmentExecutor = new DefaultSegmentExecutor(primaryKey, primaryKeyAlias, repository.getSqlRunner(), (AbstractRepository<Object, Object>) repository);
             // 查询执行器
-            QueryResolver queryResolver = new SegmentQueryResolver(repositoryNodeResolver, queryConfigResolver, repositoryJoinResolver, segmentResolver);
+            QueryResolver queryResolver = new SegmentQueryResolver(repositoryInfoResolver, queryConfigResolver, repositoryJoinResolver, segmentResolver);
             QueryExecutor queryExecutor = new SegmentQueryExecutor(queryResolver, segmentExecutor);
             repository.setQueryExecutor3(queryExecutor);
         }

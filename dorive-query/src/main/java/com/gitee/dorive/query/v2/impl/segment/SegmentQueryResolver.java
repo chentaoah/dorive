@@ -29,12 +29,12 @@ import com.gitee.dorive.query.v2.api.QueryResolver;
 import com.gitee.dorive.query.v2.api.SegmentResolver;
 import com.gitee.dorive.query.v2.entity.QueryConfig;
 import com.gitee.dorive.query.v2.entity.QueryRepositoryMapping;
-import com.gitee.dorive.query.v2.entity.RepositoryNode;
+import com.gitee.dorive.query.v2.entity.RepositoryInfo;
 import com.gitee.dorive.query.v2.entity.segment.RepositoryJoin;
 import com.gitee.dorive.query.v2.entity.segment.SegmentInfo;
 import com.gitee.dorive.query.v2.impl.core.ExampleResolver;
 import com.gitee.dorive.query.v2.impl.core.QueryConfigResolver;
-import com.gitee.dorive.query.v2.impl.core.RepositoryNodeResolver;
+import com.gitee.dorive.query.v2.impl.core.RepositoryInfoResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -44,7 +44,7 @@ import java.util.*;
 @AllArgsConstructor
 public class SegmentQueryResolver implements QueryResolver {
 
-    private final RepositoryNodeResolver repositoryNodeResolver;
+    private final RepositoryInfoResolver repositoryInfoResolver;
     private final QueryConfigResolver queryConfigResolver;
     private final RepositoryJoinResolver repositoryJoinResolver;
     private final SegmentResolver segmentResolver;
@@ -62,18 +62,18 @@ public class SegmentQueryResolver implements QueryResolver {
         List<RepositoryJoin> repositoryJoins = new ArrayList<>();
         Map<RepositoryContext, Example> repositoryExampleMap = new LinkedHashMap<>(8);
 
-        Map<RepositoryNode, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
+        Map<RepositoryInfo, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
         SegmentInfo segmentInfo = new SegmentInfo();
 
         for (QueryRepositoryMapping queryRepositoryMapping : reversedQueryRepositoryMappings) {
-            RepositoryNode repositoryNode = queryRepositoryMapping.getRepositoryNode();
-            RepositoryNode parent = repositoryNode.getParent();
-            String lastAccessPath = repositoryNode.getLastAccessPath();
-            RepositoryItem lastRepositoryItem = repositoryNode.getLastRepositoryItem();
-            RepositoryContext repositoryContext = repositoryNode.getRepositoryContext();
+            RepositoryInfo repositoryInfo = queryRepositoryMapping.getRepositoryInfo();
+            RepositoryInfo parent = repositoryInfo.getParent();
+            String lastAccessPath = repositoryInfo.getLastAccessPath();
+            RepositoryItem lastRepositoryItem = repositoryInfo.getLastRepositoryItem();
+            RepositoryContext repositoryContext = repositoryInfo.getRepositoryContext();
 
             // 别名
-            String alias = "t" + repositoryNode.getSequence();
+            String alias = "t" + repositoryInfo.getSequence();
             repositoryAliasMap.put(repositoryContext, alias);
 
             // 选取
@@ -84,7 +84,7 @@ public class SegmentQueryResolver implements QueryResolver {
             }
 
             // 如果被激活，则解析连接条件
-            Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryNode);
+            Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryInfo);
             if (exampleMap != null) {
                 List<RepositoryJoin> joins = repositoryJoinResolver.resolve(context, exampleMap.keySet());
                 repositoryJoins.addAll(joins);
@@ -92,8 +92,8 @@ public class SegmentQueryResolver implements QueryResolver {
                 for (RepositoryJoin join : joins) {
                     RepositoryContext joiner = join.getJoiner();
                     if (!repositoryAliasMap.containsKey(joiner)) {
-                        RepositoryNode joinRepositoryNode = repositoryNodeResolver.findRepositoryNode(joiner);
-                        repositoryAliasMap.put(joiner, "t" + joinRepositoryNode.getSequence());
+                        RepositoryInfo joinRepositoryInfo = repositoryInfoResolver.findRepositoryInfo(joiner);
+                        repositoryAliasMap.put(joiner, "t" + joinRepositoryInfo.getSequence());
                         repositoryExampleMap.put(joiner, new InnerExample());
                     }
                 }

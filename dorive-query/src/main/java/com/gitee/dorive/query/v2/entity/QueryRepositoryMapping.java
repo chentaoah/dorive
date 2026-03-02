@@ -31,7 +31,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class QueryRepositoryMapping {
-    private RepositoryNode repositoryNode;
+    private RepositoryInfo repositoryInfo;
     private List<QueryFieldDefinition> queryFields;
 
     public void appendCriteria(Object query, Example example) {
