@@ -55,7 +55,7 @@ import com.gitee.dorive.query.v2.impl.core.QueryInfoResolver;
 import com.gitee.dorive.query.v2.impl.core.RepositoryInfoResolver;
 import com.gitee.dorive.query.v2.impl.custom.CustomQueryExecutor;
 import com.gitee.dorive.query.v2.impl.fallback.ContextMismatchQueryExecutor;
-import com.gitee.dorive.query.v2.impl.segment.RepositoryJoinResolver;
+import com.gitee.dorive.query.v2.impl.segment.JoinInfoResolver;
 import com.gitee.dorive.query.v2.impl.segment.SegmentQueryExecutor;
 import com.gitee.dorive.query.v2.impl.segment.SegmentQueryResolver;
 import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQuerier;
@@ -214,7 +214,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             // 查询对象解析器
             QueryInfoResolver queryInfoResolver = repository.getProperty(QueryInfoResolver.class);
             // 连接解析器
-            RepositoryJoinResolver repositoryJoinResolver = new RepositoryJoinResolver(repository);
+            JoinInfoResolver joinInfoResolver = new JoinInfoResolver(repository);
 
             EntityElement entityElement = repositoryContext.getEntityElement();
             String primaryKey = entityElement.getPrimaryKey();
@@ -225,7 +225,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             SegmentResolver segmentResolver = new DefaultSegmentResolver();
             SegmentExecutor segmentExecutor = new DefaultSegmentExecutor(primaryKey, primaryKeyAlias, repository.getSqlRunner(), (AbstractRepository<Object, Object>) repository);
             // 查询执行器
-            QueryResolver queryResolver = new SegmentQueryResolver(repositoryInfoResolver, queryInfoResolver, repositoryJoinResolver, segmentResolver);
+            QueryResolver queryResolver = new SegmentQueryResolver(repositoryInfoResolver, queryInfoResolver, joinInfoResolver, segmentResolver);
             QueryExecutor queryExecutor = new SegmentQueryExecutor(queryResolver, segmentExecutor);
             repository.setQueryExecutor3(queryExecutor);
         }

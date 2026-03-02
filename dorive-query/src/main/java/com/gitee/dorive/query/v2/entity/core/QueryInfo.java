@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.v2.entity.segment;
+package com.gitee.dorive.query.v2.entity.core;
 
-import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.query.v2.impl.core.ExampleResolver;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class RepositoryJoin {
-    private RepositoryContext joiner;
-    private List<Condition> conditions;
+public class QueryInfo {
+    private List<QueryRepositoryMapping> queryRepositoryMappings;
+    private List<QueryRepositoryMapping> reversedQueryRepositoryMappings;
+    private ExampleResolver exampleResolver;
 }

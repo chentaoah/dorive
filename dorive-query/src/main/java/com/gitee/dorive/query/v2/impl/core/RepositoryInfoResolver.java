@@ -19,7 +19,7 @@ package com.gitee.dorive.query.v2.impl.core;
 
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.query.v2.entity.RepositoryInfo;
+import com.gitee.dorive.query.v2.entity.core.RepositoryInfo;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 

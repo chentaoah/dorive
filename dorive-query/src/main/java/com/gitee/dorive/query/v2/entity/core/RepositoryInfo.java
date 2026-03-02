@@ -15,16 +15,23 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.v2.entity.segment;
+package com.gitee.dorive.query.v2.entity.core;
 
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import lombok.Data;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class Condition {
-    private RepositoryContext source;
-    private String sourceField;
-    private RepositoryContext target;
-    private String targetField;
-    private String literal;
+import java.util.List;
+
+@Getter
+@Setter
+public class RepositoryInfo {
+    private RepositoryInfo parent;
+    private String lastAccessPath;
+    private RepositoryItem lastRepositoryItem;
+    private String absolutePath;
+    private RepositoryContext repositoryContext;
+    private Integer sequence;
+    private List<RepositoryInfo> children;
 }

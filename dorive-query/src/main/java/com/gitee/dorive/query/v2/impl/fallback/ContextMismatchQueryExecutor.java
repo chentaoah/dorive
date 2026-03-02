@@ -23,7 +23,7 @@ import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.query.v2.impl.core.ExampleResolver;
 import com.gitee.dorive.query.v2.impl.core.QueryInfoResolver;
-import com.gitee.dorive.query.v2.entity.QueryInfo;
+import com.gitee.dorive.query.v2.entity.core.QueryInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

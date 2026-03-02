@@ -19,7 +19,7 @@ package com.gitee.dorive.query.v2.api;
 
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.query.v2.entity.segment.RepositoryJoin;
+import com.gitee.dorive.query.v2.entity.segment.JoinInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ import java.util.Map;
 public interface SegmentResolver {
 
     Object resolve(Map<RepositoryContext, String> repositoryAliasMap,
-                   List<RepositoryJoin> repositoryJoins,
+                   List<JoinInfo> joinInfos,
                    Map<RepositoryContext, Example> repositoryExampleMap,
                    RepositoryContext repositoryContext,
                    Example example);

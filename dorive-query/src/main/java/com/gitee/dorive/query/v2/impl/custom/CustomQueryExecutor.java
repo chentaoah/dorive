@@ -31,7 +31,7 @@ import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
-import com.gitee.dorive.query.v2.entity.QueryInfo;
+import com.gitee.dorive.query.v2.entity.core.QueryInfo;
 import com.gitee.dorive.query.v2.impl.core.ExampleResolver;
 import com.gitee.dorive.query.v2.impl.core.QueryInfoResolver;
 import lombok.AllArgsConstructor;

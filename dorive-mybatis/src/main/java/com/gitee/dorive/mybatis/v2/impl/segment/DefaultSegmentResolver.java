@@ -31,8 +31,8 @@ import com.gitee.dorive.mybatis.v2.entity.SelectSegment;
 import com.gitee.dorive.mybatis.v2.entity.TableJoinSegment;
 import com.gitee.dorive.mybatis.v2.entity.TableSegment;
 import com.gitee.dorive.query.v2.api.SegmentResolver;
-import com.gitee.dorive.query.v2.entity.segment.Condition;
-import com.gitee.dorive.query.v2.entity.segment.RepositoryJoin;
+import com.gitee.dorive.query.v2.entity.segment.ConditionInfo;
+import com.gitee.dorive.query.v2.entity.segment.JoinInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class DefaultSegmentResolver implements SegmentResolver {
 
     @Override
     public Object resolve(Map<RepositoryContext, String> repositoryAliasMap,
-                          List<RepositoryJoin> repositoryJoins,
+                          List<JoinInfo> joinInfos,
                           Map<RepositoryContext, Example> repositoryExampleMap,
                           RepositoryContext repositoryContext,
                           Example example) {
@@ -56,7 +56,7 @@ public class DefaultSegmentResolver implements SegmentResolver {
         tableSegment.setTableAlias(tableAlias);
         tableSegment.setArgSegments(newArgSegments(tableAlias, example, args));
 
-        List<TableJoinSegment> tableJoinSegments = newTableJoinSegments(repositoryAliasMap, repositoryJoins, repositoryExampleMap, args);
+        List<TableJoinSegment> tableJoinSegments = newTableJoinSegments(repositoryAliasMap, joinInfos, repositoryExampleMap, args);
 
         SelectSegment selectSegment = new SelectSegment();
         // from table
@@ -75,18 +75,18 @@ public class DefaultSegmentResolver implements SegmentResolver {
     }
 
     private List<TableJoinSegment> newTableJoinSegments(Map<RepositoryContext, String> repositoryAliasMap,
-                                                        List<RepositoryJoin> repositoryJoins,
+                                                        List<JoinInfo> joinInfos,
                                                         Map<RepositoryContext, Example> repositoryExampleMap,
                                                         List<Object> args) {
-        List<TableJoinSegment> tableJoinSegments = new ArrayList<>(repositoryJoins.size());
-        for (RepositoryJoin repositoryJoin : repositoryJoins) {
-            RepositoryContext joiner = repositoryJoin.getJoiner();
+        List<TableJoinSegment> tableJoinSegments = new ArrayList<>(joinInfos.size());
+        for (JoinInfo joinInfo : joinInfos) {
+            RepositoryContext joiner = joinInfo.getJoiner();
             EntityStoreInfo entityStoreInfo = joiner.getProperty(EntityStoreInfo.class);
             String tableName = entityStoreInfo.getTableName();
             String tableAlias = repositoryAliasMap.get(joiner);
             Example example = repositoryExampleMap.get(joiner);
 
-            TableJoinSegment tableJoinSegment = new TableJoinSegment(newOnSegments(repositoryAliasMap, repositoryJoin));
+            TableJoinSegment tableJoinSegment = new TableJoinSegment(newOnSegments(repositoryAliasMap, joinInfo));
             tableJoinSegment.setTableName(tableName);
             tableJoinSegment.setTableAlias(tableAlias);
             tableJoinSegment.setArgSegments(newArgSegments(tableAlias, example, args));
@@ -95,15 +95,15 @@ public class DefaultSegmentResolver implements SegmentResolver {
         return tableJoinSegments;
     }
 
-    private List<OnSegment> newOnSegments(Map<RepositoryContext, String> repositoryAliasMap, RepositoryJoin repositoryJoin) {
-        List<Condition> conditions = repositoryJoin.getConditions();
-        List<OnSegment> onSegments = new ArrayList<>(conditions.size());
-        for (Condition condition : conditions) {
-            RepositoryContext source = condition.getSource();
-            String sourceField = condition.getSourceField();
-            RepositoryContext target = condition.getTarget();
-            String targetField = condition.getTargetField();
-            String literal = condition.getLiteral();
+    private List<OnSegment> newOnSegments(Map<RepositoryContext, String> repositoryAliasMap, JoinInfo joinInfo) {
+        List<ConditionInfo> conditionInfos = joinInfo.getConditionInfos();
+        List<OnSegment> onSegments = new ArrayList<>(conditionInfos.size());
+        for (ConditionInfo conditionInfo : conditionInfos) {
+            RepositoryContext source = conditionInfo.getSource();
+            String sourceField = conditionInfo.getSourceField();
+            RepositoryContext target = conditionInfo.getTarget();
+            String targetField = conditionInfo.getTargetField();
+            String literal = conditionInfo.getLiteral();
 
             String sourceTableAlias = repositoryAliasMap.get(source);
             String sourceFieldAlias = source.getProperty(Translator.class).toAlias(sourceField);

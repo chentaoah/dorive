@@ -27,10 +27,10 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.query.v2.api.QueryResolver;
 import com.gitee.dorive.query.v2.api.SegmentResolver;
-import com.gitee.dorive.query.v2.entity.QueryInfo;
-import com.gitee.dorive.query.v2.entity.QueryRepositoryMapping;
-import com.gitee.dorive.query.v2.entity.RepositoryInfo;
-import com.gitee.dorive.query.v2.entity.segment.RepositoryJoin;
+import com.gitee.dorive.query.v2.entity.core.QueryInfo;
+import com.gitee.dorive.query.v2.entity.core.QueryRepositoryMapping;
+import com.gitee.dorive.query.v2.entity.core.RepositoryInfo;
+import com.gitee.dorive.query.v2.entity.segment.JoinInfo;
 import com.gitee.dorive.query.v2.entity.segment.SegmentInfo;
 import com.gitee.dorive.query.v2.impl.core.ExampleResolver;
 import com.gitee.dorive.query.v2.impl.core.QueryInfoResolver;
@@ -46,7 +46,7 @@ public class SegmentQueryResolver implements QueryResolver {
 
     private final RepositoryInfoResolver repositoryInfoResolver;
     private final QueryInfoResolver queryInfoResolver;
-    private final RepositoryJoinResolver repositoryJoinResolver;
+    private final JoinInfoResolver joinInfoResolver;
     private final SegmentResolver segmentResolver;
 
     @Override
@@ -59,7 +59,7 @@ public class SegmentQueryResolver implements QueryResolver {
         ExampleResolver exampleResolver = queryInfo.getExampleResolver();
 
         Map<RepositoryContext, String> repositoryAliasMap = new LinkedHashMap<>(8);
-        List<RepositoryJoin> repositoryJoins = new ArrayList<>();
+        List<JoinInfo> joinInfos = new ArrayList<>();
         Map<RepositoryContext, Example> repositoryExampleMap = new LinkedHashMap<>(8);
 
         Map<RepositoryInfo, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
@@ -86,10 +86,10 @@ public class SegmentQueryResolver implements QueryResolver {
             // 如果被激活，则解析连接条件
             Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryInfo);
             if (exampleMap != null) {
-                List<RepositoryJoin> joins = repositoryJoinResolver.resolve(context, exampleMap.keySet());
-                repositoryJoins.addAll(joins);
+                List<JoinInfo> joins = joinInfoResolver.resolve(context, exampleMap.keySet());
+                joinInfos.addAll(joins);
                 // 额外分配别名和筛选条件
-                for (RepositoryJoin join : joins) {
+                for (JoinInfo join : joins) {
                     RepositoryContext joiner = join.getJoiner();
                     if (!repositoryAliasMap.containsKey(joiner)) {
                         RepositoryInfo joinRepositoryInfo = repositoryInfoResolver.findRepositoryInfo(joiner);
@@ -125,8 +125,8 @@ public class SegmentQueryResolver implements QueryResolver {
 
         // 转化筛选条件
         repositoryExampleMap.forEach(((repository, eachExample) -> repository.getProperty(ExampleConverter.class).convert(context, eachExample)));
-        Collections.reverse(repositoryJoins);
-        Object segment = segmentResolver.resolve(repositoryAliasMap, repositoryJoins, repositoryExampleMap, segmentInfo.getRepository(), example);
+        Collections.reverse(joinInfos);
+        Object segment = segmentResolver.resolve(repositoryAliasMap, joinInfos, repositoryExampleMap, segmentInfo.getRepository(), example);
         segmentInfo.setSegment(segment);
 
         return segmentInfo;

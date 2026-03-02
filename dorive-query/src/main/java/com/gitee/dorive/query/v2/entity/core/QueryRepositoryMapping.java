@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.query.v2.entity;
+package com.gitee.dorive.query.v2.entity.core;
 
 import com.gitee.dorive.base.v1.common.constant.Operator;
 import com.gitee.dorive.base.v1.common.constant.OperatorV2;
