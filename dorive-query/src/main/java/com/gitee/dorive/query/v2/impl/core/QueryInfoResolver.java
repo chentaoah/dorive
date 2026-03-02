@@ -25,7 +25,7 @@ import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
 import com.gitee.dorive.base.v1.common.entity.QueryFieldDefinition;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.query.v2.entity.QueryConfig;
+import com.gitee.dorive.query.v2.entity.QueryInfo;
 import com.gitee.dorive.query.v2.entity.QueryRepositoryMapping;
 import com.gitee.dorive.query.v2.entity.RepositoryInfo;
 import lombok.Data;
@@ -37,13 +37,13 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Data
-public class QueryConfigResolver {
+public class QueryInfoResolver {
 
     private RepositoryContext repositoryContext;
     private Map<Class<?>, QueryDefinition> classQueryDefinitionMap = new ConcurrentHashMap<>();
-    private Map<Class<?>, QueryConfig> classQueryConfigMap = new ConcurrentHashMap<>();
+    private Map<Class<?>, QueryInfo> classQueryInfoMap = new ConcurrentHashMap<>();
 
-    public QueryConfigResolver(RepositoryContext repositoryContext) {
+    public QueryInfoResolver(RepositoryContext repositoryContext) {
         this.repositoryContext = repositoryContext;
         resolve();
     }
@@ -92,11 +92,11 @@ public class QueryConfigResolver {
         // 条件
         ExampleResolver exampleResolver = new ExampleResolver(queryDefinition);
 
-        QueryConfig queryConfig = new QueryConfig();
-        queryConfig.setQueryRepositoryMappings(queryRepositoryMappings);
-        queryConfig.setReversedQueryRepositoryMappings(reversedQueryRepositoryMappings);
-        queryConfig.setExampleResolver(exampleResolver);
-        classQueryConfigMap.put(queryClass, queryConfig);
+        QueryInfo queryInfo = new QueryInfo();
+        queryInfo.setQueryRepositoryMappings(queryRepositoryMappings);
+        queryInfo.setReversedQueryRepositoryMappings(reversedQueryRepositoryMappings);
+        queryInfo.setExampleResolver(exampleResolver);
+        classQueryInfoMap.put(queryClass, queryInfo);
     }
 
     private List<RepositoryInfo> resetQueryField(QueryFieldDefinition queryFieldDefinition) {
@@ -145,8 +145,8 @@ public class QueryConfigResolver {
         return repositoryInfos;
     }
 
-    public QueryConfig findQueryConfig(Class<?> queryClass) {
-        return classQueryConfigMap.get(queryClass);
+    public QueryInfo findQueryInfo(Class<?> queryClass) {
+        return classQueryInfoMap.get(queryClass);
     }
 
 }

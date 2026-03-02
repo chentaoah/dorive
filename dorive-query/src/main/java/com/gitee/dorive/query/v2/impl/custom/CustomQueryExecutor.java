@@ -31,9 +31,9 @@ import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
-import com.gitee.dorive.query.v2.entity.QueryConfig;
+import com.gitee.dorive.query.v2.entity.QueryInfo;
 import com.gitee.dorive.query.v2.impl.core.ExampleResolver;
-import com.gitee.dorive.query.v2.impl.core.QueryConfigResolver;
+import com.gitee.dorive.query.v2.impl.core.QueryInfoResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -46,7 +46,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class CustomQueryExecutor implements QueryExecutor {
 
-    private final QueryConfigResolver queryConfigResolver;
+    private final QueryInfoResolver queryInfoResolver;
     private final String primaryKey;
     private final EntityStoreInfo entityStoreInfo;
     private final AbstractRepository<Object, Object> repository;
@@ -70,9 +70,9 @@ public class CustomQueryExecutor implements QueryExecutor {
 
     @SuppressWarnings("unchecked")
     private Result<Object> executeQuery(Context context, Object query) {
-        QueryConfig queryConfig = queryConfigResolver.findQueryConfig(query.getClass());
-        Assert.notNull(queryConfig, "No query config found!");
-        ExampleResolver exampleResolver = queryConfig.getExampleResolver();
+        QueryInfo queryInfo = queryInfoResolver.findQueryInfo(query.getClass());
+        Assert.notNull(queryInfo, "No query info found!");
+        ExampleResolver exampleResolver = queryInfo.getExampleResolver();
 
         QueryDefinition queryDefinition = exampleResolver.getQueryDefinition();
         String method = queryDefinition.getQueryDef().getMethod();
@@ -108,9 +108,9 @@ public class CustomQueryExecutor implements QueryExecutor {
     }
 
     private long executeCount(Context context, Object query) {
-        QueryConfig queryConfig = queryConfigResolver.findQueryConfig(query.getClass());
-        Assert.notNull(queryConfig, "No query config found!");
-        ExampleResolver exampleResolver = queryConfig.getExampleResolver();
+        QueryInfo queryInfo = queryInfoResolver.findQueryInfo(query.getClass());
+        Assert.notNull(queryInfo, "No query info found!");
+        ExampleResolver exampleResolver = queryInfo.getExampleResolver();
 
         QueryDefinition queryDefinition = exampleResolver.getQueryDefinition();
         String countMethod = queryDefinition.getQueryDef().getCountMethod();

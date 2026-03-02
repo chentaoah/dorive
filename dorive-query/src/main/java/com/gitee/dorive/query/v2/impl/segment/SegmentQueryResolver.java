@@ -27,13 +27,13 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.query.v2.api.QueryResolver;
 import com.gitee.dorive.query.v2.api.SegmentResolver;
-import com.gitee.dorive.query.v2.entity.QueryConfig;
+import com.gitee.dorive.query.v2.entity.QueryInfo;
 import com.gitee.dorive.query.v2.entity.QueryRepositoryMapping;
 import com.gitee.dorive.query.v2.entity.RepositoryInfo;
 import com.gitee.dorive.query.v2.entity.segment.RepositoryJoin;
 import com.gitee.dorive.query.v2.entity.segment.SegmentInfo;
 import com.gitee.dorive.query.v2.impl.core.ExampleResolver;
-import com.gitee.dorive.query.v2.impl.core.QueryConfigResolver;
+import com.gitee.dorive.query.v2.impl.core.QueryInfoResolver;
 import com.gitee.dorive.query.v2.impl.core.RepositoryInfoResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,7 +45,7 @@ import java.util.*;
 public class SegmentQueryResolver implements QueryResolver {
 
     private final RepositoryInfoResolver repositoryInfoResolver;
-    private final QueryConfigResolver queryConfigResolver;
+    private final QueryInfoResolver queryInfoResolver;
     private final RepositoryJoinResolver repositoryJoinResolver;
     private final SegmentResolver segmentResolver;
 
@@ -53,10 +53,10 @@ public class SegmentQueryResolver implements QueryResolver {
     public Object resolve(Context context, Object query) {
         Selector selector = context.getOption(Selector.class);
 
-        QueryConfig queryConfig = queryConfigResolver.findQueryConfig(query.getClass());
-        Assert.notNull(queryConfig, "No query config found!");
-        List<QueryRepositoryMapping> reversedQueryRepositoryMappings = queryConfig.getReversedQueryRepositoryMappings();
-        ExampleResolver exampleResolver = queryConfig.getExampleResolver();
+        QueryInfo queryInfo = queryInfoResolver.findQueryInfo(query.getClass());
+        Assert.notNull(queryInfo, "No query info found!");
+        List<QueryRepositoryMapping> reversedQueryRepositoryMappings = queryInfo.getReversedQueryRepositoryMappings();
+        ExampleResolver exampleResolver = queryInfo.getExampleResolver();
 
         Map<RepositoryContext, String> repositoryAliasMap = new LinkedHashMap<>(8);
         List<RepositoryJoin> repositoryJoins = new ArrayList<>();

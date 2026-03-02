@@ -23,7 +23,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class QueryConfig {
+public class QueryInfo {
     private List<QueryRepositoryMapping> queryRepositoryMappings;
     private List<QueryRepositoryMapping> reversedQueryRepositoryMappings;
     private ExampleResolver exampleResolver;

@@ -22,8 +22,8 @@ import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.query.v2.impl.core.ExampleResolver;
-import com.gitee.dorive.query.v2.impl.core.QueryConfigResolver;
-import com.gitee.dorive.query.v2.entity.QueryConfig;
+import com.gitee.dorive.query.v2.impl.core.QueryInfoResolver;
+import com.gitee.dorive.query.v2.entity.QueryInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -34,7 +34,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ContextMismatchQueryExecutor implements QueryExecutor {
 
-    private final QueryConfigResolver queryConfigResolver;
+    private final QueryInfoResolver queryInfoResolver;
 
     @Override
     public List<Object> selectByQuery(Options options, Object query) {
@@ -43,9 +43,9 @@ public class ContextMismatchQueryExecutor implements QueryExecutor {
 
     @Override
     public Page<Object> selectPageByQuery(Options options, Object query) {
-        QueryConfig queryConfig = queryConfigResolver.findQueryConfig(query.getClass());
-        Assert.notNull(queryConfig, "No query config found!");
-        ExampleResolver exampleResolver = queryConfig.getExampleResolver();
+        QueryInfo queryInfo = queryInfoResolver.findQueryInfo(query.getClass());
+        Assert.notNull(queryInfo, "No query info found!");
+        ExampleResolver exampleResolver = queryInfo.getExampleResolver();
         return exampleResolver.newPage(query);
     }
 

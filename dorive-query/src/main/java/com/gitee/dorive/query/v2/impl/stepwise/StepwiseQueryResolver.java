@@ -23,9 +23,9 @@ import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.query.v2.impl.core.ExampleResolver;
-import com.gitee.dorive.query.v2.impl.core.QueryConfigResolver;
+import com.gitee.dorive.query.v2.impl.core.QueryInfoResolver;
 import com.gitee.dorive.query.v2.api.QueryResolver;
-import com.gitee.dorive.query.v2.entity.QueryConfig;
+import com.gitee.dorive.query.v2.entity.QueryInfo;
 import com.gitee.dorive.query.v2.entity.QueryRepositoryMapping;
 import com.gitee.dorive.query.v2.entity.RepositoryInfo;
 import lombok.AllArgsConstructor;
@@ -39,14 +39,14 @@ import java.util.Map;
 @AllArgsConstructor
 public class StepwiseQueryResolver implements QueryResolver {
 
-    private final QueryConfigResolver queryConfigResolver;
+    private final QueryInfoResolver queryInfoResolver;
 
     @Override
     public Object resolve(Context context, Object query) {
-        QueryConfig queryConfig = queryConfigResolver.findQueryConfig(query.getClass());
-        Assert.notNull(queryConfig, "No query config found!");
-        List<QueryRepositoryMapping> reversedQueryRepositoryMappings = queryConfig.getReversedQueryRepositoryMappings();
-        ExampleResolver exampleResolver = queryConfig.getExampleResolver();
+        QueryInfo queryInfo = queryInfoResolver.findQueryInfo(query.getClass());
+        Assert.notNull(queryInfo, "No query info found!");
+        List<QueryRepositoryMapping> reversedQueryRepositoryMappings = queryInfo.getReversedQueryRepositoryMappings();
+        ExampleResolver exampleResolver = queryInfo.getExampleResolver();
 
         Map<RepositoryInfo, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
         Example rootExample = null;
