@@ -72,19 +72,19 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractListableRep
     private QueryExecutor adaptive(Options options, Object query, boolean count) {
         QueryMode queryMode = options.getOption(QueryMode.class);
         if (queryMode == null) {
-            queryMode = isCustomMethod(query, count) ? QueryMode.SQL_CUSTOM2 : QueryMode.SQL_EXECUTE2;
+            queryMode = isCustomMethod(query, count) ? QueryMode.SQL_CUSTOM : QueryMode.SQL_EXECUTE;
         }
         // 上下文未匹配
         if (!matches(options, getRootRepository())) {
             return contextMismatchQueryExecutor;
         }
-        if (queryMode == QueryMode.STEPWISE2) {
+        if (queryMode == QueryMode.STEPWISE) {
             return stepwiseQueryExecutor;
 
-        } else if (queryMode == QueryMode.SQL_EXECUTE2) {
+        } else if (queryMode == QueryMode.SQL_EXECUTE) {
             return segmentQueryExecutor;
 
-        } else if (queryMode == QueryMode.SQL_CUSTOM2) {
+        } else if (queryMode == QueryMode.SQL_CUSTOM) {
             return customQueryExecutor;
         }
         throw new RuntimeException("Unsupported query mode!");
