@@ -162,12 +162,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     }
 
     @Override
-    public void buildQueryExecutor(RepositoryContext repositoryContext) {
-        // ignore
-    }
-
-    @Override
-    public void buildQueryExecutor1(RepositoryContext repositoryContext) {
+    public void buildContextMismatchQueryExecutor(RepositoryContext repositoryContext) {
         // 查询
         if (repositoryContext instanceof AbstractQueryRepository) {
             AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
@@ -181,13 +176,13 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             repository.setClassQueryDefinitionMap(queryInfoResolver.getClassQueryDefinitionMap());
             // 上下文未匹配查询执行器
             QueryExecutor queryExecutor = new ContextMismatchQueryExecutor(queryInfoResolver);
-            repository.setQueryExecutor1(queryExecutor);
+            repository.setContextMismatchQueryExecutor(queryExecutor);
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void buildQueryExecutor2(RepositoryContext repositoryContext) {
+    public void buildStepwiseQueryExecutor(RepositoryContext repositoryContext) {
         // 查询
         if (repositoryContext instanceof AbstractQueryRepository) {
             AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
@@ -199,13 +194,13 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             // 查询执行器
             QueryResolver queryResolver = new StepwiseQueryResolver(queryInfoResolver);
             QueryExecutor queryExecutor = new StepwiseQueryExecutor(queryResolver, (AbstractRepository<Object, Object>) repository);
-            repository.setQueryExecutor2(queryExecutor);
+            repository.setStepwiseQueryExecutor(queryExecutor);
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void buildQueryExecutor3(RepositoryContext repositoryContext) {
+    public void buildSegmentQueryExecutor(RepositoryContext repositoryContext) {
         // 查询
         if (repositoryContext instanceof AbstractMybatisRepository) {
             AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
@@ -227,13 +222,13 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             // 查询执行器
             QueryResolver queryResolver = new SegmentQueryResolver(repositoryInfoResolver, queryInfoResolver, joinInfoResolver, segmentResolver);
             QueryExecutor queryExecutor = new SegmentQueryExecutor(queryResolver, segmentExecutor);
-            repository.setQueryExecutor3(queryExecutor);
+            repository.setSegmentQueryExecutor(queryExecutor);
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void buildQueryExecutor4(RepositoryContext repositoryContext) {
+    public void buildCustomQueryExecutor(RepositoryContext repositoryContext) {
         // 查询
         if (repositoryContext instanceof AbstractMybatisRepository) {
             AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
@@ -246,7 +241,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             EntityStoreInfo entityStoreInfo = repository.getProperty(EntityStoreInfo.class);
             // 查询执行器
             QueryExecutor queryExecutor = new CustomQueryExecutor(queryInfoResolver, primaryKey, entityStoreInfo, (AbstractRepository<Object, Object>) repository);
-            repository.setQueryExecutor4(queryExecutor);
+            repository.setCustomQueryExecutor(queryExecutor);
         }
     }
 
@@ -254,7 +249,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     public void buildMybatisRepository(RepositoryContext repositoryContext) {
         if (repositoryContext instanceof AbstractMybatisRepository) {
             AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
-            QueryExecutor queryExecutor = repository.getQueryExecutor3();
+            QueryExecutor queryExecutor = repository.getSegmentQueryExecutor();
             if (queryExecutor instanceof SegmentQueryExecutor) {
                 QueryResolver queryResolver = ((SegmentQueryExecutor) queryExecutor).getQueryResolver();
                 CountQuerier countQuerier = new DefaultCountQuerier(repository, queryResolver, repository.getSqlRunner());

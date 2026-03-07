@@ -37,21 +37,19 @@ import java.util.Map;
 @Setter
 public abstract class AbstractQueryRepository<E, PK> extends AbstractListableRepository<E, PK> implements QueryRepository<E, PK> {
     private Map<Class<?>, QueryDefinition> classQueryDefinitionMap;
-    private QueryExecutor queryExecutor;
-    private QueryExecutor queryExecutor1;
-    private QueryExecutor queryExecutor2;
-    private QueryExecutor queryExecutor3;
-    private QueryExecutor queryExecutor4;
+    private QueryExecutor contextMismatchQueryExecutor;
+    private QueryExecutor stepwiseQueryExecutor;
+    private QueryExecutor segmentQueryExecutor;
+    private QueryExecutor customQueryExecutor;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
         RepositoryBuilder repositoryBuilder = getRepositoryBuilder();
-        repositoryBuilder.buildQueryExecutor(this);
-        repositoryBuilder.buildQueryExecutor1(this);
-        repositoryBuilder.buildQueryExecutor2(this);
-        repositoryBuilder.buildQueryExecutor3(this);
-        repositoryBuilder.buildQueryExecutor4(this);
+        repositoryBuilder.buildContextMismatchQueryExecutor(this);
+        repositoryBuilder.buildStepwiseQueryExecutor(this);
+        repositoryBuilder.buildSegmentQueryExecutor(this);
+        repositoryBuilder.buildCustomQueryExecutor(this);
     }
 
     @Override
@@ -78,18 +76,18 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractListableRep
         }
         // 上下文未匹配
         if (!matches(options, getRootRepository())) {
-            return queryExecutor1;
+            return contextMismatchQueryExecutor;
         }
         if (queryMode == QueryMode.STEPWISE2) {
-            return queryExecutor2;
+            return stepwiseQueryExecutor;
 
         } else if (queryMode == QueryMode.SQL_EXECUTE2) {
-            return queryExecutor3;
+            return segmentQueryExecutor;
 
         } else if (queryMode == QueryMode.SQL_CUSTOM2) {
-            return queryExecutor4;
+            return customQueryExecutor;
         }
-        return queryExecutor;
+        throw new RuntimeException("Unsupported query mode!");
     }
 
     private boolean isCustomMethod(Object query, boolean count) {
