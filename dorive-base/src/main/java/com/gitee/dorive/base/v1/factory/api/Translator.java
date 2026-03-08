@@ -21,4 +21,6 @@ public interface Translator {
 
     String toAlias(String field);
 
+    String toField(String alias);
+
 }

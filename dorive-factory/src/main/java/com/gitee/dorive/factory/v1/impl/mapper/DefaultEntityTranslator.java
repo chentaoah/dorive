@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.factory.v1.impl.mapper;
 
+import com.gitee.dorive.factory.v1.api.Converter;
 import com.gitee.dorive.factory.v1.api.EntityTranslator;
 import com.gitee.dorive.factory.v1.api.FieldMapper;
 import lombok.AllArgsConstructor;
@@ -31,13 +32,41 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DefaultEntityTranslator implements EntityTranslator {
-    private Map<String, String> fieldAliasMapping;
-    private Map<String, FieldMapper> fieldFieldMapperMap;
-    private Map<String, FieldMapper> aliasFieldMapperMap;
+
+    private Map<String, String> fieldAliasMap = new LinkedHashMap<>();
+    private Map<String, String> aliasFieldMap = new LinkedHashMap<>();
+    private Map<String, FieldMapper> fieldFieldMapperMap = new LinkedHashMap<>();
+    private Map<String, FieldMapper> aliasFieldMapperMap = new LinkedHashMap<>();
+    private List<FieldMapper> valueObjFields = new ArrayList<>(4);
+    private List<FieldMapper> matchedValueObjFields = new ArrayList<>(4);
+    private List<FieldMapper> unmatchedValueObjFields = new ArrayList<>(4);
+
+    public void addField(String field, boolean isMatch, String alias, boolean isValueObj, Converter converter) {
+        fieldAliasMap.put(field, alias);
+        aliasFieldMap.put(alias, field);
+
+        FieldMapper fieldMapper = new DefaultFieldMapper(field, alias, converter);
+        fieldFieldMapperMap.put(field, fieldMapper);
+        aliasFieldMapperMap.put(alias, fieldMapper);
+
+        if (isValueObj) {
+            valueObjFields.add(fieldMapper);
+            if (isMatch) {
+                matchedValueObjFields.add(fieldMapper);
+            } else {
+                unmatchedValueObjFields.add(fieldMapper);
+            }
+        }
+    }
 
     @Override
     public String toAlias(String field) {
-        return fieldAliasMapping.getOrDefault(field, field);
+        return fieldAliasMap.getOrDefault(field, field);
+    }
+
+    @Override
+    public String toField(String alias) {
+        return aliasFieldMap.getOrDefault(alias, alias);
     }
 
     @Override

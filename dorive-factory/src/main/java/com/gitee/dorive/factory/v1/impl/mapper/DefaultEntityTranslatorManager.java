@@ -20,12 +20,10 @@ package com.gitee.dorive.factory.v1.impl.mapper;
 import com.gitee.dorive.base.v1.factory.api.Translator;
 import com.gitee.dorive.factory.v1.api.EntityTranslator;
 import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
-import com.gitee.dorive.factory.v1.api.FieldMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,10 +31,8 @@ import java.util.Set;
 @AllArgsConstructor
 public class DefaultEntityTranslatorManager implements EntityTranslatorManager {
     private final Map<String, EntityTranslator> categoryEntityTranslatorMap;
-    private final List<FieldMapper> valueObjFields;
-    private final List<FieldMapper> matchedValueObjFields;
-    private final List<FieldMapper> unmatchedValueObjFields;
     private final Set<Type> valueObjTypes;
+    private final boolean containMatchedValueObj;
 
     @Override
     public Translator getTranslator(String category) {
@@ -44,7 +40,17 @@ public class DefaultEntityTranslatorManager implements EntityTranslatorManager {
     }
 
     @Override
+    public boolean containValueObj() {
+        return valueObjTypes != null && !valueObjTypes.isEmpty();
+    }
+
+    @Override
     public boolean isValueObjType(Type type) {
         return valueObjTypes.contains(type);
+    }
+
+    @Override
+    public boolean containMatchedValueObj() {
+        return containMatchedValueObj;
     }
 }

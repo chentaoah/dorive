@@ -51,8 +51,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     @Override
     public void setEntityTranslatorManager(EntityTranslatorManager entityTranslatorManager, EntityTranslator reEntityTranslator, EntityTranslator deEntityTranslator) {
         super.setEntityTranslatorManager(entityTranslatorManager, reEntityTranslator, deEntityTranslator);
-        List<FieldMapper> matchedValueObjFields = entityTranslatorManager.getMatchedValueObjFields();
-        if (!matchedValueObjFields.isEmpty()) {
+        if (entityTranslatorManager.containMatchedValueObj()) {
             setReCopyOptions();
             setDeCopyOptions();
         }
@@ -112,8 +111,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     public Object doReconstitute(Context context, Object persistent) {
         Object entity = super.doReconstitute(context, persistent);
         Map<String, Object> resultMap = (Map<String, Object>) persistent;
-        EntityTranslatorManager entityTranslatorManager = getEntityTranslatorManager();
-        List<FieldMapper> unmatchedValueObjFields = entityTranslatorManager.getUnmatchedValueObjFields();
+        List<FieldMapper> unmatchedValueObjFields = getReEntityTranslator().getUnmatchedValueObjFields();
         for (FieldMapper fieldMapper : unmatchedValueObjFields) {
             Object valueObj = fieldMapper.reconstitute(resultMap);
             if (valueObj != null) {
@@ -126,8 +124,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     @Override
     public Object doDeconstruct(Context context, Object entity) {
         Object pojo = super.doDeconstruct(context, entity);
-        EntityTranslatorManager entityTranslatorManager = getEntityTranslatorManager();
-        List<FieldMapper> unmatchedValueObjFields = entityTranslatorManager.getUnmatchedValueObjFields();
+        List<FieldMapper> unmatchedValueObjFields = getDeEntityTranslator().getUnmatchedValueObjFields();
         for (FieldMapper fieldMapper : unmatchedValueObjFields) {
             Object valueObj = BeanUtil.getFieldValue(entity, fieldMapper.getField());
             valueObj = valueObj != null ? fieldMapper.deconstruct(valueObj) : null;

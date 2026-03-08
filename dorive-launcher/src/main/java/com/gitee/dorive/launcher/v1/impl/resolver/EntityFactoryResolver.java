@@ -22,7 +22,6 @@ import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
 import com.gitee.dorive.factory.v1.api.EntityTranslator;
 import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
-import com.gitee.dorive.factory.v1.api.FieldMapper;
 import com.gitee.dorive.factory.v1.impl.factory.ContextEntityFactory;
 import com.gitee.dorive.factory.v1.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.factory.v1.impl.factory.ValueObjEntityFactory;
@@ -30,8 +29,6 @@ import com.gitee.dorive.repository.v1.impl.repository.AbstractContextRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -50,8 +47,7 @@ public class EntityFactoryResolver {
         Class<?> factoryClass = repositoryDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
-            List<FieldMapper> valueObjFields = entityTranslatorManager.getValueObjFields();
-            entityFactory = valueObjFields.isEmpty() ? new DefaultEntityFactory() : new ValueObjEntityFactory();
+            entityFactory = !entityTranslatorManager.containValueObj() ? new DefaultEntityFactory() : new ValueObjEntityFactory();
         } else {
             ApplicationContext applicationContext = repository.getApplicationContext();
             entityFactory = (EntityFactory) applicationContext.getBean(factoryClass);

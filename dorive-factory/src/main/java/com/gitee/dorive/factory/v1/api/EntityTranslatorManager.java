@@ -20,16 +20,13 @@ package com.gitee.dorive.factory.v1.api;
 import com.gitee.dorive.base.v1.factory.api.TranslatorManager;
 
 import java.lang.reflect.Type;
-import java.util.List;
 
 public interface EntityTranslatorManager extends TranslatorManager {
 
-    List<FieldMapper> getValueObjFields();
-
-    List<FieldMapper> getMatchedValueObjFields();
-
-    List<FieldMapper> getUnmatchedValueObjFields();
+    boolean containValueObj();
 
     boolean isValueObjType(Type type);
+
+    boolean containMatchedValueObj();
 
 }

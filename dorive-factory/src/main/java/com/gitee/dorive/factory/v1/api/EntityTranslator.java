@@ -32,4 +32,10 @@ public interface EntityTranslator extends Translator {
 
     FieldMapper getFieldMapperByAlias(String alias);
 
+    List<FieldMapper> getValueObjFields();
+
+    List<FieldMapper> getMatchedValueObjFields();
+
+    List<FieldMapper> getUnmatchedValueObjFields();
+
 }
