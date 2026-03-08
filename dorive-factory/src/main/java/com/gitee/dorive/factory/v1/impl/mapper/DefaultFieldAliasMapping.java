@@ -18,7 +18,7 @@
 package com.gitee.dorive.factory.v1.impl.mapper;
 
 import com.gitee.dorive.factory.v1.api.Converter;
-import com.gitee.dorive.factory.v1.api.FieldMapper;
+import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +26,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class DefaultFieldMapper implements FieldMapper {
+public class DefaultFieldAliasMapping implements FieldAliasMapping {
     private String field;
     private String alias;
     private Converter converter;

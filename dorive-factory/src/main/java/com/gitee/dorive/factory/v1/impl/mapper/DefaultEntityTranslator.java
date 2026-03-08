@@ -19,7 +19,7 @@ package com.gitee.dorive.factory.v1.impl.mapper;
 
 import com.gitee.dorive.factory.v1.api.Converter;
 import com.gitee.dorive.factory.v1.api.EntityTranslator;
-import com.gitee.dorive.factory.v1.api.FieldMapper;
+import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,26 +35,26 @@ public class DefaultEntityTranslator implements EntityTranslator {
 
     private Map<String, String> fieldAliasMap = new LinkedHashMap<>();
     private Map<String, String> aliasFieldMap = new LinkedHashMap<>();
-    private Map<String, FieldMapper> fieldFieldMapperMap = new LinkedHashMap<>();
-    private Map<String, FieldMapper> aliasFieldMapperMap = new LinkedHashMap<>();
-    private List<FieldMapper> valueObjFields = new ArrayList<>(4);
-    private List<FieldMapper> matchedValueObjFields = new ArrayList<>(4);
-    private List<FieldMapper> unmatchedValueObjFields = new ArrayList<>(4);
+    private Map<String, FieldAliasMapping> fieldFieldAliasMappingMap = new LinkedHashMap<>();
+    private Map<String, FieldAliasMapping> aliasFieldAliasMappingMap = new LinkedHashMap<>();
+    private List<FieldAliasMapping> valueObjFields = new ArrayList<>(4);
+    private List<FieldAliasMapping> matchedValueObjFields = new ArrayList<>(4);
+    private List<FieldAliasMapping> unmatchedValueObjFields = new ArrayList<>(4);
 
     public void addField(String field, boolean isMatch, String alias, boolean isValueObj, Converter converter) {
         fieldAliasMap.put(field, alias);
         aliasFieldMap.put(alias, field);
 
-        FieldMapper fieldMapper = new DefaultFieldMapper(field, alias, converter);
-        fieldFieldMapperMap.put(field, fieldMapper);
-        aliasFieldMapperMap.put(alias, fieldMapper);
+        FieldAliasMapping fieldAliasMapping = new DefaultFieldAliasMapping(field, alias, converter);
+        fieldFieldAliasMappingMap.put(field, fieldAliasMapping);
+        aliasFieldAliasMappingMap.put(alias, fieldAliasMapping);
 
         if (isValueObj) {
-            valueObjFields.add(fieldMapper);
+            valueObjFields.add(fieldAliasMapping);
             if (isMatch) {
-                matchedValueObjFields.add(fieldMapper);
+                matchedValueObjFields.add(fieldAliasMapping);
             } else {
-                unmatchedValueObjFields.add(fieldMapper);
+                unmatchedValueObjFields.add(fieldAliasMapping);
             }
         }
     }
@@ -96,12 +96,12 @@ public class DefaultEntityTranslator implements EntityTranslator {
     }
 
     @Override
-    public FieldMapper getFieldMapperByField(String field) {
-        return fieldFieldMapperMap.get(field);
+    public FieldAliasMapping getFieldAliasMappingByField(String field) {
+        return fieldFieldAliasMappingMap.get(field);
     }
 
     @Override
-    public FieldMapper getFieldMapperByAlias(String alias) {
-        return aliasFieldMapperMap.get(alias);
+    public FieldAliasMapping getFieldAliasMappingByAlias(String alias) {
+        return aliasFieldAliasMappingMap.get(alias);
     }
 }

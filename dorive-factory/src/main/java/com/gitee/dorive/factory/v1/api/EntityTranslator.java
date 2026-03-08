@@ -28,14 +28,14 @@ public interface EntityTranslator extends Translator {
 
     Set<String> toAliases(Set<String> fields);
 
-    FieldMapper getFieldMapperByField(String field);
+    FieldAliasMapping getFieldAliasMappingByField(String field);
 
-    FieldMapper getFieldMapperByAlias(String alias);
+    FieldAliasMapping getFieldAliasMappingByAlias(String alias);
 
-    List<FieldMapper> getValueObjFields();
+    List<FieldAliasMapping> getValueObjFields();
 
-    List<FieldMapper> getMatchedValueObjFields();
+    List<FieldAliasMapping> getMatchedValueObjFields();
 
-    List<FieldMapper> getUnmatchedValueObjFields();
+    List<FieldAliasMapping> getUnmatchedValueObjFields();
 
 }

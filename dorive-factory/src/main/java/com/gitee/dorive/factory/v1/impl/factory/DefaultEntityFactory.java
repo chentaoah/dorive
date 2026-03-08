@@ -25,7 +25,7 @@ import com.gitee.dorive.factory.v1.api.EntityAdapter;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
 import com.gitee.dorive.factory.v1.api.EntityTranslator;
 import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
-import com.gitee.dorive.factory.v1.api.FieldMapper;
+import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -64,23 +64,23 @@ public class DefaultEntityFactory implements EntityFactory {
 
     private void initReCopyOptions() {
         this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(alias -> {
-            FieldMapper fieldMapperByAlias = reEntityTranslator.getFieldMapperByAlias(alias);
-            return fieldMapperByAlias != null ? fieldMapperByAlias.getField() : alias;
+            FieldAliasMapping fieldAliasMappingByAlias = reEntityTranslator.getFieldAliasMappingByAlias(alias);
+            return fieldAliasMappingByAlias != null ? fieldAliasMappingByAlias.getField() : alias;
 
         }).setFieldValueEditor((field, value) -> {
-            FieldMapper fieldMapperByField = reEntityTranslator.getFieldMapperByField(field);
-            return fieldMapperByField != null ? fieldMapperByField.reconstitute(value) : value;
+            FieldAliasMapping fieldAliasMappingByField = reEntityTranslator.getFieldAliasMappingByField(field);
+            return fieldAliasMappingByField != null ? fieldAliasMappingByField.reconstitute(value) : value;
         });
     }
 
     private void initDeCopyOptions() {
         this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(field -> {
-            FieldMapper fieldMapperByField = deEntityTranslator.getFieldMapperByField(field);
-            return fieldMapperByField != null ? fieldMapperByField.getAlias() : field;
+            FieldAliasMapping fieldAliasMappingByField = deEntityTranslator.getFieldAliasMappingByField(field);
+            return fieldAliasMappingByField != null ? fieldAliasMappingByField.getAlias() : field;
 
         }).setFieldValueEditor((alias, value) -> {
-            FieldMapper fieldMapperByAlias = deEntityTranslator.getFieldMapperByAlias(alias);
-            return fieldMapperByAlias != null ? fieldMapperByAlias.deconstruct(value) : value;
+            FieldAliasMapping fieldAliasMappingByAlias = deEntityTranslator.getFieldAliasMappingByAlias(alias);
+            return fieldAliasMappingByAlias != null ? fieldAliasMappingByAlias.deconstruct(value) : value;
         });
     }
 

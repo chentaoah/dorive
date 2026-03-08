@@ -27,7 +27,7 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.factory.v1.api.EntityTranslator;
 import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
-import com.gitee.dorive.factory.v1.api.FieldMapper;
+import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
 import com.gitee.dorive.factory.v1.util.TypeUtils;
 
 import java.util.Collection;
@@ -111,11 +111,11 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     public Object doReconstitute(Context context, Object persistent) {
         Object entity = super.doReconstitute(context, persistent);
         Map<String, Object> resultMap = (Map<String, Object>) persistent;
-        List<FieldMapper> unmatchedValueObjFields = getReEntityTranslator().getUnmatchedValueObjFields();
-        for (FieldMapper fieldMapper : unmatchedValueObjFields) {
-            Object valueObj = fieldMapper.reconstitute(resultMap);
+        List<FieldAliasMapping> unmatchedValueObjFields = getReEntityTranslator().getUnmatchedValueObjFields();
+        for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
+            Object valueObj = fieldAliasMapping.reconstitute(resultMap);
             if (valueObj != null) {
-                BeanUtil.setFieldValue(entity, fieldMapper.getField(), valueObj);
+                BeanUtil.setFieldValue(entity, fieldAliasMapping.getField(), valueObj);
             }
         }
         return entity;
@@ -124,10 +124,10 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     @Override
     public Object doDeconstruct(Context context, Object entity) {
         Object pojo = super.doDeconstruct(context, entity);
-        List<FieldMapper> unmatchedValueObjFields = getDeEntityTranslator().getUnmatchedValueObjFields();
-        for (FieldMapper fieldMapper : unmatchedValueObjFields) {
-            Object valueObj = BeanUtil.getFieldValue(entity, fieldMapper.getField());
-            valueObj = valueObj != null ? fieldMapper.deconstruct(valueObj) : null;
+        List<FieldAliasMapping> unmatchedValueObjFields = getDeEntityTranslator().getUnmatchedValueObjFields();
+        for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
+            Object valueObj = BeanUtil.getFieldValue(entity, fieldAliasMapping.getField());
+            valueObj = valueObj != null ? fieldAliasMapping.deconstruct(valueObj) : null;
             if (valueObj != null) {
                 BeanUtil.copyProperties(valueObj, pojo, CopyOptions.create().ignoreNullValue());
             }

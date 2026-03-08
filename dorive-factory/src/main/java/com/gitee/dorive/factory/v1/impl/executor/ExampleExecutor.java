@@ -29,7 +29,7 @@ import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.executor.impl.AbstractProxyExecutor;
 import com.gitee.dorive.factory.v1.api.EntityTranslator;
-import com.gitee.dorive.factory.v1.api.FieldMapper;
+import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
 import com.gitee.dorive.base.v1.core.entity.op.Condition;
 import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.cop.ConditionUpdate;
@@ -163,13 +163,13 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
         String property = criterion.getProperty();
         Object value = criterion.getValue();
 
-        FieldMapper fieldMapper = entityTranslator.getFieldMapperByField(property);
-        if (fieldMapper == null) {
-            fieldMapper = entityTranslator.getFieldMapperByAlias(property);
+        FieldAliasMapping fieldAliasMapping = entityTranslator.getFieldAliasMappingByField(property);
+        if (fieldAliasMapping == null) {
+            fieldAliasMapping = entityTranslator.getFieldAliasMappingByAlias(property);
         }
-        if (fieldMapper != null) {
-            property = fieldMapper.getAlias();
-            value = fieldMapper.deconstruct(value);
+        if (fieldAliasMapping != null) {
+            property = fieldAliasMapping.getAlias();
+            value = fieldAliasMapping.deconstruct(value);
             criterion.setProperty(property);
             criterion.setValue(value);
         }
