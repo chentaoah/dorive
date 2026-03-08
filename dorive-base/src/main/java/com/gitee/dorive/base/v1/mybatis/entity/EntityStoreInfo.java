@@ -32,9 +32,9 @@ public class EntityStoreInfo {
     private String tableName;
     private String idProperty;
     private String idColumn;
-    private Map<String, String> propAliasMappingWithoutPk;
-    private Map<String, String> propAliasMapping;
-    private Map<String, String> aliasPropMapping;
+    private Map<String, String> propAliasMapWithoutPk;
+    private Map<String, String> propAliasMap;
+    private Map<String, String> aliasPropMap;
     private String selectColumns;
     private Map<String, MethodInvoker> selectMethodMap;
 }

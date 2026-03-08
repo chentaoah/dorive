@@ -238,8 +238,8 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     }
 
     private void buildUpdateWrapper(UpdateWrapper<Object> updateWrapper, Object persistentObj, Set<String> nullableProps) {
-        Map<String, String> propAliasMappingWithoutPk = entityStoreInfo.getPropAliasMappingWithoutPk();
-        propAliasMappingWithoutPk.forEach((prop, alias) -> {
+        Map<String, String> propAliasMapWithoutPk = entityStoreInfo.getPropAliasMapWithoutPk();
+        propAliasMapWithoutPk.forEach((prop, alias) -> {
             Object value = BeanUtil.getFieldValue(persistentObj, prop);
             if (value != null || nullableProps.contains(alias)) {
                 updateWrapper.set(true, alias, value);

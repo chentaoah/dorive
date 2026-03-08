@@ -76,7 +76,7 @@ public class MybatisPlusRepositoryBuilder {
         String reCategory = Category.ENTITY_DATABASE.name();
         String deCategory = Category.ENTITY_POJO.name();
 
-        EntityTranslatorManagerResolver entityTranslatorManagerResolver = new EntityTranslatorManagerResolver(entityElement, entityStoreInfo.getAliasPropMapping(), reCategory, deCategory);
+        EntityTranslatorManagerResolver entityTranslatorManagerResolver = new EntityTranslatorManagerResolver(entityElement, entityStoreInfo.getAliasPropMap(), reCategory, deCategory);
         EntityTranslatorManager entityTranslatorManager = entityTranslatorManagerResolver.newEntityTranslatorManager();
         repository.setProperty(EntityTranslatorManager.class, entityTranslatorManager);
 
@@ -144,20 +144,20 @@ public class MybatisPlusRepositoryBuilder {
         List<TableFieldInfo> tableFieldInfos = tableInfo.getFieldList();
         int size = tableFieldInfos.size() + 1;
 
-        Map<String, String> propAliasMappingWithoutPk = new LinkedHashMap<>(size * 4 / 3 + 1);
+        Map<String, String> propAliasMapWithoutPk = new LinkedHashMap<>(size * 4 / 3 + 1);
         for (TableFieldInfo tableFieldInfo : tableFieldInfos) {
-            propAliasMappingWithoutPk.put(tableFieldInfo.getProperty(), tableFieldInfo.getColumn());
+            propAliasMapWithoutPk.put(tableFieldInfo.getProperty(), tableFieldInfo.getColumn());
         }
 
-        Map<String, String> propAliasMapping = new LinkedHashMap<>(size * 4 / 3 + 1);
+        Map<String, String> propAliasMap = new LinkedHashMap<>(size * 4 / 3 + 1);
         if (StringUtils.isNotBlank(keyProperty) && StringUtils.isNotBlank(keyColumn)) {
-            propAliasMapping.put(keyProperty, keyColumn);
+            propAliasMap.put(keyProperty, keyColumn);
         }
-        propAliasMapping.putAll(propAliasMappingWithoutPk);
+        propAliasMap.putAll(propAliasMapWithoutPk);
 
-        Map<String, String> aliasPropMapping = MapUtil.reverse(propAliasMapping);
+        Map<String, String> aliasPropMap = MapUtil.reverse(propAliasMap);
 
-        List<String> columns = new ArrayList<>(propAliasMapping.values());
+        List<String> columns = new ArrayList<>(propAliasMap.values());
         String selectColumns = StrUtil.join(",", columns);
 
         Map<String, MethodInvoker> selectMethodMap = new ConcurrentHashMap<>(8);
@@ -168,7 +168,7 @@ public class MybatisPlusRepositoryBuilder {
                 selectMethodMap.putIfAbsent(name, methodInvoker);
             }
         }
-        return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn, propAliasMappingWithoutPk, propAliasMapping, aliasPropMapping, selectColumns, selectMethodMap);
+        return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn, propAliasMapWithoutPk, propAliasMap, aliasPropMap, selectColumns, selectMethodMap);
     }
 
     private Executor newExecutor(EntityElement entityElement, EntityStoreInfo entityStoreInfo) {

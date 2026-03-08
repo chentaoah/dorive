@@ -46,13 +46,13 @@ import java.util.Set;
 public class EntityTranslatorManagerResolver {
 
     private EntityElement entityElement;
-    private Map<String, String> aliasPropMapping;
+    private Map<String, String> aliasPropMap;
     private String reCategory;
     private String deCategory;
 
     public EntityTranslatorManager newEntityTranslatorManager() {
         List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
-        Map<String, String> fieldAliasMapping = entityElement.getFieldAliasMapping();
+        Map<String, String> fieldAliasMap = entityElement.getFieldAliasMap();
 
         // 类别 => EntityTranslator
         Map<String, EntityTranslator> categoryEntityTranslatorMap = new LinkedHashMap<>(4);
@@ -65,12 +65,12 @@ public class EntityTranslatorManagerResolver {
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
             // 字段名称
             String field = fieldDefinition.getFieldName();
-            String expected = fieldAliasMapping.getOrDefault(field, field);
+            String expected = fieldAliasMap.getOrDefault(field, field);
 
             // 是否存在别名
-            boolean isMatch = aliasPropMapping.containsKey(expected);
+            boolean isMatch = aliasPropMap.containsKey(expected);
             String alias = isMatch ? expected : null;
-            String prop = isMatch ? aliasPropMapping.get(alias) : null;
+            String prop = isMatch ? aliasPropMap.get(alias) : null;
 
             // 是否值对象
             FieldDef fieldDef = fieldDefinition.getFieldDef();
