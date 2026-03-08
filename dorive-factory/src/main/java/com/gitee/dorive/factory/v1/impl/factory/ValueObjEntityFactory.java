@@ -25,16 +25,21 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.factory.v1.api.EntityTranslator;
 import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
 import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
 import com.gitee.dorive.factory.v1.util.TypeUtils;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+@Getter
+@Setter
 public class ValueObjEntityFactory extends DefaultEntityFactory {
+
+    private EntityTranslatorManager entityTranslatorManager;
 
     // 从hutool源码中拷贝
     protected TypeConverter converter = (type, value) -> {
@@ -49,8 +54,8 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     };
 
     @Override
-    public void setEntityTranslatorManager(EntityTranslatorManager entityTranslatorManager, EntityTranslator reEntityTranslator, EntityTranslator deEntityTranslator) {
-        super.setEntityTranslatorManager(entityTranslatorManager, reEntityTranslator, deEntityTranslator);
+    public void initialize() {
+        super.initialize();
         if (entityTranslatorManager.containMatchedValueObj()) {
             setReCopyOptions();
             setDeCopyOptions();
@@ -58,7 +63,6 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     }
 
     private void setReCopyOptions() {
-        EntityTranslatorManager entityTranslatorManager = getEntityTranslatorManager();
         getReCopyOptions().setConverter(((targetType, value) -> {
             if (value == null) {
                 return null;
@@ -84,7 +88,6 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     }
 
     private void setDeCopyOptions() {
-        EntityTranslatorManager entityTranslatorManager = getEntityTranslatorManager();
         getDeCopyOptions().setConverter(((targetType, value) -> {
             if (value == null) {
                 return null;

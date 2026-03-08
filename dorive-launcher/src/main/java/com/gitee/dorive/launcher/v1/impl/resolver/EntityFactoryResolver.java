@@ -52,12 +52,23 @@ public class EntityFactoryResolver {
             ApplicationContext applicationContext = repository.getApplicationContext();
             entityFactory = (EntityFactory) applicationContext.getBean(factoryClass);
         }
+        // 默认
         if (entityFactory instanceof DefaultEntityFactory) {
             DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
             defaultEntityFactory.setEntityElement(entityElement);
-            defaultEntityFactory.setReType(entityElement.getGenericType());
+            defaultEntityFactory.setReType(reType);
             defaultEntityFactory.setDeType(deType);
-            defaultEntityFactory.setEntityTranslatorManager(entityTranslatorManager, reEntityTranslator, deEntityTranslator);
+            defaultEntityFactory.setReEntityTranslator(reEntityTranslator);
+            defaultEntityFactory.setDeEntityTranslator(deEntityTranslator);
+        }
+        // 值对象
+        if (entityFactory instanceof ValueObjEntityFactory) {
+            ValueObjEntityFactory valueObjEntityFactory = (ValueObjEntityFactory) entityFactory;
+            valueObjEntityFactory.setEntityTranslatorManager(entityTranslatorManager);
+        }
+        // 初始化
+        if (entityFactory instanceof DefaultEntityFactory) {
+            ((DefaultEntityFactory) entityFactory).initialize();
         }
         // 边界上下文实体工厂
         ContextEntityFactory contextEntityFactory = new ContextEntityFactory();

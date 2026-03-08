@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.factory.v1.api;
 
-public interface EntityAdapter {
+public interface TypeAdapter {
 
-    Class<?> adaptEntityType(Object persistent);
+    Class<?> determineType(Object persistent);
 
 }

@@ -21,11 +21,11 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.factory.v1.api.EntityAdapter;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
 import com.gitee.dorive.factory.v1.api.EntityTranslator;
-import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
 import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
+import com.gitee.dorive.factory.v1.api.TypeAdapter;
+import com.gitee.dorive.factory.v1.impl.adapter.MapTypeAdapter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,25 +41,23 @@ import java.util.List;
 public class DefaultEntityFactory implements EntityFactory {
 
     private EntityElement entityElement;
+    // 类型
     private Class<?> reType;
     private Class<?> deType;
-    // 序列化
-    private EntityTranslatorManager entityTranslatorManager;
+    // 转换器
     private EntityTranslator reEntityTranslator;
     private EntityTranslator deEntityTranslator;
+    // 序列化配置
     private CopyOptions reCopyOptions;
     private CopyOptions deCopyOptions;
     // 适配器
-    private EntityAdapter entityAdapter;
+    private TypeAdapter typeAdapter;
 
-    public void setEntityTranslatorManager(EntityTranslatorManager entityTranslatorManager, EntityTranslator reEntityTranslator, EntityTranslator deEntityTranslator) {
-        this.entityTranslatorManager = entityTranslatorManager;
-        this.reEntityTranslator = reEntityTranslator;
-        this.deEntityTranslator = deEntityTranslator;
+    public void initialize() {
         initReCopyOptions();
         initDeCopyOptions();
-        initEntityAdapter();
-        processEntityAdapter();
+        initTypeAdapter();
+        processTypeAdapter();
     }
 
     private void initReCopyOptions() {
@@ -84,13 +82,13 @@ public class DefaultEntityFactory implements EntityFactory {
         });
     }
 
-    protected void initEntityAdapter() {
-        this.entityAdapter = (persistent) -> reType;
+    protected void initTypeAdapter() {
+        this.typeAdapter = (persistent) -> reType;
     }
 
-    protected void processEntityAdapter() {
-        if (entityAdapter instanceof AdaptiveEntityAdapter) {
-            ((AdaptiveEntityAdapter) entityAdapter).initialize(entityElement, reEntityTranslator);
+    protected void processTypeAdapter() {
+        if (typeAdapter instanceof MapTypeAdapter) {
+            ((MapTypeAdapter) typeAdapter).initialize(entityElement, reEntityTranslator);
         }
     }
 
@@ -105,7 +103,7 @@ public class DefaultEntityFactory implements EntityFactory {
     }
 
     public Object doReconstitute(Context context, Object persistent) {
-        return BeanUtil.toBean(persistent, entityAdapter.adaptEntityType(persistent), reCopyOptions);
+        return BeanUtil.toBean(persistent, typeAdapter.determineType(persistent), reCopyOptions);
     }
 
     @Override
