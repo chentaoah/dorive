@@ -17,12 +17,12 @@
 
 package com.gitee.dorive.factory.v1.api;
 
+import com.gitee.dorive.base.v1.factory.api.TranslatorManager;
+
 import java.lang.reflect.Type;
 import java.util.List;
 
-public interface EntityMappers {
-
-    EntityMapper getEntityMapper(String mapper);
+public interface EntityMappers extends TranslatorManager {
 
     List<FieldMapper> getValueObjFields();
 

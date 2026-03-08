@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.factory.v1.impl.mapper;
 
+import com.gitee.dorive.base.v1.factory.api.Translator;
 import com.gitee.dorive.factory.v1.api.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMappers;
 import com.gitee.dorive.factory.v1.api.FieldMapper;
@@ -38,8 +39,8 @@ public class DefaultEntityMappers implements EntityMappers {
     private final Set<Type> valueObjTypes;
 
     @Override
-    public EntityMapper getEntityMapper(String mapper) {
-        return mapperEntityMapperMap.get(mapper);
+    public Translator getTranslator(String category) {
+        return mapperEntityMapperMap.get(category);
     }
 
     @Override

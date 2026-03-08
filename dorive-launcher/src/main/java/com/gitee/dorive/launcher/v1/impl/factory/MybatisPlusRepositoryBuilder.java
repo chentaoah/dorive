@@ -81,13 +81,12 @@ public class MybatisPlusRepositoryBuilder {
         repository.setProperty(EntityMappers.class, entityMappers);
 
         // 命名转换器管理
-        TranslatorManager translatorManager = entityMappers::getEntityMapper;
-        Translator translator = translatorManager.getTranslator(Category.ENTITY_DATABASE.name());
-        repository.setProperty(TranslatorManager.class, translatorManager);
+        Translator translator = entityMappers.getTranslator(Category.ENTITY_DATABASE.name());
+        repository.setProperty(TranslatorManager.class, entityMappers);
         repository.setProperty(Translator.class, translator);
 
-        EntityMapper reEntityMapper = entityMappers.getEntityMapper(reMapper);
-        EntityMapper deEntityMapper = entityMappers.getEntityMapper(deMapper);
+        EntityMapper reEntityMapper = (EntityMapper) entityMappers.getTranslator(reMapper);
+        EntityMapper deEntityMapper = (EntityMapper) entityMappers.getTranslator(deMapper);
 
         EntityFactoryResolver entityFactoryResolver = new EntityFactoryResolver(
                 repository, entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(), entityMappers, reEntityMapper, deEntityMapper);
@@ -107,7 +106,7 @@ public class MybatisPlusRepositoryBuilder {
         defaultRepository.setExecutor(executor);
         defaultRepository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         defaultRepository.setProperty(EntityMappers.class, entityMappers);
-        defaultRepository.setProperty(TranslatorManager.class, translatorManager);
+        defaultRepository.setProperty(TranslatorManager.class, entityMappers);
         defaultRepository.setProperty(Translator.class, translator);
         defaultRepository.setProperty(ExampleConverter.class, exampleConverter);
         return defaultRepository;
