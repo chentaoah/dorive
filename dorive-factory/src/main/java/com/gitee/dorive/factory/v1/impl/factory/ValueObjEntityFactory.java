@@ -109,8 +109,8 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Object reconstitute(Context context, Object persistent) {
-        Object entity = super.reconstitute(context, persistent);
+    public Object doReconstitute(Context context, Object persistent) {
+        Object entity = super.doReconstitute(context, persistent);
         Map<String, Object> resultMap = (Map<String, Object>) persistent;
         EntityMappers entityMappers = getEntityMappers();
         List<FieldMapper> unmatchedValueObjFields = entityMappers.getUnmatchedValueObjFields();
@@ -124,8 +124,8 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     }
 
     @Override
-    public Object deconstruct(Context context, Object entity) {
-        Object pojo = super.deconstruct(context, entity);
+    public Object doDeconstruct(Context context, Object entity) {
+        Object pojo = super.doDeconstruct(context, entity);
         EntityMappers entityMappers = getEntityMappers();
         List<FieldMapper> unmatchedValueObjFields = entityMappers.getUnmatchedValueObjFields();
         for (FieldMapper fieldMapper : unmatchedValueObjFields) {

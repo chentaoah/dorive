@@ -98,13 +98,13 @@ public class DefaultEntityFactory implements EntityFactory {
     public List<Object> reconstitute(Context context, List<?> persistentObjs) {
         List<Object> entities = new ArrayList<>(persistentObjs.size());
         for (Object persistent : persistentObjs) {
-            Object entity = reconstitute(context, persistent);
+            Object entity = doReconstitute(context, persistent);
             entities.add(entity);
         }
         return entities;
     }
 
-    public Object reconstitute(Context context, Object persistent) {
+    public Object doReconstitute(Context context, Object persistent) {
         return BeanUtil.toBean(persistent, entityAdapter.adaptEntityType(persistent), reCopyOptions);
     }
 
@@ -112,13 +112,13 @@ public class DefaultEntityFactory implements EntityFactory {
     public List<Object> deconstruct(Context context, List<?> entities) {
         List<Object> persistentObjs = new ArrayList<>(entities.size());
         for (Object entity : entities) {
-            Object persistent = deconstruct(context, entity);
+            Object persistent = doDeconstruct(context, entity);
             persistentObjs.add(persistent);
         }
         return persistentObjs;
     }
 
-    public Object deconstruct(Context context, Object entity) {
+    public Object doDeconstruct(Context context, Object entity) {
         return BeanUtil.toBean(entity, deType, deCopyOptions);
     }
 
