@@ -52,10 +52,15 @@ public class EntityTranslatorManagerResolver {
         List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
         Map<String, String> fieldAliasMapping = entityElement.getFieldAliasMapping();
 
+        // 类别 => EntityTranslator
         Map<String, EntityTranslator> mapperEntityTranslatorMap = new LinkedHashMap<>(4);
+        // 全部的值对象字段
         List<FieldMapper> valueObjFields = new ArrayList<>(4);
+        // 匹配的值对象字段
         List<FieldMapper> matchedValueObjFields = new ArrayList<>(4);
+        // 未匹配的值对象字段
         List<FieldMapper> unmatchedValueObjFields = new ArrayList<>(4);
+        // 全部的值对象类型
         Set<Type> valueObjTypes = new HashSet<>(6);
 
         int size = fieldDefinitions.size() * 4 / 3 + 1;
