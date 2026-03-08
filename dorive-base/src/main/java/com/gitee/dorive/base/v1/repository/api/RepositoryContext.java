@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.base.v1.repository.api;
 
+import com.gitee.dorive.base.v1.common.api.BoundedContext;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Options;
@@ -35,6 +36,8 @@ public interface RepositoryContext extends Properties {
     Class<?> getEntityClass();
 
     ApplicationContext getApplicationContext();
+
+    BoundedContext getBoundedContext();
 
     RepositoryDef getRepositoryDef();
 

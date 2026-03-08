@@ -41,7 +41,7 @@ import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
 import com.gitee.dorive.factory.v1.impl.executor.ExampleExecutor;
 import com.gitee.dorive.factory.v1.impl.executor.FactoryExecutor;
 import com.gitee.dorive.factory.v1.impl.resolver.EntityTranslatorManagerResolver;
-import com.gitee.dorive.launcher.v1.impl.resolver.EntityFactoryResolver;
+import com.gitee.dorive.factory.v1.impl.resolver.EntityFactoryResolver;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.binder.v1.impl.union.UnionExecutor;
 import com.gitee.dorive.mybatis.plus.v1.impl.common.DefaultMethodInvoker;

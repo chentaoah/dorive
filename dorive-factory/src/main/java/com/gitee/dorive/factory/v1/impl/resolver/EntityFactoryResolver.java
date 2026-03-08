@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.launcher.v1.impl.resolver;
+package com.gitee.dorive.factory.v1.impl.resolver;
 
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
 import com.gitee.dorive.factory.v1.api.EntityTranslator;
 import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
 import com.gitee.dorive.factory.v1.impl.factory.ContextEntityFactory;
 import com.gitee.dorive.factory.v1.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.factory.v1.impl.factory.ValueObjEntityFactory;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractContextRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
@@ -34,7 +34,7 @@ import org.springframework.context.ApplicationContext;
 @AllArgsConstructor
 public class EntityFactoryResolver {
 
-    private AbstractContextRepository<?, ?> repository;
+    private RepositoryContext repository;
     private EntityElement entityElement;
     private Class<?> reType;
     private Class<?> deType;
