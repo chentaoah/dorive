@@ -45,15 +45,15 @@ public class EntityTranslatorManagerResolver {
 
     private EntityElement entityElement;
     private Map<String, String> aliasPropMapping;
-    private String reMapper;
-    private String deMapper;
+    private String reCategory;
+    private String deCategory;
 
     public EntityTranslatorManager newEntityTranslatorManager() {
         List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
         Map<String, String> fieldAliasMapping = entityElement.getFieldAliasMapping();
 
         // 类别 => EntityTranslator
-        Map<String, EntityTranslator> mapperEntityTranslatorMap = new LinkedHashMap<>(4);
+        Map<String, EntityTranslator> categoryEntityTranslatorMap = new LinkedHashMap<>(4);
         // 全部的值对象字段
         List<FieldMapper> valueObjFields = new ArrayList<>(4);
         // 匹配的值对象字段
@@ -64,7 +64,9 @@ public class EntityTranslatorManagerResolver {
         Set<Type> valueObjTypes = new HashSet<>(6);
 
         int size = fieldDefinitions.size() * 4 / 3 + 1;
+        // ENTITY_DATABASE
         DefaultEntityTranslator entityTranslator1 = new DefaultEntityTranslator(new LinkedHashMap<>(size), new LinkedHashMap<>(size), new LinkedHashMap<>(size));
+        // ENTITY_POJO
         DefaultEntityTranslator entityTranslator2 = new DefaultEntityTranslator(new LinkedHashMap<>(size), new LinkedHashMap<>(size), new LinkedHashMap<>(size));
 
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
@@ -94,10 +96,10 @@ public class EntityTranslatorManagerResolver {
             }
         }
 
-        mapperEntityTranslatorMap.put(reMapper, entityTranslator1);
-        mapperEntityTranslatorMap.put(deMapper, entityTranslator2);
+        categoryEntityTranslatorMap.put(reCategory, entityTranslator1);
+        categoryEntityTranslatorMap.put(deCategory, entityTranslator2);
 
-        return new DefaultEntityTranslatorManager(mapperEntityTranslatorMap, valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes);
+        return new DefaultEntityTranslatorManager(categoryEntityTranslatorMap, valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes);
     }
 
     private Converter newConverter(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {

@@ -73,10 +73,10 @@ public class MybatisPlusRepositoryBuilder {
         EntityStoreInfo entityStoreInfo = resolveEntityStoreInfo(repository.getRepositoryDef());
         repository.setProperty(EntityStoreInfo.class, entityStoreInfo);
 
-        String reMapper = Category.ENTITY_DATABASE.name();
-        String deMapper = Category.ENTITY_POJO.name();
+        String reCategory = Category.ENTITY_DATABASE.name();
+        String deCategory = Category.ENTITY_POJO.name();
 
-        EntityTranslatorManagerResolver entityTranslatorManagerResolver = new EntityTranslatorManagerResolver(entityElement, entityStoreInfo.getAliasPropMapping(), reMapper, deMapper);
+        EntityTranslatorManagerResolver entityTranslatorManagerResolver = new EntityTranslatorManagerResolver(entityElement, entityStoreInfo.getAliasPropMapping(), reCategory, deCategory);
         EntityTranslatorManager entityTranslatorManager = entityTranslatorManagerResolver.newEntityTranslatorManager();
         repository.setProperty(EntityTranslatorManager.class, entityTranslatorManager);
 
@@ -85,8 +85,8 @@ public class MybatisPlusRepositoryBuilder {
         repository.setProperty(TranslatorManager.class, entityTranslatorManager);
         repository.setProperty(Translator.class, translator);
 
-        EntityTranslator reEntityTranslator = (EntityTranslator) entityTranslatorManager.getTranslator(reMapper);
-        EntityTranslator deEntityTranslator = (EntityTranslator) entityTranslatorManager.getTranslator(deMapper);
+        EntityTranslator reEntityTranslator = (EntityTranslator) entityTranslatorManager.getTranslator(reCategory);
+        EntityTranslator deEntityTranslator = (EntityTranslator) entityTranslatorManager.getTranslator(deCategory);
 
         EntityFactoryResolver entityFactoryResolver = new EntityFactoryResolver(
                 repository, entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(), entityTranslatorManager, reEntityTranslator, deEntityTranslator);

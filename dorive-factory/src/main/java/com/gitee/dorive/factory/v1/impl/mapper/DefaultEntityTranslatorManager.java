@@ -32,7 +32,7 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor
 public class DefaultEntityTranslatorManager implements EntityTranslatorManager {
-    private final Map<String, EntityTranslator> mapperEntityTranslatorMap;
+    private final Map<String, EntityTranslator> categoryEntityTranslatorMap;
     private final List<FieldMapper> valueObjFields;
     private final List<FieldMapper> matchedValueObjFields;
     private final List<FieldMapper> unmatchedValueObjFields;
@@ -40,7 +40,7 @@ public class DefaultEntityTranslatorManager implements EntityTranslatorManager {
 
     @Override
     public Translator getTranslator(String category) {
-        return mapperEntityTranslatorMap.get(category);
+        return categoryEntityTranslatorMap.get(category);
     }
 
     @Override
