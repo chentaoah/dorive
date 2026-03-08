@@ -19,10 +19,7 @@ package com.gitee.dorive.factory.v1.impl.factory;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
-import com.gitee.dorive.base.v1.common.api.BoundedContext;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.common.entity.PropertyDefinition;
-import com.gitee.dorive.base.v1.common.def.PropertyDef;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.factory.v1.api.EntityAdapter;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
@@ -36,8 +33,6 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Setter
@@ -54,31 +49,8 @@ public class DefaultEntityFactory implements EntityFactory {
     private EntityMapper deEntityMapper;
     private CopyOptions reCopyOptions;
     private CopyOptions deCopyOptions;
-    // 边界上下文
-    private String boundedContextName;
-    private BoundedContext boundedContext;
-    private CopyOptions ctxCopyOptions;
     // 适配器
     private EntityAdapter entityAdapter;
-
-    public void setEntityElement(EntityElement entityElement) {
-        this.entityElement = entityElement;
-        initCtxCopyOptions();
-    }
-
-    private void initCtxCopyOptions() {
-        List<PropertyDefinition> propertyDefinitions = entityElement.getPropertyDefinitions();
-        if (!propertyDefinitions.isEmpty()) {
-            Map<String, String> keyFieldNameMapping = new ConcurrentHashMap<>(propertyDefinitions.size() * 4 / 3 + 1);
-            for (PropertyDefinition propertyDefinition : propertyDefinitions) {
-                PropertyDef propertyDef = propertyDefinition.getPropertyDef();
-                String key = propertyDef.getValue();
-                String fieldName = propertyDefinition.getFieldName();
-                keyFieldNameMapping.put(key, fieldName);
-            }
-            this.ctxCopyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(keyFieldNameMapping);
-        }
-    }
 
     public void setEntityMappers(EntityMappers entityMappers, EntityMapper reEntityMapper, EntityMapper deEntityMapper) {
         this.entityMappers = entityMappers;
@@ -124,28 +96,10 @@ public class DefaultEntityFactory implements EntityFactory {
 
     @Override
     public List<Object> reconstitute(Context context, List<?> persistentObjs) {
-        BoundedContext boundedContext = null;
-        if (ctxCopyOptions != null) {
-            Object attachment = context.getAttachment(boundedContextName);
-            if (attachment instanceof BoundedContext) {
-                boundedContext = (BoundedContext) attachment;
-            }
-            if (boundedContext == null) {
-                boundedContext = this.boundedContext;
-            }
-        }
         List<Object> entities = new ArrayList<>(persistentObjs.size());
-        if (boundedContext == null) {
-            for (Object persistent : persistentObjs) {
-                Object entity = reconstitute(context, persistent);
-                entities.add(entity);
-            }
-        } else {
-            for (Object persistent : persistentObjs) {
-                Object entity = reconstitute(context, persistent);
-                BeanUtil.copyProperties(boundedContext, entity, ctxCopyOptions);
-                entities.add(entity);
-            }
+        for (Object persistent : persistentObjs) {
+            Object entity = reconstitute(context, persistent);
+            entities.add(entity);
         }
         return entities;
     }
