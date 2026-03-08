@@ -74,12 +74,12 @@ import java.util.List;
 
 /**
  * RepositoryContext's properties:
- * EntityStoreInfo、EntityMappers、TranslatorManager、Translator、ExampleConverter
+ * EntityStoreInfo、EntityTranslatorManager、TranslatorManager、Translator、ExampleConverter
  * MergedRepositoryResolver、QueryTypeResolver、
  * RepositoryInfoResolver、QueryInfoResolver、StepwiseQuerier
  * <p>
  * DefaultRepository's properties:
- * EntityStoreInfo、EntityMappers、TranslatorManager、Translator、ExampleConverter、RepositoryContext
+ * EntityStoreInfo、EntityTranslatorManager、TranslatorManager、Translator、ExampleConverter、RepositoryContext
  * <p>
  * RepositoryItem's properties:
  * ExampleBuilder、EntityJoiner、EntityHandler

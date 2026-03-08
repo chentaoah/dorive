@@ -22,7 +22,7 @@ import com.gitee.dorive.base.v1.factory.api.Translator;
 import java.util.List;
 import java.util.Set;
 
-public interface EntityMapper extends Translator {
+public interface EntityTranslator extends Translator {
 
     List<String> toAliases(List<String> fields);
 

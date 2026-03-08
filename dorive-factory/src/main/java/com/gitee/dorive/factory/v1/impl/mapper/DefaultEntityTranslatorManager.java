@@ -18,8 +18,8 @@
 package com.gitee.dorive.factory.v1.impl.mapper;
 
 import com.gitee.dorive.base.v1.factory.api.Translator;
-import com.gitee.dorive.factory.v1.api.EntityMapper;
-import com.gitee.dorive.factory.v1.api.EntityMappers;
+import com.gitee.dorive.factory.v1.api.EntityTranslator;
+import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
 import com.gitee.dorive.factory.v1.api.FieldMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,8 +31,8 @@ import java.util.Set;
 
 @Getter
 @AllArgsConstructor
-public class DefaultEntityMappers implements EntityMappers {
-    private final Map<String, EntityMapper> mapperEntityMapperMap;
+public class DefaultEntityTranslatorManager implements EntityTranslatorManager {
+    private final Map<String, EntityTranslator> mapperEntityTranslatorMap;
     private final List<FieldMapper> valueObjFields;
     private final List<FieldMapper> matchedValueObjFields;
     private final List<FieldMapper> unmatchedValueObjFields;
@@ -40,7 +40,7 @@ public class DefaultEntityMappers implements EntityMappers {
 
     @Override
     public Translator getTranslator(String category) {
-        return mapperEntityMapperMap.get(category);
+        return mapperEntityTranslatorMap.get(category);
     }
 
     @Override

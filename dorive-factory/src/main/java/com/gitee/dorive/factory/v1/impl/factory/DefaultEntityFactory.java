@@ -23,8 +23,8 @@ import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.factory.v1.api.EntityAdapter;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
-import com.gitee.dorive.factory.v1.api.EntityMapper;
-import com.gitee.dorive.factory.v1.api.EntityMappers;
+import com.gitee.dorive.factory.v1.api.EntityTranslator;
+import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
 import com.gitee.dorive.factory.v1.api.FieldMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -44,18 +44,18 @@ public class DefaultEntityFactory implements EntityFactory {
     private Class<?> reType;
     private Class<?> deType;
     // 序列化
-    private EntityMappers entityMappers;
-    private EntityMapper reEntityMapper;
-    private EntityMapper deEntityMapper;
+    private EntityTranslatorManager entityTranslatorManager;
+    private EntityTranslator reEntityTranslator;
+    private EntityTranslator deEntityTranslator;
     private CopyOptions reCopyOptions;
     private CopyOptions deCopyOptions;
     // 适配器
     private EntityAdapter entityAdapter;
 
-    public void setEntityMappers(EntityMappers entityMappers, EntityMapper reEntityMapper, EntityMapper deEntityMapper) {
-        this.entityMappers = entityMappers;
-        this.reEntityMapper = reEntityMapper;
-        this.deEntityMapper = deEntityMapper;
+    public void setEntityTranslatorManager(EntityTranslatorManager entityTranslatorManager, EntityTranslator reEntityTranslator, EntityTranslator deEntityTranslator) {
+        this.entityTranslatorManager = entityTranslatorManager;
+        this.reEntityTranslator = reEntityTranslator;
+        this.deEntityTranslator = deEntityTranslator;
         initReCopyOptions();
         initDeCopyOptions();
         initEntityAdapter();
@@ -64,22 +64,22 @@ public class DefaultEntityFactory implements EntityFactory {
 
     private void initReCopyOptions() {
         this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(alias -> {
-            FieldMapper fieldMapperByAlias = reEntityMapper.getFieldMapperByAlias(alias);
+            FieldMapper fieldMapperByAlias = reEntityTranslator.getFieldMapperByAlias(alias);
             return fieldMapperByAlias != null ? fieldMapperByAlias.getField() : alias;
 
         }).setFieldValueEditor((field, value) -> {
-            FieldMapper fieldMapperByField = reEntityMapper.getFieldMapperByField(field);
+            FieldMapper fieldMapperByField = reEntityTranslator.getFieldMapperByField(field);
             return fieldMapperByField != null ? fieldMapperByField.reconstitute(value) : value;
         });
     }
 
     private void initDeCopyOptions() {
         this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(field -> {
-            FieldMapper fieldMapperByField = deEntityMapper.getFieldMapperByField(field);
+            FieldMapper fieldMapperByField = deEntityTranslator.getFieldMapperByField(field);
             return fieldMapperByField != null ? fieldMapperByField.getAlias() : field;
 
         }).setFieldValueEditor((alias, value) -> {
-            FieldMapper fieldMapperByAlias = deEntityMapper.getFieldMapperByAlias(alias);
+            FieldMapper fieldMapperByAlias = deEntityTranslator.getFieldMapperByAlias(alias);
             return fieldMapperByAlias != null ? fieldMapperByAlias.deconstruct(value) : value;
         });
     }
@@ -90,7 +90,7 @@ public class DefaultEntityFactory implements EntityFactory {
 
     protected void processEntityAdapter() {
         if (entityAdapter instanceof AdaptiveEntityAdapter) {
-            ((AdaptiveEntityAdapter) entityAdapter).initialize(entityElement, reEntityMapper);
+            ((AdaptiveEntityAdapter) entityAdapter).initialize(entityElement, reEntityTranslator);
         }
     }
 

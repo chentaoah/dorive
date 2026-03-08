@@ -22,7 +22,7 @@ import com.gitee.dorive.base.v1.factory.api.TranslatorManager;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public interface EntityMappers extends TranslatorManager {
+public interface EntityTranslatorManager extends TranslatorManager {
 
     List<FieldMapper> getValueObjFields();
 

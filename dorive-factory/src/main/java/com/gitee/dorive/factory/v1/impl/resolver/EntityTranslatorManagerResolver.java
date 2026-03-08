@@ -22,11 +22,11 @@ import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
 import com.gitee.dorive.base.v1.common.def.FieldDef;
 import com.gitee.dorive.factory.v1.api.Converter;
-import com.gitee.dorive.factory.v1.api.EntityMapper;
-import com.gitee.dorive.factory.v1.api.EntityMappers;
+import com.gitee.dorive.factory.v1.api.EntityTranslator;
+import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
 import com.gitee.dorive.factory.v1.api.FieldMapper;
-import com.gitee.dorive.factory.v1.impl.mapper.DefaultEntityMapper;
-import com.gitee.dorive.factory.v1.impl.mapper.DefaultEntityMappers;
+import com.gitee.dorive.factory.v1.impl.mapper.DefaultEntityTranslator;
+import com.gitee.dorive.factory.v1.impl.mapper.DefaultEntityTranslatorManager;
 import com.gitee.dorive.factory.v1.impl.mapper.DefaultFieldMapper;
 import com.gitee.dorive.factory.v1.impl.converter.JsonArrayConverter;
 import com.gitee.dorive.factory.v1.impl.converter.JsonConverter;
@@ -41,26 +41,26 @@ import java.util.*;
 
 @Data
 @AllArgsConstructor
-public class EntityMappersResolver {
+public class EntityTranslatorManagerResolver {
 
     private EntityElement entityElement;
     private Map<String, String> aliasPropMapping;
     private String reMapper;
     private String deMapper;
 
-    public EntityMappers newEntityMappers() {
+    public EntityTranslatorManager newEntityTranslatorManager() {
         List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
         Map<String, String> fieldAliasMapping = entityElement.getFieldAliasMapping();
 
-        Map<String, EntityMapper> mapperEntityMapperMap = new LinkedHashMap<>(4);
+        Map<String, EntityTranslator> mapperEntityTranslatorMap = new LinkedHashMap<>(4);
         List<FieldMapper> valueObjFields = new ArrayList<>(4);
         List<FieldMapper> matchedValueObjFields = new ArrayList<>(4);
         List<FieldMapper> unmatchedValueObjFields = new ArrayList<>(4);
         Set<Type> valueObjTypes = new HashSet<>(6);
 
         int size = fieldDefinitions.size() * 4 / 3 + 1;
-        DefaultEntityMapper entityMapper1 = new DefaultEntityMapper(new LinkedHashMap<>(size), new LinkedHashMap<>(size), new LinkedHashMap<>(size));
-        DefaultEntityMapper entityMapper2 = new DefaultEntityMapper(new LinkedHashMap<>(size), new LinkedHashMap<>(size), new LinkedHashMap<>(size));
+        DefaultEntityTranslator entityTranslator1 = new DefaultEntityTranslator(new LinkedHashMap<>(size), new LinkedHashMap<>(size), new LinkedHashMap<>(size));
+        DefaultEntityTranslator entityTranslator2 = new DefaultEntityTranslator(new LinkedHashMap<>(size), new LinkedHashMap<>(size), new LinkedHashMap<>(size));
 
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
             String field = fieldDefinition.getFieldName();
@@ -74,8 +74,8 @@ public class EntityMappersResolver {
             boolean isValueObj = fieldDef != null && fieldDef.isValueObj();
             Converter converter = newConverter(fieldDefinition, isMatch, isValueObj);
 
-            addToEntityMapper(entityMapper1, field, alias, converter);
-            addToEntityMapper(entityMapper2, field, prop, converter);
+            addToEntityTranslator(entityTranslator1, field, alias, converter);
+            addToEntityTranslator(entityTranslator2, field, prop, converter);
 
             FieldMapper fieldMapper = new DefaultFieldMapper(field, alias, converter);
             if (isValueObj) {
@@ -89,10 +89,10 @@ public class EntityMappersResolver {
             }
         }
 
-        mapperEntityMapperMap.put(reMapper, entityMapper1);
-        mapperEntityMapperMap.put(deMapper, entityMapper2);
+        mapperEntityTranslatorMap.put(reMapper, entityTranslator1);
+        mapperEntityTranslatorMap.put(deMapper, entityTranslator2);
 
-        return new DefaultEntityMappers(mapperEntityMapperMap, valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes);
+        return new DefaultEntityTranslatorManager(mapperEntityTranslatorMap, valueObjFields, matchedValueObjFields, unmatchedValueObjFields, valueObjTypes);
     }
 
     private Converter newConverter(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {
@@ -117,11 +117,11 @@ public class EntityMappersResolver {
         return null;
     }
 
-    private void addToEntityMapper(DefaultEntityMapper entityMapper, String field, String alias, Converter converter) {
-        entityMapper.getFieldAliasMapping().put(field, alias);
+    private void addToEntityTranslator(DefaultEntityTranslator entityTranslator, String field, String alias, Converter converter) {
+        entityTranslator.getFieldAliasMapping().put(field, alias);
         FieldMapper fieldMapper = new DefaultFieldMapper(field, alias, converter);
-        entityMapper.getFieldFieldMapperMap().put(field, fieldMapper);
-        entityMapper.getAliasFieldMapperMap().put(alias, fieldMapper);
+        entityTranslator.getFieldFieldMapperMap().put(field, fieldMapper);
+        entityTranslator.getAliasFieldMapperMap().put(alias, fieldMapper);
     }
 
 }

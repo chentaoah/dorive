@@ -25,8 +25,8 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.factory.v1.api.EntityMapper;
-import com.gitee.dorive.factory.v1.api.EntityMappers;
+import com.gitee.dorive.factory.v1.api.EntityTranslator;
+import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
 import com.gitee.dorive.factory.v1.api.FieldMapper;
 import com.gitee.dorive.factory.v1.util.TypeUtils;
 
@@ -49,9 +49,9 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     };
 
     @Override
-    public void setEntityMappers(EntityMappers entityMappers, EntityMapper reEntityMapper, EntityMapper deEntityMapper) {
-        super.setEntityMappers(entityMappers, reEntityMapper, deEntityMapper);
-        List<FieldMapper> matchedValueObjFields = entityMappers.getMatchedValueObjFields();
+    public void setEntityTranslatorManager(EntityTranslatorManager entityTranslatorManager, EntityTranslator reEntityTranslator, EntityTranslator deEntityTranslator) {
+        super.setEntityTranslatorManager(entityTranslatorManager, reEntityTranslator, deEntityTranslator);
+        List<FieldMapper> matchedValueObjFields = entityTranslatorManager.getMatchedValueObjFields();
         if (!matchedValueObjFields.isEmpty()) {
             setReCopyOptions();
             setDeCopyOptions();
@@ -59,7 +59,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     }
 
     private void setReCopyOptions() {
-        EntityMappers entityMappers = getEntityMappers();
+        EntityTranslatorManager entityTranslatorManager = getEntityTranslatorManager();
         getReCopyOptions().setConverter(((targetType, value) -> {
             if (value == null) {
                 return null;
@@ -76,7 +76,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
                 if (Map.class.isAssignableFrom(rawType)) {
                     return value;
                 }
-                if (entityMappers.isValueObjType(rawType)) {
+                if (entityTranslatorManager.isValueObjType(rawType)) {
                     return value;
                 }
             }
@@ -85,7 +85,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     }
 
     private void setDeCopyOptions() {
-        EntityMappers entityMappers = getEntityMappers();
+        EntityTranslatorManager entityTranslatorManager = getEntityTranslatorManager();
         getDeCopyOptions().setConverter(((targetType, value) -> {
             if (value == null) {
                 return null;
@@ -99,7 +99,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
                     return value;
                 }
                 // 注意：值对象的子类实例，不会进入该分支
-                if (entityMappers.isValueObjType(value.getClass())) {
+                if (entityTranslatorManager.isValueObjType(value.getClass())) {
                     return value;
                 }
             }
@@ -112,8 +112,8 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     public Object doReconstitute(Context context, Object persistent) {
         Object entity = super.doReconstitute(context, persistent);
         Map<String, Object> resultMap = (Map<String, Object>) persistent;
-        EntityMappers entityMappers = getEntityMappers();
-        List<FieldMapper> unmatchedValueObjFields = entityMappers.getUnmatchedValueObjFields();
+        EntityTranslatorManager entityTranslatorManager = getEntityTranslatorManager();
+        List<FieldMapper> unmatchedValueObjFields = entityTranslatorManager.getUnmatchedValueObjFields();
         for (FieldMapper fieldMapper : unmatchedValueObjFields) {
             Object valueObj = fieldMapper.reconstitute(resultMap);
             if (valueObj != null) {
@@ -126,8 +126,8 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     @Override
     public Object doDeconstruct(Context context, Object entity) {
         Object pojo = super.doDeconstruct(context, entity);
-        EntityMappers entityMappers = getEntityMappers();
-        List<FieldMapper> unmatchedValueObjFields = entityMappers.getUnmatchedValueObjFields();
+        EntityTranslatorManager entityTranslatorManager = getEntityTranslatorManager();
+        List<FieldMapper> unmatchedValueObjFields = entityTranslatorManager.getUnmatchedValueObjFields();
         for (FieldMapper fieldMapper : unmatchedValueObjFields) {
             Object valueObj = BeanUtil.getFieldValue(entity, fieldMapper.getField());
             valueObj = valueObj != null ? fieldMapper.deconstruct(valueObj) : null;

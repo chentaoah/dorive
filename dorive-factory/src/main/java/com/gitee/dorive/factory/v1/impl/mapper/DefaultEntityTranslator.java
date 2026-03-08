@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.factory.v1.impl.mapper;
 
-import com.gitee.dorive.factory.v1.api.EntityMapper;
+import com.gitee.dorive.factory.v1.api.EntityTranslator;
 import com.gitee.dorive.factory.v1.api.FieldMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,7 +30,7 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DefaultEntityMapper implements EntityMapper {
+public class DefaultEntityTranslator implements EntityTranslator {
     private Map<String, String> fieldAliasMapping;
     private Map<String, FieldMapper> fieldFieldMapperMap;
     private Map<String, FieldMapper> aliasFieldMapperMap;

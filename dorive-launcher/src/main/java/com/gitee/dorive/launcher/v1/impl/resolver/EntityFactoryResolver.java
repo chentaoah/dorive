@@ -20,8 +20,8 @@ package com.gitee.dorive.launcher.v1.impl.resolver;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
-import com.gitee.dorive.factory.v1.api.EntityMapper;
-import com.gitee.dorive.factory.v1.api.EntityMappers;
+import com.gitee.dorive.factory.v1.api.EntityTranslator;
+import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
 import com.gitee.dorive.factory.v1.api.FieldMapper;
 import com.gitee.dorive.factory.v1.impl.factory.ContextEntityFactory;
 import com.gitee.dorive.factory.v1.impl.factory.DefaultEntityFactory;
@@ -41,16 +41,16 @@ public class EntityFactoryResolver {
     private EntityElement entityElement;
     private Class<?> reType;
     private Class<?> deType;
-    private EntityMappers entityMappers;
-    private EntityMapper reEntityMapper;
-    private EntityMapper deEntityMapper;
+    private EntityTranslatorManager entityTranslatorManager;
+    private EntityTranslator reEntityTranslator;
+    private EntityTranslator deEntityTranslator;
 
     public EntityFactory newEntityFactory() {
         RepositoryDef repositoryDef = repository.getRepositoryDef();
         Class<?> factoryClass = repositoryDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
-            List<FieldMapper> valueObjFields = entityMappers.getValueObjFields();
+            List<FieldMapper> valueObjFields = entityTranslatorManager.getValueObjFields();
             entityFactory = valueObjFields.isEmpty() ? new DefaultEntityFactory() : new ValueObjEntityFactory();
         } else {
             ApplicationContext applicationContext = repository.getApplicationContext();
@@ -61,7 +61,7 @@ public class EntityFactoryResolver {
             defaultEntityFactory.setEntityElement(entityElement);
             defaultEntityFactory.setReType(entityElement.getGenericType());
             defaultEntityFactory.setDeType(deType);
-            defaultEntityFactory.setEntityMappers(entityMappers, reEntityMapper, deEntityMapper);
+            defaultEntityFactory.setEntityTranslatorManager(entityTranslatorManager, reEntityTranslator, deEntityTranslator);
         }
         // 边界上下文实体工厂
         ContextEntityFactory contextEntityFactory = new ContextEntityFactory();
