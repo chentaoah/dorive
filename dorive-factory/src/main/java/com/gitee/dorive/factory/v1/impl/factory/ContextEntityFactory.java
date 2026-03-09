@@ -50,14 +50,14 @@ public class ContextEntityFactory implements EntityFactory {
     public void initCtxCopyOptions(EntityElement entityElement) {
         List<PropertyDefinition> propertyDefinitions = entityElement.getPropertyDefinitions();
         if (!propertyDefinitions.isEmpty()) {
-            Map<String, String> keyFieldNameMapping = new ConcurrentHashMap<>(propertyDefinitions.size() * 4 / 3 + 1);
+            Map<String, String> keyFieldNameMap = new ConcurrentHashMap<>(propertyDefinitions.size() * 4 / 3 + 1);
             for (PropertyDefinition propertyDefinition : propertyDefinitions) {
                 PropertyDef propertyDef = propertyDefinition.getPropertyDef();
                 String key = propertyDef.getValue();
                 String fieldName = propertyDefinition.getFieldName();
-                keyFieldNameMapping.put(key, fieldName);
+                keyFieldNameMap.put(key, fieldName);
             }
-            this.ctxCopyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(keyFieldNameMapping);
+            this.ctxCopyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(keyFieldNameMap);
         }
     }
 

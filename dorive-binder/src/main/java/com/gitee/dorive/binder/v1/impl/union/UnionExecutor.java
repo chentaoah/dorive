@@ -129,7 +129,7 @@ public class UnionExecutor extends AbstractProxyExecutor {
 
     @SuppressWarnings("unchecked")
     private Result<Object> buildResult(List<Map<String, Object>> resultMaps) {
-        Map<String, Map<String, Object>> idResultMapMapping = new LinkedHashMap<>(resultMaps.size() * 4 / 3 + 1);
+        Map<String, Map<String, Object>> idResultMapMap = new LinkedHashMap<>(resultMaps.size() * 4 / 3 + 1);
         for (Map<String, Object> resultMap : resultMaps) {
             Object id = resultMap.get(entityStoreInfo.getIdColumn());
             Object row = resultMap.get("$row");
@@ -138,10 +138,10 @@ public class UnionExecutor extends AbstractProxyExecutor {
             }
             String idStr = id.toString();
             String rowStr = row.toString();
-            if (!idResultMapMapping.containsKey(idStr)) {
-                idResultMapMapping.put(idStr, resultMap);
+            if (!idResultMapMap.containsKey(idStr)) {
+                idResultMapMap.put(idStr, resultMap);
             } else {
-                Map<String, Object> existResultMap = idResultMapMapping.get(idStr);
+                Map<String, Object> existResultMap = idResultMapMap.get(idStr);
                 List<String> existRows = (List<String>) existResultMap.computeIfAbsent("$rows", key -> new ArrayList<>(4));
                 if (existRows.isEmpty()) {
                     Object existRow = existResultMap.get("$row");
@@ -152,7 +152,7 @@ public class UnionExecutor extends AbstractProxyExecutor {
                 existRows.add(rowStr);
             }
         }
-        return new Result<>(null, new ArrayList<>(idResultMapMapping.values()));
+        return new Result<>(null, new ArrayList<>(idResultMapMap.values()));
     }
 
 }
