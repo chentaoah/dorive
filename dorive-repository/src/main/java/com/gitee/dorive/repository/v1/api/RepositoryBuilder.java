@@ -28,6 +28,8 @@ import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 
 public interface RepositoryBuilder {
 
+    void prepare(RepositoryContext repositoryContext);
+
     AbstractRepository<Object, Object> newRepository(RepositoryContext repositoryContext, EntityElement entityElement);
 
     BinderExecutor newBinderExecutor(RepositoryContext repositoryContext, EntityElement entityElement);
@@ -40,14 +42,6 @@ public interface RepositoryBuilder {
 
     EntityOpHandler newEntityOpHandler(RepositoryContext repositoryContext);
 
-    void buildContextMismatchQueryExecutor(RepositoryContext repositoryContext);
-
-    void buildStepwiseQueryExecutor(RepositoryContext repositoryContext);
-
-    void buildSegmentQueryExecutor(RepositoryContext repositoryContext);
-
-    void buildCustomQueryExecutor(RepositoryContext repositoryContext);
-
-    void buildMybatisRepository(RepositoryContext repositoryContext);
+    void initialize(RepositoryContext repositoryContext);
 
 }

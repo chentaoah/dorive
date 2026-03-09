@@ -80,9 +80,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         // 仓储构建器
         this.repositoryBuilder = applicationContext.getBean(RepositoryBuilder.class);
+        // 准备
+        repositoryBuilder.prepare(this);
 
         Class<?> repositoryClass = this.getClass();
         Class<?> entityClass = ReflectUtils.getFirstTypeArgument(repositoryClass);
@@ -111,6 +113,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setEntityElement(rootRepository.getEntityElement());
         setOperationFactory(rootRepository.getOperationFactory());
         setExecutor(newExecutor());
+
+        // 初始化
+        repositoryBuilder.initialize(this);
     }
 
     private void prepareRepositoryDef(Class<?> repositoryClass, Class<?> entityClass) {

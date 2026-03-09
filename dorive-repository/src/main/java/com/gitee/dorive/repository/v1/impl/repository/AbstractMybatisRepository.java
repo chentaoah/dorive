@@ -17,11 +17,9 @@
 
 package com.gitee.dorive.repository.v1.impl.repository;
 
-import com.gitee.dorive.base.v1.common.api.ImplFactory;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
-import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
+import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.mybatis.entity.CountQuery;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,15 +31,6 @@ import java.util.Map;
 public abstract class AbstractMybatisRepository<E, PK> extends AbstractInnerRepository<E, PK> implements CountQuerier {
     private SqlRunner sqlRunner;
     private CountQuerier countQuerier;
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        ImplFactory implFactory = getApplicationContext().getBean(ImplFactory.class);
-        this.sqlRunner = implFactory.getInstance(SqlRunner.class);
-        super.afterPropertiesSet();
-        RepositoryBuilder repositoryBuilder = getRepositoryBuilder();
-        repositoryBuilder.buildMybatisRepository(this);
-    }
 
     @Override
     public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {

@@ -25,7 +25,6 @@ import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.query.enums.QueryMode;
 import com.gitee.dorive.repository.v1.api.QueryRepository;
-import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -41,16 +40,6 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractListableRep
     private QueryExecutor stepwiseQueryExecutor;
     private QueryExecutor segmentQueryExecutor;
     private QueryExecutor customQueryExecutor;
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
-        RepositoryBuilder repositoryBuilder = getRepositoryBuilder();
-        repositoryBuilder.buildContextMismatchQueryExecutor(this);
-        repositoryBuilder.buildStepwiseQueryExecutor(this);
-        repositoryBuilder.buildSegmentQueryExecutor(this);
-        repositoryBuilder.buildCustomQueryExecutor(this);
-    }
 
     @Override
     @SuppressWarnings("unchecked")

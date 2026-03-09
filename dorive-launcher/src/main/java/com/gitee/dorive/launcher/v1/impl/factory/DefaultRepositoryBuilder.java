@@ -20,6 +20,7 @@ package com.gitee.dorive.launcher.v1.impl.factory;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
+import com.gitee.dorive.base.v1.common.api.ImplFactory;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.enums.JoinType;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
@@ -28,6 +29,7 @@ import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.api.Translator;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
+import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
@@ -69,6 +71,7 @@ import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
 import com.gitee.dorive.repository.v1.impl.resolver.DerivedRepositoryResolver;
+import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 
@@ -85,6 +88,16 @@ import java.util.List;
  * ExampleBuilder、EntityJoiner、EntityHandler
  */
 public class DefaultRepositoryBuilder implements RepositoryBuilder {
+
+    @Override
+    public void prepare(RepositoryContext repositoryContext) {
+        if (repositoryContext instanceof AbstractMybatisRepository) {
+            AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
+            ApplicationContext applicationContext = repository.getApplicationContext();
+            ImplFactory implFactory = applicationContext.getBean(ImplFactory.class);
+            repository.setSqlRunner(implFactory.getInstance(SqlRunner.class));
+        }
+    }
 
     @Override
     public AbstractRepository<Object, Object> newRepository(RepositoryContext repositoryContext, EntityElement entityElement) {
@@ -162,7 +175,15 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     }
 
     @Override
-    public void buildContextMismatchQueryExecutor(RepositoryContext repositoryContext) {
+    public void initialize(RepositoryContext repositoryContext) {
+        buildContextMismatchQueryExecutor(repositoryContext);
+        buildStepwiseQueryExecutor(repositoryContext);
+        buildSegmentQueryExecutor(repositoryContext);
+        buildCustomQueryExecutor(repositoryContext);
+        buildMybatisRepository(repositoryContext);
+    }
+
+    private void buildContextMismatchQueryExecutor(RepositoryContext repositoryContext) {
         // 查询
         if (repositoryContext instanceof AbstractQueryRepository) {
             AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
@@ -180,9 +201,8 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         }
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public void buildStepwiseQueryExecutor(RepositoryContext repositoryContext) {
+    private void buildStepwiseQueryExecutor(RepositoryContext repositoryContext) {
         // 查询
         if (repositoryContext instanceof AbstractQueryRepository) {
             AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
@@ -198,9 +218,8 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         }
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public void buildSegmentQueryExecutor(RepositoryContext repositoryContext) {
+    private void buildSegmentQueryExecutor(RepositoryContext repositoryContext) {
         // 查询
         if (repositoryContext instanceof AbstractMybatisRepository) {
             AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
@@ -226,9 +245,8 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         }
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public void buildCustomQueryExecutor(RepositoryContext repositoryContext) {
+    private void buildCustomQueryExecutor(RepositoryContext repositoryContext) {
         // 查询
         if (repositoryContext instanceof AbstractMybatisRepository) {
             AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
@@ -245,8 +263,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         }
     }
 
-    @Override
-    public void buildMybatisRepository(RepositoryContext repositoryContext) {
+    private void buildMybatisRepository(RepositoryContext repositoryContext) {
         if (repositoryContext instanceof AbstractMybatisRepository) {
             AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
             QueryExecutor queryExecutor = repository.getSegmentQueryExecutor();
