@@ -19,7 +19,6 @@ package com.gitee.dorive.launcher.v1.impl.factory;
 
 import com.gitee.dorive.base.v1.common.api.ImplFactory;
 import com.gitee.dorive.base.v1.mybatis.api.SqlFormat;
-import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.mybatis.plus.v1.impl.common.DefaultSqlHelper;
 
 public class DefaultImplFactory implements ImplFactory {
@@ -28,9 +27,6 @@ public class DefaultImplFactory implements ImplFactory {
     @SuppressWarnings("unchecked")
     public <T> T getInstance(Class<T> clazz, Object... args) {
         if (clazz == SqlFormat.class) {
-            return (T) new DefaultSqlHelper();
-
-        } else if (clazz == SqlRunner.class) {
             return (T) new DefaultSqlHelper();
         }
         return null;

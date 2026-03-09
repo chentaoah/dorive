@@ -20,7 +20,6 @@ package com.gitee.dorive.launcher.v1.impl.factory;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
-import com.gitee.dorive.base.v1.common.api.ImplFactory;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.enums.JoinType;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
@@ -29,7 +28,6 @@ import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.api.Translator;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
-import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
@@ -47,6 +45,7 @@ import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
 import com.gitee.dorive.joiner.v1.impl.joiner.DefaultEntityJoiner;
+import com.gitee.dorive.mybatis.plus.v1.impl.common.DefaultSqlHelper;
 import com.gitee.dorive.mybatis.v2.impl.querier.DefaultCountQuerier;
 import com.gitee.dorive.mybatis.v2.impl.segment.DefaultSegmentExecutor;
 import com.gitee.dorive.mybatis.v2.impl.segment.DefaultSegmentResolver;
@@ -71,7 +70,6 @@ import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
 import com.gitee.dorive.repository.v1.impl.resolver.DerivedRepositoryResolver;
-import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 
@@ -93,9 +91,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     public void prepare(RepositoryContext repositoryContext) {
         if (repositoryContext instanceof AbstractMybatisRepository) {
             AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
-            ApplicationContext applicationContext = repository.getApplicationContext();
-            ImplFactory implFactory = applicationContext.getBean(ImplFactory.class);
-            repository.setSqlRunner(implFactory.getInstance(SqlRunner.class));
+            repository.setSqlRunner(new DefaultSqlHelper());
         }
     }
 
