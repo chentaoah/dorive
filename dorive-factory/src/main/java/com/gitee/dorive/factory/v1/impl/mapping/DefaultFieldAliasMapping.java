@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.impl.mapper;
+package com.gitee.dorive.factory.v1.impl.mapping;
 
 import com.gitee.dorive.factory.v1.api.Converter;
 import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
