@@ -70,34 +70,36 @@ public class MybatisPlusRepositoryBuilder {
     public AbstractRepository<Object, Object> newRepository(EntityElement entityElement) {
         OperationFactory operationFactory = new OperationFactory(entityElement);
 
+        // 存储信息
         EntityStoreInfo entityStoreInfo = resolveEntityStoreInfo(repository.getRepositoryDef());
-        repository.setProperty(EntityStoreInfo.class, entityStoreInfo);
 
+        // 别名转换
         String reCategory = Category.ENTITY_DATABASE.name();
         String deCategory = Category.ENTITY_POJO.name();
-
         EntityTranslatorManagerResolver entityTranslatorManagerResolver = new EntityTranslatorManagerResolver(entityElement, entityStoreInfo.getAliasPropMap(), reCategory, deCategory);
         EntityTranslatorManager entityTranslatorManager = entityTranslatorManagerResolver.newEntityTranslatorManager();
-        repository.setProperty(EntityTranslatorManager.class, entityTranslatorManager);
-
-        // 命名转换器管理
-        Translator translator = entityTranslatorManager.getTranslator(Category.ENTITY_DATABASE.name());
-        repository.setProperty(TranslatorManager.class, entityTranslatorManager);
-        repository.setProperty(Translator.class, translator);
-
         EntityTranslator reEntityTranslator = (EntityTranslator) entityTranslatorManager.getTranslator(reCategory);
         EntityTranslator deEntityTranslator = (EntityTranslator) entityTranslatorManager.getTranslator(deCategory);
 
+        // 实体工厂
         EntityFactoryResolver entityFactoryResolver = new EntityFactoryResolver(
-                repository, entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(), entityTranslatorManager, reEntityTranslator, deEntityTranslator);
+                repository, entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(),
+                entityTranslatorManager, reEntityTranslator, deEntityTranslator);
         EntityFactory entityFactory = entityFactoryResolver.newEntityFactory();
 
+        // 执行器
         Executor executor = newExecutor(entityElement, entityStoreInfo);
         executor = new UnionExecutor(executor, repository.getSqlRunner(), entityStoreInfo);
         executor = new FactoryExecutor(executor, entityElement, entityStoreInfo.getIdProperty(), entityFactory);
         executor = new ExampleExecutor(executor, entityElement, reEntityTranslator);
 
+        // 查询条件转换器
         ExampleConverter exampleConverter = (ExampleConverter) executor;
+
+        repository.setProperty(EntityStoreInfo.class, entityStoreInfo);
+        repository.setProperty(EntityTranslatorManager.class, entityTranslatorManager);
+        repository.setProperty(TranslatorManager.class, entityTranslatorManager);
+        repository.setProperty(Translator.class, reEntityTranslator);
         repository.setProperty(ExampleConverter.class, exampleConverter);
 
         DefaultRepository defaultRepository = new DefaultRepository();
@@ -107,7 +109,7 @@ public class MybatisPlusRepositoryBuilder {
         defaultRepository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         defaultRepository.setProperty(EntityTranslatorManager.class, entityTranslatorManager);
         defaultRepository.setProperty(TranslatorManager.class, entityTranslatorManager);
-        defaultRepository.setProperty(Translator.class, translator);
+        defaultRepository.setProperty(Translator.class, reEntityTranslator);
         defaultRepository.setProperty(ExampleConverter.class, exampleConverter);
         return defaultRepository;
     }
