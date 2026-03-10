@@ -20,8 +20,8 @@ package com.gitee.dorive.launcher.v1.autoconfigure;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.gitee.dorive.base.v1.common.api.ImplFactory;
-import com.gitee.dorive.launcher.v1.impl.factory.DefaultImplFactory;
+import com.gitee.dorive.base.v1.core.util.CriterionUtils;
+import com.gitee.dorive.mybatis.plus.v1.impl.common.DefaultSqlHelper;
 import com.gitee.dorive.mybatis.plus.v1.impl.injector.EasySqlInjector;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -70,8 +70,11 @@ public class DoriveMybatisPlusConfiguration implements EnvironmentPostProcessor 
     }
 
     @Bean
-    public static ImplFactory implFactory() {
-        return new DefaultImplFactory();
+    @ConditionalOnMissingBean
+    public static DefaultSqlHelper defaultSqlHelper() {
+        DefaultSqlHelper defaultSqlHelper = new DefaultSqlHelper();
+        CriterionUtils.sqlFormat = defaultSqlHelper;
+        return defaultSqlHelper;
     }
 
 }

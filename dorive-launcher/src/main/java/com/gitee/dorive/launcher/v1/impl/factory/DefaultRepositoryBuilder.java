@@ -28,6 +28,7 @@ import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.api.Translator;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
+import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
@@ -45,7 +46,6 @@ import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
 import com.gitee.dorive.joiner.v1.impl.joiner.DefaultEntityJoiner;
-import com.gitee.dorive.mybatis.plus.v1.impl.common.DefaultSqlHelper;
 import com.gitee.dorive.mybatis.v2.impl.querier.DefaultCountQuerier;
 import com.gitee.dorive.mybatis.v2.impl.segment.DefaultSegmentExecutor;
 import com.gitee.dorive.mybatis.v2.impl.segment.DefaultSegmentResolver;
@@ -91,7 +91,8 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     public void prepare(RepositoryContext repositoryContext) {
         if (repositoryContext instanceof AbstractMybatisRepository) {
             AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
-            repository.setSqlRunner(new DefaultSqlHelper());
+            SqlRunner sqlRunner = repository.getApplicationContext().getBean(SqlRunner.class);
+            repository.setSqlRunner(sqlRunner);
         }
     }
 

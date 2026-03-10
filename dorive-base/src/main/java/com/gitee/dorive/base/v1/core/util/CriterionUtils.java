@@ -18,23 +18,16 @@
 package com.gitee.dorive.base.v1.core.util;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import com.gitee.dorive.base.v1.common.constant.Operator;
-import com.gitee.dorive.base.v1.common.api.ImplFactory;
-import com.gitee.dorive.base.v1.mybatis.api.SqlFormat;
 import com.gitee.dorive.base.v1.core.entity.qry.Criterion;
+import com.gitee.dorive.base.v1.mybatis.api.SqlFormat;
 
 import java.util.Collection;
 import java.util.Date;
 
 public class CriterionUtils {
 
-    private static final SqlFormat sqlFormat;
-
-    static {
-        ImplFactory implFactory = SpringUtil.getBean(ImplFactory.class);
-        sqlFormat = implFactory.getInstance(SqlFormat.class);
-    }
+    public static SqlFormat sqlFormat;
 
     public static String getOperator(Criterion criterion) {
         String operator = criterion.getOperator();
