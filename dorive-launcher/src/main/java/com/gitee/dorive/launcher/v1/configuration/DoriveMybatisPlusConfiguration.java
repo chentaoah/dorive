@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.launcher.v1.autoconfigure;
+package com.gitee.dorive.launcher.v1.configuration;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;

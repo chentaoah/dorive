@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.launcher.v1.autoconfigure;
+package com.gitee.dorive.launcher.v1.configuration;
 
 import com.gitee.dorive.aggregate.v1.impl.DefaultEntityResolver;
 import com.gitee.dorive.aggregate.v1.impl.DefaultQueryResolver;
