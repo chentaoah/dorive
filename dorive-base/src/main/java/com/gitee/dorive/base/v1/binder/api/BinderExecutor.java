@@ -27,6 +27,8 @@ import java.util.Map;
 
 public interface BinderExecutor {
 
+    List<Binder> getValueRouteBinders();
+
     List<Binder> getValueFilterBinders();
 
     Map<String, List<Binder>> getMergedStrongBindersMap();

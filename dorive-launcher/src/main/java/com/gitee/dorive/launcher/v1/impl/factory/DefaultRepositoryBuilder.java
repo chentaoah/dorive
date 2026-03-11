@@ -40,7 +40,7 @@ import com.gitee.dorive.binder.v1.impl.example.MultiExampleBuilder;
 import com.gitee.dorive.binder.v1.impl.example.SingleExampleBuilder;
 import com.gitee.dorive.binder.v1.impl.handler.AdaptiveEntityHandler;
 import com.gitee.dorive.binder.v1.impl.handler.DefaultEntityHandler;
-import com.gitee.dorive.binder.v1.impl.handler.ValueFilterEntityHandler;
+import com.gitee.dorive.executor.v1.impl.handler.qry.ValueFilterEntityHandler;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.executor.v1.impl.executor.ContextExecutor;
 import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;

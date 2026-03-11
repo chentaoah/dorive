@@ -35,17 +35,17 @@ import java.util.List;
 @AllArgsConstructor
 public abstract class AbstractEntityHandler implements EntityHandler {
 
-    protected final RepositoryItem repository;
+    protected final RepositoryItem repositoryItem;
     protected final KeyValueJoiner keyValueJoiner;
 
     @Override
     public long handle(Context context, List<Object> entities) {
         Example example = newExample(context, entities);
         if (!example.isEmpty()) {
-            OperationFactory operationFactory = repository.getOperationFactory();
+            OperationFactory operationFactory = repositoryItem.getOperationFactory();
             Query query = operationFactory.buildQueryByExample(example);
             query.includeRoot();
-            Result<Object> result = repository.executeQuery(context, query);
+            Result<Object> result = repositoryItem.executeQuery(context, query);
             keyValueJoiner.setCollectionSize(result.getRecords().size() / entities.size() + 1);
             handleResult(context, result);
             keyValueJoiner.join(entities);

@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.binder.v1.impl.handler;
+package com.gitee.dorive.executor.v1.impl.handler.qry;
 
 import com.gitee.dorive.base.v1.binder.api.Binder;
+import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -32,7 +32,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ValueFilterEntityHandler implements EntityHandler {
 
-    private RepositoryItem repository;
+    private RepositoryItem repositoryItem;
     private EntityHandler entityHandler;
 
     @Override
@@ -42,8 +42,8 @@ public class ValueFilterEntityHandler implements EntityHandler {
     }
 
     private List<Object> filterByValueRouteBinders(Context context, List<Object> entities) {
-        BinderResolver binderResolver = (BinderResolver) repository.getBinderExecutor();
-        List<Binder> valueRouteBinders = binderResolver.getValueRouteBinders();
+        BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
+        List<Binder> valueRouteBinders = binderExecutor.getValueRouteBinders();
         if (valueRouteBinders.isEmpty()) {
             return entities;
         }
