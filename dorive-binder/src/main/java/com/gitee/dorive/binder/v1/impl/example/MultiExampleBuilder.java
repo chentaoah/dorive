@@ -22,7 +22,7 @@ import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
-import com.gitee.dorive.binder.v1.api.ExampleBuilder;
+import com.gitee.dorive.base.v1.binder.api.ExampleBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.binder.v1.impl.handler;
+package com.gitee.dorive.executor.v1.impl.handler.qry;
 
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.enums.JoinType;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.binder.v1.impl.union.UnionEntityHandler;
-import com.gitee.dorive.binder.v1.impl.union.KeyValueJoiner;
+import com.gitee.dorive.executor.v1.impl.union.KeyValueJoiner;
+import com.gitee.dorive.executor.v1.impl.union.UnionEntityHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -33,19 +33,19 @@ import java.util.List;
 @AllArgsConstructor
 public class AdaptiveEntityHandler implements EntityHandler {
 
-    private final RepositoryItem repository;
+    private final RepositoryItem repositoryItem;
 
     @Override
     public long handle(Context context, List<Object> entities) {
-        BinderExecutor binderExecutor = repository.getBinderExecutor();
+        BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
         JoinType joinType = binderExecutor.getJoinType();
         if (joinType == JoinType.SINGLE || joinType == JoinType.MULTI) {
-            EntityHandler entityHandler = repository.getProperty(EntityHandler.class);
+            EntityHandler entityHandler = repositoryItem.getProperty(EntityHandler.class);
             return entityHandler.handle(context, entities);
 
         } else if (joinType == JoinType.UNION) {
-            KeyValueJoiner keyValueJoiner = new KeyValueJoiner(repository, entities);
-            return new UnionEntityHandler(repository, keyValueJoiner).handle(context, entities);
+            KeyValueJoiner keyValueJoiner = new KeyValueJoiner(repositoryItem, entities);
+            return new UnionEntityHandler(repositoryItem, keyValueJoiner).handle(context, entities);
         }
         return 0L;
     }

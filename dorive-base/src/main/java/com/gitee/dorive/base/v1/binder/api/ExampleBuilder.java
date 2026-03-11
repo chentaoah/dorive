@@ -15,28 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.binder.v1.impl.union;
+package com.gitee.dorive.base.v1.binder.api;
 
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
 
 import java.util.List;
 
-public class KeyValueJoiner extends HashMapJoiner {
+public interface ExampleBuilder {
 
-    private RepositoryItem repository;
+    Example newExample(Context context, List<Object> entities);
 
-    public KeyValueJoiner(RepositoryItem repository, List<Object> entities) {
-        super(repository.isCollection(), entities);
-        this.repository = repository;
-    }
-
-    @Override
-    protected void doJoin(Object entity, Object object) {
-        EntityElement entityElement = repository.getEntityElement();
-        Object value = entityElement.getValue(entity);
-        if (value == null) {
-            entityElement.setValue(entity, object);
-        }
-    }
 }

@@ -15,13 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.binder.v1.impl.union;
+package com.gitee.dorive.executor.v1.impl.union;
 
-import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Data
 public abstract class HashMapJoiner {

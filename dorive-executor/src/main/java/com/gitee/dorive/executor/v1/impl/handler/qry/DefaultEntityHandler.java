@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.binder.v1.impl.handler;
+package com.gitee.dorive.executor.v1.impl.handler.qry;
 
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
@@ -26,7 +26,7 @@ import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.binder.v1.api.ExampleBuilder;
+import com.gitee.dorive.base.v1.binder.api.ExampleBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -36,14 +36,14 @@ import java.util.List;
 @AllArgsConstructor
 public class DefaultEntityHandler implements EntityHandler {
 
-    private final RepositoryItem repository;
+    private final RepositoryItem repositoryItem;
 
     @Override
     public long handle(Context context, List<Object> entities) {
-        OperationFactory operationFactory = repository.getOperationFactory();
-        BinderExecutor binderExecutor = repository.getBinderExecutor();
-        ExampleBuilder exampleBuilder = repository.getProperty(ExampleBuilder.class);
-        EntityJoiner entityJoiner = repository.getProperty(EntityJoiner.class);
+        OperationFactory operationFactory = repositoryItem.getOperationFactory();
+        BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
+        ExampleBuilder exampleBuilder = repositoryItem.getProperty(ExampleBuilder.class);
+        EntityJoiner entityJoiner = repositoryItem.getProperty(EntityJoiner.class);
 
         Example example = exampleBuilder.newExample(context, entities);
         binderExecutor.appendFilterCriteria(context, example);
@@ -52,7 +52,7 @@ public class DefaultEntityHandler implements EntityHandler {
         }
         Query query = operationFactory.buildQueryByExample(example);
         query.includeRoot();
-        Result<Object> result = repository.executeQuery(context, query);
+        Result<Object> result = repositoryItem.executeQuery(context, query);
         entityJoiner.join(context, entities, result.getRecords());
         return result.getCount();
     }

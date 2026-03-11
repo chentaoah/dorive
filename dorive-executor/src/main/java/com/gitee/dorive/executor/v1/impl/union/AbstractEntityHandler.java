@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.binder.v1.impl.union;
+package com.gitee.dorive.executor.v1.impl.union;
 
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
