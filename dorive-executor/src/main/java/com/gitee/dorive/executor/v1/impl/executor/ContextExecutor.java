@@ -37,12 +37,12 @@ import java.util.List;
 @Setter
 public class ContextExecutor extends AbstractExecutor implements EntityHandler, EntityOpHandler {
 
-    private final RepositoryContext repository;
+    private final RepositoryContext repositoryContext;
     private final EntityHandler entityHandler;
     private final EntityOpHandler entityOpHandler;
 
-    public ContextExecutor(RepositoryContext repository, EntityHandler entityHandler, EntityOpHandler entityOpHandler) {
-        this.repository = repository;
+    public ContextExecutor(RepositoryContext repositoryContext, EntityHandler entityHandler, EntityOpHandler entityOpHandler) {
+        this.repositoryContext = repositoryContext;
         this.entityHandler = entityHandler;
         this.entityOpHandler = entityOpHandler;
     }
@@ -50,8 +50,8 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler, 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Assert.isTrue(!query.isEmpty(), "The query cannot be empty!");
-        RepositoryItem rootRepository = repository.getRootRepository();
-        if (repository.matches(context, rootRepository) || query.isIncludeRoot()) {
+        RepositoryItem rootRepository = repositoryContext.getRootRepository();
+        if (repositoryContext.matches(context, rootRepository) || query.isIncludeRoot()) {
             Result<Object> result = rootRepository.executeQuery(context, query);
             List<Object> entities = result.getRecords();
             if (!entities.isEmpty()) {
