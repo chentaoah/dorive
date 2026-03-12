@@ -30,12 +30,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
-public class DerivedRepositoryResolver {
+public class RepositoryDerivedResolver {
 
     private RepositoryContext repositoryContext;
     private Map<Class<?>, AbstractContextRepository<?, ?>> classRepositoryMap;
 
-    public DerivedRepositoryResolver(RepositoryContext repositoryContext) {
+    public RepositoryDerivedResolver(RepositoryContext repositoryContext) {
         this.repositoryContext = repositoryContext;
     }
 

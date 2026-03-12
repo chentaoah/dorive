@@ -20,6 +20,7 @@ package com.gitee.dorive.launcher.v1.impl.factory;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
+import com.gitee.dorive.base.v1.binder.api.ExampleBuilder;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.enums.JoinType;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
@@ -35,19 +36,18 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
-import com.gitee.dorive.base.v1.binder.api.ExampleBuilder;
 import com.gitee.dorive.binder.v1.impl.example.MultiExampleBuilder;
 import com.gitee.dorive.binder.v1.impl.example.SingleExampleBuilder;
-import com.gitee.dorive.executor.v1.impl.handler.qry.AdaptiveEntityHandler;
-import com.gitee.dorive.executor.v1.impl.handler.qry.DefaultEntityHandler;
-import com.gitee.dorive.executor.v1.impl.handler.qry.ValueFilterEntityHandler;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.executor.v1.impl.executor.ContextExecutor;
 import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
+import com.gitee.dorive.executor.v1.impl.handler.qry.AdaptiveEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.ContextMatchEntityHandler;
+import com.gitee.dorive.executor.v1.impl.handler.qry.DefaultEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
+import com.gitee.dorive.executor.v1.impl.handler.qry.ValueFilterEntityHandler;
 import com.gitee.dorive.joiner.v1.impl.joiner.DefaultEntityJoiner;
 import com.gitee.dorive.mybatis.v2.impl.querier.DefaultCountQuerier;
 import com.gitee.dorive.mybatis.v2.impl.segment.DefaultSegmentExecutor;
@@ -72,7 +72,7 @@ import com.gitee.dorive.repository.v1.impl.repository.AbstractContextRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
-import com.gitee.dorive.repository.v1.impl.resolver.DerivedRepositoryResolver;
+import com.gitee.dorive.repository.v1.impl.resolver.RepositoryDerivedResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,21 +126,17 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
 
     @Override
     public Executor newExecutor(RepositoryContext repositoryContext) {
-        // 处理器
-        EntityHandler entityHandler = newEntityHandler(repositoryContext);
-        EntityOpHandler entityOpHandler = newEntityOpHandler(repositoryContext);
         // 委托
-        DerivedRepositoryResolver repositoryResolver = new DerivedRepositoryResolver(repositoryContext);
-        repositoryResolver.resolve();
-        if (repositoryResolver.hasDerived()) {
-            entityHandler = new DelegatedEntityHandler(repositoryContext, repositoryResolver.getEntityHandlerMap(entityHandler));
-            entityOpHandler = new DelegatedEntityOpHandler(repositoryContext, repositoryResolver.getEntityOpHandlerMap(entityOpHandler));
-        }
+        RepositoryDerivedResolver repositoryDerivedResolver = new RepositoryDerivedResolver(repositoryContext);
+        repositoryDerivedResolver.resolve();
+        // 处理器
+        EntityHandler entityHandler = newEntityHandler(repositoryContext, repositoryDerivedResolver);
+        EntityOpHandler entityOpHandler = newEntityOpHandler(repositoryContext, repositoryDerivedResolver);
         // 创建上下文执行器
         return new ContextExecutor(repositoryContext, entityHandler, entityOpHandler);
     }
 
-    private EntityHandler newEntityHandler(RepositoryContext repositoryContext) {
+    private EntityHandler newEntityHandler(RepositoryContext repositoryContext, RepositoryDerivedResolver repositoryDerivedResolver) {
         List<RepositoryItem> subRepositories = repositoryContext.getSubRepositories();
         List<EntityHandler> entityHandlers = new ArrayList<>(subRepositories.size());
         for (RepositoryItem repositoryItem : subRepositories) {
@@ -170,11 +166,19 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         if (repositoryContext instanceof AbstractQueryRepository) {
             new RefInjector((AbstractQueryRepository<?, ?>) repositoryContext, entityHandler, repositoryContext.getEntityClass());
         }
+        // DelegatedEntityHandler
+        if (repositoryDerivedResolver.hasDerived()) {
+            entityHandler = new DelegatedEntityHandler(repositoryContext, repositoryDerivedResolver.getEntityHandlerMap(entityHandler));
+        }
         return entityHandler;
     }
 
-    private EntityOpHandler newEntityOpHandler(RepositoryContext repositoryContext) {
-        return new BatchEntityOpHandler(repositoryContext);
+    private EntityOpHandler newEntityOpHandler(RepositoryContext repositoryContext, RepositoryDerivedResolver repositoryDerivedResolver) {
+        EntityOpHandler entityOpHandler = new BatchEntityOpHandler(repositoryContext);
+        if (repositoryDerivedResolver.hasDerived()) {
+            entityOpHandler = new DelegatedEntityOpHandler(repositoryContext, repositoryDerivedResolver.getEntityOpHandlerMap(entityOpHandler));
+        }
+        return entityOpHandler;
     }
 
     @Override
