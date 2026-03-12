@@ -38,7 +38,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class DelegatedEntityOpHandler implements EntityOpHandler {
 
-    private final RepositoryContext repository;
+    private final RepositoryContext repositoryContext;
     private final Map<Class<?>, EntityOpHandler> entityOpHandlerMap;
 
     @Override
@@ -57,7 +57,7 @@ public class DelegatedEntityOpHandler implements EntityOpHandler {
             List<Object> subEntities = entry.getValue();
             EntityOpHandler entityOpHandler = entityOpHandlerMap.get(entityType);
             if (entityOpHandler == null) {
-                entityOpHandler = entityOpHandlerMap.get(repository.getEntityClass());
+                entityOpHandler = entityOpHandlerMap.get(repositoryContext.getEntityClass());
             }
             if (entityOpHandler != null) {
                 totalCount += entityOpHandler.handle(context, buildOperation(entityOp, subEntities));
@@ -77,7 +77,7 @@ public class DelegatedEntityOpHandler implements EntityOpHandler {
             return new Delete(entities);
 
         } else if (entityOp instanceof InsertOrUpdate) {
-            OperationFactory operationFactory = repository.getOperationFactory();
+            OperationFactory operationFactory = repositoryContext.getOperationFactory();
             return operationFactory.buildInsertOrUpdate(entities);
         }
         return null;

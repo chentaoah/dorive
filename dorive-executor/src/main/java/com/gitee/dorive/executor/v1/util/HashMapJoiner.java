@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.impl.union;
+package com.gitee.dorive.executor.v1.util;
 
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;

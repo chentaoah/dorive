@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.impl.union;
+package com.gitee.dorive.executor.v1.impl.handler.union;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.Binder;
@@ -26,6 +26,7 @@ import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.entity.qry.UnionExample;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.executor.v1.util.KeyValueJoiner;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,8 +38,8 @@ import java.util.Map;
 @Setter
 public class UnionEntityHandler extends AbstractEntityHandler {
 
-    public UnionEntityHandler(RepositoryItem repository, KeyValueJoiner keyValueJoiner) {
-        super(repository, keyValueJoiner);
+    public UnionEntityHandler(RepositoryItem repositoryItem, KeyValueJoiner keyValueJoiner) {
+        super(repositoryItem, keyValueJoiner);
     }
 
     @Override

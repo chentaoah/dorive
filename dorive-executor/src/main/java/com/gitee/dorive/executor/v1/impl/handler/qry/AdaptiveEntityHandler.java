@@ -22,8 +22,8 @@ import com.gitee.dorive.base.v1.common.enums.JoinType;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.executor.v1.impl.union.KeyValueJoiner;
-import com.gitee.dorive.executor.v1.impl.union.UnionEntityHandler;
+import com.gitee.dorive.executor.v1.util.KeyValueJoiner;
+import com.gitee.dorive.executor.v1.impl.handler.union.UnionEntityHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
