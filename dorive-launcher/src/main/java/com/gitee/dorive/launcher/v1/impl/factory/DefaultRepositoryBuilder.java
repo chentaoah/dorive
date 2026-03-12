@@ -42,12 +42,12 @@ import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.executor.v1.impl.executor.ContextExecutor;
 import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
-import com.gitee.dorive.executor.v1.impl.handler.qry.AdaptiveEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.ContextMatchEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.DefaultEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.ValueFilterEntityHandler;
+import com.gitee.dorive.executor.v1.impl.handler.qry.UnionEntityHandler;
 import com.gitee.dorive.joiner.v1.impl.joiner.DefaultEntityJoiner;
 import com.gitee.dorive.mybatis.v2.impl.querier.DefaultCountQuerier;
 import com.gitee.dorive.mybatis.v2.impl.segment.DefaultSegmentExecutor;
@@ -140,7 +140,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         List<RepositoryItem> subRepositories = repositoryContext.getSubRepositories();
         List<EntityHandler> entityHandlers = new ArrayList<>(subRepositories.size());
         for (RepositoryItem repositoryItem : subRepositories) {
-            // DefaultEntityHandler
+            // EntityHandler
             EntityHandler entityHandler = null;
             BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
             JoinType joinType = binderExecutor.getJoinType();
@@ -148,10 +148,13 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
                 List<Binder> binders = binderExecutor.getRootStrongBinders();
                 ExampleBuilder exampleBuilder = joinType == JoinType.SINGLE ? new SingleExampleBuilder(binders.get(0)) : new MultiExampleBuilder(binders);
                 EntityJoiner entityJoiner = new DefaultEntityJoiner(repositoryItem);
+                // DefaultEntityHandler
                 entityHandler = new DefaultEntityHandler(repositoryItem, exampleBuilder, entityJoiner);
+
+            } else if (joinType == JoinType.UNION) {
+                // UnionEntityHandler
+                entityHandler = new UnionEntityHandler(repositoryItem);
             }
-            // AdaptiveEntityHandler
-            entityHandler = new AdaptiveEntityHandler(repositoryItem, entityHandler);
             // ValueFilterEntityHandler
             if (binderExecutor.hasValueRouteBinders()) {
                 entityHandler = new ValueFilterEntityHandler(repositoryItem, entityHandler);

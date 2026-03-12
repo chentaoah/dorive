@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.impl.handler.union;
+package com.gitee.dorive.executor.v1.impl.handler.qry;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.Binder;
@@ -44,25 +44,25 @@ import java.util.Map;
 public class UnionEntityHandler implements EntityHandler {
 
     private final RepositoryItem repositoryItem;
-    private final KeyValueJoiner keyValueJoiner;
 
     @Override
     public long handle(Context context, List<Object> entities) {
-        Example example = newExample(context, entities);
+        KeyValueJoiner keyValueJoiner = new KeyValueJoiner(repositoryItem, entities);
+        Example example = newExample(context, entities, keyValueJoiner);
         if (!example.isEmpty()) {
             OperationFactory operationFactory = repositoryItem.getOperationFactory();
             Query query = operationFactory.buildQueryByExample(example);
             query.includeRoot();
             Result<Object> result = repositoryItem.executeQuery(context, query);
             keyValueJoiner.setCollectionSize(result.getRecords().size() / entities.size() + 1);
-            handleResult(result);
+            handleResult(keyValueJoiner, result);
             keyValueJoiner.join(entities);
             return result.getCount();
         }
         return 0L;
     }
 
-    private Example newExample(Context context, List<Object> entities) {
+    private Example newExample(Context context, List<Object> entities, KeyValueJoiner keyValueJoiner) {
         UnionExample unionExample = new UnionExample();
         for (int index = 0; index < entities.size(); index++) {
             Object entity = entities.get(index);
@@ -103,7 +103,7 @@ public class UnionEntityHandler implements EntityHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private void handleResult(Result<Object> result) {
+    private void handleResult(KeyValueJoiner keyValueJoiner, Result<Object> result) {
         List<Map<String, Object>> recordMaps = result.getRecordMaps();
         List<Object> entities = result.getRecords();
         Assert.isTrue(recordMaps.size() == entities.size(), "Inconsistent data!");
