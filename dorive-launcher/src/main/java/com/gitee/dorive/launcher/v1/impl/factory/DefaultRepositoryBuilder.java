@@ -174,7 +174,9 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     }
 
     private EntityOpHandler newEntityOpHandler(RepositoryContext repositoryContext, RepositoryDerivedResolver repositoryDerivedResolver) {
+        // BatchEntityOpHandler
         EntityOpHandler entityOpHandler = new BatchEntityOpHandler(repositoryContext);
+        // DelegatedEntityOpHandler
         if (repositoryDerivedResolver.hasDerived()) {
             entityOpHandler = new DelegatedEntityOpHandler(repositoryContext, repositoryDerivedResolver.getEntityOpHandlerMap(entityOpHandler));
         }
