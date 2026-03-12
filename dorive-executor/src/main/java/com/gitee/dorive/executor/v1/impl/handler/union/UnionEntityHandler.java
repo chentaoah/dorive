@@ -21,12 +21,16 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.entity.qry.UnionExample;
+import com.gitee.dorive.base.v1.core.impl.OperationFactory;
+import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.executor.v1.util.KeyValueJoiner;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,14 +40,29 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class UnionEntityHandler extends AbstractEntityHandler {
+@AllArgsConstructor
+public class UnionEntityHandler implements EntityHandler {
 
-    public UnionEntityHandler(RepositoryItem repositoryItem, KeyValueJoiner keyValueJoiner) {
-        super(repositoryItem, keyValueJoiner);
-    }
+    private final RepositoryItem repositoryItem;
+    private final KeyValueJoiner keyValueJoiner;
 
     @Override
-    public Example newExample(Context context, List<Object> entities) {
+    public long handle(Context context, List<Object> entities) {
+        Example example = newExample(context, entities);
+        if (!example.isEmpty()) {
+            OperationFactory operationFactory = repositoryItem.getOperationFactory();
+            Query query = operationFactory.buildQueryByExample(example);
+            query.includeRoot();
+            Result<Object> result = repositoryItem.executeQuery(context, query);
+            keyValueJoiner.setCollectionSize(result.getRecords().size() / entities.size() + 1);
+            handleResult(result);
+            keyValueJoiner.join(entities);
+            return result.getCount();
+        }
+        return 0L;
+    }
+
+    private Example newExample(Context context, List<Object> entities) {
         UnionExample unionExample = new UnionExample();
         for (int index = 0; index < entities.size(); index++) {
             Object entity = entities.get(index);
@@ -83,9 +102,8 @@ public class UnionEntityHandler extends AbstractEntityHandler {
         return example;
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    protected void handleResult(Context context, Result<Object> result) {
+    private void handleResult(Result<Object> result) {
         List<Map<String, Object>> recordMaps = result.getRecordMaps();
         List<Object> entities = result.getRecords();
         Assert.isTrue(recordMaps.size() == entities.size(), "Inconsistent data!");
