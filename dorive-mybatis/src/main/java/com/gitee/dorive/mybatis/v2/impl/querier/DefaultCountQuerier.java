@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class DefaultCountQuerier implements CountQuerier {
 
-    private final RepositoryContext repository;
+    private final RepositoryContext repositoryContext;
     private final QueryResolver queryResolver;
     private final SqlRunner sqlRunner;
 
@@ -66,7 +66,7 @@ public class DefaultCountQuerier implements CountQuerier {
         String tableAlias = tableSegment.getTableAlias();
 
         // group by
-        Translator translator = repository.getProperty(Translator.class);
+        Translator translator = repositoryContext.getProperty(Translator.class);
         List<String> groupBy = toAliases(translator, countQuery.getGroupBy());
         String groupByColumns = CollUtil.join(groupBy, ",", tableAlias + ".", null);
         selectSegment.setGroupBy("GROUP BY " + groupByColumns);

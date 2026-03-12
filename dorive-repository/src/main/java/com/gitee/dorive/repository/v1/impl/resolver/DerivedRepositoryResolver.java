@@ -32,24 +32,24 @@ import java.util.Map;
 @Data
 public class DerivedRepositoryResolver {
 
-    private RepositoryContext repository;
+    private RepositoryContext repositoryContext;
     private Map<Class<?>, AbstractContextRepository<?, ?>> classRepositoryMap;
 
-    public DerivedRepositoryResolver(RepositoryContext repository) {
-        this.repository = repository;
+    public DerivedRepositoryResolver(RepositoryContext repositoryContext) {
+        this.repositoryContext = repositoryContext;
     }
 
     public void resolve() {
-        RepositoryDef repositoryDef = repository.getRepositoryDef();
+        RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
         Class<?>[] derived = repositoryDef.getDerived();
         classRepositoryMap = new LinkedHashMap<>(derived.length * 4 / 3 + 1);
         for (Class<?> clazz : derived) {
             if (AbstractContextRepository.class.isAssignableFrom(clazz)) {
-                ApplicationContext applicationContext = repository.getApplicationContext();
+                ApplicationContext applicationContext = repositoryContext.getApplicationContext();
                 Object beanInstance = applicationContext.getBean(clazz);
                 AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) beanInstance;
                 Class<?> fieldEntityClass = abstractContextRepository.getEntityClass();
-                if (repository.getEntityClass().isAssignableFrom(fieldEntityClass)) {
+                if (repositoryContext.getEntityClass().isAssignableFrom(fieldEntityClass)) {
                     classRepositoryMap.put(fieldEntityClass, abstractContextRepository);
                 }
             }
@@ -63,7 +63,7 @@ public class DerivedRepositoryResolver {
     public Map<Class<?>, EntityHandler> getEntityHandlerMap(EntityHandler entityHandler) {
         int size = classRepositoryMap.size() + 1;
         Map<Class<?>, EntityHandler> entityHandlerMap = new LinkedHashMap<>(size * 4 / 3 + 1);
-        entityHandlerMap.put(repository.getEntityClass(), entityHandler);
+        entityHandlerMap.put(repositoryContext.getEntityClass(), entityHandler);
         classRepositoryMap.forEach((clazz, repository) -> {
             Executor executor = repository.getExecutor();
             if (executor instanceof EntityHandler) {
@@ -76,7 +76,7 @@ public class DerivedRepositoryResolver {
     public Map<Class<?>, EntityOpHandler> getEntityOpHandlerMap(EntityOpHandler entityOpHandler) {
         int size = classRepositoryMap.size() + 1;
         Map<Class<?>, EntityOpHandler> entityOpHandlerMap = new LinkedHashMap<>(size * 4 / 3 + 1);
-        entityOpHandlerMap.put(repository.getEntityClass(), entityOpHandler);
+        entityOpHandlerMap.put(repositoryContext.getEntityClass(), entityOpHandler);
         classRepositoryMap.forEach((clazz, repository) -> {
             Executor executor = repository.getExecutor();
             if (executor instanceof EntityOpHandler) {

@@ -34,7 +34,7 @@ import org.springframework.context.ApplicationContext;
 @AllArgsConstructor
 public class EntityFactoryResolver {
 
-    private RepositoryContext repository;
+    private RepositoryContext repositoryContext;
     private EntityElement entityElement;
     private Class<?> reType;
     private Class<?> deType;
@@ -43,13 +43,13 @@ public class EntityFactoryResolver {
     private EntityTranslator deEntityTranslator;
 
     public EntityFactory newEntityFactory() {
-        RepositoryDef repositoryDef = repository.getRepositoryDef();
+        RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
         Class<?> factoryClass = repositoryDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
             entityFactory = !entityTranslatorManager.containValueObj() ? new DefaultEntityFactory() : new ValueObjEntityFactory();
         } else {
-            ApplicationContext applicationContext = repository.getApplicationContext();
+            ApplicationContext applicationContext = repositoryContext.getApplicationContext();
             entityFactory = (EntityFactory) applicationContext.getBean(factoryClass);
         }
         // 默认
@@ -73,7 +73,7 @@ public class EntityFactoryResolver {
         // 边界上下文实体工厂
         ContextEntityFactory contextEntityFactory = new ContextEntityFactory();
         contextEntityFactory.setBoundedContextName(repositoryDef.getBoundedContext());
-        contextEntityFactory.setBoundedContext(repository.getBoundedContext());
+        contextEntityFactory.setBoundedContext(repositoryContext.getBoundedContext());
         contextEntityFactory.initCtxCopyOptions(entityElement);
         contextEntityFactory.setEntityFactory(entityFactory);
         return contextEntityFactory;
