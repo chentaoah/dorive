@@ -85,9 +85,6 @@ import java.util.List;
  * DefaultRepository's properties:
  * EntityStoreInfo、EntityTranslatorManager、TranslatorManager、Translator、ExampleConverter
  * RepositoryContext
- * <p>
- * RepositoryItem's properties:
- * ExampleBuilder、EntityJoiner、EntityHandler
  */
 public class DefaultRepositoryBuilder implements RepositoryBuilder {
 
@@ -128,24 +125,6 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     }
 
     @Override
-    public void buildRepositoryItem(RepositoryItem repositoryItem) {
-        BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
-        JoinType joinType = binderExecutor.getJoinType();
-        if (joinType == JoinType.SINGLE || joinType == JoinType.MULTI) {
-            // 条件构建器
-            List<Binder> binders = binderExecutor.getRootStrongBinders();
-            ExampleBuilder exampleBuilder = joinType == JoinType.SINGLE ? new SingleExampleBuilder(binders.get(0)) : new MultiExampleBuilder(binders);
-            repositoryItem.setProperty(ExampleBuilder.class, exampleBuilder);
-            // 连接器
-            EntityJoiner entityJoiner = new DefaultEntityJoiner(repositoryItem);
-            repositoryItem.setProperty(EntityJoiner.class, entityJoiner);
-            // 处理器
-            EntityHandler entityHandler = new DefaultEntityHandler(repositoryItem);
-            repositoryItem.setProperty(EntityHandler.class, entityHandler);
-        }
-    }
-
-    @Override
     public Executor newExecutor(RepositoryContext repositoryContext) {
         // 处理器
         EntityHandler entityHandler = newEntityHandler(repositoryContext);
@@ -165,10 +144,19 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         List<RepositoryItem> subRepositories = repositoryContext.getSubRepositories();
         List<EntityHandler> entityHandlers = new ArrayList<>(subRepositories.size());
         for (RepositoryItem repositoryItem : subRepositories) {
-            // AdaptiveEntityHandler
-            EntityHandler entityHandler = new AdaptiveEntityHandler(repositoryItem);
-            // ValueFilterEntityHandler
+            // DefaultEntityHandler
+            EntityHandler entityHandler = null;
             BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
+            JoinType joinType = binderExecutor.getJoinType();
+            if (joinType == JoinType.SINGLE || joinType == JoinType.MULTI) {
+                List<Binder> binders = binderExecutor.getRootStrongBinders();
+                ExampleBuilder exampleBuilder = joinType == JoinType.SINGLE ? new SingleExampleBuilder(binders.get(0)) : new MultiExampleBuilder(binders);
+                EntityJoiner entityJoiner = new DefaultEntityJoiner(repositoryItem);
+                entityHandler = new DefaultEntityHandler(repositoryItem, exampleBuilder, entityJoiner);
+            }
+            // AdaptiveEntityHandler
+            entityHandler = new AdaptiveEntityHandler(repositoryItem, entityHandler);
+            // ValueFilterEntityHandler
             if (binderExecutor.hasValueRouteBinders()) {
                 entityHandler = new ValueFilterEntityHandler(repositoryItem, entityHandler);
             }

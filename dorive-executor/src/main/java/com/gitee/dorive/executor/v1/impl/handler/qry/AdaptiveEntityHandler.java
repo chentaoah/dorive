@@ -34,13 +34,13 @@ import java.util.List;
 public class AdaptiveEntityHandler implements EntityHandler {
 
     private final RepositoryItem repositoryItem;
+    private final EntityHandler entityHandler;
 
     @Override
     public long handle(Context context, List<Object> entities) {
         BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
         JoinType joinType = binderExecutor.getJoinType();
         if (joinType == JoinType.SINGLE || joinType == JoinType.MULTI) {
-            EntityHandler entityHandler = repositoryItem.getProperty(EntityHandler.class);
             return entityHandler.handle(context, entities);
 
         } else if (joinType == JoinType.UNION) {

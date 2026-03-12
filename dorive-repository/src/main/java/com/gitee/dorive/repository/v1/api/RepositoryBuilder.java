@@ -32,8 +32,6 @@ public interface RepositoryBuilder {
 
     BinderExecutor newBinderExecutor(RepositoryContext repositoryContext, EntityElement entityElement);
 
-    void buildRepositoryItem(RepositoryItem repositoryItem);
-
     Executor newExecutor(RepositoryContext repositoryContext);
 
     void initialize(RepositoryContext repositoryContext);

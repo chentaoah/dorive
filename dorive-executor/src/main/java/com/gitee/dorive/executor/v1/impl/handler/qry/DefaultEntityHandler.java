@@ -37,13 +37,13 @@ import java.util.List;
 public class DefaultEntityHandler implements EntityHandler {
 
     private final RepositoryItem repositoryItem;
+    private final ExampleBuilder exampleBuilder;
+    private final EntityJoiner entityJoiner;
 
     @Override
     public long handle(Context context, List<Object> entities) {
         OperationFactory operationFactory = repositoryItem.getOperationFactory();
         BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
-        ExampleBuilder exampleBuilder = repositoryItem.getProperty(ExampleBuilder.class);
-        EntityJoiner entityJoiner = repositoryItem.getProperty(EntityJoiner.class);
 
         Example example = exampleBuilder.newExample(context, entities);
         binderExecutor.appendFilterCriteria(context, example);
