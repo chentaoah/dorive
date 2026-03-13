@@ -34,6 +34,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
 @AllArgsConstructor
@@ -43,27 +44,53 @@ public class BatchEntityOpHandler implements EntityOpHandler {
 
     @Override
     public long handle(Context context, EntityOp entityOp) {
-        int totalCount = 0;
+        final AtomicInteger totalCount = new AtomicInteger(0);
         if (entityOp instanceof Insert) {
-            totalCount += executeInsert(context, entityOp);
+            execute(context, entityOp, totalCount, (RepositoryItem repositoryItem, boolean isMatch, Object rootEntity, List<?> entities) -> {
+                if (isMatch) {
+                    repositoryItem.getBoundValue(context, rootEntity, entities);
+                }
+                Operation operation = new Insert(entities);
+                operation.switchRoot(isMatch);
+                totalCount.addAndGet(repositoryItem.execute(context, operation));
+                if (entities.size() == 1) {
+                    repositoryItem.setBoundId(context, rootEntity, entities.get(0));
+                }
+            });
 
-        } else if (entityOp instanceof Update) {
-            totalCount += executeUpdateOrDelete(context, entityOp);
-
-        } else if (entityOp instanceof Delete) {
-            totalCount += executeUpdateOrDelete(context, entityOp);
+        } else if (entityOp instanceof Update || entityOp instanceof Delete) {
+            execute(context, entityOp, totalCount, (RepositoryItem repositoryItem, boolean isMatch, Object rootEntity, List<?> entities) -> {
+                Operation operation = entityOp instanceof Update ? new Update(entities) : new Delete(entities);
+                operation.switchRoot(isMatch);
+                totalCount.addAndGet(repositoryItem.execute(context, operation));
+            });
 
         } else if (entityOp instanceof InsertOrUpdate) {
-            totalCount += executeInsertOrUpdate(context, entityOp);
+            execute(context, entityOp, totalCount, (RepositoryItem repositoryItem, boolean isMatch, Object rootEntity, List<?> entities) -> {
+                if (isMatch) {
+                    repositoryItem.getBoundValue(context, rootEntity, entities);
+                }
+                OperationFactory operationFactory = repositoryItem.getOperationFactory();
+                Operation operation = operationFactory.buildInsertOrUpdate(entities);
+                operation.switchRoot(isMatch);
+                totalCount.addAndGet(repositoryItem.execute(context, operation));
+                if (entities.size() == 1) {
+                    repositoryItem.setBoundId(context, rootEntity, entities.get(0));
+                }
+            });
         }
-        return totalCount;
+        return totalCount.get();
     }
 
-    private int executeInsert(Context context, EntityOp entityOp) {
-        int totalCount = 0;
+    private void execute(Context context, EntityOp entityOp, AtomicInteger totalCount, Executor executor) {
         for (RepositoryItem repositoryItem : repositoryContext.getOrderedRepositories()) {
             if (repositoryItem.isRoot()) {
-                totalCount += executeRoot(context, entityOp, repositoryItem);
+                if (entityOp.isNotIgnoreRoot()) {
+                    boolean isMatch = repositoryContext.matches(context, repositoryItem);
+                    if (isMatch || entityOp.isIncludeRoot()) {
+                        totalCount.addAndGet(repositoryItem.execute(context, entityOp));
+                    }
+                }
             } else {
                 boolean isMatch = repositoryContext.matches(context, repositoryItem);
                 if (isMatch || repositoryItem.isAggregated()) {
@@ -71,83 +98,12 @@ public class BatchEntityOpHandler implements EntityOpHandler {
                     for (Object rootEntity : rootEntities) {
                         List<?> entities = getEntities(repositoryItem, rootEntity);
                         if (entities != null) {
-                            if (isMatch) {
-                                repositoryItem.getBoundValue(context, rootEntity, entities);
-                            }
-                            Operation operation = new Insert(entities);
-                            operation.switchRoot(isMatch);
-                            totalCount += repositoryItem.execute(context, operation);
-                            if (entities.size() == 1) {
-                                repositoryItem.setBoundId(context, rootEntity, entities.get(0));
-                            }
+                            executor.execute(repositoryItem, isMatch, rootEntity, entities);
                         }
                     }
                 }
             }
         }
-        return totalCount;
-    }
-
-    private int executeUpdateOrDelete(Context context, EntityOp entityOp) {
-        int totalCount = 0;
-        for (RepositoryItem repositoryItem : repositoryContext.getOrderedRepositories()) {
-            if (repositoryItem.isRoot()) {
-                totalCount += executeRoot(context, entityOp, repositoryItem);
-            } else {
-                boolean isMatch = repositoryContext.matches(context, repositoryItem);
-                if (isMatch || repositoryItem.isAggregated()) {
-                    List<?> rootEntities = entityOp.getEntities();
-                    for (Object rootEntity : rootEntities) {
-                        List<?> entities = getEntities(repositoryItem, rootEntity);
-                        if (entities != null) {
-                            Operation operation = entityOp instanceof Update ? new Update(entities) : new Delete(entities);
-                            operation.switchRoot(isMatch);
-                            totalCount += repositoryItem.execute(context, operation);
-                        }
-                    }
-                }
-            }
-        }
-        return totalCount;
-    }
-
-    private int executeInsertOrUpdate(Context context, EntityOp entityOp) {
-        int totalCount = 0;
-        for (RepositoryItem repositoryItem : repositoryContext.getOrderedRepositories()) {
-            if (repositoryItem.isRoot()) {
-                totalCount += executeRoot(context, entityOp, repositoryItem);
-            } else {
-                boolean isMatch = repositoryContext.matches(context, repositoryItem);
-                if (isMatch || repositoryItem.isAggregated()) {
-                    List<?> rootEntities = entityOp.getEntities();
-                    for (Object rootEntity : rootEntities) {
-                        List<?> entities = getEntities(repositoryItem, rootEntity);
-                        if (entities != null) {
-                            if (isMatch) {
-                                repositoryItem.getBoundValue(context, rootEntity, entities);
-                            }
-                            OperationFactory operationFactory = repositoryItem.getOperationFactory();
-                            Operation operation = operationFactory.buildInsertOrUpdate(entities);
-                            operation.switchRoot(isMatch);
-                            totalCount += repositoryItem.execute(context, operation);
-                            if (entities.size() == 1) {
-                                repositoryItem.setBoundId(context, rootEntity, entities.get(0));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return totalCount;
-    }
-
-    private int executeRoot(Context context, EntityOp entityOp, RepositoryItem repositoryItem) {
-        if (entityOp.isNotIgnoreRoot()) {
-            if (repositoryContext.matches(context, repositoryItem) || entityOp.isIncludeRoot()) {
-                return repositoryItem.execute(context, entityOp);
-            }
-        }
-        return 0;
     }
 
     private List<?> getEntities(RepositoryItem repositoryItem, Object rootEntity) {
@@ -162,4 +118,7 @@ public class BatchEntityOpHandler implements EntityOpHandler {
         return null;
     }
 
+    private interface Executor {
+        void execute(RepositoryItem repositoryItem, boolean isMatch, Object rootEntity, List<?> entities);
+    }
 }
