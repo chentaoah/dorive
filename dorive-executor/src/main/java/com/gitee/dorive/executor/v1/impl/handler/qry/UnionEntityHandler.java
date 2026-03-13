@@ -91,8 +91,8 @@ public class UnionEntityHandler implements EntityHandler {
                 }
             }
             if (boundValue != null) {
-                String fieldName = binder.getField();
-                example.eq(fieldName, boundValue);
+                String field = binder.getField();
+                example.eq(field, boundValue);
             } else {
                 example.getCriteria().clear();
                 break;

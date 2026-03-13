@@ -39,11 +39,11 @@ public class SingleExampleBuilder implements ExampleBuilder {
         Example example = new InnerExample();
         List<Object> boundValues = collectBoundValues(context, entities);
         if (!boundValues.isEmpty()) {
-            String fieldName = binder.getField();
+            String field = binder.getField();
             if (boundValues.size() == 1) {
-                example.eq(fieldName, boundValues.get(0));
+                example.eq(field, boundValues.get(0));
             } else {
-                example.in(fieldName, boundValues);
+                example.in(field, boundValues);
             }
         }
         return example;
