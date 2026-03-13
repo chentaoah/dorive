@@ -73,7 +73,7 @@ public class JoinInfoResolver {
                 for (Binder strongBinder : strongBinders) {
                     ConditionInfo conditionInfo = new ConditionInfo();
                     conditionInfo.setSource(repositoryContext);
-                    conditionInfo.setSourceField(strongBinder.getFieldName());
+                    conditionInfo.setSourceField(strongBinder.getField());
                     conditionInfo.setTarget(targetRepositoryContext);
                     conditionInfo.setTargetField(strongBinder.getTargetField());
                     conditionInfos.add(conditionInfo);
@@ -94,7 +94,7 @@ public class JoinInfoResolver {
             for (Binder valueFilterBinder : valueFilterBinders) {
                 ConditionInfo conditionInfo = new ConditionInfo();
                 conditionInfo.setSource(repositoryContext);
-                conditionInfo.setSourceField(valueFilterBinder.getFieldName());
+                conditionInfo.setSourceField(valueFilterBinder.getField());
                 conditionInfo.setLiteral(CriterionUtils.sqlParam(valueFilterBinder.getBoundValue(context, null)));
                 conditionInfos.add(conditionInfo);
             }

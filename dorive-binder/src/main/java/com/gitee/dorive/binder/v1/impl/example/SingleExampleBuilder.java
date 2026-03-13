@@ -39,7 +39,7 @@ public class SingleExampleBuilder implements ExampleBuilder {
         Example example = new InnerExample();
         List<Object> boundValues = collectBoundValues(context, entities);
         if (!boundValues.isEmpty()) {
-            String fieldName = binder.getFieldName();
+            String fieldName = binder.getField();
             if (boundValues.size() == 1) {
                 example.eq(fieldName, boundValues.get(0));
             } else {

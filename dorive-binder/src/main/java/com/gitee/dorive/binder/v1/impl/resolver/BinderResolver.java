@@ -265,7 +265,7 @@ public class BinderResolver implements BinderExecutor {
         for (Binder weakBinder : weakBinders) {
             Object boundValue = weakBinder.input(context, null);
             if (boundValue != null) {
-                String fieldName = weakBinder.getFieldName();
+                String fieldName = weakBinder.getField();
                 example.eq(fieldName, boundValue);
             }
         }
@@ -278,7 +278,7 @@ public class BinderResolver implements BinderExecutor {
             Object boundValue = valueFilterBinder.getBoundValue(context, null);
             boundValue = valueFilterBinder.input(context, boundValue);
             if (boundValue != null) {
-                String fieldName = valueFilterBinder.getFieldName();
+                String fieldName = valueFilterBinder.getField();
                 example.eq(fieldName, boundValue);
             }
         }

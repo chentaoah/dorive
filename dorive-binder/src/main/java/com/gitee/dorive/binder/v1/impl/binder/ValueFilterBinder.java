@@ -39,11 +39,6 @@ public class ValueFilterBinder extends AbstractBinder {
     }
 
     @Override
-    public String getBoundName() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Object getBoundValue(Context context, Object entity) {
         return value;
     }

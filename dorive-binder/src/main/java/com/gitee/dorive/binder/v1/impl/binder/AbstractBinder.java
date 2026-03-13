@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.binder.v1.impl.binder;
 
+import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.common.def.BindingDef;
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.Processor;
@@ -31,32 +32,41 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public abstract class AbstractBinder implements Binder {
-
     protected BindingDef bindingDef;
     protected FieldEndpoint fieldEndpoint;
     protected BindEndpoint bindEndpoint;
     protected Processor processor;
 
-    public String getFieldName() {
-        return fieldEndpoint.getFieldDefinition().getFieldName();
+    @Override
+    public String getField() {
+        String field = bindingDef.getField();
+        Assert.notBlank(field, "The field cannot be blank!");
+        return field;
     }
 
+    @Override
+    public String getTargetField() {
+        String targetField = bindingDef.getTargetField();
+        Assert.notBlank(targetField, "The targetField cannot be blank!");
+        return targetField;
+    }
+
+    @Override
     public Object getFieldValue(Context context, Object entity) {
         return fieldEndpoint.getValue(entity);
     }
 
+    @Override
     public void setFieldValue(Context context, Object entity, Object value) {
         fieldEndpoint.setValue(entity, value);
     }
 
-    public String getBoundName() {
-        return bindEndpoint.getFieldDefinition().getFieldName();
-    }
-
+    @Override
     public Object getBoundValue(Context context, Object entity) {
         return bindEndpoint.getValue(entity);
     }
 
+    @Override
     public void setBoundValue(Context context, Object entity, Object value) {
         bindEndpoint.setValue(entity, value);
     }
@@ -71,10 +81,6 @@ public abstract class AbstractBinder implements Binder {
         return value == null || processor == null ? value : processor.output(context, value);
     }
 
-    public String getTargetField() {
-        return bindingDef.getTargetField();
-    }
-
     public boolean isBindCollection() {
         return bindEndpoint.getFieldDefinition().isCollection();
     }
@@ -86,5 +92,4 @@ public abstract class AbstractBinder implements Binder {
     public boolean isSameType() {
         return fieldEndpoint.getFieldDefinition().isSameType(bindEndpoint.getFieldDefinition());
     }
-
 }
