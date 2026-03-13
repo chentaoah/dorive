@@ -169,7 +169,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         proxyRepository.setAggregated(isAggregated);
         proxyRepository.setBinderExecutor(binderExecutor);
         proxyRepository.setOrderByFactory(orderByFactory);
-        proxyRepository.setBound(false);
         return proxyRepository;
     }
 

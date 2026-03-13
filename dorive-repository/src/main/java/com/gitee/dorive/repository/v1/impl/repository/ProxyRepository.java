@@ -48,7 +48,6 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
     private boolean aggregated;
     private BinderExecutor binderExecutor;
     private OrderByFactory orderByFactory;
-    private boolean bound;
 
     @Override
     public RepositoryContext getRepositoryContext() {

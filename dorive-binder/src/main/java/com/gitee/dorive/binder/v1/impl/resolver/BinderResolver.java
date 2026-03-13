@@ -241,7 +241,6 @@ public class BinderResolver implements BinderExecutor {
 
         Map<String, RepositoryItem> repositoryMap = repositoryContext.getRepositoryMap();
         RepositoryItem belongRepository = repositoryMap.getOrDefault("/" + bind, rootRepository);
-        belongRepository.setBound(true);
 
         bindEndpoint.setBelongAccessPath(belongRepository.getAccessPath());
         bindEndpoint.setBelongRepository(belongRepository);

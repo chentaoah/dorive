@@ -56,8 +56,4 @@ public interface RepositoryItem extends Repository<Object, Object>, Executor, Pr
 
     void setBoundId(Context context, Object rootEntity, Object entity);
 
-    void setBound(boolean bound);
-
-    boolean isBound();
-
 }
