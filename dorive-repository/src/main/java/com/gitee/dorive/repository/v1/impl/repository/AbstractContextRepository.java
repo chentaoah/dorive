@@ -199,9 +199,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         if (!entityDef.isAggregate()) {
             AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) repository;
             RepositoryItem rootRepository = abstractContextRepository.getRootRepository();
-            if (rootRepository instanceof ProxyRepository) {
-                return ((ProxyRepository) rootRepository).getProxyRepository();
-            }
+            return rootRepository.getProxyRepository();
         }
         return repository;
     }
