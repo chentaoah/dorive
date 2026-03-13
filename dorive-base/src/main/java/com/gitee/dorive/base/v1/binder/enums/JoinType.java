@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.common.enums;
+package com.gitee.dorive.base.v1.binder.enums;
 
-public enum RootControl {
-    UNCONTROLLED,
-    INCLUDE_ROOT,
-    IGNORE_ROOT
+public enum JoinType {
+    SINGLE,
+    MULTI,
+    UNION
 }

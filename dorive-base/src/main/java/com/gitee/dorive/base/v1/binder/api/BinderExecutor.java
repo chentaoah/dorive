@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.base.v1.binder.api;
 
-import com.gitee.dorive.base.v1.common.enums.JoinType;
+import com.gitee.dorive.base.v1.binder.enums.JoinType;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 

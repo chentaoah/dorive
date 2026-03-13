@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.common.enums;
+package com.gitee.dorive.base.v1.binder.enums;
 
 public enum BindingType {
     STRONG,
