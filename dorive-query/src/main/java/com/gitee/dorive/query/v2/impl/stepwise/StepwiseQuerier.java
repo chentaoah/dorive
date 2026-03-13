@@ -84,8 +84,8 @@ public class StepwiseQuerier {
                 for (Binder valueRouteBinder : valueRouteBinders) {
                     Object fieldValue = valueRouteBinder.getFieldValue(context, null);
                     if (fieldValue != null) {
-                        String boundName = valueRouteBinder.getTargetField();
-                        targetExample.eq(boundName, fieldValue);
+                        String targetField = valueRouteBinder.getTargetField();
+                        targetExample.eq(targetField, fieldValue);
                     }
                 }
             });
@@ -103,11 +103,11 @@ public class StepwiseQuerier {
                         targetExample.setAbandoned(true);
                         return;
                     }
-                    String boundName = strongBinder.getTargetField();
+                    String targetField = strongBinder.getTargetField();
                     if (fieldValues.size() == 1) {
-                        targetExample.eq(boundName, fieldValues.get(0));
+                        targetExample.eq(targetField, fieldValues.get(0));
                     } else {
-                        targetExample.in(boundName, fieldValues);
+                        targetExample.in(targetField, fieldValues);
                     }
 
                 } else {
