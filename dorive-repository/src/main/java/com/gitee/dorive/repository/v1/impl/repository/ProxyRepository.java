@@ -70,11 +70,6 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
     }
 
     @Override
-    public boolean hasField(String field) {
-        return getEntityElement().hasField(field);
-    }
-
-    @Override
     public void getBoundValue(Context context, Object rootEntity, Collection<?> entities) {
         binderExecutor.getBoundValue(context, rootEntity, entities);
     }
