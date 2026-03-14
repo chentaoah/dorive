@@ -34,7 +34,7 @@ import com.gitee.dorive.base.v1.core.util.ReflectUtils;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.executor.api.RepositoryItemMatcher;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
@@ -214,7 +214,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @Override
     public boolean matches(Options options, RepositoryItem repositoryItem) {
-        RepositoryItemMatcher repositoryItemMatcher = options.getOption(RepositoryItemMatcher.class);
-        return repositoryItemMatcher != null && repositoryItemMatcher.matches(repositoryItem);
+        Matcher matcher = options.getOption(Matcher.class);
+        return matcher != null && matcher.matches(repositoryItem);
     }
 }

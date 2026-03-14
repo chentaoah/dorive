@@ -18,18 +18,18 @@
 package com.gitee.dorive.base.v1.core.api;
 
 import com.gitee.dorive.base.v1.core.entity.ctx.EnumOptions;
-import com.gitee.dorive.base.v1.executor.api.RepositoryItemMatcher;
-import com.gitee.dorive.base.v1.executor.impl.matcher.AllRepositoryItemMatcher;
-import com.gitee.dorive.base.v1.executor.impl.matcher.NoneRepositoryItemMatcher;
-import com.gitee.dorive.base.v1.executor.impl.matcher.RootRepositoryItemMatcher;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
+import com.gitee.dorive.base.v1.executor.impl.matcher.AllMatcher;
+import com.gitee.dorive.base.v1.executor.impl.matcher.NoneMatcher;
+import com.gitee.dorive.base.v1.executor.impl.matcher.RootMatcher;
 
 import java.util.Map;
 
 public interface Options {
 
-    Options NONE = new EnumOptions(RepositoryItemMatcher.class, new NoneRepositoryItemMatcher());
-    Options ROOT = new EnumOptions(RepositoryItemMatcher.class, new RootRepositoryItemMatcher());
-    Options ALL = new EnumOptions(RepositoryItemMatcher.class, new AllRepositoryItemMatcher());
+    Options NONE = new EnumOptions(Matcher.class, new NoneMatcher());
+    Options ROOT = new EnumOptions(Matcher.class, new RootMatcher());
+    Options ALL = new EnumOptions(Matcher.class, new AllMatcher());
 
     Map<Class<?>, Object> getOptions();
 

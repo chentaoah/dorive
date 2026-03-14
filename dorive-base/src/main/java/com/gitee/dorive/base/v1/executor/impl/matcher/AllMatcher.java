@@ -18,11 +18,11 @@
 package com.gitee.dorive.base.v1.executor.impl.matcher;
 
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.executor.api.RepositoryItemMatcher;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
 
-public class NoneRepositoryItemMatcher implements RepositoryItemMatcher {
+public class AllMatcher implements Matcher {
     @Override
     public boolean matches(RepositoryItem repositoryItem) {
-        return false;
+        return true;
     }
 }

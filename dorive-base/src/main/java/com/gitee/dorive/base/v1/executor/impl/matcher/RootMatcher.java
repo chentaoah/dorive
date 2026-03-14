@@ -15,12 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.executor.api;
+package com.gitee.dorive.base.v1.executor.impl.matcher;
 
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
 
-public interface RepositoryItemMatcher {
-
-    boolean matches(RepositoryItem repositoryItem);
-
+public class RootMatcher implements Matcher {
+    @Override
+    public boolean matches(RepositoryItem repositoryItem) {
+        return repositoryItem.isRoot();
+    }
 }
