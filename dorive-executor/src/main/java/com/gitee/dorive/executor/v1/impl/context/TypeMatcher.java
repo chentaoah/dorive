@@ -15,26 +15,30 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.executor.impl.matcher;
+package com.gitee.dorive.executor.v1.impl.context;
 
-import com.gitee.dorive.base.v1.executor.api.Selector;
+import com.gitee.dorive.base.v1.core.entity.ctx.AbstractGenericOptions;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.executor.api.RepositoryItemMatcher;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
-@AllArgsConstructor
-public class SelectorRepositoryItemMatcher implements RepositoryItemMatcher {
+@EqualsAndHashCode(callSuper = false)
+public class TypeMatcher extends AbstractGenericOptions {
 
-    private final Selector selector;
+    private Set<Class<?>> types;
+
+    public TypeMatcher(Class<?>... types) {
+        this.types = Arrays.stream(types).collect(Collectors.toSet());
+    }
 
     @Override
     public boolean matches(RepositoryItem repositoryItem) {
-        if (selector != null) {
-            return selector.matches(repositoryItem);
-        }
-        return false;
+        return types.contains(repositoryItem.getEntityClass());
     }
 
 }

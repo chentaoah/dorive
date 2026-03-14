@@ -33,7 +33,6 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.executor.api.RepositoryItemMatcher;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
-import com.gitee.dorive.base.v1.executor.impl.matcher.SelectorRepositoryItemMatcher;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -82,8 +81,8 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         RepositoryItemMatcher repositoryItemMatcher = context.getOption(RepositoryItemMatcher.class);
-        if (repositoryItemMatcher instanceof SelectorRepositoryItemMatcher) {
-            Selector selector = ((SelectorRepositoryItemMatcher) repositoryItemMatcher).getSelector();
+        if (repositoryItemMatcher instanceof Selector) {
+            Selector selector = (Selector) repositoryItemMatcher;
             List<String> properties = selector.select(getName());
             if (properties != null && !properties.isEmpty()) {
                 Object primaryKey = query.getPrimaryKey();

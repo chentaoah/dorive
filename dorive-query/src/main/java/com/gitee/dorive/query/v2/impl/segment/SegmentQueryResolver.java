@@ -19,9 +19,9 @@ package com.gitee.dorive.query.v2.impl.segment;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
+import com.gitee.dorive.base.v1.executor.api.RepositoryItemMatcher;
 import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
@@ -38,7 +38,11 @@ import com.gitee.dorive.query.v2.impl.core.RepositoryInfoResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -51,7 +55,7 @@ public class SegmentQueryResolver implements QueryResolver {
 
     @Override
     public Object resolve(Context context, Object query) {
-        Selector selector = context.getOption(Selector.class);
+        RepositoryItemMatcher repositoryItemMatcher = context.getOption(RepositoryItemMatcher.class);
 
         QueryInfo queryInfo = queryInfoResolver.findQueryInfo(query.getClass());
         Assert.notNull(queryInfo, "No query info found!");
@@ -78,7 +82,7 @@ public class SegmentQueryResolver implements QueryResolver {
 
             // 选取
             RepositoryItem repositoryItem = lastRepositoryItem != null ? lastRepositoryItem : repositoryContext.getRootRepository();
-            if (selector != null && selector.matches(repositoryItem)) {
+            if (repositoryItemMatcher != null && repositoryItemMatcher.matches(repositoryItem)) {
                 segmentInfo.setSelectedRepository(repositoryContext);
                 segmentInfo.setSelectedRepositoryAlias(alias);
             }

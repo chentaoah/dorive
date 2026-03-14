@@ -15,29 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.impl.context;
+package com.gitee.dorive.base.v1.core.entity.ctx;
 
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.gitee.dorive.base.v1.executor.api.RepositoryItemMatcher;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
+public abstract class AbstractGenericOptions extends AbstractOptions implements RepositoryItemMatcher {
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class TypeSelector extends AbstractSelector {
-
-    private Set<Class<?>> types;
-
-    public TypeSelector(Class<?>... types) {
-        this.types = Arrays.stream(types).collect(Collectors.toSet());
-    }
-
-    @Override
-    public boolean matches(RepositoryItem repositoryItem) {
-        return types.contains(repositoryItem.getEntityClass());
+    public AbstractGenericOptions() {
+        setOption(RepositoryItemMatcher.class, this);
     }
 
 }

@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.LambdaMeta;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.entity.Field;
+import com.gitee.dorive.base.v1.core.entity.ctx.AbstractGenericOptions;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,17 +34,17 @@ import java.util.Set;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class LambdaSelector extends AbstractSelector {
+public class LambdaMatcher extends AbstractGenericOptions {
 
     private Class<?> type;
     private Set<java.lang.reflect.Field> fields;
 
-    public LambdaSelector(Class<?> type) {
+    public LambdaMatcher(Class<?> type) {
         this.type = type;
         this.fields = new LinkedHashSet<>(8);
     }
 
-    public <T> LambdaSelector and(SFunction<T, ?> function) {
+    public <T> LambdaMatcher and(SFunction<T, ?> function) {
         LambdaMeta meta = LambdaUtils.extract(function);
         Class<?> instantiatedClass = meta.getInstantiatedClass();
         String fieldName = PropertyNamer.methodToProperty(meta.getImplMethodName());

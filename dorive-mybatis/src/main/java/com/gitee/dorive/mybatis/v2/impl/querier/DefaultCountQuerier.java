@@ -19,8 +19,8 @@ package com.gitee.dorive.mybatis.v2.impl.querier;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.core.entity.ctx.DefaultContext;
+import com.gitee.dorive.base.v1.executor.api.RepositoryItemMatcher;
 import com.gitee.dorive.base.v1.factory.api.Translator;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
@@ -49,10 +49,10 @@ public class DefaultCountQuerier implements CountQuerier {
 
     @Override
     public Map<String, Long> selectCountMap(Context context, CountQuery countQuery) {
-        Selector selector = countQuery.getSelector();
-        if (selector != null) {
+        RepositoryItemMatcher matcher = countQuery.getMatcher();
+        if (matcher != null) {
             context = new DefaultContext(context);
-            context.setOption(Selector.class, selector);
+            context.setOption(RepositoryItemMatcher.class, matcher);
         }
 
         SegmentInfo segmentInfo = (SegmentInfo) queryResolver.resolve(context, countQuery.getQuery());

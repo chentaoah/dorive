@@ -17,11 +17,9 @@
 
 package com.gitee.dorive.base.v1.executor.api;
 
-import com.gitee.dorive.base.v1.core.api.Options;
-
 import java.util.List;
 
-public interface Selector extends Options, RepositoryItemMatcher {
+public interface Selector {
 
     List<String> select(String name);
 

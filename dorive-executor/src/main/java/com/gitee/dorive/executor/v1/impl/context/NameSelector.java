@@ -18,6 +18,8 @@
 package com.gitee.dorive.executor.v1.impl.context;
 
 import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.base.v1.core.entity.ctx.AbstractGenericOptions;
+import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,7 +29,7 @@ import java.util.*;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class NameSelector extends AbstractSelector {
+public class NameSelector extends AbstractGenericOptions implements Selector {
 
     private Set<String> names = Collections.emptySet();
     private Map<String, NameDef> nameDefMap = Collections.emptyMap();
