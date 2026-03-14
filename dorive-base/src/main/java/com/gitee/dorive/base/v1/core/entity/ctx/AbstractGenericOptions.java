@@ -20,9 +20,7 @@ package com.gitee.dorive.base.v1.core.entity.ctx;
 import com.gitee.dorive.base.v1.executor.api.Matcher;
 
 public abstract class AbstractGenericOptions extends AbstractOptions implements Matcher {
-
     public AbstractGenericOptions() {
         setOption(Matcher.class, this);
     }
-
 }
