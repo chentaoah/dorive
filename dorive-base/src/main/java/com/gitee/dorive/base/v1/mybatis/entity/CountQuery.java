@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.base.v1.mybatis.entity;
 
-import com.gitee.dorive.base.v1.core.api.Selector;
+import com.gitee.dorive.base.v1.executor.api.Selector;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

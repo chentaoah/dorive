@@ -19,7 +19,7 @@ package com.gitee.dorive.mybatis.v2.impl.querier;
 
 import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.api.Selector;
+import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.core.entity.ctx.DefaultContext;
 import com.gitee.dorive.base.v1.factory.api.Translator;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;

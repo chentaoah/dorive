@@ -19,7 +19,7 @@ package com.gitee.dorive.query.v2.impl.segment;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.api.Selector;
+import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.factory.api.ExampleConverter;

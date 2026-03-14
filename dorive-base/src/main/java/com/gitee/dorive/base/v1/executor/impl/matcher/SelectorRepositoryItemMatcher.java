@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.base.v1.executor.impl.matcher;
 
-import com.gitee.dorive.base.v1.core.api.Selector;
+import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.executor.api.RepositoryItemMatcher;
 import lombok.AllArgsConstructor;

@@ -19,7 +19,7 @@ package com.gitee.dorive.repository.v1.impl.repository;
 
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.api.Selector;
+import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
