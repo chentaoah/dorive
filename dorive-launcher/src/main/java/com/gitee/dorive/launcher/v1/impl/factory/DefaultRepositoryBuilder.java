@@ -39,7 +39,7 @@ import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.binder.v1.impl.example.MultiExampleBuilder;
 import com.gitee.dorive.binder.v1.impl.example.SingleExampleBuilder;
 import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
-import com.gitee.dorive.executor.v1.impl.executor.ContextExecutor;
+import com.gitee.dorive.executor.v1.impl.executor.RepositoryExecutor;
 import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
@@ -133,7 +133,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         EntityHandler entityHandler = newEntityHandler(repositoryContext, repositoryDerivedResolver);
         EntityOpHandler entityOpHandler = newEntityOpHandler(repositoryContext, repositoryDerivedResolver);
         // 创建上下文执行器
-        return new ContextExecutor(repositoryContext, entityHandler, entityOpHandler);
+        return new RepositoryExecutor(repositoryContext, entityHandler, entityOpHandler);
     }
 
     private EntityHandler newEntityHandler(RepositoryContext repositoryContext, RepositoryDerivedResolver repositoryDerivedResolver) {

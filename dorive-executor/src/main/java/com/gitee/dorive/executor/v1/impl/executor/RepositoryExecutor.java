@@ -28,6 +28,7 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,17 +36,12 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ContextExecutor extends AbstractExecutor implements EntityHandler, EntityOpHandler {
+@AllArgsConstructor
+public class RepositoryExecutor extends AbstractExecutor implements EntityHandler, EntityOpHandler {
 
     private final RepositoryContext repositoryContext;
     private final EntityHandler entityHandler;
     private final EntityOpHandler entityOpHandler;
-
-    public ContextExecutor(RepositoryContext repositoryContext, EntityHandler entityHandler, EntityOpHandler entityOpHandler) {
-        this.repositoryContext = repositoryContext;
-        this.entityHandler = entityHandler;
-        this.entityOpHandler = entityOpHandler;
-    }
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
@@ -69,7 +65,7 @@ public class ContextExecutor extends AbstractExecutor implements EntityHandler, 
 
     @Override
     public long executeCount(Context context, Query query) {
-        throw new RuntimeException("This method does not support!");
+        throw new UnsupportedOperationException();
     }
 
     @Override
