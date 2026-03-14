@@ -15,9 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.repository.api;
+package com.gitee.dorive.base.v1.executor.api;
 
-public interface RepositoryMatcher {
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+
+public interface RepositoryItemMatcher {
 
     boolean matches(RepositoryItem repositoryItem);
 

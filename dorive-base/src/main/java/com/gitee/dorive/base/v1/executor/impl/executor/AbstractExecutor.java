@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.repository.impl.matcher;
+package com.gitee.dorive.base.v1.executor.impl.executor;
 
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
+import com.gitee.dorive.base.v1.executor.api.Executor;
+import lombok.Getter;
+import lombok.Setter;
 
-public class AllRepositoryMatcher implements RepositoryMatcher {
-    @Override
-    public boolean matches(RepositoryItem repositoryItem) {
-        return true;
-    }
+@Getter
+@Setter
+public abstract class AbstractExecutor implements Executor {
 }

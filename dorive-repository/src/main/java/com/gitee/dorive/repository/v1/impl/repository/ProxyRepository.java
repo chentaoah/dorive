@@ -31,9 +31,9 @@ import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
+import com.gitee.dorive.base.v1.executor.api.RepositoryItemMatcher;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
-import com.gitee.dorive.base.v1.repository.impl.matcher.SelectorRepositoryMatcher;
+import com.gitee.dorive.base.v1.executor.impl.matcher.SelectorRepositoryItemMatcher;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -81,9 +81,9 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
-        RepositoryMatcher repositoryMatcher = context.getOption(RepositoryMatcher.class);
-        if (repositoryMatcher instanceof SelectorRepositoryMatcher) {
-            Selector selector = ((SelectorRepositoryMatcher) repositoryMatcher).getSelector();
+        RepositoryItemMatcher repositoryItemMatcher = context.getOption(RepositoryItemMatcher.class);
+        if (repositoryItemMatcher instanceof SelectorRepositoryItemMatcher) {
+            Selector selector = ((SelectorRepositoryItemMatcher) repositoryItemMatcher).getSelector();
             List<String> properties = selector.select(getName());
             if (properties != null && !properties.isEmpty()) {
                 Object primaryKey = query.getPrimaryKey();

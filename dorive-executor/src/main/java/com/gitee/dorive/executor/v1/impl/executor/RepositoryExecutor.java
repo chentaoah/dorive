@@ -23,7 +23,7 @@ import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
 import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.base.v1.executor.impl.AbstractExecutor;
+import com.gitee.dorive.base.v1.executor.impl.executor.AbstractExecutor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
