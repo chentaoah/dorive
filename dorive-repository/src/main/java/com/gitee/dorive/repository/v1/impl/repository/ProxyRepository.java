@@ -83,7 +83,7 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
         Matcher matcher = context.getOption(Matcher.class);
         if (matcher instanceof Selector) {
             Selector selector = (Selector) matcher;
-            List<String> properties = selector.select(getName());
+            List<String> properties = selector.select(this);
             if (properties != null && !properties.isEmpty()) {
                 Object primaryKey = query.getPrimaryKey();
                 if (primaryKey != null) {

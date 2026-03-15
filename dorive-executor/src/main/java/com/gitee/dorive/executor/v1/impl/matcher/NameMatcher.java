@@ -62,7 +62,8 @@ public class NameMatcher extends AbstractGenericOptions implements Selector {
     }
 
     @Override
-    public List<String> select(String name) {
+    public List<String> select(RepositoryItem repositoryItem) {
+        String name = repositoryItem.getName();
         NameDef nameDef = nameDefMap.get(name);
         return nameDef != null && !nameDef.getProperties().isEmpty() ? nameDef.getProperties() : null;
     }
