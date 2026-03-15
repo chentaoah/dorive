@@ -18,6 +18,7 @@
 package com.gitee.dorive.executor.v1.impl.matcher;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.base.v1.core.entity.ctx.GenericOptions;
 import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
@@ -37,20 +38,17 @@ public class NameMatcher extends GenericOptions {
 
     public NameMatcher(String... strings) {
         Assert.notEmpty(strings, "The strings cannot be empty!");
-
         List<String> names = new ArrayList<>(strings.length);
         List<Selector> selectors = new ArrayList<>(strings.length);
         for (String str : strings) {
+            String name = str;
+            Selector selector = null;
             if (str.contains("(") && str.contains(")")) {
-                String name = str.substring(0, str.indexOf("("));
-                String propText = str.substring(str.indexOf("(") + 1, str.indexOf(")"));
-                names.add(name);
-                selectors.add(new DefaultSelector(propText));
-
-            } else {
-                names.add(str);
-                selectors.add(null);
+                name = StrUtil.subBefore(str, "(", false);
+                selector = new DefaultSelector(StrUtil.subBetween(str, "(", ")"));
             }
+            names.add(name);
+            selectors.add(selector);
         }
         this.names = Collections.unmodifiableList(names);
         with(selectors.toArray(new Selector[0]));

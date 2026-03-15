@@ -36,8 +36,9 @@ public class GenericOptions extends DefaultOptions implements Matcher {
         setOption(Matcher.class, this);
     }
 
-    public void with(Selector... selectors) {
+    public Options with(Selector... selectors) {
         setOptions(Selector.class, Arrays.stream(selectors).collect(Collectors.toList()));
+        return this;
     }
 
     public static Selector getSelector(Options options, RepositoryItem repositoryItem) {
