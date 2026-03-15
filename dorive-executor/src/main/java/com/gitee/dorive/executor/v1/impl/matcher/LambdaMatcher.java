@@ -23,25 +23,25 @@ import com.baomidou.mybatisplus.core.toolkit.support.LambdaMeta;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.entity.Field;
-import com.gitee.dorive.base.v1.core.entity.ctx.AbstractGenericOptions;
+import com.gitee.dorive.base.v1.core.entity.ctx.GenericOptions;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class LambdaMatcher extends AbstractGenericOptions {
+public class LambdaMatcher extends GenericOptions {
 
     private Class<?> type;
-    private Set<java.lang.reflect.Field> fields;
+    private List<java.lang.reflect.Field> fields;
 
     public LambdaMatcher(Class<?> type) {
         this.type = type;
-        this.fields = new LinkedHashSet<>(8);
+        this.fields = new ArrayList<>(4);
     }
 
     public <T> LambdaMatcher and(SFunction<T, ?> function) {
@@ -54,17 +54,20 @@ public class LambdaMatcher extends AbstractGenericOptions {
     }
 
     @Override
-    public boolean matches(RepositoryItem repositoryItem) {
+    public int indexOf(RepositoryItem repositoryItem) {
         if (repositoryItem.isRoot() && type.equals(repositoryItem.getEntityClass())) {
-            return true;
+            return 0;
         }
         EntityElement entityElement = repositoryItem.getEntityElement();
         Field field = entityElement.getField();
         if (field != null) {
             java.lang.reflect.Field javaField = field.getField();
-            return fields.contains(javaField);
+            int index = fields.indexOf(javaField);
+            if (index >= 0) {
+                return index + 1;
+            }
         }
-        return false;
+        return -1;
     }
 
 }

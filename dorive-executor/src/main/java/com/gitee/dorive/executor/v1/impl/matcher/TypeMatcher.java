@@ -17,28 +17,28 @@
 
 package com.gitee.dorive.executor.v1.impl.matcher;
 
-import com.gitee.dorive.base.v1.core.entity.ctx.AbstractGenericOptions;
+import com.gitee.dorive.base.v1.core.entity.ctx.GenericOptions;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.Arrays;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TypeMatcher extends AbstractGenericOptions {
+public class TypeMatcher extends GenericOptions {
 
-    private Set<Class<?>> types;
+    private List<Class<?>> types;
 
     public TypeMatcher(Class<?>... types) {
-        this.types = Arrays.stream(types).collect(Collectors.toSet());
+        this.types = Arrays.stream(types).collect(Collectors.toList());
     }
 
     @Override
-    public boolean matches(RepositoryItem repositoryItem) {
-        return types.contains(repositoryItem.getEntityClass());
+    public int indexOf(RepositoryItem repositoryItem) {
+        return types.indexOf(repositoryItem.getEntityClass());
     }
 
 }

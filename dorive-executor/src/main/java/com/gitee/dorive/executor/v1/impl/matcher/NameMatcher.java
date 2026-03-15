@@ -17,62 +17,48 @@
 
 package com.gitee.dorive.executor.v1.impl.matcher;
 
-import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.base.v1.core.entity.ctx.AbstractGenericOptions;
+import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.base.v1.core.entity.ctx.GenericOptions;
 import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import lombok.AllArgsConstructor;
+import com.gitee.dorive.executor.v1.impl.selector.DefaultSelector;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class NameMatcher extends AbstractGenericOptions implements Selector {
+public class NameMatcher extends GenericOptions {
 
-    private Set<String> names = Collections.emptySet();
-    private Map<String, NameDef> nameDefMap = Collections.emptyMap();
+    private List<String> names;
 
-    public NameMatcher(String... names) {
-        if (names != null && names.length > 0) {
-            int size = names.length * 4 / 3 + 1;
-            this.names = new LinkedHashSet<>(size);
-            this.nameDefMap = new LinkedHashMap<>(size);
-            for (String name : names) {
-                if (name.contains("(") && name.contains(")")) {
-                    String realName = name.substring(0, name.indexOf("("));
-                    String propText = name.substring(name.indexOf("(") + 1, name.indexOf(")"));
-                    List<String> properties = StrUtil.splitTrim(propText, ",");
-                    this.names.add(realName);
-                    this.nameDefMap.put(realName, new NameDef(realName, Collections.unmodifiableList(properties)));
+    public NameMatcher(String... strings) {
+        Assert.notEmpty(strings, "The strings cannot be empty!");
 
-                } else {
-                    this.names.add(name);
-                    this.nameDefMap.put(name, new NameDef(name, Collections.emptyList()));
-                }
+        List<String> names = new ArrayList<>(strings.length);
+        List<Selector> selectors = new ArrayList<>(strings.length);
+        for (String str : strings) {
+            if (str.contains("(") && str.contains(")")) {
+                String name = str.substring(0, str.indexOf("("));
+                String propText = str.substring(str.indexOf("(") + 1, str.indexOf(")"));
+                names.add(name);
+                selectors.add(new DefaultSelector(propText));
+
+            } else {
+                names.add(str);
+                selectors.add(null);
             }
-            this.names = Collections.unmodifiableSet(this.names);
         }
+        this.names = Collections.unmodifiableList(names);
+        with(selectors.toArray(new Selector[0]));
     }
 
     @Override
-    public boolean matches(RepositoryItem repositoryItem) {
-        return names.contains(repositoryItem.getName());
-    }
-
-    @Override
-    public List<String> select(RepositoryItem repositoryItem) {
-        String name = repositoryItem.getName();
-        NameDef nameDef = nameDefMap.get(name);
-        return nameDef != null && !nameDef.getProperties().isEmpty() ? nameDef.getProperties() : null;
-    }
-
-    @Data
-    @AllArgsConstructor
-    public static class NameDef {
-        private String name;
-        private List<String> properties;
+    public int indexOf(RepositoryItem repositoryItem) {
+        return names.indexOf(repositoryItem.getName());
     }
 
 }

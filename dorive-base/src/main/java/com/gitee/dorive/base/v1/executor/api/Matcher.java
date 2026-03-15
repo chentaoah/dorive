@@ -21,6 +21,12 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 
 public interface Matcher {
 
-    boolean matches(RepositoryItem repositoryItem);
+    default boolean matches(RepositoryItem repositoryItem) {
+        return indexOf(repositoryItem) >= 0;
+    }
+
+    default int indexOf(RepositoryItem repositoryItem) {
+        return -1;
+    }
 
 }

@@ -15,12 +15,31 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.core.entity.ctx;
+package com.gitee.dorive.executor.v1.impl.selector;
 
-import com.gitee.dorive.base.v1.executor.api.Matcher;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.base.v1.executor.api.Selector;
+import lombok.Getter;
+import lombok.Setter;
 
-public abstract class AbstractGenericOptions extends AbstractOptions implements Matcher {
-    public AbstractGenericOptions() {
-        setOption(Matcher.class, this);
+import java.util.Collections;
+import java.util.List;
+
+@Getter
+@Setter
+public class DefaultSelector implements Selector {
+
+    private List<String> properties;
+
+    public DefaultSelector(String propText) {
+        Assert.notBlank(propText, "The propText cannot be blank!");
+        this.properties = Collections.unmodifiableList(StrUtil.splitTrim(propText, ","));
     }
+
+    @Override
+    public List<String> select() {
+        return properties;
+    }
+
 }

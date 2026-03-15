@@ -17,51 +17,57 @@
 
 package com.gitee.dorive.base.v1.core.entity.ctx;
 
-import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public abstract class AbstractContext extends AbstractOptions implements Context {
+public class DefaultOptions implements Options {
 
-    private Map<String, Object> attachments = new ConcurrentHashMap<>(8);
+    private Map<Class<?>, Object> map;
 
-    public AbstractContext(Options options) {
-        super(options);
+    public DefaultOptions() {
+        this.map = new ConcurrentHashMap<>(4);
     }
 
-    public AbstractContext(Context context) {
-        super(context);
-        this.attachments.putAll(context.getAttachments());
+    public DefaultOptions(Map<Class<?>, Object> map) {
+        this.map = map;
     }
 
-    public AbstractContext(Options options, Context context) {
-        super(options);
-        this.attachments.putAll(context.getAttachments());
+    public DefaultOptions(Options options) {
+        this.map = new ConcurrentHashMap<>(options.getMap());
     }
 
     @Override
-    public void setAttachment(String name, Object value) {
-        attachments.put(name, value);
+    public <T> void setOption(Class<T> type, T value) {
+        map.put(type, value);
     }
 
     @Override
-    public Object getAttachment(String name) {
-        return attachments.get(name);
+    @SuppressWarnings("unchecked")
+    public <T> T getOption(Class<T> type) {
+        return (T) map.get(type);
     }
 
     @Override
-    public void removeAttachment(String name) {
-        attachments.remove(name);
+    public <T> void setOptions(Class<T> type, List<T> value) {
+        map.put(type, value);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> List<T> getOptions(Class<T> type) {
+        return (List<T>) map.get(type);
+    }
+
+    @Override
+    public void remove(Class<?> type) {
+        map.remove(type);
     }
 
 }
