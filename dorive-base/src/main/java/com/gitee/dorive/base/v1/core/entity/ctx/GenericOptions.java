@@ -45,7 +45,7 @@ public class GenericOptions extends DefaultOptions implements Matcher {
         List<Selector> selectors = options.getOptions(Selector.class);
         if (matcher != null && selectors != null) {
             int index = matcher.indexOf(repositoryItem);
-            if (index >= 0 && selectors.size() > index) {
+            if (index >= 0 && index < selectors.size()) {
                 return selectors.get(index);
             }
         }
