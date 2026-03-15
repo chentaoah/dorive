@@ -36,7 +36,7 @@ public class GenericOptions extends DefaultOptions implements Matcher {
         setOption(Matcher.class, this);
     }
 
-    public Options with(Selector... selectors) {
+    public GenericOptions with(Selector... selectors) {
         setOptions(Selector.class, Arrays.stream(selectors).collect(Collectors.toList()));
         return this;
     }
