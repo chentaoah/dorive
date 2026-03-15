@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.impl.selector;
+package com.gitee.dorive.executor.v1.impl.matcher;
 
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.base.v1.core.entity.ctx.AbstractGenericOptions;
@@ -29,12 +29,12 @@ import java.util.*;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class NameSelector extends AbstractGenericOptions implements Selector {
+public class NameMatcher extends AbstractGenericOptions implements Selector {
 
     private Set<String> names = Collections.emptySet();
     private Map<String, NameDef> nameDefMap = Collections.emptyMap();
 
-    public NameSelector(String... names) {
+    public NameMatcher(String... names) {
         if (names != null && names.length > 0) {
             int size = names.length * 4 / 3 + 1;
             this.names = new LinkedHashSet<>(size);
