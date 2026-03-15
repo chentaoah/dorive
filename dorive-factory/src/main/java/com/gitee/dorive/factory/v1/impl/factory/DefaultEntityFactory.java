@@ -22,7 +22,7 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
-import com.gitee.dorive.factory.v1.api.EntityTranslator;
+import com.gitee.dorive.factory.v1.api.EntityTransformer;
 import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
 import com.gitee.dorive.factory.v1.api.TypeAdapter;
 import com.gitee.dorive.factory.v1.impl.adapter.MapTypeAdapter;
@@ -45,8 +45,8 @@ public class DefaultEntityFactory implements EntityFactory {
     private Class<?> reType;
     private Class<?> deType;
     // 转换器
-    private EntityTranslator reEntityTranslator;
-    private EntityTranslator deEntityTranslator;
+    private EntityTransformer reEntityTransformer;
+    private EntityTransformer deEntityTransformer;
     // 序列化配置
     private CopyOptions reCopyOptions;
     private CopyOptions deCopyOptions;
@@ -62,22 +62,22 @@ public class DefaultEntityFactory implements EntityFactory {
 
     private void initReCopyOptions() {
         this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(alias -> {
-            FieldAliasMapping fieldAliasMappingByAlias = reEntityTranslator.getFieldAliasMappingByAlias(alias);
+            FieldAliasMapping fieldAliasMappingByAlias = reEntityTransformer.getFieldAliasMappingByAlias(alias);
             return fieldAliasMappingByAlias != null ? fieldAliasMappingByAlias.getField() : alias;
 
         }).setFieldValueEditor((field, value) -> {
-            FieldAliasMapping fieldAliasMappingByField = reEntityTranslator.getFieldAliasMappingByField(field);
+            FieldAliasMapping fieldAliasMappingByField = reEntityTransformer.getFieldAliasMappingByField(field);
             return fieldAliasMappingByField != null ? fieldAliasMappingByField.reconstitute(value) : value;
         });
     }
 
     private void initDeCopyOptions() {
         this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(field -> {
-            FieldAliasMapping fieldAliasMappingByField = deEntityTranslator.getFieldAliasMappingByField(field);
+            FieldAliasMapping fieldAliasMappingByField = deEntityTransformer.getFieldAliasMappingByField(field);
             return fieldAliasMappingByField != null ? fieldAliasMappingByField.getAlias() : field;
 
         }).setFieldValueEditor((alias, value) -> {
-            FieldAliasMapping fieldAliasMappingByAlias = deEntityTranslator.getFieldAliasMappingByAlias(alias);
+            FieldAliasMapping fieldAliasMappingByAlias = deEntityTransformer.getFieldAliasMappingByAlias(alias);
             return fieldAliasMappingByAlias != null ? fieldAliasMappingByAlias.deconstruct(value) : value;
         });
     }
@@ -88,7 +88,7 @@ public class DefaultEntityFactory implements EntityFactory {
 
     protected void processTypeAdapter() {
         if (typeAdapter instanceof MapTypeAdapter) {
-            ((MapTypeAdapter) typeAdapter).initialize(entityElement, reEntityTranslator);
+            ((MapTypeAdapter) typeAdapter).initialize(entityElement, reEntityTransformer);
         }
     }
 

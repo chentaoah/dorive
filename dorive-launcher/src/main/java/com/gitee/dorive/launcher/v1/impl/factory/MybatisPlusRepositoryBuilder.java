@@ -29,18 +29,18 @@ import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
-import com.gitee.dorive.base.v1.factory.api.Translator;
-import com.gitee.dorive.base.v1.factory.api.TranslatorManager;
+import com.gitee.dorive.base.v1.factory.api.Transformer;
+import com.gitee.dorive.base.v1.factory.api.TransformerManager;
 import com.gitee.dorive.base.v1.factory.enums.Category;
 import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
-import com.gitee.dorive.factory.v1.api.EntityTranslator;
-import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
+import com.gitee.dorive.factory.v1.api.EntityTransformer;
+import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
 import com.gitee.dorive.factory.v1.impl.executor.ExampleExecutor;
 import com.gitee.dorive.factory.v1.impl.executor.FactoryExecutor;
-import com.gitee.dorive.factory.v1.impl.resolver.EntityTranslatorManagerResolver;
+import com.gitee.dorive.factory.v1.impl.resolver.EntityTransformerManagerResolver;
 import com.gitee.dorive.factory.v1.impl.resolver.EntityFactoryResolver;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.executor.v1.impl.executor.UnionExecutor;
@@ -76,30 +76,30 @@ public class MybatisPlusRepositoryBuilder {
         // 别名转换
         String reCategory = Category.ENTITY_DATABASE.name();
         String deCategory = Category.ENTITY_POJO.name();
-        EntityTranslatorManagerResolver entityTranslatorManagerResolver = new EntityTranslatorManagerResolver(entityElement, entityStoreInfo.getAliasPropMap(), reCategory, deCategory);
-        EntityTranslatorManager entityTranslatorManager = entityTranslatorManagerResolver.newEntityTranslatorManager();
-        EntityTranslator reEntityTranslator = (EntityTranslator) entityTranslatorManager.getTranslator(reCategory);
-        EntityTranslator deEntityTranslator = (EntityTranslator) entityTranslatorManager.getTranslator(deCategory);
+        EntityTransformerManagerResolver entityTransformerManagerResolver = new EntityTransformerManagerResolver(entityElement, entityStoreInfo.getAliasPropMap(), reCategory, deCategory);
+        EntityTransformerManager entityTransformerManager = entityTransformerManagerResolver.newEntityTransformerManager();
+        EntityTransformer reEntityTransformer = (EntityTransformer) entityTransformerManager.getTransformer(reCategory);
+        EntityTransformer deEntityTransformer = (EntityTransformer) entityTransformerManager.getTransformer(deCategory);
 
         // 实体工厂
         EntityFactoryResolver entityFactoryResolver = new EntityFactoryResolver(
                 repository, entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(),
-                entityTranslatorManager, reEntityTranslator, deEntityTranslator);
+                entityTransformerManager, reEntityTransformer, deEntityTransformer);
         EntityFactory entityFactory = entityFactoryResolver.newEntityFactory();
 
         // 执行器
         Executor executor = newExecutor(entityElement, entityStoreInfo);
         executor = new UnionExecutor(executor, repository.getSqlRunner(), entityStoreInfo);
         executor = new FactoryExecutor(executor, entityElement, entityStoreInfo.getIdProperty(), entityFactory);
-        executor = new ExampleExecutor(executor, entityElement, reEntityTranslator);
+        executor = new ExampleExecutor(executor, entityElement, reEntityTransformer);
 
         // 查询条件转换器
         ExampleConverter exampleConverter = (ExampleConverter) executor;
 
         repository.setProperty(EntityStoreInfo.class, entityStoreInfo);
-        repository.setProperty(EntityTranslatorManager.class, entityTranslatorManager);
-        repository.setProperty(TranslatorManager.class, entityTranslatorManager);
-        repository.setProperty(Translator.class, reEntityTranslator);
+        repository.setProperty(EntityTransformerManager.class, entityTransformerManager);
+        repository.setProperty(TransformerManager.class, entityTransformerManager);
+        repository.setProperty(Transformer.class, reEntityTransformer);
         repository.setProperty(ExampleConverter.class, exampleConverter);
 
         DefaultRepository defaultRepository = new DefaultRepository();
@@ -107,9 +107,9 @@ public class MybatisPlusRepositoryBuilder {
         defaultRepository.setOperationFactory(operationFactory);
         defaultRepository.setExecutor(executor);
         defaultRepository.setProperty(EntityStoreInfo.class, entityStoreInfo);
-        defaultRepository.setProperty(EntityTranslatorManager.class, entityTranslatorManager);
-        defaultRepository.setProperty(TranslatorManager.class, entityTranslatorManager);
-        defaultRepository.setProperty(Translator.class, reEntityTranslator);
+        defaultRepository.setProperty(EntityTransformerManager.class, entityTransformerManager);
+        defaultRepository.setProperty(TransformerManager.class, entityTransformerManager);
+        defaultRepository.setProperty(Transformer.class, reEntityTransformer);
         defaultRepository.setProperty(ExampleConverter.class, exampleConverter);
         return defaultRepository;
     }

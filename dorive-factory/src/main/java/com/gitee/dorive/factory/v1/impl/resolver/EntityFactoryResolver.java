@@ -21,8 +21,8 @@ import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
-import com.gitee.dorive.factory.v1.api.EntityTranslator;
-import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
+import com.gitee.dorive.factory.v1.api.EntityTransformer;
+import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
 import com.gitee.dorive.factory.v1.impl.factory.ContextEntityFactory;
 import com.gitee.dorive.factory.v1.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.factory.v1.impl.factory.ValueObjEntityFactory;
@@ -38,16 +38,16 @@ public class EntityFactoryResolver {
     private EntityElement entityElement;
     private Class<?> reType;
     private Class<?> deType;
-    private EntityTranslatorManager entityTranslatorManager;
-    private EntityTranslator reEntityTranslator;
-    private EntityTranslator deEntityTranslator;
+    private EntityTransformerManager entityTransformerManager;
+    private EntityTransformer reEntityTransformer;
+    private EntityTransformer deEntityTransformer;
 
     public EntityFactory newEntityFactory() {
         RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
         Class<?> factoryClass = repositoryDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
-            entityFactory = !entityTranslatorManager.containValueObj() ? new DefaultEntityFactory() : new ValueObjEntityFactory();
+            entityFactory = !entityTransformerManager.containValueObj() ? new DefaultEntityFactory() : new ValueObjEntityFactory();
         } else {
             ApplicationContext applicationContext = repositoryContext.getApplicationContext();
             entityFactory = (EntityFactory) applicationContext.getBean(factoryClass);
@@ -58,13 +58,13 @@ public class EntityFactoryResolver {
             defaultEntityFactory.setEntityElement(entityElement);
             defaultEntityFactory.setReType(reType);
             defaultEntityFactory.setDeType(deType);
-            defaultEntityFactory.setReEntityTranslator(reEntityTranslator);
-            defaultEntityFactory.setDeEntityTranslator(deEntityTranslator);
+            defaultEntityFactory.setReEntityTransformer(reEntityTransformer);
+            defaultEntityFactory.setDeEntityTransformer(deEntityTransformer);
         }
         // 值对象
         if (entityFactory instanceof ValueObjEntityFactory) {
             ValueObjEntityFactory valueObjEntityFactory = (ValueObjEntityFactory) entityFactory;
-            valueObjEntityFactory.setEntityTranslatorManager(entityTranslatorManager);
+            valueObjEntityFactory.setEntityTransformerManager(entityTransformerManager);
         }
         // 初始化
         if (entityFactory instanceof DefaultEntityFactory) {

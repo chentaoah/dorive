@@ -18,7 +18,7 @@
 package com.gitee.dorive.factory.v1.impl.mapping;
 
 import com.gitee.dorive.factory.v1.api.Converter;
-import com.gitee.dorive.factory.v1.api.EntityTranslator;
+import com.gitee.dorive.factory.v1.api.EntityTransformer;
 import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,7 +31,7 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DefaultEntityTranslator implements EntityTranslator {
+public class DefaultEntityTransformer implements EntityTransformer {
 
     private Map<String, String> fieldAliasMap = new LinkedHashMap<>();
     private Map<String, String> aliasFieldMap = new LinkedHashMap<>();

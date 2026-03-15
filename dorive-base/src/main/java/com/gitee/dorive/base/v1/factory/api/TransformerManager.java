@@ -17,10 +17,8 @@
 
 package com.gitee.dorive.base.v1.factory.api;
 
-public interface Translator {
+public interface TransformerManager {
 
-    String toAlias(String field);
-
-    String toField(String alias);
+    Transformer getTransformer(String category);
 
 }

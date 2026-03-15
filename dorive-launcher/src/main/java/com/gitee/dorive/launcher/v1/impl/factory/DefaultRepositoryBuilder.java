@@ -26,7 +26,7 @@ import com.gitee.dorive.base.v1.binder.enums.JoinType;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.factory.api.Translator;
+import com.gitee.dorive.base.v1.factory.api.Transformer;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
@@ -79,11 +79,11 @@ import java.util.List;
 
 /**
  * RepositoryContext's properties:
- * EntityStoreInfo、EntityTranslatorManager、TranslatorManager、Translator、ExampleConverter
+ * EntityStoreInfo、EntityTransformerManager、TransformerManager、Transformer、ExampleConverter
  * RepositoryInfoResolver、QueryInfoResolver、StepwiseQuerier
  * <p>
  * DefaultRepository's properties:
- * EntityStoreInfo、EntityTranslatorManager、TranslatorManager、Translator、ExampleConverter
+ * EntityStoreInfo、EntityTransformerManager、TransformerManager、Transformer、ExampleConverter
  * RepositoryContext
  */
 public class DefaultRepositoryBuilder implements RepositoryBuilder {
@@ -245,8 +245,8 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             EntityElement entityElement = repositoryContext.getEntityElement();
             String primaryKey = entityElement.getPrimaryKey();
 
-            Translator translator = repository.getProperty(Translator.class);
-            String primaryKeyAlias = translator.toAlias(primaryKey);
+            Transformer transformer = repository.getProperty(Transformer.class);
+            String primaryKeyAlias = transformer.toAlias(primaryKey);
 
             SegmentResolver segmentResolver = new DefaultSegmentResolver();
             SegmentExecutor segmentExecutor = new DefaultSegmentExecutor(primaryKey, primaryKeyAlias, repository.getSqlRunner(), (AbstractRepository<Object, Object>) repository);

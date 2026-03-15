@@ -15,10 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.factory.api;
+package com.gitee.dorive.factory.v1.api;
 
-public interface TranslatorManager {
+import com.gitee.dorive.base.v1.factory.api.TransformerManager;
 
-    Translator getTranslator(String category);
+import java.lang.reflect.Type;
+
+public interface EntityTransformerManager extends TransformerManager {
+
+    boolean containValueObj();
+
+    boolean isValueObjType(Type type);
+
+    boolean containMatchedValueObj();
 
 }

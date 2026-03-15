@@ -15,27 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.api;
+package com.gitee.dorive.base.v1.factory.api;
 
-import com.gitee.dorive.base.v1.factory.api.Translator;
+public interface Transformer {
 
-import java.util.List;
-import java.util.Set;
+    String toAlias(String field);
 
-public interface EntityTranslator extends Translator {
-
-    List<String> toAliases(List<String> fields);
-
-    Set<String> toAliases(Set<String> fields);
-
-    FieldAliasMapping getFieldAliasMappingByField(String field);
-
-    FieldAliasMapping getFieldAliasMappingByAlias(String alias);
-
-    List<FieldAliasMapping> getValueObjFields();
-
-    List<FieldAliasMapping> getMatchedValueObjFields();
-
-    List<FieldAliasMapping> getUnmatchedValueObjFields();
+    String toField(String alias);
 
 }

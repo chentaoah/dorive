@@ -25,7 +25,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
+import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
 import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
 import com.gitee.dorive.factory.v1.util.TypeUtils;
 import lombok.Getter;
@@ -39,7 +39,7 @@ import java.util.Map;
 @Setter
 public class ValueObjEntityFactory extends DefaultEntityFactory {
 
-    private EntityTranslatorManager entityTranslatorManager;
+    private EntityTransformerManager entityTransformerManager;
 
     // 从hutool源码中拷贝
     protected TypeConverter converter = (type, value) -> {
@@ -56,7 +56,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     @Override
     public void initialize() {
         super.initialize();
-        if (entityTranslatorManager.containMatchedValueObj()) {
+        if (entityTransformerManager.containMatchedValueObj()) {
             setReCopyOptions();
             setDeCopyOptions();
         }
@@ -79,7 +79,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
                 if (Map.class.isAssignableFrom(rawType)) {
                     return value;
                 }
-                if (entityTranslatorManager.isValueObjType(rawType)) {
+                if (entityTransformerManager.isValueObjType(rawType)) {
                     return value;
                 }
             }
@@ -101,7 +101,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
                     return value;
                 }
                 // 注意：值对象的子类实例，不会进入该分支
-                if (entityTranslatorManager.isValueObjType(value.getClass())) {
+                if (entityTransformerManager.isValueObjType(value.getClass())) {
                     return value;
                 }
             }
@@ -114,7 +114,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     public Object doReconstitute(Context context, Object persistent) {
         Object entity = super.doReconstitute(context, persistent);
         Map<String, Object> resultMap = (Map<String, Object>) persistent;
-        List<FieldAliasMapping> unmatchedValueObjFields = getReEntityTranslator().getUnmatchedValueObjFields();
+        List<FieldAliasMapping> unmatchedValueObjFields = getReEntityTransformer().getUnmatchedValueObjFields();
         for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
             Object valueObj = fieldAliasMapping.reconstitute(resultMap);
             if (valueObj != null) {
@@ -127,7 +127,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     @Override
     public Object doDeconstruct(Context context, Object entity) {
         Object pojo = super.doDeconstruct(context, entity);
-        List<FieldAliasMapping> unmatchedValueObjFields = getDeEntityTranslator().getUnmatchedValueObjFields();
+        List<FieldAliasMapping> unmatchedValueObjFields = getDeEntityTransformer().getUnmatchedValueObjFields();
         for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
             Object valueObj = BeanUtil.getFieldValue(entity, fieldAliasMapping.getField());
             valueObj = valueObj != null ? fieldAliasMapping.deconstruct(valueObj) : null;

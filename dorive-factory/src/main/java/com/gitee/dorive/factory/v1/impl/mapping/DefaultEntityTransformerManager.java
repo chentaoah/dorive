@@ -17,9 +17,9 @@
 
 package com.gitee.dorive.factory.v1.impl.mapping;
 
-import com.gitee.dorive.base.v1.factory.api.Translator;
-import com.gitee.dorive.factory.v1.api.EntityTranslator;
-import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
+import com.gitee.dorive.base.v1.factory.api.Transformer;
+import com.gitee.dorive.factory.v1.api.EntityTransformer;
+import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -29,14 +29,14 @@ import java.util.Set;
 
 @Getter
 @AllArgsConstructor
-public class DefaultEntityTranslatorManager implements EntityTranslatorManager {
-    private final Map<String, EntityTranslator> categoryEntityTranslatorMap;
+public class DefaultEntityTransformerManager implements EntityTransformerManager {
+    private final Map<String, EntityTransformer> categoryEntityTransformerMap;
     private final Set<Type> valueObjTypes;
     private final boolean containMatchedValueObj;
 
     @Override
-    public Translator getTranslator(String category) {
-        return categoryEntityTranslatorMap.get(category);
+    public Transformer getTransformer(String category) {
+        return categoryEntityTransformerMap.get(category);
     }
 
     @Override

@@ -21,7 +21,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.ctx.DefaultContext;
 import com.gitee.dorive.base.v1.executor.api.Matcher;
-import com.gitee.dorive.base.v1.factory.api.Translator;
+import com.gitee.dorive.base.v1.factory.api.Transformer;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.mybatis.entity.CountQuery;
@@ -66,17 +66,17 @@ public class DefaultCountQuerier implements CountQuerier {
         String tableAlias = tableSegment.getTableAlias();
 
         // group by
-        Translator translator = repositoryContext.getProperty(Translator.class);
-        List<String> groupBy = toAliases(translator, countQuery.getGroupBy());
+        Transformer transformer = repositoryContext.getProperty(Transformer.class);
+        List<String> groupBy = toAliases(transformer, countQuery.getGroupBy());
         String groupByColumns = CollUtil.join(groupBy, ",", tableAlias + ".", null);
         selectSegment.setGroupBy("GROUP BY " + groupByColumns);
 
         // count by
         if (selectedRepository != null) {
-            translator = selectedRepository.getProperty(Translator.class);
+            transformer = selectedRepository.getProperty(Transformer.class);
             tableAlias = selectedRepositoryAlias;
         }
-        List<String> countBy = toAliases(translator, countQuery.getCountBy());
+        List<String> countBy = toAliases(transformer, countQuery.getCountBy());
         String countByStr = CollUtil.join(countBy, ",',',", tableAlias + ".", null);
         String countByExp = buildCountByExp(countQuery, countBy, countByStr);
 
@@ -92,8 +92,8 @@ public class DefaultCountQuerier implements CountQuerier {
         return countMap;
     }
 
-    private List<String> toAliases(Translator translator, List<String> properties) {
-        return properties.stream().map(translator::toAlias).collect(Collectors.toList());
+    private List<String> toAliases(Transformer transformer, List<String> properties) {
+        return properties.stream().map(transformer::toAlias).collect(Collectors.toList());
     }
 
     private String buildCountByExp(CountQuery countQuery, List<String> countBy, String countByStr) {

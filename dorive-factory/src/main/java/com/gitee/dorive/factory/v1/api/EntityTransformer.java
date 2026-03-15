@@ -17,16 +17,25 @@
 
 package com.gitee.dorive.factory.v1.api;
 
-import com.gitee.dorive.base.v1.factory.api.TranslatorManager;
+import com.gitee.dorive.base.v1.factory.api.Transformer;
 
-import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Set;
 
-public interface EntityTranslatorManager extends TranslatorManager {
+public interface EntityTransformer extends Transformer {
 
-    boolean containValueObj();
+    List<String> toAliases(List<String> fields);
 
-    boolean isValueObjType(Type type);
+    Set<String> toAliases(Set<String> fields);
 
-    boolean containMatchedValueObj();
+    FieldAliasMapping getFieldAliasMappingByField(String field);
+
+    FieldAliasMapping getFieldAliasMappingByAlias(String alias);
+
+    List<FieldAliasMapping> getValueObjFields();
+
+    List<FieldAliasMapping> getMatchedValueObjFields();
+
+    List<FieldAliasMapping> getUnmatchedValueObjFields();
 
 }

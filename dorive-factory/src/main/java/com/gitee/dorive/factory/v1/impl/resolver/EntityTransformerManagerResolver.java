@@ -22,14 +22,14 @@ import com.gitee.dorive.base.v1.common.def.FieldDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
 import com.gitee.dorive.factory.v1.api.Converter;
-import com.gitee.dorive.factory.v1.api.EntityTranslator;
-import com.gitee.dorive.factory.v1.api.EntityTranslatorManager;
+import com.gitee.dorive.factory.v1.api.EntityTransformer;
+import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
 import com.gitee.dorive.factory.v1.impl.converter.JsonArrayConverter;
 import com.gitee.dorive.factory.v1.impl.converter.JsonConverter;
 import com.gitee.dorive.factory.v1.impl.converter.MapConverter;
 import com.gitee.dorive.factory.v1.impl.converter.MapExpConverter;
-import com.gitee.dorive.factory.v1.impl.mapping.DefaultEntityTranslator;
-import com.gitee.dorive.factory.v1.impl.mapping.DefaultEntityTranslatorManager;
+import com.gitee.dorive.factory.v1.impl.mapping.DefaultEntityTransformer;
+import com.gitee.dorive.factory.v1.impl.mapping.DefaultEntityTransformerManager;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -43,24 +43,24 @@ import java.util.Set;
 
 @Data
 @AllArgsConstructor
-public class EntityTranslatorManagerResolver {
+public class EntityTransformerManagerResolver {
 
     private EntityElement entityElement;
     private Map<String, String> aliasPropMap;
     private String reCategory;
     private String deCategory;
 
-    public EntityTranslatorManager newEntityTranslatorManager() {
+    public EntityTransformerManager newEntityTransformerManager() {
         List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
         Map<String, String> fieldAliasMap = entityElement.getFieldAliasMap();
 
-        // 类别 => EntityTranslator
-        Map<String, EntityTranslator> categoryEntityTranslatorMap = new LinkedHashMap<>(4);
+        // 类别 => EntityTransformer
+        Map<String, EntityTransformer> categoryEntityTransformerMap = new LinkedHashMap<>(4);
         Set<Type> valueObjTypes = new HashSet<>(6);
         boolean containMatchedValueObj = false;
 
-        DefaultEntityTranslator reEntityTranslator = new DefaultEntityTranslator();
-        DefaultEntityTranslator deEntityTranslator = new DefaultEntityTranslator();
+        DefaultEntityTransformer reEntityTransformer = new DefaultEntityTransformer();
+        DefaultEntityTransformer deEntityTransformer = new DefaultEntityTransformer();
 
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
             // 字段名称
@@ -86,16 +86,16 @@ public class EntityTranslatorManagerResolver {
             // 值转换器
             Converter converter = newConverter(fieldDefinition, isMatch, isValueObj);
 
-            reEntityTranslator.addField(field, isMatch, alias, isValueObj, converter);
-            deEntityTranslator.addField(field, isMatch, prop, isValueObj, converter);
+            reEntityTransformer.addField(field, isMatch, alias, isValueObj, converter);
+            deEntityTransformer.addField(field, isMatch, prop, isValueObj, converter);
         }
 
         // ENTITY_DATABASE
-        categoryEntityTranslatorMap.put(reCategory, reEntityTranslator);
+        categoryEntityTransformerMap.put(reCategory, reEntityTransformer);
         // ENTITY_POJO
-        categoryEntityTranslatorMap.put(deCategory, deEntityTranslator);
+        categoryEntityTransformerMap.put(deCategory, deEntityTransformer);
 
-        return new DefaultEntityTranslatorManager(categoryEntityTranslatorMap, valueObjTypes, containMatchedValueObj);
+        return new DefaultEntityTransformerManager(categoryEntityTransformerMap, valueObjTypes, containMatchedValueObj);
     }
 
     private Converter newConverter(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {
