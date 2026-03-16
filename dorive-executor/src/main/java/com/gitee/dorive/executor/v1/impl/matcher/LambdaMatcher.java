@@ -44,6 +44,11 @@ public class LambdaMatcher extends GenericOptions {
         this.fields = new ArrayList<>(4);
     }
 
+    public LambdaMatcher(Class<?> type, List<java.lang.reflect.Field> fields) {
+        this.type = type;
+        this.fields = fields;
+    }
+
     public <T> LambdaMatcher and(SFunction<T, ?> function) {
         LambdaMeta meta = LambdaUtils.extract(function);
         Class<?> instantiatedClass = meta.getInstantiatedClass();
