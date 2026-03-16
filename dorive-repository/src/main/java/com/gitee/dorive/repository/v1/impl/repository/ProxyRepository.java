@@ -19,8 +19,8 @@ package com.gitee.dorive.repository.v1.impl.repository;
 
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
-import com.gitee.dorive.base.v1.core.entity.ctx.GenericOptions;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
@@ -29,6 +29,7 @@ import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
@@ -80,7 +81,7 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
-        Selector selector = GenericOptions.getSelector(context, this);
+        Selector selector = getSelector(context, this);
         if (selector != null) {
             List<String> properties = selector.select();
             if (properties != null && !properties.isEmpty()) {
@@ -103,6 +104,18 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
             }
         }
         return super.executeQuery(context, query);
+    }
+
+    private Selector getSelector(Options options, RepositoryItem repositoryItem) {
+        Matcher matcher = options.getOption(Matcher.class);
+        List<Selector> selectors = options.getOptions(Selector.class);
+        if (matcher != null && selectors != null) {
+            int index = matcher.indexOf(repositoryItem);
+            if (index >= 0 && index < selectors.size()) {
+                return selectors.get(index);
+            }
+        }
+        return null;
     }
 
     @Override

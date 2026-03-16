@@ -23,7 +23,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.LambdaMeta;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.entity.Field;
-import com.gitee.dorive.base.v1.core.entity.ctx.GenericOptions;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,7 +34,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class LambdaMatcher extends GenericOptions {
+public class LambdaMatcher implements Matcher {
 
     private Class<?> type;
     private List<java.lang.reflect.Field> fields;

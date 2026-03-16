@@ -30,6 +30,14 @@ public class Builder {
     private List<Field> fields;
     private String[] selectors;
 
+    public static Options build(String... names) {
+        return new Builder().match(names).build();
+    }
+
+    public static Options build(Class<?>... types) {
+        return new Builder().match(types).build();
+    }
+
     public Builder match(String... names) {
         this.names = names;
         return this;
@@ -59,11 +67,13 @@ public class Builder {
 
     public Options build() {
         Options options = new DefaultOptions();
-
         // Matcher
         Matcher matcher = null;
+        List<Selector> matcherSelectors = null;
         if (names != null && names.length > 0) {
-            matcher = new NameMatcher(names);
+            NameMatcher nameMatcher = new NameMatcher(names);
+            matcher = nameMatcher;
+            matcherSelectors = nameMatcher.getSelectors();
 
         } else if (types != null && types.length > 0) {
             if (types.length == 1 && (fields != null && !fields.isEmpty())) {
@@ -75,12 +85,13 @@ public class Builder {
         if (matcher != null) {
             options.setOption(Matcher.class, matcher);
         }
-
+        if (matcherSelectors != null) {
+            options.setOptions(Selector.class, matcherSelectors);
+        }
         // Selector
         if (selectors != null && selectors.length > 0) {
             options.setOptions(Selector.class, Arrays.stream(selectors).map(DefaultSelector::new).collect(Collectors.toList()));
         }
-
         return options;
     }
 }

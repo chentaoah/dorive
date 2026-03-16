@@ -19,7 +19,7 @@ package com.gitee.dorive.executor.v1.impl.matcher;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.base.v1.core.entity.ctx.GenericOptions;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.executor.v1.impl.selector.DefaultSelector;
@@ -32,9 +32,10 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class NameMatcher extends GenericOptions {
+public class NameMatcher implements Matcher {
 
     private List<String> names;
+    private List<Selector> selectors;
 
     public NameMatcher(String... strings) {
         Assert.notEmpty(strings, "The strings cannot be empty!");
@@ -51,7 +52,7 @@ public class NameMatcher extends GenericOptions {
             selectors.add(selector);
         }
         this.names = Collections.unmodifiableList(names);
-        with(selectors.toArray(new Selector[0]));
+        this.selectors = Collections.unmodifiableList(selectors);
     }
 
     @Override

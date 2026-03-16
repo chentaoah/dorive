@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.executor.v1.impl.matcher;
 
-import com.gitee.dorive.base.v1.core.entity.ctx.GenericOptions;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TypeMatcher extends GenericOptions {
+public class TypeMatcher implements Matcher {
 
     private List<Class<?>> types;
 
