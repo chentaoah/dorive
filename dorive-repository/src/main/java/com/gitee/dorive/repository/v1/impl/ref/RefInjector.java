@@ -45,12 +45,12 @@ public class RefInjector {
         }
         Object fieldValue = ReflectUtil.getStaticFieldValue(field);
         if (fieldValue instanceof RefImpl) {
-            RefImpl refImpl = (RefImpl) fieldValue;
+            RefImpl<?> refImpl = (RefImpl<?>) fieldValue;
             if (!refImpl.isInitialized()) {
                 initialize(refImpl);
             }
         } else {
-            RefImpl refImpl = new RefImpl();
+            RefImpl<?> refImpl = new RefImpl<>();
             initialize(refImpl);
             doInject(field, refImpl);
         }
@@ -66,19 +66,14 @@ public class RefInjector {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    private void initialize(RefImpl refImpl) {
-        refImpl.setEntityElement(repository.getEntityElement());
-        refImpl.setOperationFactory(repository.getOperationFactory());
-        refImpl.setExecutor(repository.getExecutor());
-
-        refImpl.setProxyRepository((AbstractQueryRepository<Object, Object>) repository);
-        refImpl.setRepository((AbstractQueryRepository<Object, Object>) repository);
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void initialize(RefImpl<?> refImpl) {
+        refImpl.setRepository((AbstractQueryRepository) repository);
         refImpl.setEntityHandler(entityHandler);
         refImpl.setInitialized(true);
     }
 
-    private void doInject(Field field, RefImpl refImpl) {
+    private void doInject(Field field, RefImpl<?> refImpl) {
         ReflectUtil.setFieldValue(null, field, refImpl);
     }
 

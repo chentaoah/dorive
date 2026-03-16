@@ -32,7 +32,7 @@ import java.util.Collections;
 @AllArgsConstructor
 public class RefObjImpl implements RefObj {
 
-    private RefImpl ref;
+    private RefImpl<?> ref;
     private Object object;
 
     @Override
@@ -45,20 +45,22 @@ public class RefObjImpl implements RefObj {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public int insertOrUpdate(Options options) {
         if (!(options instanceof Context)) {
             options = new DefaultContext(options);
         }
-        AbstractRepository<Object, Object> repository = ref.getProxyRepository();
+        AbstractRepository<Object, Object> repository = (AbstractRepository<Object, Object>) ref.getRepository();
         return repository.insertOrUpdate(options, object);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public int delete(Options options) {
         if (!(options instanceof Context)) {
             options = new DefaultContext(options);
         }
-        AbstractRepository<Object, Object> repository = ref.getProxyRepository();
+        AbstractRepository<Object, Object> repository = (AbstractRepository<Object, Object>) ref.getRepository();
         return repository.delete(options, object);
     }
 
