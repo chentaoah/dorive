@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.repository.v1.impl.injector;
+package com.gitee.dorive.repository.v1.impl.ref;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
@@ -37,10 +37,9 @@ public class RefInjector {
         this.repository = repository;
         this.entityHandler = entityHandler;
         this.entityClass = entityClass;
-        inject();
     }
 
-    private void inject() {
+    public void inject() {
         Field staticRefField = findStaticRefField();
         if (staticRefField != null) {
             Ref<Object> ref = newRefImpl();

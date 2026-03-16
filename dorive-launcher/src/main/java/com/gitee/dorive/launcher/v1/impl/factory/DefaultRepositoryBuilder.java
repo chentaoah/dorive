@@ -67,7 +67,7 @@ import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQueryExecutor;
 import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQueryResolver;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.impl.executor.ExecutorEventExecutor;
-import com.gitee.dorive.repository.v1.impl.injector.RefInjector;
+import com.gitee.dorive.repository.v1.impl.ref.RefInjector;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractContextRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
@@ -167,7 +167,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         EntityHandler entityHandler = new BatchEntityHandler(repositoryContext, entityHandlers);
         // 仓储依赖注入
         if (repositoryContext instanceof AbstractQueryRepository) {
-            new RefInjector((AbstractQueryRepository<?, ?>) repositoryContext, entityHandler, repositoryContext.getEntityClass());
+            new RefInjector((AbstractQueryRepository<?, ?>) repositoryContext, entityHandler, repositoryContext.getEntityClass()).inject();
         }
         // DelegatedEntityHandler
         if (repositoryDerivedResolver.hasDerived()) {
