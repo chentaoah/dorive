@@ -19,7 +19,6 @@ package com.gitee.dorive.repository.v1.impl.ref;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
-import com.gitee.dorive.repository.v1.api.Ref;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import lombok.Data;
 
@@ -40,10 +39,20 @@ public class RefInjector {
     }
 
     public void inject() {
-        Field staticRefField = findStaticRefField();
-        if (staticRefField != null) {
-            Ref<Object> ref = newRefImpl();
-            doInject(staticRefField, ref);
+        Field field = findStaticRefField();
+        if (field == null) {
+            return;
+        }
+        Object fieldValue = ReflectUtil.getStaticFieldValue(field);
+        if (fieldValue instanceof RefImpl) {
+            RefImpl refImpl = (RefImpl) fieldValue;
+            if (!refImpl.isInitialized()) {
+                initialize(refImpl);
+            }
+        } else {
+            RefImpl refImpl = new RefImpl();
+            initialize(refImpl);
+            doInject(field, refImpl);
         }
     }
 
@@ -58,16 +67,19 @@ public class RefInjector {
     }
 
     @SuppressWarnings("unchecked")
-    private Ref<Object> newRefImpl() {
-        RefImpl refImpl = new RefImpl((AbstractQueryRepository<Object, Object>) repository, entityHandler);
+    private void initialize(RefImpl refImpl) {
         refImpl.setEntityElement(repository.getEntityElement());
         refImpl.setOperationFactory(repository.getOperationFactory());
         refImpl.setExecutor(repository.getExecutor());
-        return refImpl;
+
+        refImpl.setProxyRepository((AbstractQueryRepository<Object, Object>) repository);
+        refImpl.setRepository((AbstractQueryRepository<Object, Object>) repository);
+        refImpl.setEntityHandler(entityHandler);
+        refImpl.setInitialized(true);
     }
 
-    private void doInject(Field field, Ref<Object> ref) {
-        ReflectUtil.setFieldValue(null, field, ref);
+    private void doInject(Field field, RefImpl refImpl) {
+        ReflectUtil.setFieldValue(null, field, refImpl);
     }
 
 }

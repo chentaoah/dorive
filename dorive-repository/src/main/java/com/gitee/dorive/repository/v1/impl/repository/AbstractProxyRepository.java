@@ -51,7 +51,7 @@ public abstract class AbstractProxyRepository extends AbstractRepository<Object,
         if (proxyRepository instanceof AbstractProxyRepository) {
             ((AbstractProxyRepository) proxyRepository).setProxyRepository(repository);
         }
-        proxyRepository = repository;
+        this.proxyRepository = repository;
     }
 
     @Override

@@ -24,23 +24,18 @@ import com.gitee.dorive.repository.v1.api.Ref;
 import com.gitee.dorive.repository.v1.api.RefObj;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractProxyRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
+@Setter
 public class RefImpl extends AbstractProxyRepository implements Ref<Object> {
 
     private AbstractQueryRepository<Object, Object> repository;
     private EntityHandler entityHandler;
-
-    public RefImpl(AbstractQueryRepository<Object, Object> repository, EntityHandler entityHandler) {
-        super(repository);
-        this.repository = repository;
-        this.entityHandler = entityHandler;
-    }
+    private boolean initialized;
 
     @Override
     public int insertList(Options options, List<Object> entities) {
