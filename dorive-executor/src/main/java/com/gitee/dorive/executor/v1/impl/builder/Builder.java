@@ -14,6 +14,7 @@ import com.gitee.dorive.executor.v1.impl.matcher.TypeMatcher;
 import com.gitee.dorive.executor.v1.impl.selector.DefaultSelector;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
 import java.lang.reflect.Field;
@@ -90,8 +91,12 @@ public class Builder {
         }
         // Selector
         if (selectors != null && selectors.length > 0) {
-            options.setOptions(Selector.class, Arrays.stream(selectors).map(DefaultSelector::new).collect(Collectors.toList()));
+            options.setOptions(Selector.class, Arrays.stream(selectors).map(this::newSelector).collect(Collectors.toList()));
         }
         return options;
+    }
+
+    private Selector newSelector(String string) {
+        return StringUtils.isNotBlank(string) ? new DefaultSelector(string) : null;
     }
 }
