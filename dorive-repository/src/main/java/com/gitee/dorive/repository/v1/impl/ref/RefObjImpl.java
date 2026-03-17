@@ -32,7 +32,7 @@ import java.util.Collections;
 @AllArgsConstructor
 public class RefObjImpl implements RefObj {
 
-    private RefImpl<?> ref;
+    private RefImpl<?> refImpl;
     private Object object;
 
     @Override
@@ -40,7 +40,7 @@ public class RefObjImpl implements RefObj {
         if (!(options instanceof Context)) {
             options = new DefaultContext(options);
         }
-        EntityHandler entityHandler = ref.getEntityHandler();
+        EntityHandler entityHandler = refImpl.getEntityHandler();
         return entityHandler.handle((Context) options, Collections.singletonList(object));
     }
 
@@ -50,7 +50,7 @@ public class RefObjImpl implements RefObj {
         if (!(options instanceof Context)) {
             options = new DefaultContext(options);
         }
-        AbstractRepository<Object, Object> repository = (AbstractRepository<Object, Object>) ref.getRepository();
+        AbstractRepository<Object, Object> repository = (AbstractRepository<Object, Object>) refImpl.getRepository();
         return repository.insertOrUpdate(options, object);
     }
 
@@ -60,7 +60,7 @@ public class RefObjImpl implements RefObj {
         if (!(options instanceof Context)) {
             options = new DefaultContext(options);
         }
-        AbstractRepository<Object, Object> repository = (AbstractRepository<Object, Object>) ref.getRepository();
+        AbstractRepository<Object, Object> repository = (AbstractRepository<Object, Object>) refImpl.getRepository();
         return repository.delete(options, object);
     }
 
