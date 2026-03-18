@@ -21,7 +21,7 @@ import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
-import com.gitee.dorive.binder.v1.api.ExampleBuilder;
+import com.gitee.dorive.base.v1.binder.api.ExampleBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -39,11 +39,11 @@ public class SingleExampleBuilder implements ExampleBuilder {
         Example example = new InnerExample();
         List<Object> boundValues = collectBoundValues(context, entities);
         if (!boundValues.isEmpty()) {
-            String fieldName = binder.getFieldName();
+            String field = binder.getField();
             if (boundValues.size() == 1) {
-                example.eq(fieldName, boundValues.get(0));
+                example.eq(field, boundValues.get(0));
             } else {
-                example.in(fieldName, boundValues);
+                example.in(field, boundValues);
             }
         }
         return example;

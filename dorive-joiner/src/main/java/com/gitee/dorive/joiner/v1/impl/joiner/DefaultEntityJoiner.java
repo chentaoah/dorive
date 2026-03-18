@@ -20,7 +20,7 @@ package com.gitee.dorive.joiner.v1.impl.joiner;
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.common.enums.JoinType;
+import com.gitee.dorive.base.v1.binder.enums.JoinType;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
@@ -37,15 +37,15 @@ import java.util.function.BiConsumer;
 
 @Data
 public class DefaultEntityJoiner implements EntityJoiner {
-    private RepositoryItem repository;
+    private RepositoryItem repositoryItem;
     private KeyGenerator keyGen1;
     private KeyGenerator keyGen2;
     private BiConsumer<Object, Object> setter;
 
-    public DefaultEntityJoiner(RepositoryItem repository) {
-        this.repository = repository;
-        EntityElement entityElement = repository.getEntityElement();
-        BinderExecutor binderExecutor = repository.getBinderExecutor();
+    public DefaultEntityJoiner(RepositoryItem repositoryItem) {
+        this.repositoryItem = repositoryItem;
+        EntityElement entityElement = repositoryItem.getEntityElement();
+        BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
         JoinType joinType = binderExecutor.getJoinType();
         List<Binder> binders = binderExecutor.getRootStrongBinders();
         if (joinType == JoinType.SINGLE) {
@@ -70,6 +70,6 @@ public class DefaultEntityJoiner implements EntityJoiner {
         collectionJoiner.joinAndSet(
                 entities1, o -> keyGen1.generate(context, o),
                 entities2, o -> keyGen2.generate(context, o),
-                repository.isCollection(), setter);
+                repositoryItem.isCollection(), setter);
     }
 }

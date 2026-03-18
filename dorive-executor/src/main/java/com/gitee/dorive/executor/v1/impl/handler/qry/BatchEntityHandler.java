@@ -17,40 +17,20 @@
 
 package com.gitee.dorive.executor.v1.impl.handler.qry;
 
-import cn.hutool.extra.spring.SpringUtil;
-import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
-import com.gitee.dorive.base.v1.executor.api.EntityHandlerFactory;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class BatchEntityHandler implements EntityHandler {
 
-    private final RepositoryContext repository;
+    private final RepositoryContext repositoryContext;
     private final List<EntityHandler> entityHandlers;
-
-    public BatchEntityHandler(RepositoryContext repository) {
-        // 获取工厂
-        EntityHandlerFactory entityHandlerFactory = SpringUtil.getBean(EntityHandlerFactory.class);
-        this.repository = repository;
-        List<RepositoryItem> subRepositories = repository.getSubRepositories();
-        this.entityHandlers = new ArrayList<>(subRepositories.size());
-        for (RepositoryItem subRepository : subRepositories) {
-            EntityHandler entityHandler = entityHandlerFactory.create("AdaptiveEntityHandler", subRepository);
-            BinderExecutor binderExecutor = subRepository.getBinderExecutor();
-            if (binderExecutor.hasValueRouteBinders()) {
-                entityHandler = entityHandlerFactory.create("ValueFilterEntityHandler", subRepository, entityHandler);
-            }
-            entityHandler = new ContextMatchEntityHandler(repository, subRepository, entityHandler);
-            entityHandlers.add(entityHandler);
-        }
-    }
 
     @Override
     public long handle(Context context, List<Object> entities) {

@@ -29,8 +29,8 @@ import com.gitee.dorive.base.v1.common.def.BindingDef;
 import com.gitee.dorive.base.v1.common.def.EntityDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
-import com.gitee.dorive.base.v1.common.enums.BindingType;
-import com.gitee.dorive.base.v1.common.enums.JoinType;
+import com.gitee.dorive.base.v1.binder.enums.BindingType;
+import com.gitee.dorive.base.v1.binder.enums.JoinType;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
@@ -241,7 +241,6 @@ public class BinderResolver implements BinderExecutor {
 
         Map<String, RepositoryItem> repositoryMap = repositoryContext.getRepositoryMap();
         RepositoryItem belongRepository = repositoryMap.getOrDefault("/" + bind, rootRepository);
-        belongRepository.setBound(true);
 
         bindEndpoint.setBelongAccessPath(belongRepository.getAccessPath());
         bindEndpoint.setBelongRepository(belongRepository);
@@ -266,8 +265,8 @@ public class BinderResolver implements BinderExecutor {
         for (Binder weakBinder : weakBinders) {
             Object boundValue = weakBinder.input(context, null);
             if (boundValue != null) {
-                String fieldName = weakBinder.getFieldName();
-                example.eq(fieldName, boundValue);
+                String field = weakBinder.getField();
+                example.eq(field, boundValue);
             }
         }
         appendFilterValue(context, example);
@@ -279,8 +278,8 @@ public class BinderResolver implements BinderExecutor {
             Object boundValue = valueFilterBinder.getBoundValue(context, null);
             boundValue = valueFilterBinder.input(context, boundValue);
             if (boundValue != null) {
-                String fieldName = valueFilterBinder.getFieldName();
-                example.eq(fieldName, boundValue);
+                String field = valueFilterBinder.getField();
+                example.eq(field, boundValue);
             }
         }
     }

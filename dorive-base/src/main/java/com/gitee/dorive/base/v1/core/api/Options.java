@@ -17,26 +17,32 @@
 
 package com.gitee.dorive.base.v1.core.api;
 
-import com.gitee.dorive.base.v1.core.entity.ctx.EnumOptions;
-import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
-import com.gitee.dorive.base.v1.repository.impl.matcher.AllRepositoryMatcher;
-import com.gitee.dorive.base.v1.repository.impl.matcher.NoneRepositoryMatcher;
-import com.gitee.dorive.base.v1.repository.impl.matcher.RootRepositoryMatcher;
+import com.gitee.dorive.base.v1.core.entity.ctx.DefaultOptions;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
+import com.gitee.dorive.base.v1.executor.impl.matcher.AllMatcher;
+import com.gitee.dorive.base.v1.executor.impl.matcher.NoneMatcher;
+import com.gitee.dorive.base.v1.executor.impl.matcher.RootMatcher;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public interface Options {
 
-    Options NONE = new EnumOptions(RepositoryMatcher.class, new NoneRepositoryMatcher());
-    Options ROOT = new EnumOptions(RepositoryMatcher.class, new RootRepositoryMatcher());
-    Options ALL = new EnumOptions(RepositoryMatcher.class, new AllRepositoryMatcher());
+    Options NONE = new DefaultOptions(Collections.singletonMap(Matcher.class, new NoneMatcher()));
+    Options ROOT = new DefaultOptions(Collections.singletonMap(Matcher.class, new RootMatcher()));
+    Options ALL = new DefaultOptions(Collections.singletonMap(Matcher.class, new AllMatcher()));
 
-    Map<Class<?>, Object> getOptions();
+    Map<Class<?>, Object> getMap();
 
     <T> void setOption(Class<T> type, T value);
 
     <T> T getOption(Class<T> type);
 
-    void removeOption(Class<?> type);
+    <T> void setOptions(Class<T> type, List<T> value);
+
+    <T> List<T> getOptions(Class<T> type);
+
+    void remove(Class<?> type);
 
 }

@@ -1,0 +1,107 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.gitee.dorive.query.v2.impl.segment;
+
+import com.gitee.dorive.base.v1.binder.api.Binder;
+import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.util.CriterionUtils;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.query.v2.entity.segment.ConditionInfo;
+import com.gitee.dorive.query.v2.entity.segment.JoinInfo;
+import lombok.Data;
+
+import java.util.*;
+
+@Data
+public class JoinInfoResolver {
+
+    private final RepositoryContext repositoryContext;
+    private final List<RepositoryItem> reverseSubRepositoryItems;
+
+    public JoinInfoResolver(RepositoryContext repositoryContext) {
+        this.repositoryContext = repositoryContext;
+        List<RepositoryItem> repositoryItems = new ArrayList<>(repositoryContext.getSubRepositories());
+        Collections.reverse(repositoryItems);
+        this.reverseSubRepositoryItems = repositoryItems;
+    }
+
+    public List<JoinInfo> resolve(Context context, Set<String> accessPaths) {
+        accessPaths = new LinkedHashSet<>(accessPaths);
+        Set<String> finalAccessPaths = accessPaths;
+
+        Map<String, RepositoryItem> repositoryMap = repositoryContext.getRepositoryMap();
+        List<JoinInfo> joinInfos = new ArrayList<>(accessPaths.size());
+        for (RepositoryItem repositoryItem : reverseSubRepositoryItems) {
+            // 获取查询条件
+            String accessPath = repositoryItem.getAccessPath();
+            if (!accessPaths.contains(accessPath)) {
+                continue;
+            }
+            // 仓储
+            RepositoryContext repositoryContext = repositoryItem.getRepositoryContext();
+            // 连接
+            JoinInfo joinInfo = new JoinInfo();
+            joinInfo.setJoiner(repositoryContext);
+            // 获取绑定关系
+            BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
+            Map<String, List<Binder>> mergedStrongBindersMap = binderExecutor.getMergedStrongBindersMap();
+            Map<String, List<Binder>> mergedValueRouteBindersMap = binderExecutor.getMergedValueRouteBindersMap();
+            List<Binder> valueFilterBinders = binderExecutor.getValueFilterBinders();
+            // 连接条件
+            List<ConditionInfo> conditionInfos = new ArrayList<>(mergedStrongBindersMap.size() + mergedValueRouteBindersMap.size() + valueFilterBinders.size());
+            mergedStrongBindersMap.forEach((targetAccessPath, strongBinders) -> {
+                finalAccessPaths.add(targetAccessPath);
+                RepositoryItem targetRepositoryItem = repositoryMap.get(targetAccessPath);
+                RepositoryContext targetRepositoryContext = targetRepositoryItem.getRepositoryContext();
+                for (Binder strongBinder : strongBinders) {
+                    ConditionInfo conditionInfo = new ConditionInfo();
+                    conditionInfo.setSource(repositoryContext);
+                    conditionInfo.setSourceField(strongBinder.getField());
+                    conditionInfo.setTarget(targetRepositoryContext);
+                    conditionInfo.setTargetField(strongBinder.getTargetField());
+                    conditionInfos.add(conditionInfo);
+                }
+            });
+            mergedValueRouteBindersMap.forEach((targetAccessPath, valueRouteBinders) -> {
+                finalAccessPaths.add(targetAccessPath);
+                RepositoryItem targetRepositoryItem = repositoryMap.get(targetAccessPath);
+                RepositoryContext targetRepositoryContext = targetRepositoryItem.getRepositoryContext();
+                for (Binder valueRouteBinder : valueRouteBinders) {
+                    ConditionInfo conditionInfo = new ConditionInfo();
+                    conditionInfo.setSource(targetRepositoryContext);
+                    conditionInfo.setSourceField(valueRouteBinder.getTargetField());
+                    conditionInfo.setLiteral(CriterionUtils.sqlParam(valueRouteBinder.getFieldValue(context, null)));
+                    conditionInfos.add(conditionInfo);
+                }
+            });
+            for (Binder valueFilterBinder : valueFilterBinders) {
+                ConditionInfo conditionInfo = new ConditionInfo();
+                conditionInfo.setSource(repositoryContext);
+                conditionInfo.setSourceField(valueFilterBinder.getField());
+                conditionInfo.setLiteral(CriterionUtils.sqlParam(valueFilterBinder.getBoundValue(context, null)));
+                conditionInfos.add(conditionInfo);
+            }
+            joinInfo.setConditionInfos(conditionInfos);
+            joinInfos.add(joinInfo);
+        }
+        return joinInfos;
+    }
+
+}

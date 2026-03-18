@@ -39,7 +39,7 @@ public class ValueRouteBinder extends AbstractBinder {
     }
 
     @Override
-    public String getFieldName() {
+    public String getField() {
         throw new UnsupportedOperationException();
     }
 

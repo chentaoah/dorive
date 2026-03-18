@@ -32,7 +32,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class DelegatedEntityHandler implements EntityHandler {
 
-    private final RepositoryContext repository;
+    private final RepositoryContext repositoryContext;
     private final Map<Class<?>, EntityHandler> entityHandlerMap;
 
     @Override
@@ -50,7 +50,7 @@ public class DelegatedEntityHandler implements EntityHandler {
             List<Object> subEntities = entry.getValue();
             EntityHandler entityHandler = entityHandlerMap.get(entityType);
             if (entityHandler == null) {
-                entityHandler = entityHandlerMap.get(repository.getEntityClass());
+                entityHandler = entityHandlerMap.get(repositoryContext.getEntityClass());
             }
             if (entityHandler != null) {
                 totalCount += entityHandler.handle(context, subEntities);

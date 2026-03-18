@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive</artifactId>
-    <version>3.5.5</version>
+    <version>3.5.6</version>
     <packaging>pom</packaging>
 
     <licenses>
@@ -37,9 +37,7 @@
         <module>dorive-factory</module>
         <module>dorive-joiner</module>
         <module>dorive-query</module>
-        <module>dorive-query2</module>
         <module>dorive-mybatis</module>
-        <module>dorive-mybatis2</module>
         <module>dorive-mybatis-plus</module>
         <module>dorive-module</module>
         <module>dorive-module-test</module>

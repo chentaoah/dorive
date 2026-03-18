@@ -35,8 +35,8 @@ import java.util.Map;
 public class MapExpConverter implements Converter {
 
     private FieldDefinition fieldDefinition;
-    private Map<Object, Object> reMapping = Collections.emptyMap();
-    private Map<Object, Object> deMapping = Collections.emptyMap();
+    private Map<Object, Object> reMap = Collections.emptyMap();
+    private Map<Object, Object> deMap = Collections.emptyMap();
 
     public MapExpConverter(FieldDefinition fieldDefinition) {
         this.fieldDefinition = fieldDefinition;
@@ -44,8 +44,8 @@ public class MapExpConverter implements Converter {
         Class<?> genericType = fieldDefinition.getGenericType();
         String expression = fieldDef.getExpression();
         if (StringUtils.isNotBlank(expression)) {
-            this.reMapping = new LinkedHashMap<>(8);
-            this.deMapping = new LinkedHashMap<>(8);
+            this.reMap = new LinkedHashMap<>(8);
+            this.deMap = new LinkedHashMap<>(8);
             List<String> items = StrUtil.splitTrim(expression, ",");
             for (String item : items) {
                 if (StringUtils.isNotBlank(item)) {
@@ -53,12 +53,12 @@ public class MapExpConverter implements Converter {
                     String entityValue = valueValuePair.get(0);
                     String mapValue = valueValuePair.get(1);
                     if (genericType == Integer.class) {
-                        reMapping.put(Integer.valueOf(mapValue), Integer.valueOf(entityValue));
-                        deMapping.put(Integer.valueOf(entityValue), Integer.valueOf(mapValue));
+                        reMap.put(Integer.valueOf(mapValue), Integer.valueOf(entityValue));
+                        deMap.put(Integer.valueOf(entityValue), Integer.valueOf(mapValue));
 
                     } else if (genericType == String.class) {
-                        reMapping.put(mapValue, entityValue);
-                        deMapping.put(entityValue, mapValue);
+                        reMap.put(mapValue, entityValue);
+                        deMap.put(entityValue, mapValue);
                     }
                 }
             }
@@ -69,7 +69,7 @@ public class MapExpConverter implements Converter {
         if (value == null) {
             return null;
         }
-        Object entityValue = reMapping.get(value);
+        Object entityValue = reMap.get(value);
         if (entityValue != null) {
             return entityValue;
         }
@@ -80,7 +80,7 @@ public class MapExpConverter implements Converter {
         if (value == null) {
             return null;
         }
-        Object mapValue = deMapping.get(value);
+        Object mapValue = deMap.get(value);
         if (mapValue != null) {
             return mapValue;
         }

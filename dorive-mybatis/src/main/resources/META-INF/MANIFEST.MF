@@ -4,16 +4,15 @@ Dorive-Project: dorive
 Dorive-Domain: mybatis
 Dorive-Subdomain: null
 Dorive-Module: dorive-mybatis
-Dorive-Version: v1
+Dorive-Version: v2
 Dorive-Type: biz
 Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
-Dorive-Requires: Context, OrderBy, Operator, RepositoryItem, RepositoryContext, TranslatorManager, Category,
- DefaultRepository, EntityStoreInfo, Page, InnerExample, ResultType, CriterionUtils, Result, Binder, BinderExecutor,
- Translator, Criterion, AbstractRepository, Example, SqlRunner, MethodInvoker, Selector
-Dorive-Provides: null
+Dorive-Requires: Context, OrderBy, Operator, RepositoryContext, CountQuery, EntityStoreInfo, Page, InnerExample,
+ CriterionUtils, Result, Translator, Criterion, AbstractRepository, Example, SqlRunner, DefaultContext, Selector
+Dorive-Provides: CountQuerier
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null

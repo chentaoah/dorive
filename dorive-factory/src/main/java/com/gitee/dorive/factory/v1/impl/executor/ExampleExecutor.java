@@ -27,9 +27,9 @@ import com.gitee.dorive.base.v1.core.entity.qry.UnionExample;
 import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.executor.impl.AbstractProxyExecutor;
-import com.gitee.dorive.factory.v1.api.EntityMapper;
-import com.gitee.dorive.factory.v1.api.FieldMapper;
+import com.gitee.dorive.base.v1.executor.impl.executor.AbstractProxyExecutor;
+import com.gitee.dorive.factory.v1.api.EntityTransformer;
+import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
 import com.gitee.dorive.base.v1.core.entity.op.Condition;
 import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.cop.ConditionUpdate;
@@ -47,12 +47,12 @@ import java.util.Set;
 public class ExampleExecutor extends AbstractProxyExecutor implements ExampleConverter {
 
     private EntityElement entityElement;
-    private EntityMapper entityMapper;
+    private EntityTransformer entityTransformer;
 
-    public ExampleExecutor(Executor executor, EntityElement entityElement, EntityMapper entityMapper) {
+    public ExampleExecutor(Executor executor, EntityElement entityElement, EntityTransformer entityTransformer) {
         super(executor);
         this.entityElement = entityElement;
-        this.entityMapper = entityMapper;
+        this.entityTransformer = entityTransformer;
     }
 
     @Override
@@ -111,7 +111,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
     private void convertUpdate(Update update) {
         Set<String> nullableProps = update.getNullableProps();
         if (nullableProps != null && !nullableProps.isEmpty()) {
-            nullableProps = entityMapper.toAliases(nullableProps);
+            nullableProps = entityTransformer.toAliases(nullableProps);
             update.setNullableProps(nullableProps);
         }
     }
@@ -119,7 +119,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
     private void convertConditionUpdate(ConditionUpdate conditionUpdate) {
         Set<String> nullableProps = conditionUpdate.getNullableProps();
         if (nullableProps != null && !nullableProps.isEmpty()) {
-            nullableProps = entityMapper.toAliases(nullableProps);
+            nullableProps = entityTransformer.toAliases(nullableProps);
             conditionUpdate.setNullableProps(nullableProps);
         }
     }
@@ -127,7 +127,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
     private void convertSelectProps(Example example) {
         List<String> properties = example.getSelectProps();
         if (properties != null && !properties.isEmpty()) {
-            properties = entityMapper.toAliases(properties);
+            properties = entityTransformer.toAliases(properties);
             example.setSelectProps(properties);
         }
     }
@@ -147,7 +147,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
                     if (value instanceof MultiInBuilder) {
                         MultiInBuilder builder = (MultiInBuilder) value;
                         List<String> properties = builder.getProperties();
-                        properties = entityMapper.toAliases(properties);
+                        properties = entityTransformer.toAliases(properties);
                         builder.setProperties(properties);
                         criterion.setProperty(builder.buildPropertiesStr());
                         criterion.setValue(builder.buildValuesStr());
@@ -163,13 +163,13 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
         String property = criterion.getProperty();
         Object value = criterion.getValue();
 
-        FieldMapper fieldMapper = entityMapper.getFieldMapperByField(property);
-        if (fieldMapper == null) {
-            fieldMapper = entityMapper.getFieldMapperByAlias(property);
+        FieldAliasMapping fieldAliasMapping = entityTransformer.getFieldAliasMappingByField(property);
+        if (fieldAliasMapping == null) {
+            fieldAliasMapping = entityTransformer.getFieldAliasMappingByAlias(property);
         }
-        if (fieldMapper != null) {
-            property = fieldMapper.getAlias();
-            value = fieldMapper.deconstruct(value);
+        if (fieldAliasMapping != null) {
+            property = fieldAliasMapping.getAlias();
+            value = fieldAliasMapping.deconstruct(value);
             criterion.setProperty(property);
             criterion.setValue(value);
         }
@@ -179,7 +179,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
             List<String> properties = orderBy.getProperties();
-            properties = entityMapper.toAliases(properties);
+            properties = entityTransformer.toAliases(properties);
             orderBy.setProperties(properties);
         }
     }

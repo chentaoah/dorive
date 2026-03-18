@@ -19,37 +19,20 @@ package com.gitee.dorive.repository.v1.api;
 
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.executor.api.EntityHandler;
-import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 
 public interface RepositoryBuilder {
+
+    void prepare(RepositoryContext repositoryContext);
 
     AbstractRepository<Object, Object> newRepository(RepositoryContext repositoryContext, EntityElement entityElement);
 
     BinderExecutor newBinderExecutor(RepositoryContext repositoryContext, EntityElement entityElement);
 
-    void buildRepositoryItem(RepositoryItem repositoryItem);
-
     Executor newExecutor(RepositoryContext repositoryContext);
 
-    EntityHandler newEntityHandler(RepositoryContext repositoryContext);
-
-    EntityOpHandler newEntityOpHandler(RepositoryContext repositoryContext);
-
-    void buildQueryExecutor(RepositoryContext repositoryContext);
-
-    void buildQueryExecutor1(RepositoryContext repositoryContext);
-
-    void buildQueryExecutor2(RepositoryContext repositoryContext);
-
-    void buildQueryExecutor3(RepositoryContext repositoryContext);
-
-    void buildQueryExecutor4(RepositoryContext repositoryContext);
-
-    void buildMybatisRepository(RepositoryContext repositoryContext);
+    void initialize(RepositoryContext repositoryContext);
 
 }

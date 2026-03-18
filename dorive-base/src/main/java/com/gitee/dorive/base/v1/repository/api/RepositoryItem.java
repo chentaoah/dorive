@@ -32,6 +32,8 @@ public interface RepositoryItem extends Repository<Object, Object>, Executor, Pr
 
     OperationFactory getOperationFactory();
 
+    Class<?> getEntityClass();
+
     AbstractRepository<Object, Object> getProxyRepository();
 
     RepositoryContext getRepositoryContext();
@@ -39,10 +41,6 @@ public interface RepositoryItem extends Repository<Object, Object>, Executor, Pr
     String getName();
 
     boolean isCollection();
-
-    Class<?> getEntityClass();
-
-    boolean hasField(String field);
 
     String getAccessPath();
 
@@ -55,9 +53,5 @@ public interface RepositoryItem extends Repository<Object, Object>, Executor, Pr
     void getBoundValue(Context context, Object rootEntity, Collection<?> entities);
 
     void setBoundId(Context context, Object rootEntity, Object entity);
-
-    void setBound(boolean bound);
-
-    boolean isBound();
 
 }

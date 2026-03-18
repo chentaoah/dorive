@@ -61,18 +61,18 @@ public class EntityElementResolver {
             entityElement.setBindingDefs(Collections.emptyList());
         }
 
-        Map<String, String> fieldAliasMapping = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
+        Map<String, String> fieldAliasMap = new LinkedHashMap<>(fieldDefinitions.size() * 4 / 3 + 1);
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
             String fieldName = fieldDefinition.getFieldName();
             String alias = fieldDefinition.getAlias();
             if (StringUtils.isBlank(alias)) {
                 alias = StrUtil.toUnderlineCase(fieldName);
             }
-            fieldAliasMapping.put(fieldName, alias);
+            fieldAliasMap.put(fieldName, alias);
         }
 
         entityElement.setAccessPath(accessPath);
-        entityElement.setFieldAliasMapping(fieldAliasMapping);
+        entityElement.setFieldAliasMap(fieldAliasMap);
         return entityElement;
     }
 

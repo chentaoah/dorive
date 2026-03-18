@@ -29,21 +29,21 @@ import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
-import com.gitee.dorive.base.v1.factory.api.Translator;
-import com.gitee.dorive.base.v1.factory.api.TranslatorManager;
+import com.gitee.dorive.base.v1.factory.api.Transformer;
+import com.gitee.dorive.base.v1.factory.api.TransformerManager;
 import com.gitee.dorive.base.v1.factory.enums.Category;
 import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
-import com.gitee.dorive.factory.v1.api.EntityMapper;
-import com.gitee.dorive.factory.v1.api.EntityMappers;
+import com.gitee.dorive.factory.v1.api.EntityTransformer;
+import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
 import com.gitee.dorive.factory.v1.impl.executor.ExampleExecutor;
 import com.gitee.dorive.factory.v1.impl.executor.FactoryExecutor;
-import com.gitee.dorive.factory.v1.impl.resolver.EntityMappersResolver;
-import com.gitee.dorive.launcher.v1.impl.resolver.EntityFactoryResolver;
+import com.gitee.dorive.factory.v1.impl.resolver.EntityTransformerManagerResolver;
+import com.gitee.dorive.factory.v1.impl.resolver.EntityFactoryResolver;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
-import com.gitee.dorive.binder.v1.impl.union.UnionExecutor;
+import com.gitee.dorive.executor.v1.impl.executor.UnionExecutor;
 import com.gitee.dorive.mybatis.plus.v1.impl.common.DefaultMethodInvoker;
 import com.gitee.dorive.mybatis.plus.v1.impl.executor.MybatisPlusExecutor;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
@@ -70,35 +70,36 @@ public class MybatisPlusRepositoryBuilder {
     public AbstractRepository<Object, Object> newRepository(EntityElement entityElement) {
         OperationFactory operationFactory = new OperationFactory(entityElement);
 
+        // 存储信息
         EntityStoreInfo entityStoreInfo = resolveEntityStoreInfo(repository.getRepositoryDef());
-        repository.setProperty(EntityStoreInfo.class, entityStoreInfo);
 
-        String reMapper = Category.ENTITY_DATABASE.name();
-        String deMapper = Category.ENTITY_POJO.name();
+        // 别名转换
+        String reCategory = Category.ENTITY_DATABASE.name();
+        String deCategory = Category.ENTITY_POJO.name();
+        EntityTransformerManagerResolver entityTransformerManagerResolver = new EntityTransformerManagerResolver(entityElement, entityStoreInfo.getAliasPropMap(), reCategory, deCategory);
+        EntityTransformerManager entityTransformerManager = entityTransformerManagerResolver.newEntityTransformerManager();
+        EntityTransformer reEntityTransformer = (EntityTransformer) entityTransformerManager.getTransformer(reCategory);
+        EntityTransformer deEntityTransformer = (EntityTransformer) entityTransformerManager.getTransformer(deCategory);
 
-        EntityMappersResolver entityMappersResolver = new EntityMappersResolver(entityElement, entityStoreInfo.getAliasPropMapping(), reMapper, deMapper);
-        EntityMappers entityMappers = entityMappersResolver.newEntityMappers();
-        repository.setProperty(EntityMappers.class, entityMappers);
-
-        // 命名转换器管理
-        TranslatorManager translatorManager = entityMappers::getEntityMapper;
-        Translator translator = translatorManager.getTranslator(Category.ENTITY_DATABASE.name());
-        repository.setProperty(TranslatorManager.class, translatorManager);
-        repository.setProperty(Translator.class, translator);
-
-        EntityMapper reEntityMapper = entityMappers.getEntityMapper(reMapper);
-        EntityMapper deEntityMapper = entityMappers.getEntityMapper(deMapper);
-
+        // 实体工厂
         EntityFactoryResolver entityFactoryResolver = new EntityFactoryResolver(
-                repository, entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(), entityMappers, reEntityMapper, deEntityMapper);
+                repository, entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(),
+                entityTransformerManager, reEntityTransformer, deEntityTransformer);
         EntityFactory entityFactory = entityFactoryResolver.newEntityFactory();
 
+        // 执行器
         Executor executor = newExecutor(entityElement, entityStoreInfo);
         executor = new UnionExecutor(executor, repository.getSqlRunner(), entityStoreInfo);
         executor = new FactoryExecutor(executor, entityElement, entityStoreInfo.getIdProperty(), entityFactory);
-        executor = new ExampleExecutor(executor, entityElement, reEntityMapper);
+        executor = new ExampleExecutor(executor, entityElement, reEntityTransformer);
 
+        // 查询条件转换器
         ExampleConverter exampleConverter = (ExampleConverter) executor;
+
+        repository.setProperty(EntityStoreInfo.class, entityStoreInfo);
+        repository.setProperty(EntityTransformerManager.class, entityTransformerManager);
+        repository.setProperty(TransformerManager.class, entityTransformerManager);
+        repository.setProperty(Transformer.class, reEntityTransformer);
         repository.setProperty(ExampleConverter.class, exampleConverter);
 
         DefaultRepository defaultRepository = new DefaultRepository();
@@ -106,9 +107,9 @@ public class MybatisPlusRepositoryBuilder {
         defaultRepository.setOperationFactory(operationFactory);
         defaultRepository.setExecutor(executor);
         defaultRepository.setProperty(EntityStoreInfo.class, entityStoreInfo);
-        defaultRepository.setProperty(EntityMappers.class, entityMappers);
-        defaultRepository.setProperty(TranslatorManager.class, translatorManager);
-        defaultRepository.setProperty(Translator.class, translator);
+        defaultRepository.setProperty(EntityTransformerManager.class, entityTransformerManager);
+        defaultRepository.setProperty(TransformerManager.class, entityTransformerManager);
+        defaultRepository.setProperty(Transformer.class, reEntityTransformer);
         defaultRepository.setProperty(ExampleConverter.class, exampleConverter);
         return defaultRepository;
     }
@@ -145,20 +146,20 @@ public class MybatisPlusRepositoryBuilder {
         List<TableFieldInfo> tableFieldInfos = tableInfo.getFieldList();
         int size = tableFieldInfos.size() + 1;
 
-        Map<String, String> propAliasMappingWithoutPk = new LinkedHashMap<>(size * 4 / 3 + 1);
+        Map<String, String> propAliasMapWithoutPk = new LinkedHashMap<>(size * 4 / 3 + 1);
         for (TableFieldInfo tableFieldInfo : tableFieldInfos) {
-            propAliasMappingWithoutPk.put(tableFieldInfo.getProperty(), tableFieldInfo.getColumn());
+            propAliasMapWithoutPk.put(tableFieldInfo.getProperty(), tableFieldInfo.getColumn());
         }
 
-        Map<String, String> propAliasMapping = new LinkedHashMap<>(size * 4 / 3 + 1);
+        Map<String, String> propAliasMap = new LinkedHashMap<>(size * 4 / 3 + 1);
         if (StringUtils.isNotBlank(keyProperty) && StringUtils.isNotBlank(keyColumn)) {
-            propAliasMapping.put(keyProperty, keyColumn);
+            propAliasMap.put(keyProperty, keyColumn);
         }
-        propAliasMapping.putAll(propAliasMappingWithoutPk);
+        propAliasMap.putAll(propAliasMapWithoutPk);
 
-        Map<String, String> aliasPropMapping = MapUtil.reverse(propAliasMapping);
+        Map<String, String> aliasPropMap = MapUtil.reverse(propAliasMap);
 
-        List<String> columns = new ArrayList<>(propAliasMapping.values());
+        List<String> columns = new ArrayList<>(propAliasMap.values());
         String selectColumns = StrUtil.join(",", columns);
 
         Map<String, MethodInvoker> selectMethodMap = new ConcurrentHashMap<>(8);
@@ -169,7 +170,7 @@ public class MybatisPlusRepositoryBuilder {
                 selectMethodMap.putIfAbsent(name, methodInvoker);
             }
         }
-        return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn, propAliasMappingWithoutPk, propAliasMapping, aliasPropMapping, selectColumns, selectMethodMap);
+        return new EntityStoreInfo(mapperClass, mapper, pojoClass, tableName, keyProperty, keyColumn, propAliasMapWithoutPk, propAliasMap, aliasPropMap, selectColumns, selectMethodMap);
     }
 
     private Executor newExecutor(EntityElement entityElement, EntityStoreInfo entityStoreInfo) {

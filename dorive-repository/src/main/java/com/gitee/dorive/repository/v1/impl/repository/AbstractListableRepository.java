@@ -37,8 +37,8 @@ public abstract class AbstractListableRepository<E, PK> extends AbstractContextR
     @Override
     public long selectCountByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        RepositoryItem repository = getRootRepository();
-        return repository.selectCountByExample(options, example);
+        RepositoryItem rootRepository = getRootRepository();
+        return rootRepository.selectCountByExample(options, example);
     }
 
     @Override
@@ -46,9 +46,9 @@ public abstract class AbstractListableRepository<E, PK> extends AbstractContextR
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
         int totalCount = 0;
-        for (RepositoryItem repository : getOrderedRepositories()) {
-            if (matches(options, repository)) {
-                totalCount += repository.updateByExample(options, entity, ExampleUtils.clone(example));
+        for (RepositoryItem repositoryItem : getOrderedRepositories()) {
+            if (matches(options, repositoryItem)) {
+                totalCount += repositoryItem.updateByExample(options, entity, ExampleUtils.clone(example));
             }
         }
         return totalCount;
@@ -65,9 +65,9 @@ public abstract class AbstractListableRepository<E, PK> extends AbstractContextR
     public int deleteByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         int totalCount = 0;
-        for (RepositoryItem repository : getOrderedRepositories()) {
-            if (matches(options, repository)) {
-                totalCount += repository.deleteByExample(options, ExampleUtils.clone(example));
+        for (RepositoryItem repositoryItem : getOrderedRepositories()) {
+            if (matches(options, repositoryItem)) {
+                totalCount += repositoryItem.deleteByExample(options, ExampleUtils.clone(example));
             }
         }
         return totalCount;

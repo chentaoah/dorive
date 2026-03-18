@@ -39,7 +39,7 @@ import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.eop.Delete;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
-import com.gitee.dorive.base.v1.executor.impl.AbstractExecutor;
+import com.gitee.dorive.base.v1.executor.impl.executor.AbstractExecutor;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.mybatis.plus.v1.enums.InsertMethod;
 import com.gitee.dorive.mybatis.plus.v1.impl.common.AppenderContext;
@@ -238,8 +238,8 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     }
 
     private void buildUpdateWrapper(UpdateWrapper<Object> updateWrapper, Object persistentObj, Set<String> nullableProps) {
-        Map<String, String> propAliasMappingWithoutPk = entityStoreInfo.getPropAliasMappingWithoutPk();
-        propAliasMappingWithoutPk.forEach((prop, alias) -> {
+        Map<String, String> propAliasMapWithoutPk = entityStoreInfo.getPropAliasMapWithoutPk();
+        propAliasMapWithoutPk.forEach((prop, alias) -> {
             Object value = BeanUtil.getFieldValue(persistentObj, prop);
             if (value != null || nullableProps.contains(alias)) {
                 updateWrapper.set(true, alias, value);

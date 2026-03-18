@@ -19,7 +19,7 @@ package com.gitee.dorive.repository.v1.impl.repository;
 
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.api.Selector;
+import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
@@ -29,11 +29,11 @@ import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
+import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
-import com.gitee.dorive.base.v1.repository.impl.matcher.SelectorRepositoryMatcher;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -48,7 +48,6 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
     private boolean aggregated;
     private BinderExecutor binderExecutor;
     private OrderByFactory orderByFactory;
-    private boolean bound;
 
     @Override
     public RepositoryContext getRepositoryContext() {
@@ -71,11 +70,6 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
     }
 
     @Override
-    public boolean hasField(String field) {
-        return getEntityElement().hasField(field);
-    }
-
-    @Override
     public void getBoundValue(Context context, Object rootEntity, Collection<?> entities) {
         binderExecutor.getBoundValue(context, rootEntity, entities);
     }
@@ -87,10 +81,9 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
-        RepositoryMatcher repositoryMatcher = context.getOption(RepositoryMatcher.class);
-        if (repositoryMatcher instanceof SelectorRepositoryMatcher) {
-            Selector selector = ((SelectorRepositoryMatcher) repositoryMatcher).getSelector();
-            List<String> properties = selector.select(getName());
+        Selector selector = getSelector(context, this);
+        if (selector != null) {
+            List<String> properties = selector.select();
             if (properties != null && !properties.isEmpty()) {
                 Object primaryKey = query.getPrimaryKey();
                 if (primaryKey != null) {
@@ -111,6 +104,18 @@ public class ProxyRepository extends AbstractProxyRepository implements Reposito
             }
         }
         return super.executeQuery(context, query);
+    }
+
+    private Selector getSelector(Options options, RepositoryItem repositoryItem) {
+        Matcher matcher = options.getOption(Matcher.class);
+        List<Selector> selectors = options.getOptions(Selector.class);
+        if (matcher != null && selectors != null) {
+            int index = matcher.indexOf(repositoryItem);
+            if (index >= 0 && index < selectors.size()) {
+                return selectors.get(index);
+            }
+        }
+        return null;
     }
 
     @Override

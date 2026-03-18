@@ -17,22 +17,17 @@
 
 package com.gitee.dorive.base.v1.binder.api;
 
-import com.gitee.dorive.base.v1.common.def.BindingDef;
 import com.gitee.dorive.base.v1.core.api.Context;
 
 public interface Binder extends Processor {
 
-    BindingDef getBindingDef();
+    String getField();
 
     String getTargetField();
-
-    String getFieldName();
 
     Object getFieldValue(Context context, Object entity);
 
     void setFieldValue(Context context, Object entity, Object value);
-
-    String getBoundName();
 
     Object getBoundValue(Context context, Object entity);
 

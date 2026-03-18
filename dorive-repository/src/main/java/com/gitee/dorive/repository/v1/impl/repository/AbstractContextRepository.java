@@ -34,7 +34,7 @@ import com.gitee.dorive.base.v1.core.util.ReflectUtils;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.repository.api.RepositoryMatcher;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
@@ -80,9 +80,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         // 仓储构建器
         this.repositoryBuilder = applicationContext.getBean(RepositoryBuilder.class);
+        // 准备
+        repositoryBuilder.prepare(this);
 
         Class<?> repositoryClass = this.getClass();
         Class<?> entityClass = ReflectUtils.getFirstTypeArgument(repositoryClass);
@@ -111,6 +113,9 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         setEntityElement(rootRepository.getEntityElement());
         setOperationFactory(rootRepository.getOperationFactory());
         setExecutor(newExecutor());
+
+        // 初始化
+        repositoryBuilder.initialize(this);
     }
 
     private void prepareRepositoryDef(Class<?> repositoryClass, Class<?> entityClass) {
@@ -164,8 +169,6 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         proxyRepository.setAggregated(isAggregated);
         proxyRepository.setBinderExecutor(binderExecutor);
         proxyRepository.setOrderByFactory(orderByFactory);
-        proxyRepository.setBound(false);
-        repositoryBuilder.buildRepositoryItem(proxyRepository);
         return proxyRepository;
     }
 
@@ -196,9 +199,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         if (!entityDef.isAggregate()) {
             AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) repository;
             RepositoryItem rootRepository = abstractContextRepository.getRootRepository();
-            if (rootRepository instanceof ProxyRepository) {
-                return ((ProxyRepository) rootRepository).getProxyRepository();
-            }
+            return rootRepository.getProxyRepository();
         }
         return repository;
     }
@@ -213,7 +214,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     @Override
     public boolean matches(Options options, RepositoryItem repositoryItem) {
-        RepositoryMatcher repositoryMatcher = options.getOption(RepositoryMatcher.class);
-        return repositoryMatcher != null && repositoryMatcher.matches(repositoryItem);
+        Matcher matcher = options.getOption(Matcher.class);
+        return matcher != null && matcher.matches(repositoryItem);
     }
 }

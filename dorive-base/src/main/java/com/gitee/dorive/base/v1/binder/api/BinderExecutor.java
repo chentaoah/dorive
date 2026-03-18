@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.base.v1.binder.api;
 
-import com.gitee.dorive.base.v1.common.enums.JoinType;
+import com.gitee.dorive.base.v1.binder.enums.JoinType;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 
@@ -26,6 +26,10 @@ import java.util.List;
 import java.util.Map;
 
 public interface BinderExecutor {
+
+    List<Binder> getStrongBinders();
+
+    List<Binder> getValueRouteBinders();
 
     List<Binder> getValueFilterBinders();
 

@@ -19,16 +19,13 @@ package com.gitee.dorive.factory.v1.impl.factory;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
-import com.gitee.dorive.base.v1.common.api.BoundedContext;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.common.entity.PropertyDefinition;
-import com.gitee.dorive.base.v1.common.def.PropertyDef;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.factory.v1.api.EntityAdapter;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
-import com.gitee.dorive.factory.v1.api.EntityMapper;
-import com.gitee.dorive.factory.v1.api.EntityMappers;
-import com.gitee.dorive.factory.v1.api.FieldMapper;
+import com.gitee.dorive.factory.v1.api.EntityTransformer;
+import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
+import com.gitee.dorive.factory.v1.api.TypeAdapter;
+import com.gitee.dorive.factory.v1.impl.adapter.MapTypeAdapter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,8 +33,6 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Setter
@@ -46,125 +41,82 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultEntityFactory implements EntityFactory {
 
     private EntityElement entityElement;
+    // 类型
     private Class<?> reType;
     private Class<?> deType;
-    // 序列化
-    private EntityMappers entityMappers;
-    private EntityMapper reEntityMapper;
-    private EntityMapper deEntityMapper;
+    // 转换器
+    private EntityTransformer reEntityTransformer;
+    private EntityTransformer deEntityTransformer;
+    // 序列化配置
     private CopyOptions reCopyOptions;
     private CopyOptions deCopyOptions;
-    // 边界上下文
-    private String boundedContextName;
-    private BoundedContext boundedContext;
-    private CopyOptions ctxCopyOptions;
     // 适配器
-    private EntityAdapter entityAdapter;
+    private TypeAdapter typeAdapter;
 
-    public void setEntityElement(EntityElement entityElement) {
-        this.entityElement = entityElement;
-        initCtxCopyOptions();
-    }
-
-    private void initCtxCopyOptions() {
-        List<PropertyDefinition> propertyDefinitions = entityElement.getPropertyDefinitions();
-        if (!propertyDefinitions.isEmpty()) {
-            Map<String, String> keyFieldNameMapping = new ConcurrentHashMap<>(propertyDefinitions.size() * 4 / 3 + 1);
-            for (PropertyDefinition propertyDefinition : propertyDefinitions) {
-                PropertyDef propertyDef = propertyDefinition.getPropertyDef();
-                String key = propertyDef.getValue();
-                String fieldName = propertyDefinition.getFieldName();
-                keyFieldNameMapping.put(key, fieldName);
-            }
-            this.ctxCopyOptions = CopyOptions.create().ignoreNullValue().setFieldMapping(keyFieldNameMapping);
-        }
-    }
-
-    public void setEntityMappers(EntityMappers entityMappers, EntityMapper reEntityMapper, EntityMapper deEntityMapper) {
-        this.entityMappers = entityMappers;
-        this.reEntityMapper = reEntityMapper;
-        this.deEntityMapper = deEntityMapper;
+    public void initialize() {
         initReCopyOptions();
         initDeCopyOptions();
-        initEntityAdapter();
-        processEntityAdapter();
+        initTypeAdapter();
+        processTypeAdapter();
     }
 
     private void initReCopyOptions() {
         this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(alias -> {
-            FieldMapper fieldMapperByAlias = reEntityMapper.getFieldMapperByAlias(alias);
-            return fieldMapperByAlias != null ? fieldMapperByAlias.getField() : alias;
+            FieldAliasMapping fieldAliasMappingByAlias = reEntityTransformer.getFieldAliasMappingByAlias(alias);
+            return fieldAliasMappingByAlias != null ? fieldAliasMappingByAlias.getField() : alias;
 
         }).setFieldValueEditor((field, value) -> {
-            FieldMapper fieldMapperByField = reEntityMapper.getFieldMapperByField(field);
-            return fieldMapperByField != null ? fieldMapperByField.reconstitute(value) : value;
+            FieldAliasMapping fieldAliasMappingByField = reEntityTransformer.getFieldAliasMappingByField(field);
+            return fieldAliasMappingByField != null ? fieldAliasMappingByField.reconstitute(value) : value;
         });
     }
 
     private void initDeCopyOptions() {
         this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(field -> {
-            FieldMapper fieldMapperByField = deEntityMapper.getFieldMapperByField(field);
-            return fieldMapperByField != null ? fieldMapperByField.getAlias() : field;
+            FieldAliasMapping fieldAliasMappingByField = deEntityTransformer.getFieldAliasMappingByField(field);
+            return fieldAliasMappingByField != null ? fieldAliasMappingByField.getAlias() : field;
 
         }).setFieldValueEditor((alias, value) -> {
-            FieldMapper fieldMapperByAlias = deEntityMapper.getFieldMapperByAlias(alias);
-            return fieldMapperByAlias != null ? fieldMapperByAlias.deconstruct(value) : value;
+            FieldAliasMapping fieldAliasMappingByAlias = deEntityTransformer.getFieldAliasMappingByAlias(alias);
+            return fieldAliasMappingByAlias != null ? fieldAliasMappingByAlias.deconstruct(value) : value;
         });
     }
 
-    protected void initEntityAdapter() {
-        this.entityAdapter = (persistent) -> reType;
+    protected void initTypeAdapter() {
+        this.typeAdapter = (persistent) -> reType;
     }
 
-    protected void processEntityAdapter() {
-        if (entityAdapter instanceof AdaptiveEntityAdapter) {
-            ((AdaptiveEntityAdapter) entityAdapter).initialize(entityElement, reEntityMapper);
+    protected void processTypeAdapter() {
+        if (typeAdapter instanceof MapTypeAdapter) {
+            ((MapTypeAdapter) typeAdapter).initialize(entityElement, reEntityTransformer);
         }
     }
 
     @Override
     public List<Object> reconstitute(Context context, List<?> persistentObjs) {
-        BoundedContext boundedContext = null;
-        if (ctxCopyOptions != null) {
-            Object attachment = context.getAttachment(boundedContextName);
-            if (attachment instanceof BoundedContext) {
-                boundedContext = (BoundedContext) attachment;
-            }
-            if (boundedContext == null) {
-                boundedContext = this.boundedContext;
-            }
-        }
         List<Object> entities = new ArrayList<>(persistentObjs.size());
-        if (boundedContext == null) {
-            for (Object persistent : persistentObjs) {
-                Object entity = reconstitute(context, persistent);
-                entities.add(entity);
-            }
-        } else {
-            for (Object persistent : persistentObjs) {
-                Object entity = reconstitute(context, persistent);
-                BeanUtil.copyProperties(boundedContext, entity, ctxCopyOptions);
-                entities.add(entity);
-            }
+        for (Object persistent : persistentObjs) {
+            Object entity = doReconstitute(context, persistent);
+            entities.add(entity);
         }
         return entities;
     }
 
-    public Object reconstitute(Context context, Object persistent) {
-        return BeanUtil.toBean(persistent, entityAdapter.adaptEntityType(persistent), reCopyOptions);
+    public Object doReconstitute(Context context, Object persistent) {
+        return BeanUtil.toBean(persistent, typeAdapter.determineType(persistent), reCopyOptions);
     }
 
     @Override
     public List<Object> deconstruct(Context context, List<?> entities) {
         List<Object> persistentObjs = new ArrayList<>(entities.size());
         for (Object entity : entities) {
-            Object persistent = deconstruct(context, entity);
+            Object persistent = doDeconstruct(context, entity);
             persistentObjs.add(persistent);
         }
         return persistentObjs;
     }
 
-    public Object deconstruct(Context context, Object entity) {
+    public Object doDeconstruct(Context context, Object entity) {
         return BeanUtil.toBean(entity, deType, deCopyOptions);
     }
 

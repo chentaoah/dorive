@@ -18,13 +18,8 @@
 package com.gitee.dorive.base.v1.query.enums;
 
 public enum QueryMode {
-    // 1.0
+    // 2.0
     STEPWISE,
-    SQL_BUILD,
     SQL_EXECUTE,
     SQL_CUSTOM,
-    // 2.0
-    STEPWISE2,
-    SQL_EXECUTE2,
-    SQL_CUSTOM2,
 }

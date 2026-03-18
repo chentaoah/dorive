@@ -25,7 +25,6 @@ import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.query.enums.QueryMode;
 import com.gitee.dorive.repository.v1.api.QueryRepository;
-import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -37,22 +36,10 @@ import java.util.Map;
 @Setter
 public abstract class AbstractQueryRepository<E, PK> extends AbstractListableRepository<E, PK> implements QueryRepository<E, PK> {
     private Map<Class<?>, QueryDefinition> classQueryDefinitionMap;
-    private QueryExecutor queryExecutor;
-    private QueryExecutor queryExecutor1;
-    private QueryExecutor queryExecutor2;
-    private QueryExecutor queryExecutor3;
-    private QueryExecutor queryExecutor4;
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
-        RepositoryBuilder repositoryBuilder = getRepositoryBuilder();
-        repositoryBuilder.buildQueryExecutor(this);
-        repositoryBuilder.buildQueryExecutor1(this);
-        repositoryBuilder.buildQueryExecutor2(this);
-        repositoryBuilder.buildQueryExecutor3(this);
-        repositoryBuilder.buildQueryExecutor4(this);
-    }
+    private QueryExecutor contextMismatchQueryExecutor;
+    private QueryExecutor stepwiseQueryExecutor;
+    private QueryExecutor segmentQueryExecutor;
+    private QueryExecutor customQueryExecutor;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -74,22 +61,22 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractListableRep
     private QueryExecutor adaptive(Options options, Object query, boolean count) {
         QueryMode queryMode = options.getOption(QueryMode.class);
         if (queryMode == null) {
-            queryMode = isCustomMethod(query, count) ? QueryMode.SQL_CUSTOM2 : QueryMode.SQL_EXECUTE2;
+            queryMode = isCustomMethod(query, count) ? QueryMode.SQL_CUSTOM : QueryMode.SQL_EXECUTE;
         }
         // 上下文未匹配
         if (!matches(options, getRootRepository())) {
-            return queryExecutor1;
+            return contextMismatchQueryExecutor;
         }
-        if (queryMode == QueryMode.STEPWISE2) {
-            return queryExecutor2;
+        if (queryMode == QueryMode.STEPWISE) {
+            return stepwiseQueryExecutor;
 
-        } else if (queryMode == QueryMode.SQL_EXECUTE2) {
-            return queryExecutor3;
+        } else if (queryMode == QueryMode.SQL_EXECUTE) {
+            return segmentQueryExecutor;
 
-        } else if (queryMode == QueryMode.SQL_CUSTOM2) {
-            return queryExecutor4;
+        } else if (queryMode == QueryMode.SQL_CUSTOM) {
+            return customQueryExecutor;
         }
-        return queryExecutor;
+        throw new RuntimeException("Unsupported query mode!");
     }
 
     private boolean isCustomMethod(Object query, boolean count) {

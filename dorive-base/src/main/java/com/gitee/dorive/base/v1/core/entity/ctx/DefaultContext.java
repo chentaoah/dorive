@@ -19,10 +19,21 @@ package com.gitee.dorive.base.v1.core.entity.ctx;
 
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Getter
+@Setter
 @NoArgsConstructor
-public class DefaultContext extends AbstractContext {
+@AllArgsConstructor
+public class DefaultContext extends DefaultOptions implements Context {
+
+    private Map<String, Object> attachments = new ConcurrentHashMap<>(8);
 
     public DefaultContext(Options options) {
         super(options);
@@ -30,10 +41,27 @@ public class DefaultContext extends AbstractContext {
 
     public DefaultContext(Context context) {
         super(context);
+        this.attachments.putAll(context.getAttachments());
     }
 
     public DefaultContext(Options options, Context context) {
-        super(options, context);
+        super(options);
+        this.attachments.putAll(context.getAttachments());
+    }
+
+    @Override
+    public void setAttachment(String name, Object value) {
+        attachments.put(name, value);
+    }
+
+    @Override
+    public Object getAttachment(String name) {
+        return attachments.get(name);
+    }
+
+    @Override
+    public void removeAttachment(String name) {
+        attachments.remove(name);
     }
 
 }

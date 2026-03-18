@@ -22,7 +22,7 @@ import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
-import com.gitee.dorive.binder.v1.api.ExampleBuilder;
+import com.gitee.dorive.base.v1.binder.api.ExampleBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -46,7 +46,7 @@ public class MultiExampleBuilder implements ExampleBuilder {
     }
 
     private MultiInBuilder newMultiInBuilder(Context context, List<Object> entities) {
-        List<String> properties = binders.stream().map(Binder::getFieldName).collect(Collectors.toList());
+        List<String> properties = binders.stream().map(Binder::getField).collect(Collectors.toList());
         MultiInBuilder multiInBuilder = new MultiInBuilder(properties, entities.size());
         for (Object entity : entities) {
             for (Binder binder : binders) {
