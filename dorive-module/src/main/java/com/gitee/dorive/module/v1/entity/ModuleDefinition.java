@@ -29,8 +29,10 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.util.stream.Collectors;
 
 import static com.gitee.dorive.module.v1.impl.parser.AbstractModuleParser.PATH_MATCHER;
 
@@ -57,6 +59,8 @@ public class ModuleDefinition {
     private List<String> waits;
     private String tablePrefix;
     private String requestPrefix;
+
+    private List<String> paths;
 
     public ModuleDefinition(Manifest manifest) {
         Assert.notNull(manifest, "The manifest can not be null!");
@@ -107,37 +111,21 @@ public class ModuleDefinition {
         this.waits = filterValues(waits);
         this.tablePrefix = filterValue(tablePrefix);
         this.requestPrefix = filterValue(requestPrefix);
+
+        this.paths = new ArrayList<>(5);
+        paths.add(this.organization);
+        paths.add(this.project);
+        paths.add(this.domain);
+        paths.add(this.subdomain);
+        paths.add(this.version);
     }
 
     private String filterValue(String value) {
-        if (StringUtils.isBlank(value)) {
-            return null;
-        }
-        if ("null".equals(value)) {
-            return null;
-        }
-        return value;
+        return StringUtils.isBlank(value) || "null".equals(value) ? null : value;
     }
 
     private List<String> filterValues(String values) {
-        if (StringUtils.isBlank(values)) {
-            return Collections.emptyList();
-        }
-        if ("null".equals(values)) {
-            return Collections.emptyList();
-        }
-        return StrUtil.splitTrim(values, ",");
-    }
-
-    public String getScanPackage() {
-        List<String> packages = new ArrayList<>(2);
-        if (StringUtils.isNotBlank(organization)) {
-            packages.add(NameUtils.toPackage(organization));
-        }
-        if (StringUtils.isNotBlank(project)) {
-            packages.add(NameUtils.toPackage(project));
-        }
-        return StrUtil.join(".", packages) + ".**";
+        return StringUtils.isBlank(values) || "null".equals(values) ? Collections.emptyList() : StrUtil.splitTrim(values, ",");
     }
 
     public boolean isGlobalValues(Class<?> clazz) {
@@ -150,35 +138,20 @@ public class ModuleDefinition {
         return CollUtil.findOne(exports, export -> PATH_MATCHER.match(export, className)) != null;
     }
 
+    public String getProjectPath() {
+        return paths.subList(0, 2).stream().filter(Objects::nonNull).collect(Collectors.joining("."));
+    }
+
     public String getDomainPath() {
-        List<String> packages = new ArrayList<>(2);
-        if (StringUtils.isNotBlank(project)) {
-            packages.add(project);
-        }
-        if (StringUtils.isNotBlank(domain)) {
-            packages.add(domain);
-        }
-        return StrUtil.join(".", packages);
+        return paths.subList(0, 3).stream().filter(Objects::nonNull).collect(Collectors.joining("."));
+    }
+
+    public String getScanPackage() {
+        return paths.subList(0, 2).stream().filter(Objects::nonNull).map(NameUtils::toPackage).collect(Collectors.joining(".")) + ".**";
     }
 
     public String getBasePackage() {
-        List<String> packages = new ArrayList<>(5);
-        if (StringUtils.isNotBlank(organization)) {
-            packages.add(NameUtils.toPackage(organization));
-        }
-        if (StringUtils.isNotBlank(project)) {
-            packages.add(NameUtils.toPackage(project));
-        }
-        if (StringUtils.isNotBlank(domain)) {
-            packages.add(NameUtils.toPackage(domain));
-        }
-        if (StringUtils.isNotBlank(subdomain)) {
-            packages.add(NameUtils.toPackage(subdomain));
-        }
-        if (StringUtils.isNotBlank(version)) {
-            packages.add(NameUtils.toPackage(version));
-        }
-        return StrUtil.join(".", packages);
+        return paths.subList(0, 5).stream().filter(Objects::nonNull).map(NameUtils::toPackage).collect(Collectors.joining("."));
     }
 
     public String getMainClassName() {
