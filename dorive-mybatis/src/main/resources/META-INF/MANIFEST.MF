@@ -10,8 +10,9 @@ Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
-Dorive-Requires: Context, OrderBy, Operator, RepositoryContext, CountQuery, EntityStoreInfo, Page, InnerExample,
- CriterionUtils, Result, Translator, Criterion, AbstractRepository, Example, SqlRunner, DefaultContext, Selector
+Dorive-Requires: Context, OrderBy, Operator, RepositoryContext, Transformer, CountQuery, Matcher, EntityStoreInfo,
+ Page, InnerExample, CriterionUtils, Result, Criterion, AbstractRepository, Example, SqlRunner,
+ DefaultContext
 Dorive-Provides: CountQuerier
 Dorive-Notifies: null
 Dorive-Waits: null

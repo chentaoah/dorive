@@ -10,8 +10,8 @@ Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
-Dorive-Requires: Entity, QueryFieldDefinition, FieldDefinition, FieldEntityDefinition, EntityElement, PropertyDefinition,
- ReflectUtils, QueryDef, EntityDef, EntityDefinition, QueryDefinition, QueryFieldDef, BindingDef, Property
+Dorive-Requires: Entity, QueryFieldDefinition, FieldDefinition, FieldEntityDefinition, EntityElement, PropertyDefinition, ReflectUtils, QueryDef,
+ EntityDef, EntityDefinition, QueryDefinition, QueryFieldDef, BindingDef, Property
 Dorive-Provides: QueryResolver, EntityResolver
 Dorive-Notifies: null
 Dorive-Waits: null

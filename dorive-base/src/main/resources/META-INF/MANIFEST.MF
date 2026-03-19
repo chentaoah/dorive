@@ -11,15 +11,14 @@ Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
 Dorive-Requires: null
-Dorive-Provides: Entity, QueryFieldDefinition, FieldDefinition, FieldEntityDefinition, EntityElement,
- PropertyDefinition, ReflectUtils, QueryDef, EntityDef, EntityDefinition, QueryDefinition, QueryFieldDef,
- BindingDef, Property, Context, Query, EntityStoreInfo, JoinType, InnerExample, Result, UnionExample,
- AbstractProxyExecutor, Executor, MultiInBuilder, BindingType, Example, OperationFactory, AbstractExecutor,
- Delete, RepositoryMatcher, EntityOp, Operation, Insert, Update, Field, InsertOrUpdate, AbstractOptions,
- SelectorRepositoryMatcher, Operator, PropertyDef, ConditionUpdate, Page, Translator, Criterion, OrderBy,
- Condition, FieldDef, BoundedContext, TranslatorManager, Category, CountQuery, QueryMode, DefaultRepository,
- ResultType, RepositoryDef, AbstractRepository, CriterionUtils, ConditionDelete, Sort, DefaultContext,
- Options, StringUtils, OperatorV2, ExampleUtils, OrderByDef, OrderByFactory, Repository
+Dorive-Provides: Delete, Entity, Query, PropertyDef, FieldDefinition, FieldEntityDefinition, Page, EntityElement,
+ Insert, Update, Result, UnionExample, QueryDefinition, QueryFieldDef, MultiInBuilder, Example,
+ Sort, TransformerManager, QueryFieldDefinition, EntityStoreInfo, CriterionUtils, FieldDef, InsertOrUpdate, DefaultContext,
+ OperationFactory, Operator, Options, Transformer, CountQuery, ConditionUpdate, EntityOp, InnerExample,
+ Operation, ConditionDelete, EntityDef, Field, Executor, Criterion, BindingType, StringUtils,
+ QueryMode, Property, Context, AbstractExecutor, OrderBy, Condition, DefaultRepository, JoinType,
+ ExampleUtils, PropertyDefinition, ReflectUtils, QueryDef, AbstractProxyExecutor, OrderByDef, EntityDefinition, OrderByFactory,
+ RepositoryDef, Repository, OperatorV2, AbstractRepository, BoundedContext, BindingDef, DefaultOptions
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null

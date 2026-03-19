@@ -10,12 +10,11 @@ Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
-Dorive-Requires: Delete, Options, CountQuery, Query, Page, EntityOp, EntityElement, Operation, InnerExample, Insert,
- Update, EntityOpHandler, EntityDef, Result, QueryDefinition, Executor, BinderExecutor, QueryExecutor, Example,
- QueryMode, EntityHandler, SelectorRepositoryMatcher, Selector, Context, DefaultRepository, ImplFactory,
- RepositoryMatcher, ExampleUtils, EntityResolver, ReflectUtils, QueryDef, AbstractProxyExecutor, OrderByDef,
- OrderByFactory, Repository, RepositoryDef, AbstractRepository, InsertOrUpdate, SqlRunner, BoundedContext,
- DefaultContext, OperationFactory
+Dorive-Requires: Delete, Options, CountQuery, Query, Matcher, Page, EntityOp, EntityElement,
+ Operation, InnerExample, Insert, Update, EntityDef, Result, EntityOpHandler, QueryDefinition,
+ Executor, BinderExecutor, QueryExecutor, Example, QueryMode, EntityHandler, Selector, Context,
+ DefaultRepository, ExampleUtils, EntityResolver, ReflectUtils, QueryDef, AbstractProxyExecutor, OrderByDef, OrderByFactory,
+ Repository, RepositoryDef, AbstractRepository, InsertOrUpdate, SqlRunner, BoundedContext, DefaultContext, OperationFactory,
 Dorive-Provides: RepositoryItem, RepositoryContext, BoundedContextAware, CountQuerier
 Dorive-Notifies: null
 Dorive-Waits: null
