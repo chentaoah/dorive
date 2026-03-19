@@ -129,13 +129,11 @@ public class ModuleDefinition {
     }
 
     public boolean isGlobalValues(Class<?> clazz) {
-        String className = clazz.getName();
-        return CollUtil.findOne(globalValues, export -> PATH_MATCHER.match(export, className)) != null;
+        return CollUtil.findOne(globalValues, export -> PATH_MATCHER.match(export, clazz.getName())) != null;
     }
 
     public boolean isExposed(Class<?> clazz) {
-        String className = clazz.getName();
-        return CollUtil.findOne(exports, export -> PATH_MATCHER.match(export, className)) != null;
+        return CollUtil.findOne(exports, export -> PATH_MATCHER.match(export, clazz.getName())) != null;
     }
 
     public String getProjectPath() {
