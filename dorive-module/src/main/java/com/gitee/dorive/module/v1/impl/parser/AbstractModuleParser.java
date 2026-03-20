@@ -127,9 +127,8 @@ public abstract class AbstractModuleParser implements ModuleParser {
         Set<String> requires = new HashSet<>();
         Set<String> provides = new HashSet<>();
         for (ModuleDefinition moduleDefinition : getModuleDefinitions()) {
-            String projectPath = moduleDefinition.getProjectPath();
-            requires.addAll(moduleDefinition.getRequires().stream().map(r -> projectPath + "." + r).collect(Collectors.toList()));
-            provides.addAll(moduleDefinition.getProvides().stream().map(p -> projectPath + "." + p).collect(Collectors.toList()));
+            requires.addAll(moduleDefinition.getRequires());
+            provides.addAll(moduleDefinition.getProvides());
         }
         Collection<String> collection = CollectionUtil.subtract(requires, provides);
         if (!collection.isEmpty()) {
