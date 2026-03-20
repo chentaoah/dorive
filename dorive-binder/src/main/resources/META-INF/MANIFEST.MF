@@ -10,9 +10,24 @@ Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
-Dorive-Requires: Context, RepositoryItem, RepositoryContext, MultiInBuilder, BindingType, FieldDefinition, Example, JoinType,
- BindingDef, InnerExample, EntityElement, EntityDef
-Dorive-Provides: Binder, Processor, ExampleBuilder, BinderExecutor
+Dorive-Requires: ~,
+ com.gitee.dorive.base.v1.common.entity.FieldDefinition,
+ com.gitee.dorive.base.v1.common.def.BindingDef,
+ com.gitee.dorive.base.v1.core.api.Context,
+ com.gitee.dorive.base.v1.repository.api.RepositoryItem,
+ com.gitee.dorive.base.v1.core.entity.qry.Example,
+ com.gitee.dorive.base.v1.core.entity.qry.InnerExample,
+ com.gitee.dorive.base.v1.executor.util.MultiInBuilder,
+ com.gitee.dorive.base.v1.common.def.EntityDef,
+ com.gitee.dorive.base.v1.common.entity.EntityElement,
+ com.gitee.dorive.base.v1.binder.enums.BindingType,
+ com.gitee.dorive.base.v1.binder.enums.JoinType,
+ com.gitee.dorive.base.v1.repository.api.RepositoryContext
+Dorive-Provides: ~,
+ com.gitee.dorive.base.v1.binder.api.Binder,
+ com.gitee.dorive.base.v1.binder.api.ExampleBuilder,
+ com.gitee.dorive.base.v1.binder.api.Processor,
+ com.gitee.dorive.base.v1.binder.api.BinderExecutor
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null

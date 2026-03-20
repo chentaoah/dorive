@@ -10,7 +10,9 @@ Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
-Dorive-Requires: BoundedContextAware, BoundedContext
+Dorive-Requires: ~,
+ com.gitee.dorive.base.v1.common.api.BoundedContext,
+ com.gitee.dorive.base.v1.common.api.BoundedContextAware
 Dorive-Provides: null
 Dorive-Notifies: null
 Dorive-Waits: null

@@ -10,10 +10,32 @@ Dorive-Tags: null
 Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
-Dorive-Requires: Operator, OrderBy, Context, Condition, Delete, AbstractExecutor, Query, EntityStoreInfo,
- ConditionUpdate, Page, EntityOp, EntityElement, Operation, ConditionDelete, Insert, Update,
- EntityDef, Result, Criterion, Example, Sort
-Dorive-Provides: SqlRunner, MethodInvoker, SqlFormat
+Dorive-Requires: ~,
+ com.gitee.dorive.base.v1.core.entity.qry.Example,
+ com.gitee.dorive.base.v1.common.constant.Operator,
+ com.gitee.dorive.base.v1.core.entity.qry.Criterion,
+ com.gitee.dorive.base.v1.core.entity.qry.OrderBy,
+ com.gitee.dorive.base.v1.core.entity.qry.Page,
+ com.gitee.dorive.base.v1.common.constant.Sort,
+ com.gitee.dorive.base.v1.common.entity.EntityElement,
+ com.gitee.dorive.base.v1.common.def.EntityDef,
+ com.gitee.dorive.base.v1.core.api.Context,
+ com.gitee.dorive.base.v1.core.entity.op.Result,
+ com.gitee.dorive.base.v1.core.entity.op.Condition,
+ com.gitee.dorive.base.v1.core.entity.op.EntityOp,
+ com.gitee.dorive.base.v1.core.entity.op.Operation,
+ com.gitee.dorive.base.v1.core.entity.cop.ConditionDelete,
+ com.gitee.dorive.base.v1.core.entity.cop.ConditionUpdate,
+ com.gitee.dorive.base.v1.core.entity.cop.Query,
+ com.gitee.dorive.base.v1.core.entity.eop.Delete,
+ com.gitee.dorive.base.v1.core.entity.eop.Insert,
+ com.gitee.dorive.base.v1.core.entity.eop.Update,
+ com.gitee.dorive.base.v1.executor.impl.executor.AbstractExecutor,
+ com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo
+Dorive-Provides: ~,
+ com.gitee.dorive.base.v1.mybatis.api.MethodInvoker,
+ com.gitee.dorive.base.v1.mybatis.api.SqlFormat,
+ com.gitee.dorive.base.v1.mybatis.api.SqlRunner
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null
