@@ -125,7 +125,13 @@ public class ModuleDefinition {
     }
 
     private List<String> filterValues(String values) {
-        return StringUtils.isBlank(values) || "null".equals(values) ? Collections.emptyList() : StrUtil.splitTrim(values, ",");
+        if (StringUtils.isBlank(values) || "null".equals(values)) {
+            return Collections.emptyList();
+        }
+        List<String> strings = StrUtil.splitTrim(values, ",");
+        // 移除换行
+        strings.remove("~");
+        return strings;
     }
 
     public boolean isGlobalValues(Class<?> clazz) {
