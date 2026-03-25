@@ -15,17 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.aggregate.v1.impl;
+package com.gitee.dorive.base.v1.aggregate.api;
 
-import com.gitee.dorive.base.v1.aggregate.api.QueryResolver;
-import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
+import com.gitee.dorive.base.v1.common.entity.EntityElement;
 
-public class DefaultQueryResolver implements QueryResolver {
+import java.util.List;
 
-    @Override
-    public QueryDefinition resolve(Class<?> queryType) {
-        QueryDefinitionResolver queryDefinitionResolver = new QueryDefinitionResolver();
-        return queryDefinitionResolver.resolve(queryType);
-    }
+public interface EntityTypeResolver {
+
+    List<EntityElement> resolve(Class<?> entityType);
 
 }

@@ -17,20 +17,15 @@
 
 package com.gitee.dorive.aggregate.v1.impl;
 
-import com.gitee.dorive.base.v1.common.entity.EntityDefinition;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.aggregate.api.EntityResolver;
+import com.gitee.dorive.base.v1.aggregate.api.QueryTypeResolver;
+import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
 
-import java.util.List;
-
-public class DefaultEntityResolver implements EntityResolver {
+public class DefaultQueryTypeResolver implements QueryTypeResolver {
 
     @Override
-    public List<EntityElement> resolve(Class<?> entityType) {
-        EntityDefinitionResolver entityDefinitionResolver = new EntityDefinitionResolver();
-        EntityDefinition entityDefinition = entityDefinitionResolver.resolve(entityType);
-        EntityElementResolver entityElementResolver = new EntityElementResolver();
-        return entityElementResolver.resolve(entityDefinition);
+    public QueryDefinition resolve(Class<?> queryType) {
+        QueryDefinitionResolver queryDefinitionResolver = new QueryDefinitionResolver();
+        return queryDefinitionResolver.resolve(queryType);
     }
 
 }

@@ -17,12 +17,10 @@
 
 package com.gitee.dorive.base.v1.aggregate.api;
 
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
 
-import java.util.List;
+public interface QueryTypeResolver {
 
-public interface EntityResolver {
-
-    List<EntityElement> resolve(Class<?> entityType);
+    QueryDefinition resolve(Class<?> queryType);
 
 }

@@ -19,6 +19,7 @@ package com.gitee.dorive.query.v2.impl.core;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
+import com.gitee.dorive.base.v1.aggregate.api.QueryTypeResolver;
 import com.gitee.dorive.base.v1.common.def.QueryFieldDef;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
@@ -59,8 +60,8 @@ public class QueryInfoResolver {
     }
 
     private void resolveQueryClass(Class<?> queryClass) {
-        com.gitee.dorive.base.v1.aggregate.api.QueryResolver queryResolver = SpringUtil.getBean(com.gitee.dorive.base.v1.aggregate.api.QueryResolver.class);
-        QueryDefinition queryDefinition = queryResolver.resolve(queryClass);
+        QueryTypeResolver queryTypeResolver = SpringUtil.getBean(QueryTypeResolver.class);
+        QueryDefinition queryDefinition = queryTypeResolver.resolve(queryClass);
         classQueryDefinitionMap.put(queryClass, queryDefinition);
 
         Map<RepositoryInfo, QueryRepositoryMapping> queryRepositoryMappingMap = new LinkedHashMap<>();

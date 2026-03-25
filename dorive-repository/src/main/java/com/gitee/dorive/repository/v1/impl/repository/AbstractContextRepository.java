@@ -19,7 +19,7 @@ package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
-import com.gitee.dorive.base.v1.aggregate.api.EntityResolver;
+import com.gitee.dorive.base.v1.aggregate.api.EntityTypeResolver;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.api.BoundedContext;
 import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
@@ -94,8 +94,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         resetBoundedContextIfNecessary();
         determineEnableEventPublish();
 
-        EntityResolver entityResolver = applicationContext.getBean(EntityResolver.class);
-        List<EntityElement> entityElements = entityResolver.resolve(entityClass);
+        EntityTypeResolver entityTypeResolver = applicationContext.getBean(EntityTypeResolver.class);
+        List<EntityElement> entityElements = entityTypeResolver.resolve(entityClass);
 
         for (EntityElement entityElement : entityElements) {
             String accessPath = entityElement.getAccessPath();
