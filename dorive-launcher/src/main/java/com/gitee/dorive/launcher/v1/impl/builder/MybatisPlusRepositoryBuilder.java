@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.launcher.v1.impl.factory;
+package com.gitee.dorive.launcher.v1.impl.builder;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
@@ -41,7 +41,6 @@ import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
 import com.gitee.dorive.factory.v1.impl.executor.ExampleExecutor;
 import com.gitee.dorive.factory.v1.impl.executor.FactoryExecutor;
 import com.gitee.dorive.factory.v1.impl.resolver.EntityTransformerManagerResolver;
-import com.gitee.dorive.factory.v1.impl.resolver.EntityFactoryResolver;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.executor.v1.impl.executor.UnionExecutor;
 import com.gitee.dorive.mybatis.plus.v1.impl.common.DefaultMethodInvoker;
@@ -82,10 +81,10 @@ public class MybatisPlusRepositoryBuilder {
         EntityTransformer deEntityTransformer = (EntityTransformer) entityTransformerManager.getTransformer(deCategory);
 
         // 实体工厂
-        EntityFactoryResolver entityFactoryResolver = new EntityFactoryResolver(
+        EntityFactoryBuilder entityFactoryBuilder = new EntityFactoryBuilder(
                 repository, entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(),
                 entityTransformerManager, reEntityTransformer, deEntityTransformer);
-        EntityFactory entityFactory = entityFactoryResolver.newEntityFactory();
+        EntityFactory entityFactory = entityFactoryBuilder.newEntityFactory();
 
         // 执行器
         Executor executor = newExecutor(entityElement, entityStoreInfo);

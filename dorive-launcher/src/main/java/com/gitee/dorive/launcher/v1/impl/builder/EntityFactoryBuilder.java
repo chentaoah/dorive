@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.impl.resolver;
+package com.gitee.dorive.launcher.v1.impl.builder;
 
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
@@ -32,7 +32,7 @@ import org.springframework.context.ApplicationContext;
 
 @Data
 @AllArgsConstructor
-public class EntityFactoryResolver {
+public class EntityFactoryBuilder {
 
     private RepositoryContext repositoryContext;
     private EntityElement entityElement;

@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.launcher.v1.impl.factory;
+package com.gitee.dorive.launcher.v1.impl.builder;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.binder.api.ExampleBuilder;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.binder.enums.JoinType;
+import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
@@ -38,7 +38,6 @@ import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.binder.v1.impl.example.MultiExampleBuilder;
 import com.gitee.dorive.binder.v1.impl.example.SingleExampleBuilder;
-import com.gitee.dorive.binder.v1.impl.resolver.BinderResolver;
 import com.gitee.dorive.executor.v1.impl.executor.RepositoryExecutor;
 import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
@@ -46,8 +45,8 @@ import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.ContextMatchEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.DefaultEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
-import com.gitee.dorive.executor.v1.impl.handler.qry.ValueFilterEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.UnionEntityHandler;
+import com.gitee.dorive.executor.v1.impl.handler.qry.ValueFilterEntityHandler;
 import com.gitee.dorive.joiner.v1.impl.joiner.DefaultEntityJoiner;
 import com.gitee.dorive.mybatis.v2.impl.querier.DefaultCountQuerier;
 import com.gitee.dorive.mybatis.v2.impl.segment.DefaultSegmentExecutor;
@@ -119,9 +118,8 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
 
     @Override
     public BinderExecutor newBinderExecutor(RepositoryContext repositoryContext, EntityElement entityElement) {
-        BinderResolver binderResolver = new BinderResolver(repositoryContext);
-        binderResolver.resolve(entityElement);
-        return binderResolver;
+        BinderExecutorBuilder binderExecutorBuilder = new BinderExecutorBuilder(repositoryContext, entityElement);
+        return binderExecutorBuilder.newBinderExecutor();
     }
 
     @Override

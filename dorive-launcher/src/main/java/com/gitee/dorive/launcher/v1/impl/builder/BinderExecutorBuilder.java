@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.binder.v1.impl.resolver;
+package com.gitee.dorive.launcher.v1.impl.builder;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
@@ -25,63 +25,57 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.binder.api.Processor;
+import com.gitee.dorive.base.v1.binder.enums.BindingType;
+import com.gitee.dorive.base.v1.binder.enums.JoinType;
 import com.gitee.dorive.base.v1.common.def.BindingDef;
 import com.gitee.dorive.base.v1.common.def.EntityDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
-import com.gitee.dorive.base.v1.binder.enums.BindingType;
-import com.gitee.dorive.base.v1.binder.enums.JoinType;
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.binder.v1.impl.binder.*;
+import com.gitee.dorive.binder.v1.impl.binder.AbstractBinder;
+import com.gitee.dorive.binder.v1.impl.binder.StrongBinder;
+import com.gitee.dorive.binder.v1.impl.binder.ValueFilterBinder;
+import com.gitee.dorive.binder.v1.impl.binder.ValueRouteBinder;
+import com.gitee.dorive.binder.v1.impl.binder.WeakBinder;
 import com.gitee.dorive.binder.v1.impl.endpoint.BindEndpoint;
 import com.gitee.dorive.binder.v1.impl.endpoint.FieldEndpoint;
 import com.gitee.dorive.binder.v1.impl.processor.SpELProcessor;
+import com.gitee.dorive.binder.v1.impl.executor.DefaultBinderExecutor;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
-public class BinderResolver implements BinderExecutor {
+@AllArgsConstructor
+public class BinderExecutorBuilder {
 
     private RepositoryContext repositoryContext;
-    private List<Binder> allBinders;
-    private List<Binder> strongBinders;
-    private List<Binder> weakBinders;
-    private List<Binder> valueRouteBinders;
-    private List<Binder> valueFilterBinders;
-    // 决定了关联查询具体使用哪种实现
-    private Map<String, List<Binder>> mergedStrongBindersMap;
-    private Map<String, List<Binder>> mergedValueRouteBindersMap;
-    private Binder boundIdBinder;
-    private List<String> selfFields;
-    private JoinType joinType;
+    private EntityElement entityElement;
 
-    public BinderResolver(RepositoryContext repositoryContext) {
-        this.repositoryContext = repositoryContext;
-    }
-
-    public void resolve(EntityElement entityElement) {
+    public BinderExecutor newBinderExecutor() {
         EntityDef entityDef = entityElement.getEntityDef();
         List<BindingDef> bindingDefs = entityElement.getBindingDefs();
         Class<?> genericType = entityElement.getGenericType();
         String primaryKey = entityElement.getPrimaryKey();
 
-        this.allBinders = new ArrayList<>(bindingDefs.size());
-        this.strongBinders = new ArrayList<>(bindingDefs.size());
-        this.weakBinders = new ArrayList<>(bindingDefs.size());
-        this.valueRouteBinders = new ArrayList<>(bindingDefs.size());
-        this.valueFilterBinders = new ArrayList<>(bindingDefs.size());
-        this.mergedStrongBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
-        this.mergedValueRouteBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
-        this.boundIdBinder = null;
-        this.selfFields = new ArrayList<>(bindingDefs.size());
-        this.joinType = JoinType.UNION;
-        String fieldErrorMsg = "The field configured for @Binding does not exist within the entity! type: {}, field: {}";
+        List<Binder> allBinders = new ArrayList<>(bindingDefs.size());
+        List<Binder> strongBinders = new ArrayList<>(bindingDefs.size());
+        List<Binder> weakBinders = new ArrayList<>(bindingDefs.size());
+        List<Binder> valueRouteBinders = new ArrayList<>(bindingDefs.size());
+        List<Binder> valueFilterBinders = new ArrayList<>(bindingDefs.size());
+        Map<String, List<Binder>> mergedStrongBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
+        Map<String, List<Binder>> mergedValueRouteBindersMap = new LinkedHashMap<>(bindingDefs.size() * 4 / 3 + 1);
+        Binder boundIdBinder = null;
+        List<String> selfFields = new ArrayList<>(bindingDefs.size());
+        JoinType joinType = JoinType.UNION;
 
         for (BindingDef bindingDef : bindingDefs) {
             resetBindingDef(bindingDef);
@@ -95,14 +89,14 @@ public class BinderResolver implements BinderExecutor {
                 valueRouteBinders.add(valueRouteBinder);
 
                 String belongAccessPath = valueRouteBinder.getBelongAccessPath();
-                List<Binder> valueRouteBinders = mergedValueRouteBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
-                valueRouteBinders.add(valueRouteBinder);
+                List<Binder> targetValueRouteBinders = mergedValueRouteBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
+                targetValueRouteBinders.add(valueRouteBinder);
                 continue;
             }
 
             String field = bindingDef.getField();
             FieldDefinition fieldDefinition = entityElement.getFieldDefinition(field);
-            Assert.notNull(fieldDefinition, fieldErrorMsg, genericType.getName(), field);
+            Assert.notNull(fieldDefinition, "The field configured for @Binding does not exist within the entity! type: {}, field: {}", genericType.getName(), field);
             FieldEndpoint fieldEndpoint = new FieldEndpoint(fieldDefinition, "#entity." + field);
 
             if (bindingType == BindingType.STRONG) {
@@ -112,8 +106,8 @@ public class BinderResolver implements BinderExecutor {
                 strongBinders.add(strongBinder);
 
                 String belongAccessPath = strongBinder.getBelongAccessPath();
-                List<Binder> strongBinders = mergedStrongBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
-                strongBinders.add(strongBinder);
+                List<Binder> targetStrongBinders = mergedStrongBindersMap.computeIfAbsent(belongAccessPath, key -> new ArrayList<>(2));
+                targetStrongBinders.add(strongBinder);
 
                 if (strongBinder.isSameType() && primaryKey.equals(field)) {
                     if (entityDef.getPriority() == 0) {
@@ -146,6 +140,10 @@ public class BinderResolver implements BinderExecutor {
                 joinType = binders.size() == 1 ? JoinType.SINGLE : JoinType.MULTI;
             }
         }
+
+        return new DefaultBinderExecutor(allBinders, strongBinders, weakBinders, valueRouteBinders, valueFilterBinders,
+                mergedStrongBindersMap, mergedValueRouteBindersMap,
+                boundIdBinder, selfFields, joinType);
     }
 
     private void resetBindingDef(BindingDef bindingDef) {
@@ -247,69 +245,4 @@ public class BinderResolver implements BinderExecutor {
         return bindEndpoint;
     }
 
-    @Override
-    public List<Binder> getRootStrongBinders() {
-        return mergedStrongBindersMap.get("/");
-    }
-
-    @Override
-    public boolean hasValueRouteBinders() {
-        return !getValueRouteBinders().isEmpty();
-    }
-
-    @Override
-    public void appendFilterCriteria(Context context, Example example) {
-        if (example == null || example.isEmpty()) {
-            return;
-        }
-        for (Binder weakBinder : weakBinders) {
-            Object boundValue = weakBinder.input(context, null);
-            if (boundValue != null) {
-                String field = weakBinder.getField();
-                example.eq(field, boundValue);
-            }
-        }
-        appendFilterValue(context, example);
-    }
-
-    @Override
-    public void appendFilterValue(Context context, Example example) {
-        for (Binder valueFilterBinder : valueFilterBinders) {
-            Object boundValue = valueFilterBinder.getBoundValue(context, null);
-            boundValue = valueFilterBinder.input(context, boundValue);
-            if (boundValue != null) {
-                String field = valueFilterBinder.getField();
-                example.eq(field, boundValue);
-            }
-        }
-    }
-
-    @Override
-    public void getBoundValue(Context context, Object rootEntity, Collection<?> entities) {
-        for (Object entity : entities) {
-            for (Binder strongBinder : getStrongBinders()) {
-                Object fieldValue = strongBinder.getFieldValue(context, entity);
-                if (fieldValue == null) {
-                    Object boundValue = strongBinder.getBoundValue(context, rootEntity);
-                    if (boundValue != null) {
-                        strongBinder.setFieldValue(context, entity, boundValue);
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void setBoundId(Context context, Object rootEntity, Object entity) {
-        Binder boundIdBinder = getBoundIdBinder();
-        if (boundIdBinder != null) {
-            Object boundValue = boundIdBinder.getBoundValue(context, rootEntity);
-            if (boundValue == null) {
-                Object primaryKey = boundIdBinder.getFieldValue(context, entity);
-                if (primaryKey != null) {
-                    boundIdBinder.setBoundValue(context, rootEntity, primaryKey);
-                }
-            }
-        }
-    }
 }

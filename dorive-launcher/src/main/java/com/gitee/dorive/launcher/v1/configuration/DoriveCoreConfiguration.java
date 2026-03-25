@@ -21,7 +21,7 @@ import com.gitee.dorive.aggregate.v1.impl.DefaultEntityResolver;
 import com.gitee.dorive.aggregate.v1.impl.DefaultQueryResolver;
 import com.gitee.dorive.base.v1.aggregate.api.EntityResolver;
 import com.gitee.dorive.base.v1.aggregate.api.QueryResolver;
-import com.gitee.dorive.launcher.v1.impl.factory.DefaultRepositoryBuilder;
+import com.gitee.dorive.launcher.v1.impl.builder.DefaultRepositoryBuilder;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
 import org.springframework.context.annotation.Bean;
