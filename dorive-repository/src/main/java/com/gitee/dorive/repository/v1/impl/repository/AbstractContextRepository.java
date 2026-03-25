@@ -160,16 +160,16 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         BinderExecutor binderExecutor = repositoryBuilder.newBinderExecutor(this, entityElement);
         OrderByFactory orderByFactory = orderByDef == null ? null : new OrderByFactory(orderByDef);
 
-        ProxyRepository proxyRepository = new ProxyRepository();
-        proxyRepository.setEntityElement(entityElement);
-        proxyRepository.setOperationFactory(operationFactory);
-        proxyRepository.setProxyRepository(repository);
-        proxyRepository.setAccessPath(accessPath);
-        proxyRepository.setRoot(isRoot);
-        proxyRepository.setAggregated(isAggregated);
-        proxyRepository.setBinderExecutor(binderExecutor);
-        proxyRepository.setOrderByFactory(orderByFactory);
-        return proxyRepository;
+        DefaultRepositoryItem defaultRepositoryItem = new DefaultRepositoryItem();
+        defaultRepositoryItem.setEntityElement(entityElement);
+        defaultRepositoryItem.setOperationFactory(operationFactory);
+        defaultRepositoryItem.setProxyRepository(repository);
+        defaultRepositoryItem.setAccessPath(accessPath);
+        defaultRepositoryItem.setRoot(isRoot);
+        defaultRepositoryItem.setAggregated(isAggregated);
+        defaultRepositoryItem.setBinderExecutor(binderExecutor);
+        defaultRepositoryItem.setOrderByFactory(orderByFactory);
+        return defaultRepositoryItem;
     }
 
     private void resetEntityDef(EntityElement entityElement) {
