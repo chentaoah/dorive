@@ -25,8 +25,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.test.context.SpringBootTestArgsProxy;
 import org.springframework.boot.test.context.SpringBootContextLoader;
+import org.springframework.boot.test.context.SpringBootTestAnnotationProxy;
 import org.springframework.boot.web.reactive.context.GenericReactiveWebApplicationContext;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
@@ -58,7 +58,7 @@ public class SpringBootModularContextLoader extends SpringBootContextLoader impl
                 }
             }
         }
-        this.args = SpringBootTestArgsProxy.get(config.getContextCustomizers());
+        this.args = SpringBootTestAnnotationProxy.get(config);
         return super.loadContext(config);
     }
 
