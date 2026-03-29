@@ -56,7 +56,7 @@ public class UnionExecutor extends AbstractProxyExecutor {
             UnionExample unionExample = (UnionExample) example;
             String sql = buildSql(unionExample);
             if (StringUtils.isNotBlank(sql)) {
-                List<Map<String, Object>> resultMaps = sqlRunner.selectList(sql, (Object) null);
+                List<Map<String, Object>> resultMaps = sqlRunner.selectList(sql);
                 return buildResult(resultMaps);
             }
         }
