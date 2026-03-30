@@ -18,16 +18,12 @@ Dorive-Requires: ~,
  com.gitee.dorive.base.v1.core.entity.qry.Example,
  com.gitee.dorive.base.v1.core.entity.qry.InnerExample,
  com.gitee.dorive.base.v1.executor.util.MultiInBuilder,
- com.gitee.dorive.base.v1.common.def.EntityDef,
- com.gitee.dorive.base.v1.common.entity.EntityElement,
- com.gitee.dorive.base.v1.binder.enums.BindingType,
- com.gitee.dorive.base.v1.binder.enums.JoinType,
- com.gitee.dorive.base.v1.repository.api.RepositoryContext
+ com.gitee.dorive.base.v1.binder.enums.JoinType
 Dorive-Provides: ~,
  com.gitee.dorive.base.v1.binder.api.Binder,
  com.gitee.dorive.base.v1.binder.api.ExampleBuilder,
- com.gitee.dorive.base.v1.binder.api.Processor,
- com.gitee.dorive.base.v1.binder.api.BinderExecutor
+ com.gitee.dorive.base.v1.binder.api.BinderExecutor,
+ com.gitee.dorive.base.v1.binder.api.Processor
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null

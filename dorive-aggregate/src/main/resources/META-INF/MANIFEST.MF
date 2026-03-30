@@ -26,8 +26,8 @@ Dorive-Requires: ~,
  com.gitee.dorive.base.v1.common.def.QueryDef,
  com.gitee.dorive.base.v1.common.def.QueryFieldDef
 Dorive-Provides: ~,
- com.gitee.dorive.base.v1.aggregate.api.EntityResolver,
- com.gitee.dorive.base.v1.aggregate.api.QueryResolver
+ com.gitee.dorive.base.v1.aggregate.api.EntityTypeResolver,
+ com.gitee.dorive.base.v1.aggregate.api.QueryTypeResolver
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null

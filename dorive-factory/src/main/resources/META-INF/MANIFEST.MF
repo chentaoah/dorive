@@ -36,9 +36,7 @@ Dorive-Requires: ~,
  com.gitee.dorive.base.v1.core.entity.eop.Insert,
  com.gitee.dorive.base.v1.common.api.BoundedContext,
  com.gitee.dorive.base.v1.common.def.PropertyDef,
- com.gitee.dorive.base.v1.common.entity.PropertyDefinition,
- com.gitee.dorive.base.v1.common.def.RepositoryDef,
- com.gitee.dorive.base.v1.repository.api.RepositoryContext
+ com.gitee.dorive.base.v1.common.entity.PropertyDefinition
 Dorive-Provides: com.gitee.dorive.base.v1.factory.api.ExampleConverter
 Dorive-Notifies: null
 Dorive-Waits: null
