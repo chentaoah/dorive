@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.aggregate.v1.impl;
+package com.gitee.dorive.definition.v1.impl;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;

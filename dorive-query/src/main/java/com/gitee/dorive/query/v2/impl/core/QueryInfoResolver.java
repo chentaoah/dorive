@@ -19,7 +19,7 @@ package com.gitee.dorive.query.v2.impl.core;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
-import com.gitee.dorive.base.v1.aggregate.api.QueryTypeResolver;
+import com.gitee.dorive.base.v1.definition.api.QueryTypeResolver;
 import com.gitee.dorive.base.v1.common.def.QueryFieldDef;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;

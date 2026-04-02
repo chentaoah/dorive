@@ -15,12 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.aggregate.api;
+package com.gitee.dorive.base.v1.definition.api;
 
-import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
+import com.gitee.dorive.base.v1.common.entity.EntityElement;
 
-public interface QueryTypeResolver {
+import java.util.List;
 
-    QueryDefinition resolve(Class<?> queryType);
+public interface EntityTypeResolver {
+
+    List<EntityElement> resolve(Class<?> entityType);
 
 }

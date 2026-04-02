@@ -30,7 +30,7 @@
 
     <modules>
         <module>dorive-base</module>
-        <module>dorive-aggregate</module>
+        <module>dorive-definition</module>
         <module>dorive-binder</module>
         <module>dorive-joiner</module>
         <module>dorive-factory</module>

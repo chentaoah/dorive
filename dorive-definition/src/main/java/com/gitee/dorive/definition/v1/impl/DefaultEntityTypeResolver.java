@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.aggregate.v1.impl;
+package com.gitee.dorive.definition.v1.impl;
 
 import com.gitee.dorive.base.v1.common.entity.EntityDefinition;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.aggregate.api.EntityTypeResolver;
+import com.gitee.dorive.base.v1.definition.api.EntityTypeResolver;
 
 import java.util.List;
 

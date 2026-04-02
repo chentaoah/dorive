@@ -17,10 +17,10 @@
 
 package com.gitee.dorive.launcher.v1.configuration;
 
-import com.gitee.dorive.aggregate.v1.impl.DefaultEntityTypeResolver;
-import com.gitee.dorive.aggregate.v1.impl.DefaultQueryTypeResolver;
-import com.gitee.dorive.base.v1.aggregate.api.EntityTypeResolver;
-import com.gitee.dorive.base.v1.aggregate.api.QueryTypeResolver;
+import com.gitee.dorive.definition.v1.impl.DefaultEntityTypeResolver;
+import com.gitee.dorive.definition.v1.impl.DefaultQueryTypeResolver;
+import com.gitee.dorive.base.v1.definition.api.EntityTypeResolver;
+import com.gitee.dorive.base.v1.definition.api.QueryTypeResolver;
 import com.gitee.dorive.launcher.v1.impl.builder.DefaultRepositoryBuilder;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;

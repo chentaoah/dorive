@@ -1,9 +1,9 @@
 Dorive-Origin: null
 Dorive-Organization: com.gitee
 Dorive-Project: dorive
-Dorive-Domain: aggregate
+Dorive-Domain: definition
 Dorive-Subdomain: null
-Dorive-Module: dorive-aggregate
+Dorive-Module: dorive-definition
 Dorive-Version: v1
 Dorive-Type: biz
 Dorive-Tags: null
@@ -26,8 +26,8 @@ Dorive-Requires: ~,
  com.gitee.dorive.base.v1.common.def.QueryDef,
  com.gitee.dorive.base.v1.common.def.QueryFieldDef
 Dorive-Provides: ~,
- com.gitee.dorive.base.v1.aggregate.api.EntityTypeResolver,
- com.gitee.dorive.base.v1.aggregate.api.QueryTypeResolver
+ com.gitee.dorive.base.v1.definition.api.EntityTypeResolver,
+ com.gitee.dorive.base.v1.definition.api.QueryTypeResolver
 Dorive-Notifies: null
 Dorive-Waits: null
 Dorive-Table-Prefix: null

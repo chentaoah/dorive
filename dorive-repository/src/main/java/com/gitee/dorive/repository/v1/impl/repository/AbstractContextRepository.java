@@ -19,7 +19,7 @@ package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
-import com.gitee.dorive.base.v1.aggregate.api.EntityTypeResolver;
+import com.gitee.dorive.base.v1.definition.api.EntityTypeResolver;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.api.BoundedContext;
 import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
