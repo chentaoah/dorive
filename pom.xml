@@ -31,12 +31,12 @@
     <modules>
         <module>dorive-base</module>
         <module>dorive-aggregate</module>
-        <module>dorive-repository</module>
         <module>dorive-binder</module>
-        <module>dorive-executor</module>
-        <module>dorive-factory</module>
         <module>dorive-joiner</module>
+        <module>dorive-factory</module>
         <module>dorive-query</module>
+        <module>dorive-executor</module>
+        <module>dorive-repository</module>
         <module>dorive-mybatis</module>
         <module>dorive-mybatis-plus</module>
         <module>dorive-module</module>
