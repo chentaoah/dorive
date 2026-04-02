@@ -11,11 +11,11 @@ Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
 Dorive-Requires: ~,
- com.gitee.dorive.base.v1.core.api.Context,
  com.gitee.dorive.base.v1.binder.api.Binder,
  com.gitee.dorive.base.v1.binder.api.BinderExecutor,
- com.gitee.dorive.base.v1.common.entity.EntityElement,
  com.gitee.dorive.base.v1.binder.enums.JoinType,
+ com.gitee.dorive.base.v1.common.entity.EntityElement,
+ com.gitee.dorive.base.v1.core.api.Context,
  com.gitee.dorive.base.v1.repository.api.RepositoryItem
 Dorive-Provides: com.gitee.dorive.base.v1.joiner.api.EntityJoiner
 Dorive-Notifies: null

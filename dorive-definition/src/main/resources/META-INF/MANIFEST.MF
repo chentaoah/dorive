@@ -11,20 +11,20 @@ Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
 Dorive-Requires: ~,
- com.gitee.dorive.base.v1.common.entity.EntityDefinition,
- com.gitee.dorive.base.v1.common.entity.EntityElement,
- com.gitee.dorive.base.v1.common.entity.QueryDefinition,
  com.gitee.dorive.base.v1.common.annotation.Entity,
  com.gitee.dorive.base.v1.common.annotation.Property,
+ com.gitee.dorive.base.v1.common.def.BindingDef,
+ com.gitee.dorive.base.v1.common.def.EntityDef,
+ com.gitee.dorive.base.v1.common.def.QueryDef,
+ com.gitee.dorive.base.v1.common.def.QueryFieldDef,
+ com.gitee.dorive.base.v1.common.entity.EntityDefinition,
+ com.gitee.dorive.base.v1.common.entity.EntityElement,
  com.gitee.dorive.base.v1.common.entity.FieldDefinition,
  com.gitee.dorive.base.v1.common.entity.FieldEntityDefinition,
  com.gitee.dorive.base.v1.common.entity.PropertyDefinition,
- com.gitee.dorive.base.v1.core.util.ReflectUtils,
- com.gitee.dorive.base.v1.common.def.BindingDef,
- com.gitee.dorive.base.v1.common.def.EntityDef,
+ com.gitee.dorive.base.v1.common.entity.QueryDefinition,
  com.gitee.dorive.base.v1.common.entity.QueryFieldDefinition,
- com.gitee.dorive.base.v1.common.def.QueryDef,
- com.gitee.dorive.base.v1.common.def.QueryFieldDef
+ com.gitee.dorive.base.v1.core.util.ReflectUtils
 Dorive-Provides: ~,
  com.gitee.dorive.base.v1.definition.api.EntityTypeResolver,
  com.gitee.dorive.base.v1.definition.api.QueryTypeResolver

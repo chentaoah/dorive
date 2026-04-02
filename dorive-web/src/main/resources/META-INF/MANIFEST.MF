@@ -11,9 +11,9 @@ Dorive-Profiles: null
 Dorive-Configs: null
 Dorive-Exports: **
 Dorive-Requires: ~,
- com.gitee.dorive.base.v1.core.util.ReflectUtils,
  com.gitee.dorive.base.v1.core.api.Options,
- com.gitee.dorive.base.v1.core.entity.qry.Page
+ com.gitee.dorive.base.v1.core.entity.qry.Page,
+ com.gitee.dorive.base.v1.core.util.ReflectUtils
 Dorive-Provides: null
 Dorive-Notifies: null
 Dorive-Waits: null
