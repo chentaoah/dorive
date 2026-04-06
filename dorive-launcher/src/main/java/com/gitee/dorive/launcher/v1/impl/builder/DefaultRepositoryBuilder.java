@@ -79,7 +79,7 @@ import java.util.List;
 /**
  * RepositoryContext's properties:
  * EntityStoreInfo、EntityTransformerManager、TransformerManager、Transformer、ExampleConverter
- * RepositoryInfoResolver、QueryInfoResolver、StepwiseQuerier
+ * RepositoryInfoResolver、QueryInfoResolver、StepwiseQuerier、JoinInfoResolver
  * <p>
  * DefaultRepository's properties:
  * EntityStoreInfo、EntityTransformerManager、TransformerManager、Transformer、ExampleConverter
@@ -239,6 +239,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             QueryInfoResolver queryInfoResolver = repository.getProperty(QueryInfoResolver.class);
             // 连接解析器
             JoinInfoResolver joinInfoResolver = new JoinInfoResolver(repository);
+            repository.setProperty(JoinInfoResolver.class, joinInfoResolver);
 
             EntityElement entityElement = repositoryContext.getEntityElement();
             String primaryKey = entityElement.getPrimaryKey();
@@ -249,7 +250,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             SegmentResolver segmentResolver = new DefaultSegmentResolver();
             SegmentExecutor segmentExecutor = new DefaultSegmentExecutor(primaryKey, primaryKeyAlias, repository.getSqlRunner(), (AbstractRepository<Object, Object>) repository);
             // 查询执行器
-            QueryResolver queryResolver = new SegmentQueryResolver(repositoryInfoResolver, queryInfoResolver, joinInfoResolver, segmentResolver);
+            QueryResolver queryResolver = new SegmentQueryResolver(repositoryInfoResolver, queryInfoResolver, segmentResolver);
             QueryExecutor queryExecutor = new SegmentQueryExecutor(queryResolver, segmentExecutor);
             repository.setSegmentQueryExecutor(queryExecutor);
         }

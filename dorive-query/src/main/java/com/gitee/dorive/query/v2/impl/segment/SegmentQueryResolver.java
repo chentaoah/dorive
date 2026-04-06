@@ -50,7 +50,6 @@ public class SegmentQueryResolver implements QueryResolver {
 
     private final RepositoryInfoResolver repositoryInfoResolver;
     private final QueryInfoResolver queryInfoResolver;
-    private final JoinInfoResolver joinInfoResolver;
     private final SegmentResolver segmentResolver;
 
     @Override
@@ -62,11 +61,16 @@ public class SegmentQueryResolver implements QueryResolver {
         List<QueryRepositoryMapping> reversedQueryRepositoryMappings = queryInfo.getReversedQueryRepositoryMappings();
         ExampleResolver exampleResolver = queryInfo.getExampleResolver();
 
+        // 仓储 => 别名
         Map<RepositoryContext, String> repositoryAliasMap = new LinkedHashMap<>(8);
+        // 连接信息
         List<JoinInfo> joinInfos = new ArrayList<>();
+        // 仓储 => 条件
         Map<RepositoryContext, Example> repositoryExampleMap = new LinkedHashMap<>(8);
 
+        // 仓储信息 => (属性 => 条件)
         Map<RepositoryInfo, Map<String, Example>> nodeExampleMapMap = new LinkedHashMap<>(8);
+        // 片段信息
         SegmentInfo segmentInfo = new SegmentInfo();
 
         for (QueryRepositoryMapping queryRepositoryMapping : reversedQueryRepositoryMappings) {
@@ -90,6 +94,8 @@ public class SegmentQueryResolver implements QueryResolver {
             // 如果被激活，则解析连接条件
             Map<String, Example> exampleMap = nodeExampleMapMap.get(repositoryInfo);
             if (exampleMap != null) {
+                // 20260406 ct 修复因简化代码，而导致的逻辑错误，这里的JoinInfoResolver不能是同一个
+                JoinInfoResolver joinInfoResolver = repositoryContext.getProperty(JoinInfoResolver.class);
                 List<JoinInfo> joins = joinInfoResolver.resolve(context, exampleMap.keySet());
                 joinInfos.addAll(joins);
                 // 额外分配别名和筛选条件
