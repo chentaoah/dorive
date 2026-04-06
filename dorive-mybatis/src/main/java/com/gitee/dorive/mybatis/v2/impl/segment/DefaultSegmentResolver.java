@@ -127,17 +127,23 @@ public class DefaultSegmentResolver implements SegmentResolver {
         for (Criterion criterion : example.getCriteria()) {
             String property = criterion.getProperty();
             String operator = CriterionUtils.getOperator(criterion);
+            Object value = criterion.getValue();
+
+            String leftExpr = tableAlias + "." + property;
+            String rightExpr;
             if (Operator.IS_NULL.equals(operator) || Operator.IS_NOT_NULL.equals(operator)) {
-                ArgSegment argSegment = new ArgSegment(tableAlias + "." + property, operator, null);
-                argSegments.add(argSegment);
+                rightExpr = null;
+
+            } else if (Operator.IN.equals(operator) || Operator.NOT_IN.equals(operator)) {
+                // 20260406 ct 适配mybatis-plus3.5.13版本，手动拼接IN、NOT_IN
+                rightExpr = CriterionUtils.getValue(criterion);
 
             } else {
-                Object value = criterion.getValue();
                 args.add(CriterionUtils.format(operator, value));
-                int index = args.size() - 1;
-                ArgSegment argSegment = new ArgSegment(tableAlias + "." + property, operator, "{" + index + "}");
-                argSegments.add(argSegment);
+                rightExpr = "{" + (args.size() - 1) + "}";
             }
+            ArgSegment argSegment = new ArgSegment(leftExpr, operator, rightExpr);
+            argSegments.add(argSegment);
         }
         return argSegments;
     }
