@@ -1,16 +1,16 @@
-Dorive-Origin: null
-Dorive-Organization: com.gitee
-Dorive-Project: dorive
-Dorive-Domain: factory
-Dorive-Subdomain: null
-Dorive-Module: dorive-factory
-Dorive-Version: v1
-Dorive-Type: biz
-Dorive-Tags: null
-Dorive-Profiles: null
-Dorive-Configs: null
-Dorive-Exports: **
-Dorive-Requires: ~,
+X-Module-Origin: null
+X-Module-Organization: com.gitee
+X-Module-Project: dorive
+X-Module-Domain: factory
+X-Module-Subdomain: null
+X-Module-Name: dorive-factory
+X-Module-Version: v1
+X-Module-Type: biz
+X-Module-Tags: null
+X-Module-Profiles: null
+X-Module-Configs: null
+X-Module-Exports: **
+X-Module-Requires: ~,
  com.gitee.dorive.base.v1.common.api.BoundedContext,
  com.gitee.dorive.base.v1.common.constant.Operator,
  com.gitee.dorive.base.v1.common.def.FieldDef,
@@ -37,8 +37,8 @@ Dorive-Requires: ~,
  com.gitee.dorive.base.v1.executor.util.MultiInBuilder,
  com.gitee.dorive.base.v1.factory.api.Transformer,
  com.gitee.dorive.base.v1.factory.api.TransformerManager
-Dorive-Provides: com.gitee.dorive.base.v1.factory.api.ExampleConverter
-Dorive-Notifies: null
-Dorive-Waits: null
-Dorive-Table-Prefix: null
-Dorive-Request-Prefix: null
+X-Module-Provides: com.gitee.dorive.base.v1.factory.api.ExampleConverter
+X-Module-Notifies: null
+X-Module-Waits: null
+X-Module-Table-Prefix: null
+X-Module-Request-Prefix: null

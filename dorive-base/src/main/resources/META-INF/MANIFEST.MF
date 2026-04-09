@@ -1,17 +1,17 @@
-Dorive-Origin: null
-Dorive-Organization: com.gitee
-Dorive-Project: dorive
-Dorive-Domain: base
-Dorive-Subdomain: null
-Dorive-Module: dorive-base
-Dorive-Version: v1
-Dorive-Type: base
-Dorive-Tags: null
-Dorive-Profiles: null
-Dorive-Configs: null
-Dorive-Exports: **
-Dorive-Requires: null
-Dorive-Provides: ~,
+X-Module-Origin: null
+X-Module-Organization: com.gitee
+X-Module-Project: dorive
+X-Module-Domain: base
+X-Module-Subdomain: null
+X-Module-Name: dorive-base
+X-Module-Version: v1
+X-Module-Type: base
+X-Module-Tags: null
+X-Module-Profiles: null
+X-Module-Configs: null
+X-Module-Exports: **
+X-Module-Requires: null
+X-Module-Provides: ~,
  com.gitee.dorive.base.v1.binder.enums.JoinType,
  com.gitee.dorive.base.v1.common.annotation.Entity,
  com.gitee.dorive.base.v1.common.annotation.Property,
@@ -74,7 +74,7 @@ Dorive-Provides: ~,
  com.gitee.dorive.base.v1.repository.api.Repository,
  com.gitee.dorive.base.v1.repository.impl.AbstractRepository,
  com.gitee.dorive.base.v1.repository.impl.DefaultRepository
-Dorive-Notifies: null
-Dorive-Waits: null
-Dorive-Table-Prefix: null
-Dorive-Request-Prefix: null
+X-Module-Notifies: null
+X-Module-Waits: null
+X-Module-Table-Prefix: null
+X-Module-Request-Prefix: null

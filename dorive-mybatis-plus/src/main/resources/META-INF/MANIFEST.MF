@@ -1,16 +1,16 @@
-Dorive-Origin: null
-Dorive-Organization: com.gitee
-Dorive-Project: dorive
-Dorive-Domain: mybatis
-Dorive-Subdomain: plus
-Dorive-Module: dorive-mybatis-plus
-Dorive-Version: v1
-Dorive-Type: biz
-Dorive-Tags: null
-Dorive-Profiles: null
-Dorive-Configs: null
-Dorive-Exports: **
-Dorive-Requires: ~,
+X-Module-Origin: null
+X-Module-Organization: com.gitee
+X-Module-Project: dorive
+X-Module-Domain: mybatis
+X-Module-Subdomain: plus
+X-Module-Name: dorive-mybatis-plus
+X-Module-Version: v1
+X-Module-Type: biz
+X-Module-Tags: null
+X-Module-Profiles: null
+X-Module-Configs: null
+X-Module-Exports: **
+X-Module-Requires: ~,
  com.gitee.dorive.base.v1.common.constant.Operator,
  com.gitee.dorive.base.v1.common.constant.Sort,
  com.gitee.dorive.base.v1.common.def.EntityDef,
@@ -32,11 +32,11 @@ Dorive-Requires: ~,
  com.gitee.dorive.base.v1.core.entity.qry.Page,
  com.gitee.dorive.base.v1.executor.impl.executor.AbstractExecutor,
  com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo
-Dorive-Provides: ~,
+X-Module-Provides: ~,
  com.gitee.dorive.base.v1.mybatis.api.MethodInvoker,
  com.gitee.dorive.base.v1.mybatis.api.SqlFormat,
  com.gitee.dorive.base.v1.mybatis.api.SqlRunner
-Dorive-Notifies: null
-Dorive-Waits: null
-Dorive-Table-Prefix: null
-Dorive-Request-Prefix: null
+X-Module-Notifies: null
+X-Module-Waits: null
+X-Module-Table-Prefix: null
+X-Module-Request-Prefix: null

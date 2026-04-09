@@ -1,16 +1,16 @@
-Dorive-Origin: null
-Dorive-Organization: com.gitee
-Dorive-Project: dorive
-Dorive-Domain: query
-Dorive-Subdomain: null
-Dorive-Module: dorive-query
-Dorive-Version: v2
-Dorive-Type: biz
-Dorive-Tags: null
-Dorive-Profiles: null
-Dorive-Configs: null
-Dorive-Exports: **
-Dorive-Requires: ~,
+X-Module-Origin: null
+X-Module-Organization: com.gitee
+X-Module-Project: dorive
+X-Module-Domain: query
+X-Module-Subdomain: null
+X-Module-Name: dorive-query
+X-Module-Version: v2
+X-Module-Type: biz
+X-Module-Tags: null
+X-Module-Profiles: null
+X-Module-Configs: null
+X-Module-Exports: **
+X-Module-Requires: ~,
  com.gitee.dorive.base.v1.binder.api.Binder,
  com.gitee.dorive.base.v1.binder.api.BinderExecutor,
  com.gitee.dorive.base.v1.common.constant.Operator,
@@ -42,8 +42,8 @@ Dorive-Requires: ~,
  com.gitee.dorive.base.v1.repository.api.RepositoryContext,
  com.gitee.dorive.base.v1.repository.api.RepositoryItem,
  com.gitee.dorive.base.v1.repository.impl.AbstractRepository
-Dorive-Provides: com.gitee.dorive.base.v1.query.api.QueryExecutor
-Dorive-Notifies: null
-Dorive-Waits: null
-Dorive-Table-Prefix: null
-Dorive-Request-Prefix: null
+X-Module-Provides: com.gitee.dorive.base.v1.query.api.QueryExecutor
+X-Module-Notifies: null
+X-Module-Waits: null
+X-Module-Table-Prefix: null
+X-Module-Request-Prefix: null
