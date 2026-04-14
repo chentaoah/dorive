@@ -27,7 +27,7 @@ public class SpringApplicationInterceptor {
 
     @RuntimeType
     public static Object intercept(@Argument(0) Class<?> primarySource, @Argument(1) String[] args) {
-        System.out.printf("[Agent] Intercepting target method. Primary source: %s, args: %s%n", primarySource.getName(), Arrays.toString(args));
+        System.out.printf("[Agent] Intercepting method. Primary source: %s, args: %s%n", primarySource.getName(), Arrays.toString(args));
         // 完全替换原有的启动逻辑，不调用 originalCall.call()
         return SpringModularApplication.run(primarySource, args);
     }
