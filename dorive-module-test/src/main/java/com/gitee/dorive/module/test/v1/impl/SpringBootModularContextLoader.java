@@ -28,74 +28,53 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.context.SpringBootContextLoader;
 import org.springframework.boot.test.context.SpringBootTestAnnotationProxy;
 import org.springframework.boot.web.reactive.context.GenericReactiveWebApplicationContext;
-import org.springframework.cglib.proxy.Enhancer;
-import org.springframework.cglib.proxy.MethodInterceptor;
-import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.test.context.MergedContextConfiguration;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 
-import java.lang.reflect.Method;
+public class SpringBootModularContextLoader extends SpringBootContextLoader {
 
-public class SpringBootModularContextLoader extends SpringBootContextLoader implements MethodInterceptor {
-
-    private MergedContextConfiguration config;
     private Class<?> primarySource;
     private String[] args;
-    private SpringApplication springApplication;
 
     @Override
-    public ApplicationContext loadContext(MergedContextConfiguration config) throws Exception {
-        this.config = config;
-        Class<?>[] configClasses = config.getClasses();
+    public ApplicationContext loadContext(MergedContextConfiguration mergedConfig) throws Exception {
+        Class<?>[] configClasses = mergedConfig.getClasses();
         if (configClasses.length > 0) {
             for (Class<?> configClass : configClasses) {
                 SpringBootApplication annotation = AnnotationUtils.getAnnotation(configClass, SpringBootApplication.class);
+                //noinspection ConstantConditions
                 if (annotation != null) {
                     this.primarySource = configClass;
                     break;
                 }
             }
         }
-        this.args = SpringBootTestAnnotationProxy.get(config);
-        return super.loadContext(config);
+        this.args = SpringBootTestAnnotationProxy.get(mergedConfig);
+        return super.loadContext(mergedConfig);
     }
 
     @Override
     protected SpringApplication getSpringApplication() {
         SpringApplicationBuilder builder = SpringModularApplication.build(primarySource, args);
-        this.springApplication = builder.build();
-
-        Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(SpringApplication.class);
-        enhancer.setCallback(this);
-        Class<?>[] argumentTypes = new Class[]{Class[].class};
-        Object[] arguments = new Object[]{new Class[]{primarySource}};
-        return (SpringApplication) enhancer.create(argumentTypes, arguments);
+        return builder.build();
     }
 
     @Override
-    public Object intercept(Object instance, Method method, Object[] args, MethodProxy methodProxy) throws Exception {
-        String methodName = method.getName();
-        if ("setApplicationContextFactory".equals(methodName)) {
-            boolean isEmbeddedWebEnvironment = ReflectUtil.invoke(this, "isEmbeddedWebEnvironment", config);
-            if (!isEmbeddedWebEnvironment) {
-                springApplication.setApplicationContextFactory((type) -> {
-                    if (type != WebApplicationType.NONE) {
-                        if (type == WebApplicationType.REACTIVE) {
-                            return new GenericReactiveWebApplicationContext(new ModuleDefaultListableBeanFactory());
-
-                        } else if (type == WebApplicationType.SERVLET) {
-                            return new GenericWebApplicationContext(new ModuleDefaultListableBeanFactory());
-                        }
-                    }
-                    return ApplicationContextFactory.DEFAULT.create(type);
-                });
+    protected ApplicationContextFactory getApplicationContextFactory(MergedContextConfiguration mergedConfig) {
+        boolean isEmbeddedWebEnvironment = ReflectUtil.invoke(this, "isEmbeddedWebEnvironment", mergedConfig);
+        return (webApplicationType) -> {
+            if (webApplicationType != WebApplicationType.NONE && !isEmbeddedWebEnvironment) {
+                if (webApplicationType == WebApplicationType.REACTIVE) {
+                    return new GenericReactiveWebApplicationContext(new ModuleDefaultListableBeanFactory());
+                }
+                if (webApplicationType == WebApplicationType.SERVLET) {
+                    return new GenericWebApplicationContext(new ModuleDefaultListableBeanFactory());
+                }
             }
-            return null;
-        }
-        return method.invoke(springApplication, args);
+            return ApplicationContextFactory.DEFAULT.create(webApplicationType);
+        };
     }
 
 }
