@@ -44,7 +44,7 @@ public class SpringBootModularContextLoader extends SpringBootContextLoader {
         if (configClasses.length > 0) {
             for (Class<?> configClass : configClasses) {
                 SpringBootApplication annotation = AnnotationUtils.getAnnotation(configClass, SpringBootApplication.class);
-                //noinspection ConstantConditions
+                // noinspection ConstantConditions
                 if (annotation != null) {
                     this.primarySource = configClass;
                     break;
