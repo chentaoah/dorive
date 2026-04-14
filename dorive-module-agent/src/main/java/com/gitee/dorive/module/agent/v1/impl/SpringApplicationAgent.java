@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.module.agent.v1.impl;
 
+import com.gitee.dorive.module.agent.v1.impl.interceptor.SpringApplicationInterceptor;
+import com.gitee.dorive.module.agent.v1.impl.interceptor.SpringBootTestContextBootstrapperInterceptor;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.implementation.MethodDelegation;
 
@@ -29,6 +31,9 @@ public class SpringApplicationAgent {
     public static final String CLASS_NAME = "org.springframework.boot.SpringApplication";
     public static final String METHOD_NAME = "run";
 
+    public static final String TEST_CLASS_NAME = "org.springframework.boot.test.context.SpringBootTestContextBootstrapper";
+    public static final String TEST_METHOD_NAME = "getDefaultContextLoaderClass";
+
     public static void premain(String agentArgs, Instrumentation inst) {
         System.out.printf("[Agent] Starting agent. Agent args: %s, class name: %s, method name: %s%n", agentArgs, CLASS_NAME, METHOD_NAME);
         new AgentBuilder.Default()
@@ -36,6 +41,14 @@ public class SpringApplicationAgent {
                 .transform((builder, typeDescription, classLoader, module, protectionDomain) ->
                         builder.method(named(METHOD_NAME).and(takesArguments(Class.class, String[].class)).and(isPublic()).and(isStatic()))
                                 .intercept(MethodDelegation.to(SpringApplicationInterceptor.class)))
+                .installOn(inst);
+
+        System.out.printf("[Test Agent] Starting agent. Agent args: %s, class name: %s, method name: %s%n", agentArgs, TEST_CLASS_NAME, TEST_METHOD_NAME);
+        new AgentBuilder.Default()
+                .type(named(TEST_CLASS_NAME))
+                .transform((builder, typeDescription, classLoader, module, protectionDomain) ->
+                        builder.method(named(TEST_METHOD_NAME).and(takesArguments(Class.class)))
+                                .intercept(MethodDelegation.to(SpringBootTestContextBootstrapperInterceptor.class)))
                 .installOn(inst);
     }
 

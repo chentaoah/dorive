@@ -17,6 +17,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-module-test</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
         </dependency>

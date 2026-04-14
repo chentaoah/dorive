@@ -15,21 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.module.agent.v1.impl;
+package com.gitee.dorive.module.agent.v1.impl.interceptor;
 
-import com.gitee.dorive.module.v1.impl.SpringModularApplication;
+import com.gitee.dorive.module.test.v1.impl.SpringBootModularContextLoader;
 import net.bytebuddy.implementation.bind.annotation.Argument;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 
-import java.util.Arrays;
-
-public class SpringApplicationInterceptor {
+public class SpringBootTestContextBootstrapperInterceptor {
 
     @RuntimeType
-    public static Object intercept(@Argument(0) Class<?> primarySource, @Argument(1) String[] args) {
-        System.out.printf("[Agent] Intercepting method. Primary source: %s, args: %s%n", primarySource.getName(), Arrays.toString(args));
-        // 完全替换原有的启动逻辑，不调用 originalCall.call()
-        return SpringModularApplication.run(primarySource, args);
+    public static Object intercept(@Argument(0) Class<?> testClass) {
+        System.out.printf("[Test Agent] Intercepting method. Test class: %s%n", testClass.getName());
+        return SpringBootModularContextLoader.class;
     }
 
 }
