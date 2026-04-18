@@ -148,5 +148,5 @@ module: ${project}/${module}/target/classes
 maven: ${groupId}:${artifactId}:${version}
 ```
 
-- 运行时，动态加载依赖模块与第三方库。
+- 运行时，动态加载依赖的模块与代码库。
 - 一般用于测试场景。
