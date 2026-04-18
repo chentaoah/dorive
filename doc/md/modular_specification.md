@@ -40,7 +40,10 @@ ${project}
 
 ### 依赖关系
 
-1 * 加载模块 ==> N * 业务模块 ==> 1 * 基础模块
+加载模块 * 1 ==> 业务模块 * N ==> 基础模块 * 1
+
+- 业务模块之间不建议直接依赖
+- 业务模块之间通过接口调用（接口放置在基础模块中）
 
 ### 模块结构
 
@@ -68,7 +71,7 @@ ${organization}.${project}.${domain}.${version} // 包
 └── Application.java // 启动器
 ```
 
-- 项目未使用领域驱动，可移除领域层。
+- 未应用领域驱动设计的项目，可移除领域层。
 
 ### 启动器
 
@@ -105,7 +108,7 @@ X-Module-Name: ${project}-${domain}
 # 【版本】（一般为v1）
 X-Module-Version: ${version}
 # 描述
-X-Module-Description: ${description}
+X-Module-Description: null
 # 【类型】（base-基础模块、biz-业务模块、launcher-加载模块、single-单体模块）
 X-Module-Type: ${type}
 # 标签
