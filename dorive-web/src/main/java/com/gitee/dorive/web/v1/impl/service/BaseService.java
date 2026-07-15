@@ -77,7 +77,7 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
         return example;
     }
 
-    public boolean validateForCreate(E entity) {
+    public boolean validateUniqueConstraintForCreate(E entity) {
         if (CollUtil.isEmpty(uniqueConstraintFields)) {
             return true;
         }
@@ -85,7 +85,7 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
         return repository.selectCountByExample(Options.ROOT, example) == 0;
     }
 
-    public boolean validateForUpdate(E entity) {
+    public boolean validateUniqueConstraintForUpdate(E entity) {
         if (CollUtil.isEmpty(uniqueConstraintFields)) {
             return true;
         }
@@ -98,7 +98,7 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
 
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> add(Options options, E entity) {
-        if (!validateForCreate(entity)) {
+        if (!validateUniqueConstraintForCreate(entity)) {
             return ResObject.failWith("重复的数据！");
         }
         return doAdd(options, entity);
@@ -125,7 +125,7 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
 
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> edit(Options options, E entity) {
-        if (!validateForUpdate(entity)) {
+        if (!validateUniqueConstraintForUpdate(entity)) {
             return ResObject.failWith("重复的数据！");
         }
         return doEdit(options, entity);
