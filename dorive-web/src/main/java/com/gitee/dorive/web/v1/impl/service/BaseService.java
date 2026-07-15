@@ -17,10 +17,15 @@
 
 package com.gitee.dorive.web.v1.impl.service;
 
-import com.gitee.dorive.base.v1.core.util.ReflectUtils;
+import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.util.ReflectUtil;
+import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
+import com.gitee.dorive.base.v1.core.util.ReflectUtils;
+import com.gitee.dorive.base.v1.web.annotation.UniqueConstraint;
+import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.web.v1.entity.ResObject;
 import lombok.Getter;
@@ -31,6 +36,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -39,6 +46,7 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
 
     private ApplicationContext applicationContext;
     private AbstractQueryRepository<E, Object> repository;
+    private List<Field> uniqueConstraintFields;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -51,6 +59,34 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
         Class<?> entityClass = ReflectUtils.getFirstTypeArgument(getClass());
         Class<?> repositoryClass = RepositoryRegister.findRepositoryClass(entityClass);
         this.repository = (AbstractQueryRepository<E, Object>) applicationContext.getBean(repositoryClass);
+
+        this.uniqueConstraintFields = new ArrayList<>();
+        for (Field field : ReflectUtil.getFields(entityClass)) {
+            if (AnnotationUtil.hasAnnotation(field, UniqueConstraint.class)) {
+                uniqueConstraintFields.add(field);
+            }
+        }
+    }
+
+    private Example newExampleForValidate(E entity) {
+        Example example = new Example();
+        for (Field field : uniqueConstraintFields) {
+            example.eq(field.getName(), ReflectUtil.getFieldValue(entity, field));
+        }
+        return example;
+    }
+
+    public boolean validateForCreate(E entity) {
+        Example example = newExampleForValidate(entity);
+        return repository.selectCountByExample(Options.ROOT, example) == 0;
+    }
+
+    public boolean validateForUpdate(E entity) {
+        Example example = newExampleForValidate(entity);
+        EntityElement entityElement = repository.getEntityElement();
+        String primaryKey = entityElement.getPrimaryKey();
+        example.ne(primaryKey, ReflectUtil.getFieldValue(entity, primaryKey));
+        return repository.selectCountByExample(Options.ROOT, example) == 0;
     }
 
     @Transactional(rollbackFor = Exception.class)
