@@ -98,6 +98,13 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
 
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> add(Options options, E entity) {
+        if (!validateForCreate(entity)) {
+            return ResObject.failWith("重复的数据！");
+        }
+        return doAdd(options, entity);
+    }
+
+    public ResObject<Object> doAdd(Options options, E entity) {
         int count = repository.insert(options, entity);
         return ResObject.of(count > 0);
     }
@@ -118,6 +125,13 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
 
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> edit(Options options, E entity) {
+        if (!validateForUpdate(entity)) {
+            return ResObject.failWith("重复的数据！");
+        }
+        return doEdit(options, entity);
+    }
+
+    public ResObject<Object> doEdit(Options options, E entity) {
         int count = repository.update(options, entity);
         return ResObject.of(count > 0);
     }
