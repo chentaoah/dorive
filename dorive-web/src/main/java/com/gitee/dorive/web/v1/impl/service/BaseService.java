@@ -18,6 +18,7 @@
 package com.gitee.dorive.web.v1.impl.service;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Options;
@@ -77,11 +78,17 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
     }
 
     public boolean validateForCreate(E entity) {
+        if (CollUtil.isEmpty(uniqueConstraintFields)) {
+            return true;
+        }
         Example example = newExampleForValidate(entity);
         return repository.selectCountByExample(Options.ROOT, example) == 0;
     }
 
     public boolean validateForUpdate(E entity) {
+        if (CollUtil.isEmpty(uniqueConstraintFields)) {
+            return true;
+        }
         Example example = newExampleForValidate(entity);
         EntityElement entityElement = repository.getEntityElement();
         String primaryKey = entityElement.getPrimaryKey();
