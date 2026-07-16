@@ -42,7 +42,9 @@ public class Validator {
     public ResObject<Object> validate(String method, Object entity) {
         List<Result> results = new ArrayList<>(1);
         if (!validateUniqueConstraint(method, entity)) {
-            results.add(new Result(method, entity, UniqueConstraint.class.getSimpleName(), "重复的数据"));
+            String fieldsMsg = uniqueConstraintFields.stream().map(Field::getName).collect(Collectors.joining("、"));
+            String message = String.format("重复的数据：%s", fieldsMsg);
+            results.add(new Result(method, entity, uniqueConstraintFields, UniqueConstraint.class.getSimpleName(), message));
         }
         if (!results.isEmpty()) {
             String message = results.stream() //
@@ -80,6 +82,7 @@ public class Validator {
     public static class Result {
         private String method;
         private Object entity;
+        private List<Field> fields;
         private String type;
         private String message;
     }
