@@ -59,7 +59,7 @@ public class Validator {
         if (CollUtil.isEmpty(uniqueConstraintFields)) {
             return true;
         }
-        Example example = newExampleByUniqueConstraint(entity);
+        Example example = newExampleByUniqueConstraintFields(entity);
         if ("edit".equals(method)) {
             EntityElement entityElement = repository.getEntityElement();
             String primaryKey = entityElement.getPrimaryKey();
@@ -68,7 +68,7 @@ public class Validator {
         return repository.selectCountByExample(Options.ROOT, example) == 0;
     }
 
-    public Example newExampleByUniqueConstraint(Object entity) {
+    public Example newExampleByUniqueConstraintFields(Object entity) {
         Example example = new Example();
         for (Field field : uniqueConstraintFields) {
             example.eq(field.getName(), ReflectUtil.getFieldValue(entity, field));
