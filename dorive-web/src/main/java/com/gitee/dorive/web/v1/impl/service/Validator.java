@@ -42,8 +42,7 @@ public class Validator {
     public ResObject<Object> validate(String method, Object entity) {
         List<Result> results = new ArrayList<>(1);
         if (!validateUniqueConstraint(method, entity)) {
-            Result result = new Result(method, entity, UniqueConstraint.class.getSimpleName(), "重复的数据");
-            results.add(result);
+            results.add(new Result(method, entity, UniqueConstraint.class.getSimpleName(), "重复的数据"));
         }
         if (!results.isEmpty()) {
             String message = results.stream() //
