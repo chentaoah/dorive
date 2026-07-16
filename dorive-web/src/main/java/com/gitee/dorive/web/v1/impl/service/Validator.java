@@ -44,9 +44,15 @@ public class Validator {
     public ResObject<Object> validate(String method, Object entity) {
         if (enabled) {
             List<Result> results = new ArrayList<>(1);
-            if (!validateUniqueConstraint(method, entity)) {
+            int code = validateUniqueConstraint(method, entity);
+            if (code == -1) { // 提交数据已存在
                 String fieldsMsg = uniqueConstraintFields.stream().map(Field::getName).collect(Collectors.joining("、"));
                 String message = String.format("提交数据已存在，请检查字段：%s", fieldsMsg);
+                results.add(new Result(method, entity, uniqueConstraintFields, UniqueConstraint.class.getSimpleName(), message));
+
+            } else if (code == -2) { // 提交数据字段为空
+                String fieldsMsg = uniqueConstraintFields.stream().map(Field::getName).collect(Collectors.joining("、"));
+                String message = String.format("提交数据字段为空，请检查字段：%s", fieldsMsg);
                 results.add(new Result(method, entity, uniqueConstraintFields, UniqueConstraint.class.getSimpleName(), message));
             }
             if (!results.isEmpty()) {
@@ -60,25 +66,28 @@ public class Validator {
         return ResObject.success();
     }
 
-    public boolean validateUniqueConstraint(String method, Object entity) {
+    public int validateUniqueConstraint(String method, Object entity) {
         if (CollUtil.isEmpty(uniqueConstraintFields)) {
-            return true;
+            return 0;
         }
-        Example example = newExampleByUniqueConstraintFields(entity);
-        if ("edit".equals(method)) {
-            EntityElement entityElement = repository.getEntityElement();
-            String primaryKey = entityElement.getPrimaryKey();
-            example.ne(primaryKey, ReflectUtil.getFieldValue(entity, primaryKey));
-        }
-        return repository.selectCountByExample(Options.ROOT, example) == 0;
-    }
-
-    public Example newExampleByUniqueConstraintFields(Object entity) {
         Example example = new Example();
         for (Field field : uniqueConstraintFields) {
-            example.eq(field.getName(), ReflectUtil.getFieldValue(entity, field));
+            String fieldName = field.getName();
+            Object fieldValue = ReflectUtil.getFieldValue(entity, field);
+            if (fieldValue == null) {
+                return -2;
+            }
+            example.eq(fieldName, fieldValue);
         }
-        return example;
+        if ("edit".equals(method)) {
+            String fieldName = repository.getEntityElement().getPrimaryKey();
+            Object fieldValue = ReflectUtil.getFieldValue(entity, fieldName);
+            if (fieldValue == null) {
+                return -2;
+            }
+            example.ne(fieldName, fieldValue);
+        }
+        return repository.selectCountByExample(Options.ROOT, example) == 0 ? 0 : -1;
     }
 
     @Data
