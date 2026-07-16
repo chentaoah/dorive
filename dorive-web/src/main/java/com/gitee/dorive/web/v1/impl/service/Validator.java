@@ -53,7 +53,7 @@ public class Validator {
                 String message = results.stream() //
                         .map(function) //
                         .map(Result::getMessage) //
-                        .collect(Collectors.joining("，")) + "。";
+                        .collect(Collectors.joining("；"));
                 return ResObject.failWith(message);
             }
         }
