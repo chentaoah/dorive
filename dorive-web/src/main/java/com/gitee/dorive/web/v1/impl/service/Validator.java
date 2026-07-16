@@ -27,6 +27,7 @@ public class Validator {
     private final AbstractQueryRepository<?, ?> repository;
     private final List<Field> uniqueConstraintFields;
     private final Function<Result, Result> function;
+    private final boolean enabled;
 
     public <E> Validator(AbstractQueryRepository<E, Object> repository, Class<?> entityClass, Function<Result, Result> function) {
         this.repository = repository;
@@ -37,21 +38,24 @@ public class Validator {
             }
         }
         this.function = function == null ? Function.identity() : function;
+        this.enabled = CollUtil.isNotEmpty(uniqueConstraintFields);
     }
 
     public ResObject<Object> validate(String method, Object entity) {
-        List<Result> results = new ArrayList<>(1);
-        if (!validateUniqueConstraint(method, entity)) {
-            String fieldsMsg = uniqueConstraintFields.stream().map(Field::getName).collect(Collectors.joining("、"));
-            String message = String.format("重复的数据：%s", fieldsMsg);
-            results.add(new Result(method, entity, uniqueConstraintFields, UniqueConstraint.class.getSimpleName(), message));
-        }
-        if (!results.isEmpty()) {
-            String message = results.stream() //
-                    .map(function) //
-                    .map(Result::getMessage) //
-                    .collect(Collectors.joining("，")) + "。";
-            return ResObject.failWith(message);
+        if (enabled) {
+            List<Result> results = new ArrayList<>(1);
+            if (!validateUniqueConstraint(method, entity)) {
+                String fieldsMsg = uniqueConstraintFields.stream().map(Field::getName).collect(Collectors.joining("、"));
+                String message = String.format("提交数据重复，请检查字段：%s", fieldsMsg);
+                results.add(new Result(method, entity, uniqueConstraintFields, UniqueConstraint.class.getSimpleName(), message));
+            }
+            if (!results.isEmpty()) {
+                String message = results.stream() //
+                        .map(function) //
+                        .map(Result::getMessage) //
+                        .collect(Collectors.joining("，")) + "。";
+                return ResObject.failWith(message);
+            }
         }
         return ResObject.success();
     }
