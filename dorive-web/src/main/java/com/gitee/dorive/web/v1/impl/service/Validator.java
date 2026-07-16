@@ -46,7 +46,7 @@ public class Validator {
             List<Result> results = new ArrayList<>(1);
             if (!validateUniqueConstraint(method, entity)) {
                 String fieldsMsg = uniqueConstraintFields.stream().map(Field::getName).collect(Collectors.joining("、"));
-                String message = String.format("提交数据重复，请检查字段：%s", fieldsMsg);
+                String message = String.format("提交数据已存在，请检查字段：%s", fieldsMsg);
                 results.add(new Result(method, entity, uniqueConstraintFields, UniqueConstraint.class.getSimpleName(), message));
             }
             if (!results.isEmpty()) {
