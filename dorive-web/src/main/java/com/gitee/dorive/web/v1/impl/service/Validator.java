@@ -86,14 +86,18 @@ public class Validator {
         if (CollUtil.isEmpty(uniqueConstraintFields)) {
             return 0;
         }
+        int nullCount = 0;
         Example example = new Example();
         for (Field field : uniqueConstraintFields) {
             String fieldName = field.getName();
             Object fieldValue = ReflectUtil.getFieldValue(entity, field);
             if (fieldValue == null) {
-                return -2;
+                nullCount++;
             }
             example.eq(fieldName, fieldValue);
+        }
+        if (nullCount > 0) {
+            return "edit".equals(method) && nullCount == uniqueConstraintFields.size() ? 0 : -2;
         }
         if ("edit".equals(method)) {
             String fieldName = repository.getEntityElement().getPrimaryKey();
