@@ -17,24 +17,14 @@
 
 package com.gitee.dorive.repository.v1.api;
 
-import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
+import org.springframework.context.ApplicationEvent;
 
-public interface RepositoryBuilder {
+public interface EventFactory {
 
-    void prepare(RepositoryContext repositoryContext);
+    ApplicationEvent newExecutorEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp);
 
-    EventFactory newEventFactory(RepositoryContext repositoryContext);
-
-    AbstractRepository<Object, Object> newRepository(RepositoryContext repositoryContext, EntityElement entityElement);
-
-    BinderExecutor newBinderExecutor(RepositoryContext repositoryContext, EntityElement entityElement);
-
-    Executor newExecutor(RepositoryContext repositoryContext);
-
-    void initialize(RepositoryContext repositoryContext);
+    ApplicationEvent newRepositoryEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp);
 
 }

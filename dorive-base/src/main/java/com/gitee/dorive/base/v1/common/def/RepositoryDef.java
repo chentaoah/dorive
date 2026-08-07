@@ -34,6 +34,7 @@ public class RepositoryDef {
     private Class<?> factory;
     private Class<?>[] derived;
     private Class<?>[] events;
+    private Class<?> eventFactory;
     private Class<?>[] queries;
     private String boundedContext;
 
@@ -46,6 +47,7 @@ public class RepositoryDef {
             repositoryDef.setFactory(repository.factory());
             repositoryDef.setDerived(repository.derived());
             repositoryDef.setEvents(repository.events());
+            repositoryDef.setEventFactory(repository.eventFactory());
             repositoryDef.setQueries(repository.queries());
             repositoryDef.setBoundedContext(repository.boundedContext());
             return repositoryDef;

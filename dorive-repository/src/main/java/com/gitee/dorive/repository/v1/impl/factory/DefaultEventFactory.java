@@ -22,12 +22,15 @@ import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
 import com.gitee.dorive.base.v1.core.entity.eop.Delete;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
+import com.gitee.dorive.repository.v1.api.EventFactory;
 import com.gitee.dorive.repository.v1.entity.event.BaseEvent;
 import com.gitee.dorive.repository.v1.entity.event.ext.*;
+import org.springframework.context.ApplicationEvent;
 
-public class EventFactory {
+public class DefaultEventFactory implements EventFactory {
 
-    public static BaseEvent<?> newExecutorEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
+    @Override
+    public ApplicationEvent newExecutorEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
         BaseEvent<?> baseEvent = null;
         if (entityOp instanceof Insert) {
             baseEvent = new ExecutorInsertEvent<>(source);
@@ -47,7 +50,8 @@ public class EventFactory {
         return baseEvent;
     }
 
-    public static BaseEvent<?> newRepositoryEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
+    @Override
+    public ApplicationEvent newRepositoryEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
         BaseEvent<?> baseEvent = null;
         if (entityOp instanceof Insert) {
             baseEvent = new RepositoryInsertEvent<>(source);
