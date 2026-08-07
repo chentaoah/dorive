@@ -19,6 +19,7 @@ package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
+import com.gitee.dorive.base.v1.common.annotation.Event;
 import com.gitee.dorive.base.v1.common.api.BoundedContext;
 import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
 import com.gitee.dorive.base.v1.common.def.EntityDef;
@@ -44,7 +45,9 @@ import com.gitee.dorive.repository.v1.entity.event.RepositoryEvent;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
 import com.gitee.dorive.repository.v1.impl.executor.RepositoryEventExecutor;
 import com.gitee.dorive.repository.v1.impl.factory.ExecutorEventFactory;
+import com.gitee.dorive.repository.v1.impl.factory.ExecutorTargetEventFactory;
 import com.gitee.dorive.repository.v1.impl.factory.RepositoryEventFactory;
+import com.gitee.dorive.repository.v1.impl.factory.RepositoryTargetEventFactory;
 import jakarta.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,12 +56,14 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -148,6 +153,16 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
             } else if (RepositoryEvent.class.isAssignableFrom(eventClass)) {
                 repositoryEventFactories.add(new RepositoryEventFactory());
+            }
+        }
+        Set<Event> eventsAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(getClass(), Event.class);
+        for (Event eventsAnnotation : eventsAnnotations) {
+            Class<?> source = eventsAnnotation.source();
+            if (ExecutorEvent.class.isAssignableFrom(source)) {
+                executorEventFactories.add(new ExecutorTargetEventFactory(source, eventsAnnotation.target()));
+
+            } else if (RepositoryEvent.class.isAssignableFrom(source)) {
+                repositoryEventFactories.add(new RepositoryTargetEventFactory(source, eventsAnnotation.target()));
             }
         }
     }
