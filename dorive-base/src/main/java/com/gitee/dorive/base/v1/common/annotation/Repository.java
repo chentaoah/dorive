@@ -56,11 +56,6 @@ public @interface Repository {
     Class<?>[] events() default {};
 
     /**
-     * 事件工厂
-     */
-    Class<?> eventFactory() default Object.class;
-
-    /**
      * 查询对象
      */
     Class<?>[] queries() default {};
