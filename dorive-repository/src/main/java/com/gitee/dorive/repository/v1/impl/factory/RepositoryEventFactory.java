@@ -18,28 +18,28 @@
 package com.gitee.dorive.repository.v1.impl.factory;
 
 import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
 import com.gitee.dorive.base.v1.core.entity.eop.Delete;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
-import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
 import com.gitee.dorive.repository.v1.api.EventFactory;
 import com.gitee.dorive.repository.v1.entity.event.BaseEvent;
 import com.gitee.dorive.repository.v1.entity.event.ext.*;
 import org.springframework.context.ApplicationEvent;
 
-public class DefaultExecutorEventFactory implements EventFactory {
+public class RepositoryEventFactory implements EventFactory {
 
     @Override
     public ApplicationEvent newApplicationEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
         BaseEvent<?> baseEvent = null;
         if (entityOp instanceof Insert) {
-            baseEvent = new ExecutorInsertEvent<>(source);
+            baseEvent = new RepositoryInsertEvent<>(source);
 
         } else if (entityOp instanceof Update) {
-            baseEvent = new ExecutorUpdateEvent<>(source);
+            baseEvent = new RepositoryUpdateEvent<>(source);
 
         } else if (entityOp instanceof Delete) {
-            baseEvent = new ExecutorDeleteEvent<>(source);
+            baseEvent = new RepositoryDeleteEvent<>(source);
         }
         if (baseEvent != null) {
             baseEvent.setRoot(root);

@@ -18,8 +18,6 @@
 package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ArrayUtil;
-import com.gitee.dorive.base.v1.definition.api.EntityTypeResolver;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.api.BoundedContext;
 import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
@@ -31,10 +29,11 @@ import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
 import com.gitee.dorive.base.v1.core.util.ReflectUtils;
+import com.gitee.dorive.base.v1.definition.api.EntityTypeResolver;
 import com.gitee.dorive.base.v1.executor.api.Executor;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.repository.v1.api.EventFactory;
@@ -44,8 +43,8 @@ import com.gitee.dorive.repository.v1.entity.event.ExecutorEvent;
 import com.gitee.dorive.repository.v1.entity.event.RepositoryEvent;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
 import com.gitee.dorive.repository.v1.impl.executor.RepositoryEventExecutor;
-import com.gitee.dorive.repository.v1.impl.factory.DefaultExecutorEventFactory;
-import com.gitee.dorive.repository.v1.impl.factory.DefaultRepositoryEventFactory;
+import com.gitee.dorive.repository.v1.impl.factory.ExecutorEventFactory;
+import com.gitee.dorive.repository.v1.impl.factory.RepositoryEventFactory;
 import jakarta.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,7 +54,11 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -139,11 +142,13 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     private void determineEnableEventPublish() {
         Class<?>[] events = repositoryDef.getEvents();
-        if (ArrayUtil.contains(events, ExecutorEvent.class)) {
-            executorEventFactories.add(new DefaultExecutorEventFactory());
-        }
-        if (ArrayUtil.contains(events, RepositoryEvent.class)) {
-            repositoryEventFactories.add(new DefaultRepositoryEventFactory());
+        for (Class<?> eventClass : events) {
+            if (ExecutorEvent.class.isAssignableFrom(eventClass)) {
+                executorEventFactories.add(new ExecutorEventFactory());
+
+            } else if (RepositoryEvent.class.isAssignableFrom(eventClass)) {
+                repositoryEventFactories.add(new RepositoryEventFactory());
+            }
         }
     }
 
