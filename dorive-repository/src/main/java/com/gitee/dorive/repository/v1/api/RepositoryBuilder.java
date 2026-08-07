@@ -27,8 +27,6 @@ public interface RepositoryBuilder {
 
     void prepare(RepositoryContext repositoryContext);
 
-    EventFactory newEventFactory(RepositoryContext repositoryContext);
-
     AbstractRepository<Object, Object> newRepository(RepositoryContext repositoryContext, EntityElement entityElement);
 
     BinderExecutor newBinderExecutor(RepositoryContext repositoryContext, EntityElement entityElement);

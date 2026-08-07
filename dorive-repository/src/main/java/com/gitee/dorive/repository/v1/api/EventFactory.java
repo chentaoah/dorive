@@ -23,8 +23,6 @@ import org.springframework.context.ApplicationEvent;
 
 public interface EventFactory {
 
-    ApplicationEvent newExecutorEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp);
-
-    ApplicationEvent newRepositoryEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp);
+    ApplicationEvent newApplicationEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp);
 
 }

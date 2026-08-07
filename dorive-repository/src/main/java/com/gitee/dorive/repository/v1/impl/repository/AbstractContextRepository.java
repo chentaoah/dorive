@@ -44,6 +44,8 @@ import com.gitee.dorive.repository.v1.entity.event.ExecutorEvent;
 import com.gitee.dorive.repository.v1.entity.event.RepositoryEvent;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
 import com.gitee.dorive.repository.v1.impl.executor.RepositoryEventExecutor;
+import com.gitee.dorive.repository.v1.impl.factory.DefaultExecutorEventFactory;
+import com.gitee.dorive.repository.v1.impl.factory.DefaultRepositoryEventFactory;
 import jakarta.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
@@ -67,9 +69,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     private RepositoryItem rootRepository;
     private List<RepositoryItem> subRepositories = new ArrayList<>();
     private List<RepositoryItem> orderedRepositories = new ArrayList<>();
-    private boolean enableExecutorEvent = false;
-    private boolean enableRepositoryEvent = false;
-    private EventFactory eventFactory;
+    private List<EventFactory> executorEventFactories = new ArrayList<>();
+    private List<EventFactory> repositoryEventFactories = new ArrayList<>();
 
     @Override
     public void setApplicationContext(@Nonnull ApplicationContext applicationContext) throws BeansException {
@@ -138,9 +139,12 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     private void determineEnableEventPublish() {
         Class<?>[] events = repositoryDef.getEvents();
-        this.enableExecutorEvent = ArrayUtil.contains(events, ExecutorEvent.class);
-        this.enableRepositoryEvent = ArrayUtil.contains(events, RepositoryEvent.class);
-        this.eventFactory = repositoryBuilder.newEventFactory(this);
+        if (ArrayUtil.contains(events, ExecutorEvent.class)) {
+            executorEventFactories.add(new DefaultExecutorEventFactory());
+        }
+        if (ArrayUtil.contains(events, RepositoryEvent.class)) {
+            repositoryEventFactories.add(new DefaultRepositoryEventFactory());
+        }
     }
 
     private RepositoryItem newRepositoryItem(EntityElement entityElement) {
@@ -209,8 +213,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     protected Executor newExecutor() {
         Executor executor = repositoryBuilder.newExecutor(this);
-        if (enableRepositoryEvent) {
-            executor = new RepositoryEventExecutor(executor, applicationContext, getEntityElement(), eventFactory);
+        if (!repositoryEventFactories.isEmpty()) {
+            executor = new RepositoryEventExecutor(executor, applicationContext, getEntityElement(), repositoryEventFactories);
         }
         return executor;
     }

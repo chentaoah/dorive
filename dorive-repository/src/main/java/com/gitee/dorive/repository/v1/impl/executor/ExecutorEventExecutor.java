@@ -29,19 +29,21 @@ import lombok.Setter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class ExecutorEventExecutor extends AbstractProxyExecutor {
 
     private ApplicationContext applicationContext;
     private EntityElement entityElement;
-    private EventFactory eventFactory;
+    private List<EventFactory> eventFactories;
 
-    public ExecutorEventExecutor(Executor executor, ApplicationContext applicationContext, EntityElement entityElement, EventFactory eventFactory) {
+    public ExecutorEventExecutor(Executor executor, ApplicationContext applicationContext, EntityElement entityElement, List<EventFactory> eventFactories) {
         super(executor);
         this.applicationContext = applicationContext;
         this.entityElement = entityElement;
-        this.eventFactory = eventFactory;
+        this.eventFactories = eventFactories;
     }
 
     @Override
@@ -50,8 +52,10 @@ public class ExecutorEventExecutor extends AbstractProxyExecutor {
         if (totalCount != 0) {
             if (operation instanceof EntityOp entityOp) {
                 Class<?> entityClass = getEntityElement().getGenericType();
-                ApplicationEvent applicationEvent = eventFactory.newExecutorEvent(this, entityOp.isUncontrolled(), entityClass, context, entityOp);
-                getApplicationContext().publishEvent(applicationEvent);
+                for (EventFactory eventFactory : eventFactories) {
+                    ApplicationEvent applicationEvent = eventFactory.newApplicationEvent(this, entityOp.isUncontrolled(), entityClass, context, entityOp);
+                    getApplicationContext().publishEvent(applicationEvent);
+                }
             }
         }
         return totalCount;

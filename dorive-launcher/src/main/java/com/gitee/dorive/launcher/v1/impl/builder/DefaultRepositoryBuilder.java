@@ -68,7 +68,6 @@ import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQueryResolver;
 import com.gitee.dorive.repository.v1.api.EventFactory;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.impl.executor.ExecutorEventExecutor;
-import com.gitee.dorive.repository.v1.impl.factory.DefaultEventFactory;
 import com.gitee.dorive.repository.v1.impl.ref.RefInjector;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractContextRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
@@ -100,17 +99,6 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     }
 
     @Override
-    public EventFactory newEventFactory(RepositoryContext repositoryContext) {
-        RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
-        Class<?> eventFactoryClass = repositoryDef.getEventFactory();
-        if (eventFactoryClass != Object.class) {
-            ApplicationContext applicationContext = repositoryContext.getApplicationContext();
-            return (EventFactory) applicationContext.getBean(eventFactoryClass);
-        }
-        return new DefaultEventFactory();
-    }
-
-    @Override
     public AbstractRepository<Object, Object> newRepository(RepositoryContext repositoryContext, EntityElement entityElement) {
         AbstractRepository<Object, Object> repository = null;
         // mybatis-plus
@@ -119,9 +107,10 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         }
         // 事件
         if (repositoryContext instanceof AbstractContextRepository<?, ?> contextRepository) {
-            if (contextRepository.isEnableExecutorEvent() && repository instanceof DefaultRepository) {
+            List<EventFactory> executorEventFactories = contextRepository.getExecutorEventFactories();
+            if (!executorEventFactories.isEmpty() && repository instanceof DefaultRepository) {
                 Executor executor = repository.getExecutor();
-                executor = new ExecutorEventExecutor(executor, contextRepository.getApplicationContext(), repository.getEntityElement(), contextRepository.getEventFactory());
+                executor = new ExecutorEventExecutor(executor, contextRepository.getApplicationContext(), repository.getEntityElement(), executorEventFactories);
                 repository.setExecutor(executor);
             }
         }

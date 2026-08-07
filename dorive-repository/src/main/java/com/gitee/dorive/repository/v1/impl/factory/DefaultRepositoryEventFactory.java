@@ -27,31 +27,10 @@ import com.gitee.dorive.repository.v1.entity.event.BaseEvent;
 import com.gitee.dorive.repository.v1.entity.event.ext.*;
 import org.springframework.context.ApplicationEvent;
 
-public class DefaultEventFactory implements EventFactory {
+public class DefaultRepositoryEventFactory implements EventFactory {
 
     @Override
-    public ApplicationEvent newExecutorEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
-        BaseEvent<?> baseEvent = null;
-        if (entityOp instanceof Insert) {
-            baseEvent = new ExecutorInsertEvent<>(source);
-
-        } else if (entityOp instanceof Update) {
-            baseEvent = new ExecutorUpdateEvent<>(source);
-
-        } else if (entityOp instanceof Delete) {
-            baseEvent = new ExecutorDeleteEvent<>(source);
-        }
-        if (baseEvent != null) {
-            baseEvent.setRoot(root);
-            baseEvent.setEntityClass(entityClass);
-            baseEvent.setContext(context);
-            baseEvent.setEntityOp(entityOp);
-        }
-        return baseEvent;
-    }
-
-    @Override
-    public ApplicationEvent newRepositoryEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
+    public ApplicationEvent newApplicationEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
         BaseEvent<?> baseEvent = null;
         if (entityOp instanceof Insert) {
             baseEvent = new RepositoryInsertEvent<>(source);
