@@ -25,9 +25,17 @@ import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
 import com.gitee.dorive.repository.v1.api.EventFactory;
 import com.gitee.dorive.repository.v1.entity.event.BaseEvent;
 import com.gitee.dorive.repository.v1.entity.event.ext.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
 
+@Getter
+@Setter
+@AllArgsConstructor
 public class ExecutorEventFactory implements EventFactory {
+
+    private final Class<?> source;
 
     @Override
     public ApplicationEvent newApplicationEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
@@ -47,7 +55,7 @@ public class ExecutorEventFactory implements EventFactory {
             baseEvent.setContext(context);
             baseEvent.setEntityOp(entityOp);
         }
-        return baseEvent;
+        return baseEvent != null && this.source.isAssignableFrom(baseEvent.getClass()) ? baseEvent : null;
     }
 
 }

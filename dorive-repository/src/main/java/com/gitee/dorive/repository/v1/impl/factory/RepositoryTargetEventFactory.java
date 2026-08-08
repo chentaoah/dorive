@@ -20,7 +20,6 @@ package com.gitee.dorive.repository.v1.impl.factory;
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
@@ -29,16 +28,19 @@ import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class RepositoryTargetEventFactory extends RepositoryEventFactory {
 
-    private final Class<?> source;
     private final Class<?> target;
+
+    public RepositoryTargetEventFactory(Class<?> source, Class<?> target) {
+        super(source);
+        this.target = target;
+    }
 
     @Override
     public ApplicationEvent newApplicationEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
         ApplicationEvent applicationEvent = super.newApplicationEvent(source, root, entityClass, context, entityOp);
-        if (this.source.isAssignableFrom(applicationEvent.getClass())) {
+        if (applicationEvent != null) {
             List<?> entities = entityOp.getEntities();
             if (entities.size() == 1) {
                 return (ApplicationEvent) BeanUtil.copyProperties(entities.get(0), target);
