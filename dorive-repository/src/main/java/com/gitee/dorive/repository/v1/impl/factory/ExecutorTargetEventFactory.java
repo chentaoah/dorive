@@ -18,6 +18,7 @@
 package com.gitee.dorive.repository.v1.impl.factory;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
 import lombok.Getter;
@@ -43,7 +44,9 @@ public class ExecutorTargetEventFactory extends ExecutorEventFactory {
         if (applicationEvent != null) {
             List<?> entities = entityOp.getEntities();
             if (entities.size() == 1) {
-                return (ApplicationEvent) BeanUtil.copyProperties(entities.get(0), target);
+                ApplicationEvent newApplicationEvent = (ApplicationEvent) ReflectUtil.newInstance(target, source);
+                BeanUtil.copyProperties(entities.get(0), newApplicationEvent);
+                return newApplicationEvent;
             }
         }
         return null;
