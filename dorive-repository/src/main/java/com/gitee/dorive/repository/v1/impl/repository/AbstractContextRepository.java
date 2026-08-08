@@ -149,10 +149,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Class<?>[] events = repositoryDef.getEvents();
         for (Class<?> eventClass : events) {
             if (ExecutorEvent.class.isAssignableFrom(eventClass)) {
-                executorEventFactories.add(new ExecutorEventFactory());
+                executorEventFactories.add(new ExecutorEventFactory(eventClass));
 
             } else if (RepositoryEvent.class.isAssignableFrom(eventClass)) {
-                repositoryEventFactories.add(new RepositoryEventFactory());
+                repositoryEventFactories.add(new RepositoryEventFactory(eventClass));
             }
         }
         Set<Event> eventsAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(getClass(), Event.class);
