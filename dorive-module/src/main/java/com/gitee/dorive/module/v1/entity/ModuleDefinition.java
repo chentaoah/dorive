@@ -57,6 +57,8 @@ public class ModuleDefinition {
     private List<String> provides;
     private List<String> notifies;
     private List<String> waits;
+    private List<String> publishes;
+    private List<String> subscribes;
     private String tablePrefix;
     private String requestPrefix;
 
@@ -86,6 +88,8 @@ public class ModuleDefinition {
         String provides = mainAttributes.getValue("X-Module-Provides");
         String notifies = mainAttributes.getValue("X-Module-Notifies");
         String waits = mainAttributes.getValue("X-Module-Waits");
+        String publishes = mainAttributes.getValue("X-Module-Publishes");
+        String subscribes = mainAttributes.getValue("X-Module-Subscribes");
         String tablePrefix = mainAttributes.getValue("X-Module-Table-Prefix");
         String requestPrefix = mainAttributes.getValue("X-Module-Request-Prefix");
 
@@ -109,6 +113,8 @@ public class ModuleDefinition {
         this.provides = filterValues(provides);
         this.notifies = filterValues(notifies);
         this.waits = filterValues(waits);
+        this.publishes = filterValues(publishes);
+        this.subscribes = filterValues(subscribes);
         this.tablePrefix = filterValue(tablePrefix);
         this.requestPrefix = filterValue(requestPrefix);
 
