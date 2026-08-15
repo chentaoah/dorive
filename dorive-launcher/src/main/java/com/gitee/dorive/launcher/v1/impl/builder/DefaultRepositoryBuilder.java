@@ -22,6 +22,7 @@ import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.binder.api.ExampleBuilder;
 import com.gitee.dorive.base.v1.binder.enums.JoinType;
+import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
@@ -64,6 +65,7 @@ import com.gitee.dorive.query.v2.impl.segment.SegmentQueryResolver;
 import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQuerier;
 import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQueryExecutor;
 import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQueryResolver;
+import com.gitee.dorive.repository.v1.api.EventFactory;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.impl.executor.ExecutorEventExecutor;
 import com.gitee.dorive.repository.v1.impl.ref.RefInjector;
@@ -72,6 +74,7 @@ import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
 import com.gitee.dorive.repository.v1.impl.resolver.RepositoryDerivedResolver;
+import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +82,7 @@ import java.util.List;
 /**
  * RepositoryContext's properties:
  * EntityStoreInfo、EntityTransformerManager、TransformerManager、Transformer、ExampleConverter
- * RepositoryInfoResolver、QueryInfoResolver、StepwiseQuerier
+ * RepositoryInfoResolver、QueryInfoResolver、StepwiseQuerier、JoinInfoResolver
  * <p>
  * DefaultRepository's properties:
  * EntityStoreInfo、EntityTransformerManager、TransformerManager、Transformer、ExampleConverter
@@ -89,8 +92,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
 
     @Override
     public void prepare(RepositoryContext repositoryContext) {
-        if (repositoryContext instanceof AbstractMybatisRepository) {
-            AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
+        if (repositoryContext instanceof AbstractMybatisRepository<?, ?> repository) {
             SqlRunner sqlRunner = repository.getApplicationContext().getBean(SqlRunner.class);
             repository.setSqlRunner(sqlRunner);
         }
@@ -104,11 +106,11 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             repository = new MybatisPlusRepositoryBuilder((MybatisPlusRepository<?, ?>) repositoryContext).newRepository(entityElement);
         }
         // 事件
-        if (repositoryContext instanceof AbstractContextRepository) {
-            AbstractContextRepository<?, ?> contextRepository = (AbstractContextRepository<?, ?>) repositoryContext;
-            if (contextRepository.isEnableExecutorEvent() && repository instanceof DefaultRepository) {
+        if (repositoryContext instanceof AbstractContextRepository<?, ?> contextRepository) {
+            List<EventFactory> executorEventFactories = contextRepository.getExecutorEventFactories();
+            if (!executorEventFactories.isEmpty() && repository instanceof DefaultRepository) {
                 Executor executor = repository.getExecutor();
-                executor = new ExecutorEventExecutor(executor, contextRepository.getApplicationContext(), repository.getEntityElement());
+                executor = new ExecutorEventExecutor(executor, contextRepository.getApplicationContext(), repository.getEntityElement(), executorEventFactories);
                 repository.setExecutor(executor);
             }
         }
@@ -195,8 +197,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
 
     private void buildContextMismatchQueryExecutor(RepositoryContext repositoryContext) {
         // 查询
-        if (repositoryContext instanceof AbstractQueryRepository) {
-            AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
+        if (repositoryContext instanceof AbstractQueryRepository<?, ?> repository) {
             // 仓储解析器
             RepositoryInfoResolver repositoryInfoResolver = new RepositoryInfoResolver(repository);
             repository.setProperty(RepositoryInfoResolver.class, repositoryInfoResolver);
@@ -214,8 +215,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     @SuppressWarnings("unchecked")
     private void buildStepwiseQueryExecutor(RepositoryContext repositoryContext) {
         // 查询
-        if (repositoryContext instanceof AbstractQueryRepository) {
-            AbstractQueryRepository<?, ?> repository = (AbstractQueryRepository<?, ?>) repositoryContext;
+        if (repositoryContext instanceof AbstractQueryRepository<?, ?> repository) {
             // 查询对象解析器
             QueryInfoResolver queryInfoResolver = repository.getProperty(QueryInfoResolver.class);
             // 逆向查询器
@@ -231,14 +231,14 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     @SuppressWarnings("unchecked")
     private void buildSegmentQueryExecutor(RepositoryContext repositoryContext) {
         // 查询
-        if (repositoryContext instanceof AbstractMybatisRepository) {
-            AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
+        if (repositoryContext instanceof AbstractMybatisRepository<?, ?> repository) {
             // 仓储解析器
             RepositoryInfoResolver repositoryInfoResolver = repository.getProperty(RepositoryInfoResolver.class);
             // 查询对象解析器
             QueryInfoResolver queryInfoResolver = repository.getProperty(QueryInfoResolver.class);
             // 连接解析器
             JoinInfoResolver joinInfoResolver = new JoinInfoResolver(repository);
+            repository.setProperty(JoinInfoResolver.class, joinInfoResolver);
 
             EntityElement entityElement = repositoryContext.getEntityElement();
             String primaryKey = entityElement.getPrimaryKey();
@@ -249,7 +249,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             SegmentResolver segmentResolver = new DefaultSegmentResolver();
             SegmentExecutor segmentExecutor = new DefaultSegmentExecutor(primaryKey, primaryKeyAlias, repository.getSqlRunner(), (AbstractRepository<Object, Object>) repository);
             // 查询执行器
-            QueryResolver queryResolver = new SegmentQueryResolver(repositoryInfoResolver, queryInfoResolver, joinInfoResolver, segmentResolver);
+            QueryResolver queryResolver = new SegmentQueryResolver(repositoryInfoResolver, queryInfoResolver, segmentResolver);
             QueryExecutor queryExecutor = new SegmentQueryExecutor(queryResolver, segmentExecutor);
             repository.setSegmentQueryExecutor(queryExecutor);
         }
@@ -258,8 +258,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     @SuppressWarnings("unchecked")
     private void buildCustomQueryExecutor(RepositoryContext repositoryContext) {
         // 查询
-        if (repositoryContext instanceof AbstractMybatisRepository) {
-            AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
+        if (repositoryContext instanceof AbstractMybatisRepository<?, ?> repository) {
             // 查询对象解析器
             QueryInfoResolver queryInfoResolver = repository.getProperty(QueryInfoResolver.class);
             // 主键
@@ -274,8 +273,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     }
 
     private void buildMybatisRepository(RepositoryContext repositoryContext) {
-        if (repositoryContext instanceof AbstractMybatisRepository) {
-            AbstractMybatisRepository<?, ?> repository = (AbstractMybatisRepository<?, ?>) repositoryContext;
+        if (repositoryContext instanceof AbstractMybatisRepository<?, ?> repository) {
             QueryExecutor queryExecutor = repository.getSegmentQueryExecutor();
             if (queryExecutor instanceof SegmentQueryExecutor) {
                 QueryResolver queryResolver = ((SegmentQueryExecutor) queryExecutor).getQueryResolver();

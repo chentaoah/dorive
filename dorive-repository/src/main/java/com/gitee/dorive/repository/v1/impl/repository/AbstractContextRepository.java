@@ -18,9 +18,8 @@
 package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ArrayUtil;
-import com.gitee.dorive.base.v1.aggregate.api.EntityTypeResolver;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
+import com.gitee.dorive.base.v1.common.annotation.Event;
 import com.gitee.dorive.base.v1.common.api.BoundedContext;
 import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
 import com.gitee.dorive.base.v1.common.def.EntityDef;
@@ -31,18 +30,25 @@ import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
 import com.gitee.dorive.base.v1.core.util.ReflectUtils;
+import com.gitee.dorive.base.v1.definition.api.EntityTypeResolver;
 import com.gitee.dorive.base.v1.executor.api.Executor;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
+import com.gitee.dorive.repository.v1.api.EventFactory;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.api.RepositoryPostProcessor;
 import com.gitee.dorive.repository.v1.entity.event.ExecutorEvent;
 import com.gitee.dorive.repository.v1.entity.event.RepositoryEvent;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
 import com.gitee.dorive.repository.v1.impl.executor.RepositoryEventExecutor;
+import com.gitee.dorive.repository.v1.impl.factory.ExecutorEventFactory;
+import com.gitee.dorive.repository.v1.impl.factory.ExecutorTargetEventFactory;
+import com.gitee.dorive.repository.v1.impl.factory.RepositoryEventFactory;
+import com.gitee.dorive.repository.v1.impl.factory.RepositoryTargetEventFactory;
+import jakarta.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -50,13 +56,18 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Setter
-public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK>
-        implements ApplicationContextAware, BoundedContextAware, InitializingBean, RepositoryContext {
+public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, BoundedContextAware, InitializingBean, RepositoryContext {
 
     private ApplicationContext applicationContext;
     private BoundedContext boundedContext;
@@ -66,11 +77,11 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
     private RepositoryItem rootRepository;
     private List<RepositoryItem> subRepositories = new ArrayList<>();
     private List<RepositoryItem> orderedRepositories = new ArrayList<>();
-    private boolean enableExecutorEvent = false;
-    private boolean enableRepositoryEvent = false;
+    private List<EventFactory> executorEventFactories = new ArrayList<>();
+    private List<EventFactory> repositoryEventFactories = new ArrayList<>();
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(@Nonnull ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
@@ -136,8 +147,24 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     private void determineEnableEventPublish() {
         Class<?>[] events = repositoryDef.getEvents();
-        this.enableExecutorEvent = ArrayUtil.contains(events, ExecutorEvent.class);
-        this.enableRepositoryEvent = ArrayUtil.contains(events, RepositoryEvent.class);
+        for (Class<?> eventClass : events) {
+            if (ExecutorEvent.class.isAssignableFrom(eventClass)) {
+                executorEventFactories.add(new ExecutorEventFactory(eventClass));
+
+            } else if (RepositoryEvent.class.isAssignableFrom(eventClass)) {
+                repositoryEventFactories.add(new RepositoryEventFactory(eventClass));
+            }
+        }
+        Set<Event> eventsAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(getClass(), Event.class);
+        for (Event eventsAnnotation : eventsAnnotations) {
+            Class<?> source = eventsAnnotation.source();
+            if (ExecutorEvent.class.isAssignableFrom(source)) {
+                executorEventFactories.add(new ExecutorTargetEventFactory(source, eventsAnnotation.target()));
+
+            } else if (RepositoryEvent.class.isAssignableFrom(source)) {
+                repositoryEventFactories.add(new RepositoryTargetEventFactory(source, eventsAnnotation.target()));
+            }
+        }
     }
 
     private RepositoryItem newRepositoryItem(EntityElement entityElement) {
@@ -206,8 +233,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
 
     protected Executor newExecutor() {
         Executor executor = repositoryBuilder.newExecutor(this);
-        if (enableRepositoryEvent) {
-            executor = new RepositoryEventExecutor(executor, applicationContext, getEntityElement());
+        if (!repositoryEventFactories.isEmpty()) {
+            executor = new RepositoryEventExecutor(executor, applicationContext, getEntityElement(), repositoryEventFactories);
         }
         return executor;
     }

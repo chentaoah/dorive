@@ -90,7 +90,7 @@ public abstract class AbstractModuleParser implements ModuleParser {
                 try (InputStream inputStream = resource.getInputStream()) {
                     Manifest manifest = new Manifest(inputStream);
                     Attributes mainAttributes = manifest.getMainAttributes();
-                    String moduleName = mainAttributes.getValue("Dorive-Module");
+                    String moduleName = mainAttributes.getValue("X-Module-Name");
                     if (moduleName != null) {
                         ModuleDefinition moduleDefinition = new ModuleDefinition(manifest);
                         nameModuleDefinitionMap.put(moduleName, moduleDefinition);

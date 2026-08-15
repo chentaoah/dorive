@@ -17,10 +17,10 @@
 
 package com.gitee.dorive.web.v1.impl.service;
 
-import com.gitee.dorive.base.v1.core.util.ReflectUtils;
 import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
+import com.gitee.dorive.base.v1.core.util.ReflectUtils;
+import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.web.v1.entity.ResObject;
 import lombok.Getter;
@@ -39,6 +39,7 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
 
     private ApplicationContext applicationContext;
     private AbstractQueryRepository<E, Object> repository;
+    private Validator validator;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -51,10 +52,19 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
         Class<?> entityClass = ReflectUtils.getFirstTypeArgument(getClass());
         Class<?> repositoryClass = RepositoryRegister.findRepositoryClass(entityClass);
         this.repository = (AbstractQueryRepository<E, Object>) applicationContext.getBean(repositoryClass);
+        this.validator = new Validator(repository, entityClass, null);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> add(Options options, E entity) {
+        ResObject<Object> resObject = validator.validate("add", entity);
+        if (resObject != null && resObject.isFailure()) {
+            return resObject;
+        }
+        return doAdd(options, entity);
+    }
+
+    public ResObject<Object> doAdd(Options options, E entity) {
         int count = repository.insert(options, entity);
         return ResObject.of(count > 0);
     }
@@ -75,6 +85,14 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
 
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> edit(Options options, E entity) {
+        ResObject<Object> resObject = validator.validate("edit", entity);
+        if (resObject != null && resObject.isFailure()) {
+            return resObject;
+        }
+        return doEdit(options, entity);
+    }
+
+    public ResObject<Object> doEdit(Options options, E entity) {
         int count = repository.update(options, entity);
         return ResObject.of(count > 0);
     }

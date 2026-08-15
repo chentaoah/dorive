@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.module.v1.impl.environment;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.module.v1.api.ModuleParser;
@@ -40,11 +41,13 @@ public class ModuleContextAnnotationAutowireCandidateResolver extends ContextAnn
             Class<?> declaringClass = (Class<?>) ReflectUtil.getFieldValue(descriptor, "declaringClass");
             if (declaringClass != null && moduleParser.isUnderScanPackage(declaringClass.getName())) {
                 ModuleDefinition moduleDefinition = moduleParser.findModuleDefinition(declaringClass);
-                if (moduleDefinition != null && !moduleDefinition.isGlobalValues(declaringClass)) {
-                    String strValue = (String) value;
-                    if (strValue.startsWith("${") && strValue.endsWith("}")) {
-                        strValue = StrUtil.removePrefix(strValue, "${");
-                        return "${" + moduleDefinition.getPropertiesPrefix() + strValue;
+                if (moduleDefinition != null) {
+                    if (CollUtil.isNotEmpty(moduleDefinition.getConfigs()) && !moduleDefinition.isGlobalValues(declaringClass)) {
+                        String strValue = (String) value;
+                        if (strValue.startsWith("${") && strValue.endsWith("}")) {
+                            strValue = StrUtil.removePrefix(strValue, "${");
+                            return "${" + moduleDefinition.getPropertiesPrefix() + strValue;
+                        }
                     }
                 }
             }

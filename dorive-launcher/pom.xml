@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.gitee.digital-engine</groupId>
         <artifactId>dorive</artifactId>
-        <version>3.5.6</version>
+        <version>4.0.0</version>
     </parent>
     <artifactId>dorive-launcher</artifactId>
     <dependencies>
@@ -17,12 +17,7 @@
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-aggregate</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-repository</artifactId>
+            <artifactId>dorive-definition</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -32,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-executor</artifactId>
+            <artifactId>dorive-joiner</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -42,12 +37,17 @@
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-joiner</artifactId>
+            <artifactId>dorive-query</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
-            <artifactId>dorive-query</artifactId>
+            <artifactId>dorive-executor</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-repository</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

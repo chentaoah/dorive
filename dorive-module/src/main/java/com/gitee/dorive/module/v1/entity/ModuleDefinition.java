@@ -57,6 +57,8 @@ public class ModuleDefinition {
     private List<String> provides;
     private List<String> notifies;
     private List<String> waits;
+    private List<String> publishes;
+    private List<String> subscribes;
     private String tablePrefix;
     private String requestPrefix;
 
@@ -66,28 +68,30 @@ public class ModuleDefinition {
         Assert.notNull(manifest, "The manifest can not be null!");
 
         Attributes mainAttributes = manifest.getMainAttributes();
-        String origin = mainAttributes.getValue("Dorive-Origin");
-        String organization = mainAttributes.getValue("Dorive-Organization");
-        String project = mainAttributes.getValue("Dorive-Project");
-        String domain = mainAttributes.getValue("Dorive-Domain");
-        String subdomain = mainAttributes.getValue("Dorive-Subdomain");
+        String origin = mainAttributes.getValue("X-Module-Origin");
+        String organization = mainAttributes.getValue("X-Module-Organization");
+        String project = mainAttributes.getValue("X-Module-Project");
+        String domain = mainAttributes.getValue("X-Module-Domain");
+        String subdomain = mainAttributes.getValue("X-Module-Subdomain");
 
-        String name = mainAttributes.getValue("Dorive-Module");
-        String version = mainAttributes.getValue("Dorive-Version");
-        String description = mainAttributes.getValue("Dorive-Description");
-        String type = mainAttributes.getValue("Dorive-Type");
-        String tags = mainAttributes.getValue("Dorive-Tags");
+        String name = mainAttributes.getValue("X-Module-Name");
+        String version = mainAttributes.getValue("X-Module-Version");
+        String description = mainAttributes.getValue("X-Module-Description");
+        String type = mainAttributes.getValue("X-Module-Type");
+        String tags = mainAttributes.getValue("X-Module-Tags");
 
-        String profiles = mainAttributes.getValue("Dorive-Profiles");
-        String configs = mainAttributes.getValue("Dorive-Configs");
-        String globalValues = mainAttributes.getValue("Dorive-Global-Values");
-        String exports = mainAttributes.getValue("Dorive-Exports");
-        String requires = mainAttributes.getValue("Dorive-Requires");
-        String provides = mainAttributes.getValue("Dorive-Provides");
-        String notifies = mainAttributes.getValue("Dorive-Notifies");
-        String waits = mainAttributes.getValue("Dorive-Waits");
-        String tablePrefix = mainAttributes.getValue("Dorive-Table-Prefix");
-        String requestPrefix = mainAttributes.getValue("Dorive-Request-Prefix");
+        String profiles = mainAttributes.getValue("X-Module-Profiles");
+        String configs = mainAttributes.getValue("X-Module-Configs");
+        String globalValues = mainAttributes.getValue("X-Module-Global-Values");
+        String exports = mainAttributes.getValue("X-Module-Exports");
+        String requires = mainAttributes.getValue("X-Module-Requires");
+        String provides = mainAttributes.getValue("X-Module-Provides");
+        String notifies = mainAttributes.getValue("X-Module-Notifies");
+        String waits = mainAttributes.getValue("X-Module-Waits");
+        String publishes = mainAttributes.getValue("X-Module-Publishes");
+        String subscribes = mainAttributes.getValue("X-Module-Subscribes");
+        String tablePrefix = mainAttributes.getValue("X-Module-Table-Prefix");
+        String requestPrefix = mainAttributes.getValue("X-Module-Request-Prefix");
 
         this.origin = filterValue(origin);
         this.organization = filterValue(organization);
@@ -109,6 +113,8 @@ public class ModuleDefinition {
         this.provides = filterValues(provides);
         this.notifies = filterValues(notifies);
         this.waits = filterValues(waits);
+        this.publishes = filterValues(publishes);
+        this.subscribes = filterValues(subscribes);
         this.tablePrefix = filterValue(tablePrefix);
         this.requestPrefix = filterValue(requestPrefix);
 

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.gitee.digital-engine</groupId>
         <artifactId>dorive</artifactId>
-        <version>3.5.6</version>
+        <version>4.0.0</version>
     </parent>
     <artifactId>dorive-module</artifactId>
     <dependencies>
@@ -25,7 +25,11 @@
                 </exclusion>
                 <exclusion>
                     <groupId>com.baomidou</groupId>
-                    <artifactId>mybatis-plus-boot-starter</artifactId>
+                    <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.baomidou</groupId>
+                    <artifactId>mybatis-plus-jsqlparser</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
