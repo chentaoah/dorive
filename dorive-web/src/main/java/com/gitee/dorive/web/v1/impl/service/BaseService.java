@@ -71,7 +71,14 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
 
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> addBatch(Options options, List<E> entities) {
-        int count = repository.insertList(options, entities);
+        int count = 0;
+        for (E entity : entities) {
+            ResObject<Object> resObject = add(options, entity);
+            if (resObject != null && resObject.isFailure()) {
+                throw new RuntimeException("第" + (count + 1) + "条数据操作失败，原因：【" + resObject.getMessage() + "】");
+            }
+            count++;
+        }
         return ResObject.of(count > 0);
     }
 
@@ -99,7 +106,14 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
 
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> editBatch(Options options, List<E> entities) {
-        int count = repository.updateList(options, entities);
+        int count = 0;
+        for (E entity : entities) {
+            ResObject<Object> resObject = edit(options, entity);
+            if (resObject != null && resObject.isFailure()) {
+                throw new RuntimeException("第" + (count + 1) + "条数据操作失败，原因：【" + resObject.getMessage() + "】");
+            }
+            count++;
+        }
         return ResObject.of(count > 0);
     }
 
