@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.web.v1.impl.service;
 
+import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.core.util.ReflectUtils;
@@ -71,6 +72,7 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
 
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> addBatch(Options options, List<E> entities) {
+        Assert.notNull(entities, "The entities cannot be null!");
         int count = 0;
         for (E entity : entities) {
             ResObject<Object> resObject = add(options, entity);
@@ -106,6 +108,7 @@ public class BaseService<E, Q> implements ApplicationContextAware, InitializingB
 
     @Transactional(rollbackFor = Exception.class)
     public ResObject<Object> editBatch(Options options, List<E> entities) {
+        Assert.notNull(entities, "The entities cannot be null!");
         int count = 0;
         for (E entity : entities) {
             ResObject<Object> resObject = edit(options, entity);
