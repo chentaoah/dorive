@@ -149,8 +149,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
     @SuppressWarnings("unchecked")
     public int execute(Context context, Operation operation) {
         int totalCount = 0;
-        if (operation instanceof EntityOp) {
-            EntityOp entityOp = (EntityOp) operation;
+        if (operation instanceof EntityOp entityOp) {
             List<?> persistentObjs = entityOp.getEntities();
             if (entityOp instanceof Insert) {
                 InsertMethod insertMethod = context.getOption(InsertMethod.class);
@@ -163,8 +162,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                     }
                 }
 
-            } else if (operation instanceof Update) {
-                Update update = (Update) operation;
+            } else if (operation instanceof Update update) {
                 Set<String> nullableProps = update.getNullableProps();
                 if (nullableProps != null && !nullableProps.isEmpty()) {
                     for (Object persistentObj : persistentObjs) {
@@ -186,8 +184,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
             }
 
         } else if (operation instanceof Condition) {
-            if (operation instanceof ConditionUpdate) {
-                ConditionUpdate conditionUpdate = (ConditionUpdate) operation;
+            if (operation instanceof ConditionUpdate conditionUpdate) {
                 Object persistentObj = conditionUpdate.getEntity();
                 Set<String> nullableProps = conditionUpdate.getNullableProps();
                 Object primaryKey = conditionUpdate.getPrimaryKey();
@@ -210,8 +207,7 @@ public class MybatisPlusExecutor extends AbstractExecutor {
                     }
                 }
 
-            } else if (operation instanceof ConditionDelete) {
-                ConditionDelete conditionDelete = (ConditionDelete) operation;
+            } else if (operation instanceof ConditionDelete conditionDelete) {
                 Object primaryKey = conditionDelete.getPrimaryKey();
                 Example example = conditionDelete.getExample();
                 if (primaryKey != null) {
