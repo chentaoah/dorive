@@ -78,8 +78,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
 
     @Override
     public int execute(Context context, Operation operation) {
-        if (operation instanceof Condition) {
-            Condition condition = (Condition) operation;
+        if (operation instanceof Condition condition) {
             Example example = condition.getExample();
             if (example != null) {
                 convert(context, example);
@@ -144,8 +143,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
                     }
                 } else if (Operator.MULTI_IN.equals(operator)) {
                     Object value = criterion.getValue();
-                    if (value instanceof MultiInBuilder) {
-                        MultiInBuilder builder = (MultiInBuilder) value;
+                    if (value instanceof MultiInBuilder builder) {
                         List<String> properties = builder.getProperties();
                         properties = entityTransformer.toAliases(properties);
                         builder.setProperties(properties);
