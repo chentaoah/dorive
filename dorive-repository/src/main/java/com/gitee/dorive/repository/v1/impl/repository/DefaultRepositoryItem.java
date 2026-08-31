@@ -42,13 +42,18 @@ import java.util.List;
 
 @Getter
 @Setter
-public class DefaultRepositoryItem extends AbstractProxyRepository implements RepositoryItem {
+public class DefaultRepositoryItem extends AbstractRepositoryEle implements RepositoryItem {
 
     private String accessPath;
     private boolean root;
     private boolean aggregated;
     private BinderExecutor binderExecutor;
     private OrderByFactory orderByFactory;
+
+    @Override
+    public AbstractRepositoryEle getProxyRepository() {
+        return (AbstractRepositoryEle) getExecutor();
+    }
 
     @Override
     public RepositoryContext getRepositoryContext() {

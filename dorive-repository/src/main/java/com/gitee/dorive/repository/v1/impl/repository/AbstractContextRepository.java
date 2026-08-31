@@ -190,7 +190,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         DefaultRepositoryItem defaultRepositoryItem = new DefaultRepositoryItem();
         defaultRepositoryItem.setEntityElement(entityElement);
         defaultRepositoryItem.setOperationFactory(operationFactory);
-        defaultRepositoryItem.setProxyRepository(repository);
+        defaultRepositoryItem.setExecutor(repository);
         defaultRepositoryItem.setAccessPath(accessPath);
         defaultRepositoryItem.setRoot(isRoot);
         defaultRepositoryItem.setAggregated(isAggregated);
