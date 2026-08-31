@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.base.v1.mybatis.entity;
 
-import com.gitee.dorive.base.v1.executor.api.Matcher;
+import com.gitee.dorive.base.v1.executor.api.Selector;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,7 +33,7 @@ import java.util.List;
 public class CountQuery {
     private Object query;
     private boolean distinct = true;
-    private Matcher matcher;
+    private Selector selector;
     private List<String> countBy;
     private List<String> groupBy;
 

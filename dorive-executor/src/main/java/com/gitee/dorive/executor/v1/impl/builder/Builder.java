@@ -8,10 +8,12 @@ import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.ctx.DefaultOptions;
 import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.executor.api.Selection;
+import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.executor.v1.impl.matcher.LambdaMatcher;
 import com.gitee.dorive.executor.v1.impl.matcher.NameMatcher;
 import com.gitee.dorive.executor.v1.impl.matcher.TypeMatcher;
 import com.gitee.dorive.executor.v1.impl.selection.DefaultSelection;
+import com.gitee.dorive.executor.v1.impl.selector.DefaultSelector;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -67,7 +69,6 @@ public class Builder {
     }
 
     public Options build() {
-        Options options = new DefaultOptions();
         // Matcher
         Matcher matcher = null;
         List<Selection> matcherSelections = null;
@@ -83,16 +84,22 @@ public class Builder {
                 matcher = new TypeMatcher(types);
             }
         }
+
+        // Selector
+        DefaultSelector selector = new DefaultSelector();
         if (matcher != null) {
-            options.setOption(Matcher.class, matcher);
+            selector.setMatcher(matcher);
         }
         if (matcherSelections != null) {
-            options.setOptions(Selection.class, matcherSelections);
+            selector.setSelections(matcherSelections);
         }
-        // Selection
         if (selections != null && selections.length > 0) {
-            options.setOptions(Selection.class, Arrays.stream(selections).map(this::newSelection).collect(Collectors.toList()));
+            selector.setSelections(Arrays.stream(selections).map(this::newSelection).collect(Collectors.toList()));
         }
+
+        // Options
+        Options options = new DefaultOptions();
+        options.setOption(Selector.class, selector);
         return options;
     }
 
