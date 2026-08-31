@@ -19,6 +19,7 @@ package com.gitee.dorive.repository.v1.impl.repository;
 
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.entity.cop.ConditionUpdate;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
@@ -36,6 +37,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @Getter
@@ -106,6 +108,18 @@ public class DefaultRepositoryItem extends AbstractProxyRepository implements Re
 
     @Override
     public int execute(Context context, Operation operation) {
+        Selector selector = context.getOption(Selector.class);
+        if (selector != null) {
+            List<String> properties = selector.select(this);
+            if (properties != null && !properties.isEmpty()) {
+                if (operation instanceof Update update) {
+                    update.setNullableProps(new LinkedHashSet<>(properties));
+
+                } else if (operation instanceof ConditionUpdate conditionUpdate) {
+                    conditionUpdate.setNullableProps(new LinkedHashSet<>(properties));
+                }
+            }
+        }
         if (!isAggregated() && operation instanceof InsertOrUpdate insertOrUpdate) {
             Insert insert = insertOrUpdate.getInsert();
             Update update = insertOrUpdate.getUpdate();
