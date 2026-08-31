@@ -26,7 +26,6 @@ import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.repository.api.Repository;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 import com.gitee.dorive.mybatis.v2.entity.SelectSegment;
 import com.gitee.dorive.mybatis.v2.entity.TableSegment;
 import com.gitee.dorive.query.v2.api.SegmentExecutor;

@@ -22,7 +22,6 @@ import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.binder.api.ExampleBuilder;
 import com.gitee.dorive.base.v1.binder.enums.JoinType;
-import com.gitee.dorive.base.v1.common.def.RepositoryDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
@@ -36,7 +35,7 @@ import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepositoryEle;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.binder.v1.impl.example.MultiExampleBuilder;
 import com.gitee.dorive.binder.v1.impl.example.SingleExampleBuilder;
@@ -75,7 +74,6 @@ import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
 import com.gitee.dorive.repository.v1.impl.resolver.RepositoryDerivedResolver;
-import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,8 +98,8 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     }
 
     @Override
-    public AbstractRepository<Object, Object> newRepository(RepositoryContext repositoryContext, EntityElement entityElement) {
-        AbstractRepository<Object, Object> repository = null;
+    public AbstractRepositoryEle newRepository(RepositoryContext repositoryContext, EntityElement entityElement) {
+        AbstractRepositoryEle repository = null;
         // mybatis-plus
         if (repositoryContext instanceof MybatisPlusRepository) {
             repository = new MybatisPlusRepositoryBuilder((MybatisPlusRepository<?, ?>) repositoryContext).newRepository(entityElement);

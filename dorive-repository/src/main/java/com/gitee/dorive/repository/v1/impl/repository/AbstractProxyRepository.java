@@ -18,36 +18,31 @@
 package com.gitee.dorive.repository.v1.impl.repository;
 
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepositoryEle;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class AbstractProxyRepository extends AbstractRepository<Object, Object> {
+public abstract class AbstractProxyRepository extends AbstractRepositoryEle {
 
-    private AbstractRepository<Object, Object> proxyRepository;
+    private AbstractRepositoryEle proxyRepository;
 
-    public AbstractRepository<Object, Object> getProxyRepository() {
+    public AbstractRepositoryEle getProxyRepository() {
         if (proxyRepository instanceof AbstractProxyRepository) {
             return ((AbstractProxyRepository) proxyRepository).getProxyRepository();
         }
         return proxyRepository;
     }
 
-    public void setProxyRepository(AbstractRepository<Object, Object> repository) {
+    public void setProxyRepository(AbstractRepositoryEle repository) {
         if (proxyRepository instanceof AbstractProxyRepository) {
             ((AbstractProxyRepository) proxyRepository).setProxyRepository(repository);
         }

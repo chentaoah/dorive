@@ -18,23 +18,14 @@
 package com.gitee.dorive.base.v1.repository.api;
 
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.impl.OperationFactory;
-import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepositoryEle;
 
 import java.util.Collection;
 
-public interface RepositoryItem extends Executor, Properties {
+public interface RepositoryItem extends RepositoryEle {
 
-    EntityElement getEntityElement();
-
-    OperationFactory getOperationFactory();
-
-    Class<?> getEntityClass();
-
-    AbstractRepository<Object, Object> getProxyRepository();
+    AbstractRepositoryEle getProxyRepository();
 
     RepositoryContext getRepositoryContext();
 

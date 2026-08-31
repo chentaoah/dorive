@@ -35,7 +35,7 @@ import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepositoryEle;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.repository.v1.api.EventFactory;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
@@ -67,7 +67,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public abstract class AbstractContextRepository<E, PK> extends AbstractRepository<E, PK> implements ApplicationContextAware, BoundedContextAware, InitializingBean, RepositoryContext {
+public abstract class AbstractContextRepository<E, PK> extends AbstractRepositoryEle implements ApplicationContextAware, BoundedContextAware, InitializingBean, RepositoryContext {
 
     private ApplicationContext applicationContext;
     private BoundedContext boundedContext;
@@ -174,7 +174,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         String accessPath = entityElement.getAccessPath();
         boolean isRoot = entityElement.isRoot();
 
-        AbstractRepository<Object, Object> repository;
+        AbstractRepositoryEle repository;
         if (isRoot) {
             repository = repositoryBuilder.newRepository(this, entityElement);
             repository.setProperty(RepositoryContext.class, this);
@@ -218,11 +218,10 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         entityDef.setRepository(newRepositoryClass);
     }
 
-    @SuppressWarnings("unchecked")
-    private AbstractRepository<Object, Object> doGetRepository(EntityElement entityElement) {
+    private AbstractRepositoryEle doGetRepository(EntityElement entityElement) {
         EntityDef entityDef = entityElement.getEntityDef();
         Class<?> repositoryClass = entityDef.getRepository();
-        AbstractRepository<Object, Object> repository = (AbstractRepository<Object, Object>) applicationContext.getBean(repositoryClass);
+        AbstractRepositoryEle repository = (AbstractRepositoryEle) applicationContext.getBean(repositoryClass);
         if (!entityDef.isAggregate()) {
             AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) repository;
             RepositoryItem rootRepository = abstractContextRepository.getRootRepository();

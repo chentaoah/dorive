@@ -33,7 +33,7 @@ import com.gitee.dorive.base.v1.factory.api.Transformer;
 import com.gitee.dorive.base.v1.factory.api.TransformerManager;
 import com.gitee.dorive.base.v1.factory.enums.Category;
 import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepositoryEle;
 import com.gitee.dorive.base.v1.repository.impl.DefaultRepository;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
 import com.gitee.dorive.factory.v1.api.EntityTransformer;
@@ -66,7 +66,7 @@ public class MybatisPlusRepositoryBuilder {
 
     private final MybatisPlusRepository<?, ?> repository;
 
-    public AbstractRepository<Object, Object> newRepository(EntityElement entityElement) {
+    public AbstractRepositoryEle newRepository(EntityElement entityElement) {
         OperationFactory operationFactory = new OperationFactory(entityElement);
 
         // 存储信息

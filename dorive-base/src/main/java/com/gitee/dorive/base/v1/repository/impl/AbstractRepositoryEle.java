@@ -24,12 +24,13 @@ import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Executor;
+import com.gitee.dorive.base.v1.repository.api.RepositoryEle;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class AbstractRepository<E, PK> extends AbstractProperties implements Executor {
+public abstract class AbstractRepositoryEle extends AbstractProperties implements RepositoryEle {
 
     private EntityElement entityElement;
     private OperationFactory operationFactory;

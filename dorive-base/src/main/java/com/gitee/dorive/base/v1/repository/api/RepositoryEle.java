@@ -15,24 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.repository.v1.api;
+package com.gitee.dorive.base.v1.repository.api;
 
-import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepositoryEle;
 
-public interface RepositoryBuilder {
+public interface RepositoryEle extends Properties, Executor {
 
-    void prepare(RepositoryContext repositoryContext);
+    EntityElement getEntityElement();
 
-    AbstractRepositoryEle newRepository(RepositoryContext repositoryContext, EntityElement entityElement);
+    OperationFactory getOperationFactory();
 
-    BinderExecutor newBinderExecutor(RepositoryContext repositoryContext, EntityElement entityElement);
-
-    Executor newExecutor(RepositoryContext repositoryContext);
-
-    void initialize(RepositoryContext repositoryContext);
+    Class<?> getEntityClass();
 
 }

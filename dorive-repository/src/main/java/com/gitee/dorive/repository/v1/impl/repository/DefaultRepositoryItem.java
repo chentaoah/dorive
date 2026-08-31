@@ -32,7 +32,7 @@ import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
 import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.impl.AbstractRepositoryEle;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -52,11 +52,11 @@ public class DefaultRepositoryItem extends AbstractProxyRepository implements Re
 
     @Override
     public RepositoryContext getRepositoryContext() {
-        AbstractRepository<Object, Object> abstractRepository = getProxyRepository();
-        if (abstractRepository instanceof RepositoryContext) {
-            return (RepositoryContext) abstractRepository;
+        AbstractRepositoryEle abstractRepositoryEle = getProxyRepository();
+        if (abstractRepositoryEle instanceof RepositoryContext) {
+            return (RepositoryContext) abstractRepositoryEle;
         } else {
-            return abstractRepository.getProperty(RepositoryContext.class);
+            return abstractRepositoryEle.getProperty(RepositoryContext.class);
         }
     }
 

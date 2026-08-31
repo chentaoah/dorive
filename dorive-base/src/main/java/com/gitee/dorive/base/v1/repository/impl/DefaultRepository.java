@@ -22,5 +22,5 @@ import lombok.Setter;
 
 @Setter
 @NoArgsConstructor
-public class DefaultRepository extends AbstractRepository<Object, Object> {
+public class DefaultRepository extends AbstractRepositoryEle {
 }
