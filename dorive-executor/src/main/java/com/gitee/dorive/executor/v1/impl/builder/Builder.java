@@ -11,7 +11,7 @@ import com.gitee.dorive.base.v1.executor.api.Selection;
 import com.gitee.dorive.executor.v1.impl.matcher.LambdaMatcher;
 import com.gitee.dorive.executor.v1.impl.matcher.NameMatcher;
 import com.gitee.dorive.executor.v1.impl.matcher.TypeMatcher;
-import com.gitee.dorive.executor.v1.impl.selector.DefaultSelection;
+import com.gitee.dorive.executor.v1.impl.selection.DefaultSelection;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;

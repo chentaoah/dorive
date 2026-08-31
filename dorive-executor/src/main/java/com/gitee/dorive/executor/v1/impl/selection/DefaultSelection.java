@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.impl.selector;
+package com.gitee.dorive.executor.v1.impl.selection;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;

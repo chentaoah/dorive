@@ -22,7 +22,7 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.executor.api.Selection;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.executor.v1.impl.selector.DefaultSelection;
+import com.gitee.dorive.executor.v1.impl.selection.DefaultSelection;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
