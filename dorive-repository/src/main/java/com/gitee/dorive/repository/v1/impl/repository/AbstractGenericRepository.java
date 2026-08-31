@@ -18,6 +18,8 @@
 package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.base.v1.common.api.BoundedContext;
+import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
@@ -31,19 +33,50 @@ import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.core.impl.OperationFactory;
 import com.gitee.dorive.base.v1.core.util.ExampleUtils;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.repository.v1.api.GenericRepository;
+import jakarta.annotation.Nonnull;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import java.util.List;
 
-public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositoryContext implements GenericRepository<E, PK> {
+@Getter
+@Setter
+public abstract class AbstractGenericRepository<E, PK> implements GenericRepository<E, PK>, ApplicationContextAware, BoundedContextAware, InitializingBean {
+
+    protected ApplicationContext applicationContext;
+    protected BoundedContext boundedContext;
+    protected RepositoryContext repositoryContext;
+
+    @Override
+    public void setApplicationContext(@Nonnull ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void setBoundedContext(BoundedContext boundedContext) {
+        this.boundedContext = boundedContext;
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        AbstractRepositoryContext abstractRepositoryContext = new AbstractRepositoryContext(applicationContext, boundedContext);
+        abstractRepositoryContext.afterPropertiesSet();
+        this.repositoryContext = abstractRepositoryContext;
+    }
 
     @Override
     @SuppressWarnings("unchecked")
     public E selectOneByPrimaryKey(Options options, PK primaryKey) {
         Assert.notNull(primaryKey, "The primary key cannot be null!");
-        Query query = getOperationFactory().buildQueryByPK(primaryKey);
-        Result<Object> result = executeQuery((Context) options, query);
+        Query query = repositoryContext.getOperationFactory().buildQueryByPK(primaryKey);
+        Result<Object> result = repositoryContext.executeQuery((Context) options, query);
         return (E) result.getRecord();
     }
 
@@ -57,8 +90,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     @SuppressWarnings("unchecked")
     public List<E> selectByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        Query query = getOperationFactory().buildQueryByExample(example);
-        Result<Object> result = executeQuery((Context) options, query);
+        Query query = repositoryContext.getOperationFactory().buildQueryByExample(example);
+        Result<Object> result = repositoryContext.executeQuery((Context) options, query);
         return (List<E>) result.getRecords();
     }
 
@@ -67,30 +100,30 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     public Page<E> selectPageByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         Assert.notNull(example.getPage(), "The page cannot be null!");
-        Query query = getOperationFactory().buildQueryByExample(example);
-        Result<Object> result = executeQuery((Context) options, query);
+        Query query = repositoryContext.getOperationFactory().buildQueryByExample(example);
+        Result<Object> result = repositoryContext.executeQuery((Context) options, query);
         return (Page<E>) result.getPage();
     }
 
     @Override
     public long selectCountByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        Query query = getOperationFactory().buildQueryByExample(example);
-        return getRootRepository().executeCount((Context) options, query);
+        Query query = repositoryContext.getOperationFactory().buildQueryByExample(example);
+        return repositoryContext.getRootRepository().executeCount((Context) options, query);
     }
 
     @Override
     public int insert(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = getOperationFactory().buildInsert(entity);
-        return execute((Context) options, operation);
+        Operation operation = repositoryContext.getOperationFactory().buildInsert(entity);
+        return repositoryContext.execute((Context) options, operation);
     }
 
     @Override
     public int update(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = getOperationFactory().buildUpdate(options, entity);
-        return execute((Context) options, operation);
+        Operation operation = repositoryContext.getOperationFactory().buildUpdate(options, entity);
+        return repositoryContext.execute((Context) options, operation);
     }
 
     @Override
@@ -98,9 +131,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
         int totalCount = 0;
-        for (RepositoryItem repositoryItem : getOrderedRepositories()) {
-            if (matches(options, repositoryItem)) {
-                Operation operation = getOperationFactory().buildUpdateByExample(options, entity, ExampleUtils.clone(example));
+        for (RepositoryItem repositoryItem : repositoryContext.getOrderedRepositories()) {
+            if (repositoryContext.matches(options, repositoryItem)) {
+                Operation operation = repositoryContext.getOperationFactory().buildUpdateByExample(options, entity, ExampleUtils.clone(example));
                 totalCount += repositoryItem.execute((Context) options, operation);
             }
         }
@@ -110,15 +143,15 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     @Override
     public int insertOrUpdate(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = getOperationFactory().buildInsertOrUpdate(entity);
-        return execute((Context) options, operation);
+        Operation operation = repositoryContext.getOperationFactory().buildInsertOrUpdate(entity);
+        return repositoryContext.execute((Context) options, operation);
     }
 
     @Override
     public int delete(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = getOperationFactory().buildDelete(entity);
-        return execute((Context) options, operation);
+        Operation operation = repositoryContext.getOperationFactory().buildDelete(entity);
+        return repositoryContext.execute((Context) options, operation);
     }
 
     @Override
@@ -132,9 +165,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     public int deleteByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         int totalCount = 0;
-        for (RepositoryItem repositoryItem : getOrderedRepositories()) {
-            if (matches(options, repositoryItem)) {
-                Operation operation = getOperationFactory().buildDeleteByExample(ExampleUtils.clone(example));
+        for (RepositoryItem repositoryItem : repositoryContext.getOrderedRepositories()) {
+            if (repositoryContext.matches(options, repositoryItem)) {
+                Operation operation = repositoryContext.getOperationFactory().buildDeleteByExample(ExampleUtils.clone(example));
                 totalCount += repositoryItem.execute((Context) options, operation);
             }
         }
@@ -150,7 +183,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             return 0;
         }
         Operation operation = new Insert(entities);
-        return execute((Context) options, operation);
+        return repositoryContext.execute((Context) options, operation);
     }
 
     @Override
@@ -160,7 +193,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             return 0;
         }
         Operation operation = new Update(entities);
-        return execute((Context) options, operation);
+        return repositoryContext.execute((Context) options, operation);
     }
 
     @Override
@@ -169,9 +202,9 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         if (entities.isEmpty()) {
             return 0;
         }
-        OperationFactory operationFactory = getOperationFactory();
+        OperationFactory operationFactory = repositoryContext.getOperationFactory();
         Operation operation = operationFactory.buildInsertOrUpdate(entities);
-        return execute((Context) options, operation);
+        return repositoryContext.execute((Context) options, operation);
     }
 
     @Override
@@ -181,7 +214,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             return 0;
         }
         Operation operation = new Delete(entities);
-        return execute((Context) options, operation);
+        return repositoryContext.execute((Context) options, operation);
     }
 
     // ================================================================================

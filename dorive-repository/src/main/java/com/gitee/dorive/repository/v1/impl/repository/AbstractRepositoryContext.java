@@ -21,7 +21,6 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.annotation.Event;
 import com.gitee.dorive.base.v1.common.api.BoundedContext;
-import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
 import com.gitee.dorive.base.v1.common.def.EntityDef;
 import com.gitee.dorive.base.v1.common.def.OrderByDef;
 import com.gitee.dorive.base.v1.common.def.RepositoryDef;
@@ -48,14 +47,10 @@ import com.gitee.dorive.repository.v1.impl.factory.ExecutorEventFactory;
 import com.gitee.dorive.repository.v1.impl.factory.ExecutorTargetEventFactory;
 import com.gitee.dorive.repository.v1.impl.factory.RepositoryEventFactory;
 import com.gitee.dorive.repository.v1.impl.factory.RepositoryTargetEventFactory;
-import jakarta.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.util.ArrayList;
@@ -67,7 +62,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public abstract class AbstractRepositoryContext extends AbstractRepositoryEle implements ApplicationContextAware, BoundedContextAware, InitializingBean, RepositoryContext {
+public class AbstractRepositoryContext extends AbstractRepositoryEle implements RepositoryContext {
 
     private ApplicationContext applicationContext;
     private BoundedContext boundedContext;
@@ -80,17 +75,11 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
     private List<EventFactory> executorEventFactories = new ArrayList<>();
     private List<EventFactory> repositoryEventFactories = new ArrayList<>();
 
-    @Override
-    public void setApplicationContext(@Nonnull ApplicationContext applicationContext) throws BeansException {
+    public AbstractRepositoryContext(ApplicationContext applicationContext, BoundedContext boundedContext) {
         this.applicationContext = applicationContext;
-    }
-
-    @Override
-    public void setBoundedContext(BoundedContext boundedContext) {
         this.boundedContext = boundedContext;
     }
 
-    @Override
     public void afterPropertiesSet() {
         // 仓储构建器
         this.repositoryBuilder = applicationContext.getBean(RepositoryBuilder.class);

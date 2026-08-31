@@ -100,7 +100,7 @@ public class Validator {
             return "edit".equals(method) && nullCount == uniqueConstraintFields.size() ? 0 : -2;
         }
         if ("edit".equals(method)) {
-            String fieldName = repository.getEntityElement().getPrimaryKey();
+            String fieldName = repository.getRepositoryContext().getEntityElement().getPrimaryKey();
             Object fieldValue = ReflectUtil.getFieldValue(entity, fieldName);
             if (fieldValue == null) {
                 return -2;
