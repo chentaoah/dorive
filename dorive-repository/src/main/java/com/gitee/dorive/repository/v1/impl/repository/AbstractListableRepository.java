@@ -20,6 +20,7 @@ package com.gitee.dorive.repository.v1.impl.repository;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
+import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.repository.v1.api.ListableRepository;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
@@ -38,17 +39,20 @@ public abstract class AbstractListableRepository<E, PK> extends AbstractContextR
     public long selectCountByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         RepositoryItem rootRepository = getRootRepository();
-        return rootRepository.selectCountByExample(options, example);
+        Query query = getOperationFactory().buildQueryByExample(example);
+        return rootRepository.executeCount((Context) options, query);
     }
 
     @Override
     public int updateByExample(Options options, Object entity, Example example) {
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
+        OperationFactory operationFactory = getOperationFactory();
         int totalCount = 0;
         for (RepositoryItem repositoryItem : getOrderedRepositories()) {
             if (matches(options, repositoryItem)) {
-                totalCount += repositoryItem.updateByExample(options, entity, ExampleUtils.clone(example));
+                Operation operation = operationFactory.buildUpdateByExample(options, entity, ExampleUtils.clone(example));
+                totalCount += repositoryItem.execute((Context) options, operation);
             }
         }
         return totalCount;
@@ -64,10 +68,12 @@ public abstract class AbstractListableRepository<E, PK> extends AbstractContextR
     @Override
     public int deleteByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
+        OperationFactory operationFactory = getOperationFactory();
         int totalCount = 0;
         for (RepositoryItem repositoryItem : getOrderedRepositories()) {
             if (matches(options, repositoryItem)) {
-                totalCount += repositoryItem.deleteByExample(options, ExampleUtils.clone(example));
+                Operation operation = operationFactory.buildDeleteByExample(ExampleUtils.clone(example));
+                totalCount += repositoryItem.execute((Context) options, operation);
             }
         }
         return totalCount;

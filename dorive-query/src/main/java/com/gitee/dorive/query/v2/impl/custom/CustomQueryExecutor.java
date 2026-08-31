@@ -30,7 +30,7 @@ import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.query.v2.entity.core.QueryInfo;
 import com.gitee.dorive.query.v2.impl.core.ExampleResolver;
 import com.gitee.dorive.query.v2.impl.core.QueryInfoResolver;
@@ -49,7 +49,7 @@ public class CustomQueryExecutor implements QueryExecutor {
     private final QueryInfoResolver queryInfoResolver;
     private final String primaryKey;
     private final EntityStoreInfo entityStoreInfo;
-    private final AbstractRepository<Object, Object> repository;
+    private final Repository<Object, Object> repository;
 
     @Override
     public List<Object> selectByQuery(Options options, Object query) {

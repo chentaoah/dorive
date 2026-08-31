@@ -43,6 +43,7 @@ import java.util.List;
 @Getter
 @Setter
 public class DefaultRepositoryItem extends AbstractProxyRepository implements RepositoryItem {
+
     private String accessPath;
     private boolean root;
     private boolean aggregated;

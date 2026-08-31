@@ -21,7 +21,9 @@ import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
+import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.ctx.DefaultContext;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
@@ -73,7 +75,10 @@ public class StepwiseQuerier {
             } else if (example.isNotEmpty()) {
                 example.select(binderExecutor.getSelfFields());
                 binderExecutor.appendFilterValue(context, example);
-                entities = repositoryItem.selectByExample(new DefaultContext(Options.ROOT, context), example);
+                Context newContext = new DefaultContext(Options.ROOT, context);
+                Query newQuery = new Query(example);
+                Result<Object> result = repositoryItem.executeQuery(newContext, newQuery);
+                entities = result.getRecords();
 
             } else {
                 continue;

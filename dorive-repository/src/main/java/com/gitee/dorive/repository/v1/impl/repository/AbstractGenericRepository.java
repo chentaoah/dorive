@@ -17,14 +17,111 @@
 
 package com.gitee.dorive.repository.v1.impl.repository;
 
+import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
+import com.gitee.dorive.base.v1.core.entity.cop.Query;
+import com.gitee.dorive.base.v1.core.entity.op.Operation;
+import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
+import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.repository.v1.api.GenericRepository;
 
 import java.util.List;
 
 public abstract class AbstractGenericRepository<E, PK> extends AbstractQueryRepository<E, PK> implements GenericRepository<E, PK> {
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public E selectOneByPrimaryKey(Options options, PK primaryKey) {
+        Assert.notNull(primaryKey, "The primary key cannot be null!");
+        Query query = getOperationFactory().buildQueryByPK(primaryKey);
+        Result<Object> result = executeQuery((Context) options, query);
+        return (E) result.getRecord();
+    }
+
+    @Override
+    public E selectOneByExample(Options options, Example example) {
+        List<E> entities = selectByExample(options, example);
+        return entities != null && !entities.isEmpty() ? entities.get(0) : null;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<E> selectByExample(Options options, Example example) {
+        Assert.notNull(example, "The example cannot be null!");
+        Query query = getOperationFactory().buildQueryByExample(example);
+        Result<Object> result = executeQuery((Context) options, query);
+        return (List<E>) result.getRecords();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Page<E> selectPageByExample(Options options, Example example) {
+        Assert.notNull(example, "The example cannot be null!");
+        Assert.notNull(example.getPage(), "The page cannot be null!");
+        Query query = getOperationFactory().buildQueryByExample(example);
+        Result<Object> result = executeQuery((Context) options, query);
+        return (Page<E>) result.getPage();
+    }
+
+    @Override
+    public long selectCountByExample(Options options, Example example) {
+        Assert.notNull(example, "The example cannot be null!");
+        Query query = getOperationFactory().buildQueryByExample(example);
+        return executeCount((Context) options, query);
+    }
+
+    @Override
+    public int insert(Options options, E entity) {
+        Assert.notNull(entity, "The entity cannot be null!");
+        Operation operation = getOperationFactory().buildInsert(entity);
+        return execute((Context) options, operation);
+    }
+
+    @Override
+    public int update(Options options, E entity) {
+        Assert.notNull(entity, "The entity cannot be null!");
+        Operation operation = getOperationFactory().buildUpdate(options, entity);
+        return execute((Context) options, operation);
+    }
+
+    @Override
+    public int updateByExample(Options options, Object entity, Example example) {
+        Assert.notNull(entity, "The entity cannot be null!");
+        Assert.notNull(example, "The example cannot be null!");
+        Operation operation = getOperationFactory().buildUpdateByExample(options, entity, example);
+        return execute((Context) options, operation);
+    }
+
+    @Override
+    public int insertOrUpdate(Options options, E entity) {
+        Assert.notNull(entity, "The entity cannot be null!");
+        Operation operation = getOperationFactory().buildInsertOrUpdate(entity);
+        return execute((Context) options, operation);
+    }
+
+    @Override
+    public int delete(Options options, E entity) {
+        Assert.notNull(entity, "The entity cannot be null!");
+        Operation operation = getOperationFactory().buildDelete(entity);
+        return execute((Context) options, operation);
+    }
+
+    @Override
+    public int deleteByPrimaryKey(Options options, PK primaryKey) {
+        Assert.notNull(primaryKey, "The primary key cannot be null!");
+        Operation operation = getOperationFactory().buildDeleteByPK(primaryKey);
+        return execute((Context) options, operation);
+    }
+
+    @Override
+    public int deleteByExample(Options options, Example example) {
+        Assert.notNull(example, "The example cannot be null!");
+        Operation operation = getOperationFactory().buildDeleteByExample(example);
+        return execute((Context) options, operation);
+    }
 
     @Override
     public E findOneById(PK id) {

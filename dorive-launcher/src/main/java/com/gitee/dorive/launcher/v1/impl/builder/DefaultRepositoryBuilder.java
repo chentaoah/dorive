@@ -33,6 +33,7 @@ import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
+import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
@@ -223,7 +224,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             repository.setProperty(StepwiseQuerier.class, stepwiseQuerier);
             // 查询执行器
             QueryResolver queryResolver = new StepwiseQueryResolver(queryInfoResolver);
-            QueryExecutor queryExecutor = new StepwiseQueryExecutor(queryResolver, (AbstractRepository<Object, Object>) repository);
+            QueryExecutor queryExecutor = new StepwiseQueryExecutor(queryResolver, (Repository<Object, Object>) repository);
             repository.setStepwiseQueryExecutor(queryExecutor);
         }
     }
@@ -247,7 +248,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             String primaryKeyAlias = transformer.toAlias(primaryKey);
 
             SegmentResolver segmentResolver = new DefaultSegmentResolver();
-            SegmentExecutor segmentExecutor = new DefaultSegmentExecutor(primaryKey, primaryKeyAlias, repository.getSqlRunner(), (AbstractRepository<Object, Object>) repository);
+            SegmentExecutor segmentExecutor = new DefaultSegmentExecutor(primaryKey, primaryKeyAlias, repository.getSqlRunner(), (Repository<Object, Object>) repository);
             // 查询执行器
             QueryResolver queryResolver = new SegmentQueryResolver(repositoryInfoResolver, queryInfoResolver, segmentResolver);
             QueryExecutor queryExecutor = new SegmentQueryExecutor(queryResolver, segmentExecutor);
@@ -267,7 +268,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             // 数据库信息
             EntityStoreInfo entityStoreInfo = repository.getProperty(EntityStoreInfo.class);
             // 查询执行器
-            QueryExecutor queryExecutor = new CustomQueryExecutor(queryInfoResolver, primaryKey, entityStoreInfo, (AbstractRepository<Object, Object>) repository);
+            QueryExecutor queryExecutor = new CustomQueryExecutor(queryInfoResolver, primaryKey, entityStoreInfo, (Repository<Object, Object>) repository);
             repository.setCustomQueryExecutor(queryExecutor);
         }
     }

@@ -21,7 +21,7 @@ import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.core.entity.ctx.DefaultContext;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.repository.v1.api.RefObj;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -50,7 +50,7 @@ public class RefObjImpl implements RefObj {
         if (!(options instanceof Context)) {
             options = new DefaultContext(options);
         }
-        AbstractRepository<Object, Object> repository = (AbstractRepository<Object, Object>) refImpl.getRepository();
+        Repository<Object, Object> repository = (Repository<Object, Object>) refImpl.getRepository();
         return repository.insertOrUpdate(options, object);
     }
 
@@ -60,7 +60,7 @@ public class RefObjImpl implements RefObj {
         if (!(options instanceof Context)) {
             options = new DefaultContext(options);
         }
-        AbstractRepository<Object, Object> repository = (AbstractRepository<Object, Object>) refImpl.getRepository();
+        Repository<Object, Object> repository = (Repository<Object, Object>) refImpl.getRepository();
         return repository.delete(options, object);
     }
 

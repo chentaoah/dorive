@@ -26,7 +26,7 @@ import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
 
 import java.util.Collection;
 
-public interface RepositoryItem extends Repository<Object, Object>, Executor, Properties {
+public interface RepositoryItem extends Executor, Properties {
 
     EntityElement getEntityElement();
 

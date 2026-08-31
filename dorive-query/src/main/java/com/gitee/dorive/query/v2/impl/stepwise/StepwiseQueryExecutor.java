@@ -22,7 +22,7 @@ import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.query.v2.api.QueryResolver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,7 +35,7 @@ import java.util.List;
 public class StepwiseQueryExecutor implements QueryExecutor {
 
     private final QueryResolver queryResolver;
-    private final AbstractRepository<Object, Object> repository;
+    private final Repository<Object, Object> repository;
 
     @Override
     public List<Object> selectByQuery(Options options, Object query) {

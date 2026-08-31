@@ -55,61 +55,6 @@ public abstract class AbstractProxyRepository extends AbstractRepository<Object,
     }
 
     @Override
-    public Object selectOneByPrimaryKey(Options options, Object primaryKey) {
-        return proxyRepository.selectOneByPrimaryKey(options, primaryKey);
-    }
-
-    @Override
-    public List<Object> selectByExample(Options options, Example example) {
-        return proxyRepository.selectByExample(options, example);
-    }
-
-    @Override
-    public Page<Object> selectPageByExample(Options options, Example example) {
-        return proxyRepository.selectPageByExample(options, example);
-    }
-
-    @Override
-    public long selectCountByExample(Options options, Example example) {
-        return proxyRepository.selectCountByExample(options, example);
-    }
-
-    @Override
-    public int insert(Options options, Object entity) {
-        return proxyRepository.insert(options, entity);
-    }
-
-    @Override
-    public int update(Options options, Object entity) {
-        return proxyRepository.update(options, entity);
-    }
-
-    @Override
-    public int updateByExample(Options options, Object entity, Example example) {
-        return proxyRepository.updateByExample(options, entity, example);
-    }
-
-    @Override
-    public int insertOrUpdate(Options options, Object entity) {
-        return proxyRepository.insertOrUpdate(options, entity);
-    }
-
-    @Override
-    public int delete(Options options, Object entity) {
-        return proxyRepository.delete(options, entity);
-    }
-
-    @Override
-    public int deleteByPrimaryKey(Options options, Object primaryKey) {
-        return proxyRepository.deleteByPrimaryKey(options, primaryKey);
-    }
-
-    @Override
-    public int deleteByExample(Options options, Example example) {
-        return proxyRepository.deleteByExample(options, example);
-    }
-
-    @Override
     public Result<Object> executeQuery(Context context, Query query) {
         return proxyRepository.executeQuery(context, query);
     }
