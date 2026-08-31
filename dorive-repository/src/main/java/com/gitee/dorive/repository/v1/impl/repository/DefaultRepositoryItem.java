@@ -106,8 +106,7 @@ public class DefaultRepositoryItem extends AbstractProxyRepository implements Re
 
     @Override
     public int execute(Context context, Operation operation) {
-        if (!isAggregated() && operation instanceof InsertOrUpdate) {
-            InsertOrUpdate insertOrUpdate = (InsertOrUpdate) operation;
+        if (!isAggregated() && operation instanceof InsertOrUpdate insertOrUpdate) {
             Insert insert = insertOrUpdate.getInsert();
             Update update = insertOrUpdate.getUpdate();
             int totalCount = 0;
