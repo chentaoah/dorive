@@ -21,16 +21,22 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.core.api.Context;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
+import com.gitee.dorive.base.v1.core.entity.eop.Delete;
+import com.gitee.dorive.base.v1.core.entity.eop.Insert;
+import com.gitee.dorive.base.v1.core.entity.eop.Update;
 import com.gitee.dorive.base.v1.core.entity.op.Operation;
 import com.gitee.dorive.base.v1.core.entity.op.Result;
 import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.entity.qry.Page;
+import com.gitee.dorive.base.v1.core.impl.OperationFactory;
+import com.gitee.dorive.base.v1.core.util.ExampleUtils;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.repository.v1.api.GenericRepository;
 
 import java.util.List;
 
-public abstract class AbstractGenericRepository<E, PK> extends AbstractQueryRepository<E, PK> implements GenericRepository<E, PK> {
+public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK> implements GenericRepository<E, PK> {
 
     @Override
     @SuppressWarnings("unchecked")
@@ -70,7 +76,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractQueryRepo
     public long selectCountByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         Query query = getOperationFactory().buildQueryByExample(example);
-        return executeCount((Context) options, query);
+        return getRootRepository().executeCount((Context) options, query);
     }
 
     @Override
@@ -91,8 +97,14 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractQueryRepo
     public int updateByExample(Options options, Object entity, Example example) {
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
-        Operation operation = getOperationFactory().buildUpdateByExample(options, entity, example);
-        return execute((Context) options, operation);
+        int totalCount = 0;
+        for (RepositoryItem repositoryItem : getOrderedRepositories()) {
+            if (matches(options, repositoryItem)) {
+                Operation operation = getOperationFactory().buildUpdateByExample(options, entity, ExampleUtils.clone(example));
+                totalCount += repositoryItem.execute((Context) options, operation);
+            }
+        }
+        return totalCount;
     }
 
     @Override
@@ -112,16 +124,67 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractQueryRepo
     @Override
     public int deleteByPrimaryKey(Options options, PK primaryKey) {
         Assert.notNull(primaryKey, "The primary key cannot be null!");
-        Operation operation = getOperationFactory().buildDeleteByPK(primaryKey);
-        return execute((Context) options, operation);
+        E entity = selectOneByPrimaryKey(options, primaryKey);
+        return delete(options, entity);
     }
 
     @Override
     public int deleteByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        Operation operation = getOperationFactory().buildDeleteByExample(example);
+        int totalCount = 0;
+        for (RepositoryItem repositoryItem : getOrderedRepositories()) {
+            if (matches(options, repositoryItem)) {
+                Operation operation = getOperationFactory().buildDeleteByExample(ExampleUtils.clone(example));
+                totalCount += repositoryItem.execute((Context) options, operation);
+            }
+        }
+        return totalCount;
+    }
+
+    // ================================================================================
+
+    @Override
+    public int insertList(Options options, List<E> entities) {
+        Assert.notNull(entities, "The entities cannot be null!");
+        if (entities.isEmpty()) {
+            return 0;
+        }
+        Operation operation = new Insert(entities);
         return execute((Context) options, operation);
     }
+
+    @Override
+    public int updateList(Options options, List<E> entities) {
+        Assert.notNull(entities, "The entities cannot be null!");
+        if (entities.isEmpty()) {
+            return 0;
+        }
+        Operation operation = new Update(entities);
+        return execute((Context) options, operation);
+    }
+
+    @Override
+    public int insertOrUpdateList(Options options, List<E> entities) {
+        Assert.notNull(entities, "The entities cannot be null!");
+        if (entities.isEmpty()) {
+            return 0;
+        }
+        OperationFactory operationFactory = getOperationFactory();
+        Operation operation = operationFactory.buildInsertOrUpdate(entities);
+        return execute((Context) options, operation);
+    }
+
+    @Override
+    public int deleteList(Options options, List<E> entities) {
+        Assert.notNull(entities, "The entities cannot be null!");
+        if (entities.isEmpty()) {
+            return 0;
+        }
+        Operation operation = new Delete(entities);
+        return execute((Context) options, operation);
+    }
+
+    // ================================================================================
 
     @Override
     public E findOneById(PK id) {
