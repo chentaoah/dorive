@@ -43,7 +43,7 @@ X-Module-Provides: ~,
  com.gitee.dorive.base.v1.executor.api.EntityHandler,
  com.gitee.dorive.base.v1.executor.api.EntityOpHandler,
  com.gitee.dorive.base.v1.executor.api.Matcher,
- com.gitee.dorive.base.v1.executor.api.Selector
+ com.gitee.dorive.base.v1.executor.api.Selection
 X-Module-Notifies: null
 X-Module-Waits: null
 X-Module-Table-Prefix: null

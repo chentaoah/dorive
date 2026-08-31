@@ -30,7 +30,7 @@ import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.core.impl.OrderByFactory;
 import com.gitee.dorive.base.v1.executor.api.Matcher;
-import com.gitee.dorive.base.v1.executor.api.Selector;
+import com.gitee.dorive.base.v1.executor.api.Selection;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
@@ -81,9 +81,9 @@ public class DefaultRepositoryItem extends AbstractProxyRepository implements Re
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
-        Selector selector = getSelector(context, this);
-        if (selector != null) {
-            List<String> properties = selector.select();
+        Selection selection = getSelection(context, this);
+        if (selection != null) {
+            List<String> properties = selection.select();
             if (properties != null && !properties.isEmpty()) {
                 Object primaryKey = query.getPrimaryKey();
                 if (primaryKey != null) {
@@ -106,13 +106,13 @@ public class DefaultRepositoryItem extends AbstractProxyRepository implements Re
         return super.executeQuery(context, query);
     }
 
-    private Selector getSelector(Options options, RepositoryItem repositoryItem) {
+    private Selection getSelection(Options options, RepositoryItem repositoryItem) {
         Matcher matcher = options.getOption(Matcher.class);
-        List<Selector> selectors = options.getOptions(Selector.class);
-        if (matcher != null && selectors != null) {
+        List<Selection> selections = options.getOptions(Selection.class);
+        if (matcher != null && selections != null) {
             int index = matcher.indexOf(repositoryItem);
-            if (index >= 0 && index < selectors.size()) {
-                return selectors.get(index);
+            if (index >= 0 && index < selections.size()) {
+                return selections.get(index);
             }
         }
         return null;

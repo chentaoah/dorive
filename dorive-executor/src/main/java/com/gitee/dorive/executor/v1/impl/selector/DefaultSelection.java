@@ -15,12 +15,31 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.executor.api;
+package com.gitee.dorive.executor.v1.impl.selector;
 
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
+import com.gitee.dorive.base.v1.executor.api.Selection;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Collections;
 import java.util.List;
 
-public interface Selector {
+@Getter
+@Setter
+public class DefaultSelection implements Selection {
 
-    List<String> select();
+    private List<String> properties;
+
+    public DefaultSelection(String propText) {
+        Assert.notBlank(propText, "The propText cannot be blank!");
+        this.properties = Collections.unmodifiableList(StrUtil.splitTrim(propText, ","));
+    }
+
+    @Override
+    public List<String> select() {
+        return properties;
+    }
 
 }

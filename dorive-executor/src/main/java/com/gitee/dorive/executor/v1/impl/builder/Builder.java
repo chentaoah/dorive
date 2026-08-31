@@ -7,11 +7,11 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.ctx.DefaultOptions;
 import com.gitee.dorive.base.v1.executor.api.Matcher;
-import com.gitee.dorive.base.v1.executor.api.Selector;
+import com.gitee.dorive.base.v1.executor.api.Selection;
 import com.gitee.dorive.executor.v1.impl.matcher.LambdaMatcher;
 import com.gitee.dorive.executor.v1.impl.matcher.NameMatcher;
 import com.gitee.dorive.executor.v1.impl.matcher.TypeMatcher;
-import com.gitee.dorive.executor.v1.impl.selector.DefaultSelector;
+import com.gitee.dorive.executor.v1.impl.selector.DefaultSelection;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +29,7 @@ public class Builder {
     private String[] names;
     private Class<?>[] types;
     private List<Field> fields;
-    private String[] selectors;
+    private String[] selections;
 
     public static Options build(String... names) {
         return new Builder().match(names).build();
@@ -61,8 +61,8 @@ public class Builder {
         return this;
     }
 
-    public Builder select(String... selectors) {
-        this.selectors = selectors;
+    public Builder select(String... selections) {
+        this.selections = selections;
         return this;
     }
 
@@ -70,11 +70,11 @@ public class Builder {
         Options options = new DefaultOptions();
         // Matcher
         Matcher matcher = null;
-        List<Selector> matcherSelectors = null;
+        List<Selection> matcherSelections = null;
         if (names != null && names.length > 0) {
             NameMatcher nameMatcher = new NameMatcher(names);
             matcher = nameMatcher;
-            matcherSelectors = nameMatcher.getSelectors();
+            matcherSelections = nameMatcher.getSelections();
 
         } else if (types != null && types.length > 0) {
             if (types.length == 1 && (fields != null && !fields.isEmpty())) {
@@ -86,17 +86,17 @@ public class Builder {
         if (matcher != null) {
             options.setOption(Matcher.class, matcher);
         }
-        if (matcherSelectors != null) {
-            options.setOptions(Selector.class, matcherSelectors);
+        if (matcherSelections != null) {
+            options.setOptions(Selection.class, matcherSelections);
         }
-        // Selector
-        if (selectors != null && selectors.length > 0) {
-            options.setOptions(Selector.class, Arrays.stream(selectors).map(this::newSelector).collect(Collectors.toList()));
+        // Selection
+        if (selections != null && selections.length > 0) {
+            options.setOptions(Selection.class, Arrays.stream(selections).map(this::newSelection).collect(Collectors.toList()));
         }
         return options;
     }
 
-    private Selector newSelector(String string) {
-        return StringUtils.isNotBlank(string) ? new DefaultSelector(string) : null;
+    private Selection newSelection(String string) {
+        return StringUtils.isNotBlank(string) ? new DefaultSelection(string) : null;
     }
 }
