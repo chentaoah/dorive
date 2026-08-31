@@ -67,7 +67,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public abstract class AbstractContextRepository<E, PK> extends AbstractRepositoryEle implements ApplicationContextAware, BoundedContextAware, InitializingBean, RepositoryContext {
+public abstract class AbstractRepositoryContext extends AbstractRepositoryEle implements ApplicationContextAware, BoundedContextAware, InitializingBean, RepositoryContext {
 
     private ApplicationContext applicationContext;
     private BoundedContext boundedContext;
@@ -183,7 +183,7 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         }
 
         OperationFactory operationFactory = repository.getOperationFactory();
-        boolean isAggregated = repository instanceof AbstractContextRepository;
+        boolean isAggregated = repository instanceof AbstractRepositoryContext;
         BinderExecutor binderExecutor = repositoryBuilder.newBinderExecutor(this, entityElement);
         OrderByFactory orderByFactory = orderByDef == null ? null : new OrderByFactory(orderByDef);
 
@@ -223,8 +223,8 @@ public abstract class AbstractContextRepository<E, PK> extends AbstractRepositor
         Class<?> repositoryClass = entityDef.getRepository();
         AbstractRepositoryEle repository = (AbstractRepositoryEle) applicationContext.getBean(repositoryClass);
         if (!entityDef.isAggregate()) {
-            AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) repository;
-            RepositoryItem rootRepository = abstractContextRepository.getRootRepository();
+            AbstractRepositoryContext abstractRepositoryContext = (AbstractRepositoryContext) repository;
+            RepositoryItem rootRepository = abstractRepositoryContext.getRootRepository();
             return rootRepository.getProxyRepository();
         }
         return repository;

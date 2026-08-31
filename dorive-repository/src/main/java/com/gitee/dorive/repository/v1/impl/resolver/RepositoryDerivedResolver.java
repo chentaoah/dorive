@@ -22,7 +22,7 @@ import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractContextRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractRepositoryContext;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
 
@@ -33,7 +33,7 @@ import java.util.Map;
 public class RepositoryDerivedResolver {
 
     private RepositoryContext repositoryContext;
-    private Map<Class<?>, AbstractContextRepository<?, ?>> classRepositoryMap;
+    private Map<Class<?>, AbstractRepositoryContext> classRepositoryMap;
 
     public RepositoryDerivedResolver(RepositoryContext repositoryContext) {
         this.repositoryContext = repositoryContext;
@@ -44,13 +44,13 @@ public class RepositoryDerivedResolver {
         Class<?>[] derived = repositoryDef.getDerived();
         classRepositoryMap = new LinkedHashMap<>(derived.length * 4 / 3 + 1);
         for (Class<?> clazz : derived) {
-            if (AbstractContextRepository.class.isAssignableFrom(clazz)) {
+            if (AbstractRepositoryContext.class.isAssignableFrom(clazz)) {
                 ApplicationContext applicationContext = repositoryContext.getApplicationContext();
                 Object beanInstance = applicationContext.getBean(clazz);
-                AbstractContextRepository<?, ?> abstractContextRepository = (AbstractContextRepository<?, ?>) beanInstance;
-                Class<?> fieldEntityClass = abstractContextRepository.getEntityClass();
+                AbstractRepositoryContext abstractRepositoryContext = (AbstractRepositoryContext) beanInstance;
+                Class<?> fieldEntityClass = abstractRepositoryContext.getEntityClass();
                 if (repositoryContext.getEntityClass().isAssignableFrom(fieldEntityClass)) {
-                    classRepositoryMap.put(fieldEntityClass, abstractContextRepository);
+                    classRepositoryMap.put(fieldEntityClass, abstractRepositoryContext);
                 }
             }
         }

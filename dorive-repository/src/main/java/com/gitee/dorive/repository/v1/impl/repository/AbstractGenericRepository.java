@@ -36,7 +36,7 @@ import com.gitee.dorive.repository.v1.api.GenericRepository;
 
 import java.util.List;
 
-public abstract class AbstractGenericRepository<E, PK> extends AbstractContextRepository<E, PK> implements GenericRepository<E, PK> {
+public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositoryContext implements GenericRepository<E, PK> {
 
     @Override
     @SuppressWarnings("unchecked")

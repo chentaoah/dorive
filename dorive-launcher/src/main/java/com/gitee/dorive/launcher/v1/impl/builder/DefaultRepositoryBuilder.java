@@ -69,7 +69,7 @@ import com.gitee.dorive.repository.v1.api.EventFactory;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.impl.executor.ExecutorEventExecutor;
 import com.gitee.dorive.repository.v1.impl.ref.RefInjector;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractContextRepository;
+import com.gitee.dorive.repository.v1.impl.repository.AbstractRepositoryContext;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
@@ -105,7 +105,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
             repository = new MybatisPlusRepositoryBuilder((MybatisPlusRepository<?, ?>) repositoryContext).newRepository(entityElement);
         }
         // 事件
-        if (repositoryContext instanceof AbstractContextRepository<?, ?> contextRepository) {
+        if (repositoryContext instanceof AbstractRepositoryContext contextRepository) {
             List<EventFactory> executorEventFactories = contextRepository.getExecutorEventFactories();
             if (!executorEventFactories.isEmpty() && repository instanceof DefaultRepository) {
                 Executor executor = repository.getExecutor();
