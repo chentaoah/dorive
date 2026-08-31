@@ -18,20 +18,19 @@
 package com.gitee.dorive.base.v1.core.api;
 
 import com.gitee.dorive.base.v1.core.entity.ctx.DefaultOptions;
-import com.gitee.dorive.base.v1.executor.api.Matcher;
-import com.gitee.dorive.base.v1.executor.impl.matcher.AllMatcher;
-import com.gitee.dorive.base.v1.executor.impl.matcher.NoneMatcher;
-import com.gitee.dorive.base.v1.executor.impl.matcher.RootMatcher;
+import com.gitee.dorive.base.v1.executor.api.Selector;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static com.gitee.dorive.base.v1.executor.impl.selector.DefaultSelector.*;
+
 public interface Options {
 
-    Options NONE = new DefaultOptions(Collections.singletonMap(Matcher.class, new NoneMatcher()));
-    Options ROOT = new DefaultOptions(Collections.singletonMap(Matcher.class, new RootMatcher()));
-    Options ALL = new DefaultOptions(Collections.singletonMap(Matcher.class, new AllMatcher()));
+    Options NONE = new DefaultOptions(Collections.singletonMap(Selector.class, NONE_SELECTOR));
+    Options ROOT = new DefaultOptions(Collections.singletonMap(Selector.class, ROOT_SELECTOR));
+    Options ALL = new DefaultOptions(Collections.singletonMap(Selector.class, ALL_SELECTOR));
 
     Map<Class<?>, Object> getMap();
 
