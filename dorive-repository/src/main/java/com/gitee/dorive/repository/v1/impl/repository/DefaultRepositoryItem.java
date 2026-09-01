@@ -17,8 +17,10 @@
 
 package com.gitee.dorive.repository.v1.impl.repository;
 
+import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.api.Options;
 import com.gitee.dorive.base.v1.core.entity.cop.ConditionUpdate;
 import com.gitee.dorive.base.v1.core.entity.cop.Query;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
@@ -83,6 +85,14 @@ public class DefaultRepositoryItem extends AbstractRepositoryEle implements Repo
     @Override
     public void setBoundId(Context context, Object rootEntity, Object entity) {
         binderExecutor.setBoundId(context, rootEntity, entity);
+    }
+
+    @Override
+    public List<Object> selectByExample(Options options, Example example) {
+        Assert.notNull(example, "The example cannot be null!");
+        Query query = getOperationFactory().buildQueryByExample(example);
+        Result<Object> result = executeQuery((Context) options, query);
+        return result.getRecords();
     }
 
     @Override

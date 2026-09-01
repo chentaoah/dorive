@@ -19,9 +19,12 @@ package com.gitee.dorive.base.v1.repository.api;
 
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.core.api.Options;
+import com.gitee.dorive.base.v1.core.entity.qry.Example;
 import com.gitee.dorive.base.v1.repository.impl.AbstractRepositoryEle;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface RepositoryItem extends RepositoryEle {
 
@@ -44,5 +47,7 @@ public interface RepositoryItem extends RepositoryEle {
     void getBoundValue(Context context, Object rootEntity, Collection<?> entities);
 
     void setBoundId(Context context, Object rootEntity, Object entity);
+
+    List<Object> selectByExample(Options options, Example example);
 
 }

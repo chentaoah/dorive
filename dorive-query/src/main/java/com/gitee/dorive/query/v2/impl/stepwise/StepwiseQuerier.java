@@ -75,10 +75,7 @@ public class StepwiseQuerier {
             } else if (example.isNotEmpty()) {
                 example.select(binderExecutor.getSelfFields());
                 binderExecutor.appendFilterValue(context, example);
-                Context newContext = new DefaultContext(Options.ROOT, context);
-                Query newQuery = new Query(example);
-                Result<Object> result = repositoryItem.executeQuery(newContext, newQuery);
-                entities = result.getRecords();
+                entities = repositoryItem.selectByExample(new DefaultContext(Options.ROOT, context), example);
 
             } else {
                 continue;
