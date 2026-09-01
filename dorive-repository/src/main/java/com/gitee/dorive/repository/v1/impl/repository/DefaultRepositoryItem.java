@@ -96,6 +96,28 @@ public class DefaultRepositoryItem extends AbstractRepositoryEle implements Repo
     }
 
     @Override
+    public long selectCountByExample(Options options, Example example) {
+        Assert.notNull(example, "The example cannot be null!");
+        Query query = getOperationFactory().buildQueryByExample(example);
+        return executeCount((Context) options, query);
+    }
+
+    @Override
+    public int updateByExample(Options options, Object entity, Example example) {
+        Assert.notNull(entity, "The entity cannot be null!");
+        Assert.notNull(example, "The example cannot be null!");
+        Operation operation = getOperationFactory().buildUpdateByExample(options, entity, example);
+        return execute((Context) options, operation);
+    }
+
+    @Override
+    public int deleteByExample(Options options, Example example) {
+        Assert.notNull(example, "The example cannot be null!");
+        Operation operation = getOperationFactory().buildDeleteByExample(example);
+        return execute((Context) options, operation);
+    }
+
+    @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Selector selector = context.getOption(Selector.class);
         if (selector != null) {

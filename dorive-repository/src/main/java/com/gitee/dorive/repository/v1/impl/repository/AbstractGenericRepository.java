@@ -75,8 +75,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     @Override
     public long selectCountByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        Query query = getOperationFactory().buildQueryByExample(example);
-        return getRootRepository().executeCount((Context) options, query);
+        return getRootRepository().selectCountByExample(options, example);
     }
 
     @Override
@@ -100,8 +99,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         int totalCount = 0;
         for (RepositoryItem repositoryItem : getOrderedRepositories()) {
             if (matches(options, repositoryItem)) {
-                Operation operation = getOperationFactory().buildUpdateByExample(options, entity, ExampleUtils.clone(example));
-                totalCount += repositoryItem.execute((Context) options, operation);
+                totalCount += repositoryItem.updateByExample(options, entity, ExampleUtils.clone(example));
             }
         }
         return totalCount;
@@ -134,8 +132,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         int totalCount = 0;
         for (RepositoryItem repositoryItem : getOrderedRepositories()) {
             if (matches(options, repositoryItem)) {
-                Operation operation = getOperationFactory().buildDeleteByExample(ExampleUtils.clone(example));
-                totalCount += repositoryItem.execute((Context) options, operation);
+                totalCount += repositoryItem.deleteByExample(options, ExampleUtils.clone(example));
             }
         }
         return totalCount;
