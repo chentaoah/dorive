@@ -44,8 +44,7 @@ public class RefInjector {
             return;
         }
         Object fieldValue = ReflectUtil.getStaticFieldValue(field);
-        if (fieldValue instanceof RefImpl) {
-            RefImpl<?> refImpl = (RefImpl<?>) fieldValue;
+        if (fieldValue instanceof RefImpl<?> refImpl) {
             if (!refImpl.isInitialized()) {
                 initialize(refImpl);
             }
