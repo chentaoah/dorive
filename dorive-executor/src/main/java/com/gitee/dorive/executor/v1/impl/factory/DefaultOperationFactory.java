@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.core.impl;
+package com.gitee.dorive.executor.v1.impl.factory;
 
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.core.api.Options;
@@ -29,6 +29,7 @@ import com.gitee.dorive.base.v1.core.entity.eop.Delete;
 import com.gitee.dorive.base.v1.core.entity.eop.Insert;
 import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
 import com.gitee.dorive.base.v1.core.entity.eop.Update;
+import com.gitee.dorive.base.v1.executor.api.OperationFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -38,22 +39,26 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class OperationFactory {
+public class DefaultOperationFactory implements OperationFactory {
 
     private EntityElement entityElement;
 
+    @Override
     public Query buildQueryByPK(Object primaryKey) {
         return new Query(primaryKey);
     }
 
+    @Override
     public Query buildQueryByExample(Example example) {
         return new Query(example);
     }
 
+    @Override
     public Operation buildInsert(Object entity) {
         return new Insert(Collections.singletonList(entity));
     }
 
+    @Override
     public Operation buildUpdate(Options options, Object entity) {
         Update update = new Update(Collections.singletonList(entity));
         NullableFields<?> nullableFields = options.getOption(NullableFields.class);
@@ -63,6 +68,7 @@ public class OperationFactory {
         return update;
     }
 
+    @Override
     public Operation buildUpdateByExample(Options options, Object entity, Example example) {
         ConditionUpdate conditionUpdate = new ConditionUpdate(entity, example);
         NullableFields<?> nullableFields = options.getOption(NullableFields.class);
@@ -72,6 +78,7 @@ public class OperationFactory {
         return conditionUpdate;
     }
 
+    @Override
     public Operation buildInsertOrUpdate(Object entity) {
         List<Object> entities = Collections.singletonList(entity);
         InsertOrUpdate insertOrUpdate = new InsertOrUpdate(entities);
@@ -84,6 +91,7 @@ public class OperationFactory {
         return insertOrUpdate;
     }
 
+    @Override
     public InsertOrUpdate buildInsertOrUpdate(List<?> entities) {
         InsertOrUpdate insertOrUpdate = new InsertOrUpdate(entities);
         List<Object> insertList = new ArrayList<>(entities.size());
@@ -105,14 +113,17 @@ public class OperationFactory {
         return insertOrUpdate;
     }
 
+    @Override
     public Operation buildDelete(Object entity) {
         return new Delete(Collections.singletonList(entity));
     }
 
+    @Override
     public Operation buildDeleteByPK(Object primaryKey) {
         return new ConditionDelete(primaryKey);
     }
 
+    @Override
     public Operation buildDeleteByExample(Example example) {
         return new ConditionDelete(example);
     }

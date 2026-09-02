@@ -18,7 +18,7 @@
 package com.gitee.dorive.base.v1.repository.api;
 
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.core.impl.OperationFactory;
+import com.gitee.dorive.base.v1.executor.api.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 
 public interface RepositoryEle extends Properties, Executor {
