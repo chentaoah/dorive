@@ -24,7 +24,7 @@ X-Module-Requires: ~,
  com.gitee.dorive.base.v1.common.entity.PropertyDefinition,
  com.gitee.dorive.base.v1.common.entity.QueryDefinition,
  com.gitee.dorive.base.v1.common.entity.QueryFieldDefinition,
- com.gitee.dorive.base.v1.core.util.ReflectUtils
+ com.gitee.dorive.base.v1.executor.util.ReflectUtils
 X-Module-Provides: ~,
  com.gitee.dorive.base.v1.definition.api.EntityTypeResolver,
  com.gitee.dorive.base.v1.definition.api.QueryTypeResolver

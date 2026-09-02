@@ -19,7 +19,7 @@ package com.gitee.dorive.binder.v1.impl.processor;
 
 import com.gitee.dorive.base.v1.common.def.BindingDef;
 import com.gitee.dorive.base.v1.binder.api.Processor;
-import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Context;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;

@@ -11,9 +11,9 @@ X-Module-Profiles: null
 X-Module-Configs: null
 X-Module-Exports: **
 X-Module-Requires: ~,
- com.gitee.dorive.base.v1.core.api.Options,
- com.gitee.dorive.base.v1.core.entity.qry.Page,
- com.gitee.dorive.base.v1.core.util.ReflectUtils
+ com.gitee.dorive.base.v1.executor.api.Options,
+ com.gitee.dorive.base.v1.executor.entity.qry.Page,
+ com.gitee.dorive.base.v1.executor.util.ReflectUtils
 X-Module-Provides: null
 X-Module-Notifies: null
 X-Module-Waits: null

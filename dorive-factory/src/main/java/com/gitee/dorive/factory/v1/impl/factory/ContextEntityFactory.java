@@ -23,7 +23,7 @@ import com.gitee.dorive.base.v1.common.api.BoundedContext;
 import com.gitee.dorive.base.v1.common.def.PropertyDef;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.common.entity.PropertyDefinition;
-import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

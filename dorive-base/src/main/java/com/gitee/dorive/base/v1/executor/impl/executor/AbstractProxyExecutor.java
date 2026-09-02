@@ -17,10 +17,10 @@
 
 package com.gitee.dorive.base.v1.executor.impl.executor;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.cop.Query;
-import com.gitee.dorive.base.v1.core.entity.op.Operation;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.entity.cop.Query;
+import com.gitee.dorive.base.v1.executor.entity.op.Operation;
+import com.gitee.dorive.base.v1.executor.entity.op.Result;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

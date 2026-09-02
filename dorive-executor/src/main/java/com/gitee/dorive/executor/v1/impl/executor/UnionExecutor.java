@@ -19,11 +19,11 @@ package com.gitee.dorive.executor.v1.impl.executor;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.base.v1.core.entity.qry.*;
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
+import com.gitee.dorive.base.v1.executor.entity.qry.*;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.entity.op.Result;
 import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.core.entity.cop.Query;
+import com.gitee.dorive.base.v1.executor.entity.cop.Query;
 import com.gitee.dorive.base.v1.executor.impl.executor.AbstractProxyExecutor;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
@@ -52,8 +52,7 @@ public class UnionExecutor extends AbstractProxyExecutor {
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Example example = query.getExample();
-        if (example instanceof UnionExample) {
-            UnionExample unionExample = (UnionExample) example;
+        if (example instanceof UnionExample unionExample) {
             String sql = buildSql(unionExample);
             if (StringUtils.isNotBlank(sql)) {
                 List<Map<String, Object>> resultMaps = sqlRunner.selectList(sql);

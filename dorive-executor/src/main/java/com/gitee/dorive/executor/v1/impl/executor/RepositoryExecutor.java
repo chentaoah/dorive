@@ -18,11 +18,11 @@
 package com.gitee.dorive.executor.v1.impl.executor;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.cop.Query;
-import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
-import com.gitee.dorive.base.v1.core.entity.op.Operation;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.entity.cop.Query;
+import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
+import com.gitee.dorive.base.v1.executor.entity.op.Operation;
+import com.gitee.dorive.base.v1.executor.entity.op.Result;
 import com.gitee.dorive.base.v1.executor.impl.executor.AbstractExecutor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;

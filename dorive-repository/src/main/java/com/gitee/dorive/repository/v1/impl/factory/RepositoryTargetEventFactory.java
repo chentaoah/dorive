@@ -19,8 +19,8 @@ package com.gitee.dorive.repository.v1.impl.factory;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;

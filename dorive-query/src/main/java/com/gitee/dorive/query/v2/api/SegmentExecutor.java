@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.query.v2.api;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.entity.op.Result;
 import com.gitee.dorive.query.v2.entity.segment.SegmentInfo;
 
 public interface SegmentExecutor {

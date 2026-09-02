@@ -18,9 +18,9 @@
 package com.gitee.dorive.web.v1.impl.service;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.core.entity.qry.Page;
-import com.gitee.dorive.base.v1.core.util.ReflectUtils;
+import com.gitee.dorive.base.v1.executor.api.Options;
+import com.gitee.dorive.base.v1.executor.entity.qry.Page;
+import com.gitee.dorive.base.v1.executor.util.ReflectUtils;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.web.v1.entity.ResObject;

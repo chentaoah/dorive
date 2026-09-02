@@ -21,7 +21,7 @@ import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
 import com.gitee.dorive.base.v1.binder.enums.JoinType;
-import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.joiner.v1.api.CollectionJoiner;

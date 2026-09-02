@@ -15,7 +15,7 @@ X-Module-Requires: ~,
  com.gitee.dorive.base.v1.binder.api.BinderExecutor,
  com.gitee.dorive.base.v1.binder.enums.JoinType,
  com.gitee.dorive.base.v1.common.entity.EntityElement,
- com.gitee.dorive.base.v1.core.api.Context,
+ com.gitee.dorive.base.v1.executor.api.Context,
  com.gitee.dorive.base.v1.repository.api.RepositoryItem
 X-Module-Provides: com.gitee.dorive.base.v1.joiner.api.EntityJoiner
 X-Module-Notifies: null

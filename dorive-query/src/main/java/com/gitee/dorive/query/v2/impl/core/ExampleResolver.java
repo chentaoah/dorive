@@ -21,9 +21,9 @@ import cn.hutool.core.convert.Convert;
 import com.gitee.dorive.base.v1.common.constant.Sort;
 import com.gitee.dorive.base.v1.common.entity.Field;
 import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
-import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
-import com.gitee.dorive.base.v1.core.entity.qry.Page;
-import com.gitee.dorive.base.v1.core.util.StringUtils;
+import com.gitee.dorive.base.v1.executor.entity.qry.OrderBy;
+import com.gitee.dorive.base.v1.executor.entity.qry.Page;
+import com.gitee.dorive.base.v1.executor.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

@@ -24,7 +24,7 @@ import cn.hutool.core.convert.TypeConverter;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
 import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
 import com.gitee.dorive.factory.v1.util.TypeUtils;

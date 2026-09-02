@@ -18,19 +18,19 @@
 package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.core.entity.cop.Query;
-import com.gitee.dorive.base.v1.core.entity.eop.Delete;
-import com.gitee.dorive.base.v1.core.entity.eop.Insert;
-import com.gitee.dorive.base.v1.core.entity.eop.Update;
-import com.gitee.dorive.base.v1.core.entity.op.Operation;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
-import com.gitee.dorive.base.v1.core.entity.qry.Page;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Options;
+import com.gitee.dorive.base.v1.executor.entity.cop.Query;
+import com.gitee.dorive.base.v1.executor.entity.eop.Delete;
+import com.gitee.dorive.base.v1.executor.entity.eop.Insert;
+import com.gitee.dorive.base.v1.executor.entity.eop.Update;
+import com.gitee.dorive.base.v1.executor.entity.op.Operation;
+import com.gitee.dorive.base.v1.executor.entity.op.Result;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
+import com.gitee.dorive.base.v1.executor.entity.qry.InnerExample;
+import com.gitee.dorive.base.v1.executor.entity.qry.Page;
 import com.gitee.dorive.base.v1.executor.api.OperationFactory;
-import com.gitee.dorive.base.v1.core.util.ExampleUtils;
+import com.gitee.dorive.base.v1.executor.util.ExampleUtils;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.repository.v1.api.GenericRepository;
 

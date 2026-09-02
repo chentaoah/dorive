@@ -19,17 +19,17 @@ package com.gitee.dorive.factory.v1.impl.executor;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.executor.impl.executor.AbstractProxyExecutor;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
-import com.gitee.dorive.base.v1.core.entity.qry.Page;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.base.v1.core.entity.op.EntityOp;
-import com.gitee.dorive.base.v1.core.entity.op.Operation;
-import com.gitee.dorive.base.v1.core.entity.cop.ConditionUpdate;
-import com.gitee.dorive.base.v1.core.entity.cop.Query;
-import com.gitee.dorive.base.v1.core.entity.eop.Insert;
+import com.gitee.dorive.base.v1.executor.entity.qry.Page;
+import com.gitee.dorive.base.v1.executor.entity.op.Result;
+import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
+import com.gitee.dorive.base.v1.executor.entity.op.Operation;
+import com.gitee.dorive.base.v1.executor.entity.cop.ConditionUpdate;
+import com.gitee.dorive.base.v1.executor.entity.cop.Query;
+import com.gitee.dorive.base.v1.executor.entity.eop.Insert;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -74,8 +74,7 @@ public class FactoryExecutor extends AbstractProxyExecutor {
 
     @Override
     public int execute(Context context, Operation operation) {
-        if (operation instanceof EntityOp) {
-            EntityOp entityOp = (EntityOp) operation;
+        if (operation instanceof EntityOp entityOp) {
             List<?> entities = entityOp.getEntities();
             List<Object> persistentObjs = entityFactory.deconstruct(context, entities);
             entityOp.setEntities(persistentObjs);
@@ -94,8 +93,7 @@ public class FactoryExecutor extends AbstractProxyExecutor {
             }
             return totalCount;
 
-        } else if (operation instanceof ConditionUpdate) {
-            ConditionUpdate conditionUpdate = (ConditionUpdate) operation;
+        } else if (operation instanceof ConditionUpdate conditionUpdate) {
             Object entity = conditionUpdate.getEntity();
             if (entity != null) {
                 List<Object> persistentObjs = entityFactory.deconstruct(context, Collections.singletonList(entity));

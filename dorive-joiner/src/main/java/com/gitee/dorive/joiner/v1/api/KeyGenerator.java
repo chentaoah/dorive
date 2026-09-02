@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.joiner.v1.api;
 
-import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Context;
 
 public interface KeyGenerator {
 

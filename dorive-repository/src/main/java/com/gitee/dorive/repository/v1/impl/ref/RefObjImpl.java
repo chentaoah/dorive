@@ -17,10 +17,10 @@
 
 package com.gitee.dorive.repository.v1.impl.ref;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.api.Options;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Options;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
-import com.gitee.dorive.base.v1.core.entity.ctx.DefaultContext;
+import com.gitee.dorive.base.v1.executor.entity.ctx.DefaultContext;
 import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.repository.v1.api.RefObj;
 import lombok.AllArgsConstructor;

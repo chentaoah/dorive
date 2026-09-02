@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.repository.v1.api;
 
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 
 import java.util.List;
 

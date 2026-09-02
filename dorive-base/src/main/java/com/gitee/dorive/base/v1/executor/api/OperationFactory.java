@@ -17,11 +17,10 @@
 
 package com.gitee.dorive.base.v1.executor.api;
 
-import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.core.entity.cop.Query;
-import com.gitee.dorive.base.v1.core.entity.eop.InsertOrUpdate;
-import com.gitee.dorive.base.v1.core.entity.op.Operation;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.executor.entity.cop.Query;
+import com.gitee.dorive.base.v1.executor.entity.eop.InsertOrUpdate;
+import com.gitee.dorive.base.v1.executor.entity.op.Operation;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 
 import java.util.List;
 

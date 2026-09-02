@@ -17,10 +17,10 @@
 
 package com.gitee.dorive.query.v2.impl.stepwise;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.base.v1.core.entity.qry.Page;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Options;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
+import com.gitee.dorive.base.v1.executor.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.query.v2.api.QueryResolver;

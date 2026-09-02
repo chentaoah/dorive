@@ -19,13 +19,11 @@ package com.gitee.dorive.query.v2.impl.stepwise;
 
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.core.entity.cop.Query;
-import com.gitee.dorive.base.v1.core.entity.ctx.DefaultContext;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Options;
+import com.gitee.dorive.base.v1.executor.entity.ctx.DefaultContext;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
+import com.gitee.dorive.base.v1.executor.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
