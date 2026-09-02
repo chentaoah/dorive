@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.module.v1.impl.inject;
 
-import com.gitee.dorive.base.v1.common.api.BoundedContext;
-import com.gitee.dorive.base.v1.common.api.BoundedContextAware;
+import com.gitee.dorive.base.v1.definition.api.BoundedContext;
+import com.gitee.dorive.base.v1.definition.api.BoundedContextAware;
 import com.gitee.dorive.module.v1.api.ModuleParser;
 import com.gitee.dorive.module.v1.entity.ModuleDefinition;
 import com.gitee.dorive.module.v1.impl.parser.DefaultModuleParser;

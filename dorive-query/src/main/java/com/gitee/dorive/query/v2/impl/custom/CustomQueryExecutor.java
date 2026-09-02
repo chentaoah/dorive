@@ -19,7 +19,7 @@ package com.gitee.dorive.query.v2.impl.custom;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
+import com.gitee.dorive.base.v1.definition.entity.QueryDefinition;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Options;
 import com.gitee.dorive.base.v1.executor.entity.op.Result;

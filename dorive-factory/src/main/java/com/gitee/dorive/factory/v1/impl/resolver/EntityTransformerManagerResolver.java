@@ -18,9 +18,9 @@
 package com.gitee.dorive.factory.v1.impl.resolver;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.base.v1.common.def.FieldDef;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
+import com.gitee.dorive.base.v1.definition.def.FieldDef;
+import com.gitee.dorive.base.v1.definition.entity.EntityElement;
+import com.gitee.dorive.base.v1.definition.entity.FieldDefinition;
 import com.gitee.dorive.factory.v1.api.Converter;
 import com.gitee.dorive.factory.v1.api.EntityTransformer;
 import com.gitee.dorive.factory.v1.api.EntityTransformerManager;

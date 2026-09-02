@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.base.v1.executor.entity.qry;
 
-import com.gitee.dorive.base.v1.common.constant.Operator;
-import com.gitee.dorive.base.v1.common.constant.Sort;
+import com.gitee.dorive.base.v1.definition.constant.Operator;
+import com.gitee.dorive.base.v1.definition.constant.Sort;
 import com.gitee.dorive.base.v1.executor.util.StringUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;

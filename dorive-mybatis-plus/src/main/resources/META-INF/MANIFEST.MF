@@ -11,10 +11,10 @@ X-Module-Profiles: null
 X-Module-Configs: null
 X-Module-Exports: **
 X-Module-Requires: ~,
- com.gitee.dorive.base.v1.common.constant.Operator,
- com.gitee.dorive.base.v1.common.constant.Sort,
- com.gitee.dorive.base.v1.common.def.EntityDef,
- com.gitee.dorive.base.v1.common.entity.EntityElement,
+ com.gitee.dorive.base.v1.definition.constant.Operator,
+ com.gitee.dorive.base.v1.definition.constant.Sort,
+ com.gitee.dorive.base.v1.definition.def.EntityDef,
+ com.gitee.dorive.base.v1.definition.entity.EntityElement,
  com.gitee.dorive.base.v1.executor.api.Context,
  com.gitee.dorive.base.v1.executor.entity.cop.ConditionDelete,
  com.gitee.dorive.base.v1.executor.entity.cop.ConditionUpdate,

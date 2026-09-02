@@ -18,7 +18,7 @@
 package com.gitee.dorive.mybatis.v2.impl.segment;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.base.v1.common.constant.Operator;
+import com.gitee.dorive.base.v1.definition.constant.Operator;
 import com.gitee.dorive.base.v1.executor.entity.qry.Criterion;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import com.gitee.dorive.base.v1.executor.util.CriterionUtils;

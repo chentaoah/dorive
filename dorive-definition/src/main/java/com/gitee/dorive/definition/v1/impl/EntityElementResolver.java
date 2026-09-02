@@ -19,12 +19,12 @@ package com.gitee.dorive.definition.v1.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.base.v1.common.def.BindingDef;
-import com.gitee.dorive.base.v1.common.def.EntityDef;
-import com.gitee.dorive.base.v1.common.entity.EntityDefinition;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
-import com.gitee.dorive.base.v1.common.entity.FieldEntityDefinition;
+import com.gitee.dorive.base.v1.definition.def.BindingDef;
+import com.gitee.dorive.base.v1.definition.def.EntityDef;
+import com.gitee.dorive.base.v1.definition.entity.EntityDefinition;
+import com.gitee.dorive.base.v1.definition.entity.EntityElement;
+import com.gitee.dorive.base.v1.definition.entity.FieldDefinition;
+import com.gitee.dorive.base.v1.definition.entity.FieldEntityDefinition;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 

@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.launcher.v1.impl.builder;
 
-import com.gitee.dorive.base.v1.common.def.RepositoryDef;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
+import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.factory.v1.api.EntityFactory;
 import com.gitee.dorive.factory.v1.api.EntityTransformer;
@@ -53,8 +53,7 @@ public class EntityFactoryBuilder {
             entityFactory = (EntityFactory) applicationContext.getBean(factoryClass);
         }
         // 默认
-        if (entityFactory instanceof DefaultEntityFactory) {
-            DefaultEntityFactory defaultEntityFactory = (DefaultEntityFactory) entityFactory;
+        if (entityFactory instanceof DefaultEntityFactory defaultEntityFactory) {
             defaultEntityFactory.setEntityElement(entityElement);
             defaultEntityFactory.setReType(reType);
             defaultEntityFactory.setDeType(deType);
@@ -62,8 +61,7 @@ public class EntityFactoryBuilder {
             defaultEntityFactory.setDeEntityTransformer(deEntityTransformer);
         }
         // 值对象
-        if (entityFactory instanceof ValueObjEntityFactory) {
-            ValueObjEntityFactory valueObjEntityFactory = (ValueObjEntityFactory) entityFactory;
+        if (entityFactory instanceof ValueObjEntityFactory valueObjEntityFactory) {
             valueObjEntityFactory.setEntityTransformerManager(entityTransformerManager);
         }
         // 初始化

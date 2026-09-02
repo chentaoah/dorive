@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.binder.v1.impl.endpoint;
 
-import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
+import com.gitee.dorive.base.v1.definition.entity.FieldDefinition;
 import com.gitee.dorive.binder.v1.api.Endpoint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

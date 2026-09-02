@@ -17,11 +17,15 @@
 
 package com.gitee.dorive.executor.v1.util;
 
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@Setter
 public class KeyValueJoiner extends HashMapJoiner {
 
     private RepositoryItem repositoryItem;

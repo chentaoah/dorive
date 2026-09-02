@@ -18,8 +18,8 @@
 package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.base.v1.common.def.QueryDef;
-import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
+import com.gitee.dorive.base.v1.definition.def.QueryDef;
+import com.gitee.dorive.base.v1.definition.entity.QueryDefinition;
 import com.gitee.dorive.base.v1.executor.api.Options;
 import com.gitee.dorive.base.v1.executor.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;

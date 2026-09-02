@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.binder.v1.impl.endpoint;
 
-import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
+import com.gitee.dorive.base.v1.definition.entity.FieldDefinition;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;

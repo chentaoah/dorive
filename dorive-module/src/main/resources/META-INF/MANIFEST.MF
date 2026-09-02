@@ -11,8 +11,8 @@ X-Module-Profiles: null
 X-Module-Configs: null
 X-Module-Exports: **
 X-Module-Requires: ~,
- com.gitee.dorive.base.v1.common.api.BoundedContext,
- com.gitee.dorive.base.v1.common.api.BoundedContextAware
+ com.gitee.dorive.base.v1.definition.api.BoundedContext,
+ com.gitee.dorive.base.v1.definition.api.BoundedContextAware
 X-Module-Provides: null
 X-Module-Notifies: null
 X-Module-Waits: null

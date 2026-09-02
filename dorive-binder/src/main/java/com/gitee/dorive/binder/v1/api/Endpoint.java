@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.binder.v1.api;
 
-import com.gitee.dorive.base.v1.common.entity.FieldDefinition;
+import com.gitee.dorive.base.v1.definition.entity.FieldDefinition;
 
 public interface Endpoint {
 

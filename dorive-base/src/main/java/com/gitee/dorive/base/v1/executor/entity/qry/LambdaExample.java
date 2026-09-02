@@ -18,7 +18,7 @@
 package com.gitee.dorive.base.v1.executor.entity.qry;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.gitee.dorive.base.v1.common.constant.Operator;
+import com.gitee.dorive.base.v1.definition.constant.Operator;
 import com.gitee.dorive.base.v1.executor.util.LambdaUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

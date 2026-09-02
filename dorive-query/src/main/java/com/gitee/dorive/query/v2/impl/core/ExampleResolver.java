@@ -18,9 +18,9 @@
 package com.gitee.dorive.query.v2.impl.core;
 
 import cn.hutool.core.convert.Convert;
-import com.gitee.dorive.base.v1.common.constant.Sort;
-import com.gitee.dorive.base.v1.common.entity.Field;
-import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
+import com.gitee.dorive.base.v1.definition.constant.Sort;
+import com.gitee.dorive.base.v1.definition.entity.Field;
+import com.gitee.dorive.base.v1.definition.entity.QueryDefinition;
 import com.gitee.dorive.base.v1.executor.entity.qry.OrderBy;
 import com.gitee.dorive.base.v1.executor.entity.qry.Page;
 import com.gitee.dorive.base.v1.executor.util.StringUtils;

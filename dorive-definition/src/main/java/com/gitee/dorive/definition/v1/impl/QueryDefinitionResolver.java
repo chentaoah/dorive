@@ -19,10 +19,10 @@ package com.gitee.dorive.definition.v1.impl;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
-import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
-import com.gitee.dorive.base.v1.common.entity.QueryFieldDefinition;
-import com.gitee.dorive.base.v1.common.def.QueryDef;
-import com.gitee.dorive.base.v1.common.def.QueryFieldDef;
+import com.gitee.dorive.base.v1.definition.entity.QueryDefinition;
+import com.gitee.dorive.base.v1.definition.entity.QueryFieldDefinition;
+import com.gitee.dorive.base.v1.definition.def.QueryDef;
+import com.gitee.dorive.base.v1.definition.def.QueryFieldDef;
 import com.gitee.dorive.base.v1.executor.util.ReflectUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +56,7 @@ public class QueryDefinitionResolver {
         String limitField = queryDef.getLimitField();
 
         List<QueryFieldDefinition> queryFieldDefinitions = new ArrayList<>();
-        List<com.gitee.dorive.base.v1.common.entity.Field> ignoreFields = new ArrayList<>();
+        List<com.gitee.dorive.base.v1.definition.entity.Field> ignoreFields = new ArrayList<>();
 
         List<Field> fields = ReflectUtils.getAllFields(queryType);
         // 去重
@@ -91,8 +91,8 @@ public class QueryDefinitionResolver {
         queryDefinition.setIgnoreFields(ignoreFields);
     }
 
-    private com.gitee.dorive.base.v1.common.entity.Field readField(Field field) {
-        return new com.gitee.dorive.base.v1.common.entity.Field(field);
+    private com.gitee.dorive.base.v1.definition.entity.Field readField(Field field) {
+        return new com.gitee.dorive.base.v1.definition.entity.Field(field);
     }
 
     private QueryFieldDefinition readQueryField(Field field) {

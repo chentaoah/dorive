@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.repository.v1.impl.executor;
 
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
+import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.eop.Insert;
 import com.gitee.dorive.base.v1.executor.entity.eop.InsertOrUpdate;

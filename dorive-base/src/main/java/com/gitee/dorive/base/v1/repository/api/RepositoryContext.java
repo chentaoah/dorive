@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.base.v1.repository.api;
 
-import com.gitee.dorive.base.v1.common.api.BoundedContext;
-import com.gitee.dorive.base.v1.common.def.RepositoryDef;
+import com.gitee.dorive.base.v1.definition.api.BoundedContext;
+import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.executor.api.Options;
 import org.springframework.context.ApplicationContext;
 

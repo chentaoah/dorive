@@ -12,8 +12,8 @@ X-Module-Configs: null
 X-Module-Exports: **
 X-Module-Requires: ~,
  com.gitee.dorive.base.v1.binder.enums.JoinType,
- com.gitee.dorive.base.v1.common.def.BindingDef,
- com.gitee.dorive.base.v1.common.entity.FieldDefinition,
+ com.gitee.dorive.base.v1.definition.def.BindingDef,
+ com.gitee.dorive.base.v1.definition.entity.FieldDefinition,
  com.gitee.dorive.base.v1.executor.api.Context,
  com.gitee.dorive.base.v1.executor.entity.qry.Example,
  com.gitee.dorive.base.v1.executor.entity.qry.InnerExample,

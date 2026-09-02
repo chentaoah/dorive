@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.base.v1.definition.api;
 
-import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
+import com.gitee.dorive.base.v1.definition.entity.QueryDefinition;
 
 public interface QueryTypeResolver {
 
