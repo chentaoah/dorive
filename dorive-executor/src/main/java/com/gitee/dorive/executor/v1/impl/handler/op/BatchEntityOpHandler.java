@@ -50,7 +50,8 @@ public class BatchEntityOpHandler implements EntityOpHandler {
                 if (isMatch) {
                     repositoryItem.getBoundValue(context, rootEntity, entities);
                 }
-                Operation operation = new Insert(entities);
+                OperationFactory operationFactory = repositoryItem.getOperationFactory();
+                Operation operation = operationFactory.buildInsert(entities);
                 operation.switchRoot(isMatch);
                 totalCount.addAndGet(repositoryItem.execute(context, operation));
                 if (entities.size() == 1) {
@@ -60,7 +61,8 @@ public class BatchEntityOpHandler implements EntityOpHandler {
 
         } else if (entityOp instanceof Update || entityOp instanceof Delete) {
             execute(context, entityOp, totalCount, (RepositoryItem repositoryItem, boolean isMatch, Object rootEntity, List<?> entities) -> {
-                Operation operation = entityOp instanceof Update ? new Update(entities) : new Delete(entities);
+                OperationFactory operationFactory = repositoryItem.getOperationFactory();
+                Operation operation = entityOp instanceof Update ? operationFactory.buildUpdate(entities) : operationFactory.buildDelete(entities);
                 operation.switchRoot(isMatch);
                 totalCount.addAndGet(repositoryItem.execute(context, operation));
             });

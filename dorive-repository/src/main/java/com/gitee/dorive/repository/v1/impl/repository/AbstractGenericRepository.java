@@ -147,7 +147,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         if (entities.isEmpty()) {
             return 0;
         }
-        Operation operation = new Insert(entities);
+        Operation operation = getOperationFactory().buildInsert(entities);
         return execute((Context) options, operation);
     }
 
@@ -157,7 +157,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         if (entities.isEmpty()) {
             return 0;
         }
-        Operation operation = new Update(entities);
+        Operation operation = getOperationFactory().buildUpdate(entities);
         return execute((Context) options, operation);
     }
 
@@ -167,8 +167,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         if (entities.isEmpty()) {
             return 0;
         }
-        OperationFactory operationFactory = getOperationFactory();
-        Operation operation = operationFactory.buildInsertOrUpdate(entities);
+        Operation operation = getOperationFactory().buildInsertOrUpdate(entities);
         return execute((Context) options, operation);
     }
 
@@ -178,7 +177,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         if (entities.isEmpty()) {
             return 0;
         }
-        Operation operation = new Delete(entities);
+        Operation operation = getOperationFactory().buildDelete(entities);
         return execute((Context) options, operation);
     }
 

@@ -67,17 +67,17 @@ public class DelegatedEntityOpHandler implements EntityOpHandler {
     }
 
     private EntityOp buildOperation(EntityOp entityOp, List<Object> entities) {
+        OperationFactory operationFactory = repositoryContext.getOperationFactory();
         if (entityOp instanceof Insert) {
-            return new Insert(entities);
+            return (EntityOp) operationFactory.buildInsert(entities);
 
         } else if (entityOp instanceof Update) {
-            return new Update(entities);
+            return (EntityOp) operationFactory.buildUpdate(entities);
 
         } else if (entityOp instanceof Delete) {
-            return new Delete(entities);
+            return (EntityOp) operationFactory.buildDelete(entities);
 
         } else if (entityOp instanceof InsertOrUpdate) {
-            OperationFactory operationFactory = repositoryContext.getOperationFactory();
             return (EntityOp) operationFactory.buildInsertOrUpdate(entities);
         }
         return null;
