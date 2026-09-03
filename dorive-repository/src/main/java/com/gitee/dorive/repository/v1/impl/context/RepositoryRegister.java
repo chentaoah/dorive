@@ -20,7 +20,7 @@ package com.gitee.dorive.repository.v1.impl.context;
 import cn.hutool.core.util.ClassUtil;
 import com.gitee.dorive.repository.v1.api.RepositoryPostProcessor;
 import com.gitee.dorive.base.v1.executor.util.ReflectUtils;
-import com.gitee.dorive.repository.v1.impl.repository.AbstractRepositoryContext;
+import com.gitee.dorive.repository.v1.impl.repository.ele.AbstractRepositoryContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;

@@ -50,7 +50,7 @@ X-Module-Requires: ~,
  com.gitee.dorive.base.v1.query.enums.QueryMode,
  com.gitee.dorive.base.v1.repository.api.Repository,
  com.gitee.dorive.base.v1.repository.impl.AbstractRepository,
- com.gitee.dorive.base.v1.repository.impl.DefaultRepository
+ com.gitee.dorive.repository.v1.impl.repository.ele.DefaultRepository
 X-Module-Provides: ~,
  com.gitee.dorive.base.v1.definition.api.BoundedContextAware,
  com.gitee.dorive.base.v1.mybatis.api.CountQuerier,

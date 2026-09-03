@@ -21,7 +21,6 @@ import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Options;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepositoryEle;
 
 import java.util.Collection;
 import java.util.List;

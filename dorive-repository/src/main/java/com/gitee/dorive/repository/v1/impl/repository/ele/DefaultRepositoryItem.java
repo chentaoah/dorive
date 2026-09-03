@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.repository.v1.impl.repository;
+package com.gitee.dorive.repository.v1.impl.repository.ele;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
@@ -35,7 +35,6 @@ import com.gitee.dorive.base.v1.executor.impl.factory.OrderByFactory;
 import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepositoryEle;
 import lombok.Getter;
 import lombok.Setter;
 

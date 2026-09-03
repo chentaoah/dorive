@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.repository.impl;
+package com.gitee.dorive.repository.v1.impl.repository.ele;
 
 import lombok.NoArgsConstructor;
 import lombok.Setter;
