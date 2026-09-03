@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.web.annotation;
+package com.gitee.dorive.base.v1.definition.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

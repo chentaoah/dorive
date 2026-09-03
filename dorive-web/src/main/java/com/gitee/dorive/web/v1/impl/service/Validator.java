@@ -22,7 +22,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.executor.api.Options;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
-import com.gitee.dorive.base.v1.web.annotation.UniqueConstraint;
+import com.gitee.dorive.base.v1.definition.annotation.UniqueConstraint;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.web.v1.entity.ResObject;
 import lombok.AllArgsConstructor;
