@@ -28,8 +28,6 @@ import java.util.List;
 
 public interface RepositoryItem extends RepositoryEle {
 
-    AbstractRepositoryEle getProxyRepository();
-
     RepositoryContext getRepositoryContext();
 
     String getName();

@@ -20,6 +20,7 @@ package com.gitee.dorive.repository.v1.impl.repository;
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.executor.api.Options;
 import com.gitee.dorive.base.v1.executor.entity.cop.ConditionUpdate;
 import com.gitee.dorive.base.v1.executor.entity.cop.Query;
@@ -53,18 +54,15 @@ public class DefaultRepositoryItem extends AbstractRepositoryEle implements Repo
     private OrderByFactory orderByFactory;
 
     @Override
-    public AbstractRepositoryEle getProxyRepository() {
-        return (AbstractRepositoryEle) getExecutor();
-    }
-
-    @Override
     public RepositoryContext getRepositoryContext() {
-        AbstractRepositoryEle abstractRepositoryEle = getProxyRepository();
-        if (abstractRepositoryEle instanceof RepositoryContext) {
-            return (RepositoryContext) abstractRepositoryEle;
-        } else {
+        Executor executor = getExecutor();
+        if (executor instanceof RepositoryContext) {
+            return (RepositoryContext) executor;
+
+        } else if (executor instanceof AbstractRepositoryEle abstractRepositoryEle) {
             return abstractRepositoryEle.getProperty(RepositoryContext.class);
         }
+        return null;
     }
 
     @Override

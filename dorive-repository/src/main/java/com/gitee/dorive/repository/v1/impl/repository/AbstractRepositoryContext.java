@@ -225,7 +225,7 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
         if (!entityDef.isAggregate()) {
             AbstractRepositoryContext abstractRepositoryContext = (AbstractRepositoryContext) repository;
             RepositoryItem rootRepository = abstractRepositoryContext.getRootRepository();
-            return rootRepository.getProxyRepository();
+            return (AbstractRepositoryEle) rootRepository.getExecutor();
         }
         return repository;
     }

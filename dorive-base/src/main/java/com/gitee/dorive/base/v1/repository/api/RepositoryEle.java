@@ -27,6 +27,8 @@ public interface RepositoryEle extends Properties, Executor {
 
     OperationFactory getOperationFactory();
 
+    Executor getExecutor();
+
     Class<?> getEntityClass();
 
 }
