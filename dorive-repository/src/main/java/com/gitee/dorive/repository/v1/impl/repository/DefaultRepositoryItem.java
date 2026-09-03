@@ -40,6 +40,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -117,20 +118,17 @@ public class DefaultRepositoryItem extends AbstractRepositoryEle implements Repo
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
-        Selector selector = context.getOption(Selector.class);
-        if (selector != null) {
-            List<String> properties = selector.select(this);
-            if (properties != null && !properties.isEmpty()) {
-                Object primaryKey = query.getPrimaryKey();
-                if (primaryKey != null) {
-                    Example example = new InnerExample().eq(getEntityElement().getPrimaryKey(), primaryKey);
-                    query.setPrimaryKey(null);
-                    query.setExample(example);
-                }
-                Example example = query.getExample();
-                if (example != null) {
-                    example.select(properties);
-                }
+        List<String> properties = select(context);
+        if (properties != null && !properties.isEmpty()) {
+            Object primaryKey = query.getPrimaryKey();
+            if (primaryKey != null) {
+                Example example = new InnerExample().eq(getEntityElement().getPrimaryKey(), primaryKey);
+                query.setPrimaryKey(null);
+                query.setExample(example);
+            }
+            Example example = query.getExample();
+            if (example != null) {
+                example.select(properties);
             }
         }
         Example example = query.getExample();
@@ -144,16 +142,13 @@ public class DefaultRepositoryItem extends AbstractRepositoryEle implements Repo
 
     @Override
     public int execute(Context context, Operation operation) {
-        Selector selector = context.getOption(Selector.class);
-        if (selector != null) {
-            List<String> properties = selector.select(this);
-            if (properties != null && !properties.isEmpty()) {
-                if (operation instanceof Update update) {
-                    update.setNullableProps(new LinkedHashSet<>(properties));
+        List<String> properties = select(context);
+        if (properties != null && !properties.isEmpty()) {
+            if (operation instanceof Update update) {
+                update.setNullableProps(new LinkedHashSet<>(properties));
 
-                } else if (operation instanceof ConditionUpdate conditionUpdate) {
-                    conditionUpdate.setNullableProps(new LinkedHashSet<>(properties));
-                }
+            } else if (operation instanceof ConditionUpdate conditionUpdate) {
+                conditionUpdate.setNullableProps(new LinkedHashSet<>(properties));
             }
         }
         if (!isAggregated() && operation instanceof InsertOrUpdate insertOrUpdate) {
@@ -169,6 +164,11 @@ public class DefaultRepositoryItem extends AbstractRepositoryEle implements Repo
             return totalCount;
         }
         return super.execute(context, operation);
+    }
+
+    private List<String> select(Context context) {
+        Selector selector = context.getOption(Selector.class);
+        return selector != null ? selector.select(this) : Collections.emptyList();
     }
 
 }
