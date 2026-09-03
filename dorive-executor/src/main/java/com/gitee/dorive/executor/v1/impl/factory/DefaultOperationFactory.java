@@ -52,13 +52,13 @@ public class DefaultOperationFactory implements OperationFactory {
     }
 
     @Override
-    public Operation buildInsert(Object entity) {
-        return new Insert(Collections.singletonList(entity));
+    public Operation buildInsert(List<?> entities) {
+        return new Insert(entities);
     }
 
     @Override
-    public Operation buildUpdate(Object entity) {
-        return new Update(Collections.singletonList(entity));
+    public Operation buildUpdate(List<?> entities) {
+        return new Update(entities);
     }
 
     @Override
@@ -67,20 +67,7 @@ public class DefaultOperationFactory implements OperationFactory {
     }
 
     @Override
-    public Operation buildInsertOrUpdate(Object entity) {
-        List<Object> entities = Collections.singletonList(entity);
-        InsertOrUpdate insertOrUpdate = new InsertOrUpdate(entities);
-        Object primaryKey = entityElement.getPrimaryKey(entity);
-        if (primaryKey == null) {
-            insertOrUpdate.setInsert(new Insert(entities));
-        } else {
-            insertOrUpdate.setUpdate(new Update(entities));
-        }
-        return insertOrUpdate;
-    }
-
-    @Override
-    public InsertOrUpdate buildInsertOrUpdate(List<?> entities) {
+    public Operation buildInsertOrUpdate(List<?> entities) {
         InsertOrUpdate insertOrUpdate = new InsertOrUpdate(entities);
         List<Object> insertList = new ArrayList<>(entities.size());
         List<Object> updateList = new ArrayList<>(entities.size());
@@ -102,13 +89,8 @@ public class DefaultOperationFactory implements OperationFactory {
     }
 
     @Override
-    public Operation buildDelete(Object entity) {
-        return new Delete(Collections.singletonList(entity));
-    }
-
-    @Override
-    public Operation buildDeleteByPK(Object primaryKey) {
-        return new ConditionDelete(primaryKey);
+    public Operation buildDelete(List<?> entities) {
+        return new Delete(entities);
     }
 
     @Override

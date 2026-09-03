@@ -30,19 +30,15 @@ public interface OperationFactory {
 
     Query buildQueryByExample(Example example);
 
-    Operation buildInsert(Object entity);
+    Operation buildInsert(List<?> entities);
 
-    Operation buildUpdate(Object entity);
+    Operation buildUpdate(List<?> entities);
 
     Operation buildUpdateByExample(Object entity, Example example);
 
-    Operation buildInsertOrUpdate(Object entity);
+    Operation buildInsertOrUpdate(List<?> entities);
 
-    InsertOrUpdate buildInsertOrUpdate(List<?> entities);
-
-    Operation buildDelete(Object entity);
-
-    Operation buildDeleteByPK(Object primaryKey);
+    Operation buildDelete(List<?> entities);
 
     Operation buildDeleteByExample(Example example);
 

@@ -34,6 +34,7 @@ import com.gitee.dorive.base.v1.executor.util.ExampleUtils;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.repository.v1.api.GenericRepository;
 
+import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositoryContext implements GenericRepository<E, PK> {
@@ -81,14 +82,14 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     @Override
     public int insert(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = getOperationFactory().buildInsert(entity);
+        Operation operation = getOperationFactory().buildInsert(Collections.singletonList(entity));
         return execute((Context) options, operation);
     }
 
     @Override
     public int update(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = getOperationFactory().buildUpdate(entity);
+        Operation operation = getOperationFactory().buildUpdate(Collections.singletonList(entity));
         return execute((Context) options, operation);
     }
 
@@ -108,14 +109,14 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     @Override
     public int insertOrUpdate(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = getOperationFactory().buildInsertOrUpdate(entity);
+        Operation operation = getOperationFactory().buildInsertOrUpdate(Collections.singletonList(entity));
         return execute((Context) options, operation);
     }
 
     @Override
     public int delete(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = getOperationFactory().buildDelete(entity);
+        Operation operation = getOperationFactory().buildDelete(Collections.singletonList(entity));
         return execute((Context) options, operation);
     }
 
