@@ -18,9 +18,7 @@
 package com.gitee.dorive.executor.v1.impl.factory;
 
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
-import com.gitee.dorive.base.v1.executor.api.Options;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
-import com.gitee.dorive.base.v1.executor.entity.op.NullableFields;
 import com.gitee.dorive.base.v1.executor.entity.op.Operation;
 import com.gitee.dorive.base.v1.executor.entity.cop.ConditionDelete;
 import com.gitee.dorive.base.v1.executor.entity.cop.ConditionUpdate;
@@ -59,23 +57,13 @@ public class DefaultOperationFactory implements OperationFactory {
     }
 
     @Override
-    public Operation buildUpdate(Options options, Object entity) {
-        Update update = new Update(Collections.singletonList(entity));
-        NullableFields<?> nullableFields = options.getOption(NullableFields.class);
-        if (nullableFields != null) {
-            update.setNullableProps(nullableFields);
-        }
-        return update;
+    public Operation buildUpdate(Object entity) {
+        return new Update(Collections.singletonList(entity));
     }
 
     @Override
-    public Operation buildUpdateByExample(Options options, Object entity, Example example) {
-        ConditionUpdate conditionUpdate = new ConditionUpdate(entity, example);
-        NullableFields<?> nullableFields = options.getOption(NullableFields.class);
-        if (nullableFields != null) {
-            conditionUpdate.setNullableProps(nullableFields);
-        }
-        return conditionUpdate;
+    public Operation buildUpdateByExample(Object entity, Example example) {
+        return new ConditionUpdate(entity, example);
     }
 
     @Override

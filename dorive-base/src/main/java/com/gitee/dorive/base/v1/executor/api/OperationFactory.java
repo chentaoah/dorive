@@ -32,9 +32,9 @@ public interface OperationFactory {
 
     Operation buildInsert(Object entity);
 
-    Operation buildUpdate(Options options, Object entity);
+    Operation buildUpdate(Object entity);
 
-    Operation buildUpdateByExample(Options options, Object entity, Example example);
+    Operation buildUpdateByExample(Object entity, Example example);
 
     Operation buildInsertOrUpdate(Object entity);
 

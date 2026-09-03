@@ -88,7 +88,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     @Override
     public int update(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
-        Operation operation = getOperationFactory().buildUpdate(options, entity);
+        Operation operation = getOperationFactory().buildUpdate(entity);
         return execute((Context) options, operation);
     }
 

@@ -104,7 +104,7 @@ public class DefaultRepositoryItem extends AbstractRepositoryEle implements Repo
     public int updateByExample(Options options, Object entity, Example example) {
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
-        Operation operation = getOperationFactory().buildUpdateByExample(options, entity, example);
+        Operation operation = getOperationFactory().buildUpdateByExample(entity, example);
         return execute((Context) options, operation);
     }
 
