@@ -22,6 +22,7 @@ import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.executor.api.Options;
+import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.executor.entity.cop.ConditionUpdate;
 import com.gitee.dorive.base.v1.executor.entity.cop.Query;
 import com.gitee.dorive.base.v1.executor.entity.eop.Insert;
@@ -32,8 +33,8 @@ import com.gitee.dorive.base.v1.executor.entity.op.Result;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import com.gitee.dorive.base.v1.executor.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.executor.impl.factory.OrderByFactory;
-import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryEle;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.Getter;
 import lombok.Setter;
@@ -59,8 +60,8 @@ public class DefaultRepositoryItem extends AbstractRepositoryEle implements Repo
         if (executor instanceof RepositoryContext) {
             return (RepositoryContext) executor;
 
-        } else if (executor instanceof AbstractRepositoryEle abstractRepositoryEle) {
-            return abstractRepositoryEle.getProperty(RepositoryContext.class);
+        } else if (executor instanceof RepositoryEle repositoryEle) {
+            return repositoryEle.getProperty(RepositoryContext.class);
         }
         return null;
     }

@@ -26,13 +26,14 @@ import com.gitee.dorive.base.v1.definition.def.EntityDef;
 import com.gitee.dorive.base.v1.definition.def.OrderByDef;
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
+import com.gitee.dorive.base.v1.event.api.EventFactory;
 import com.gitee.dorive.base.v1.executor.api.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Options;
 import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.executor.impl.factory.OrderByFactory;
 import com.gitee.dorive.base.v1.executor.util.ReflectUtils;
-import com.gitee.dorive.base.v1.event.api.EventFactory;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryEle;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.api.RepositoryPostProcessor;
@@ -139,23 +140,23 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
         String accessPath = entityElement.getAccessPath();
         boolean isRoot = entityElement.isRoot();
 
-        AbstractRepositoryEle repository;
+        RepositoryEle repositoryEle;
         if (isRoot) {
-            repository = repositoryBuilder.newRepository(this, entityElement);
-            repository.setProperty(RepositoryContext.class, this);
+            repositoryEle = repositoryBuilder.newRepositoryEle(this, entityElement);
+            repositoryEle.setProperty(RepositoryContext.class, this);
         } else {
-            repository = doGetRepository(entityElement);
+            repositoryEle = doGetRepositoryEle(entityElement);
         }
 
-        OperationFactory operationFactory = repository.getOperationFactory();
-        boolean isAggregated = repository instanceof AbstractRepositoryContext;
+        OperationFactory operationFactory = repositoryEle.getOperationFactory();
+        boolean isAggregated = repositoryEle instanceof AbstractRepositoryContext;
         BinderExecutor binderExecutor = repositoryBuilder.newBinderExecutor(this, entityElement);
         OrderByFactory orderByFactory = orderByDef == null ? null : new OrderByFactory(orderByDef);
 
         DefaultRepositoryItem defaultRepositoryItem = new DefaultRepositoryItem();
         defaultRepositoryItem.setEntityElement(entityElement);
         defaultRepositoryItem.setOperationFactory(operationFactory);
-        defaultRepositoryItem.setExecutor(repository);
+        defaultRepositoryItem.setExecutor(repositoryEle);
         defaultRepositoryItem.setAccessPath(accessPath);
         defaultRepositoryItem.setRoot(isRoot);
         defaultRepositoryItem.setAggregated(isAggregated);
@@ -183,16 +184,16 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
         entityDef.setRepository(newRepositoryClass);
     }
 
-    private AbstractRepositoryEle doGetRepository(EntityElement entityElement) {
+    private RepositoryEle doGetRepositoryEle(EntityElement entityElement) {
         EntityDef entityDef = entityElement.getEntityDef();
         Class<?> repositoryClass = entityDef.getRepository();
-        AbstractRepositoryEle repository = (AbstractRepositoryEle) applicationContext.getBean(repositoryClass);
+        RepositoryEle repositoryEle = (RepositoryEle) applicationContext.getBean(repositoryClass);
         if (!entityDef.isAggregate()) {
-            AbstractRepositoryContext abstractRepositoryContext = (AbstractRepositoryContext) repository;
+            AbstractRepositoryContext abstractRepositoryContext = (AbstractRepositoryContext) repositoryEle;
             RepositoryItem rootRepository = abstractRepositoryContext.getRootRepository();
-            return (AbstractRepositoryEle) rootRepository.getExecutor();
+            return (RepositoryEle) rootRepository.getExecutor();
         }
-        return repository;
+        return repositoryEle;
     }
 
     @Override

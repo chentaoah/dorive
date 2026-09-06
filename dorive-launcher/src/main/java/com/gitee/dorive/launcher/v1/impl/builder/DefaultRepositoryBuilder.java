@@ -25,6 +25,7 @@ import com.gitee.dorive.base.v1.binder.enums.JoinType;
 import com.gitee.dorive.base.v1.definition.annotation.Event;
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
+import com.gitee.dorive.base.v1.event.api.EventFactory;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
@@ -34,13 +35,20 @@ import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
-import com.gitee.dorive.base.v1.event.api.EventFactory;
 import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryEle;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.example.MultiExampleBuilder;
 import com.gitee.dorive.binder.v1.impl.example.SingleExampleBuilder;
+import com.gitee.dorive.event.v1.entity.ExecutorEvent;
+import com.gitee.dorive.event.v1.entity.RepositoryEvent;
+import com.gitee.dorive.event.v1.factory.ExecutorEventFactory;
+import com.gitee.dorive.event.v1.factory.ExecutorTargetEventFactory;
+import com.gitee.dorive.event.v1.factory.RepositoryEventFactory;
+import com.gitee.dorive.event.v1.factory.RepositoryTargetEventFactory;
 import com.gitee.dorive.executor.v1.impl.executor.ExecutorEventExecutor;
+import com.gitee.dorive.executor.v1.impl.executor.RepositoryEventExecutor;
 import com.gitee.dorive.executor.v1.impl.executor.RepositoryExecutor;
 import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
@@ -68,19 +76,10 @@ import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQuerier;
 import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQueryExecutor;
 import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQueryResolver;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
-import com.gitee.dorive.executor.v1.impl.executor.RepositoryEventExecutor;
-import com.gitee.dorive.event.v1.entity.ExecutorEvent;
-import com.gitee.dorive.event.v1.entity.RepositoryEvent;
-import com.gitee.dorive.event.v1.factory.ExecutorEventFactory;
-import com.gitee.dorive.event.v1.factory.ExecutorTargetEventFactory;
-import com.gitee.dorive.event.v1.factory.RepositoryEventFactory;
-import com.gitee.dorive.event.v1.factory.RepositoryTargetEventFactory;
 import com.gitee.dorive.repository.v1.impl.ref.RefInjector;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
-import com.gitee.dorive.repository.v1.impl.repository.ele.AbstractRepositoryContext;
-import com.gitee.dorive.repository.v1.impl.repository.ele.AbstractRepositoryEle;
 import com.gitee.dorive.repository.v1.impl.repository.ele.DefaultRepository;
 import com.gitee.dorive.repository.v1.impl.resolver.RepositoryDerivedResolver;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -136,23 +135,21 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
     }
 
     @Override
-    public AbstractRepositoryEle newRepository(RepositoryContext repositoryContext, EntityElement entityElement) {
-        AbstractRepositoryEle repository = null;
+    public RepositoryEle newRepositoryEle(RepositoryContext repositoryContext, EntityElement entityElement) {
+        RepositoryEle repositoryEle = null;
         // mybatis-plus
         if (repositoryContext instanceof MybatisPlusRepository) {
-            repository = new MybatisPlusRepositoryBuilder((MybatisPlusRepository<?, ?>) repositoryContext).newRepository(entityElement);
+            repositoryEle = new MybatisPlusRepositoryBuilder((MybatisPlusRepository<?, ?>) repositoryContext).newRepositoryEle(entityElement);
         }
         // 事件
-        if (repositoryContext instanceof AbstractRepositoryContext contextRepository) {
-            List<EventFactory> executorEventFactories = contextRepository.getExecutorEventFactories();
-            if (!executorEventFactories.isEmpty() && repository instanceof DefaultRepository) {
-                Executor executor = repository.getExecutor();
-                executor = new ExecutorEventExecutor(executor, contextRepository.getApplicationContext(), repository.getEntityElement(), executorEventFactories);
-                repository.setExecutor(executor);
-            }
+        List<EventFactory> executorEventFactories = repositoryContext.getExecutorEventFactories();
+        if (!executorEventFactories.isEmpty() && repositoryEle instanceof DefaultRepository defaultRepository) {
+            Executor executor = defaultRepository.getExecutor();
+            executor = new ExecutorEventExecutor(repositoryContext, defaultRepository.getEntityElement(), executor);
+            defaultRepository.setExecutor(executor);
         }
-        Assert.notNull(repository, "Unsupported repository type!");
-        return repository;
+        Assert.notNull(repositoryEle, "Unsupported repository type!");
+        return repositoryEle;
     }
 
     @Override

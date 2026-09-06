@@ -26,27 +26,27 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
-import com.gitee.dorive.base.v1.executor.api.OperationFactory;
-import com.gitee.dorive.executor.v1.impl.factory.DefaultOperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Executor;
+import com.gitee.dorive.base.v1.executor.api.OperationFactory;
+import com.gitee.dorive.base.v1.factory.api.EntityFactory;
+import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
 import com.gitee.dorive.base.v1.factory.api.Transformer;
 import com.gitee.dorive.base.v1.factory.api.TransformerManager;
 import com.gitee.dorive.base.v1.factory.enums.Category;
 import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
-import com.gitee.dorive.repository.v1.impl.repository.ele.AbstractRepositoryEle;
-import com.gitee.dorive.repository.v1.impl.repository.ele.DefaultRepository;
-import com.gitee.dorive.base.v1.factory.api.EntityFactory;
-import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
-import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
+import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
+import com.gitee.dorive.base.v1.repository.api.RepositoryEle;
 import com.gitee.dorive.executor.v1.impl.executor.ExampleExecutor;
 import com.gitee.dorive.executor.v1.impl.executor.FactoryExecutor;
-import com.gitee.dorive.factory.v1.impl.resolver.EntityTransformerManagerResolver;
-import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.executor.v1.impl.executor.UnionExecutor;
+import com.gitee.dorive.executor.v1.impl.factory.DefaultOperationFactory;
+import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
+import com.gitee.dorive.factory.v1.impl.resolver.EntityTransformerManagerResolver;
 import com.gitee.dorive.mybatis.plus.v1.impl.common.DefaultMethodInvoker;
 import com.gitee.dorive.mybatis.plus.v1.impl.executor.MybatisPlusExecutor;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
+import com.gitee.dorive.repository.v1.impl.repository.ele.DefaultRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -67,7 +67,7 @@ public class MybatisPlusRepositoryBuilder {
 
     private final MybatisPlusRepository<?, ?> repository;
 
-    public AbstractRepositoryEle newRepository(EntityElement entityElement) {
+    public RepositoryEle newRepositoryEle(EntityElement entityElement) {
         OperationFactory operationFactory = new DefaultOperationFactory(entityElement);
 
         // 存储信息
