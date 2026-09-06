@@ -27,7 +27,6 @@ import com.gitee.dorive.base.v1.executor.entity.qry.UnionExample;
 import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.executor.impl.executor.AbstractProxyExecutor;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
 import com.gitee.dorive.base.v1.executor.entity.op.Condition;

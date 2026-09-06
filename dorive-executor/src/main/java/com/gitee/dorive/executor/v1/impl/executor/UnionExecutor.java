@@ -24,7 +24,6 @@ import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.op.Result;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.executor.entity.cop.Query;
-import com.gitee.dorive.base.v1.executor.impl.executor.AbstractProxyExecutor;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import lombok.Getter;

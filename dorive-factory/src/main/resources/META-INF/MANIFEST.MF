@@ -33,7 +33,7 @@ X-Module-Requires: ~,
  com.gitee.dorive.base.v1.executor.entity.qry.Page,
  com.gitee.dorive.base.v1.executor.entity.qry.UnionExample,
  com.gitee.dorive.base.v1.executor.api.Executor,
- com.gitee.dorive.base.v1.executor.impl.executor.AbstractProxyExecutor,
+ com.gitee.dorive.executor.v1.impl.executor.AbstractProxyExecutor,
  com.gitee.dorive.base.v1.executor.util.MultiInBuilder,
  com.gitee.dorive.base.v1.factory.api.Transformer,
  com.gitee.dorive.base.v1.factory.api.TransformerManager
