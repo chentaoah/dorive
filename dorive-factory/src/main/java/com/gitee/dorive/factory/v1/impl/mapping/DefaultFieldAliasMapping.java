@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.factory.v1.impl.mapping;
 
-import com.gitee.dorive.factory.v1.api.Converter;
-import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
+import com.gitee.dorive.base.v1.factory.api.Converter;
+import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

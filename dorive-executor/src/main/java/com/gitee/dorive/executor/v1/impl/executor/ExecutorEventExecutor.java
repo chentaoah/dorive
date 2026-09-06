@@ -15,18 +15,15 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.repository.v1.impl.executor;
+package com.gitee.dorive.executor.v1.impl.executor;
 
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.Context;
-import com.gitee.dorive.base.v1.executor.entity.eop.Insert;
-import com.gitee.dorive.base.v1.executor.entity.eop.InsertOrUpdate;
-import com.gitee.dorive.base.v1.executor.entity.eop.Update;
+import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
 import com.gitee.dorive.base.v1.executor.entity.op.Operation;
-import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.executor.impl.executor.AbstractProxyExecutor;
-import com.gitee.dorive.repository.v1.api.EventFactory;
+import com.gitee.dorive.base.v1.repository.api.EventFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationContext;
@@ -36,13 +33,13 @@ import java.util.List;
 
 @Getter
 @Setter
-public class RepositoryEventExecutor extends AbstractProxyExecutor {
+public class ExecutorEventExecutor extends AbstractProxyExecutor {
 
     private ApplicationContext applicationContext;
     private EntityElement entityElement;
     private List<EventFactory> eventFactories;
 
-    public RepositoryEventExecutor(Executor executor, ApplicationContext applicationContext, EntityElement entityElement, List<EventFactory> eventFactories) {
+    public ExecutorEventExecutor(Executor executor, ApplicationContext applicationContext, EntityElement entityElement, List<EventFactory> eventFactories) {
         super(executor);
         this.applicationContext = applicationContext;
         this.entityElement = entityElement;
@@ -53,31 +50,17 @@ public class RepositoryEventExecutor extends AbstractProxyExecutor {
     public int execute(Context context, Operation operation) {
         int totalCount = super.execute(context, operation);
         if (totalCount != 0) {
-            if (operation instanceof InsertOrUpdate insertOrUpdate) {
-                Insert insert = insertOrUpdate.getInsert();
-                Update update = insertOrUpdate.getUpdate();
-                if (insert != null) {
-                    publishEvent(context, insert);
+            if (operation instanceof EntityOp entityOp) {
+                Class<?> entityClass = getEntityElement().getGenericType();
+                for (EventFactory eventFactory : eventFactories) {
+                    ApplicationEvent applicationEvent = eventFactory.newApplicationEvent(this, entityOp.isUncontrolled(), entityClass, context, entityOp);
+                    if (applicationEvent != null) {
+                        applicationContext.publishEvent(applicationEvent);
+                    }
                 }
-                if (update != null) {
-                    publishEvent(context, update);
-                }
-            } else {
-                publishEvent(context, operation);
             }
         }
         return totalCount;
     }
 
-    private void publishEvent(Context context, Operation operation) {
-        if (operation instanceof EntityOp entityOp) {
-            Class<?> entityClass = getEntityElement().getGenericType();
-            for (EventFactory eventFactory : eventFactories) {
-                ApplicationEvent applicationEvent = eventFactory.newApplicationEvent(this, entityOp.isUncontrolled(), entityClass, context, entityOp);
-                if (applicationEvent != null) {
-                    applicationContext.publishEvent(applicationEvent);
-                }
-            }
-        }
-    }
 }

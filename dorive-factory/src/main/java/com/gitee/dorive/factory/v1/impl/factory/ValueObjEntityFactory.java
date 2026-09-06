@@ -26,7 +26,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
-import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
+import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
 import com.gitee.dorive.factory.v1.util.TypeUtils;
 import lombok.Getter;
 import lombok.Setter;

@@ -24,7 +24,7 @@ import com.gitee.dorive.base.v1.definition.def.PropertyDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.definition.entity.PropertyDefinition;
 import com.gitee.dorive.base.v1.executor.api.Context;
-import com.gitee.dorive.factory.v1.api.EntityFactory;
+import com.gitee.dorive.base.v1.factory.api.EntityFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -15,14 +15,16 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.repository.v1.api;
+package com.gitee.dorive.base.v1.factory.api;
 
 import com.gitee.dorive.base.v1.executor.api.Context;
-import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
-import org.springframework.context.ApplicationEvent;
 
-public interface EventFactory {
+import java.util.List;
 
-    ApplicationEvent newApplicationEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp);
+public interface EntityFactory {
+
+    List<Object> reconstitute(Context context, List<?> persistentObjs);
+
+    List<Object> deconstruct(Context context, List<?> entities);
 
 }

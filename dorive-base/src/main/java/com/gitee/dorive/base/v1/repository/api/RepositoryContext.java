@@ -41,6 +41,10 @@ public interface RepositoryContext extends RepositoryEle {
 
     List<RepositoryItem> getOrderedRepositories();
 
+    List<EventFactory> getExecutorEventFactories();
+
+    List<EventFactory> getRepositoryEventFactories();
+
     boolean matches(Options options, RepositoryItem repositoryItem);
 
 }

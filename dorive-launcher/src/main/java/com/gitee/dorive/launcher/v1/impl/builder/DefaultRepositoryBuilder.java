@@ -32,13 +32,13 @@ import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
+import com.gitee.dorive.base.v1.repository.api.EventFactory;
 import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.repository.v1.impl.repository.ele.AbstractRepositoryEle;
-import com.gitee.dorive.repository.v1.impl.repository.ele.DefaultRepository;
 import com.gitee.dorive.binder.v1.impl.example.MultiExampleBuilder;
 import com.gitee.dorive.binder.v1.impl.example.SingleExampleBuilder;
+import com.gitee.dorive.executor.v1.impl.executor.ExecutorEventExecutor;
 import com.gitee.dorive.executor.v1.impl.executor.RepositoryExecutor;
 import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
@@ -65,14 +65,15 @@ import com.gitee.dorive.query.v2.impl.segment.SegmentQueryResolver;
 import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQuerier;
 import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQueryExecutor;
 import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQueryResolver;
-import com.gitee.dorive.repository.v1.api.EventFactory;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
-import com.gitee.dorive.repository.v1.impl.executor.ExecutorEventExecutor;
+import com.gitee.dorive.executor.v1.impl.executor.RepositoryEventExecutor;
 import com.gitee.dorive.repository.v1.impl.ref.RefInjector;
-import com.gitee.dorive.repository.v1.impl.repository.ele.AbstractRepositoryContext;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
+import com.gitee.dorive.repository.v1.impl.repository.ele.AbstractRepositoryContext;
+import com.gitee.dorive.repository.v1.impl.repository.ele.AbstractRepositoryEle;
+import com.gitee.dorive.repository.v1.impl.repository.ele.DefaultRepository;
 import com.gitee.dorive.repository.v1.impl.resolver.RepositoryDerivedResolver;
 
 import java.util.ArrayList;
@@ -132,7 +133,13 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         EntityHandler entityHandler = newEntityHandler(repositoryContext, repositoryDerivedResolver);
         EntityOpHandler entityOpHandler = newEntityOpHandler(repositoryContext, repositoryDerivedResolver);
         // 创建上下文执行器
-        return new RepositoryExecutor(repositoryContext, entityHandler, entityOpHandler);
+        Executor executor = new RepositoryExecutor(repositoryContext, entityHandler, entityOpHandler);
+        // 仓储事件执行器
+        List<EventFactory> repositoryEventFactories = repositoryContext.getRepositoryEventFactories();
+        if (!repositoryEventFactories.isEmpty()) {
+            executor = new RepositoryEventExecutor(executor, repositoryContext.getApplicationContext(), repositoryContext.getEntityElement(), repositoryEventFactories);
+        }
+        return executor;
     }
 
     private EntityHandler newEntityHandler(RepositoryContext repositoryContext, RepositoryDerivedResolver repositoryDerivedResolver) {

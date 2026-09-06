@@ -22,26 +22,24 @@ import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.definition.annotation.Event;
 import com.gitee.dorive.base.v1.definition.api.BoundedContext;
 import com.gitee.dorive.base.v1.definition.api.BoundedContextAware;
+import com.gitee.dorive.base.v1.definition.api.EntityTypeResolver;
 import com.gitee.dorive.base.v1.definition.def.EntityDef;
 import com.gitee.dorive.base.v1.definition.def.OrderByDef;
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
-import com.gitee.dorive.base.v1.executor.api.Options;
 import com.gitee.dorive.base.v1.executor.api.OperationFactory;
+import com.gitee.dorive.base.v1.executor.api.Options;
+import com.gitee.dorive.base.v1.executor.api.Selector;
 import com.gitee.dorive.base.v1.executor.impl.factory.OrderByFactory;
 import com.gitee.dorive.base.v1.executor.util.ReflectUtils;
-import com.gitee.dorive.base.v1.definition.api.EntityTypeResolver;
-import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.executor.api.Selector;
+import com.gitee.dorive.base.v1.repository.api.EventFactory;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.repository.v1.api.EventFactory;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.api.RepositoryPostProcessor;
 import com.gitee.dorive.repository.v1.entity.event.ExecutorEvent;
 import com.gitee.dorive.repository.v1.entity.event.RepositoryEvent;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
-import com.gitee.dorive.repository.v1.impl.executor.RepositoryEventExecutor;
 import com.gitee.dorive.repository.v1.impl.factory.ExecutorEventFactory;
 import com.gitee.dorive.repository.v1.impl.factory.ExecutorTargetEventFactory;
 import com.gitee.dorive.repository.v1.impl.factory.RepositoryEventFactory;
@@ -121,7 +119,7 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
 
         setEntityElement(rootRepository.getEntityElement());
         setOperationFactory(rootRepository.getOperationFactory());
-        setExecutor(newExecutor());
+        setExecutor(repositoryBuilder.newExecutor(this));
 
         // 初始化
         repositoryBuilder.initialize(this);
@@ -226,14 +224,6 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
             return (AbstractRepositoryEle) rootRepository.getExecutor();
         }
         return repository;
-    }
-
-    protected Executor newExecutor() {
-        Executor executor = repositoryBuilder.newExecutor(this);
-        if (!repositoryEventFactories.isEmpty()) {
-            executor = new RepositoryEventExecutor(executor, applicationContext, getEntityElement(), repositoryEventFactories);
-        }
-        return executor;
     }
 
     @Override

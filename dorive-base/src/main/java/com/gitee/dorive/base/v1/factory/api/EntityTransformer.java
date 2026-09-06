@@ -15,12 +15,25 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.api;
+package com.gitee.dorive.base.v1.factory.api;
 
-public interface Converter {
+import java.util.List;
+import java.util.Set;
 
-    Object reconstitute(Object value);
+public interface EntityTransformer extends Transformer {
 
-    Object deconstruct(Object value);
+    List<String> toAliases(List<String> fields);
+
+    Set<String> toAliases(Set<String> fields);
+
+    FieldAliasMapping getFieldAliasMappingByField(String field);
+
+    FieldAliasMapping getFieldAliasMappingByAlias(String alias);
+
+    List<FieldAliasMapping> getValueObjFields();
+
+    List<FieldAliasMapping> getMatchedValueObjFields();
+
+    List<FieldAliasMapping> getUnmatchedValueObjFields();
 
 }

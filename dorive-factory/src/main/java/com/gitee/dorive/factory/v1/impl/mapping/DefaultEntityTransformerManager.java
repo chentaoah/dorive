@@ -18,7 +18,7 @@
 package com.gitee.dorive.factory.v1.impl.mapping;
 
 import com.gitee.dorive.base.v1.factory.api.Transformer;
-import com.gitee.dorive.factory.v1.api.EntityTransformer;
+import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

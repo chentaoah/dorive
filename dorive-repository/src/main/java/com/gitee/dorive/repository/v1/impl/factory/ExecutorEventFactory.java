@@ -22,7 +22,7 @@ import com.gitee.dorive.base.v1.executor.entity.eop.Delete;
 import com.gitee.dorive.base.v1.executor.entity.eop.Insert;
 import com.gitee.dorive.base.v1.executor.entity.eop.Update;
 import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
-import com.gitee.dorive.repository.v1.api.EventFactory;
+import com.gitee.dorive.base.v1.repository.api.EventFactory;
 import com.gitee.dorive.repository.v1.entity.event.BaseEvent;
 import com.gitee.dorive.repository.v1.entity.event.ext.*;
 import lombok.AllArgsConstructor;

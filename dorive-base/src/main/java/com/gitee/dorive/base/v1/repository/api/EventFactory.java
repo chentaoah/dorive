@@ -15,12 +15,14 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.api;
+package com.gitee.dorive.base.v1.repository.api;
 
-public interface FieldAliasMapping extends Converter {
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
+import org.springframework.context.ApplicationEvent;
 
-    String getField();
+public interface EventFactory {
 
-    String getAlias();
+    ApplicationEvent newApplicationEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp);
 
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.impl.executor;
+package com.gitee.dorive.executor.v1.impl.executor;
 
 import com.gitee.dorive.base.v1.definition.constant.Operator;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
@@ -28,8 +28,8 @@ import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.executor.impl.executor.AbstractProxyExecutor;
-import com.gitee.dorive.factory.v1.api.EntityTransformer;
-import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
+import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
+import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
 import com.gitee.dorive.base.v1.executor.entity.op.Condition;
 import com.gitee.dorive.base.v1.executor.entity.op.Operation;
 import com.gitee.dorive.base.v1.executor.entity.cop.ConditionUpdate;
