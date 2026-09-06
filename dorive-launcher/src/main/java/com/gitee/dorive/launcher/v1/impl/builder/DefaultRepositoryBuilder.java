@@ -174,7 +174,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         // 仓储事件执行器
         List<EventFactory> repositoryEventFactories = repositoryContext.getRepositoryEventFactories();
         if (!repositoryEventFactories.isEmpty()) {
-            executor = new RepositoryEventExecutor(executor, repositoryContext.getApplicationContext(), repositoryContext.getEntityElement(), repositoryEventFactories);
+            executor = new RepositoryEventExecutor(repositoryContext, executor);
         }
         return executor;
     }

@@ -26,6 +26,7 @@ import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
 import com.gitee.dorive.base.v1.executor.entity.op.Operation;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.repository.api.EventFactory;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationContext;
@@ -37,15 +38,11 @@ import java.util.List;
 @Setter
 public class RepositoryEventExecutor extends AbstractProxyExecutor {
 
-    private ApplicationContext applicationContext;
-    private EntityElement entityElement;
-    private List<EventFactory> eventFactories;
+    private final RepositoryContext repositoryContext;
 
-    public RepositoryEventExecutor(Executor executor, ApplicationContext applicationContext, EntityElement entityElement, List<EventFactory> eventFactories) {
+    public RepositoryEventExecutor(RepositoryContext repositoryContext, Executor executor) {
         super(executor);
-        this.applicationContext = applicationContext;
-        this.entityElement = entityElement;
-        this.eventFactories = eventFactories;
+        this.repositoryContext = repositoryContext;
     }
 
     @Override
@@ -70,8 +67,12 @@ public class RepositoryEventExecutor extends AbstractProxyExecutor {
 
     private void publishEvent(Context context, Operation operation) {
         if (operation instanceof EntityOp entityOp) {
-            Class<?> entityClass = getEntityElement().getGenericType();
-            for (EventFactory eventFactory : eventFactories) {
+            EntityElement entityElement = repositoryContext.getEntityElement();
+            List<EventFactory> repositoryEventFactories = repositoryContext.getRepositoryEventFactories();
+            ApplicationContext applicationContext = repositoryContext.getApplicationContext();
+
+            Class<?> entityClass = entityElement.getGenericType();
+            for (EventFactory eventFactory : repositoryEventFactories) {
                 ApplicationEvent applicationEvent = eventFactory.newApplicationEvent(this, entityOp.isUncontrolled(), entityClass, context, entityOp);
                 if (applicationEvent != null) {
                     applicationContext.publishEvent(applicationEvent);
