@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.repository.v1.entity.event;
+package com.gitee.dorive.event.v1.entity;
 
 import lombok.Getter;
 import lombok.Setter;

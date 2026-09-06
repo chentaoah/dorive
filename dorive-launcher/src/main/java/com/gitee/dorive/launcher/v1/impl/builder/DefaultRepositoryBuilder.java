@@ -22,6 +22,8 @@ import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.binder.api.ExampleBuilder;
 import com.gitee.dorive.base.v1.binder.enums.JoinType;
+import com.gitee.dorive.base.v1.definition.annotation.Event;
+import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
@@ -67,6 +69,12 @@ import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQueryExecutor;
 import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQueryResolver;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.executor.v1.impl.executor.RepositoryEventExecutor;
+import com.gitee.dorive.event.v1.entity.ExecutorEvent;
+import com.gitee.dorive.event.v1.entity.RepositoryEvent;
+import com.gitee.dorive.event.v1.factory.ExecutorEventFactory;
+import com.gitee.dorive.event.v1.factory.ExecutorTargetEventFactory;
+import com.gitee.dorive.event.v1.factory.RepositoryEventFactory;
+import com.gitee.dorive.event.v1.factory.RepositoryTargetEventFactory;
 import com.gitee.dorive.repository.v1.impl.ref.RefInjector;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
@@ -75,9 +83,11 @@ import com.gitee.dorive.repository.v1.impl.repository.ele.AbstractRepositoryCont
 import com.gitee.dorive.repository.v1.impl.repository.ele.AbstractRepositoryEle;
 import com.gitee.dorive.repository.v1.impl.repository.ele.DefaultRepository;
 import com.gitee.dorive.repository.v1.impl.resolver.RepositoryDerivedResolver;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * RepositoryContext's properties:
@@ -95,6 +105,33 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         if (repositoryContext instanceof AbstractMybatisRepository<?, ?> repository) {
             SqlRunner sqlRunner = repository.getApplicationContext().getBean(SqlRunner.class);
             repository.setSqlRunner(sqlRunner);
+        }
+    }
+
+    @Override
+    public void determineEnableEventPublish(RepositoryContext repositoryContext) {
+        RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
+        List<EventFactory> executorEventFactories = repositoryContext.getExecutorEventFactories();
+        List<EventFactory> repositoryEventFactories = repositoryContext.getRepositoryEventFactories();
+
+        Class<?>[] events = repositoryDef.getEvents();
+        for (Class<?> eventClass : events) {
+            if (ExecutorEvent.class.isAssignableFrom(eventClass)) {
+                executorEventFactories.add(new ExecutorEventFactory(eventClass));
+
+            } else if (RepositoryEvent.class.isAssignableFrom(eventClass)) {
+                repositoryEventFactories.add(new RepositoryEventFactory(eventClass));
+            }
+        }
+        Set<Event> eventsAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(repositoryContext.getClass(), Event.class);
+        for (Event eventsAnnotation : eventsAnnotations) {
+            Class<?> source = eventsAnnotation.source();
+            if (ExecutorEvent.class.isAssignableFrom(source)) {
+                executorEventFactories.add(new ExecutorTargetEventFactory(source, eventsAnnotation.target()));
+
+            } else if (RepositoryEvent.class.isAssignableFrom(source)) {
+                repositoryEventFactories.add(new RepositoryTargetEventFactory(source, eventsAnnotation.target()));
+            }
         }
     }
 

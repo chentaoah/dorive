@@ -36,6 +36,7 @@
         <module>dorive-factory</module>
         <module>dorive-query</module>
         <module>dorive-executor</module>
+        <module>dorive-event</module>
         <module>dorive-repository</module>
         <module>dorive-mybatis</module>
         <module>dorive-mybatis-plus</module>

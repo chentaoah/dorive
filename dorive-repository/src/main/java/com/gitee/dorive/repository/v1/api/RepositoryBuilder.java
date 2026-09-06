@@ -27,6 +27,8 @@ public interface RepositoryBuilder {
 
     void prepare(RepositoryContext repositoryContext);
 
+    void determineEnableEventPublish(RepositoryContext repositoryContext);
+
     AbstractRepositoryEle newRepository(RepositoryContext repositoryContext, EntityElement entityElement);
 
     BinderExecutor newBinderExecutor(RepositoryContext repositoryContext, EntityElement entityElement);

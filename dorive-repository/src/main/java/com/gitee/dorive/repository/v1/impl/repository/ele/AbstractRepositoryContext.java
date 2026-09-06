@@ -19,7 +19,6 @@ package com.gitee.dorive.repository.v1.impl.repository.ele;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
-import com.gitee.dorive.base.v1.definition.annotation.Event;
 import com.gitee.dorive.base.v1.definition.api.BoundedContext;
 import com.gitee.dorive.base.v1.definition.api.BoundedContextAware;
 import com.gitee.dorive.base.v1.definition.api.EntityTypeResolver;
@@ -37,13 +36,7 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
 import com.gitee.dorive.repository.v1.api.RepositoryPostProcessor;
-import com.gitee.dorive.repository.v1.entity.event.ExecutorEvent;
-import com.gitee.dorive.repository.v1.entity.event.RepositoryEvent;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
-import com.gitee.dorive.repository.v1.impl.factory.ExecutorEventFactory;
-import com.gitee.dorive.repository.v1.impl.factory.ExecutorTargetEventFactory;
-import com.gitee.dorive.repository.v1.impl.factory.RepositoryEventFactory;
-import com.gitee.dorive.repository.v1.impl.factory.RepositoryTargetEventFactory;
 import jakarta.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,14 +45,12 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -99,7 +90,7 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
         prepareRepositoryDef(repositoryClass, entityClass);
         Assert.notNull(repositoryDef, "The @Repository does not exist! type: {}", repositoryClass.getName());
         resetBoundedContextIfNecessary();
-        determineEnableEventPublish();
+        repositoryBuilder.determineEnableEventPublish(this);
 
         EntityTypeResolver entityTypeResolver = applicationContext.getBean(EntityTypeResolver.class);
         List<EntityElement> entityElements = entityTypeResolver.resolve(entityClass);
@@ -137,28 +128,6 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
         if (StringUtils.isNotBlank(boundedContextName)) {
             if (applicationContext.containsBean(boundedContextName)) {
                 this.boundedContext = applicationContext.getBean(boundedContextName, BoundedContext.class);
-            }
-        }
-    }
-
-    private void determineEnableEventPublish() {
-        Class<?>[] events = repositoryDef.getEvents();
-        for (Class<?> eventClass : events) {
-            if (ExecutorEvent.class.isAssignableFrom(eventClass)) {
-                executorEventFactories.add(new ExecutorEventFactory(eventClass));
-
-            } else if (RepositoryEvent.class.isAssignableFrom(eventClass)) {
-                repositoryEventFactories.add(new RepositoryEventFactory(eventClass));
-            }
-        }
-        Set<Event> eventsAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(getClass(), Event.class);
-        for (Event eventsAnnotation : eventsAnnotations) {
-            Class<?> source = eventsAnnotation.source();
-            if (ExecutorEvent.class.isAssignableFrom(source)) {
-                executorEventFactories.add(new ExecutorTargetEventFactory(source, eventsAnnotation.target()));
-
-            } else if (RepositoryEvent.class.isAssignableFrom(source)) {
-                repositoryEventFactories.add(new RepositoryTargetEventFactory(source, eventsAnnotation.target()));
             }
         }
     }

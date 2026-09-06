@@ -15,41 +15,37 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.repository.v1.impl.factory;
+package com.gitee.dorive.event.v1.entity;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
+import org.springframework.core.ResolvableType;
+import org.springframework.core.ResolvableTypeProvider;
 
 import java.util.List;
 
 @Getter
 @Setter
-public class RepositoryTargetEventFactory extends RepositoryEventFactory {
+public abstract class BaseEvent<T> extends ApplicationEvent implements ResolvableTypeProvider {
+    private boolean root;
+    private Class<?> entityClass;
+    private Context context;
+    private EntityOp entityOp;
 
-    private final Class<?> target;
-
-    public RepositoryTargetEventFactory(Class<?> source, Class<?> target) {
+    public BaseEvent(Object source) {
         super(source);
-        this.target = target;
     }
 
     @Override
-    public ApplicationEvent newApplicationEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
-        ApplicationEvent applicationEvent = super.newApplicationEvent(source, root, entityClass, context, entityOp);
-        if (applicationEvent != null) {
-            List<?> entities = entityOp.getEntities();
-            if (entities.size() == 1) {
-                ApplicationEvent newApplicationEvent = (ApplicationEvent) ReflectUtil.newInstance(target, source);
-                BeanUtil.copyProperties(entities.get(0), newApplicationEvent);
-                return newApplicationEvent;
-            }
-        }
-        return null;
+    public ResolvableType getResolvableType() {
+        return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forClass(entityClass));
     }
 
+    @SuppressWarnings("unchecked")
+    public List<T> getEntities() {
+        return (List<T>) entityOp.getEntities();
+    }
 }
