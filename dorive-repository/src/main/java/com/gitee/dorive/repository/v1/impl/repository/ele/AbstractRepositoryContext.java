@@ -149,7 +149,7 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
         }
 
         OperationFactory operationFactory = repositoryEle.getOperationFactory();
-        boolean isAggregated = repositoryEle instanceof AbstractRepositoryContext;
+        boolean isAggregated = repositoryEle instanceof RepositoryContext;
         BinderExecutor binderExecutor = repositoryBuilder.newBinderExecutor(this, entityElement);
         OrderByFactory orderByFactory = orderByDef == null ? null : new OrderByFactory(orderByDef);
 
@@ -189,8 +189,8 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
         Class<?> repositoryClass = entityDef.getRepository();
         RepositoryEle repositoryEle = (RepositoryEle) applicationContext.getBean(repositoryClass);
         if (!entityDef.isAggregate()) {
-            AbstractRepositoryContext abstractRepositoryContext = (AbstractRepositoryContext) repositoryEle;
-            RepositoryItem rootRepository = abstractRepositoryContext.getRootRepository();
+            RepositoryContext repositoryContext = (RepositoryContext) repositoryEle;
+            RepositoryItem rootRepository = repositoryContext.getRootRepository();
             return (RepositoryEle) rootRepository.getExecutor();
         }
         return repositoryEle;
