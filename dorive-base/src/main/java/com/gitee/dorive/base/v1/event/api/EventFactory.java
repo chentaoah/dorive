@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.repository.api;
+package com.gitee.dorive.base.v1.event.api;
 
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;

@@ -34,7 +34,7 @@ import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
-import com.gitee.dorive.base.v1.repository.api.EventFactory;
+import com.gitee.dorive.base.v1.event.api.EventFactory;
 import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
