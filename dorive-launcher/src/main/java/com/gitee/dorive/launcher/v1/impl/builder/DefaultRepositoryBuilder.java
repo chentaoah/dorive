@@ -144,8 +144,7 @@ public class DefaultRepositoryBuilder implements RepositoryBuilder {
         // 事件
         List<EventFactory> executorEventFactories = repositoryContext.getExecutorEventFactories();
         if (!executorEventFactories.isEmpty() && repositoryEle instanceof DefaultRepository defaultRepository) {
-            Executor executor = defaultRepository.getExecutor();
-            executor = new ExecutorEventExecutor(repositoryContext, defaultRepository.getEntityElement(), executor);
+            Executor executor = new ExecutorEventExecutor(repositoryContext, defaultRepository.getEntityElement(), defaultRepository.getExecutor());
             defaultRepository.setExecutor(executor);
         }
         Assert.notNull(repositoryEle, "Unsupported repository type!");
