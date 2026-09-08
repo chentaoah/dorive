@@ -33,7 +33,7 @@ import com.gitee.dorive.base.v1.executor.util.ReflectUtils;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryEle;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
+import com.gitee.dorive.repository.v1.api.RepositoryContextBuilder;
 import com.gitee.dorive.repository.v1.api.RepositoryPostProcessor;
 import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
 import jakarta.annotation.Nonnull;
@@ -55,7 +55,7 @@ import java.util.Map;
 public abstract class AbstractRepositoryContext extends AbstractRepositoryEle implements ApplicationContextAware, InitializingBean, RepositoryContext {
 
     private ApplicationContext applicationContext;
-    private RepositoryBuilder repositoryBuilder;
+    private RepositoryContextBuilder repositoryContextBuilder;
     private RepositoryDef repositoryDef;
     private Map<String, RepositoryItem> repositoryMap = new LinkedHashMap<>();
     private RepositoryItem rootRepository;
@@ -72,16 +72,16 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
     @Override
     public void afterPropertiesSet() {
         // 仓储构建器
-        this.repositoryBuilder = applicationContext.getBean(RepositoryBuilder.class);
+        this.repositoryContextBuilder = applicationContext.getBean(RepositoryContextBuilder.class);
         // 准备
-        repositoryBuilder.prepare(this);
+        repositoryContextBuilder.prepare(this);
 
         Class<?> repositoryClass = this.getClass();
         Class<?> entityClass = ReflectUtils.getFirstTypeArgument(repositoryClass);
 
         prepareRepositoryDef(repositoryClass, entityClass);
         Assert.notNull(repositoryDef, "The @Repository does not exist! type: {}", repositoryClass.getName());
-        repositoryBuilder.determineEnableEventPublish(this);
+        repositoryContextBuilder.determineEnableEventPublish(this);
 
         EntityTypeResolver entityTypeResolver = applicationContext.getBean(EntityTypeResolver.class);
         List<EntityElement> entityElements = entityTypeResolver.resolve(entityClass);
@@ -101,10 +101,10 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
 
         setEntityElement(rootRepository.getEntityElement());
         setOperationFactory(rootRepository.getOperationFactory());
-        setExecutor(repositoryBuilder.newExecutor(this));
+        setExecutor(repositoryContextBuilder.newExecutor(this));
 
         // 初始化
-        repositoryBuilder.initialize(this);
+        repositoryContextBuilder.initialize(this);
     }
 
     private void prepareRepositoryDef(Class<?> repositoryClass, Class<?> entityClass) {
@@ -123,7 +123,7 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
 
         RepositoryEle repositoryEle;
         if (isRoot) {
-            repositoryEle = repositoryBuilder.newRepositoryEle(this, entityElement);
+            repositoryEle = repositoryContextBuilder.newRepositoryEle(this, entityElement);
             repositoryEle.setProperty(RepositoryContext.class, this);
         } else {
             repositoryEle = doGetRepositoryEle(entityElement);
@@ -131,7 +131,7 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
 
         OperationFactory operationFactory = repositoryEle.getOperationFactory();
         boolean isAggregated = repositoryEle instanceof RepositoryContext;
-        BinderExecutor binderExecutor = repositoryBuilder.newBinderExecutor(this, entityElement);
+        BinderExecutor binderExecutor = repositoryContextBuilder.newBinderExecutor(this, entityElement);
         OrderByFactory orderByFactory = orderByDef == null ? null : new OrderByFactory(orderByDef);
 
         DefaultRepositoryItem defaultRepositoryItem = new DefaultRepositoryItem();

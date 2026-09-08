@@ -75,7 +75,7 @@ import com.gitee.dorive.query.v2.impl.segment.SegmentQueryResolver;
 import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQuerier;
 import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQueryExecutor;
 import com.gitee.dorive.query.v2.impl.stepwise.StepwiseQueryResolver;
-import com.gitee.dorive.repository.v1.api.RepositoryBuilder;
+import com.gitee.dorive.repository.v1.api.RepositoryContextBuilder;
 import com.gitee.dorive.repository.v1.impl.ref.RefInjector;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
@@ -97,7 +97,7 @@ import java.util.Set;
  * EntityStoreInfo、EntityTransformerManager、TransformerManager、Transformer、ExampleConverter
  * RepositoryContext
  */
-public class DefaultRepositoryBuilder implements RepositoryBuilder {
+public class DefaultRepositoryContextBuilder implements RepositoryContextBuilder {
 
     @Override
     public void prepare(RepositoryContext repositoryContext) {

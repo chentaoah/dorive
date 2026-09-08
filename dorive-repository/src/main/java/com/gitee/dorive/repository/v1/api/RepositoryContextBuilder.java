@@ -23,7 +23,7 @@ import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryEle;
 
-public interface RepositoryBuilder {
+public interface RepositoryContextBuilder {
 
     void prepare(RepositoryContext repositoryContext);
 
