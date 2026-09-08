@@ -19,11 +19,10 @@ package com.gitee.dorive.launcher.v1.impl.builder;
 
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
-import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.factory.api.EntityFactory;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
-import com.gitee.dorive.factory.v1.impl.factory.ContextEntityFactory;
 import com.gitee.dorive.factory.v1.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.factory.v1.impl.factory.ValueObjEntityFactory;
 import lombok.AllArgsConstructor;
@@ -68,13 +67,7 @@ public class EntityFactoryBuilder {
         if (entityFactory instanceof DefaultEntityFactory) {
             ((DefaultEntityFactory) entityFactory).initialize();
         }
-        // 边界上下文实体工厂
-        ContextEntityFactory contextEntityFactory = new ContextEntityFactory();
-        contextEntityFactory.setBoundedContextName(repositoryDef.getBoundedContext());
-        contextEntityFactory.setBoundedContext(repositoryContext.getBoundedContext());
-        contextEntityFactory.initCtxCopyOptions(entityElement);
-        contextEntityFactory.setEntityFactory(entityFactory);
-        return contextEntityFactory;
+        return entityFactory;
     }
 
 }

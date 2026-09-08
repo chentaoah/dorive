@@ -35,7 +35,6 @@ public class RepositoryDef {
     private Class<?>[] derived;
     private Class<?>[] events;
     private Class<?>[] queries;
-    private String boundedContext;
 
     public static RepositoryDef fromElement(AnnotatedElement element) {
         Repository repository = AnnotatedElementUtils.getMergedAnnotation(element, Repository.class);
@@ -47,7 +46,6 @@ public class RepositoryDef {
             repositoryDef.setDerived(repository.derived());
             repositoryDef.setEvents(repository.events());
             repositoryDef.setQueries(repository.queries());
-            repositoryDef.setBoundedContext(repository.boundedContext());
             return repositoryDef;
         }
         return null;

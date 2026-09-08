@@ -60,9 +60,4 @@ public @interface Repository {
      */
     Class<?>[] queries() default {};
 
-    /**
-     * 边界上下文
-     */
-    String boundedContext() default "";
-
 }

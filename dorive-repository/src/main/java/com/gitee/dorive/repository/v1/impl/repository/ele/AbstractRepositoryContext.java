@@ -19,8 +19,6 @@ package com.gitee.dorive.repository.v1.impl.repository.ele;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
-import com.gitee.dorive.base.v1.definition.api.BoundedContext;
-import com.gitee.dorive.base.v1.definition.api.BoundedContextAware;
 import com.gitee.dorive.base.v1.definition.api.EntityTypeResolver;
 import com.gitee.dorive.base.v1.definition.def.EntityDef;
 import com.gitee.dorive.base.v1.definition.def.OrderByDef;
@@ -41,7 +39,6 @@ import com.gitee.dorive.repository.v1.impl.context.RepositoryRegister;
 import jakarta.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -55,10 +52,9 @@ import java.util.Map;
 
 @Getter
 @Setter
-public abstract class AbstractRepositoryContext extends AbstractRepositoryEle implements ApplicationContextAware, BoundedContextAware, InitializingBean, RepositoryContext {
+public abstract class AbstractRepositoryContext extends AbstractRepositoryEle implements ApplicationContextAware, InitializingBean, RepositoryContext {
 
     private ApplicationContext applicationContext;
-    private BoundedContext boundedContext;
     private RepositoryBuilder repositoryBuilder;
     private RepositoryDef repositoryDef;
     private Map<String, RepositoryItem> repositoryMap = new LinkedHashMap<>();
@@ -74,11 +70,6 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
     }
 
     @Override
-    public void setBoundedContext(BoundedContext boundedContext) {
-        this.boundedContext = boundedContext;
-    }
-
-    @Override
     public void afterPropertiesSet() {
         // 仓储构建器
         this.repositoryBuilder = applicationContext.getBean(RepositoryBuilder.class);
@@ -90,7 +81,6 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
 
         prepareRepositoryDef(repositoryClass, entityClass);
         Assert.notNull(repositoryDef, "The @Repository does not exist! type: {}", repositoryClass.getName());
-        resetBoundedContextIfNecessary();
         repositoryBuilder.determineEnableEventPublish(this);
 
         EntityTypeResolver entityTypeResolver = applicationContext.getBean(EntityTypeResolver.class);
@@ -121,15 +111,6 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
         this.repositoryDef = RepositoryDef.fromElement(repositoryClass);
         for (RepositoryPostProcessor postProcessor : RepositoryRegister.getRepositoryPostProcessors()) {
             postProcessor.postProcessRepositoryDef(repositoryClass, entityClass, repositoryDef);
-        }
-    }
-
-    private void resetBoundedContextIfNecessary() {
-        String boundedContextName = repositoryDef.getBoundedContext();
-        if (StringUtils.isNotBlank(boundedContextName)) {
-            if (applicationContext.containsBean(boundedContextName)) {
-                this.boundedContext = applicationContext.getBean(boundedContextName, BoundedContext.class);
-            }
         }
     }
 
