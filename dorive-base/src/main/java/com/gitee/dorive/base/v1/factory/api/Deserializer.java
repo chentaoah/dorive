@@ -17,5 +17,10 @@
 
 package com.gitee.dorive.base.v1.factory.api;
 
-public interface EntityFactory extends Deserializer, Serializer {
+import com.gitee.dorive.base.v1.executor.api.Context;
+
+public interface Deserializer {
+
+    Object deserialize(Context context, Object object);
+
 }

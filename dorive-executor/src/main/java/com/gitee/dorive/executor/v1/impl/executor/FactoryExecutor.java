@@ -32,6 +32,7 @@ import com.gitee.dorive.base.v1.executor.entity.eop.Insert;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +60,7 @@ public class FactoryExecutor extends AbstractProxyExecutor {
 
         List<Object> entities = Collections.emptyList();
         if (recordMaps != null && !recordMaps.isEmpty()) {
-            entities = entityFactory.reconstitute(context, recordMaps);
+            entities = reconstitute(context, recordMaps);
         }
 
         if (page != null) {
@@ -71,11 +72,20 @@ public class FactoryExecutor extends AbstractProxyExecutor {
         return result;
     }
 
+    private List<Object> reconstitute(Context context, List<?> persistentObjs) {
+        List<Object> entities = new ArrayList<>(persistentObjs.size());
+        for (Object persistent : persistentObjs) {
+            Object entity = entityFactory.deserialize(context, persistent);
+            entities.add(entity);
+        }
+        return entities;
+    }
+
     @Override
     public int execute(Context context, Operation operation) {
         if (operation instanceof EntityOp entityOp) {
             List<?> entities = entityOp.getEntities();
-            List<Object> persistentObjs = entityFactory.deconstruct(context, entities);
+            List<Object> persistentObjs = deconstruct(context, entities);
             entityOp.setEntities(persistentObjs);
             int totalCount = super.execute(context, operation);
             entityOp.setEntities(entities);
@@ -95,7 +105,7 @@ public class FactoryExecutor extends AbstractProxyExecutor {
         } else if (operation instanceof ConditionUpdate conditionUpdate) {
             Object entity = conditionUpdate.getEntity();
             if (entity != null) {
-                List<Object> persistentObjs = entityFactory.deconstruct(context, Collections.singletonList(entity));
+                List<Object> persistentObjs = deconstruct(context, Collections.singletonList(entity));
                 conditionUpdate.setEntity(persistentObjs.get(0));
                 int totalCount = super.execute(context, operation);
                 conditionUpdate.setEntity(entity);
@@ -103,6 +113,15 @@ public class FactoryExecutor extends AbstractProxyExecutor {
             }
         }
         return super.execute(context, operation);
+    }
+
+    private List<Object> deconstruct(Context context, List<?> entities) {
+        List<Object> persistentObjs = new ArrayList<>(entities.size());
+        for (Object entity : entities) {
+            Object persistent = entityFactory.serialize(context, entity);
+            persistentObjs.add(persistent);
+        }
+        return persistentObjs;
     }
 
 }

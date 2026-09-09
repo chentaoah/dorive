@@ -111,9 +111,9 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Object doReconstitute(Context context, Object persistent) {
-        Object entity = super.doReconstitute(context, persistent);
-        Map<String, Object> resultMap = (Map<String, Object>) persistent;
+    public Object deserialize(Context context, Object object) {
+        Object entity = super.deserialize(context, object);
+        Map<String, Object> resultMap = (Map<String, Object>) object;
         List<FieldAliasMapping> unmatchedValueObjFields = getReEntityTransformer().getUnmatchedValueObjFields();
         for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
             Object valueObj = fieldAliasMapping.reconstitute(resultMap);
@@ -125,11 +125,11 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     }
 
     @Override
-    public Object doDeconstruct(Context context, Object entity) {
-        Object pojo = super.doDeconstruct(context, entity);
+    public Object serialize(Context context, Object object) {
+        Object pojo = super.serialize(context, object);
         List<FieldAliasMapping> unmatchedValueObjFields = getDeEntityTransformer().getUnmatchedValueObjFields();
         for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
-            Object valueObj = BeanUtil.getFieldValue(entity, fieldAliasMapping.getField());
+            Object valueObj = BeanUtil.getFieldValue(object, fieldAliasMapping.getField());
             valueObj = valueObj != null ? fieldAliasMapping.deconstruct(valueObj) : null;
             if (valueObj != null) {
                 BeanUtil.copyProperties(valueObj, pojo, CopyOptions.create().ignoreNullValue());
