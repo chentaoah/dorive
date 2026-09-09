@@ -36,7 +36,7 @@ X-Module-Requires: ~,
  com.gitee.dorive.executor.v1.impl.executor.AbstractProxyExecutor,
  com.gitee.dorive.base.v1.executor.util.MultiInBuilder,
  com.gitee.dorive.base.v1.factory.api.Transformer,
- com.gitee.dorive.base.v1.factory.api.TransformerManager
+ com.gitee.dorive.factory.v1.api.TransformerManager
 X-Module-Provides: com.gitee.dorive.base.v1.factory.api.ExampleConverter
 X-Module-Notifies: null
 X-Module-Waits: null

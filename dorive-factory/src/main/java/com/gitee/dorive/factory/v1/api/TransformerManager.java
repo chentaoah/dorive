@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.factory.api;
+package com.gitee.dorive.factory.v1.api;
+
+import com.gitee.dorive.base.v1.factory.api.Transformer;
 
 public interface TransformerManager {
 

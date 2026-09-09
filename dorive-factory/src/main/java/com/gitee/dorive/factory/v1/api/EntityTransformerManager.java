@@ -17,8 +17,6 @@
 
 package com.gitee.dorive.factory.v1.api;
 
-import com.gitee.dorive.base.v1.factory.api.TransformerManager;
-
 import java.lang.reflect.Type;
 
 public interface EntityTransformerManager extends TransformerManager {

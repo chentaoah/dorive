@@ -32,7 +32,7 @@ import com.gitee.dorive.base.v1.factory.api.EntityFactory;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
 import com.gitee.dorive.base.v1.factory.api.Transformer;
-import com.gitee.dorive.base.v1.factory.api.TransformerManager;
+import com.gitee.dorive.factory.v1.api.TransformerManager;
 import com.gitee.dorive.base.v1.factory.enums.Category;
 import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
