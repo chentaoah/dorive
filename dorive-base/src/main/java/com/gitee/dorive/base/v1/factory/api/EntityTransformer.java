@@ -30,10 +30,6 @@ public interface EntityTransformer extends Transformer {
 
     FieldAliasMapping getFieldAliasMappingByAlias(String alias);
 
-    List<FieldAliasMapping> getValueObjFields();
-
-    List<FieldAliasMapping> getMatchedValueObjFields();
-
     List<FieldAliasMapping> getUnmatchedValueObjFields();
 
 }
