@@ -32,7 +32,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Repository {
 
-    @AliasFor(annotation = Component.class) String value() default "";
+    @AliasFor(annotation = Component.class)
+    String value() default "";
 
     /**
      * 数据源
