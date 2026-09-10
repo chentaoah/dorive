@@ -17,9 +17,13 @@
 
 package com.gitee.dorive.factory.v1.api;
 
+import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
+
 import java.lang.reflect.Type;
 
-public interface EntityTransformerManager extends NameSerializerManager {
+public interface EntityTransformerManager {
+
+    EntityTransformer getEntityTransformer(String category);
 
     boolean containValueObj();
 

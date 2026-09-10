@@ -82,7 +82,7 @@ public class DefaultEntityTransformer implements EntityTransformer {
     }
 
     @Override
-    public List<String> toAliases(List<String> fields) {
+    public List<String> serialize(List<String> fields) {
         if (fields != null && !fields.isEmpty()) {
             List<String> aliases = new ArrayList<>(fields.size());
             for (String field : fields) {
@@ -95,7 +95,7 @@ public class DefaultEntityTransformer implements EntityTransformer {
     }
 
     @Override
-    public Set<String> toAliases(Set<String> fields) {
+    public Set<String> serialize(Set<String> fields) {
         if (fields != null && !fields.isEmpty()) {
             Set<String> aliases = new LinkedHashSet<>(fields.size() * 4 / 3 + 1);
             for (String field : fields) {

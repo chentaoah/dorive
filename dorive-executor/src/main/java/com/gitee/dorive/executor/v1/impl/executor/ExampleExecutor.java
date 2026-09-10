@@ -108,7 +108,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
     private void convertUpdate(Update update) {
         Set<String> nullableProps = update.getNullableProps();
         if (nullableProps != null && !nullableProps.isEmpty()) {
-            nullableProps = entityTransformer.toAliases(nullableProps);
+            nullableProps = entityTransformer.serialize(nullableProps);
             update.setNullableProps(nullableProps);
         }
     }
@@ -116,7 +116,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
     private void convertConditionUpdate(ConditionUpdate conditionUpdate) {
         Set<String> nullableProps = conditionUpdate.getNullableProps();
         if (nullableProps != null && !nullableProps.isEmpty()) {
-            nullableProps = entityTransformer.toAliases(nullableProps);
+            nullableProps = entityTransformer.serialize(nullableProps);
             conditionUpdate.setNullableProps(nullableProps);
         }
     }
@@ -124,7 +124,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
     private void convertSelectProps(Example example) {
         List<String> properties = example.getSelectProps();
         if (properties != null && !properties.isEmpty()) {
-            properties = entityTransformer.toAliases(properties);
+            properties = entityTransformer.serialize(properties);
             example.setSelectProps(properties);
         }
     }
@@ -143,7 +143,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
                     Object value = criterion.getValue();
                     if (value instanceof MultiInBuilder builder) {
                         List<String> properties = builder.getProperties();
-                        properties = entityTransformer.toAliases(properties);
+                        properties = entityTransformer.serialize(properties);
                         builder.setProperties(properties);
                         criterion.setProperty(builder.buildPropertiesStr());
                         criterion.setValue(builder.buildValuesStr());
@@ -173,7 +173,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
             List<String> properties = orderBy.getProperties();
-            properties = entityTransformer.toAliases(properties);
+            properties = entityTransformer.serialize(properties);
             orderBy.setProperties(properties);
         }
     }

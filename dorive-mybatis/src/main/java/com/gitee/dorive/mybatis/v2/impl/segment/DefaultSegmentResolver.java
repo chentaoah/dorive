@@ -22,7 +22,7 @@ import com.gitee.dorive.base.v1.definition.constant.Operator;
 import com.gitee.dorive.base.v1.executor.entity.qry.Criterion;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import com.gitee.dorive.base.v1.executor.util.CriterionUtils;
-import com.gitee.dorive.base.v1.factory.api.name.NameSerializer;
+import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.mybatis.v2.entity.ArgSegment;
@@ -106,13 +106,13 @@ public class DefaultSegmentResolver implements SegmentResolver {
             String literal = conditionInfo.getLiteral();
 
             String sourceTableAlias = repositoryAliasMap.get(source);
-            String sourceFieldAlias = source.getProperty(NameSerializer.class).serialize(sourceField);
+            String sourceFieldAlias = source.getProperty(EntityTransformer.class).serialize(sourceField);
             String leftExpr = sourceTableAlias + "." + sourceFieldAlias;
 
             String rightExpr = literal;
             if (target != null) {
                 String targetTableAlias = repositoryAliasMap.get(target);
-                String targetFieldAlias = target.getProperty(NameSerializer.class).serialize(targetField);
+                String targetFieldAlias = target.getProperty(EntityTransformer.class).serialize(targetField);
                 rightExpr = targetTableAlias + "." + targetFieldAlias;
             }
             Assert.notNull(rightExpr, "The rightExpr cannot be null!");

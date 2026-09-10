@@ -28,11 +28,9 @@ import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.executor.api.OperationFactory;
-import com.gitee.dorive.base.v1.factory.api.*;
+import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityFactory;
 import com.gitee.dorive.base.v1.factory.api.example.ExampleSerializer;
-import com.gitee.dorive.base.v1.factory.api.name.NameSerializer;
-import com.gitee.dorive.factory.v1.api.NameSerializerManager;
 import com.gitee.dorive.base.v1.factory.enums.Category;
 import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
@@ -78,8 +76,8 @@ public class MybatisPlusRepositoryBuilder {
         String deCategory = Category.ENTITY_POJO.name();
         EntityTransformerManagerResolver entityTransformerManagerResolver = new EntityTransformerManagerResolver(entityElement, entityStoreInfo.getAliasPropMap(), reCategory, deCategory);
         EntityTransformerManager entityTransformerManager = entityTransformerManagerResolver.newEntityTransformerManager();
-        EntityTransformer reEntityTransformer = (EntityTransformer) entityTransformerManager.getNameSerializer(reCategory);
-        EntityTransformer deEntityTransformer = (EntityTransformer) entityTransformerManager.getNameSerializer(deCategory);
+        EntityTransformer reEntityTransformer = entityTransformerManager.getEntityTransformer(reCategory);
+        EntityTransformer deEntityTransformer = entityTransformerManager.getEntityTransformer(deCategory);
 
         // 实体工厂
         EntityFactoryBuilder entityFactoryBuilder = new EntityFactoryBuilder(
@@ -98,8 +96,7 @@ public class MybatisPlusRepositoryBuilder {
 
         repository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         repository.setProperty(EntityTransformerManager.class, entityTransformerManager);
-        repository.setProperty(NameSerializerManager.class, entityTransformerManager);
-        repository.setProperty(NameSerializer.class, reEntityTransformer);
+        repository.setProperty(EntityTransformer.class, reEntityTransformer);
         repository.setProperty(ExampleSerializer.class, exampleSerializer);
 
         DefaultRepository defaultRepository = new DefaultRepository();
@@ -108,8 +105,7 @@ public class MybatisPlusRepositoryBuilder {
         defaultRepository.setExecutor(executor);
         defaultRepository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         defaultRepository.setProperty(EntityTransformerManager.class, entityTransformerManager);
-        defaultRepository.setProperty(NameSerializerManager.class, entityTransformerManager);
-        defaultRepository.setProperty(NameSerializer.class, reEntityTransformer);
+        defaultRepository.setProperty(EntityTransformer.class, reEntityTransformer);
         defaultRepository.setProperty(ExampleSerializer.class, exampleSerializer);
         return defaultRepository;
     }
