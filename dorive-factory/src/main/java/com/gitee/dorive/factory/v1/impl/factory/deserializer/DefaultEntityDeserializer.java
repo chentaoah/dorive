@@ -33,7 +33,7 @@ import lombok.Setter;
 public class DefaultEntityDeserializer implements EntityDeserializer {
 
     private EntityElement entityElement;
-    private Class<?> type;
+    private Class<?> entityType;
     private EntityMapper entityMapper;
     private CopyOptions copyOptions;
     private TypeAdapter typeAdapter;
@@ -55,7 +55,7 @@ public class DefaultEntityDeserializer implements EntityDeserializer {
     }
 
     protected void initTypeAdapter() {
-        this.typeAdapter = (persistent) -> type;
+        this.typeAdapter = (persistent) -> entityType;
     }
 
     protected void processTypeAdapter() {

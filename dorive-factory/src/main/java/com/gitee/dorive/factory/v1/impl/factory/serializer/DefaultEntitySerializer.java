@@ -29,7 +29,7 @@ import lombok.Setter;
 @Setter
 public class DefaultEntitySerializer implements EntitySerializer {
 
-    private Class<?> type;
+    private Class<?> pojoType;
     private EntityMapper entityMapper;
     private CopyOptions copyOptions;
 
@@ -49,7 +49,7 @@ public class DefaultEntitySerializer implements EntitySerializer {
 
     @Override
     public Object serialize(Context context, Object object) {
-        return BeanUtil.toBean(object, type, copyOptions);
+        return BeanUtil.toBean(object, pojoType, copyOptions);
     }
 
 }

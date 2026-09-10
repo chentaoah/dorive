@@ -67,7 +67,7 @@ public class EntityFactoryBuilder {
         }
         if (entityDeserializer instanceof DefaultEntityDeserializer defaultEntityDeserializer) {
             defaultEntityDeserializer.setEntityElement(entityElement);
-            defaultEntityDeserializer.setType(entityType);
+            defaultEntityDeserializer.setEntityType(entityType);
             defaultEntityDeserializer.setEntityMapper(entityMapperManager.getDatabaseEntityMapper());
         }
         if (entityDeserializer instanceof ValueObjEntityDeserializer valueObjEntityDeserializer) {
@@ -92,7 +92,7 @@ public class EntityFactoryBuilder {
             entitySerializer = (EntitySerializer) applicationContext.getBean(serializerClass);
         }
         if (entitySerializer instanceof DefaultEntitySerializer defaultEntitySerializer) {
-            defaultEntitySerializer.setType(pojoType);
+            defaultEntitySerializer.setPojoType(pojoType);
             defaultEntitySerializer.setEntityMapper(entityMapperManager.getPojoEntityMapper());
         }
         if (entitySerializer instanceof ValueObjEntitySerializer valueObjEntitySerializer) {
