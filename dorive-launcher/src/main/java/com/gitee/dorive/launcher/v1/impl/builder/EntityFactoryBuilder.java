@@ -48,18 +48,19 @@ public class EntityFactoryBuilder {
     private EntityTransformer deEntityTransformer;
 
     public EntityFactory newEntityFactory() {
-        RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
-        ApplicationContext applicationContext = repositoryContext.getApplicationContext();
         // 反序列化
-        Deserializer deserializer = newDeserializer(repositoryDef, applicationContext);
+        Deserializer deserializer = newDeserializer();
         // 序列化
-        Serializer serializer = newSerializer(repositoryDef, applicationContext);
+        Serializer serializer = newSerializer();
         // 实体工厂
-        return newEntityFactory(repositoryDef, applicationContext, deserializer, serializer);
+        return newEntityFactory(deserializer, serializer);
     }
 
     @NonNull
-    private Deserializer newDeserializer(RepositoryDef repositoryDef, ApplicationContext applicationContext) {
+    private Deserializer newDeserializer() {
+        RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
+        ApplicationContext applicationContext = repositoryContext.getApplicationContext();
+
         Class<?> deserializerClass = repositoryDef.getDeserializer();
         Deserializer deserializer;
         if (deserializerClass == Object.class) {
@@ -82,7 +83,10 @@ public class EntityFactoryBuilder {
     }
 
     @NonNull
-    private Serializer newSerializer(RepositoryDef repositoryDef, ApplicationContext applicationContext) {
+    private Serializer newSerializer() {
+        RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
+        ApplicationContext applicationContext = repositoryContext.getApplicationContext();
+
         Class<?> serializerClass = repositoryDef.getSerializer();
         Serializer serializer;
         if (serializerClass == Object.class) {
@@ -104,7 +108,10 @@ public class EntityFactoryBuilder {
     }
 
     @NonNull
-    private EntityFactory newEntityFactory(RepositoryDef repositoryDef, ApplicationContext applicationContext, Deserializer deserializer, Serializer serializer) {
+    private EntityFactory newEntityFactory(Deserializer deserializer, Serializer serializer) {
+        RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
+        ApplicationContext applicationContext = repositoryContext.getApplicationContext();
+
         Class<?> factoryClass = repositoryDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
