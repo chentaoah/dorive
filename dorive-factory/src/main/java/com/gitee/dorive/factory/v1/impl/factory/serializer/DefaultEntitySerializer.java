@@ -22,17 +22,19 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
 import com.gitee.dorive.base.v1.factory.api.entity.EntitySerializer;
+import com.gitee.dorive.factory.v1.api.InitializingObject;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class DefaultEntitySerializer implements EntitySerializer {
+public class DefaultEntitySerializer implements EntitySerializer, InitializingObject {
 
     private Class<?> pojoType;
     private EntityMapper entityMapper;
     private CopyOptions copyOptions;
 
+    @Override
     public void initialize() {
         initCopyOptions();
     }

@@ -24,6 +24,7 @@ import com.gitee.dorive.base.v1.factory.api.entity.EntityFactory;
 import com.gitee.dorive.base.v1.factory.api.entity.EntitySerializer;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.factory.v1.api.EntityMapperManager;
+import com.gitee.dorive.factory.v1.api.InitializingObject;
 import com.gitee.dorive.factory.v1.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.factory.v1.impl.factory.deserializer.DefaultEntityDeserializer;
 import com.gitee.dorive.factory.v1.impl.factory.deserializer.ValueObjEntityDeserializer;
@@ -73,8 +74,8 @@ public class EntityFactoryBuilder {
         if (entityDeserializer instanceof ValueObjEntityDeserializer valueObjEntityDeserializer) {
             valueObjEntityDeserializer.setEntityMapperManager(entityMapperManager);
         }
-        if (entityDeserializer instanceof DefaultEntityDeserializer defaultEntityDeserializer) {
-            defaultEntityDeserializer.initialize();
+        if (entityDeserializer instanceof InitializingObject initializingObject) {
+            initializingObject.initialize();
         }
         return entityDeserializer;
     }
@@ -98,8 +99,8 @@ public class EntityFactoryBuilder {
         if (entitySerializer instanceof ValueObjEntitySerializer valueObjEntitySerializer) {
             valueObjEntitySerializer.setEntityMapperManager(entityMapperManager);
         }
-        if (entitySerializer instanceof DefaultEntitySerializer defaultEntitySerializer) {
-            defaultEntitySerializer.initialize();
+        if (entitySerializer instanceof InitializingObject initializingObject) {
+            initializingObject.initialize();
         }
         return entitySerializer;
     }
@@ -120,6 +121,9 @@ public class EntityFactoryBuilder {
         if (entityFactory instanceof DefaultEntityFactory defaultEntityFactory) {
             defaultEntityFactory.setEntityDeserializer(entityDeserializer);
             defaultEntityFactory.setEntitySerializer(entitySerializer);
+        }
+        if (entityFactory instanceof InitializingObject initializingObject) {
+            initializingObject.initialize();
         }
         return entityFactory;
     }

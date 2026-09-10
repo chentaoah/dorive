@@ -23,6 +23,7 @@ import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityDeserializer;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
+import com.gitee.dorive.factory.v1.api.InitializingObject;
 import com.gitee.dorive.factory.v1.api.TypeAdapter;
 import com.gitee.dorive.factory.v1.impl.adapter.MapTypeAdapter;
 import lombok.Getter;
@@ -30,7 +31,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DefaultEntityDeserializer implements EntityDeserializer {
+public class DefaultEntityDeserializer implements EntityDeserializer, InitializingObject {
 
     private EntityElement entityElement;
     private Class<?> entityType;
@@ -38,6 +39,7 @@ public class DefaultEntityDeserializer implements EntityDeserializer {
     private CopyOptions copyOptions;
     private TypeAdapter typeAdapter;
 
+    @Override
     public void initialize() {
         initCopyOptions();
         initTypeAdapter();
