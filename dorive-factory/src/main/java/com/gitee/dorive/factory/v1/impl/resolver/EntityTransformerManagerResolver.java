@@ -21,13 +21,13 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.definition.def.FieldDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.definition.entity.FieldDefinition;
-import com.gitee.dorive.base.v1.factory.api.Converter;
+import com.gitee.dorive.base.v1.factory.api.ValueFactory;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
-import com.gitee.dorive.factory.v1.impl.converter.JsonArrayConverter;
-import com.gitee.dorive.factory.v1.impl.converter.JsonConverter;
-import com.gitee.dorive.factory.v1.impl.converter.MapConverter;
-import com.gitee.dorive.factory.v1.impl.converter.MapExpConverter;
+import com.gitee.dorive.factory.v1.impl.converter.JsonArrayValueFactory;
+import com.gitee.dorive.factory.v1.impl.converter.JsonValueFactory;
+import com.gitee.dorive.factory.v1.impl.converter.MapValueFactory;
+import com.gitee.dorive.factory.v1.impl.converter.MapExpValueFactory;
 import com.gitee.dorive.factory.v1.impl.mapping.DefaultEntityTransformer;
 import com.gitee.dorive.factory.v1.impl.mapping.DefaultEntityTransformerManager;
 import lombok.AllArgsConstructor;
@@ -84,10 +84,10 @@ public class EntityTransformerManagerResolver {
             }
 
             // 值转换器
-            Converter converter = newConverter(fieldDefinition, isMatch, isValueObj);
+            ValueFactory valueFactory = newConverter(fieldDefinition, isMatch, isValueObj);
 
-            reEntityTransformer.addField(field, isMatch, alias, isValueObj, converter);
-            deEntityTransformer.addField(field, isMatch, prop, isValueObj, converter);
+            reEntityTransformer.addField(field, isMatch, alias, isValueObj, valueFactory);
+            deEntityTransformer.addField(field, isMatch, prop, isValueObj, valueFactory);
         }
 
         // ENTITY_DATABASE
@@ -98,23 +98,23 @@ public class EntityTransformerManagerResolver {
         return new DefaultEntityTransformerManager(categoryEntityTransformerMap, valueObjTypes, containMatchedValueObj);
     }
 
-    private Converter newConverter(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {
+    private ValueFactory newConverter(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {
         FieldDef fieldDef = fieldDefinition.getFieldDef();
         if (fieldDef != null) {
             Class<?> converterClass = fieldDef.getConverter();
             if (converterClass != Object.class) {
-                return (Converter) ReflectUtil.newInstance(converterClass);
+                return (ValueFactory) ReflectUtil.newInstance(converterClass);
 
             } else if (isValueObj) {
                 Class<?> genericType = fieldDefinition.getGenericType();
                 if (isMatch) {
-                    return !fieldDefinition.isCollection() ? new JsonConverter(genericType) : new JsonArrayConverter(genericType);
+                    return !fieldDefinition.isCollection() ? new JsonValueFactory(genericType) : new JsonArrayValueFactory(genericType);
                 } else {
-                    return new MapConverter(genericType);
+                    return new MapValueFactory(genericType);
                 }
 
             } else if (StringUtils.isNotBlank(fieldDef.getExpression())) {
-                return new MapExpConverter(fieldDefinition);
+                return new MapExpValueFactory(fieldDefinition);
             }
         }
         return null;

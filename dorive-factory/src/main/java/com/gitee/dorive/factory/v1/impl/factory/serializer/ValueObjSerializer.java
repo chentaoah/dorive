@@ -74,7 +74,7 @@ public class ValueObjSerializer extends DefaultSerializer {
         List<FieldAliasMapping> unmatchedValueObjFields = entityTransformer.getUnmatchedValueObjFields();
         for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
             Object valueObj = BeanUtil.getFieldValue(object, fieldAliasMapping.getField());
-            valueObj = valueObj != null ? fieldAliasMapping.deconstruct(valueObj) : null;
+            valueObj = valueObj != null ? fieldAliasMapping.serialize(valueObj) : null;
             if (valueObj != null) {
                 BeanUtil.copyProperties(valueObj, pojo, CopyOptions.create().ignoreNullValue());
             }

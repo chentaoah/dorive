@@ -20,7 +20,7 @@ package com.gitee.dorive.factory.v1.impl.converter;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.base.v1.definition.entity.FieldDefinition;
 import com.gitee.dorive.base.v1.definition.def.FieldDef;
-import com.gitee.dorive.base.v1.factory.api.Converter;
+import com.gitee.dorive.base.v1.factory.api.ValueFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -32,13 +32,13 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class MapExpConverter implements Converter {
+public class MapExpValueFactory implements ValueFactory {
 
     private FieldDefinition fieldDefinition;
     private Map<Object, Object> reMap = Collections.emptyMap();
     private Map<Object, Object> deMap = Collections.emptyMap();
 
-    public MapExpConverter(FieldDefinition fieldDefinition) {
+    public MapExpValueFactory(FieldDefinition fieldDefinition) {
         this.fieldDefinition = fieldDefinition;
         FieldDef fieldDef = fieldDefinition.getFieldDef();
         Class<?> genericType = fieldDefinition.getGenericType();
@@ -65,7 +65,7 @@ public class MapExpConverter implements Converter {
         }
     }
 
-    public Object reconstitute(Object value) {
+    public Object deserialize(Object value) {
         if (value == null) {
             return null;
         }
@@ -76,7 +76,7 @@ public class MapExpConverter implements Converter {
         return value;
     }
 
-    public Object deconstruct(Object value) {
+    public Object serialize(Object value) {
         if (value == null) {
             return null;
         }

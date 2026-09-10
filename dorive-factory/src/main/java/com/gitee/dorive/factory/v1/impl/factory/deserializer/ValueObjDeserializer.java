@@ -78,7 +78,7 @@ public class ValueObjDeserializer extends DefaultDeserializer {
         Map<String, Object> resultMap = (Map<String, Object>) object;
         List<FieldAliasMapping> unmatchedValueObjFields = entityTransformer.getUnmatchedValueObjFields();
         for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
-            Object valueObj = fieldAliasMapping.reconstitute(resultMap);
+            Object valueObj = fieldAliasMapping.deserialize(resultMap);
             if (valueObj != null) {
                 BeanUtil.setFieldValue(entity, fieldAliasMapping.getField(), valueObj);
             }

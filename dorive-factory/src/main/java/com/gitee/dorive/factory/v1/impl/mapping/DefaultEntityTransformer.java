@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.factory.v1.impl.mapping;
 
-import com.gitee.dorive.base.v1.factory.api.Converter;
+import com.gitee.dorive.base.v1.factory.api.ValueFactory;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
 import lombok.AllArgsConstructor;
@@ -41,11 +41,11 @@ public class DefaultEntityTransformer implements EntityTransformer {
     private List<FieldAliasMapping> matchedValueObjFields = new ArrayList<>(4);
     private List<FieldAliasMapping> unmatchedValueObjFields = new ArrayList<>(4);
 
-    public void addField(String field, boolean isMatch, String alias, boolean isValueObj, Converter converter) {
+    public void addField(String field, boolean isMatch, String alias, boolean isValueObj, ValueFactory valueFactory) {
         fieldAliasMap.put(field, alias);
         aliasFieldMap.put(alias, field);
 
-        FieldAliasMapping fieldAliasMapping = new DefaultFieldAliasMapping(field, alias, converter);
+        FieldAliasMapping fieldAliasMapping = new DefaultFieldAliasMapping(field, alias, valueFactory);
         fieldFieldAliasMappingMap.put(field, fieldAliasMapping);
         aliasFieldAliasMappingMap.put(alias, fieldAliasMapping);
 

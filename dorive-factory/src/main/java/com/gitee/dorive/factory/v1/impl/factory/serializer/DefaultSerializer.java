@@ -28,7 +28,7 @@ public class DefaultSerializer implements Serializer {
 
         }).setFieldValueEditor((alias, value) -> {
             FieldAliasMapping fieldAliasMappingByAlias = entityTransformer.getFieldAliasMappingByAlias(alias);
-            return fieldAliasMappingByAlias != null ? fieldAliasMappingByAlias.deconstruct(value) : value;
+            return fieldAliasMappingByAlias != null ? fieldAliasMappingByAlias.serialize(value) : value;
         });
     }
 

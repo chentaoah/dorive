@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.base.v1.factory.api;
 
-public interface FieldAliasMapping extends Converter {
+public interface FieldAliasMapping extends ValueFactory {
 
     String getField();
 

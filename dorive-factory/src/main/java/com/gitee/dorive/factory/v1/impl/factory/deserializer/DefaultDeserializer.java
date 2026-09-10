@@ -52,7 +52,7 @@ public class DefaultDeserializer implements Deserializer {
 
         }).setFieldValueEditor((field, value) -> {
             FieldAliasMapping fieldAliasMappingByField = entityTransformer.getFieldAliasMappingByField(field);
-            return fieldAliasMappingByField != null ? fieldAliasMappingByField.reconstitute(value) : value;
+            return fieldAliasMappingByField != null ? fieldAliasMappingByField.deserialize(value) : value;
         });
     }
 

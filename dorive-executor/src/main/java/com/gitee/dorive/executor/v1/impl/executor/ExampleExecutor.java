@@ -166,7 +166,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
         }
         if (fieldAliasMapping != null) {
             property = fieldAliasMapping.getAlias();
-            value = fieldAliasMapping.deconstruct(value);
+            value = fieldAliasMapping.serialize(value);
             criterion.setProperty(property);
             criterion.setValue(value);
         }
