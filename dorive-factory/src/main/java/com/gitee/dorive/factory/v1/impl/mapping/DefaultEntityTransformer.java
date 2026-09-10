@@ -60,13 +60,8 @@ public class DefaultEntityTransformer implements EntityTransformer {
     }
 
     @Override
-    public String toAlias(String field) {
-        return fieldAliasMap.getOrDefault(field, field);
-    }
-
-    @Override
-    public String toField(String alias) {
-        return aliasFieldMap.getOrDefault(alias, alias);
+    public String serialize(String name) {
+        return fieldAliasMap.getOrDefault(name, name);
     }
 
     @Override
@@ -74,7 +69,7 @@ public class DefaultEntityTransformer implements EntityTransformer {
         if (fields != null && !fields.isEmpty()) {
             List<String> aliases = new ArrayList<>(fields.size());
             for (String field : fields) {
-                String alias = toAlias(field);
+                String alias = serialize(field);
                 aliases.add(alias);
             }
             return aliases;
@@ -87,7 +82,7 @@ public class DefaultEntityTransformer implements EntityTransformer {
         if (fields != null && !fields.isEmpty()) {
             Set<String> aliases = new LinkedHashSet<>(fields.size() * 4 / 3 + 1);
             for (String field : fields) {
-                String alias = toAlias(field);
+                String alias = serialize(field);
                 aliases.add(alias);
             }
             return aliases;

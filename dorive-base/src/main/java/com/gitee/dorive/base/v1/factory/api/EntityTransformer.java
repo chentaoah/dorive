@@ -20,7 +20,7 @@ package com.gitee.dorive.base.v1.factory.api;
 import java.util.List;
 import java.util.Set;
 
-public interface EntityTransformer extends Transformer {
+public interface EntityTransformer extends NameSerializer {
 
     List<String> toAliases(List<String> fields);
 

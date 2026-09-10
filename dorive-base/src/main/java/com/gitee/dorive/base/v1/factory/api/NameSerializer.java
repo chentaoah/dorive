@@ -17,10 +17,8 @@
 
 package com.gitee.dorive.base.v1.factory.api;
 
-public interface Transformer {
+public interface NameSerializer {
 
-    String toAlias(String field);
-
-    String toField(String alias);
+    String serialize(String name);
 
 }

@@ -30,7 +30,7 @@ import com.gitee.dorive.base.v1.executor.api.ConditionHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.factory.api.Transformer;
+import com.gitee.dorive.base.v1.factory.api.NameSerializer;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
@@ -92,11 +92,11 @@ import java.util.Set;
 
 /**
  * RepositoryContext's properties:
- * EntityStoreInfo、EntityTransformerManager、TransformerManager、Transformer、ExampleSerializer
+ * EntityStoreInfo、EntityTransformerManager、NameSerializerManager、NameSerializer、ExampleSerializer
  * RepositoryInfoResolver、QueryInfoResolver、StepwiseQuerier、JoinInfoResolver
  * <p>
  * DefaultRepository's properties:
- * EntityStoreInfo、EntityTransformerManager、TransformerManager、Transformer、ExampleSerializer
+ * EntityStoreInfo、EntityTransformerManager、NameSerializerManager、NameSerializer、ExampleSerializer
  * RepositoryContext
  */
 public class DefaultRepositoryContextBuilder implements RepositoryContextBuilder {
@@ -285,8 +285,8 @@ public class DefaultRepositoryContextBuilder implements RepositoryContextBuilder
             EntityElement entityElement = repositoryContext.getEntityElement();
             String primaryKey = entityElement.getPrimaryKey();
 
-            Transformer transformer = repository.getProperty(Transformer.class);
-            String primaryKeyAlias = transformer.toAlias(primaryKey);
+            NameSerializer nameSerializer = repository.getProperty(NameSerializer.class);
+            String primaryKeyAlias = nameSerializer.serialize(primaryKey);
 
             SegmentResolver segmentResolver = new DefaultSegmentResolver();
             SegmentExecutor segmentExecutor = new DefaultSegmentExecutor(primaryKey, primaryKeyAlias, repository.getSqlRunner(), (Repository<Object, Object>) repository);

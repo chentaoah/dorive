@@ -49,7 +49,7 @@ public class MapTypeAdapter implements TypeAdapter {
     public void initialize(EntityElement entityElement, EntityTransformer entityTransformer) {
         this.entityElement = entityElement;
         this.entityTransformer = entityTransformer;
-        this.alias = entityTransformer.toAlias(field);
+        this.alias = entityTransformer.serialize(field);
     }
 
     @Override

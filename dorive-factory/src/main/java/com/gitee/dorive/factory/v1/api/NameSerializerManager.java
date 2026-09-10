@@ -17,10 +17,10 @@
 
 package com.gitee.dorive.factory.v1.api;
 
-import com.gitee.dorive.base.v1.factory.api.Transformer;
+import com.gitee.dorive.base.v1.factory.api.NameSerializer;
 
-public interface TransformerManager {
+public interface NameSerializerManager {
 
-    Transformer getTransformer(String category);
+    NameSerializer getNameSerializer(String category);
 
 }
