@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.factory.v1.api;
 
-import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityTransformer;
 
 import java.lang.reflect.Type;
 

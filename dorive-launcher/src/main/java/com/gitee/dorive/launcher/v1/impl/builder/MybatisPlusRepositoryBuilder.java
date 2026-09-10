@@ -28,7 +28,7 @@ import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.executor.api.OperationFactory;
-import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityTransformer;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityFactory;
 import com.gitee.dorive.base.v1.factory.api.example.ExampleSerializer;
 import com.gitee.dorive.base.v1.factory.enums.Category;

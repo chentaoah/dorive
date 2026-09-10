@@ -15,20 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.factory.api;
+package com.gitee.dorive.factory.v1.api;
 
-import com.gitee.dorive.base.v1.factory.api.name.NameFactory;
-import com.gitee.dorive.base.v1.factory.api.value.ValueFactory;
+public interface ValueConverter {
 
-import java.util.List;
-import java.util.Set;
+    Object deserialize(Object value);
 
-public interface EntityTransformer extends NameFactory, ValueFactory {
-
-    List<String> serialize(List<String> names);
-
-    Set<String> serialize(Set<String> names);
-
-    List<FieldAliasMapping> getUnmatchedValueObjFields();
+    Object serialize(Object value);
 
 }

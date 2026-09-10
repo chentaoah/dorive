@@ -19,7 +19,7 @@ package com.gitee.dorive.factory.v1.impl.converter;
 
 import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
-import com.gitee.dorive.base.v1.factory.api.ValueConverter;
+import com.gitee.dorive.factory.v1.api.ValueConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

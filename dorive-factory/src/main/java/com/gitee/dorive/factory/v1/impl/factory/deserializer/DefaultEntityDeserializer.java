@@ -22,7 +22,7 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityDeserializer;
-import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityTransformer;
 import com.gitee.dorive.factory.v1.api.TypeAdapter;
 import com.gitee.dorive.factory.v1.impl.adapter.MapTypeAdapter;
 import lombok.Getter;

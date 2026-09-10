@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.gitee.dorive.factory.v1.impl.factory.deserializer;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -7,9 +24,9 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.executor.api.Context;
-import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
-import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
+import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
 import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
+import com.gitee.dorive.factory.v1.impl.mapping.DefaultEntityTransformer;
 import com.gitee.dorive.factory.v1.util.TypeUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -74,9 +91,9 @@ public class ValueObjEntityDeserializer extends DefaultEntityDeserializer {
     public Object deserialize(Context context, Object object) {
         Object entity = super.deserialize(context, object);
 
-        EntityTransformer entityTransformer = getEntityTransformer();
+        DefaultEntityTransformer defaultEntityTransformer = (DefaultEntityTransformer) getEntityTransformer();
         Map<String, Object> resultMap = (Map<String, Object>) object;
-        List<FieldAliasMapping> unmatchedValueObjFields = entityTransformer.getUnmatchedValueObjFields();
+        List<FieldAliasMapping> unmatchedValueObjFields = defaultEntityTransformer.getUnmatchedValueObjFields();
         for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
             Object valueObj = fieldAliasMapping.deserialize(resultMap);
             if (valueObj != null) {
