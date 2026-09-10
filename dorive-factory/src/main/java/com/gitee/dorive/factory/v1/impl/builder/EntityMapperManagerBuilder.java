@@ -79,7 +79,7 @@ public class EntityMapperManagerBuilder {
             }
 
             // 值转换器
-            ValueConverter valueConverter = newConverter(fieldDefinition, isMatch, isValueObj);
+            ValueConverter valueConverter = newValueConverter(fieldDefinition, isMatch, isValueObj);
 
             databaseEntityMapper.addField(field, isMatch, alias, isValueObj, valueConverter);
             pojoEntityMapper.addField(field, isMatch, prop, isValueObj, valueConverter);
@@ -88,7 +88,7 @@ public class EntityMapperManagerBuilder {
         return new DefaultEntityMapperManager(databaseEntityMapper, pojoEntityMapper, valueObjTypes, containMatchedValueObj);
     }
 
-    private ValueConverter newConverter(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {
+    private ValueConverter newValueConverter(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {
         FieldDef fieldDef = fieldDefinition.getFieldDef();
         if (fieldDef != null) {
             Class<?> converterClass = fieldDef.getConverter();
