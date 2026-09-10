@@ -17,5 +17,5 @@
 
 package com.gitee.dorive.base.v1.factory.api;
 
-public interface EntityFactory extends Deserializer, Serializer {
+public interface EntityFactory extends EntityDeserializer, EntitySerializer {
 }

@@ -1,6 +1,7 @@
-package com.gitee.dorive.factory.v1.impl.factory.deserializer;
+package com.gitee.dorive.factory.v1.impl.factory.serializer;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.convert.TypeConverter;
 import cn.hutool.core.util.ArrayUtil;
@@ -10,7 +11,6 @@ import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
 import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
-import com.gitee.dorive.factory.v1.util.TypeUtils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +20,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class ValueObjDeserializer extends DefaultDeserializer {
+public class ValueObjEntitySerializer extends DefaultEntitySerializer {
 
     private EntityTransformerManager entityTransformerManager;
 
@@ -49,19 +49,16 @@ public class ValueObjDeserializer extends DefaultDeserializer {
             if (value == null) {
                 return null;
             }
-            if (value instanceof String) {
+            if (targetType == String.class) {
                 // 以下情况，不再使用hutool的类型转换（toString）
-                Class<?> rawType = TypeUtils.getRawType(targetType);
-                if (rawType == null) {
-                    throw new RuntimeException("The rawType is null!");
-                }
-                if (Collection.class.isAssignableFrom(rawType)) {
+                if (value instanceof Collection) {
                     return value;
                 }
-                if (Map.class.isAssignableFrom(rawType)) {
+                if (value instanceof Map) {
                     return value;
                 }
-                if (entityTransformerManager.isValueObjType(rawType)) {
+                // 注意：值对象的子类实例，不会进入该分支
+                if (entityTransformerManager.isValueObjType(value.getClass())) {
                     return value;
                 }
             }
@@ -70,19 +67,18 @@ public class ValueObjDeserializer extends DefaultDeserializer {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Object deserialize(Context context, Object object) {
-        Object entity = super.deserialize(context, object);
+    public Object serialize(Context context, Object object) {
+        Object pojo = super.serialize(context, object);
 
         EntityTransformer entityTransformer = getEntityTransformer();
-        Map<String, Object> resultMap = (Map<String, Object>) object;
         List<FieldAliasMapping> unmatchedValueObjFields = entityTransformer.getUnmatchedValueObjFields();
         for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
-            Object valueObj = fieldAliasMapping.deserialize(resultMap);
+            Object valueObj = BeanUtil.getFieldValue(object, fieldAliasMapping.getField());
+            valueObj = valueObj != null ? fieldAliasMapping.serialize(valueObj) : null;
             if (valueObj != null) {
-                BeanUtil.setFieldValue(entity, fieldAliasMapping.getField(), valueObj);
+                BeanUtil.copyProperties(valueObj, pojo, CopyOptions.create().ignoreNullValue());
             }
         }
-        return entity;
+        return pojo;
     }
 }

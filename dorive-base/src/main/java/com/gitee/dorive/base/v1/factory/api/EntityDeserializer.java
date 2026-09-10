@@ -19,7 +19,7 @@ package com.gitee.dorive.base.v1.factory.api;
 
 import com.gitee.dorive.base.v1.executor.api.Context;
 
-public interface Deserializer {
+public interface EntityDeserializer {
 
     Object deserialize(Context context, Object object);
 

@@ -26,17 +26,17 @@ import lombok.Setter;
 @Setter
 public class DefaultEntityFactory implements EntityFactory {
 
-    private Deserializer deserializer;
-    private Serializer serializer;
+    private EntityDeserializer entityDeserializer;
+    private EntitySerializer entitySerializer;
 
     @Override
     public Object deserialize(Context context, Object object) {
-        return getDeserializer().deserialize(context, object);
+        return getEntityDeserializer().deserialize(context, object);
     }
 
     @Override
     public Object serialize(Context context, Object object) {
-        return getSerializer().serialize(context, object);
+        return getEntitySerializer().serialize(context, object);
     }
 
 }

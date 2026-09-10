@@ -5,13 +5,13 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
-import com.gitee.dorive.base.v1.factory.api.Serializer;
+import com.gitee.dorive.base.v1.factory.api.EntitySerializer;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class DefaultSerializer implements Serializer {
+public class DefaultEntitySerializer implements EntitySerializer {
 
     private Class<?> type;
     private EntityTransformer entityTransformer;

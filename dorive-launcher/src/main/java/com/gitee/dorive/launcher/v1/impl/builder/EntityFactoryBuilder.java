@@ -19,17 +19,17 @@ package com.gitee.dorive.launcher.v1.impl.builder;
 
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
-import com.gitee.dorive.base.v1.factory.api.Deserializer;
+import com.gitee.dorive.base.v1.factory.api.EntityDeserializer;
 import com.gitee.dorive.base.v1.factory.api.EntityFactory;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
-import com.gitee.dorive.base.v1.factory.api.Serializer;
+import com.gitee.dorive.base.v1.factory.api.EntitySerializer;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
-import com.gitee.dorive.factory.v1.impl.factory.deserializer.DefaultDeserializer;
+import com.gitee.dorive.factory.v1.impl.factory.deserializer.DefaultEntityDeserializer;
 import com.gitee.dorive.factory.v1.impl.factory.DefaultEntityFactory;
-import com.gitee.dorive.factory.v1.impl.factory.deserializer.ValueObjDeserializer;
-import com.gitee.dorive.factory.v1.impl.factory.serializer.DefaultSerializer;
-import com.gitee.dorive.factory.v1.impl.factory.serializer.ValueObjSerializer;
+import com.gitee.dorive.factory.v1.impl.factory.deserializer.ValueObjEntityDeserializer;
+import com.gitee.dorive.factory.v1.impl.factory.serializer.DefaultEntitySerializer;
+import com.gitee.dorive.factory.v1.impl.factory.serializer.ValueObjEntitySerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
@@ -49,66 +49,66 @@ public class EntityFactoryBuilder {
 
     public EntityFactory newEntityFactory() {
         // 反序列化
-        Deserializer deserializer = newDeserializer();
+        EntityDeserializer entityDeserializer = newEntityDeserializer();
         // 序列化
-        Serializer serializer = newSerializer();
+        EntitySerializer entitySerializer = newEntitySerializer();
         // 实体工厂
-        return newEntityFactory(deserializer, serializer);
+        return newEntityFactory(entityDeserializer, entitySerializer);
     }
 
     @NonNull
-    private Deserializer newDeserializer() {
+    private EntityDeserializer newEntityDeserializer() {
         RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
         ApplicationContext applicationContext = repositoryContext.getApplicationContext();
 
         Class<?> deserializerClass = repositoryDef.getDeserializer();
-        Deserializer deserializer;
+        EntityDeserializer entityDeserializer;
         if (deserializerClass == Object.class) {
-            deserializer = !entityTransformerManager.containValueObj() ? new DefaultDeserializer() : new ValueObjDeserializer();
+            entityDeserializer = !entityTransformerManager.containValueObj() ? new DefaultEntityDeserializer() : new ValueObjEntityDeserializer();
         } else {
-            deserializer = (Deserializer) applicationContext.getBean(deserializerClass);
+            entityDeserializer = (EntityDeserializer) applicationContext.getBean(deserializerClass);
         }
-        if (deserializer instanceof DefaultDeserializer defaultDeserializer) {
-            defaultDeserializer.setEntityElement(entityElement);
-            defaultDeserializer.setType(reType);
-            defaultDeserializer.setEntityTransformer(reEntityTransformer);
+        if (entityDeserializer instanceof DefaultEntityDeserializer defaultEntityDeserializer) {
+            defaultEntityDeserializer.setEntityElement(entityElement);
+            defaultEntityDeserializer.setType(reType);
+            defaultEntityDeserializer.setEntityTransformer(reEntityTransformer);
         }
-        if (deserializer instanceof ValueObjDeserializer valueObjDeserializer) {
-            valueObjDeserializer.setEntityTransformerManager(entityTransformerManager);
+        if (entityDeserializer instanceof ValueObjEntityDeserializer valueObjEntityDeserializer) {
+            valueObjEntityDeserializer.setEntityTransformerManager(entityTransformerManager);
         }
-        if (deserializer instanceof DefaultDeserializer defaultDeserializer) {
-            defaultDeserializer.initialize();
+        if (entityDeserializer instanceof DefaultEntityDeserializer defaultEntityDeserializer) {
+            defaultEntityDeserializer.initialize();
         }
-        return deserializer;
+        return entityDeserializer;
     }
 
     @NonNull
-    private Serializer newSerializer() {
+    private EntitySerializer newEntitySerializer() {
         RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
         ApplicationContext applicationContext = repositoryContext.getApplicationContext();
 
         Class<?> serializerClass = repositoryDef.getSerializer();
-        Serializer serializer;
+        EntitySerializer entitySerializer;
         if (serializerClass == Object.class) {
-            serializer = !entityTransformerManager.containValueObj() ? new DefaultSerializer() : new ValueObjSerializer();
+            entitySerializer = !entityTransformerManager.containValueObj() ? new DefaultEntitySerializer() : new ValueObjEntitySerializer();
         } else {
-            serializer = (Serializer) applicationContext.getBean(serializerClass);
+            entitySerializer = (EntitySerializer) applicationContext.getBean(serializerClass);
         }
-        if (serializer instanceof DefaultSerializer defaultSerializer) {
-            defaultSerializer.setType(deType);
-            defaultSerializer.setEntityTransformer(deEntityTransformer);
+        if (entitySerializer instanceof DefaultEntitySerializer defaultEntitySerializer) {
+            defaultEntitySerializer.setType(deType);
+            defaultEntitySerializer.setEntityTransformer(deEntityTransformer);
         }
-        if (serializer instanceof ValueObjSerializer valueObjSerializer) {
-            valueObjSerializer.setEntityTransformerManager(entityTransformerManager);
+        if (entitySerializer instanceof ValueObjEntitySerializer valueObjEntitySerializer) {
+            valueObjEntitySerializer.setEntityTransformerManager(entityTransformerManager);
         }
-        if (serializer instanceof DefaultSerializer defaultSerializer) {
-            defaultSerializer.initialize();
+        if (entitySerializer instanceof DefaultEntitySerializer defaultEntitySerializer) {
+            defaultEntitySerializer.initialize();
         }
-        return serializer;
+        return entitySerializer;
     }
 
     @NonNull
-    private EntityFactory newEntityFactory(Deserializer deserializer, Serializer serializer) {
+    private EntityFactory newEntityFactory(EntityDeserializer entityDeserializer, EntitySerializer entitySerializer) {
         RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
         ApplicationContext applicationContext = repositoryContext.getApplicationContext();
 
@@ -121,8 +121,8 @@ public class EntityFactoryBuilder {
         }
         // 默认
         if (entityFactory instanceof DefaultEntityFactory defaultEntityFactory) {
-            defaultEntityFactory.setDeserializer(deserializer);
-            defaultEntityFactory.setSerializer(serializer);
+            defaultEntityFactory.setEntityDeserializer(entityDeserializer);
+            defaultEntityFactory.setEntitySerializer(entitySerializer);
         }
         return entityFactory;
     }
