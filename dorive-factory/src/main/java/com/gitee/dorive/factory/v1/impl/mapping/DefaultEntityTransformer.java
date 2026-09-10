@@ -82,28 +82,28 @@ public class DefaultEntityTransformer implements EntityTransformer {
     }
 
     @Override
-    public List<String> serialize(List<String> fields) {
-        if (fields != null && !fields.isEmpty()) {
-            List<String> aliases = new ArrayList<>(fields.size());
-            for (String field : fields) {
+    public List<String> serialize(List<String> names) {
+        if (names != null && !names.isEmpty()) {
+            List<String> aliases = new ArrayList<>(names.size());
+            for (String field : names) {
                 String alias = serialize(field);
                 aliases.add(alias);
             }
             return aliases;
         }
-        return fields;
+        return names;
     }
 
     @Override
-    public Set<String> serialize(Set<String> fields) {
-        if (fields != null && !fields.isEmpty()) {
-            Set<String> aliases = new LinkedHashSet<>(fields.size() * 4 / 3 + 1);
-            for (String field : fields) {
+    public Set<String> serialize(Set<String> names) {
+        if (names != null && !names.isEmpty()) {
+            Set<String> aliases = new LinkedHashSet<>(names.size() * 4 / 3 + 1);
+            for (String field : names) {
                 String alias = serialize(field);
                 aliases.add(alias);
             }
             return aliases;
         }
-        return fields;
+        return names;
     }
 }

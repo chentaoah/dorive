@@ -25,9 +25,9 @@ import java.util.Set;
 
 public interface EntityTransformer extends NameFactory, ValueFactory {
 
-    List<String> serialize(List<String> fields);
+    List<String> serialize(List<String> names);
 
-    Set<String> serialize(Set<String> fields);
+    Set<String> serialize(Set<String> names);
 
     List<FieldAliasMapping> getUnmatchedValueObjFields();
 
