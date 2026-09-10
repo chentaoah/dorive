@@ -39,7 +39,7 @@ import com.gitee.dorive.executor.v1.impl.executor.FactoryExecutor;
 import com.gitee.dorive.executor.v1.impl.executor.UnionExecutor;
 import com.gitee.dorive.executor.v1.impl.factory.DefaultOperationFactory;
 import com.gitee.dorive.factory.v1.api.EntityMapperManager;
-import com.gitee.dorive.factory.v1.impl.resolver.EntityMapperManagerResolver;
+import com.gitee.dorive.factory.v1.impl.builder.EntityMapperManagerBuilder;
 import com.gitee.dorive.mybatis.plus.v1.impl.common.DefaultMethodInvoker;
 import com.gitee.dorive.mybatis.plus.v1.impl.executor.MybatisPlusExecutor;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
@@ -71,8 +71,8 @@ public class MybatisPlusRepositoryBuilder {
         EntityStoreInfo entityStoreInfo = resolveEntityStoreInfo(repository.getRepositoryDef());
 
         // 别名转换
-        EntityMapperManagerResolver entityMapperManagerResolver = new EntityMapperManagerResolver(entityElement, entityStoreInfo.getAliasPropMap());
-        EntityMapperManager entityMapperManager = entityMapperManagerResolver.newEntityMapperManager();
+        EntityMapperManagerBuilder entityMapperManagerBuilder = new EntityMapperManagerBuilder(entityElement, entityStoreInfo.getAliasPropMap());
+        EntityMapperManager entityMapperManager = entityMapperManagerBuilder.newEntityMapperManager();
         EntityMapper databaseEntityMapper = entityMapperManager.getDatabaseEntityMapper();
 
         // 实体工厂

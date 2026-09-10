@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.impl.resolver;
+package com.gitee.dorive.factory.v1.impl.builder;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.definition.def.FieldDef;
@@ -41,7 +41,7 @@ import java.util.Set;
 
 @Data
 @AllArgsConstructor
-public class EntityMapperManagerResolver {
+public class EntityMapperManagerBuilder {
 
     private EntityElement entityElement;
     private Map<String, String> aliasPropMap;
