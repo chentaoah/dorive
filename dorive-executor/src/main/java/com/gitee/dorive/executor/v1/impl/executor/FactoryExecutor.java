@@ -60,7 +60,7 @@ public class FactoryExecutor extends AbstractProxyExecutor {
 
         List<Object> entities = Collections.emptyList();
         if (recordMaps != null && !recordMaps.isEmpty()) {
-            entities = reconstitute(context, recordMaps);
+            entities = deserialize(context, recordMaps);
         }
 
         if (page != null) {
@@ -72,7 +72,7 @@ public class FactoryExecutor extends AbstractProxyExecutor {
         return result;
     }
 
-    private List<Object> reconstitute(Context context, List<?> persistentObjs) {
+    private List<Object> deserialize(Context context, List<?> persistentObjs) {
         List<Object> entities = new ArrayList<>(persistentObjs.size());
         for (Object persistentObj : persistentObjs) {
             Object entity = entityFactory.deserialize(context, persistentObj);
@@ -85,7 +85,7 @@ public class FactoryExecutor extends AbstractProxyExecutor {
     public int execute(Context context, Operation operation) {
         if (operation instanceof EntityOp entityOp) {
             List<?> entities = entityOp.getEntities();
-            List<Object> persistentObjs = deconstruct(context, entities);
+            List<Object> persistentObjs = serialize(context, entities);
             entityOp.setEntities(persistentObjs);
             int totalCount = super.execute(context, operation);
             entityOp.setEntities(entities);
@@ -105,7 +105,7 @@ public class FactoryExecutor extends AbstractProxyExecutor {
         } else if (operation instanceof ConditionUpdate conditionUpdate) {
             Object entity = conditionUpdate.getEntity();
             if (entity != null) {
-                List<Object> persistentObjs = deconstruct(context, Collections.singletonList(entity));
+                List<Object> persistentObjs = serialize(context, Collections.singletonList(entity));
                 conditionUpdate.setEntity(persistentObjs.get(0));
                 int totalCount = super.execute(context, operation);
                 conditionUpdate.setEntity(entity);
@@ -115,7 +115,7 @@ public class FactoryExecutor extends AbstractProxyExecutor {
         return super.execute(context, operation);
     }
 
-    private List<Object> deconstruct(Context context, List<?> entities) {
+    private List<Object> serialize(Context context, List<?> entities) {
         List<Object> persistentObjs = new ArrayList<>(entities.size());
         for (Object entity : entities) {
             Object persistentObj = entityFactory.serialize(context, entity);
