@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.base.v1.factory.api;
 
+import com.gitee.dorive.base.v1.factory.api.name.NameSerializer;
+
 import java.util.List;
 import java.util.Set;
 

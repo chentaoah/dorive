@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.factory.api;
+package com.gitee.dorive.base.v1.factory.api.entity;
 
 public interface EntityFactory extends EntityDeserializer, EntitySerializer {
 }

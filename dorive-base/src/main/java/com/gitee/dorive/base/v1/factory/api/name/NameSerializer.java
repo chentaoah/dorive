@@ -15,13 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.factory.api;
+package com.gitee.dorive.base.v1.factory.api.name;
 
-import com.gitee.dorive.base.v1.executor.api.Context;
-import com.gitee.dorive.base.v1.executor.entity.qry.Example;
+public interface NameSerializer {
 
-public interface ExampleSerializer {
-
-    void serialize(Context context, Example example);
+    String serialize(String name);
 
 }

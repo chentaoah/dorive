@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.factory.api;
+package com.gitee.dorive.base.v1.factory.api.example;
 
 import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 
-public interface EntitySerializer {
+public interface ExampleSerializer {
 
-    Object serialize(Context context, Object object);
+    void serialize(Context context, Example example);
 
 }

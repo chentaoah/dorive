@@ -21,7 +21,7 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.definition.def.FieldDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.definition.entity.FieldDefinition;
-import com.gitee.dorive.base.v1.factory.api.ValueFactory;
+import com.gitee.dorive.base.v1.factory.api.value.ValueFactory;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
 import com.gitee.dorive.factory.v1.impl.converter.JsonArrayValueFactory;

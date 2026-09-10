@@ -24,7 +24,7 @@ import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import com.gitee.dorive.base.v1.executor.entity.qry.OrderBy;
 import com.gitee.dorive.base.v1.executor.entity.op.Result;
 import com.gitee.dorive.base.v1.executor.entity.qry.UnionExample;
-import com.gitee.dorive.base.v1.factory.api.ExampleSerializer;
+import com.gitee.dorive.base.v1.factory.api.example.ExampleSerializer;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;

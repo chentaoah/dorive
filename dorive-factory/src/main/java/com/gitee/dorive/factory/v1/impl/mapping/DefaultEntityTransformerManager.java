@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.factory.v1.impl.mapping;
 
-import com.gitee.dorive.base.v1.factory.api.NameSerializer;
+import com.gitee.dorive.base.v1.factory.api.name.NameSerializer;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
 import lombok.AllArgsConstructor;

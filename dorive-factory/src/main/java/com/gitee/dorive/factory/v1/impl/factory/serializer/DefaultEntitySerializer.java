@@ -5,7 +5,7 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
-import com.gitee.dorive.base.v1.factory.api.EntitySerializer;
+import com.gitee.dorive.base.v1.factory.api.entity.EntitySerializer;
 import lombok.Getter;
 import lombok.Setter;
 

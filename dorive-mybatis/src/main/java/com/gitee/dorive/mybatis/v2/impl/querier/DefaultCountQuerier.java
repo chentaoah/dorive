@@ -21,7 +21,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.ctx.DefaultContext;
 import com.gitee.dorive.base.v1.executor.api.Selector;
-import com.gitee.dorive.base.v1.factory.api.NameSerializer;
+import com.gitee.dorive.base.v1.factory.api.name.NameSerializer;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.mybatis.entity.CountQuery;

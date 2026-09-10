@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.base.v1.factory.api;
 
+import com.gitee.dorive.base.v1.factory.api.value.ValueFactory;
+
 public interface FieldAliasMapping extends ValueFactory {
 
     String getField();

@@ -18,7 +18,9 @@
 package com.gitee.dorive.factory.v1.impl.factory;
 
 import com.gitee.dorive.base.v1.executor.api.Context;
-import com.gitee.dorive.base.v1.factory.api.*;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityDeserializer;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityFactory;
+import com.gitee.dorive.base.v1.factory.api.entity.EntitySerializer;
 import lombok.Getter;
 import lombok.Setter;
 

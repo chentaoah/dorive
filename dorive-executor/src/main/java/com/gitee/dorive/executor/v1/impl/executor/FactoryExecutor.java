@@ -21,7 +21,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.factory.api.EntityFactory;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityFactory;
 import com.gitee.dorive.base.v1.executor.entity.qry.Page;
 import com.gitee.dorive.base.v1.executor.entity.op.Result;
 import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;

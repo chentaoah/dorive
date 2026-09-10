@@ -35,9 +35,9 @@ X-Module-Requires: ~,
  com.gitee.dorive.base.v1.executor.api.Executor,
  com.gitee.dorive.executor.v1.impl.executor.AbstractProxyExecutor,
  com.gitee.dorive.base.v1.executor.util.MultiInBuilder,
- com.gitee.dorive.base.v1.factory.api.NameSerializer,
+ com.gitee.dorive.base.v1.factory.api.name.NameSerializer,
  com.gitee.dorive.factory.v1.api.NameSerializerManager
-X-Module-Provides: com.gitee.dorive.base.v1.factory.api.ExampleSerializer
+X-Module-Provides: com.gitee.dorive.base.v1.factory.api.example.ExampleSerializer
 X-Module-Notifies: null
 X-Module-Waits: null
 X-Module-Table-Prefix: null

@@ -18,7 +18,7 @@
 package com.gitee.dorive.factory.v1.impl.converter;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.base.v1.factory.api.ValueFactory;
+import com.gitee.dorive.base.v1.factory.api.value.ValueFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

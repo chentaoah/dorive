@@ -19,10 +19,10 @@ package com.gitee.dorive.launcher.v1.impl.builder;
 
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
-import com.gitee.dorive.base.v1.factory.api.EntityDeserializer;
-import com.gitee.dorive.base.v1.factory.api.EntityFactory;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityDeserializer;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityFactory;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
-import com.gitee.dorive.base.v1.factory.api.EntitySerializer;
+import com.gitee.dorive.base.v1.factory.api.entity.EntitySerializer;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
 import com.gitee.dorive.factory.v1.impl.factory.deserializer.DefaultEntityDeserializer;

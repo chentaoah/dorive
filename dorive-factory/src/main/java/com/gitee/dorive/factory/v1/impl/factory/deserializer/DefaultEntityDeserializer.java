@@ -21,7 +21,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.Context;
-import com.gitee.dorive.base.v1.factory.api.EntityDeserializer;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityDeserializer;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
 import com.gitee.dorive.factory.v1.api.TypeAdapter;

@@ -22,7 +22,7 @@ import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import com.gitee.dorive.base.v1.executor.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.executor.api.Selector;
-import com.gitee.dorive.base.v1.factory.api.ExampleSerializer;
+import com.gitee.dorive.base.v1.factory.api.example.ExampleSerializer;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.query.v2.api.QueryResolver;
