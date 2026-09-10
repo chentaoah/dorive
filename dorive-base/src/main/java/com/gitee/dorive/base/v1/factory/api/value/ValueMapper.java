@@ -15,20 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.api;
+package com.gitee.dorive.base.v1.factory.api.value;
 
-import com.gitee.dorive.base.v1.factory.api.entity.EntityTransformer;
-
-import java.lang.reflect.Type;
-
-public interface EntityTransformerManager {
-
-    EntityTransformer getEntityTransformer(String category);
-
-    boolean containValueObj();
-
-    boolean isValueObjType(Type type);
-
-    boolean containMatchedValueObj();
-
+public interface ValueMapper extends ValueDeserializer, ValueSerializer {
 }

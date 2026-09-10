@@ -25,9 +25,9 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.executor.api.Context;
-import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
-import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
-import com.gitee.dorive.factory.v1.impl.mapping.DefaultEntityTransformer;
+import com.gitee.dorive.factory.v1.impl.mapper.FieldMapping;
+import com.gitee.dorive.factory.v1.api.EntityMapperManager;
+import com.gitee.dorive.factory.v1.impl.mapper.DefaultEntityMapper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,7 +39,7 @@ import java.util.Map;
 @Setter
 public class ValueObjEntitySerializer extends DefaultEntitySerializer {
 
-    private EntityTransformerManager entityTransformerManager;
+    private EntityMapperManager entityMapperManager;
 
     // 从hutool源码中拷贝
     protected TypeConverter converter = (type, value) -> {
@@ -56,7 +56,7 @@ public class ValueObjEntitySerializer extends DefaultEntitySerializer {
     @Override
     public void initialize() {
         super.initialize();
-        if (entityTransformerManager.containMatchedValueObj()) {
+        if (entityMapperManager.containMatchedValueObj()) {
             resetCopyOptions();
         }
     }
@@ -75,7 +75,7 @@ public class ValueObjEntitySerializer extends DefaultEntitySerializer {
                     return value;
                 }
                 // 注意：值对象的子类实例，不会进入该分支
-                if (entityTransformerManager.isValueObjType(value.getClass())) {
+                if (entityMapperManager.isValueObjType(value.getClass())) {
                     return value;
                 }
             }
@@ -87,11 +87,11 @@ public class ValueObjEntitySerializer extends DefaultEntitySerializer {
     public Object serialize(Context context, Object object) {
         Object pojo = super.serialize(context, object);
 
-        DefaultEntityTransformer defaultEntityTransformer = (DefaultEntityTransformer) getEntityTransformer();
-        List<FieldAliasMapping> unmatchedValueObjFields = defaultEntityTransformer.getUnmatchedValueObjFields();
-        for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
-            Object valueObj = BeanUtil.getFieldValue(object, fieldAliasMapping.getField());
-            valueObj = valueObj != null ? fieldAliasMapping.serialize(valueObj) : null;
+        DefaultEntityMapper defaultEntityMapper = (DefaultEntityMapper) getEntityMapper();
+        List<FieldMapping> unmatchedValueObjFields = defaultEntityMapper.getUnmatchedValueObjFields();
+        for (FieldMapping fieldMapping : unmatchedValueObjFields) {
+            Object valueObj = BeanUtil.getFieldValue(object, fieldMapping.getField());
+            valueObj = valueObj != null ? fieldMapping.serialize(valueObj) : null;
             if (valueObj != null) {
                 BeanUtil.copyProperties(valueObj, pojo, CopyOptions.create().ignoreNullValue());
             }

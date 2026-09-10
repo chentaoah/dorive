@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.impl.mapping;
+package com.gitee.dorive.factory.v1.impl.mapper;
 
-import com.gitee.dorive.base.v1.factory.api.entity.EntityTransformer;
-import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
+import com.gitee.dorive.factory.v1.api.EntityMapperManager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -28,14 +28,14 @@ import java.util.Set;
 
 @Getter
 @AllArgsConstructor
-public class DefaultEntityTransformerManager implements EntityTransformerManager {
-    private final Map<String, EntityTransformer> categoryEntityTransformerMap;
+public class DefaultEntityMapperManager implements EntityMapperManager {
+    private final Map<String, EntityMapper> categoryEntityMapperMap;
     private final Set<Type> valueObjTypes;
     private final boolean containMatchedValueObj;
 
     @Override
-    public EntityTransformer getEntityTransformer(String category) {
-        return categoryEntityTransformerMap.get(category);
+    public EntityMapper getEntityMapper(String category) {
+        return categoryEntityMapperMap.get(category);
     }
 
     @Override

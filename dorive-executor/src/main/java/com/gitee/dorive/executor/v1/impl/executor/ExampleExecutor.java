@@ -27,7 +27,7 @@ import com.gitee.dorive.base.v1.executor.entity.qry.UnionExample;
 import com.gitee.dorive.base.v1.factory.api.example.ExampleSerializer;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.factory.api.entity.EntityTransformer;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
 import com.gitee.dorive.base.v1.executor.entity.op.Condition;
 import com.gitee.dorive.base.v1.executor.entity.op.Operation;
 import com.gitee.dorive.base.v1.executor.entity.cop.ConditionUpdate;
@@ -45,12 +45,12 @@ import java.util.Set;
 public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSerializer {
 
     private EntityElement entityElement;
-    private EntityTransformer entityTransformer;
+    private EntityMapper entityMapper;
 
-    public ExampleExecutor(Executor executor, EntityElement entityElement, EntityTransformer entityTransformer) {
+    public ExampleExecutor(Executor executor, EntityElement entityElement, EntityMapper entityMapper) {
         super(executor);
         this.entityElement = entityElement;
-        this.entityTransformer = entityTransformer;
+        this.entityMapper = entityMapper;
     }
 
     @Override
@@ -108,7 +108,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
     private void convertUpdate(Update update) {
         Set<String> nullableProps = update.getNullableProps();
         if (nullableProps != null && !nullableProps.isEmpty()) {
-            nullableProps = entityTransformer.serialize(nullableProps);
+            nullableProps = entityMapper.serialize(nullableProps);
             update.setNullableProps(nullableProps);
         }
     }
@@ -116,7 +116,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
     private void convertConditionUpdate(ConditionUpdate conditionUpdate) {
         Set<String> nullableProps = conditionUpdate.getNullableProps();
         if (nullableProps != null && !nullableProps.isEmpty()) {
-            nullableProps = entityTransformer.serialize(nullableProps);
+            nullableProps = entityMapper.serialize(nullableProps);
             conditionUpdate.setNullableProps(nullableProps);
         }
     }
@@ -124,7 +124,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
     private void convertSelectProps(Example example) {
         List<String> properties = example.getSelectProps();
         if (properties != null && !properties.isEmpty()) {
-            properties = entityTransformer.serialize(properties);
+            properties = entityMapper.serialize(properties);
             example.setSelectProps(properties);
         }
     }
@@ -143,7 +143,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
                     Object value = criterion.getValue();
                     if (value instanceof MultiInBuilder builder) {
                         List<String> properties = builder.getProperties();
-                        properties = entityTransformer.serialize(properties);
+                        properties = entityMapper.serialize(properties);
                         builder.setProperties(properties);
                         criterion.setProperty(builder.buildPropertiesStr());
                         criterion.setValue(builder.buildValuesStr());
@@ -159,9 +159,9 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
         String property = criterion.getProperty();
         Object value = criterion.getValue();
         // 如果是field
-        String alias = entityTransformer.serialize(property);
+        String alias = entityMapper.serialize(property);
         if (alias != null) {
-            value = entityTransformer.serialize(property, value);
+            value = entityMapper.serialize(property, value);
             property = alias;
         }
         // 重新设置回去
@@ -173,7 +173,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
         OrderBy orderBy = example.getOrderBy();
         if (orderBy != null) {
             List<String> properties = orderBy.getProperties();
-            properties = entityTransformer.serialize(properties);
+            properties = entityMapper.serialize(properties);
             orderBy.setProperties(properties);
         }
     }

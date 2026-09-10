@@ -21,10 +21,10 @@ import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityDeserializer;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityFactory;
-import com.gitee.dorive.base.v1.factory.api.entity.EntityTransformer;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
 import com.gitee.dorive.base.v1.factory.api.entity.EntitySerializer;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
-import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
+import com.gitee.dorive.factory.v1.api.EntityMapperManager;
 import com.gitee.dorive.factory.v1.impl.factory.deserializer.DefaultEntityDeserializer;
 import com.gitee.dorive.factory.v1.impl.factory.DefaultEntityFactory;
 import com.gitee.dorive.factory.v1.impl.factory.deserializer.ValueObjEntityDeserializer;
@@ -43,9 +43,9 @@ public class EntityFactoryBuilder {
     private EntityElement entityElement;
     private Class<?> reType;
     private Class<?> deType;
-    private EntityTransformerManager entityTransformerManager;
-    private EntityTransformer reEntityTransformer;
-    private EntityTransformer deEntityTransformer;
+    private EntityMapperManager entityMapperManager;
+    private EntityMapper reEntityMapper;
+    private EntityMapper deEntityMapper;
 
     public EntityFactory newEntityFactory() {
         // 反序列化
@@ -64,17 +64,17 @@ public class EntityFactoryBuilder {
         Class<?> deserializerClass = repositoryDef.getDeserializer();
         EntityDeserializer entityDeserializer;
         if (deserializerClass == Object.class) {
-            entityDeserializer = !entityTransformerManager.containValueObj() ? new DefaultEntityDeserializer() : new ValueObjEntityDeserializer();
+            entityDeserializer = entityMapperManager.containValueObj() ? new ValueObjEntityDeserializer() : new DefaultEntityDeserializer();
         } else {
             entityDeserializer = (EntityDeserializer) applicationContext.getBean(deserializerClass);
         }
         if (entityDeserializer instanceof DefaultEntityDeserializer defaultEntityDeserializer) {
             defaultEntityDeserializer.setEntityElement(entityElement);
             defaultEntityDeserializer.setType(reType);
-            defaultEntityDeserializer.setEntityTransformer(reEntityTransformer);
+            defaultEntityDeserializer.setEntityMapper(reEntityMapper);
         }
         if (entityDeserializer instanceof ValueObjEntityDeserializer valueObjEntityDeserializer) {
-            valueObjEntityDeserializer.setEntityTransformerManager(entityTransformerManager);
+            valueObjEntityDeserializer.setEntityMapperManager(entityMapperManager);
         }
         if (entityDeserializer instanceof DefaultEntityDeserializer defaultEntityDeserializer) {
             defaultEntityDeserializer.initialize();
@@ -90,16 +90,16 @@ public class EntityFactoryBuilder {
         Class<?> serializerClass = repositoryDef.getSerializer();
         EntitySerializer entitySerializer;
         if (serializerClass == Object.class) {
-            entitySerializer = !entityTransformerManager.containValueObj() ? new DefaultEntitySerializer() : new ValueObjEntitySerializer();
+            entitySerializer = entityMapperManager.containValueObj() ? new ValueObjEntitySerializer() : new DefaultEntitySerializer();
         } else {
             entitySerializer = (EntitySerializer) applicationContext.getBean(serializerClass);
         }
         if (entitySerializer instanceof DefaultEntitySerializer defaultEntitySerializer) {
             defaultEntitySerializer.setType(deType);
-            defaultEntitySerializer.setEntityTransformer(deEntityTransformer);
+            defaultEntitySerializer.setEntityMapper(deEntityMapper);
         }
         if (entitySerializer instanceof ValueObjEntitySerializer valueObjEntitySerializer) {
-            valueObjEntitySerializer.setEntityTransformerManager(entityTransformerManager);
+            valueObjEntitySerializer.setEntityMapperManager(entityMapperManager);
         }
         if (entitySerializer instanceof DefaultEntitySerializer defaultEntitySerializer) {
             defaultEntitySerializer.initialize();

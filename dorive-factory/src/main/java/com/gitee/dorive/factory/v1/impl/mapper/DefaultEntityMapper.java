@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.impl.mapping;
+package com.gitee.dorive.factory.v1.impl.mapper;
 
 import com.gitee.dorive.factory.v1.api.ValueConverter;
-import com.gitee.dorive.base.v1.factory.api.entity.EntityTransformer;
-import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,30 +30,30 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DefaultEntityTransformer implements EntityTransformer {
+public class DefaultEntityMapper implements EntityMapper {
 
     private Map<String, String> fieldAliasMap = new LinkedHashMap<>();
     private Map<String, String> aliasFieldMap = new LinkedHashMap<>();
-    private Map<String, FieldAliasMapping> fieldFieldAliasMappingMap = new LinkedHashMap<>();
-    private Map<String, FieldAliasMapping> aliasFieldAliasMappingMap = new LinkedHashMap<>();
-    private List<FieldAliasMapping> valueObjFields = new ArrayList<>(4);
-    private List<FieldAliasMapping> matchedValueObjFields = new ArrayList<>(4);
-    private List<FieldAliasMapping> unmatchedValueObjFields = new ArrayList<>(4);
+    private Map<String, FieldMapping> fieldFieldMappingMap = new LinkedHashMap<>();
+    private Map<String, FieldMapping> aliasFieldMappingMap = new LinkedHashMap<>();
+    private List<FieldMapping> valueObjFields = new ArrayList<>(4);
+    private List<FieldMapping> matchedValueObjFields = new ArrayList<>(4);
+    private List<FieldMapping> unmatchedValueObjFields = new ArrayList<>(4);
 
     public void addField(String field, boolean isMatch, String alias, boolean isValueObj, ValueConverter valueConverter) {
         fieldAliasMap.put(field, alias);
         aliasFieldMap.put(alias, field);
 
-        FieldAliasMapping fieldAliasMapping = new DefaultFieldAliasMapping(field, alias, valueConverter);
-        fieldFieldAliasMappingMap.put(field, fieldAliasMapping);
-        aliasFieldAliasMappingMap.put(alias, fieldAliasMapping);
+        FieldMapping fieldMapping = new FieldMapping(field, alias, valueConverter);
+        fieldFieldMappingMap.put(field, fieldMapping);
+        aliasFieldMappingMap.put(alias, fieldMapping);
 
         if (isValueObj) {
-            valueObjFields.add(fieldAliasMapping);
+            valueObjFields.add(fieldMapping);
             if (isMatch) {
-                matchedValueObjFields.add(fieldAliasMapping);
+                matchedValueObjFields.add(fieldMapping);
             } else {
-                unmatchedValueObjFields.add(fieldAliasMapping);
+                unmatchedValueObjFields.add(fieldMapping);
             }
         }
     }
@@ -71,14 +70,14 @@ public class DefaultEntityTransformer implements EntityTransformer {
 
     @Override
     public Object deserialize(String name, Object value) {
-        FieldAliasMapping fieldAliasMapping = aliasFieldAliasMappingMap.get(name);
-        return fieldAliasMapping != null ? fieldAliasMapping.deserialize(value) : value;
+        FieldMapping fieldMapping = aliasFieldMappingMap.get(name);
+        return fieldMapping != null ? fieldMapping.deserialize(value) : value;
     }
 
     @Override
     public Object serialize(String name, Object value) {
-        FieldAliasMapping fieldAliasMapping = fieldFieldAliasMappingMap.get(name);
-        return fieldAliasMapping != null ? fieldAliasMapping.serialize(value) : value;
+        FieldMapping fieldMapping = fieldFieldMappingMap.get(name);
+        return fieldMapping != null ? fieldMapping.serialize(value) : value;
     }
 
     @Override

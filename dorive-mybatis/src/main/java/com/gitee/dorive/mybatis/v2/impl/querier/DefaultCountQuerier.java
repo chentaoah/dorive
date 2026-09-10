@@ -21,7 +21,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.ctx.DefaultContext;
 import com.gitee.dorive.base.v1.executor.api.Selector;
-import com.gitee.dorive.base.v1.factory.api.entity.EntityTransformer;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
 import com.gitee.dorive.base.v1.factory.api.name.NameSerializer;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
@@ -67,14 +67,14 @@ public class DefaultCountQuerier implements CountQuerier {
         String tableAlias = tableSegment.getTableAlias();
 
         // group by
-        NameSerializer nameSerializer = repositoryContext.getProperty(EntityTransformer.class);
+        NameSerializer nameSerializer = repositoryContext.getProperty(EntityMapper.class);
         List<String> groupBy = toAliases(nameSerializer, countQuery.getGroupBy());
         String groupByColumns = CollUtil.join(groupBy, ",", tableAlias + ".", null);
         selectSegment.setGroupBy("GROUP BY " + groupByColumns);
 
         // count by
         if (selectedRepository != null) {
-            nameSerializer = selectedRepository.getProperty(EntityTransformer.class);
+            nameSerializer = selectedRepository.getProperty(EntityMapper.class);
             tableAlias = selectedRepositoryAlias;
         }
         List<String> countBy = toAliases(nameSerializer, countQuery.getCountBy());

@@ -17,10 +17,18 @@
 
 package com.gitee.dorive.factory.v1.api;
 
-public interface FieldAliasMapping extends ValueConverter {
+import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
 
-    String getField();
+import java.lang.reflect.Type;
 
-    String getAlias();
+public interface EntityMapperManager {
+
+    EntityMapper getEntityMapper(String category);
+
+    boolean containValueObj();
+
+    boolean isValueObjType(Type type);
+
+    boolean containMatchedValueObj();
 
 }

@@ -22,7 +22,7 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityDeserializer;
-import com.gitee.dorive.base.v1.factory.api.entity.EntityTransformer;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
 import com.gitee.dorive.factory.v1.api.TypeAdapter;
 import com.gitee.dorive.factory.v1.impl.adapter.MapTypeAdapter;
 import lombok.Getter;
@@ -34,7 +34,7 @@ public class DefaultEntityDeserializer implements EntityDeserializer {
 
     private EntityElement entityElement;
     private Class<?> type;
-    private EntityTransformer entityTransformer;
+    private EntityMapper entityMapper;
     private CopyOptions copyOptions;
     private TypeAdapter typeAdapter;
 
@@ -47,10 +47,10 @@ public class DefaultEntityDeserializer implements EntityDeserializer {
     private void initCopyOptions() {
         this.copyOptions = CopyOptions.create() //
                 .ignoreNullValue() //
-                .setFieldNameEditor(alias -> entityTransformer.deserialize(alias)) //
+                .setFieldNameEditor(alias -> entityMapper.deserialize(alias)) //
                 .setFieldValueEditor((field, value) -> {
-                    String alias = entityTransformer.serialize(field);
-                    return entityTransformer.deserialize(alias, value);
+                    String alias = entityMapper.serialize(field);
+                    return entityMapper.deserialize(alias, value);
                 });
     }
 
@@ -60,7 +60,7 @@ public class DefaultEntityDeserializer implements EntityDeserializer {
 
     protected void processTypeAdapter() {
         if (typeAdapter instanceof MapTypeAdapter) {
-            ((MapTypeAdapter) typeAdapter).initialize(entityElement, entityTransformer);
+            ((MapTypeAdapter) typeAdapter).initialize(entityElement, entityMapper);
         }
     }
 

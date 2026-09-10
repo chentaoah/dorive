@@ -30,7 +30,7 @@ import com.gitee.dorive.base.v1.executor.api.ConditionHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.factory.api.entity.EntityTransformer;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
 import com.gitee.dorive.base.v1.factory.api.name.NameSerializer;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
@@ -93,11 +93,11 @@ import java.util.Set;
 
 /**
  * RepositoryContext's properties:
- * EntityStoreInfo、EntityTransformerManager、NameSerializerManager、NameSerializer、ExampleSerializer
+ * EntityStoreInfo、EntityMapperManager、EntityMapper、ExampleSerializer
  * RepositoryInfoResolver、QueryInfoResolver、StepwiseQuerier、JoinInfoResolver
  * <p>
  * DefaultRepository's properties:
- * EntityStoreInfo、EntityTransformerManager、NameSerializerManager、NameSerializer、ExampleSerializer
+ * EntityStoreInfo、EntityMapperManager、EntityMapper、ExampleSerializer
  * RepositoryContext
  */
 public class DefaultRepositoryContextBuilder implements RepositoryContextBuilder {
@@ -286,7 +286,7 @@ public class DefaultRepositoryContextBuilder implements RepositoryContextBuilder
             EntityElement entityElement = repositoryContext.getEntityElement();
             String primaryKey = entityElement.getPrimaryKey();
 
-            NameSerializer nameSerializer = repository.getProperty(EntityTransformer.class);
+            NameSerializer nameSerializer = repository.getProperty(EntityMapper.class);
             String primaryKeyAlias = nameSerializer.serialize(primaryKey);
 
             SegmentResolver segmentResolver = new DefaultSegmentResolver();

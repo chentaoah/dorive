@@ -15,29 +15,18 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.impl.mapping;
+package com.gitee.dorive.base.v1.factory.api.entity;
 
-import com.gitee.dorive.factory.v1.api.ValueConverter;
-import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import com.gitee.dorive.base.v1.factory.api.name.NameMapper;
+import com.gitee.dorive.base.v1.factory.api.value.ValueMapper;
 
-@Getter
-@Setter
-@AllArgsConstructor
-public class DefaultFieldAliasMapping implements FieldAliasMapping {
-    private String field;
-    private String alias;
-    private ValueConverter valueConverter;
+import java.util.List;
+import java.util.Set;
 
-    @Override
-    public Object deserialize(Object value) {
-        return valueConverter == null ? value : valueConverter.deserialize(value);
-    }
+public interface EntityMapper extends NameMapper, ValueMapper {
 
-    @Override
-    public Object serialize(Object value) {
-        return valueConverter == null ? value : valueConverter.serialize(value);
-    }
+    List<String> serialize(List<String> names);
+
+    Set<String> serialize(Set<String> names);
+
 }

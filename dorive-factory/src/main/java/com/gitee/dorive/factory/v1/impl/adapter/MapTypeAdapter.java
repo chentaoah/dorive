@@ -23,7 +23,7 @@ import cn.hutool.core.lang.func.Func1;
 import cn.hutool.core.lang.func.LambdaUtil;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.factory.v1.api.TypeAdapter;
-import com.gitee.dorive.base.v1.factory.api.entity.EntityTransformer;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,7 +36,7 @@ public class MapTypeAdapter implements TypeAdapter {
     private String field;
     private Map<Object, Class<?>> valueEntityTypeMap;
     private EntityElement entityElement;
-    private EntityTransformer entityTransformer;
+    private EntityMapper entityMapper;
     private String alias;
 
     public <T> MapTypeAdapter(Func1<T, ?> func, Map<Object, Class<?>> valueEntityTypeMap) {
@@ -46,10 +46,10 @@ public class MapTypeAdapter implements TypeAdapter {
         this.valueEntityTypeMap = valueEntityTypeMap;
     }
 
-    public void initialize(EntityElement entityElement, EntityTransformer entityTransformer) {
+    public void initialize(EntityElement entityElement, EntityMapper entityMapper) {
         this.entityElement = entityElement;
-        this.entityTransformer = entityTransformer;
-        this.alias = entityTransformer.serialize(field);
+        this.entityMapper = entityMapper;
+        this.alias = entityMapper.serialize(field);
     }
 
     @Override

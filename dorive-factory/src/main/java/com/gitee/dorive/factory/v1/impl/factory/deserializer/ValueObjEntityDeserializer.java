@@ -24,9 +24,9 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.executor.api.Context;
-import com.gitee.dorive.factory.v1.api.FieldAliasMapping;
-import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
-import com.gitee.dorive.factory.v1.impl.mapping.DefaultEntityTransformer;
+import com.gitee.dorive.factory.v1.impl.mapper.FieldMapping;
+import com.gitee.dorive.factory.v1.api.EntityMapperManager;
+import com.gitee.dorive.factory.v1.impl.mapper.DefaultEntityMapper;
 import com.gitee.dorive.factory.v1.util.TypeUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +39,7 @@ import java.util.Map;
 @Setter
 public class ValueObjEntityDeserializer extends DefaultEntityDeserializer {
 
-    private EntityTransformerManager entityTransformerManager;
+    private EntityMapperManager entityMapperManager;
 
     // 从hutool源码中拷贝
     protected TypeConverter converter = (type, value) -> {
@@ -56,7 +56,7 @@ public class ValueObjEntityDeserializer extends DefaultEntityDeserializer {
     @Override
     public void initialize() {
         super.initialize();
-        if (entityTransformerManager.containMatchedValueObj()) {
+        if (entityMapperManager.containMatchedValueObj()) {
             resetCopyOptions();
         }
     }
@@ -78,7 +78,7 @@ public class ValueObjEntityDeserializer extends DefaultEntityDeserializer {
                 if (Map.class.isAssignableFrom(rawType)) {
                     return value;
                 }
-                if (entityTransformerManager.isValueObjType(rawType)) {
+                if (entityMapperManager.isValueObjType(rawType)) {
                     return value;
                 }
             }
@@ -91,13 +91,13 @@ public class ValueObjEntityDeserializer extends DefaultEntityDeserializer {
     public Object deserialize(Context context, Object object) {
         Object entity = super.deserialize(context, object);
 
-        DefaultEntityTransformer defaultEntityTransformer = (DefaultEntityTransformer) getEntityTransformer();
+        DefaultEntityMapper defaultEntityMapper = (DefaultEntityMapper) getEntityMapper();
         Map<String, Object> resultMap = (Map<String, Object>) object;
-        List<FieldAliasMapping> unmatchedValueObjFields = defaultEntityTransformer.getUnmatchedValueObjFields();
-        for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
-            Object valueObj = fieldAliasMapping.deserialize(resultMap);
+        List<FieldMapping> unmatchedValueObjFields = defaultEntityMapper.getUnmatchedValueObjFields();
+        for (FieldMapping fieldMapping : unmatchedValueObjFields) {
+            Object valueObj = fieldMapping.deserialize(resultMap);
             if (valueObj != null) {
-                BeanUtil.setFieldValue(entity, fieldAliasMapping.getField(), valueObj);
+                BeanUtil.setFieldValue(entity, fieldMapping.getField(), valueObj);
             }
         }
         return entity;
