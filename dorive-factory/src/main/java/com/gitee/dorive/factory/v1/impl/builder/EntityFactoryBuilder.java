@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.launcher.v1.impl.builder;
+package com.gitee.dorive.factory.v1.impl.builder;
 
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;

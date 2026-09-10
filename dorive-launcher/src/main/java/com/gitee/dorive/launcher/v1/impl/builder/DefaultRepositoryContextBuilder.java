@@ -43,6 +43,7 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryEle;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.binder.v1.impl.example.MultiExampleBuilder;
 import com.gitee.dorive.binder.v1.impl.example.SingleExampleBuilder;
+import com.gitee.dorive.binder.v1.impl.builder.BinderExecutorBuilder;
 import com.gitee.dorive.event.v1.entity.ExecutorEvent;
 import com.gitee.dorive.event.v1.entity.RepositoryEvent;
 import com.gitee.dorive.event.v1.factory.ExecutorEventFactory;
