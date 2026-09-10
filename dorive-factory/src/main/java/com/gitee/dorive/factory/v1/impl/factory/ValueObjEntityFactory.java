@@ -63,8 +63,8 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
 
     private void setReCopyOptions() {
         DefaultDeserializer deserializer = (DefaultDeserializer) getDeserializer();
-        CopyOptions reCopyOptions = deserializer.getReCopyOptions();
-        reCopyOptions.setConverter(((targetType, value) -> {
+        CopyOptions copyOptions = deserializer.getCopyOptions();
+        copyOptions.setConverter(((targetType, value) -> {
             if (value == null) {
                 return null;
             }
@@ -90,8 +90,8 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
 
     private void setDeCopyOptions() {
         DefaultSerializer serializer = (DefaultSerializer) getSerializer();
-        CopyOptions deCopyOptions = serializer.getDeCopyOptions();
-        deCopyOptions.setConverter(((targetType, value) -> {
+        CopyOptions copyOptions = serializer.getCopyOptions();
+        copyOptions.setConverter(((targetType, value) -> {
             if (value == null) {
                 return null;
             }
@@ -118,9 +118,9 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
         Object entity = super.deserialize(context, object);
 
         DefaultDeserializer deserializer = (DefaultDeserializer) getDeserializer();
-        EntityTransformer reEntityTransformer = deserializer.getReEntityTransformer();
+        EntityTransformer entityTransformer = deserializer.getEntityTransformer();
         Map<String, Object> resultMap = (Map<String, Object>) object;
-        List<FieldAliasMapping> unmatchedValueObjFields = reEntityTransformer.getUnmatchedValueObjFields();
+        List<FieldAliasMapping> unmatchedValueObjFields = entityTransformer.getUnmatchedValueObjFields();
         for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
             Object valueObj = fieldAliasMapping.reconstitute(resultMap);
             if (valueObj != null) {
@@ -135,8 +135,8 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
         Object pojo = super.serialize(context, object);
 
         DefaultSerializer serializer = (DefaultSerializer) getSerializer();
-        EntityTransformer deEntityTransformer = serializer.getDeEntityTransformer();
-        List<FieldAliasMapping> unmatchedValueObjFields = deEntityTransformer.getUnmatchedValueObjFields();
+        EntityTransformer entityTransformer = serializer.getEntityTransformer();
+        List<FieldAliasMapping> unmatchedValueObjFields = entityTransformer.getUnmatchedValueObjFields();
         for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
             Object valueObj = BeanUtil.getFieldValue(object, fieldAliasMapping.getField());
             valueObj = valueObj != null ? fieldAliasMapping.deconstruct(valueObj) : null;

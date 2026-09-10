@@ -34,9 +34,9 @@ import lombok.Setter;
 public class DefaultDeserializer implements Deserializer {
 
     private EntityElement entityElement;
-    private Class<?> reType;
-    private EntityTransformer reEntityTransformer;
-    private CopyOptions reCopyOptions;
+    private Class<?> type;
+    private EntityTransformer entityTransformer;
+    private CopyOptions copyOptions;
     private TypeAdapter typeAdapter;
 
     public void initialize() {
@@ -46,29 +46,29 @@ public class DefaultDeserializer implements Deserializer {
     }
 
     private void initReCopyOptions() {
-        this.reCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(alias -> {
-            FieldAliasMapping fieldAliasMappingByAlias = reEntityTransformer.getFieldAliasMappingByAlias(alias);
+        this.copyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(alias -> {
+            FieldAliasMapping fieldAliasMappingByAlias = entityTransformer.getFieldAliasMappingByAlias(alias);
             return fieldAliasMappingByAlias != null ? fieldAliasMappingByAlias.getField() : alias;
 
         }).setFieldValueEditor((field, value) -> {
-            FieldAliasMapping fieldAliasMappingByField = reEntityTransformer.getFieldAliasMappingByField(field);
+            FieldAliasMapping fieldAliasMappingByField = entityTransformer.getFieldAliasMappingByField(field);
             return fieldAliasMappingByField != null ? fieldAliasMappingByField.reconstitute(value) : value;
         });
     }
 
     protected void initTypeAdapter() {
-        this.typeAdapter = (persistent) -> reType;
+        this.typeAdapter = (persistent) -> type;
     }
 
     protected void processTypeAdapter() {
         if (typeAdapter instanceof MapTypeAdapter) {
-            ((MapTypeAdapter) typeAdapter).initialize(entityElement, reEntityTransformer);
+            ((MapTypeAdapter) typeAdapter).initialize(entityElement, entityTransformer);
         }
     }
 
     @Override
     public Object deserialize(Context context, Object object) {
-        return BeanUtil.toBean(object, typeAdapter.determineType(object), reCopyOptions);
+        return BeanUtil.toBean(object, typeAdapter.determineType(object), copyOptions);
     }
 
 }

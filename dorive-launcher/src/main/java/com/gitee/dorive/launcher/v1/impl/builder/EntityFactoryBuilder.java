@@ -68,8 +68,8 @@ public class EntityFactoryBuilder {
         }
         if (deserializer instanceof DefaultDeserializer defaultDeserializer) {
             defaultDeserializer.setEntityElement(entityElement);
-            defaultDeserializer.setReType(reType);
-            defaultDeserializer.setReEntityTransformer(reEntityTransformer);
+            defaultDeserializer.setType(reType);
+            defaultDeserializer.setEntityTransformer(reEntityTransformer);
             defaultDeserializer.initialize();
         }
         return deserializer;
@@ -85,8 +85,8 @@ public class EntityFactoryBuilder {
             serializer = (Serializer) applicationContext.getBean(serializerClass);
         }
         if (serializer instanceof DefaultSerializer defaultSerializer) {
-            defaultSerializer.setDeType(deType);
-            defaultSerializer.setDeEntityTransformer(deEntityTransformer);
+            defaultSerializer.setType(deType);
+            defaultSerializer.setEntityTransformer(deEntityTransformer);
             defaultSerializer.initialize();
         }
         return serializer;

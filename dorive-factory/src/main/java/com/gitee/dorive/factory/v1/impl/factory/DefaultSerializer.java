@@ -13,28 +13,28 @@ import lombok.Setter;
 @Setter
 public class DefaultSerializer implements Serializer {
 
-    private Class<?> deType;
-    private EntityTransformer deEntityTransformer;
-    private CopyOptions deCopyOptions;
+    private Class<?> type;
+    private EntityTransformer entityTransformer;
+    private CopyOptions copyOptions;
 
     public void initialize() {
         initDeCopyOptions();
     }
 
     private void initDeCopyOptions() {
-        this.deCopyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(field -> {
-            FieldAliasMapping fieldAliasMappingByField = deEntityTransformer.getFieldAliasMappingByField(field);
+        this.copyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(field -> {
+            FieldAliasMapping fieldAliasMappingByField = entityTransformer.getFieldAliasMappingByField(field);
             return fieldAliasMappingByField != null ? fieldAliasMappingByField.getAlias() : field;
 
         }).setFieldValueEditor((alias, value) -> {
-            FieldAliasMapping fieldAliasMappingByAlias = deEntityTransformer.getFieldAliasMappingByAlias(alias);
+            FieldAliasMapping fieldAliasMappingByAlias = entityTransformer.getFieldAliasMappingByAlias(alias);
             return fieldAliasMappingByAlias != null ? fieldAliasMappingByAlias.deconstruct(value) : value;
         });
     }
 
     @Override
     public Object serialize(Context context, Object object) {
-        return BeanUtil.toBean(object, deType, deCopyOptions);
+        return BeanUtil.toBean(object, type, copyOptions);
     }
 
 }
