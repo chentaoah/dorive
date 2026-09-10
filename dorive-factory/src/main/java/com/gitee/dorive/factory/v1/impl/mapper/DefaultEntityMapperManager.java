@@ -23,20 +23,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.lang.reflect.Type;
-import java.util.Map;
 import java.util.Set;
 
 @Getter
 @AllArgsConstructor
 public class DefaultEntityMapperManager implements EntityMapperManager {
-    private final Map<String, EntityMapper> categoryEntityMapperMap;
+    private final EntityMapper databaseEntityMapper;
+    private final EntityMapper pojoEntityMapper;
     private final Set<Type> valueObjTypes;
     private final boolean containMatchedValueObj;
-
-    @Override
-    public EntityMapper getEntityMapper(String category) {
-        return categoryEntityMapperMap.get(category);
-    }
 
     @Override
     public boolean containValueObj() {

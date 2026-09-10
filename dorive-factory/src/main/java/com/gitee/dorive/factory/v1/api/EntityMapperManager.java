@@ -23,7 +23,9 @@ import java.lang.reflect.Type;
 
 public interface EntityMapperManager {
 
-    EntityMapper getEntityMapper(String category);
+    EntityMapper getDatabaseEntityMapper();
+
+    EntityMapper getPojoEntityMapper();
 
     boolean containValueObj();
 

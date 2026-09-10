@@ -21,12 +21,11 @@ import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityDeserializer;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityFactory;
-import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
 import com.gitee.dorive.base.v1.factory.api.entity.EntitySerializer;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.factory.v1.api.EntityMapperManager;
-import com.gitee.dorive.factory.v1.impl.factory.deserializer.DefaultEntityDeserializer;
 import com.gitee.dorive.factory.v1.impl.factory.DefaultEntityFactory;
+import com.gitee.dorive.factory.v1.impl.factory.deserializer.DefaultEntityDeserializer;
 import com.gitee.dorive.factory.v1.impl.factory.deserializer.ValueObjEntityDeserializer;
 import com.gitee.dorive.factory.v1.impl.factory.serializer.DefaultEntitySerializer;
 import com.gitee.dorive.factory.v1.impl.factory.serializer.ValueObjEntitySerializer;
@@ -41,11 +40,9 @@ public class EntityFactoryBuilder {
 
     private RepositoryContext repositoryContext;
     private EntityElement entityElement;
-    private Class<?> reType;
-    private Class<?> deType;
+    private Class<?> entityType;
+    private Class<?> pojoType;
     private EntityMapperManager entityMapperManager;
-    private EntityMapper reEntityMapper;
-    private EntityMapper deEntityMapper;
 
     public EntityFactory newEntityFactory() {
         // 反序列化
@@ -70,8 +67,8 @@ public class EntityFactoryBuilder {
         }
         if (entityDeserializer instanceof DefaultEntityDeserializer defaultEntityDeserializer) {
             defaultEntityDeserializer.setEntityElement(entityElement);
-            defaultEntityDeserializer.setType(reType);
-            defaultEntityDeserializer.setEntityMapper(reEntityMapper);
+            defaultEntityDeserializer.setType(entityType);
+            defaultEntityDeserializer.setEntityMapper(entityMapperManager.getDatabaseEntityMapper());
         }
         if (entityDeserializer instanceof ValueObjEntityDeserializer valueObjEntityDeserializer) {
             valueObjEntityDeserializer.setEntityMapperManager(entityMapperManager);
@@ -95,8 +92,8 @@ public class EntityFactoryBuilder {
             entitySerializer = (EntitySerializer) applicationContext.getBean(serializerClass);
         }
         if (entitySerializer instanceof DefaultEntitySerializer defaultEntitySerializer) {
-            defaultEntitySerializer.setType(deType);
-            defaultEntitySerializer.setEntityMapper(deEntityMapper);
+            defaultEntitySerializer.setType(pojoType);
+            defaultEntitySerializer.setEntityMapper(entityMapperManager.getPojoEntityMapper());
         }
         if (entitySerializer instanceof ValueObjEntitySerializer valueObjEntitySerializer) {
             valueObjEntitySerializer.setEntityMapperManager(entityMapperManager);

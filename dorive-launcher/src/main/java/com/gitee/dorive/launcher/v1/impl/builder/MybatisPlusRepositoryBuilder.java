@@ -31,7 +31,6 @@ import com.gitee.dorive.base.v1.executor.api.OperationFactory;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityFactory;
 import com.gitee.dorive.base.v1.factory.api.example.ExampleSerializer;
-import com.gitee.dorive.base.v1.factory.enums.Category;
 import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.repository.api.RepositoryEle;
@@ -72,31 +71,27 @@ public class MybatisPlusRepositoryBuilder {
         EntityStoreInfo entityStoreInfo = resolveEntityStoreInfo(repository.getRepositoryDef());
 
         // 别名转换
-        String reCategory = Category.ENTITY_DATABASE.name();
-        String deCategory = Category.ENTITY_POJO.name();
-        EntityMapperManagerResolver entityMapperManagerResolver = new EntityMapperManagerResolver(entityElement, entityStoreInfo.getAliasPropMap(), reCategory, deCategory);
+        EntityMapperManagerResolver entityMapperManagerResolver = new EntityMapperManagerResolver(entityElement, entityStoreInfo.getAliasPropMap());
         EntityMapperManager entityMapperManager = entityMapperManagerResolver.newEntityMapperManager();
-        EntityMapper reEntityMapper = entityMapperManager.getEntityMapper(reCategory);
-        EntityMapper deEntityMapper = entityMapperManager.getEntityMapper(deCategory);
+        EntityMapper databaseEntityMapper = entityMapperManager.getDatabaseEntityMapper();
 
         // 实体工厂
-        EntityFactoryBuilder entityFactoryBuilder = new EntityFactoryBuilder(
-                repository, entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(),
-                entityMapperManager, reEntityMapper, deEntityMapper);
+        EntityFactoryBuilder entityFactoryBuilder = new EntityFactoryBuilder( //
+                repository, entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(), entityMapperManager);
         EntityFactory entityFactory = entityFactoryBuilder.newEntityFactory();
 
         // 执行器
         Executor executor = newExecutor(entityElement, entityStoreInfo);
         executor = new UnionExecutor(executor, repository.getSqlRunner(), entityStoreInfo);
         executor = new FactoryExecutor(executor, entityElement, entityStoreInfo.getIdProperty(), entityFactory);
-        executor = new ExampleExecutor(executor, entityElement, reEntityMapper);
+        executor = new ExampleExecutor(executor, entityElement, databaseEntityMapper);
 
         // 查询条件转换器
         ExampleSerializer exampleSerializer = (ExampleSerializer) executor;
 
         repository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         repository.setProperty(EntityMapperManager.class, entityMapperManager);
-        repository.setProperty(EntityMapper.class, reEntityMapper);
+        repository.setProperty(EntityMapper.class, databaseEntityMapper);
         repository.setProperty(ExampleSerializer.class, exampleSerializer);
 
         DefaultRepository defaultRepository = new DefaultRepository();
@@ -105,7 +100,7 @@ public class MybatisPlusRepositoryBuilder {
         defaultRepository.setExecutor(executor);
         defaultRepository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         defaultRepository.setProperty(EntityMapperManager.class, entityMapperManager);
-        defaultRepository.setProperty(EntityMapper.class, reEntityMapper);
+        defaultRepository.setProperty(EntityMapper.class, databaseEntityMapper);
         defaultRepository.setProperty(ExampleSerializer.class, exampleSerializer);
         return defaultRepository;
     }

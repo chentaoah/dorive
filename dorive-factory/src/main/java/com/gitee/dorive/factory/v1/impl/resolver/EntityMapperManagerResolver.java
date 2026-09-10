@@ -21,13 +21,12 @@ import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.definition.def.FieldDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.definition.entity.FieldDefinition;
-import com.gitee.dorive.factory.v1.api.ValueConverter;
-import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
 import com.gitee.dorive.factory.v1.api.EntityMapperManager;
+import com.gitee.dorive.factory.v1.api.ValueConverter;
 import com.gitee.dorive.factory.v1.impl.converter.JsonArrayValueConverter;
 import com.gitee.dorive.factory.v1.impl.converter.JsonValueConverter;
-import com.gitee.dorive.factory.v1.impl.converter.MapValueConverter;
 import com.gitee.dorive.factory.v1.impl.converter.MapExpValueConverter;
+import com.gitee.dorive.factory.v1.impl.converter.MapValueConverter;
 import com.gitee.dorive.factory.v1.impl.mapper.DefaultEntityMapper;
 import com.gitee.dorive.factory.v1.impl.mapper.DefaultEntityMapperManager;
 import lombok.AllArgsConstructor;
@@ -36,7 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Type;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,20 +45,17 @@ public class EntityMapperManagerResolver {
 
     private EntityElement entityElement;
     private Map<String, String> aliasPropMap;
-    private String reCategory;
-    private String deCategory;
 
     public EntityMapperManager newEntityMapperManager() {
         List<FieldDefinition> fieldDefinitions = entityElement.getFieldDefinitions();
         Map<String, String> fieldAliasMap = entityElement.getFieldAliasMap();
 
         // 类别 => EntityMapper
-        Map<String, EntityMapper> categoryEntityMapperMap = new LinkedHashMap<>(4);
         Set<Type> valueObjTypes = new HashSet<>(6);
         boolean containMatchedValueObj = false;
 
-        DefaultEntityMapper reEntityMapper = new DefaultEntityMapper();
-        DefaultEntityMapper deEntityMapper = new DefaultEntityMapper();
+        DefaultEntityMapper databaseEntityMapper = new DefaultEntityMapper();
+        DefaultEntityMapper pojoEntityMapper = new DefaultEntityMapper();
 
         for (FieldDefinition fieldDefinition : fieldDefinitions) {
             // 字段名称
@@ -86,16 +81,11 @@ public class EntityMapperManagerResolver {
             // 值转换器
             ValueConverter valueConverter = newConverter(fieldDefinition, isMatch, isValueObj);
 
-            reEntityMapper.addField(field, isMatch, alias, isValueObj, valueConverter);
-            deEntityMapper.addField(field, isMatch, prop, isValueObj, valueConverter);
+            databaseEntityMapper.addField(field, isMatch, alias, isValueObj, valueConverter);
+            pojoEntityMapper.addField(field, isMatch, prop, isValueObj, valueConverter);
         }
 
-        // ENTITY_DATABASE
-        categoryEntityMapperMap.put(reCategory, reEntityMapper);
-        // ENTITY_POJO
-        categoryEntityMapperMap.put(deCategory, deEntityMapper);
-
-        return new DefaultEntityMapperManager(categoryEntityMapperMap, valueObjTypes, containMatchedValueObj);
+        return new DefaultEntityMapperManager(databaseEntityMapper, pojoEntityMapper, valueObjTypes, containMatchedValueObj);
     }
 
     private ValueConverter newConverter(FieldDefinition fieldDefinition, boolean isMatch, boolean isValueObj) {
