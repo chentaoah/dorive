@@ -28,10 +28,7 @@ import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.executor.api.OperationFactory;
-import com.gitee.dorive.base.v1.factory.api.EntityFactory;
-import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
-import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
-import com.gitee.dorive.base.v1.factory.api.Transformer;
+import com.gitee.dorive.base.v1.factory.api.*;
 import com.gitee.dorive.factory.v1.api.TransformerManager;
 import com.gitee.dorive.base.v1.factory.enums.Category;
 import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
@@ -94,13 +91,13 @@ public class MybatisPlusRepositoryBuilder {
         executor = new ExampleExecutor(executor, entityElement, reEntityTransformer);
 
         // 查询条件转换器
-        ExampleConverter exampleConverter = (ExampleConverter) executor;
+        ExampleSerializer exampleSerializer = (ExampleSerializer) executor;
 
         repository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         repository.setProperty(EntityTransformerManager.class, entityTransformerManager);
         repository.setProperty(TransformerManager.class, entityTransformerManager);
         repository.setProperty(Transformer.class, reEntityTransformer);
-        repository.setProperty(ExampleConverter.class, exampleConverter);
+        repository.setProperty(ExampleSerializer.class, exampleSerializer);
 
         DefaultRepository defaultRepository = new DefaultRepository();
         defaultRepository.setEntityElement(entityElement);
@@ -110,7 +107,7 @@ public class MybatisPlusRepositoryBuilder {
         defaultRepository.setProperty(EntityTransformerManager.class, entityTransformerManager);
         defaultRepository.setProperty(TransformerManager.class, entityTransformerManager);
         defaultRepository.setProperty(Transformer.class, reEntityTransformer);
-        defaultRepository.setProperty(ExampleConverter.class, exampleConverter);
+        defaultRepository.setProperty(ExampleSerializer.class, exampleSerializer);
         return defaultRepository;
     }
 

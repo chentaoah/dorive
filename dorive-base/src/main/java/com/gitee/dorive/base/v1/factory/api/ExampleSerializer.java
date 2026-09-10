@@ -20,8 +20,8 @@ package com.gitee.dorive.base.v1.factory.api;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 
-public interface ExampleConverter {
+public interface ExampleSerializer {
 
-    void convert(Context context, Example example);
+    void serialize(Context context, Example example);
 
 }

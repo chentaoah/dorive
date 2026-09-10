@@ -92,11 +92,11 @@ import java.util.Set;
 
 /**
  * RepositoryContext's properties:
- * EntityStoreInfo、EntityTransformerManager、TransformerManager、Transformer、ExampleConverter
+ * EntityStoreInfo、EntityTransformerManager、TransformerManager、Transformer、ExampleSerializer
  * RepositoryInfoResolver、QueryInfoResolver、StepwiseQuerier、JoinInfoResolver
  * <p>
  * DefaultRepository's properties:
- * EntityStoreInfo、EntityTransformerManager、TransformerManager、Transformer、ExampleConverter
+ * EntityStoreInfo、EntityTransformerManager、TransformerManager、Transformer、ExampleSerializer
  * RepositoryContext
  */
 public class DefaultRepositoryContextBuilder implements RepositoryContextBuilder {

@@ -22,7 +22,7 @@ import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import com.gitee.dorive.base.v1.executor.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.executor.api.Selector;
-import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
+import com.gitee.dorive.base.v1.factory.api.ExampleSerializer;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.query.v2.api.QueryResolver;
@@ -134,7 +134,7 @@ public class SegmentQueryResolver implements QueryResolver {
         }
 
         // 转化筛选条件
-        repositoryExampleMap.forEach(((repository, eachExample) -> repository.getProperty(ExampleConverter.class).convert(context, eachExample)));
+        repositoryExampleMap.forEach(((repository, eachExample) -> repository.getProperty(ExampleSerializer.class).serialize(context, eachExample)));
         Collections.reverse(joinInfos);
         Object segment = segmentResolver.resolve(repositoryAliasMap, joinInfos, repositoryExampleMap, segmentInfo.getRepository(), example);
         segmentInfo.setSegment(segment);

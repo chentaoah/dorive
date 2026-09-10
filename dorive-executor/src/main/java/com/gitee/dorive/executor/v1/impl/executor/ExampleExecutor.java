@@ -24,7 +24,7 @@ import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import com.gitee.dorive.base.v1.executor.entity.qry.OrderBy;
 import com.gitee.dorive.base.v1.executor.entity.op.Result;
 import com.gitee.dorive.base.v1.executor.entity.qry.UnionExample;
-import com.gitee.dorive.base.v1.factory.api.ExampleConverter;
+import com.gitee.dorive.base.v1.factory.api.ExampleSerializer;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
@@ -43,7 +43,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class ExampleExecutor extends AbstractProxyExecutor implements ExampleConverter {
+public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSerializer {
 
     private EntityElement entityElement;
     private EntityTransformer entityTransformer;
@@ -58,7 +58,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
     public Result<Object> executeQuery(Context context, Query query) {
         Example example = query.getExample();
         if (example != null) {
-            convert(context, example);
+            serialize(context, example);
         }
         if (example instanceof UnionExample) {
             convertUnion(context, (UnionExample) example);
@@ -70,7 +70,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
     public long executeCount(Context context, Query query) {
         Example example = query.getExample();
         if (example != null) {
-            convert(context, example);
+            serialize(context, example);
         }
         return super.executeCount(context, query);
     }
@@ -80,7 +80,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
         if (operation instanceof Condition condition) {
             Example example = condition.getExample();
             if (example != null) {
-                convert(context, example);
+                serialize(context, example);
             }
         }
         if (operation instanceof Update) {
@@ -93,7 +93,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
     }
 
     @Override
-    public void convert(Context context, Example example) {
+    public void serialize(Context context, Example example) {
         convertSelectProps(example);
         convertCriteria(context, example);
         convertOrderBy(example);
@@ -138,7 +138,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleCon
                 if (Operator.AND.equals(operator) || Operator.OR.equals(operator)) {
                     Object value = criterion.getValue();
                     if (value instanceof Example) {
-                        convert(context, (Example) value);
+                        serialize(context, (Example) value);
                     }
                 } else if (Operator.MULTI_IN.equals(operator)) {
                     Object value = criterion.getValue();
