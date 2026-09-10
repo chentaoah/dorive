@@ -40,12 +40,12 @@ public class DefaultDeserializer implements Deserializer {
     private TypeAdapter typeAdapter;
 
     public void initialize() {
-        initReCopyOptions();
+        initCopyOptions();
         initTypeAdapter();
         processTypeAdapter();
     }
 
-    private void initReCopyOptions() {
+    private void initCopyOptions() {
         this.copyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(alias -> {
             FieldAliasMapping fieldAliasMappingByAlias = entityTransformer.getFieldAliasMappingByAlias(alias);
             return fieldAliasMappingByAlias != null ? fieldAliasMappingByAlias.getField() : alias;

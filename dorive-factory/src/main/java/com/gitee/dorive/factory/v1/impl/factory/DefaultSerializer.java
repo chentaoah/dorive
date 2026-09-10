@@ -18,10 +18,10 @@ public class DefaultSerializer implements Serializer {
     private CopyOptions copyOptions;
 
     public void initialize() {
-        initDeCopyOptions();
+        initCopyOptions();
     }
 
-    private void initDeCopyOptions() {
+    private void initCopyOptions() {
         this.copyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(field -> {
             FieldAliasMapping fieldAliasMappingByField = entityTransformer.getFieldAliasMappingByField(field);
             return fieldAliasMappingByField != null ? fieldAliasMappingByField.getAlias() : field;
