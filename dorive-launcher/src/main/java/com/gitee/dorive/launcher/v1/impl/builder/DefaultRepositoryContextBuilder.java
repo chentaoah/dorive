@@ -26,6 +26,7 @@ import com.gitee.dorive.base.v1.definition.annotation.Event;
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.event.api.EventFactory;
+import com.gitee.dorive.base.v1.executor.api.ConditionHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
 import com.gitee.dorive.base.v1.executor.api.Executor;
@@ -50,6 +51,7 @@ import com.gitee.dorive.event.v1.factory.RepositoryTargetEventFactory;
 import com.gitee.dorive.executor.v1.impl.executor.ExecutorEventExecutor;
 import com.gitee.dorive.executor.v1.impl.executor.RepositoryEventExecutor;
 import com.gitee.dorive.executor.v1.impl.executor.RepositoryExecutor;
+import com.gitee.dorive.executor.v1.impl.handler.cond.DefaultConditionHandler;
 import com.gitee.dorive.executor.v1.impl.handler.op.BatchEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.op.DelegatedEntityOpHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.BatchEntityHandler;
@@ -165,8 +167,9 @@ public class DefaultRepositoryContextBuilder implements RepositoryContextBuilder
         // 处理器
         EntityHandler entityHandler = newEntityHandler(repositoryContext, repositoryDerivedResolver);
         EntityOpHandler entityOpHandler = newEntityOpHandler(repositoryContext, repositoryDerivedResolver);
+        ConditionHandler conditionHandler = new DefaultConditionHandler(repositoryContext);
         // 创建上下文执行器
-        Executor executor = new RepositoryExecutor(repositoryContext, entityHandler, entityOpHandler);
+        Executor executor = new RepositoryExecutor(repositoryContext, entityHandler, entityOpHandler, conditionHandler);
         // 仓储事件执行器
         List<EventFactory> repositoryEventFactories = repositoryContext.getRepositoryEventFactories();
         if (!repositoryEventFactories.isEmpty()) {

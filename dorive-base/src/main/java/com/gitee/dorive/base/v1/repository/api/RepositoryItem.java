@@ -49,8 +49,4 @@ public interface RepositoryItem extends RepositoryEle {
 
     long selectCountByExample(Options options, Example example);
 
-    int updateByExample(Options options, Object entity, Example example);
-
-    int deleteByExample(Options options, Example example);
-
 }

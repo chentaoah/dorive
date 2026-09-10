@@ -94,13 +94,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     public int updateByExample(Options options, Object entity, Example example) {
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
-        int totalCount = 0;
-        for (RepositoryItem repositoryItem : getOrderedRepositories()) {
-            if (matches(options, repositoryItem)) {
-                totalCount += repositoryItem.updateByExample(options, entity, ExampleUtils.clone(example));
-            }
-        }
-        return totalCount;
+        Operation operation = getOperationFactory().buildUpdateByExample(entity, example);
+        return execute((Context) options, operation);
     }
 
     @Override
@@ -127,13 +122,8 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     @Override
     public int deleteByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
-        int totalCount = 0;
-        for (RepositoryItem repositoryItem : getOrderedRepositories()) {
-            if (matches(options, repositoryItem)) {
-                totalCount += repositoryItem.deleteByExample(options, ExampleUtils.clone(example));
-            }
-        }
-        return totalCount;
+        Operation operation = getOperationFactory().buildDeleteByExample(example);
+        return execute((Context) options, operation);
     }
 
     // ================================================================================
