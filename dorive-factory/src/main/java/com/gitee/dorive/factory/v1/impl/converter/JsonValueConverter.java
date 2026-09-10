@@ -17,8 +17,9 @@
 
 package com.gitee.dorive.factory.v1.impl.converter;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.gitee.dorive.base.v1.factory.api.value.ValueFactory;
+import cn.hutool.json.JSONConfig;
+import cn.hutool.json.JSONUtil;
+import com.gitee.dorive.base.v1.factory.api.ValueConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,18 +27,19 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class MapValueFactory implements ValueFactory {
+public class JsonValueConverter implements ValueConverter {
 
+    private static JSONConfig jsonConfig = JSONConfig.create().setIgnoreNullValue(false);
     private Class<?> entityClass;
 
     @Override
     public Object deserialize(Object value) {
-        return BeanUtil.toBean(value, entityClass);
+        return JSONUtil.toBean((String) value, entityClass);
     }
 
     @Override
     public Object serialize(Object value) {
-        return BeanUtil.beanToMap(value);
+        return JSONUtil.toJsonStr(value, jsonConfig);
     }
 
 }

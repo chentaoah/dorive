@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
-import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
 import com.gitee.dorive.base.v1.factory.api.entity.EntitySerializer;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,14 +21,13 @@ public class DefaultEntitySerializer implements EntitySerializer {
     }
 
     private void initCopyOptions() {
-        this.copyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(field -> {
-            FieldAliasMapping fieldAliasMappingByField = entityTransformer.getFieldAliasMappingByField(field);
-            return fieldAliasMappingByField != null ? fieldAliasMappingByField.getAlias() : field;
-
-        }).setFieldValueEditor((alias, value) -> {
-            FieldAliasMapping fieldAliasMappingByAlias = entityTransformer.getFieldAliasMappingByAlias(alias);
-            return fieldAliasMappingByAlias != null ? fieldAliasMappingByAlias.serialize(value) : value;
-        });
+        this.copyOptions = CopyOptions.create() //
+                .ignoreNullValue() //
+                .setFieldNameEditor(field -> entityTransformer.serialize(field)) //
+                .setFieldValueEditor((alias, value) -> {
+                    String field = entityTransformer.deserialize(alias);
+                    return entityTransformer.serialize(field, value);
+                });
     }
 
     @Override

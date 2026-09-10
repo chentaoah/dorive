@@ -17,20 +17,17 @@
 
 package com.gitee.dorive.base.v1.factory.api;
 
-import com.gitee.dorive.base.v1.factory.api.name.NameSerializer;
+import com.gitee.dorive.base.v1.factory.api.name.NameFactory;
+import com.gitee.dorive.base.v1.factory.api.value.ValueFactory;
 
 import java.util.List;
 import java.util.Set;
 
-public interface EntityTransformer extends NameSerializer {
+public interface EntityTransformer extends NameFactory, ValueFactory {
 
     List<String> toAliases(List<String> fields);
 
     Set<String> toAliases(Set<String> fields);
-
-    FieldAliasMapping getFieldAliasMappingByField(String field);
-
-    FieldAliasMapping getFieldAliasMappingByAlias(String alias);
 
     List<FieldAliasMapping> getUnmatchedValueObjFields();
 

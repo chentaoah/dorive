@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.factory.v1.impl.mapping;
 
-import com.gitee.dorive.base.v1.factory.api.value.ValueFactory;
+import com.gitee.dorive.base.v1.factory.api.ValueConverter;
 import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,15 +29,15 @@ import lombok.Setter;
 public class DefaultFieldAliasMapping implements FieldAliasMapping {
     private String field;
     private String alias;
-    private ValueFactory valueFactory;
+    private ValueConverter valueConverter;
 
     @Override
     public Object deserialize(Object value) {
-        return valueFactory == null ? value : valueFactory.deserialize(value);
+        return valueConverter == null ? value : valueConverter.deserialize(value);
     }
 
     @Override
     public Object serialize(Object value) {
-        return valueFactory == null ? value : valueFactory.serialize(value);
+        return valueConverter == null ? value : valueConverter.serialize(value);
     }
 }

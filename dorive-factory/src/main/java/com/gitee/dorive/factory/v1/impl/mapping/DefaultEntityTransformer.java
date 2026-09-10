@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.factory.v1.impl.mapping;
 
-import com.gitee.dorive.base.v1.factory.api.value.ValueFactory;
+import com.gitee.dorive.base.v1.factory.api.ValueConverter;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
 import lombok.AllArgsConstructor;
@@ -41,11 +41,11 @@ public class DefaultEntityTransformer implements EntityTransformer {
     private List<FieldAliasMapping> matchedValueObjFields = new ArrayList<>(4);
     private List<FieldAliasMapping> unmatchedValueObjFields = new ArrayList<>(4);
 
-    public void addField(String field, boolean isMatch, String alias, boolean isValueObj, ValueFactory valueFactory) {
+    public void addField(String field, boolean isMatch, String alias, boolean isValueObj, ValueConverter valueConverter) {
         fieldAliasMap.put(field, alias);
         aliasFieldMap.put(alias, field);
 
-        FieldAliasMapping fieldAliasMapping = new DefaultFieldAliasMapping(field, alias, valueFactory);
+        FieldAliasMapping fieldAliasMapping = new DefaultFieldAliasMapping(field, alias, valueConverter);
         fieldFieldAliasMappingMap.put(field, fieldAliasMapping);
         aliasFieldAliasMappingMap.put(alias, fieldAliasMapping);
 
@@ -60,8 +60,25 @@ public class DefaultEntityTransformer implements EntityTransformer {
     }
 
     @Override
+    public String deserialize(String name) {
+        return aliasFieldMap.getOrDefault(name, name);
+    }
+
+    @Override
     public String serialize(String name) {
         return fieldAliasMap.getOrDefault(name, name);
+    }
+
+    @Override
+    public Object deserialize(String name, Object value) {
+        FieldAliasMapping fieldAliasMapping = aliasFieldAliasMappingMap.get(name);
+        return fieldAliasMapping != null ? fieldAliasMapping.deserialize(value) : value;
+    }
+
+    @Override
+    public Object serialize(String name, Object value) {
+        FieldAliasMapping fieldAliasMapping = fieldFieldAliasMappingMap.get(name);
+        return fieldAliasMapping != null ? fieldAliasMapping.serialize(value) : value;
     }
 
     @Override
@@ -88,15 +105,5 @@ public class DefaultEntityTransformer implements EntityTransformer {
             return aliases;
         }
         return fields;
-    }
-
-    @Override
-    public FieldAliasMapping getFieldAliasMappingByField(String field) {
-        return fieldFieldAliasMappingMap.get(field);
-    }
-
-    @Override
-    public FieldAliasMapping getFieldAliasMappingByAlias(String alias) {
-        return aliasFieldAliasMappingMap.get(alias);
     }
 }

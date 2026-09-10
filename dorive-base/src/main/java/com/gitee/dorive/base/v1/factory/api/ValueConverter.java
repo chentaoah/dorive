@@ -15,29 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.impl.converter;
+package com.gitee.dorive.base.v1.factory.api;
 
-import cn.hutool.json.JSONUtil;
-import com.gitee.dorive.base.v1.factory.api.value.ValueFactory;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+public interface ValueConverter {
 
-@Getter
-@Setter
-@AllArgsConstructor
-public class JsonArrayValueFactory implements ValueFactory {
+    Object deserialize(Object value);
 
-    private Class<?> entityClass;
-
-    @Override
-    public Object deserialize(Object value) {
-        return JSONUtil.toList((String) value, entityClass);
-    }
-
-    @Override
-    public Object serialize(Object value) {
-        return JSONUtil.toJsonStr(value);
-    }
+    Object serialize(Object value);
 
 }

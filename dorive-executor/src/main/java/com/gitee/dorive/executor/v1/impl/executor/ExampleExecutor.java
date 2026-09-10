@@ -28,7 +28,6 @@ import com.gitee.dorive.base.v1.factory.api.example.ExampleSerializer;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
-import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
 import com.gitee.dorive.base.v1.executor.entity.op.Condition;
 import com.gitee.dorive.base.v1.executor.entity.op.Operation;
 import com.gitee.dorive.base.v1.executor.entity.cop.ConditionUpdate;
@@ -159,17 +158,15 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
     private void doConvertCriteria(Criterion criterion) {
         String property = criterion.getProperty();
         Object value = criterion.getValue();
-
-        FieldAliasMapping fieldAliasMapping = entityTransformer.getFieldAliasMappingByField(property);
-        if (fieldAliasMapping == null) {
-            fieldAliasMapping = entityTransformer.getFieldAliasMappingByAlias(property);
+        // 如果是field
+        String alias = entityTransformer.serialize(property);
+        if (alias != null) {
+            value = entityTransformer.serialize(property, value);
+            property = alias;
         }
-        if (fieldAliasMapping != null) {
-            property = fieldAliasMapping.getAlias();
-            value = fieldAliasMapping.serialize(value);
-            criterion.setProperty(property);
-            criterion.setValue(value);
-        }
+        // 重新设置回去
+        criterion.setProperty(property);
+        criterion.setValue(value);
     }
 
     private void convertOrderBy(Example example) {

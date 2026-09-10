@@ -15,12 +15,29 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.factory.api;
+package com.gitee.dorive.factory.v1.impl.converter;
 
-public interface FieldAliasMapping extends ValueConverter {
+import cn.hutool.core.bean.BeanUtil;
+import com.gitee.dorive.base.v1.factory.api.ValueConverter;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-    String getField();
+@Getter
+@Setter
+@AllArgsConstructor
+public class MapValueConverter implements ValueConverter {
 
-    String getAlias();
+    private Class<?> entityClass;
+
+    @Override
+    public Object deserialize(Object value) {
+        return BeanUtil.toBean(value, entityClass);
+    }
+
+    @Override
+    public Object serialize(Object value) {
+        return BeanUtil.beanToMap(value);
+    }
 
 }

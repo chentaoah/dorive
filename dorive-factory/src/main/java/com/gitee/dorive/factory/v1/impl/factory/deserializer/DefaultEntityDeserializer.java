@@ -23,7 +23,6 @@ import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityDeserializer;
 import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
-import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
 import com.gitee.dorive.factory.v1.api.TypeAdapter;
 import com.gitee.dorive.factory.v1.impl.adapter.MapTypeAdapter;
 import lombok.Getter;
@@ -46,14 +45,13 @@ public class DefaultEntityDeserializer implements EntityDeserializer {
     }
 
     private void initCopyOptions() {
-        this.copyOptions = CopyOptions.create().ignoreNullValue().setFieldNameEditor(alias -> {
-            FieldAliasMapping fieldAliasMappingByAlias = entityTransformer.getFieldAliasMappingByAlias(alias);
-            return fieldAliasMappingByAlias != null ? fieldAliasMappingByAlias.getField() : alias;
-
-        }).setFieldValueEditor((field, value) -> {
-            FieldAliasMapping fieldAliasMappingByField = entityTransformer.getFieldAliasMappingByField(field);
-            return fieldAliasMappingByField != null ? fieldAliasMappingByField.deserialize(value) : value;
-        });
+        this.copyOptions = CopyOptions.create() //
+                .ignoreNullValue() //
+                .setFieldNameEditor(alias -> entityTransformer.deserialize(alias)) //
+                .setFieldValueEditor((field, value) -> {
+                    String alias = entityTransformer.serialize(field);
+                    return entityTransformer.deserialize(alias, value);
+                });
     }
 
     protected void initTypeAdapter() {

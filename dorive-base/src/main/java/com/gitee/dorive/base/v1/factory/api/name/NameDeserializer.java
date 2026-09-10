@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.factory.api;
+package com.gitee.dorive.base.v1.factory.api.name;
 
-public interface FieldAliasMapping extends ValueConverter {
+public interface NameDeserializer {
 
-    String getField();
-
-    String getAlias();
+    String deserialize(String name);
 
 }
