@@ -74,8 +74,8 @@ public class FactoryExecutor extends AbstractProxyExecutor {
 
     private List<Object> reconstitute(Context context, List<?> persistentObjs) {
         List<Object> entities = new ArrayList<>(persistentObjs.size());
-        for (Object persistent : persistentObjs) {
-            Object entity = entityFactory.deserialize(context, persistent);
+        for (Object persistentObj : persistentObjs) {
+            Object entity = entityFactory.deserialize(context, persistentObj);
             entities.add(entity);
         }
         return entities;
@@ -118,8 +118,8 @@ public class FactoryExecutor extends AbstractProxyExecutor {
     private List<Object> deconstruct(Context context, List<?> entities) {
         List<Object> persistentObjs = new ArrayList<>(entities.size());
         for (Object entity : entities) {
-            Object persistent = entityFactory.serialize(context, entity);
-            persistentObjs.add(persistent);
+            Object persistentObj = entityFactory.serialize(context, entity);
+            persistentObjs.add(persistentObj);
         }
         return persistentObjs;
     }
