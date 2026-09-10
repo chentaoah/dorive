@@ -73,7 +73,7 @@ public class MybatisPlusRepositoryBuilder {
         // 别名转换
         EntityMapperManagerBuilder entityMapperManagerBuilder = new EntityMapperManagerBuilder(entityElement, entityStoreInfo.getAliasPropMap());
         EntityMapperManager entityMapperManager = entityMapperManagerBuilder.newEntityMapperManager();
-        EntityMapper databaseEntityMapper = entityMapperManager.getDatabaseEntityMapper();
+        EntityMapper entityMapper = entityMapperManager.getDatabaseEntityMapper();
 
         // 实体工厂
         EntityFactoryBuilder entityFactoryBuilder = new EntityFactoryBuilder( //
@@ -84,14 +84,14 @@ public class MybatisPlusRepositoryBuilder {
         Executor executor = newExecutor(entityElement, entityStoreInfo);
         executor = new UnionExecutor(executor, repository.getSqlRunner(), entityStoreInfo);
         executor = new FactoryExecutor(executor, entityElement, entityStoreInfo.getIdProperty(), entityFactory);
-        executor = new ExampleExecutor(executor, entityElement, databaseEntityMapper);
+        executor = new ExampleExecutor(executor, entityElement, entityMapper);
 
         // 查询条件转换器
         ExampleSerializer exampleSerializer = (ExampleSerializer) executor;
 
         repository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         repository.setProperty(EntityMapperManager.class, entityMapperManager);
-        repository.setProperty(EntityMapper.class, databaseEntityMapper);
+        repository.setProperty(EntityMapper.class, entityMapper);
         repository.setProperty(ExampleSerializer.class, exampleSerializer);
 
         DefaultRepository defaultRepository = new DefaultRepository();
@@ -100,7 +100,7 @@ public class MybatisPlusRepositoryBuilder {
         defaultRepository.setExecutor(executor);
         defaultRepository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         defaultRepository.setProperty(EntityMapperManager.class, entityMapperManager);
-        defaultRepository.setProperty(EntityMapper.class, databaseEntityMapper);
+        defaultRepository.setProperty(EntityMapper.class, entityMapper);
         defaultRepository.setProperty(ExampleSerializer.class, exampleSerializer);
         return defaultRepository;
     }
