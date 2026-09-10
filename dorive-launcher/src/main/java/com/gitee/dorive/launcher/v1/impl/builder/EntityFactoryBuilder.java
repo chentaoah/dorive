@@ -25,10 +25,11 @@ import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.base.v1.factory.api.Serializer;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
-import com.gitee.dorive.factory.v1.impl.factory.DefaultDeserializer;
+import com.gitee.dorive.factory.v1.impl.factory.deserializer.DefaultDeserializer;
 import com.gitee.dorive.factory.v1.impl.factory.DefaultEntityFactory;
-import com.gitee.dorive.factory.v1.impl.factory.DefaultSerializer;
-import com.gitee.dorive.factory.v1.impl.factory.ValueObjEntityFactory;
+import com.gitee.dorive.factory.v1.impl.factory.deserializer.ValueObjDeserializer;
+import com.gitee.dorive.factory.v1.impl.factory.serializer.DefaultSerializer;
+import com.gitee.dorive.factory.v1.impl.factory.serializer.ValueObjSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
@@ -62,7 +63,7 @@ public class EntityFactoryBuilder {
         Class<?> deserializerClass = repositoryDef.getDeserializer();
         Deserializer deserializer;
         if (deserializerClass == Object.class) {
-            deserializer = new DefaultDeserializer();
+            deserializer = !entityTransformerManager.containValueObj() ? new DefaultDeserializer() : new ValueObjDeserializer();
         } else {
             deserializer = (Deserializer) applicationContext.getBean(deserializerClass);
         }
@@ -70,6 +71,11 @@ public class EntityFactoryBuilder {
             defaultDeserializer.setEntityElement(entityElement);
             defaultDeserializer.setType(reType);
             defaultDeserializer.setEntityTransformer(reEntityTransformer);
+        }
+        if (deserializer instanceof ValueObjDeserializer valueObjDeserializer) {
+            valueObjDeserializer.setEntityTransformerManager(entityTransformerManager);
+        }
+        if (deserializer instanceof DefaultDeserializer defaultDeserializer) {
             defaultDeserializer.initialize();
         }
         return deserializer;
@@ -80,13 +86,18 @@ public class EntityFactoryBuilder {
         Class<?> serializerClass = repositoryDef.getSerializer();
         Serializer serializer;
         if (serializerClass == Object.class) {
-            serializer = new DefaultSerializer();
+            serializer = !entityTransformerManager.containValueObj() ? new DefaultSerializer() : new ValueObjSerializer();
         } else {
             serializer = (Serializer) applicationContext.getBean(serializerClass);
         }
         if (serializer instanceof DefaultSerializer defaultSerializer) {
             defaultSerializer.setType(deType);
             defaultSerializer.setEntityTransformer(deEntityTransformer);
+        }
+        if (serializer instanceof ValueObjSerializer valueObjSerializer) {
+            valueObjSerializer.setEntityTransformerManager(entityTransformerManager);
+        }
+        if (serializer instanceof DefaultSerializer defaultSerializer) {
             defaultSerializer.initialize();
         }
         return serializer;
@@ -97,8 +108,7 @@ public class EntityFactoryBuilder {
         Class<?> factoryClass = repositoryDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {
-            entityFactory = !entityTransformerManager.containValueObj() ? //
-                    new DefaultEntityFactory() : new ValueObjEntityFactory();
+            entityFactory = new DefaultEntityFactory();
         } else {
             entityFactory = (EntityFactory) applicationContext.getBean(factoryClass);
         }
@@ -106,11 +116,6 @@ public class EntityFactoryBuilder {
         if (entityFactory instanceof DefaultEntityFactory defaultEntityFactory) {
             defaultEntityFactory.setDeserializer(deserializer);
             defaultEntityFactory.setSerializer(serializer);
-        }
-        // 值对象
-        if (entityFactory instanceof ValueObjEntityFactory valueObjEntityFactory) {
-            valueObjEntityFactory.setEntityTransformerManager(entityTransformerManager);
-            valueObjEntityFactory.initialize();
         }
         return entityFactory;
     }

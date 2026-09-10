@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.factory.v1.impl.factory;
+package com.gitee.dorive.factory.v1.impl.factory.deserializer;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;

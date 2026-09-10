@@ -1,4 +1,4 @@
-package com.gitee.dorive.factory.v1.impl.factory;
+package com.gitee.dorive.factory.v1.impl.factory.serializer;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
