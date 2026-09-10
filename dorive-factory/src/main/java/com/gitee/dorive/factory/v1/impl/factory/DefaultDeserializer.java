@@ -39,12 +39,6 @@ public class DefaultDeserializer implements Deserializer {
     private CopyOptions reCopyOptions;
     private TypeAdapter typeAdapter;
 
-    public DefaultDeserializer(EntityElement entityElement, Class<?> reType, EntityTransformer reEntityTransformer) {
-        this.entityElement = entityElement;
-        this.reType = reType;
-        this.reEntityTransformer = reEntityTransformer;
-    }
-
     public void initialize() {
         initReCopyOptions();
         initTypeAdapter();

@@ -25,6 +25,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.factory.api.EntityTransformer;
 import com.gitee.dorive.factory.v1.api.EntityTransformerManager;
 import com.gitee.dorive.base.v1.factory.api.FieldAliasMapping;
 import com.gitee.dorive.factory.v1.util.TypeUtils;
@@ -53,9 +54,7 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
         return Convert.convertWithCheck(type, value, null, true);
     };
 
-    @Override
     public void initialize() {
-        super.initialize();
         if (entityTransformerManager.containMatchedValueObj()) {
             setReCopyOptions();
             setDeCopyOptions();
@@ -63,7 +62,9 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     }
 
     private void setReCopyOptions() {
-        getReCopyOptions().setConverter(((targetType, value) -> {
+        DefaultDeserializer deserializer = (DefaultDeserializer) getDeserializer();
+        CopyOptions reCopyOptions = deserializer.getReCopyOptions();
+        reCopyOptions.setConverter(((targetType, value) -> {
             if (value == null) {
                 return null;
             }
@@ -88,7 +89,9 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     }
 
     private void setDeCopyOptions() {
-        getDeCopyOptions().setConverter(((targetType, value) -> {
+        DefaultSerializer serializer = (DefaultSerializer) getSerializer();
+        CopyOptions deCopyOptions = serializer.getDeCopyOptions();
+        deCopyOptions.setConverter(((targetType, value) -> {
             if (value == null) {
                 return null;
             }
@@ -113,8 +116,11 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     @SuppressWarnings("unchecked")
     public Object deserialize(Context context, Object object) {
         Object entity = super.deserialize(context, object);
+
+        DefaultDeserializer deserializer = (DefaultDeserializer) getDeserializer();
+        EntityTransformer reEntityTransformer = deserializer.getReEntityTransformer();
         Map<String, Object> resultMap = (Map<String, Object>) object;
-        List<FieldAliasMapping> unmatchedValueObjFields = getReEntityTransformer().getUnmatchedValueObjFields();
+        List<FieldAliasMapping> unmatchedValueObjFields = reEntityTransformer.getUnmatchedValueObjFields();
         for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
             Object valueObj = fieldAliasMapping.reconstitute(resultMap);
             if (valueObj != null) {
@@ -127,7 +133,10 @@ public class ValueObjEntityFactory extends DefaultEntityFactory {
     @Override
     public Object serialize(Context context, Object object) {
         Object pojo = super.serialize(context, object);
-        List<FieldAliasMapping> unmatchedValueObjFields = getDeEntityTransformer().getUnmatchedValueObjFields();
+
+        DefaultSerializer serializer = (DefaultSerializer) getSerializer();
+        EntityTransformer deEntityTransformer = serializer.getDeEntityTransformer();
+        List<FieldAliasMapping> unmatchedValueObjFields = deEntityTransformer.getUnmatchedValueObjFields();
         for (FieldAliasMapping fieldAliasMapping : unmatchedValueObjFields) {
             Object valueObj = BeanUtil.getFieldValue(object, fieldAliasMapping.getField());
             valueObj = valueObj != null ? fieldAliasMapping.deconstruct(valueObj) : null;
