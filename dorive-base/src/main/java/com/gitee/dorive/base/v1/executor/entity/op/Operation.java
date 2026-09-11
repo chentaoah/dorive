@@ -26,6 +26,7 @@ import lombok.Data;
 @Data
 public class Operation {
 
+    private boolean root;
     private RootControl rootControl = RootControl.UNCONTROLLED;
 
     public void includeRoot() {
@@ -34,10 +35,6 @@ public class Operation {
 
     public void switchRoot(boolean flag) {
         this.rootControl = flag ? RootControl.INCLUDE_ROOT : RootControl.IGNORE_ROOT;
-    }
-
-    public boolean isUncontrolled() {
-        return rootControl == RootControl.UNCONTROLLED;
     }
 
     public boolean isIncludeRoot() {

@@ -26,8 +26,6 @@ import com.gitee.dorive.base.v1.executor.entity.op.Result;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import com.gitee.dorive.base.v1.executor.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.executor.entity.qry.Page;
-import com.gitee.dorive.base.v1.executor.util.ExampleUtils;
-import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.repository.v1.api.GenericRepository;
 import com.gitee.dorive.repository.v1.impl.repository.ele.AbstractRepositoryContext;
 
@@ -41,6 +39,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     public E selectOneByPrimaryKey(Options options, PK primaryKey) {
         Assert.notNull(primaryKey, "The primary key cannot be null!");
         Query query = getOperationFactory().buildQueryByPK(primaryKey);
+        query.setRoot(true);
         Result<Object> result = executeQuery((Context) options, query);
         return (E) result.getRecord();
     }
@@ -56,6 +55,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     public List<E> selectByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         Query query = getOperationFactory().buildQueryByExample(example);
+        query.setRoot(true);
         Result<Object> result = executeQuery((Context) options, query);
         return (List<E>) result.getRecords();
     }
@@ -66,6 +66,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         Assert.notNull(example, "The example cannot be null!");
         Assert.notNull(example.getPage(), "The page cannot be null!");
         Query query = getOperationFactory().buildQueryByExample(example);
+        query.setRoot(true);
         Result<Object> result = executeQuery((Context) options, query);
         return (Page<E>) result.getPage();
     }
@@ -80,6 +81,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     public int insert(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
         Operation operation = getOperationFactory().buildInsert(Collections.singletonList(entity));
+        operation.setRoot(true);
         return execute((Context) options, operation);
     }
 
@@ -87,6 +89,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     public int update(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
         Operation operation = getOperationFactory().buildUpdate(Collections.singletonList(entity));
+        operation.setRoot(true);
         return execute((Context) options, operation);
     }
 
@@ -95,6 +98,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
         Assert.notNull(entity, "The entity cannot be null!");
         Assert.notNull(example, "The example cannot be null!");
         Operation operation = getOperationFactory().buildUpdateByExample(entity, example);
+        operation.setRoot(true);
         return execute((Context) options, operation);
     }
 
@@ -102,6 +106,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     public int insertOrUpdate(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
         Operation operation = getOperationFactory().buildInsertOrUpdate(Collections.singletonList(entity));
+        operation.setRoot(true);
         return execute((Context) options, operation);
     }
 
@@ -109,6 +114,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     public int delete(Options options, E entity) {
         Assert.notNull(entity, "The entity cannot be null!");
         Operation operation = getOperationFactory().buildDelete(Collections.singletonList(entity));
+        operation.setRoot(true);
         return execute((Context) options, operation);
     }
 
@@ -123,6 +129,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
     public int deleteByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         Operation operation = getOperationFactory().buildDeleteByExample(example);
+        operation.setRoot(true);
         return execute((Context) options, operation);
     }
 
@@ -135,6 +142,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             return 0;
         }
         Operation operation = getOperationFactory().buildInsert(entities);
+        operation.setRoot(true);
         return execute((Context) options, operation);
     }
 
@@ -145,6 +153,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             return 0;
         }
         Operation operation = getOperationFactory().buildUpdate(entities);
+        operation.setRoot(true);
         return execute((Context) options, operation);
     }
 
@@ -155,6 +164,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             return 0;
         }
         Operation operation = getOperationFactory().buildInsertOrUpdate(entities);
+        operation.setRoot(true);
         return execute((Context) options, operation);
     }
 
@@ -165,6 +175,7 @@ public abstract class AbstractGenericRepository<E, PK> extends AbstractRepositor
             return 0;
         }
         Operation operation = getOperationFactory().buildDelete(entities);
+        operation.setRoot(true);
         return execute((Context) options, operation);
     }
 

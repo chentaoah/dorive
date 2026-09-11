@@ -73,7 +73,8 @@ public class RepositoryEventExecutor extends AbstractProxyExecutor {
 
             Class<?> entityClass = entityElement.getGenericType();
             for (EventFactory eventFactory : repositoryEventFactories) {
-                ApplicationEvent applicationEvent = eventFactory.newApplicationEvent(this, entityOp.isUncontrolled(), entityClass, context, entityOp);
+                ApplicationEvent applicationEvent = eventFactory.newApplicationEvent( //
+                        this, entityOp.isRoot(), entityClass, context, entityOp);
                 if (applicationEvent != null) {
                     applicationContext.publishEvent(applicationEvent);
                 }

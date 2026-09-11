@@ -90,6 +90,7 @@ public class DefaultRepositoryItem extends AbstractRepositoryEle implements Repo
     public List<Object> selectByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         Query query = getOperationFactory().buildQueryByExample(example);
+        query.setRoot(true);
         Result<Object> result = executeQuery((Context) options, query);
         return result.getRecords();
     }
@@ -98,6 +99,7 @@ public class DefaultRepositoryItem extends AbstractRepositoryEle implements Repo
     public long selectCountByExample(Options options, Example example) {
         Assert.notNull(example, "The example cannot be null!");
         Query query = getOperationFactory().buildQueryByExample(example);
+        query.setRoot(true);
         return executeCount((Context) options, query);
     }
 
