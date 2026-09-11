@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.executor.api;
+package com.gitee.dorive.executor.v1.api;
 
-import java.util.List;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 
-public interface Selection {
+public interface IndexProvider {
 
-    List<String> select();
+    int indexOf(RepositoryItem repositoryItem);
 
 }

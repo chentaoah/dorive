@@ -25,6 +25,7 @@ import com.gitee.dorive.base.v1.definition.def.OrderByDef;
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.event.api.EventFactory;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.executor.api.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Options;
 import com.gitee.dorive.base.v1.executor.api.Selector;
@@ -187,7 +188,14 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
                 return false;
             }
         }
+        Matcher matcher = options.getOption(Matcher.class);
+        if (matcher != null) {
+            return matcher.matches(repositoryItem);
+        }
         Selector selector = options.getOption(Selector.class);
-        return selector != null && selector.matches(repositoryItem);
+        if (selector != null) {
+            return selector.matches(repositoryItem);
+        }
+        return false;
     }
 }

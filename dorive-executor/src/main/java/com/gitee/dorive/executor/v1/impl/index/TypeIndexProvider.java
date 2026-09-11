@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.impl.matcher;
+package com.gitee.dorive.executor.v1.impl.index;
 
-import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.executor.v1.api.IndexProvider;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -28,11 +28,11 @@ import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TypeMatcher implements Matcher {
+public class TypeIndexProvider implements IndexProvider {
 
     private List<Class<?>> types;
 
-    public TypeMatcher(Class<?>... types) {
+    public TypeIndexProvider(Class<?>... types) {
         this.types = Arrays.stream(types).collect(Collectors.toList());
     }
 
@@ -40,5 +40,4 @@ public class TypeMatcher implements Matcher {
     public int indexOf(RepositoryItem repositoryItem) {
         return types.indexOf(repositoryItem.getEntityClass());
     }
-
 }

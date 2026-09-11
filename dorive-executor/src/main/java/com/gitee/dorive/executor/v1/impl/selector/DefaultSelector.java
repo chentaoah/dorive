@@ -15,15 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.executor.impl.selector;
+package com.gitee.dorive.executor.v1.impl.selector;
 
-import com.gitee.dorive.base.v1.executor.api.Matcher;
-import com.gitee.dorive.base.v1.executor.api.Selection;
 import com.gitee.dorive.base.v1.executor.api.Selector;
-import com.gitee.dorive.base.v1.executor.impl.matcher.AllMatcher;
-import com.gitee.dorive.base.v1.executor.impl.matcher.NoneMatcher;
-import com.gitee.dorive.base.v1.executor.impl.matcher.RootMatcher;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.executor.v1.api.IndexProvider;
+import com.gitee.dorive.executor.v1.entity.Selection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,30 +34,22 @@ import java.util.List;
 @AllArgsConstructor
 public class DefaultSelector implements Selector {
 
-    public static final Selector NONE_SELECTOR = new DefaultSelector(new NoneMatcher());
-    public static final Selector ROOT_SELECTOR = new DefaultSelector(new RootMatcher());
-    public static final Selector ALL_SELECTOR = new DefaultSelector(new AllMatcher());
-
-    private Matcher matcher;
+    private IndexProvider indexProvider;
     private List<Selection> selections;
-
-    public DefaultSelector(Matcher matcher) {
-        this.matcher = matcher;
-    }
 
     @Override
     public boolean matches(RepositoryItem repositoryItem) {
-        return matcher != null && matcher.matches(repositoryItem);
+        return indexProvider != null && indexProvider.indexOf(repositoryItem) >= 0;
     }
 
     @Override
     public List<String> select(RepositoryItem repositoryItem) {
-        if (matcher != null && selections != null) {
-            int index = matcher.indexOf(repositoryItem);
+        if (indexProvider != null && selections != null) {
+            int index = indexProvider.indexOf(repositoryItem);
             if (index >= 0 && index < selections.size()) {
                 Selection selection = selections.get(index);
                 if (selection != null) {
-                    return selection.select();
+                    return selection.getProperties();
                 }
             }
         }

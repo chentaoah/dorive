@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.impl.matcher;
+package com.gitee.dorive.executor.v1.impl.index;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import com.gitee.dorive.base.v1.executor.api.Matcher;
-import com.gitee.dorive.base.v1.executor.api.Selection;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.executor.v1.impl.selection.DefaultSelection;
+import com.gitee.dorive.executor.v1.api.IndexProvider;
+import com.gitee.dorive.executor.v1.entity.Selection;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,12 +31,12 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class NameMatcher implements Matcher {
+public class NameIndexProvider implements IndexProvider {
 
     private List<String> names;
     private List<Selection> selections;
 
-    public NameMatcher(String... strings) {
+    public NameIndexProvider(String... strings) {
         Assert.notEmpty(strings, "The strings cannot be empty!");
         List<String> names = new ArrayList<>(strings.length);
         List<Selection> selections = new ArrayList<>(strings.length);
@@ -46,7 +45,7 @@ public class NameMatcher implements Matcher {
             Selection selection = null;
             if (str.contains("(") && str.contains(")")) {
                 name = StrUtil.subBefore(str, "(", false);
-                selection = new DefaultSelection(StrUtil.subBetween(str, "(", ")"));
+                selection = new Selection(StrUtil.subBetween(str, "(", ")"));
             }
             names.add(name);
             selections.add(selection);
@@ -59,6 +58,5 @@ public class NameMatcher implements Matcher {
     public int indexOf(RepositoryItem repositoryItem) {
         return names.indexOf(repositoryItem.getName());
     }
-
 }
 

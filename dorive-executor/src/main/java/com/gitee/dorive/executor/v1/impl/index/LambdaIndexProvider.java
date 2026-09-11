@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.executor.v1.impl.matcher;
+package com.gitee.dorive.executor.v1.impl.index;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
@@ -23,33 +23,27 @@ import com.baomidou.mybatisplus.core.toolkit.support.LambdaMeta;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.definition.entity.Field;
-import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.executor.v1.api.IndexProvider;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class LambdaMatcher implements Matcher {
+public class LambdaIndexProvider implements IndexProvider {
 
     private Class<?> type;
     private List<java.lang.reflect.Field> fields;
 
-    public LambdaMatcher(Class<?> type) {
-        this.type = type;
-        this.fields = new ArrayList<>(4);
-    }
-
-    public LambdaMatcher(Class<?> type, List<java.lang.reflect.Field> fields) {
+    public LambdaIndexProvider(Class<?> type, List<java.lang.reflect.Field> fields) {
         this.type = type;
         this.fields = fields;
     }
 
-    public <T> LambdaMatcher and(SFunction<T, ?> function) {
+    public <T> LambdaIndexProvider and(SFunction<T, ?> function) {
         LambdaMeta meta = LambdaUtils.extract(function);
         Class<?> instantiatedClass = meta.getInstantiatedClass();
         String fieldName = PropertyNamer.methodToProperty(meta.getImplMethodName());
@@ -74,5 +68,4 @@ public class LambdaMatcher implements Matcher {
         }
         return -1;
     }
-
 }

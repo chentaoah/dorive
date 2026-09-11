@@ -22,15 +22,14 @@ import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.LambdaMeta;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.gitee.dorive.base.v1.executor.api.Options;
-import com.gitee.dorive.base.v1.executor.entity.ctx.DefaultOptions;
-import com.gitee.dorive.base.v1.executor.api.Matcher;
-import com.gitee.dorive.base.v1.executor.api.Selection;
 import com.gitee.dorive.base.v1.executor.api.Selector;
-import com.gitee.dorive.executor.v1.impl.matcher.LambdaMatcher;
-import com.gitee.dorive.executor.v1.impl.matcher.NameMatcher;
-import com.gitee.dorive.executor.v1.impl.matcher.TypeMatcher;
-import com.gitee.dorive.executor.v1.impl.selection.DefaultSelection;
-import com.gitee.dorive.base.v1.executor.impl.selector.DefaultSelector;
+import com.gitee.dorive.base.v1.executor.entity.ctx.DefaultOptions;
+import com.gitee.dorive.executor.v1.api.IndexProvider;
+import com.gitee.dorive.executor.v1.impl.index.LambdaIndexProvider;
+import com.gitee.dorive.executor.v1.impl.index.NameIndexProvider;
+import com.gitee.dorive.executor.v1.impl.index.TypeIndexProvider;
+import com.gitee.dorive.executor.v1.entity.Selection;
+import com.gitee.dorive.executor.v1.impl.selector.DefaultSelector;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -86,41 +85,35 @@ public class Builder {
     }
 
     public Options build() {
-        // Matcher
-        Matcher matcher = null;
-        List<Selection> matcherSelections = null;
+        // IndexProvider
+        IndexProvider indexProvider = null;
+        List<Selection> selections = null;
         if (names != null && names.length > 0) {
-            NameMatcher nameMatcher = new NameMatcher(names);
-            matcher = nameMatcher;
-            matcherSelections = nameMatcher.getSelections();
+            NameIndexProvider nameIndexProvider = new NameIndexProvider(names);
+            indexProvider = nameIndexProvider;
+            selections = nameIndexProvider.getSelections();
 
         } else if (types != null && types.length > 0) {
             if (types.length == 1 && (fields != null && !fields.isEmpty())) {
-                matcher = new LambdaMatcher(types[0], fields);
+                indexProvider = new LambdaIndexProvider(types[0], fields);
             } else {
-                matcher = new TypeMatcher(types);
+                indexProvider = new TypeIndexProvider(types);
             }
         }
 
         // Selector
-        DefaultSelector selector = new DefaultSelector();
-        if (matcher != null) {
-            selector.setMatcher(matcher);
-        }
-        if (matcherSelections != null) {
-            selector.setSelections(matcherSelections);
-        }
-        if (selections != null && selections.length > 0) {
-            selector.setSelections(Arrays.stream(selections).map(this::newSelection).collect(Collectors.toList()));
+        DefaultSelector defaultSelector = new DefaultSelector(indexProvider, selections);
+        if (this.selections != null && this.selections.length > 0) {
+            defaultSelector.setSelections(Arrays.stream(this.selections).map(this::newSelection).collect(Collectors.toList()));
         }
 
         // Options
         Options options = new DefaultOptions();
-        options.setOption(Selector.class, selector);
+        options.setOption(Selector.class, defaultSelector);
         return options;
     }
 
     private Selection newSelection(String string) {
-        return StringUtils.isNotBlank(string) ? new DefaultSelection(string) : null;
+        return StringUtils.isNotBlank(string) ? new Selection(string) : null;
     }
 }
