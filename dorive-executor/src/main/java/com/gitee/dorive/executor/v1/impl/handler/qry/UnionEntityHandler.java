@@ -29,7 +29,7 @@ import com.gitee.dorive.base.v1.executor.entity.qry.UnionExample;
 import com.gitee.dorive.base.v1.executor.api.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
-import com.gitee.dorive.executor.v1.util.KeyValueJoiner;
+import com.gitee.dorive.executor.v1.impl.util.KeyValueJoiner;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
