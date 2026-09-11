@@ -61,7 +61,7 @@ public class ExampleExecutor extends AbstractProxyExecutor {
             exampleSerializer.serialize(context, example);
         }
         if (example instanceof UnionExample) {
-            convertUnion(context, (UnionExample) example);
+            serialize(context, (UnionExample) example);
         }
         return super.executeQuery(context, query);
     }
@@ -84,22 +84,22 @@ public class ExampleExecutor extends AbstractProxyExecutor {
             }
         }
         if (operation instanceof Update) {
-            convertUpdate((Update) operation);
+            serialize((Update) operation);
         }
         if (operation instanceof ConditionUpdate) {
-            convertConditionUpdate((ConditionUpdate) operation);
+            serialize((ConditionUpdate) operation);
         }
         return super.execute(context, operation);
     }
 
-    private void convertUnion(Context context, UnionExample unionExample) {
+    private void serialize(Context context, UnionExample unionExample) {
         List<Example> examples = unionExample.getExamples();
         for (Example example : examples) {
             exampleSerializer.serialize(context, example.getCriteria());
         }
     }
 
-    private void convertUpdate(Update update) {
+    private void serialize(Update update) {
         Set<String> nullableProps = update.getNullableProps();
         if (nullableProps != null && !nullableProps.isEmpty()) {
             nullableProps = entityMapper.serialize(nullableProps);
@@ -107,7 +107,7 @@ public class ExampleExecutor extends AbstractProxyExecutor {
         }
     }
 
-    private void convertConditionUpdate(ConditionUpdate conditionUpdate) {
+    private void serialize(ConditionUpdate conditionUpdate) {
         Set<String> nullableProps = conditionUpdate.getNullableProps();
         if (nullableProps != null && !nullableProps.isEmpty()) {
             nullableProps = entityMapper.serialize(nullableProps);
