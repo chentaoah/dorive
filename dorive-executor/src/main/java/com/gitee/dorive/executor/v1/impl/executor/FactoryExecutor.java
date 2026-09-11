@@ -24,7 +24,7 @@ import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityFactory;
 import com.gitee.dorive.base.v1.executor.entity.qry.Page;
 import com.gitee.dorive.base.v1.executor.entity.op.Result;
-import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
+import com.gitee.dorive.base.v1.executor.entity.eop.EntityOp;
 import com.gitee.dorive.base.v1.executor.entity.op.Operation;
 import com.gitee.dorive.base.v1.executor.entity.cop.ConditionUpdate;
 import com.gitee.dorive.base.v1.executor.entity.cop.Query;

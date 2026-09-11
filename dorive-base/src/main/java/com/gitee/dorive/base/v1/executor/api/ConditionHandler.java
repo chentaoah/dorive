@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.base.v1.executor.api;
 
-import com.gitee.dorive.base.v1.executor.entity.op.Condition;
+import com.gitee.dorive.base.v1.executor.entity.cop.Condition;
 
 public interface ConditionHandler {
 

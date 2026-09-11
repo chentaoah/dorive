@@ -22,7 +22,7 @@ import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.eop.Insert;
 import com.gitee.dorive.base.v1.executor.entity.eop.InsertOrUpdate;
 import com.gitee.dorive.base.v1.executor.entity.eop.Update;
-import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
+import com.gitee.dorive.base.v1.executor.entity.eop.EntityOp;
 import com.gitee.dorive.base.v1.executor.entity.op.Operation;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.event.api.EventFactory;

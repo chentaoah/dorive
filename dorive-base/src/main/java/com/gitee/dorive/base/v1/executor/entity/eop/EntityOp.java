@@ -15,29 +15,22 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.executor.entity.op;
+package com.gitee.dorive.base.v1.executor.entity.eop;
 
-import com.gitee.dorive.base.v1.executor.entity.qry.Example;
+import com.gitee.dorive.base.v1.executor.entity.op.Operation;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
-public class Condition extends Operation {
+public class EntityOp extends Operation {
 
-    private Object primaryKey;
-    private Example example;
+    private List<?> entities;
 
-    public Condition(Object primaryKey) {
-        this.primaryKey = primaryKey;
-    }
-
-    public Condition(Example example) {
-        this.example = example;
-    }
-
-    public boolean isEmpty() {
-        return primaryKey == null && example == null;
+    public EntityOp(List<?> entities) {
+        this.entities = entities;
     }
 
 }

@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.base.v1.executor.entity.eop;
 
-import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
 import lombok.Getter;
 import lombok.Setter;
 

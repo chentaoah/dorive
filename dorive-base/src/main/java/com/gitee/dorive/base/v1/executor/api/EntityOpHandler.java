@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.base.v1.executor.api;
 
-import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
+import com.gitee.dorive.base.v1.executor.entity.eop.EntityOp;
 
 public interface EntityOpHandler {
 

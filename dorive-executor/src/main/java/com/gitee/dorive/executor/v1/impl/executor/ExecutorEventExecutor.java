@@ -20,7 +20,7 @@ package com.gitee.dorive.executor.v1.impl.executor;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
+import com.gitee.dorive.base.v1.executor.entity.eop.EntityOp;
 import com.gitee.dorive.base.v1.executor.entity.op.Operation;
 import com.gitee.dorive.base.v1.event.api.EventFactory;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;

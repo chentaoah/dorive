@@ -25,7 +25,7 @@ import com.gitee.dorive.base.v1.factory.api.example.ExampleSerializer;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
-import com.gitee.dorive.base.v1.executor.entity.op.Condition;
+import com.gitee.dorive.base.v1.executor.entity.cop.Condition;
 import com.gitee.dorive.base.v1.executor.entity.op.Operation;
 import com.gitee.dorive.base.v1.executor.entity.cop.ConditionUpdate;
 import com.gitee.dorive.base.v1.executor.entity.cop.Query;

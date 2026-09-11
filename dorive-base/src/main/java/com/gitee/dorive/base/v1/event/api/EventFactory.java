@@ -18,7 +18,7 @@
 package com.gitee.dorive.base.v1.event.api;
 
 import com.gitee.dorive.base.v1.executor.api.Context;
-import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
+import com.gitee.dorive.base.v1.executor.entity.eop.EntityOp;
 import org.springframework.context.ApplicationEvent;
 
 public interface EventFactory {

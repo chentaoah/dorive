@@ -18,7 +18,7 @@
 package com.gitee.dorive.event.v1.entity;
 
 import com.gitee.dorive.base.v1.executor.api.Context;
-import com.gitee.dorive.base.v1.executor.entity.op.EntityOp;
+import com.gitee.dorive.base.v1.executor.entity.eop.EntityOp;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;

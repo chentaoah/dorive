@@ -18,7 +18,6 @@
 package com.gitee.dorive.base.v1.executor.entity.cop;
 
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
-import com.gitee.dorive.base.v1.executor.entity.op.Condition;
 import lombok.Getter;
 import lombok.Setter;
 
