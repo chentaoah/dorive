@@ -25,7 +25,7 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.binder.api.Processor;
-import com.gitee.dorive.base.v1.binder.enums.BindingType;
+import com.gitee.dorive.binder.v1.enums.BindingType;
 import com.gitee.dorive.base.v1.binder.enums.JoinType;
 import com.gitee.dorive.base.v1.definition.def.BindingDef;
 import com.gitee.dorive.base.v1.definition.def.EntityDef;
