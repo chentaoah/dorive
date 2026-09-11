@@ -27,7 +27,7 @@ import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.factory.v1.impl.mapper.FieldMapping;
 import com.gitee.dorive.factory.v1.api.EntityMapperManager;
 import com.gitee.dorive.factory.v1.impl.mapper.DefaultEntityMapper;
-import com.gitee.dorive.factory.v1.util.TypeUtils;
+import com.gitee.dorive.factory.v1.impl.util.TypeUtils;
 import lombok.Getter;
 import lombok.Setter;
 
