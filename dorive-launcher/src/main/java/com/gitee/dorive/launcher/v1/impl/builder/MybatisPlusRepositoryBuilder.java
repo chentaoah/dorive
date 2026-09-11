@@ -41,6 +41,7 @@ import com.gitee.dorive.executor.v1.impl.factory.DefaultOperationFactory;
 import com.gitee.dorive.factory.v1.api.EntityMapperManager;
 import com.gitee.dorive.factory.v1.impl.builder.EntityFactoryBuilder;
 import com.gitee.dorive.factory.v1.impl.builder.EntityMapperManagerBuilder;
+import com.gitee.dorive.factory.v1.impl.example.DefaultExampleSerializer;
 import com.gitee.dorive.mybatis.plus.v1.impl.common.DefaultMethodInvoker;
 import com.gitee.dorive.mybatis.plus.v1.impl.executor.MybatisPlusExecutor;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
@@ -81,14 +82,14 @@ public class MybatisPlusRepositoryBuilder {
                 repository, entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(), entityMapperManager);
         EntityFactory entityFactory = entityFactoryBuilder.newEntityFactory();
 
+        // 查询条件转换器
+        ExampleSerializer exampleSerializer = new DefaultExampleSerializer(entityMapper);
+
         // 执行器
         Executor executor = newExecutor(entityElement, entityStoreInfo);
         executor = new UnionExecutor(executor, repository.getSqlRunner(), entityStoreInfo);
         executor = new FactoryExecutor(executor, entityElement, entityStoreInfo.getIdProperty(), entityFactory);
-        executor = new ExampleExecutor(executor, entityElement, entityMapper);
-
-        // 查询条件转换器
-        ExampleSerializer exampleSerializer = (ExampleSerializer) executor;
+        executor = new ExampleExecutor(executor, entityElement, entityMapper, exampleSerializer);
 
         repository.setProperty(EntityStoreInfo.class, entityStoreInfo);
         repository.setProperty(EntityMapperManager.class, entityMapperManager);

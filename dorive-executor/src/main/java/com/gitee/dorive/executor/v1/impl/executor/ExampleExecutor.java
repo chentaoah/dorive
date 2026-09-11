@@ -17,11 +17,8 @@
 
 package com.gitee.dorive.executor.v1.impl.executor;
 
-import com.gitee.dorive.base.v1.definition.constant.Operator;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
-import com.gitee.dorive.base.v1.executor.entity.qry.Criterion;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
-import com.gitee.dorive.base.v1.executor.entity.qry.OrderBy;
 import com.gitee.dorive.base.v1.executor.entity.op.Result;
 import com.gitee.dorive.base.v1.executor.entity.qry.UnionExample;
 import com.gitee.dorive.base.v1.factory.api.example.ExampleSerializer;
@@ -33,7 +30,6 @@ import com.gitee.dorive.base.v1.executor.entity.op.Operation;
 import com.gitee.dorive.base.v1.executor.entity.cop.ConditionUpdate;
 import com.gitee.dorive.base.v1.executor.entity.cop.Query;
 import com.gitee.dorive.base.v1.executor.entity.eop.Update;
-import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,22 +38,27 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSerializer {
+public class ExampleExecutor extends AbstractProxyExecutor {
 
     private EntityElement entityElement;
     private EntityMapper entityMapper;
+    private ExampleSerializer exampleSerializer;
 
-    public ExampleExecutor(Executor executor, EntityElement entityElement, EntityMapper entityMapper) {
+    public ExampleExecutor(Executor executor, //
+                           EntityElement entityElement, //
+                           EntityMapper entityMapper, //
+                           ExampleSerializer exampleSerializer) {
         super(executor);
         this.entityElement = entityElement;
         this.entityMapper = entityMapper;
+        this.exampleSerializer = exampleSerializer;
     }
 
     @Override
     public Result<Object> executeQuery(Context context, Query query) {
         Example example = query.getExample();
         if (example != null) {
-            serialize(context, example);
+            exampleSerializer.serialize(context, example);
         }
         if (example instanceof UnionExample) {
             convertUnion(context, (UnionExample) example);
@@ -69,7 +70,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
     public long executeCount(Context context, Query query) {
         Example example = query.getExample();
         if (example != null) {
-            serialize(context, example);
+            exampleSerializer.serialize(context, example);
         }
         return super.executeCount(context, query);
     }
@@ -79,7 +80,7 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
         if (operation instanceof Condition condition) {
             Example example = condition.getExample();
             if (example != null) {
-                serialize(context, example);
+                exampleSerializer.serialize(context, example);
             }
         }
         if (operation instanceof Update) {
@@ -91,17 +92,10 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
         return super.execute(context, operation);
     }
 
-    @Override
-    public void serialize(Context context, Example example) {
-        convertSelectProps(example);
-        convertCriteria(context, example);
-        convertOrderBy(example);
-    }
-
     private void convertUnion(Context context, UnionExample unionExample) {
         List<Example> examples = unionExample.getExamples();
         for (Example example : examples) {
-            convertCriteria(context, example);
+            exampleSerializer.serialize(context, example.getCriteria());
         }
     }
 
@@ -118,63 +112,6 @@ public class ExampleExecutor extends AbstractProxyExecutor implements ExampleSer
         if (nullableProps != null && !nullableProps.isEmpty()) {
             nullableProps = entityMapper.serialize(nullableProps);
             conditionUpdate.setNullableProps(nullableProps);
-        }
-    }
-
-    private void convertSelectProps(Example example) {
-        List<String> properties = example.getSelectProps();
-        if (properties != null && !properties.isEmpty()) {
-            properties = entityMapper.serialize(properties);
-            example.setSelectProps(properties);
-        }
-    }
-
-    private void convertCriteria(Context context, Example example) {
-        List<Criterion> criteria = example.getCriteria();
-        if (criteria != null && !criteria.isEmpty()) {
-            for (Criterion criterion : criteria) {
-                String operator = criterion.getOperator();
-                if (Operator.AND.equals(operator) || Operator.OR.equals(operator)) {
-                    Object value = criterion.getValue();
-                    if (value instanceof Example) {
-                        serialize(context, (Example) value);
-                    }
-                } else if (Operator.MULTI_IN.equals(operator)) {
-                    Object value = criterion.getValue();
-                    if (value instanceof MultiInBuilder builder) {
-                        List<String> properties = builder.getProperties();
-                        properties = entityMapper.serialize(properties);
-                        builder.setProperties(properties);
-                        criterion.setProperty(builder.buildPropertiesStr());
-                        criterion.setValue(builder.buildValuesStr());
-                    }
-                } else {
-                    doConvertCriteria(criterion);
-                }
-            }
-        }
-    }
-
-    private void doConvertCriteria(Criterion criterion) {
-        String property = criterion.getProperty();
-        Object value = criterion.getValue();
-        // 如果是field
-        String alias = entityMapper.serialize(property);
-        if (alias != null) {
-            value = entityMapper.serialize(property, value);
-            property = alias;
-        }
-        // 重新设置回去
-        criterion.setProperty(property);
-        criterion.setValue(value);
-    }
-
-    private void convertOrderBy(Example example) {
-        OrderBy orderBy = example.getOrderBy();
-        if (orderBy != null) {
-            List<String> properties = orderBy.getProperties();
-            properties = entityMapper.serialize(properties);
-            orderBy.setProperties(properties);
         }
     }
 
