@@ -64,7 +64,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractGenericRepo
             queryMode = isCustomMethod(query, count) ? QueryMode.SQL_CUSTOM : QueryMode.SQL_EXECUTE;
         }
         // 上下文未匹配
-        if (!matches(options, getRootRepository())) {
+        if (!matches(options, null, getRootRepository())) {
             return contextMismatchQueryExecutor;
         }
         if (queryMode == QueryMode.STEPWISE) {

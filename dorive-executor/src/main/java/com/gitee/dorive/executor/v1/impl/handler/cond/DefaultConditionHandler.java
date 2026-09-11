@@ -44,7 +44,7 @@ public class DefaultConditionHandler implements ConditionHandler {
                 OperationFactory operationFactory = repositoryItem.getOperationFactory();
                 Operation operation = operationFactory.buildUpdateByExample( //
                         conditionUpdate.getEntity(), ExampleUtils.clone(condition.getExample()));
-                operation.switchRoot(isMatch);
+                operation.setMatched(isMatch);
                 totalCount.addAndGet(repositoryItem.execute(context, operation));
             });
 
@@ -53,7 +53,7 @@ public class DefaultConditionHandler implements ConditionHandler {
                 OperationFactory operationFactory = repositoryItem.getOperationFactory();
                 Operation operation = operationFactory.buildDeleteByExample( //
                         ExampleUtils.clone(condition.getExample()));
-                operation.switchRoot(isMatch);
+                operation.setMatched(isMatch);
                 totalCount.addAndGet(repositoryItem.execute(context, operation));
             });
         }
@@ -63,14 +63,11 @@ public class DefaultConditionHandler implements ConditionHandler {
     private void execute(Context context, Condition condition, AtomicInteger totalCount, Executor executor) {
         for (RepositoryItem repositoryItem : repositoryContext.getOrderedRepositories()) {
             if (repositoryItem.isRoot()) {
-                if (condition.isNotIgnoreRoot()) {
-                    boolean isMatch = repositoryContext.matches(context, repositoryItem);
-                    if (isMatch || condition.isIncludeRoot()) {
-                        totalCount.addAndGet(repositoryItem.execute(context, condition));
-                    }
+                if (repositoryContext.matches(context, condition, repositoryItem)) {
+                    totalCount.addAndGet(repositoryItem.execute(context, condition));
                 }
             } else {
-                boolean isMatch = repositoryContext.matches(context, repositoryItem);
+                boolean isMatch = repositoryContext.matches(context, null, repositoryItem);
                 if (isMatch || repositoryItem.isAggregated()) {
                     executor.execute(repositoryItem, isMatch);
                 }

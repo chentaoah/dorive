@@ -36,7 +36,7 @@ public class ContextMatchEntityHandler implements EntityHandler {
 
     @Override
     public long handle(Context context, List<Object> entities) {
-        return repositoryContext.matches(context, repositoryItem) ? entityHandler.handle(context, entities) : 0L;
+        return repositoryContext.matches(context, null, repositoryItem) ? entityHandler.handle(context, entities) : 0L;
     }
 
 }

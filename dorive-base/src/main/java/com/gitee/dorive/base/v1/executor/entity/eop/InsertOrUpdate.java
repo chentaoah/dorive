@@ -35,13 +35,24 @@ public class InsertOrUpdate extends EntityOp {
     }
 
     @Override
-    public void switchRoot(boolean flag) {
-        super.switchRoot(flag);
+    public void setRoot(boolean root) {
+        super.setRoot(root);
         if (insert != null) {
-            insert.switchRoot(flag);
+            insert.setRoot(root);
         }
         if (update != null) {
-            update.switchRoot(flag);
+            update.setRoot(root);
+        }
+    }
+
+    @Override
+    public void setMatched(Boolean matched) {
+        super.setMatched(matched);
+        if (insert != null) {
+            insert.setMatched(matched);
+        }
+        if (update != null) {
+            update.setMatched(matched);
         }
     }
 

@@ -51,7 +51,7 @@ public class RepositoryExecutor extends AbstractExecutor implements EntityHandle
     public Result<Object> executeQuery(Context context, Query query) {
         Assert.isTrue(!query.isEmpty(), "The query cannot be empty!");
         RepositoryItem rootRepository = repositoryContext.getRootRepository();
-        if (repositoryContext.matches(context, rootRepository) || query.isIncludeRoot()) {
+        if (repositoryContext.matches(context, query, rootRepository)) {
             Result<Object> result = rootRepository.executeQuery(context, query);
             List<Object> entities = result.getRecords();
             if (!entities.isEmpty()) {

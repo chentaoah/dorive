@@ -17,7 +17,6 @@
 
 package com.gitee.dorive.base.v1.executor.entity.op;
 
-import com.gitee.dorive.base.v1.executor.enums.RootControl;
 import lombok.Data;
 
 /**
@@ -25,24 +24,14 @@ import lombok.Data;
  */
 @Data
 public class Operation {
-
     private boolean root;
-    private RootControl rootControl = RootControl.UNCONTROLLED;
+    private Boolean matched;
 
-    public void includeRoot() {
-        this.rootControl = RootControl.INCLUDE_ROOT;
+    public boolean isMatched() {
+        return matched != null && matched;
     }
 
-    public void switchRoot(boolean flag) {
-        this.rootControl = flag ? RootControl.INCLUDE_ROOT : RootControl.IGNORE_ROOT;
+    public boolean isNotMatched() {
+        return matched != null && !matched;
     }
-
-    public boolean isIncludeRoot() {
-        return rootControl == RootControl.INCLUDE_ROOT;
-    }
-
-    public boolean isNotIgnoreRoot() {
-        return rootControl != RootControl.IGNORE_ROOT;
-    }
-
 }

@@ -51,7 +51,7 @@ public class DefaultEntityHandler implements EntityHandler {
             return 0L;
         }
         Query query = operationFactory.buildQueryByExample(example);
-        query.includeRoot();
+        query.setMatched(true);
         Result<Object> result = repositoryItem.executeQuery(context, query);
         entityJoiner.join(context, entities, result.getRecords());
         return result.getCount();

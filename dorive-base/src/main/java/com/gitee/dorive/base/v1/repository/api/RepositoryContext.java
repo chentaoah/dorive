@@ -20,6 +20,7 @@ package com.gitee.dorive.base.v1.repository.api;
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.event.api.EventFactory;
 import com.gitee.dorive.base.v1.executor.api.Options;
+import com.gitee.dorive.base.v1.executor.entity.op.Operation;
 import org.springframework.context.ApplicationContext;
 
 import java.util.List;
@@ -43,6 +44,6 @@ public interface RepositoryContext extends RepositoryEle {
 
     List<EventFactory> getRepositoryEventFactories();
 
-    boolean matches(Options options, RepositoryItem repositoryItem);
+    boolean matches(Options options, Operation operation, RepositoryItem repositoryItem);
 
 }

@@ -52,7 +52,7 @@ public class UnionEntityHandler implements EntityHandler {
         if (!example.isEmpty()) {
             OperationFactory operationFactory = repositoryItem.getOperationFactory();
             Query query = operationFactory.buildQueryByExample(example);
-            query.includeRoot();
+            query.setMatched(true);
             Result<Object> result = repositoryItem.executeQuery(context, query);
             keyValueJoiner.setCollectionSize(result.getRecords().size() / entities.size() + 1);
             handleResult(keyValueJoiner, result);
