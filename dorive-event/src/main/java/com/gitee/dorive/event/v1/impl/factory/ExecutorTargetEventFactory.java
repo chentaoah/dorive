@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.v1.factory;
+package com.gitee.dorive.event.v1.impl.factory;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ReflectUtil;
@@ -29,11 +29,11 @@ import java.util.List;
 
 @Getter
 @Setter
-public class RepositoryTargetEventFactory extends RepositoryEventFactory {
+public class ExecutorTargetEventFactory extends ExecutorEventFactory {
 
     private final Class<?> target;
 
-    public RepositoryTargetEventFactory(Class<?> source, Class<?> target) {
+    public ExecutorTargetEventFactory(Class<?> source, Class<?> target) {
         super(source);
         this.target = target;
     }
