@@ -20,7 +20,7 @@ package com.gitee.dorive.query.v2.impl.segment;
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.executor.api.Context;
-import com.gitee.dorive.base.v1.executor.util.CriterionUtils;
+import com.gitee.dorive.base.v1.executor.impl.util.CriterionUtils;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.query.v2.entity.segment.ConditionInfo;

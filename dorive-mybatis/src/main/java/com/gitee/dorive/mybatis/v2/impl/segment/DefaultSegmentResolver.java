@@ -21,7 +21,7 @@ import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.definition.constant.Operator;
 import com.gitee.dorive.base.v1.executor.entity.qry.Criterion;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
-import com.gitee.dorive.base.v1.executor.util.CriterionUtils;
+import com.gitee.dorive.base.v1.executor.impl.util.CriterionUtils;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;

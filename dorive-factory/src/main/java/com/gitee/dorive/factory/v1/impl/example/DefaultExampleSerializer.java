@@ -5,7 +5,7 @@ import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.qry.Criterion;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import com.gitee.dorive.base.v1.executor.entity.qry.OrderBy;
-import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
+import com.gitee.dorive.base.v1.executor.impl.util.MultiInBuilder;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
 import com.gitee.dorive.base.v1.factory.api.example.ExampleSerializer;
 import lombok.AllArgsConstructor;

@@ -23,7 +23,7 @@ import com.gitee.dorive.base.v1.definition.entity.Field;
 import com.gitee.dorive.base.v1.definition.entity.QueryDefinition;
 import com.gitee.dorive.base.v1.executor.entity.qry.OrderBy;
 import com.gitee.dorive.base.v1.executor.entity.qry.Page;
-import com.gitee.dorive.base.v1.executor.util.StringUtils;
+import com.gitee.dorive.base.v1.executor.impl.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

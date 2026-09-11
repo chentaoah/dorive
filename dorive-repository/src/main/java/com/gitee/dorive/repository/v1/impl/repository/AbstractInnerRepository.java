@@ -23,7 +23,7 @@ import com.gitee.dorive.base.v1.executor.entity.ctx.DefaultContext;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import com.gitee.dorive.base.v1.executor.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.executor.entity.qry.Page;
-import com.gitee.dorive.base.v1.executor.util.ExampleUtils;
+import com.gitee.dorive.base.v1.executor.impl.util.ExampleUtils;
 
 import java.util.List;
 

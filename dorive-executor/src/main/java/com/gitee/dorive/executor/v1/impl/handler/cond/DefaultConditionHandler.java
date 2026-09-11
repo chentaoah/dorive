@@ -24,7 +24,7 @@ import com.gitee.dorive.base.v1.executor.entity.cop.ConditionDelete;
 import com.gitee.dorive.base.v1.executor.entity.cop.ConditionUpdate;
 import com.gitee.dorive.base.v1.executor.entity.op.Condition;
 import com.gitee.dorive.base.v1.executor.entity.op.Operation;
-import com.gitee.dorive.base.v1.executor.util.ExampleUtils;
+import com.gitee.dorive.base.v1.executor.impl.util.ExampleUtils;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.AllArgsConstructor;

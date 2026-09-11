@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.executor.util;
+package com.gitee.dorive.base.v1.executor.impl.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;

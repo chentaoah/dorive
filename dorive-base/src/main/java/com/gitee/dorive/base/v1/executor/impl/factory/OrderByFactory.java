@@ -21,7 +21,7 @@ import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.base.v1.definition.constant.Sort;
 import com.gitee.dorive.base.v1.definition.def.OrderByDef;
 import com.gitee.dorive.base.v1.executor.entity.qry.OrderBy;
-import com.gitee.dorive.base.v1.executor.util.ExampleUtils;
+import com.gitee.dorive.base.v1.executor.impl.util.ExampleUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 

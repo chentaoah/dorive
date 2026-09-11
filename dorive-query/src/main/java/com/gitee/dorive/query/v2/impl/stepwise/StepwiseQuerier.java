@@ -24,7 +24,7 @@ import com.gitee.dorive.base.v1.executor.api.Options;
 import com.gitee.dorive.base.v1.executor.entity.ctx.DefaultContext;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import com.gitee.dorive.base.v1.executor.entity.qry.InnerExample;
-import com.gitee.dorive.base.v1.executor.util.MultiInBuilder;
+import com.gitee.dorive.base.v1.executor.impl.util.MultiInBuilder;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.Data;
