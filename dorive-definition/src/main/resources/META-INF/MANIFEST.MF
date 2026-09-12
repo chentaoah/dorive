@@ -12,23 +12,25 @@ X-Module-Configs: null
 X-Module-Exports: **
 X-Module-Requires: ~,
  com.gitee.dorive.base.v1.definition.annotation.Entity,
- com.gitee.dorive.base.v1.definition.annotation.Property,
  com.gitee.dorive.base.v1.definition.def.BindingDef,
  com.gitee.dorive.base.v1.definition.def.EntityDef,
+ com.gitee.dorive.base.v1.definition.def.FieldDef,
+ com.gitee.dorive.base.v1.definition.def.OrderByDef,
  com.gitee.dorive.base.v1.definition.def.QueryDef,
  com.gitee.dorive.base.v1.definition.def.QueryFieldDef,
  com.gitee.dorive.base.v1.definition.entity.EntityDefinition,
  com.gitee.dorive.base.v1.definition.entity.EntityElement,
  com.gitee.dorive.base.v1.definition.entity.FieldDefinition,
  com.gitee.dorive.base.v1.definition.entity.FieldEntityDefinition,
- com.gitee.dorive.base.v1.definition.entity.PropertyDefinition,
  com.gitee.dorive.base.v1.definition.entity.QueryDefinition,
  com.gitee.dorive.base.v1.definition.entity.QueryFieldDefinition,
- com.gitee.dorive.base.v1.executor.util.ReflectUtils
+ com.gitee.dorive.base.v1.executor.impl.util.ReflectUtils
 X-Module-Provides: ~,
  com.gitee.dorive.base.v1.definition.api.EntityTypeResolver,
  com.gitee.dorive.base.v1.definition.api.QueryTypeResolver
 X-Module-Notifies: null
 X-Module-Waits: null
+X-Module-Publishes: null
+X-Module-Subscribes: null
 X-Module-Table-Prefix: null
 X-Module-Request-Prefix: null

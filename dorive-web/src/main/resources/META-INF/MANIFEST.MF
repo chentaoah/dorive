@@ -11,11 +11,15 @@ X-Module-Profiles: null
 X-Module-Configs: null
 X-Module-Exports: **
 X-Module-Requires: ~,
+ com.gitee.dorive.base.v1.definition.annotation.UniqueConstraint,
  com.gitee.dorive.base.v1.executor.api.Options,
+ com.gitee.dorive.base.v1.executor.entity.qry.Example,
  com.gitee.dorive.base.v1.executor.entity.qry.Page,
- com.gitee.dorive.base.v1.executor.util.ReflectUtils
+ com.gitee.dorive.base.v1.executor.impl.util.ReflectUtils
 X-Module-Provides: null
 X-Module-Notifies: null
 X-Module-Waits: null
+X-Module-Publishes: null
+X-Module-Subscribes: null
 X-Module-Table-Prefix: null
 X-Module-Request-Prefix: null

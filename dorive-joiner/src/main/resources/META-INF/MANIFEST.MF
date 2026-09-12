@@ -20,5 +20,7 @@ X-Module-Requires: ~,
 X-Module-Provides: com.gitee.dorive.base.v1.joiner.api.EntityJoiner
 X-Module-Notifies: null
 X-Module-Waits: null
+X-Module-Publishes: null
+X-Module-Subscribes: null
 X-Module-Table-Prefix: null
 X-Module-Request-Prefix: null

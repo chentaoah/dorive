@@ -13,11 +13,14 @@ X-Module-Exports: **
 X-Module-Requires: ~,
  com.gitee.dorive.base.v1.binder.enums.JoinType,
  com.gitee.dorive.base.v1.definition.def.BindingDef,
+ com.gitee.dorive.base.v1.definition.def.EntityDef,
+ com.gitee.dorive.base.v1.definition.entity.EntityElement,
  com.gitee.dorive.base.v1.definition.entity.FieldDefinition,
  com.gitee.dorive.base.v1.executor.api.Context,
  com.gitee.dorive.base.v1.executor.entity.qry.Example,
  com.gitee.dorive.base.v1.executor.entity.qry.InnerExample,
- com.gitee.dorive.base.v1.executor.util.MultiInBuilder,
+ com.gitee.dorive.base.v1.executor.impl.util.MultiInBuilder,
+ com.gitee.dorive.base.v1.repository.api.RepositoryContext,
  com.gitee.dorive.base.v1.repository.api.RepositoryItem
 X-Module-Provides: ~,
  com.gitee.dorive.base.v1.binder.api.Binder,
@@ -26,5 +29,7 @@ X-Module-Provides: ~,
  com.gitee.dorive.base.v1.binder.api.Processor
 X-Module-Notifies: null
 X-Module-Waits: null
+X-Module-Publishes: null
+X-Module-Subscribes: null
 X-Module-Table-Prefix: null
 X-Module-Request-Prefix: null

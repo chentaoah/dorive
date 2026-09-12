@@ -10,11 +10,11 @@ X-Module-Tags: null
 X-Module-Profiles: null
 X-Module-Configs: null
 X-Module-Exports: **
-X-Module-Requires: ~,
- com.gitee.dorive.base.v1.definition.api.BoundedContext,
- com.gitee.dorive.base.v1.definition.api.BoundedContextAware
+X-Module-Requires: null
 X-Module-Provides: null
 X-Module-Notifies: null
 X-Module-Waits: null
+X-Module-Publishes: null
+X-Module-Subscribes: null
 X-Module-Table-Prefix: null
 X-Module-Request-Prefix: null

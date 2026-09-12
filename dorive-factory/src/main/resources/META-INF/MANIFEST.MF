@@ -11,34 +11,26 @@ X-Module-Profiles: null
 X-Module-Configs: null
 X-Module-Exports: **
 X-Module-Requires: ~,
- com.gitee.dorive.base.v1.definition.api.BoundedContext,
  com.gitee.dorive.base.v1.definition.constant.Operator,
  com.gitee.dorive.base.v1.definition.def.FieldDef,
- com.gitee.dorive.base.v1.definition.def.PropertyDef,
+ com.gitee.dorive.base.v1.definition.def.RepositoryDef,
  com.gitee.dorive.base.v1.definition.entity.EntityElement,
  com.gitee.dorive.base.v1.definition.entity.FieldDefinition,
- com.gitee.dorive.base.v1.definition.entity.PropertyDefinition,
  com.gitee.dorive.base.v1.executor.api.Context,
- com.gitee.dorive.base.v1.executor.entity.cop.ConditionUpdate,
- com.gitee.dorive.base.v1.executor.entity.cop.Query,
- com.gitee.dorive.base.v1.executor.entity.eop.Insert,
- com.gitee.dorive.base.v1.executor.entity.eop.Update,
- com.gitee.dorive.base.v1.executor.entity.cop.Condition,
- com.gitee.dorive.base.v1.executor.entity.eop.EntityOp,
- com.gitee.dorive.base.v1.executor.entity.op.Operation,
- com.gitee.dorive.base.v1.executor.entity.op.Result,
  com.gitee.dorive.base.v1.executor.entity.qry.Criterion,
  com.gitee.dorive.base.v1.executor.entity.qry.Example,
  com.gitee.dorive.base.v1.executor.entity.qry.OrderBy,
- com.gitee.dorive.base.v1.executor.entity.qry.Page,
- com.gitee.dorive.base.v1.executor.entity.qry.UnionExample,
- com.gitee.dorive.base.v1.executor.api.Executor,
- com.gitee.dorive.executor.v1.impl.executor.AbstractProxyExecutor,
- com.gitee.dorive.base.v1.executor.util.MultiInBuilder,
- com.gitee.dorive.base.v1.factory.api.name.NameSerializer,
- com.gitee.dorive.factory.v1.api.NameSerializerManager
-X-Module-Provides: com.gitee.dorive.base.v1.factory.api.example.ExampleSerializer
+ com.gitee.dorive.base.v1.executor.impl.util.MultiInBuilder,
+ com.gitee.dorive.base.v1.repository.api.RepositoryContext
+X-Module-Provides: ~,
+ com.gitee.dorive.base.v1.factory.api.entity.EntityDeserializer,
+ com.gitee.dorive.base.v1.factory.api.entity.EntityFactory,
+ com.gitee.dorive.base.v1.factory.api.entity.EntityMapper,
+ com.gitee.dorive.base.v1.factory.api.entity.EntitySerializer,
+ com.gitee.dorive.base.v1.factory.api.example.ExampleSerializer
 X-Module-Notifies: null
 X-Module-Waits: null
+X-Module-Publishes: null
+X-Module-Subscribes: null
 X-Module-Table-Prefix: null
 X-Module-Request-Prefix: null
