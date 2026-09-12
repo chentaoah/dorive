@@ -85,7 +85,7 @@ import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
 import com.gitee.dorive.repository.v1.impl.repository.ele.DefaultRepository;
-import com.gitee.dorive.repository.v1.impl.resolver.RepositoryDerivedResolver;
+import com.gitee.dorive.executor.v1.impl.resolver.RepositoryDerivedResolver;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.util.ArrayList;

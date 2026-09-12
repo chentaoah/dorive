@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.repository.v1.impl.resolver;
+package com.gitee.dorive.executor.v1.impl.resolver;
 
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
