@@ -184,17 +184,14 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
         if (operation != null) {
             if (operation.isMatched()) {
                 return true;
+
             } else if (operation.isNotMatched()) {
                 return false;
             }
         }
-        Matcher matcher = options.getOption(Matcher.class);
+        Matcher matcher = options.getOption(Matcher.class, Selector.class);
         if (matcher != null) {
             return matcher.matches(repositoryItem);
-        }
-        Selector selector = options.getOption(Selector.class);
-        if (selector != null) {
-            return selector.matches(repositoryItem);
         }
         return false;
     }

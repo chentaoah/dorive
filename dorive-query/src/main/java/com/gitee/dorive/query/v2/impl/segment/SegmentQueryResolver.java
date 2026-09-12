@@ -19,6 +19,7 @@ package com.gitee.dorive.query.v2.impl.segment;
 
 import cn.hutool.core.lang.Assert;
 import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import com.gitee.dorive.base.v1.executor.entity.qry.InnerExample;
 import com.gitee.dorive.base.v1.executor.api.Selector;
@@ -54,7 +55,7 @@ public class SegmentQueryResolver implements QueryResolver {
 
     @Override
     public Object resolve(Context context, Object query) {
-        Selector selector = context.getOption(Selector.class);
+        Matcher matcher = context.getOption(Matcher.class, Selector.class);
 
         QueryInfo queryInfo = queryInfoResolver.findQueryInfo(query.getClass());
         Assert.notNull(queryInfo, "No query info found!");
@@ -86,7 +87,7 @@ public class SegmentQueryResolver implements QueryResolver {
 
             // 选取
             RepositoryItem repositoryItem = lastRepositoryItem != null ? lastRepositoryItem : repositoryContext.getRootRepository();
-            if (selector != null && selector.matches(repositoryItem)) {
+            if (matcher != null && matcher.matches(repositoryItem)) {
                 segmentInfo.setSelectedRepository(repositoryContext);
                 segmentInfo.setSelectedRepositoryAlias(alias);
             }

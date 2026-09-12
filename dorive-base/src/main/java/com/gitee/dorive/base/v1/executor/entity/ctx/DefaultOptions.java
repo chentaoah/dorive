@@ -55,6 +55,24 @@ public class DefaultOptions implements Options {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public <T> T getOption(Class<T> type, Class<?>... types) {
+        T option = getOption(type);
+        if (option != null) {
+            return option;
+        }
+        if (types != null && types.length > 0) {
+            for (Class<?> anyType : types) {
+                T anyOption = (T) getOption(anyType);
+                if (anyOption != null) {
+                    return anyOption;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
     public <T> void setOptions(Class<T> type, List<T> value) {
         map.put(type, value);
     }

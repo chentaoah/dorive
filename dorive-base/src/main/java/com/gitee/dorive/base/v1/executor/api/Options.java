@@ -38,6 +38,8 @@ public interface Options {
 
     <T> T getOption(Class<T> type);
 
+    <T> T getOption(Class<T> type, Class<?>... types);
+
     <T> void setOptions(Class<T> type, List<T> value);
 
     <T> List<T> getOptions(Class<T> type);
