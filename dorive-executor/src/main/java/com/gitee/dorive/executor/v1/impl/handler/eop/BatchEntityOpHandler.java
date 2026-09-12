@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.executor.v1.impl.handler.eop;
 
+import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.eop.Delete;
@@ -47,15 +48,16 @@ public class BatchEntityOpHandler implements EntityOpHandler {
         final AtomicInteger totalCount = new AtomicInteger(0);
         if (entityOp instanceof Insert) {
             execute(context, entityOp, totalCount, (RepositoryItem repositoryItem, boolean isMatch, Object rootEntity, List<?> entities) -> {
+                BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
                 if (isMatch) {
-                    repositoryItem.getBoundValue(context, rootEntity, entities);
+                    binderExecutor.getBoundValue(context, rootEntity, entities);
                 }
                 OperationFactory operationFactory = repositoryItem.getOperationFactory();
                 Operation operation = operationFactory.buildInsert(entities);
                 operation.setMatched(isMatch);
                 totalCount.addAndGet(repositoryItem.execute(context, operation));
                 if (entities.size() == 1) {
-                    repositoryItem.setBoundId(context, rootEntity, entities.get(0));
+                    binderExecutor.setBoundId(context, rootEntity, entities.get(0));
                 }
             });
 
@@ -69,15 +71,16 @@ public class BatchEntityOpHandler implements EntityOpHandler {
 
         } else if (entityOp instanceof InsertOrUpdate) {
             execute(context, entityOp, totalCount, (RepositoryItem repositoryItem, boolean isMatch, Object rootEntity, List<?> entities) -> {
+                BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
                 if (isMatch) {
-                    repositoryItem.getBoundValue(context, rootEntity, entities);
+                    binderExecutor.getBoundValue(context, rootEntity, entities);
                 }
                 OperationFactory operationFactory = repositoryItem.getOperationFactory();
                 Operation operation = operationFactory.buildInsertOrUpdate(entities);
                 operation.setMatched(isMatch);
                 totalCount.addAndGet(repositoryItem.execute(context, operation));
                 if (entities.size() == 1) {
-                    repositoryItem.setBoundId(context, rootEntity, entities.get(0));
+                    binderExecutor.setBoundId(context, rootEntity, entities.get(0));
                 }
             });
         }

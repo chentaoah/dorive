@@ -39,7 +39,6 @@ import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -74,16 +73,6 @@ public class DefaultRepositoryItem extends AbstractRepositoryEle implements Repo
     @Override
     public boolean isCollection() {
         return getEntityElement().isCollection();
-    }
-
-    @Override
-    public void getBoundValue(Context context, Object rootEntity, Collection<?> entities) {
-        binderExecutor.getBoundValue(context, rootEntity, entities);
-    }
-
-    @Override
-    public void setBoundId(Context context, Object rootEntity, Object entity) {
-        binderExecutor.setBoundId(context, rootEntity, entity);
     }
 
     @Override
