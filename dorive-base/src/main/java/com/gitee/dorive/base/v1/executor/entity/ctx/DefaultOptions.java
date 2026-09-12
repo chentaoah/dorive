@@ -55,9 +55,18 @@ public class DefaultOptions implements Options {
     }
 
     @Override
+    public <T> T getOption(Class<T> type1, Class<? extends T> type2) {
+        T option = getOption(type1);
+        if (option == null) {
+            option = getOption(type2);
+        }
+        return option;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
-    public <T> T getOption(Class<T> type, Class<?>... types) {
-        T option = getOption(type);
+    public <T> T getOption(Class<T> type1, Class<? extends T> type2, Class<?>... types) {
+        T option = getOption(type1, type2);
         if (option != null) {
             return option;
         }
