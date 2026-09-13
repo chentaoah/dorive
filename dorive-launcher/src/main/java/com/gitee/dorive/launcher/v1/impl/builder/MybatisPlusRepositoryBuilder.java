@@ -79,7 +79,8 @@ public class MybatisPlusRepositoryBuilder {
 
         // 实体工厂
         EntityFactoryBuilder entityFactoryBuilder = new EntityFactoryBuilder( //
-                repository, entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(), entityMapperManager);
+                repository.getRepositoryDef(), repository.getApplicationContext(), //
+                entityElement, entityElement.getGenericType(), entityStoreInfo.getPojoClass(), entityMapperManager);
         EntityFactory entityFactory = entityFactoryBuilder.newEntityFactory();
 
         // 查询条件转换器
