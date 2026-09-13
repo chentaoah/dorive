@@ -17,29 +17,43 @@
 
 package com.gitee.dorive.executor.v1.impl.selector;
 
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.base.v1.executor.api.Selector;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.executor.v1.api.IndexProvider;
+import com.gitee.dorive.executor.v1.entity.Selection;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Collections;
 import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class DefaultSelector implements Selector {
 
-    private List<String> properties;
+    private IndexProvider indexProvider;
+    private List<Selection> selections;
 
-    public DefaultSelector(String propText) {
-        Assert.notBlank(propText, "The propText cannot be blank!");
-        this.properties = Collections.unmodifiableList(StrUtil.splitTrim(propText, ","));
+    @Override
+    public boolean matches(RepositoryItem repositoryItem) {
+        return indexProvider != null && indexProvider.indexOf(repositoryItem) >= 0;
     }
 
     @Override
-    public List<String> select() {
-        return properties;
+    public List<String> select(RepositoryItem repositoryItem) {
+        if (indexProvider != null && selections != null) {
+            int index = indexProvider.indexOf(repositoryItem);
+            if (index >= 0 && index < selections.size()) {
+                Selection selection = selections.get(index);
+                if (selection != null) {
+                    return selection.getProperties();
+                }
+            }
+        }
+        return null;
     }
 
 }

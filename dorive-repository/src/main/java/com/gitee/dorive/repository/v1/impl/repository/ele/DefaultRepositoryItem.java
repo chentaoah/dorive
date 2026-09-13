@@ -1,0 +1,150 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.gitee.dorive.repository.v1.impl.repository.ele;
+
+import cn.hutool.core.lang.Assert;
+import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Executor;
+import com.gitee.dorive.base.v1.executor.api.Options;
+import com.gitee.dorive.base.v1.executor.api.Selector;
+import com.gitee.dorive.base.v1.executor.entity.cop.ConditionUpdate;
+import com.gitee.dorive.base.v1.executor.entity.cop.Query;
+import com.gitee.dorive.base.v1.executor.entity.eop.Insert;
+import com.gitee.dorive.base.v1.executor.entity.eop.InsertOrUpdate;
+import com.gitee.dorive.base.v1.executor.entity.eop.Update;
+import com.gitee.dorive.base.v1.executor.entity.op.Operation;
+import com.gitee.dorive.base.v1.executor.entity.op.Result;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
+import com.gitee.dorive.base.v1.executor.entity.qry.InnerExample;
+import com.gitee.dorive.base.v1.executor.impl.factory.OrderByFactory;
+import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
+import com.gitee.dorive.base.v1.repository.api.RepositoryEle;
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+
+@Getter
+@Setter
+public class DefaultRepositoryItem extends AbstractRepositoryEle implements RepositoryItem {
+
+    private String accessPath;
+    private boolean root;
+    private boolean aggregated;
+    private BinderExecutor binderExecutor;
+    private OrderByFactory orderByFactory;
+
+    @Override
+    public RepositoryContext getRepositoryContext() {
+        Executor executor = getExecutor();
+        if (executor instanceof RepositoryContext) {
+            return (RepositoryContext) executor;
+
+        } else if (executor instanceof RepositoryEle repositoryEle) {
+            return repositoryEle.getProperty(RepositoryContext.class);
+        }
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        return getEntityElement().getEntityDef().getName();
+    }
+
+    @Override
+    public boolean isCollection() {
+        return getEntityElement().isCollection();
+    }
+
+    @Override
+    public List<Object> selectByExample(Options options, Example example) {
+        Assert.notNull(example, "The example cannot be null!");
+        Query query = getOperationFactory().buildQueryByExample(example);
+        query.setRoot(true);
+        Result<Object> result = executeQuery((Context) options, query);
+        return result.getRecords();
+    }
+
+    @Override
+    public long selectCountByExample(Options options, Example example) {
+        Assert.notNull(example, "The example cannot be null!");
+        Query query = getOperationFactory().buildQueryByExample(example);
+        query.setRoot(true);
+        return executeCount((Context) options, query);
+    }
+
+    @Override
+    public Result<Object> executeQuery(Context context, Query query) {
+        List<String> properties = select(context);
+        if (properties != null && !properties.isEmpty()) {
+            Object primaryKey = query.getPrimaryKey();
+            if (primaryKey != null) {
+                Example example = new InnerExample().eq(getEntityElement().getPrimaryKey(), primaryKey);
+                query.setPrimaryKey(null);
+                query.setExample(example);
+            }
+            Example example = query.getExample();
+            if (example != null) {
+                example.select(properties);
+            }
+        }
+        Example example = query.getExample();
+        if (example != null) {
+            if (example.getOrderBy() == null && orderByFactory != null) {
+                example.setOrderBy(orderByFactory.newOrderBy());
+            }
+        }
+        return super.executeQuery(context, query);
+    }
+
+    @Override
+    public int execute(Context context, Operation operation) {
+        List<String> properties = select(context);
+        if (properties != null && !properties.isEmpty()) {
+            if (operation instanceof Update update) {
+                update.setNullableProps(new LinkedHashSet<>(properties));
+
+            } else if (operation instanceof ConditionUpdate conditionUpdate) {
+                conditionUpdate.setNullableProps(new LinkedHashSet<>(properties));
+            }
+        }
+        if (!isAggregated() && operation instanceof InsertOrUpdate insertOrUpdate) {
+            Insert insert = insertOrUpdate.getInsert();
+            Update update = insertOrUpdate.getUpdate();
+            int totalCount = 0;
+            if (insert != null) {
+                totalCount += super.execute(context, insert);
+            }
+            if (update != null) {
+                totalCount += super.execute(context, update);
+            }
+            return totalCount;
+        }
+        return super.execute(context, operation);
+    }
+
+    private List<String> select(Context context) {
+        Selector selector = context.getOption(Selector.class);
+        return selector != null ? selector.select(this) : Collections.emptyList();
+    }
+
+}

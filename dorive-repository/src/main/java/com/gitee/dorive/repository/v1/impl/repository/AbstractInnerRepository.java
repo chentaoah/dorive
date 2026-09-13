@@ -17,17 +17,17 @@
 
 package com.gitee.dorive.repository.v1.impl.repository;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.core.entity.ctx.DefaultContext;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
-import com.gitee.dorive.base.v1.core.entity.qry.Page;
-import com.gitee.dorive.base.v1.core.util.ExampleUtils;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Options;
+import com.gitee.dorive.base.v1.executor.entity.ctx.DefaultContext;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
+import com.gitee.dorive.base.v1.executor.entity.qry.InnerExample;
+import com.gitee.dorive.base.v1.executor.entity.qry.Page;
+import com.gitee.dorive.base.v1.executor.impl.util.ExampleUtils;
 
 import java.util.List;
 
-public abstract class AbstractInnerRepository<E, PK> extends AbstractGenericRepository<E, PK> {
+public abstract class AbstractInnerRepository<E, PK> extends AbstractQueryRepository<E, PK> {
 
     @Override
     public E selectOneByPrimaryKey(Options options, PK primaryKey) {

@@ -20,8 +20,8 @@ package com.gitee.dorive.binder.v1.impl.executor;
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.binder.enums.JoinType;
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

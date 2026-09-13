@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.query.v2.entity.segment;
 
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import lombok.Data;
 

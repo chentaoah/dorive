@@ -17,12 +17,12 @@
 
 package com.gitee.dorive.query.v2.entity.core;
 
-import com.gitee.dorive.base.v1.common.constant.Operator;
-import com.gitee.dorive.base.v1.common.constant.OperatorV2;
-import com.gitee.dorive.base.v1.common.def.QueryFieldDef;
-import com.gitee.dorive.base.v1.common.entity.QueryFieldDefinition;
-import com.gitee.dorive.base.v1.core.entity.qry.Criterion;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
+import com.gitee.dorive.base.v1.definition.constant.Operator;
+import com.gitee.dorive.base.v1.definition.constant.OperatorV2;
+import com.gitee.dorive.base.v1.definition.def.QueryFieldDef;
+import com.gitee.dorive.base.v1.definition.entity.QueryFieldDefinition;
+import com.gitee.dorive.base.v1.executor.entity.qry.Criterion;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.gitee.digital-engine</groupId>
         <artifactId>dorive</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.2</version>
     </parent>
     <artifactId>dorive-launcher</artifactId>
     <dependencies>
@@ -43,6 +43,11 @@
         <dependency>
             <groupId>com.gitee.digital-engine</groupId>
             <artifactId>dorive-executor</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gitee.digital-engine</groupId>
+            <artifactId>dorive-event</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

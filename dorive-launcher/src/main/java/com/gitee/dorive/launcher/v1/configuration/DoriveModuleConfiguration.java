@@ -18,8 +18,6 @@
 package com.gitee.dorive.launcher.v1.configuration;
 
 import com.gitee.dorive.module.v1.impl.environment.ModuleRequestMappingHandlerMapping;
-import com.gitee.dorive.module.v1.impl.filter.BoundedContextExposedBeanFilter;
-import com.gitee.dorive.module.v1.impl.inject.BoundedContextBeanPostProcessor;
 import com.gitee.dorive.module.v1.impl.inject.ModuleAutowiredBeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -33,18 +31,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 @Configuration
 @ConditionalOnProperty(prefix = "dorive.module", name = "enable", havingValue = "true")
 public class DoriveModuleConfiguration {
-
-    @Bean("boundedContextExposedBeanFilterV3")
-    @ConditionalOnMissingClass
-    public static BoundedContextExposedBeanFilter boundedContextExposedBeanFilter() {
-        return new BoundedContextExposedBeanFilter();
-    }
-
-    @Bean("boundedContextBeanPostProcessorV3")
-    @ConditionalOnMissingClass
-    public static BoundedContextBeanPostProcessor boundedContextBeanPostProcessor() {
-        return new BoundedContextBeanPostProcessor();
-    }
 
     @Bean("moduleAutowiredBeanPostProcessorV3")
     @ConditionalOnMissingClass

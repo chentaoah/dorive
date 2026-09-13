@@ -19,18 +19,18 @@ package com.gitee.dorive.query.v2.impl.custom;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
-import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
-import com.gitee.dorive.base.v1.core.entity.qry.Page;
+import com.gitee.dorive.base.v1.definition.entity.QueryDefinition;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Options;
+import com.gitee.dorive.base.v1.executor.entity.op.Result;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
+import com.gitee.dorive.base.v1.executor.entity.qry.InnerExample;
+import com.gitee.dorive.base.v1.executor.entity.qry.OrderBy;
+import com.gitee.dorive.base.v1.executor.entity.qry.Page;
 import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
 import com.gitee.dorive.base.v1.mybatis.entity.EntityStoreInfo;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.query.v2.entity.core.QueryInfo;
 import com.gitee.dorive.query.v2.impl.core.ExampleResolver;
 import com.gitee.dorive.query.v2.impl.core.QueryInfoResolver;
@@ -49,7 +49,7 @@ public class CustomQueryExecutor implements QueryExecutor {
     private final QueryInfoResolver queryInfoResolver;
     private final String primaryKey;
     private final EntityStoreInfo entityStoreInfo;
-    private final AbstractRepository<Object, Object> repository;
+    private final Repository<Object, Object> repository;
 
     @Override
     public List<Object> selectByQuery(Options options, Object query) {

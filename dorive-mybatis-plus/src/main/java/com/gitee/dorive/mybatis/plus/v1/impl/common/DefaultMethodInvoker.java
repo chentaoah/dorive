@@ -20,7 +20,7 @@ package com.gitee.dorive.mybatis.plus.v1.impl.common;
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.gitee.dorive.base.v1.mybatis.api.MethodInvoker;
-import com.gitee.dorive.base.v1.core.entity.qry.Page;
+import com.gitee.dorive.base.v1.executor.entity.qry.Page;
 import lombok.Data;
 import org.apache.ibatis.annotations.Param;
 

@@ -17,7 +17,7 @@
 
 package com.gitee.dorive.executor.v1.impl.handler.qry;
 
-import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
@@ -36,7 +36,7 @@ public class ContextMatchEntityHandler implements EntityHandler {
 
     @Override
     public long handle(Context context, List<Object> entities) {
-        return repositoryContext.matches(context, repositoryItem) ? entityHandler.handle(context, entities) : 0L;
+        return repositoryContext.matches(context, null, repositoryItem) ? entityHandler.handle(context, entities) : 0L;
     }
 
 }

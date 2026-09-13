@@ -18,10 +18,10 @@
 package com.gitee.dorive.binder.v1.impl.binder;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.base.v1.common.def.BindingDef;
+import com.gitee.dorive.base.v1.definition.def.BindingDef;
 import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.Processor;
-import com.gitee.dorive.base.v1.core.api.Context;
+import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.binder.v1.impl.endpoint.BindEndpoint;
 import com.gitee.dorive.binder.v1.impl.endpoint.FieldEndpoint;
 import lombok.AllArgsConstructor;

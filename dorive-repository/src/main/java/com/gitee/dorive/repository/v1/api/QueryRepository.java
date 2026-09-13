@@ -17,12 +17,12 @@
 
 package com.gitee.dorive.repository.v1.api;
 
-import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.core.entity.qry.Page;
+import com.gitee.dorive.base.v1.executor.api.Options;
+import com.gitee.dorive.base.v1.executor.entity.qry.Page;
 
 import java.util.List;
 
-public interface QueryRepository<E, PK> extends ListableRepository<E, PK> {
+public interface QueryRepository<E, PK> {
 
     List<E> selectByQuery(Options options, Object query);
 

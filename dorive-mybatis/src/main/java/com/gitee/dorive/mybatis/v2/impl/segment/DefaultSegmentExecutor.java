@@ -18,14 +18,14 @@
 package com.gitee.dorive.mybatis.v2.impl.segment;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.base.v1.core.entity.qry.InnerExample;
-import com.gitee.dorive.base.v1.core.entity.qry.OrderBy;
-import com.gitee.dorive.base.v1.core.entity.qry.Page;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.entity.op.Result;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
+import com.gitee.dorive.base.v1.executor.entity.qry.InnerExample;
+import com.gitee.dorive.base.v1.executor.entity.qry.OrderBy;
+import com.gitee.dorive.base.v1.executor.entity.qry.Page;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.mybatis.v2.entity.SelectSegment;
 import com.gitee.dorive.mybatis.v2.entity.TableSegment;
 import com.gitee.dorive.query.v2.api.SegmentExecutor;
@@ -45,7 +45,7 @@ public class DefaultSegmentExecutor implements SegmentExecutor {
     private final String primaryKey;
     private final String primaryKeyAlias;
     private final SqlRunner sqlRunner;
-    private final AbstractRepository<Object, Object> repository;
+    private final Repository<Object, Object> repository;
 
     @Override
     public void buildSelectColumns(SegmentInfo segmentInfo) {

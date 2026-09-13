@@ -18,23 +18,12 @@
 package com.gitee.dorive.base.v1.repository.api;
 
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
-import com.gitee.dorive.base.v1.common.entity.EntityElement;
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.impl.OperationFactory;
-import com.gitee.dorive.base.v1.executor.api.Executor;
-import com.gitee.dorive.base.v1.repository.impl.AbstractRepository;
+import com.gitee.dorive.base.v1.executor.api.Options;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
 
-import java.util.Collection;
+import java.util.List;
 
-public interface RepositoryItem extends Repository<Object, Object>, Executor, Properties {
-
-    EntityElement getEntityElement();
-
-    OperationFactory getOperationFactory();
-
-    Class<?> getEntityClass();
-
-    AbstractRepository<Object, Object> getProxyRepository();
+public interface RepositoryItem extends RepositoryEle {
 
     RepositoryContext getRepositoryContext();
 
@@ -50,8 +39,8 @@ public interface RepositoryItem extends Repository<Object, Object>, Executor, Pr
 
     BinderExecutor getBinderExecutor();
 
-    void getBoundValue(Context context, Object rootEntity, Collection<?> entities);
+    List<Object> selectByExample(Options options, Example example);
 
-    void setBoundId(Context context, Object rootEntity, Object entity);
+    long selectCountByExample(Options options, Example example);
 
 }

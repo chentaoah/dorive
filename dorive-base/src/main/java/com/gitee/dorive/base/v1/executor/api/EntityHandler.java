@@ -17,8 +17,6 @@
 
 package com.gitee.dorive.base.v1.executor.api;
 
-import com.gitee.dorive.base.v1.core.api.Context;
-
 import java.util.List;
 
 public interface EntityHandler {

@@ -18,10 +18,10 @@
 package com.gitee.dorive.repository.v1.impl.repository;
 
 import cn.hutool.core.lang.Assert;
-import com.gitee.dorive.base.v1.common.def.QueryDef;
-import com.gitee.dorive.base.v1.common.entity.QueryDefinition;
-import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.core.entity.qry.Page;
+import com.gitee.dorive.base.v1.definition.def.QueryDef;
+import com.gitee.dorive.base.v1.definition.entity.QueryDefinition;
+import com.gitee.dorive.base.v1.executor.api.Options;
+import com.gitee.dorive.base.v1.executor.entity.qry.Page;
 import com.gitee.dorive.base.v1.query.api.QueryExecutor;
 import com.gitee.dorive.base.v1.query.enums.QueryMode;
 import com.gitee.dorive.repository.v1.api.QueryRepository;
@@ -34,7 +34,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public abstract class AbstractQueryRepository<E, PK> extends AbstractListableRepository<E, PK> implements QueryRepository<E, PK> {
+public abstract class AbstractQueryRepository<E, PK> extends AbstractGenericRepository<E, PK> implements QueryRepository<E, PK> {
     private Map<Class<?>, QueryDefinition> classQueryDefinitionMap;
     private QueryExecutor contextMismatchQueryExecutor;
     private QueryExecutor stepwiseQueryExecutor;
@@ -64,7 +64,7 @@ public abstract class AbstractQueryRepository<E, PK> extends AbstractListableRep
             queryMode = isCustomMethod(query, count) ? QueryMode.SQL_CUSTOM : QueryMode.SQL_EXECUTE;
         }
         // 上下文未匹配
-        if (!matches(options, getRootRepository())) {
+        if (!matches(options, null, getRootRepository())) {
             return contextMismatchQueryExecutor;
         }
         if (queryMode == QueryMode.STEPWISE) {

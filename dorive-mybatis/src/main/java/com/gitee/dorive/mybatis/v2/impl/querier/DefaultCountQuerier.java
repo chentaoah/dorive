@@ -18,10 +18,11 @@
 package com.gitee.dorive.mybatis.v2.impl.querier;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.ctx.DefaultContext;
+import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Matcher;
-import com.gitee.dorive.base.v1.factory.api.Transformer;
+import com.gitee.dorive.base.v1.executor.entity.ctx.DefaultContext;
+import com.gitee.dorive.base.v1.factory.api.entity.EntityMapper;
+import com.gitee.dorive.base.v1.factory.api.name.NameSerializer;
 import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 import com.gitee.dorive.base.v1.mybatis.api.SqlRunner;
 import com.gitee.dorive.base.v1.mybatis.entity.CountQuery;
@@ -66,17 +67,17 @@ public class DefaultCountQuerier implements CountQuerier {
         String tableAlias = tableSegment.getTableAlias();
 
         // group by
-        Transformer transformer = repositoryContext.getProperty(Transformer.class);
-        List<String> groupBy = toAliases(transformer, countQuery.getGroupBy());
+        NameSerializer nameSerializer = repositoryContext.getProperty(EntityMapper.class);
+        List<String> groupBy = toAliases(nameSerializer, countQuery.getGroupBy());
         String groupByColumns = CollUtil.join(groupBy, ",", tableAlias + ".", null);
         selectSegment.setGroupBy("GROUP BY " + groupByColumns);
 
         // count by
         if (selectedRepository != null) {
-            transformer = selectedRepository.getProperty(Transformer.class);
+            nameSerializer = selectedRepository.getProperty(EntityMapper.class);
             tableAlias = selectedRepositoryAlias;
         }
-        List<String> countBy = toAliases(transformer, countQuery.getCountBy());
+        List<String> countBy = toAliases(nameSerializer, countQuery.getCountBy());
         String countByStr = CollUtil.join(countBy, ",',',", tableAlias + ".", null);
         String countByExp = buildCountByExp(countQuery, countBy, countByStr);
 
@@ -92,8 +93,8 @@ public class DefaultCountQuerier implements CountQuerier {
         return countMap;
     }
 
-    private List<String> toAliases(Transformer transformer, List<String> properties) {
-        return properties.stream().map(transformer::toAlias).collect(Collectors.toList());
+    private List<String> toAliases(NameSerializer nameSerializer, List<String> properties) {
+        return properties.stream().map(nameSerializer::serialize).collect(Collectors.toList());
     }
 
     private String buildCountByExp(CountQuery countQuery, List<String> countBy, String countByStr) {

@@ -17,8 +17,8 @@
 
 package com.gitee.dorive.base.v1.query.api;
 
-import com.gitee.dorive.base.v1.core.api.Options;
-import com.gitee.dorive.base.v1.core.entity.qry.Page;
+import com.gitee.dorive.base.v1.executor.api.Options;
+import com.gitee.dorive.base.v1.executor.entity.qry.Page;
 
 import java.util.List;
 

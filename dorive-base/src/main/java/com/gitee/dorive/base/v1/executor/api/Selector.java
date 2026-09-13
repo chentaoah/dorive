@@ -17,10 +17,12 @@
 
 package com.gitee.dorive.base.v1.executor.api;
 
+import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+
 import java.util.List;
 
-public interface Selector {
+public interface Selector extends Matcher {
 
-    List<String> select();
+    List<String> select(RepositoryItem repositoryItem);
 
 }

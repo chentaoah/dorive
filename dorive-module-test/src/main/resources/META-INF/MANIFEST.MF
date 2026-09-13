@@ -14,5 +14,7 @@ X-Module-Requires: null
 X-Module-Provides: null
 X-Module-Notifies: null
 X-Module-Waits: null
+X-Module-Publishes: null
+X-Module-Subscribes: null
 X-Module-Table-Prefix: null
 X-Module-Request-Prefix: null

@@ -18,11 +18,11 @@
 package com.gitee.dorive.executor.v1.impl.handler.qry;
 
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
-import com.gitee.dorive.base.v1.core.api.Context;
-import com.gitee.dorive.base.v1.core.entity.cop.Query;
-import com.gitee.dorive.base.v1.core.entity.op.Result;
-import com.gitee.dorive.base.v1.core.entity.qry.Example;
-import com.gitee.dorive.base.v1.core.impl.OperationFactory;
+import com.gitee.dorive.base.v1.executor.api.Context;
+import com.gitee.dorive.base.v1.executor.entity.cop.Query;
+import com.gitee.dorive.base.v1.executor.entity.op.Result;
+import com.gitee.dorive.base.v1.executor.entity.qry.Example;
+import com.gitee.dorive.base.v1.executor.api.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.joiner.api.EntityJoiner;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
@@ -51,7 +51,7 @@ public class DefaultEntityHandler implements EntityHandler {
             return 0L;
         }
         Query query = operationFactory.buildQueryByExample(example);
-        query.includeRoot();
+        query.setMatched(true);
         Result<Object> result = repositoryItem.executeQuery(context, query);
         entityJoiner.join(context, entities, result.getRecords());
         return result.getCount();
