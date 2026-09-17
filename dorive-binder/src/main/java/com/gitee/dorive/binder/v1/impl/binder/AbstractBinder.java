@@ -38,8 +38,8 @@ public abstract class AbstractBinder implements Binder {
     protected Processor processor;
 
     @Override
-    public String getField() {
-        String field = bindingDef.getField();
+    public String getSourceField() {
+        String field = bindingDef.getSource();
         Assert.notBlank(field, "The field cannot be blank!");
         return field;
     }
@@ -52,22 +52,22 @@ public abstract class AbstractBinder implements Binder {
     }
 
     @Override
-    public Object getFieldValue(Context context, Object entity) {
+    public Object getSourceFieldValue(Context context, Object entity) {
         return fieldEndpoint.getValue(entity);
     }
 
     @Override
-    public void setFieldValue(Context context, Object entity, Object value) {
+    public void setSourceFieldValue(Context context, Object entity, Object value) {
         fieldEndpoint.setValue(entity, value);
     }
 
     @Override
-    public Object getBoundValue(Context context, Object entity) {
+    public Object getTargetFieldValue(Context context, Object entity) {
         return bindEndpoint.getValue(entity);
     }
 
     @Override
-    public void setBoundValue(Context context, Object entity, Object value) {
+    public void setTargetFieldValue(Context context, Object entity, Object value) {
         bindEndpoint.setValue(entity, value);
     }
 

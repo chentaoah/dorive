@@ -35,21 +35,21 @@ public class ValueRouteBinder extends AbstractBinder {
     public ValueRouteBinder(BindingDef bindingDef, FieldEndpoint fieldEndpoint, BindEndpoint bindEndpoint, Processor processor) {
         super(bindingDef, fieldEndpoint, bindEndpoint, processor);
         Class<?> genericType = bindEndpoint.getFieldDefinition().getGenericType();
-        this.value = Convert.convert(genericType, bindingDef.getValue());
+        this.value = Convert.convert(genericType, bindingDef.getLiteral());
     }
 
     @Override
-    public String getField() {
+    public String getSourceField() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Object getFieldValue(Context context, Object entity) {
+    public Object getSourceFieldValue(Context context, Object entity) {
         return value;
     }
 
     @Override
-    public void setFieldValue(Context context, Object entity, Object value) {
+    public void setSourceFieldValue(Context context, Object entity, Object value) {
         throw new UnsupportedOperationException();
     }
 

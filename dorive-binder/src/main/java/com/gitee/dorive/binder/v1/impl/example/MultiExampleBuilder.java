@@ -46,11 +46,11 @@ public class MultiExampleBuilder implements ExampleBuilder {
     }
 
     private MultiInBuilder newMultiInBuilder(Context context, List<Object> entities) {
-        List<String> properties = binders.stream().map(Binder::getField).collect(Collectors.toList());
+        List<String> properties = binders.stream().map(Binder::getSourceField).collect(Collectors.toList());
         MultiInBuilder multiInBuilder = new MultiInBuilder(properties, entities.size());
         for (Object entity : entities) {
             for (Binder binder : binders) {
-                Object boundValue = binder.getBoundValue(context, entity);
+                Object boundValue = binder.getTargetFieldValue(context, entity);
                 boundValue = binder.input(context, boundValue);
                 if (boundValue != null) {
                     multiInBuilder.append(boundValue);

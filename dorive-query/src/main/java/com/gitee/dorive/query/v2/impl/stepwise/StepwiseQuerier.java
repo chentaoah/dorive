@@ -82,7 +82,7 @@ public class StepwiseQuerier {
             mergedValueRouteBindersMap.forEach((targetAccessPath, valueRouteBinders) -> {
                 Example targetExample = exampleMap.computeIfAbsent(targetAccessPath, k -> new InnerExample());
                 for (Binder valueRouteBinder : valueRouteBinders) {
-                    Object fieldValue = valueRouteBinder.getFieldValue(context, null);
+                    Object fieldValue = valueRouteBinder.getSourceFieldValue(context, null);
                     if (fieldValue != null) {
                         String targetField = valueRouteBinder.getTargetField();
                         targetExample.eq(targetField, fieldValue);
@@ -140,7 +140,7 @@ public class StepwiseQuerier {
     private List<Object> collectFieldValues(Context context, List<Object> entities, Binder strongBinder) {
         List<Object> fieldValues = new ArrayList<>(entities.size());
         for (Object entity : entities) {
-            Object fieldValue = strongBinder.getFieldValue(context, entity);
+            Object fieldValue = strongBinder.getSourceFieldValue(context, entity);
             if (fieldValue != null) {
                 fieldValue = strongBinder.output(context, fieldValue);
                 fieldValues.add(fieldValue);
@@ -152,7 +152,7 @@ public class StepwiseQuerier {
     private void collectFieldValues(Context context, List<Object> entities, List<Binder> strongBinders, MultiInBuilder builder) {
         for (Object entity : entities) {
             for (Binder strongBinder : strongBinders) {
-                Object fieldValue = strongBinder.getFieldValue(context, entity);
+                Object fieldValue = strongBinder.getSourceFieldValue(context, entity);
                 if (fieldValue != null) {
                     fieldValue = strongBinder.output(context, fieldValue);
                     builder.append(fieldValue);

@@ -21,16 +21,16 @@ import com.gitee.dorive.base.v1.executor.api.Context;
 
 public interface Binder extends Processor {
 
-    String getField();
+    String getSourceField();
 
     String getTargetField();
 
-    Object getFieldValue(Context context, Object entity);
+    Object getSourceFieldValue(Context context, Object entity);
 
-    void setFieldValue(Context context, Object entity, Object value);
+    void setSourceFieldValue(Context context, Object entity, Object value);
 
-    Object getBoundValue(Context context, Object entity);
+    Object getTargetFieldValue(Context context, Object entity);
 
-    void setBoundValue(Context context, Object entity, Object value);
+    void setTargetFieldValue(Context context, Object entity, Object value);
 
 }

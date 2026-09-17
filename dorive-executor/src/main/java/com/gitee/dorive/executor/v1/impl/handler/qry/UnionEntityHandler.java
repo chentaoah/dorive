@@ -83,7 +83,7 @@ public class UnionEntityHandler implements EntityHandler {
         BinderExecutor binderExecutor = repositoryItem.getBinderExecutor();
         List<Binder> binders = binderExecutor.getStrongBinders();
         for (Binder binder : binders) {
-            Object boundValue = binder.getBoundValue(context, entity);
+            Object boundValue = binder.getTargetFieldValue(context, entity);
             boundValue = binder.input(context, boundValue);
             if (boundValue instanceof Collection) {
                 if (((Collection<?>) boundValue).isEmpty()) {
@@ -91,7 +91,7 @@ public class UnionEntityHandler implements EntityHandler {
                 }
             }
             if (boundValue != null) {
-                String field = binder.getField();
+                String field = binder.getSourceField();
                 example.eq(field, boundValue);
             } else {
                 example.getCriteria().clear();

@@ -35,16 +35,16 @@ public class ValueFilterBinder extends AbstractBinder {
     public ValueFilterBinder(BindingDef bindingDef, FieldEndpoint fieldEndpoint, BindEndpoint bindEndpoint, Processor processor) {
         super(bindingDef, fieldEndpoint, bindEndpoint, processor);
         Class<?> genericType = fieldEndpoint.getFieldDefinition().getGenericType();
-        this.value = Convert.convert(genericType, bindingDef.getValue());
+        this.value = Convert.convert(genericType, bindingDef.getLiteral());
     }
 
     @Override
-    public Object getBoundValue(Context context, Object entity) {
+    public Object getTargetFieldValue(Context context, Object entity) {
         return value;
     }
 
     @Override
-    public void setBoundValue(Context context, Object entity, Object property) {
+    public void setTargetFieldValue(Context context, Object entity, Object property) {
         throw new UnsupportedOperationException();
     }
 

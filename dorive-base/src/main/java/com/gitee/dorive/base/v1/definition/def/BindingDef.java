@@ -35,9 +35,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BindingDef {
-    private String field;
-    private String value;
-    private String bind;
+    private String source;
+    private String literal;
+    private String target;
     private String expression;
     private Class<?> processor;
     private String targetField;

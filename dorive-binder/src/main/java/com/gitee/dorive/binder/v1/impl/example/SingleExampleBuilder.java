@@ -39,7 +39,7 @@ public class SingleExampleBuilder implements ExampleBuilder {
         Example example = new InnerExample();
         List<Object> boundValues = collectBoundValues(context, entities);
         if (!boundValues.isEmpty()) {
-            String field = binder.getField();
+            String field = binder.getSourceField();
             if (boundValues.size() == 1) {
                 example.eq(field, boundValues.get(0));
             } else {
@@ -52,7 +52,7 @@ public class SingleExampleBuilder implements ExampleBuilder {
     private List<Object> collectBoundValues(Context context, List<Object> entities) {
         List<Object> boundValues = new ArrayList<>(entities.size());
         for (Object entity : entities) {
-            Object boundValue = binder.getBoundValue(context, entity);
+            Object boundValue = binder.getTargetFieldValue(context, entity);
             boundValue = binder.input(context, boundValue);
             if (boundValue != null) {
                 boundValues.add(boundValue);

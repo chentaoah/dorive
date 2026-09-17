@@ -94,7 +94,7 @@ public class BinderExecutorBuilder {
                 continue;
             }
 
-            String field = bindingDef.getField();
+            String field = bindingDef.getSource();
             FieldDefinition fieldDefinition = entityElement.getFieldDefinition(field);
             Assert.notNull(fieldDefinition, "The field configured for @Binding does not exist within the entity! type: {}, field: {}", genericType.getName(), field);
             FieldEndpoint fieldEndpoint = new FieldEndpoint(fieldDefinition, "#entity." + field);
@@ -147,9 +147,9 @@ public class BinderExecutorBuilder {
     }
 
     private void resetBindingDef(BindingDef bindingDef) {
-        String field = StrUtil.trim(bindingDef.getField());
-        String value = StrUtil.trim(bindingDef.getValue());
-        String bind = StrUtil.trim(bindingDef.getBind());
+        String field = StrUtil.trim(bindingDef.getSource());
+        String value = StrUtil.trim(bindingDef.getLiteral());
+        String bind = StrUtil.trim(bindingDef.getTarget());
         String expression = StrUtil.trim(bindingDef.getExpression());
         Class<?> processor = bindingDef.getProcessor();
         String targetField = StrUtil.trim(bindingDef.getTargetField());
@@ -180,18 +180,18 @@ public class BinderExecutorBuilder {
             processor = SpELProcessor.class;
         }
 
-        bindingDef.setField(field);
-        bindingDef.setValue(value);
-        bindingDef.setBind(bind);
+        bindingDef.setSource(field);
+        bindingDef.setLiteral(value);
+        bindingDef.setTarget(bind);
         bindingDef.setExpression(expression);
         bindingDef.setProcessor(processor);
         bindingDef.setTargetField(targetField);
     }
 
     private BindingType determineBindingType(BindingDef bindingDef) {
-        String field = bindingDef.getField();
-        String value = bindingDef.getValue();
-        String bind = bindingDef.getBind();
+        String field = bindingDef.getSource();
+        String value = bindingDef.getLiteral();
+        String bind = bindingDef.getTarget();
         String expression = bindingDef.getExpression();
         if (ObjectUtil.isAllNotEmpty(field, bind)) {
             return BindingType.STRONG;
@@ -229,7 +229,7 @@ public class BinderExecutorBuilder {
     }
 
     private BindEndpoint newBindEndpoint(BindingDef bindingDef) {
-        String bind = bindingDef.getBind();
+        String bind = bindingDef.getTarget();
 
         RepositoryItem rootRepository = repositoryContext.getRootRepository();
         EntityElement entityElement = rootRepository.getEntityElement();

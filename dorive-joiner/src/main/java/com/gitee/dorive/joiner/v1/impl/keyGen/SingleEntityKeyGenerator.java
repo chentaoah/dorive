@@ -31,7 +31,7 @@ public class SingleEntityKeyGenerator implements KeyGenerator {
 
     @Override
     public String generate(Context context, Object entity) {
-        Object boundValue = binder.getBoundValue(context, entity);
+        Object boundValue = binder.getTargetFieldValue(context, entity);
         boundValue = binder.input(context, boundValue);
         return boundValue != null ? boundValue.toString() : null;
     }
