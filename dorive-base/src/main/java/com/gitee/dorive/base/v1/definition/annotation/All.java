@@ -22,14 +22,14 @@ import org.springframework.core.annotation.AliasFor;
 import java.lang.annotation.*;
 
 /**
- * 聚合
+ * 关联所有实体
  */
 @Entity
 @Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
-public @interface Aggregate {
+@Target({ElementType.FIELD})
+public @interface All {
 
     /**
      * @see Entity
