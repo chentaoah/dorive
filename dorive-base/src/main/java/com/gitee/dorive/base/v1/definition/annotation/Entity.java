@@ -36,7 +36,7 @@ public @interface Entity {
     /**
      * 是否聚合
      */
-    boolean aggregate() default false;
+    boolean aggregate() default true;
 
     /**
      * 指定仓储
