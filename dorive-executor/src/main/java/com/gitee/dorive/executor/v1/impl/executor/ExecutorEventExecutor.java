@@ -18,18 +18,14 @@
 package com.gitee.dorive.executor.v1.impl.executor;
 
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
+import com.gitee.dorive.base.v1.event.api.EventPublisher;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.api.Executor;
 import com.gitee.dorive.base.v1.executor.entity.eop.EntityOp;
 import com.gitee.dorive.base.v1.executor.entity.op.Operation;
-import com.gitee.dorive.base.v1.event.api.EventFactory;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -48,22 +44,16 @@ public class ExecutorEventExecutor extends AbstractProxyExecutor {
     public int execute(Context context, Operation operation) {
         int totalCount = super.execute(context, operation);
         if (totalCount != 0) {
-            if (operation instanceof EntityOp entityOp) {
-                EntityElement entityElement = getEntityElement();
-                List<EventFactory> executorEventFactories = repositoryContext.getExecutorEventFactories();
-                ApplicationContext applicationContext = repositoryContext.getApplicationContext();
-
-                Class<?> entityClass = entityElement.getGenericType();
-                for (EventFactory eventFactory : executorEventFactories) {
-                    ApplicationEvent applicationEvent = eventFactory.newApplicationEvent( //
-                            this, entityOp.isRoot(), entityClass, context, entityOp);
-                    if (applicationEvent != null) {
-                        applicationContext.publishEvent(applicationEvent);
-                    }
-                }
-            }
+            publishEvent(context, operation);
         }
         return totalCount;
     }
 
+    private void publishEvent(Context context, Operation operation) {
+        if (operation instanceof EntityOp entityOp) {
+            EntityElement entityElement = getEntityElement();
+            EventPublisher eventPublisher = repositoryContext.getExecutorEventPublisher();
+            eventPublisher.publishEvent(entityElement.getGenericType(), context, entityOp);
+        }
+    }
 }

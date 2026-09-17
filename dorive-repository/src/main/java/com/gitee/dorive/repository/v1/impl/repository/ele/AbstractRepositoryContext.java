@@ -24,7 +24,7 @@ import com.gitee.dorive.base.v1.definition.def.EntityDef;
 import com.gitee.dorive.base.v1.definition.def.OrderByDef;
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
-import com.gitee.dorive.base.v1.event.api.EventFactory;
+import com.gitee.dorive.base.v1.event.api.EventPublisher;
 import com.gitee.dorive.base.v1.executor.api.Matcher;
 import com.gitee.dorive.base.v1.executor.api.OperationFactory;
 import com.gitee.dorive.base.v1.executor.api.Options;
@@ -63,8 +63,8 @@ public abstract class AbstractRepositoryContext extends AbstractRepositoryEle im
     private RepositoryItem rootRepository;
     private List<RepositoryItem> subRepositories = new ArrayList<>();
     private List<RepositoryItem> orderedRepositories = new ArrayList<>();
-    private List<EventFactory> executorEventFactories = new ArrayList<>();
-    private List<EventFactory> repositoryEventFactories = new ArrayList<>();
+    private EventPublisher executorEventPublisher;
+    private EventPublisher repositoryEventPublisher;
 
     @Override
     public void setApplicationContext(@Nonnull ApplicationContext applicationContext) throws BeansException {
