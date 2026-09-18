@@ -42,4 +42,9 @@ public @interface Event {
      */
     Class<?> target() default Object.class;
 
+    /**
+     * 发布
+     */
+    Class<?> publisher() default Object.class;
+
 }

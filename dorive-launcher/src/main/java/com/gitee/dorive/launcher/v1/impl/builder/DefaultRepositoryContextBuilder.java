@@ -125,15 +125,23 @@ public class DefaultRepositoryContextBuilder implements RepositoryContextBuilder
             for (EventDef eventDef : eventDefs) {
                 Class<?> source = eventDef.getSource();
                 Class<?> target = eventDef.getTarget();
+                Class<?> publisher = eventDef.getPublisher();
 
-                ApplicationEventPublisher publisher = target == null || target == Object.class ?
-                        new DefaultEventPublisher(source, applicationContext) : new TargetEventPublisher(source, target, applicationContext);
+                ApplicationEventPublisher eventPublisher;
+                if (publisher != null && publisher != Object.class) {
+                    eventPublisher = (ApplicationEventPublisher) applicationContext.getBean(publisher);
 
+                } else if (target != null && target != Object.class) {
+                    eventPublisher = new TargetEventPublisher(source, target, applicationContext);
+
+                } else {
+                    eventPublisher = new DefaultEventPublisher(source, applicationContext);
+                }
                 if (ExecutorEvent.class.isAssignableFrom(source)) {
-                    executorPublishers.add(publisher);
+                    executorPublishers.add(eventPublisher);
 
                 } else if (RepositoryEvent.class.isAssignableFrom(source)) {
-                    repositoryPublishers.add(publisher);
+                    repositoryPublishers.add(eventPublisher);
                 }
             }
             if (!executorPublishers.isEmpty()) {

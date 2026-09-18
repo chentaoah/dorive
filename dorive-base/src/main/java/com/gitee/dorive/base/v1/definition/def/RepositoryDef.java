@@ -58,6 +58,7 @@ public class RepositoryDef {
                 EventDef eventDef = new EventDef();
                 eventDef.setSource(event.source());
                 eventDef.setTarget(event.target());
+                eventDef.setPublisher(event.publisher());
                 eventDefs.add(eventDef);
             }
             repositoryDef.setEvents(eventDefs);

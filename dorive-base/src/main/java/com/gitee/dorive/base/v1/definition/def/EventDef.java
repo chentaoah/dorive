@@ -27,4 +27,5 @@ import lombok.NoArgsConstructor;
 public class EventDef {
     private Class<?> source;
     private Class<?> target;
+    private Class<?> publisher;
 }
