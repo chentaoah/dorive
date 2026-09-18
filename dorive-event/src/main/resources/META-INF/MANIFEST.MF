@@ -16,7 +16,7 @@ X-Module-Requires: ~,
  com.gitee.dorive.base.v1.executor.entity.eop.EntityOp,
  com.gitee.dorive.base.v1.executor.entity.eop.Insert,
  com.gitee.dorive.base.v1.executor.entity.eop.Update
-X-Module-Provides: com.gitee.dorive.base.v1.event.api.EventFactory
+X-Module-Provides: com.gitee.dorive.base.v1.event.api.EventPublisher
 X-Module-Notifies: null
 X-Module-Waits: null
 X-Module-Publishes: null
