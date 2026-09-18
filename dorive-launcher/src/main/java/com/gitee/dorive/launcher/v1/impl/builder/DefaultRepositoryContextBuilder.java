@@ -46,7 +46,8 @@ import com.gitee.dorive.binder.v1.impl.example.SingleExampleBuilder;
 import com.gitee.dorive.binder.v1.impl.builder.BinderExecutorBuilder;
 import com.gitee.dorive.event.v1.entity.ExecutorEvent;
 import com.gitee.dorive.event.v1.entity.RepositoryEvent;
-import com.gitee.dorive.event.v1.impl.publisher.DefaultApplicationEventPublisher;
+import com.gitee.dorive.event.v1.impl.publisher.DefaultEventPublisher;
+import com.gitee.dorive.event.v1.impl.publisher.TargetEventPublisher;
 import com.gitee.dorive.event.v1.impl.publisher.ExecutorEventPublisher;
 import com.gitee.dorive.event.v1.impl.publisher.RepositoryEventPublisher;
 import com.gitee.dorive.executor.v1.impl.executor.ExecutorEventExecutor;
@@ -115,45 +116,35 @@ public class DefaultRepositoryContextBuilder implements RepositoryContextBuilder
 
     @Override
     public void determineEnableEventPublish(RepositoryContext repositoryContext) {
-        ApplicationContext applicationContext = repositoryContext.getApplicationContext();
-        RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
-
-        boolean hasExecutorEvent = false;
-        boolean hasRepositoryEvent = false;
-        List<ApplicationEventPublisher> executorPublishers = new ArrayList<>();
-        List<ApplicationEventPublisher> repositoryPublishers = new ArrayList<>();
-
-        Class<?>[] events = repositoryDef.getEvents();
-        for (Class<?> eventClass : events) {
-            if (ExecutorEvent.class.isAssignableFrom(eventClass)) {
-                hasExecutorEvent = true;
-
-            } else if (RepositoryEvent.class.isAssignableFrom(eventClass)) {
-                hasRepositoryEvent = true;
-            }
-        }
-
-        Set<Event> eventsAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(repositoryContext.getClass(), Event.class);
-        for (Event eventAnnotation : eventsAnnotations) {
-            Class<?> source = eventAnnotation.source();
-            Class<?> target = eventAnnotation.target();
-            if (ExecutorEvent.class.isAssignableFrom(source)) {
-                hasExecutorEvent = true;
-                executorPublishers.add(new DefaultApplicationEventPublisher(source, target, applicationContext));
-
-            } else if (RepositoryEvent.class.isAssignableFrom(source)) {
-                hasRepositoryEvent = true;
-                repositoryPublishers.add(new DefaultApplicationEventPublisher(source, target, applicationContext));
-            }
-        }
-
         if (repositoryContext instanceof AbstractRepositoryContext repository) {
-            if (hasExecutorEvent) {
-                executorPublishers.add(0, applicationContext);
+            ApplicationContext applicationContext = repositoryContext.getApplicationContext();
+            RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
+
+            List<ApplicationEventPublisher> executorPublishers = new ArrayList<>();
+            List<ApplicationEventPublisher> repositoryPublishers = new ArrayList<>();
+
+            Class<?>[] events = repositoryDef.getEvents();
+            for (Class<?> source : events) {
+                if (ExecutorEvent.class.isAssignableFrom(source)) {
+                    executorPublishers.add(new DefaultEventPublisher(source, applicationContext));
+
+                } else if (RepositoryEvent.class.isAssignableFrom(source)) {
+                    repositoryPublishers.add(new DefaultEventPublisher(source, applicationContext));
+                }
             }
-            if (hasRepositoryEvent) {
-                repositoryPublishers.add(0, applicationContext);
+
+            Set<Event> eventsAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(repositoryContext.getClass(), Event.class);
+            for (Event eventAnnotation : eventsAnnotations) {
+                Class<?> source = eventAnnotation.source();
+                Class<?> target = eventAnnotation.target();
+                if (ExecutorEvent.class.isAssignableFrom(source)) {
+                    executorPublishers.add(new TargetEventPublisher(source, target, applicationContext));
+
+                } else if (RepositoryEvent.class.isAssignableFrom(source)) {
+                    repositoryPublishers.add(new TargetEventPublisher(source, target, applicationContext));
+                }
             }
+
             if (!executorPublishers.isEmpty()) {
                 repository.setExecutorEventPublisher(new ExecutorEventPublisher(executorPublishers));
             }
