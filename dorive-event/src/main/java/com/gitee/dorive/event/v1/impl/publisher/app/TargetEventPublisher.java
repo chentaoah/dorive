@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.v1.impl.publisher;
+package com.gitee.dorive.event.v1.impl.publisher.app;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.gitee.dorive.base.v1.executor.entity.eop.EntityOp;

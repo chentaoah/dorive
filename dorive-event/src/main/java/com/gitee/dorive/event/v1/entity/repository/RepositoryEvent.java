@@ -15,16 +15,13 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.v1.entity.ext;
+package com.gitee.dorive.event.v1.entity.repository;
 
-import com.gitee.dorive.event.v1.entity.RepositoryEvent;
+import com.gitee.dorive.event.v1.entity.BaseEvent;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class RepositoryInsertEvent<T> extends RepositoryEvent<T> {
-    public RepositoryInsertEvent(Object source) {
-        super(source);
-    }
+public class RepositoryEvent<T> extends BaseEvent<T> {
 }

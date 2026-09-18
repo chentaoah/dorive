@@ -15,16 +15,27 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.v1.entity.ext;
+package com.gitee.dorive.event.v1.impl.publisher.app;
 
-import com.gitee.dorive.event.v1.entity.ExecutorEvent;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.lang.NonNull;
 
 @Getter
 @Setter
-public class ExecutorInsertEvent<T> extends ExecutorEvent<T> {
-    public ExecutorInsertEvent(Object source) {
-        super(source);
+@AllArgsConstructor
+public class DefaultEventPublisher implements ApplicationEventPublisher {
+
+    private final Class<?> source;
+    private final ApplicationEventPublisher publisher;
+
+    @Override
+    public void publishEvent(@NonNull Object event) {
+        if (source.isAssignableFrom(event.getClass())) {
+            publisher.publishEvent(event);
+        }
     }
+
 }
