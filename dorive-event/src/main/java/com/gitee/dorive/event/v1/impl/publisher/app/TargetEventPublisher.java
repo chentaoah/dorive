@@ -41,10 +41,12 @@ public class TargetEventPublisher implements ApplicationEventPublisher {
         BaseEvent<?> baseEvent = (BaseEvent<?>) event;
         EntityOp entityOp = baseEvent.getEntityOp();
         List<?> entities = entityOp.getEntities();
-        if (entities.size() == 1) {
-            Object newEvent = BeanUtil.copyProperties(entities.get(0), target);
-            if (newEvent != null) {
-                publisher.publishEvent(newEvent);
+        if (entities != null && !entities.isEmpty()) {
+            for (Object entity : entities) {
+                Object newEvent = BeanUtil.copyProperties(entity, target);
+                if (newEvent != null) {
+                    publisher.publishEvent(newEvent);
+                }
             }
         }
     }
