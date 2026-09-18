@@ -17,6 +17,8 @@
 
 package com.gitee.dorive.base.v1.definition.annotation;
 
+import org.springframework.core.annotation.AliasFor;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -35,7 +37,14 @@ public @interface Event {
     /**
      * 源事件
      */
-    Class<?> source();
+    @AliasFor("source")
+    Class<?> value() default Object.class;
+
+    /**
+     * 源事件
+     */
+    @AliasFor("value")
+    Class<?> source() default Object.class;
 
     /**
      * 目标事件
