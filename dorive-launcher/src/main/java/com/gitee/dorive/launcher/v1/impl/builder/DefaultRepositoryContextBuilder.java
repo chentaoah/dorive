@@ -22,7 +22,7 @@ import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.binder.api.ExampleBuilder;
 import com.gitee.dorive.base.v1.binder.enums.JoinType;
-import com.gitee.dorive.base.v1.definition.annotation.Event;
+import com.gitee.dorive.base.v1.definition.def.EventDef;
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.event.api.EventPublisher;
@@ -41,15 +41,15 @@ import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryEle;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.binder.v1.impl.builder.BinderExecutorBuilder;
 import com.gitee.dorive.binder.v1.impl.example.MultiExampleBuilder;
 import com.gitee.dorive.binder.v1.impl.example.SingleExampleBuilder;
-import com.gitee.dorive.binder.v1.impl.builder.BinderExecutorBuilder;
 import com.gitee.dorive.event.v1.entity.executor.ExecutorEvent;
 import com.gitee.dorive.event.v1.entity.repository.RepositoryEvent;
-import com.gitee.dorive.event.v1.impl.publisher.app.DefaultEventPublisher;
-import com.gitee.dorive.event.v1.impl.publisher.app.TargetEventPublisher;
 import com.gitee.dorive.event.v1.impl.publisher.ExecutorEventPublisher;
 import com.gitee.dorive.event.v1.impl.publisher.RepositoryEventPublisher;
+import com.gitee.dorive.event.v1.impl.publisher.app.DefaultEventPublisher;
+import com.gitee.dorive.event.v1.impl.publisher.app.TargetEventPublisher;
 import com.gitee.dorive.executor.v1.impl.executor.ExecutorEventExecutor;
 import com.gitee.dorive.executor.v1.impl.executor.RepositoryEventExecutor;
 import com.gitee.dorive.executor.v1.impl.executor.RepositoryExecutor;
@@ -62,6 +62,7 @@ import com.gitee.dorive.executor.v1.impl.handler.qry.DefaultEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.UnionEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.ValueFilterEntityHandler;
+import com.gitee.dorive.executor.v1.impl.resolver.RepositoryDerivedResolver;
 import com.gitee.dorive.joiner.v1.impl.joiner.DefaultEntityJoiner;
 import com.gitee.dorive.mybatis.v2.impl.querier.DefaultCountQuerier;
 import com.gitee.dorive.mybatis.v2.impl.segment.DefaultSegmentExecutor;
@@ -86,14 +87,11 @@ import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
 import com.gitee.dorive.repository.v1.impl.repository.ele.AbstractRepositoryContext;
 import com.gitee.dorive.repository.v1.impl.repository.ele.DefaultRepository;
-import com.gitee.dorive.executor.v1.impl.resolver.RepositoryDerivedResolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * RepositoryContext's properties:
@@ -122,29 +120,22 @@ public class DefaultRepositoryContextBuilder implements RepositoryContextBuilder
 
             List<ApplicationEventPublisher> executorPublishers = new ArrayList<>();
             List<ApplicationEventPublisher> repositoryPublishers = new ArrayList<>();
+            // 事件嵌套注解
+            List<EventDef> eventDefs = repositoryDef.getEvents();
+            for (EventDef eventDef : eventDefs) {
+                Class<?> source = eventDef.getSource();
+                Class<?> target = eventDef.getTarget();
 
-            Class<?>[] events = repositoryDef.getEvents();
-            for (Class<?> source : events) {
+                ApplicationEventPublisher publisher = target == null || target == Object.class ?
+                        new DefaultEventPublisher(source, applicationContext) : new TargetEventPublisher(source, target, applicationContext);
+
                 if (ExecutorEvent.class.isAssignableFrom(source)) {
-                    executorPublishers.add(new DefaultEventPublisher(source, applicationContext));
+                    executorPublishers.add(publisher);
 
                 } else if (RepositoryEvent.class.isAssignableFrom(source)) {
-                    repositoryPublishers.add(new DefaultEventPublisher(source, applicationContext));
+                    repositoryPublishers.add(publisher);
                 }
             }
-
-            Set<Event> eventsAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(repositoryContext.getClass(), Event.class);
-            for (Event eventAnnotation : eventsAnnotations) {
-                Class<?> source = eventAnnotation.source();
-                Class<?> target = eventAnnotation.target();
-                if (ExecutorEvent.class.isAssignableFrom(source)) {
-                    executorPublishers.add(new TargetEventPublisher(source, target, applicationContext));
-
-                } else if (RepositoryEvent.class.isAssignableFrom(source)) {
-                    repositoryPublishers.add(new TargetEventPublisher(source, target, applicationContext));
-                }
-            }
-
             if (!executorPublishers.isEmpty()) {
                 repository.setExecutorEventPublisher(new ExecutorEventPublisher(executorPublishers));
             }

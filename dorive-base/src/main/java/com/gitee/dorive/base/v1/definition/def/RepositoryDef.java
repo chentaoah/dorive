@@ -17,6 +17,7 @@
 
 package com.gitee.dorive.base.v1.definition.def;
 
+import com.gitee.dorive.base.v1.definition.annotation.Event;
 import com.gitee.dorive.base.v1.definition.annotation.Repository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +25,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.AnnotatedElement;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -35,7 +38,7 @@ public class RepositoryDef {
     private Class<?> deserializer;
     private Class<?> serializer;
     private Class<?>[] derived;
-    private Class<?>[] events;
+    private List<EventDef> events;
     private Class<?>[] queries;
 
     public static RepositoryDef fromElement(AnnotatedElement element) {
@@ -48,7 +51,17 @@ public class RepositoryDef {
             repositoryDef.setDeserializer(repository.deserializer());
             repositoryDef.setSerializer(repository.serializer());
             repositoryDef.setDerived(repository.derived());
-            repositoryDef.setEvents(repository.events());
+
+            // 事件嵌套注解
+            List<EventDef> eventDefs = new ArrayList<>();
+            for (Event event : repository.events()) {
+                EventDef eventDef = new EventDef();
+                eventDef.setSource(event.source());
+                eventDef.setTarget(event.target());
+                eventDefs.add(eventDef);
+            }
+            repositoryDef.setEvents(eventDefs);
+
             repositoryDef.setQueries(repository.queries());
             return repositoryDef;
         }
