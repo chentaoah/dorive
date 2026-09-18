@@ -33,21 +33,18 @@ import java.util.List;
 @AllArgsConstructor
 public class TargetEventPublisher implements ApplicationEventPublisher {
 
-    private final Class<?> source;
     private final Class<?> target;
     private final ApplicationEventPublisher publisher;
 
     @Override
     public void publishEvent(@NonNull Object event) {
-        if (source.isAssignableFrom(event.getClass())) {
-            BaseEvent<?> baseEvent = (BaseEvent<?>) event;
-            EntityOp entityOp = baseEvent.getEntityOp();
-            List<?> entities = entityOp.getEntities();
-            if (entities.size() == 1) {
-                Object newEvent = BeanUtil.copyProperties(entities.get(0), target);
-                if (newEvent != null) {
-                    publisher.publishEvent(newEvent);
-                }
+        BaseEvent<?> baseEvent = (BaseEvent<?>) event;
+        EntityOp entityOp = baseEvent.getEntityOp();
+        List<?> entities = entityOp.getEntities();
+        if (entities.size() == 1) {
+            Object newEvent = BeanUtil.copyProperties(entities.get(0), target);
+            if (newEvent != null) {
+                publisher.publishEvent(newEvent);
             }
         }
     }

@@ -48,7 +48,7 @@ import com.gitee.dorive.event.v1.entity.executor.ExecutorEvent;
 import com.gitee.dorive.event.v1.entity.repository.RepositoryEvent;
 import com.gitee.dorive.event.v1.impl.publisher.ExecutorEventPublisher;
 import com.gitee.dorive.event.v1.impl.publisher.RepositoryEventPublisher;
-import com.gitee.dorive.event.v1.impl.publisher.app.DefaultEventPublisher;
+import com.gitee.dorive.event.v1.impl.publisher.app.SourceEventPublisher;
 import com.gitee.dorive.event.v1.impl.publisher.app.TargetEventPublisher;
 import com.gitee.dorive.executor.v1.impl.executor.ExecutorEventExecutor;
 import com.gitee.dorive.executor.v1.impl.executor.RepositoryEventExecutor;
@@ -127,16 +127,19 @@ public class DefaultRepositoryContextBuilder implements RepositoryContextBuilder
                 Class<?> target = eventDef.getTarget();
                 Class<?> publisher = eventDef.getPublisher();
 
-                ApplicationEventPublisher eventPublisher;
+                // 默认
+                ApplicationEventPublisher eventPublisher = applicationContext;
                 if (publisher != null && publisher != Object.class) {
+                    // 自定义
                     eventPublisher = (ApplicationEventPublisher) applicationContext.getBean(publisher);
 
                 } else if (target != null && target != Object.class) {
-                    eventPublisher = new TargetEventPublisher(source, target, applicationContext);
-
-                } else {
-                    eventPublisher = new DefaultEventPublisher(source, applicationContext);
+                    // 转换
+                    eventPublisher = new TargetEventPublisher(target, eventPublisher);
                 }
+                // 组合
+                eventPublisher = new SourceEventPublisher(source, eventPublisher);
+
                 if (ExecutorEvent.class.isAssignableFrom(source)) {
                     executorPublishers.add(eventPublisher);
 

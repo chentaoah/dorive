@@ -26,7 +26,7 @@ import org.springframework.lang.NonNull;
 @Getter
 @Setter
 @AllArgsConstructor
-public class DefaultEventPublisher implements ApplicationEventPublisher {
+public class SourceEventPublisher implements ApplicationEventPublisher {
 
     private final Class<?> source;
     private final ApplicationEventPublisher publisher;
