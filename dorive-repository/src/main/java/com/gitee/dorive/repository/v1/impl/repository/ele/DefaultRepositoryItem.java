@@ -56,8 +56,8 @@ public class DefaultRepositoryItem extends AbstractRepositoryEle implements Repo
     @Override
     public RepositoryContext getRepositoryContext() {
         Executor executor = getExecutor();
-        if (executor instanceof RepositoryContext) {
-            return (RepositoryContext) executor;
+        if (executor instanceof RepositoryContext repositoryContext) {
+            return repositoryContext;
 
         } else if (executor instanceof RepositoryEle repositoryEle) {
             return repositoryEle.getProperty(RepositoryContext.class);
