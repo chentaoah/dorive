@@ -22,14 +22,14 @@ import org.springframework.core.annotation.AliasFor;
 import java.lang.annotation.*;
 
 /**
- * 关联所有实体
+ * 关联根实体
  */
 @Entity
 @Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
-public @interface All {
+public @interface RootEntity {
 
     /**
      * @see Entity
@@ -41,7 +41,7 @@ public @interface All {
      * @see Entity
      */
     @AliasFor(annotation = Entity.class)
-    boolean aggregate() default true;
+    boolean aggregate() default false;
 
     /**
      * @see Entity
