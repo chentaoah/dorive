@@ -65,7 +65,7 @@ public abstract class AbstractModuleParser implements ModuleParser {
         List<String> modes = args.getOptionValues("dorive.mode");
         boolean debug = modes != null && modes.contains("debug");
         try {
-            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(classLoader);
+            ResourcePatternResolver resolver = classLoader == null ? new PathMatchingResourcePatternResolver() : new PathMatchingResourcePatternResolver(classLoader);
             Resource[] resources = resolver.getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "META-INF/MANIFEST.MF");
             for (Resource resource : resources) {
                 URL url = resource.getURL();
