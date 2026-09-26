@@ -26,7 +26,7 @@ import java.util.Set;
 
 public interface ModuleParser {
 
-    void parse(ApplicationArguments args);
+    void parse(ClassLoader classLoader, ApplicationArguments args);
 
     Set<String> getModuleNames();
 

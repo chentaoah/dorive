@@ -82,11 +82,18 @@ public class ModuleLauncher {
         if (urlsToLoad.isEmpty()) {
             return null;
         }
+        // 手动创建类加载器
+        URLClassLoader urlClassLoader;
+        // 上下文中的类加载器
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         if (classLoader instanceof URLClassLoader) {
-            ClassLoaderUtils.loadUrls((URLClassLoader) classLoader, urlsToLoad);
+            urlClassLoader = (URLClassLoader) classLoader;
+            ClassLoaderUtils.loadUrls(urlClassLoader, urlsToLoad);
+        } else {
+            urlClassLoader = new URLClassLoader(urlsToLoad.toArray(new URL[0]), classLoader);
+            Thread.currentThread().setContextClassLoader(urlClassLoader);
         }
-        return classLoader;
+        return urlClassLoader;
     }
 
     private void loadClasspathIdx(URI targetClassesUri) {
