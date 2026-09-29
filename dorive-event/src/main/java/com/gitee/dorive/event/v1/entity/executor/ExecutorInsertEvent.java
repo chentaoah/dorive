@@ -15,22 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.binder.api;
+package com.gitee.dorive.event.v1.entity.executor;
 
-import com.gitee.dorive.base.v1.executor.api.Context;
+import lombok.Getter;
+import lombok.Setter;
 
-public interface Binder extends Processor {
-
-    String getSourceField();
-
-    String getTargetField();
-
-    Object getSourceFieldValue(Context context, Object entity);
-
-    void setSourceFieldValue(Context context, Object entity, Object value);
-
-    Object getTargetFieldValue(Context context, Object entity);
-
-    void setTargetFieldValue(Context context, Object entity, Object value);
-
+@Getter
+@Setter
+public class ExecutorInsertEvent<T> extends ExecutorEvent<T> {
 }

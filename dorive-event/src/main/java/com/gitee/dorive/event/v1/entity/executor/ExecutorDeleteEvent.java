@@ -15,44 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.definition.annotation;
+package com.gitee.dorive.event.v1.entity.executor;
 
-import org.springframework.core.annotation.AliasFor;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.lang.annotation.*;
-
-/**
- * 聚合
- */
-@Entity
-@Inherited
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
-public @interface Aggregate {
-
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    String name() default "";
-
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    boolean aggregate() default true;
-
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    Class<?> repository() default Object.class;
-
-    /**
-     * @see Entity
-     */
-    @AliasFor(annotation = Entity.class)
-    int priority() default 0;
-
+@Getter
+@Setter
+public class ExecutorDeleteEvent<T> extends ExecutorEvent<T> {
 }

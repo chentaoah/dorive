@@ -51,8 +51,8 @@ public class ValueFilterEntityHandler implements EntityHandler {
         for (Object entity : entities) {
             boolean isValueEqual = true;
             for (Binder valueRouteBinder : valueRouteBinders) {
-                Object fieldValue = valueRouteBinder.getFieldValue(context, null);
-                Object boundValue = valueRouteBinder.getBoundValue(context, entity);
+                Object fieldValue = valueRouteBinder.getSourceFieldValue(context, null);
+                Object boundValue = valueRouteBinder.getTargetFieldValue(context, entity);
                 boundValue = valueRouteBinder.input(context, boundValue);
                 if (!fieldValue.equals(boundValue)) {
                     isValueEqual = false;

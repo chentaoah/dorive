@@ -15,15 +15,9 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.v1.entity;
+package com.gitee.dorive.repository.v1.api;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.gitee.dorive.base.v1.mybatis.api.CountQuerier;
 
-@Getter
-@Setter
-public class ExecutorEvent<T> extends BaseEvent<T> {
-    public ExecutorEvent(Object source) {
-        super(source);
-    }
+public interface BaseRepository<E, PK> extends GenericRepository<E, PK>, QueryRepository<E, PK>, CountQuerier {
 }

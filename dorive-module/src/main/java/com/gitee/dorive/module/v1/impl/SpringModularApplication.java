@@ -48,7 +48,7 @@ public class SpringModularApplication {
         properties.put("dorive.module.enable", true);
 
         ModuleParser moduleParser = DefaultModuleParser.INSTANCE;
-        moduleParser.parse(arguments);
+        moduleParser.parse(classLoader, arguments);
         List<ModuleDefinition> moduleDefinitions = moduleParser.getModuleDefinitions();
         for (ModuleDefinition moduleDefinition : moduleDefinitions) {
             Class<?> mainClass = moduleDefinition.getMainClass();

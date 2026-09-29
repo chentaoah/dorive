@@ -21,7 +21,6 @@ import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.eop.EntityOp;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.ResolvableTypeProvider;
 
@@ -29,15 +28,11 @@ import java.util.List;
 
 @Getter
 @Setter
-public abstract class BaseEvent<T> extends ApplicationEvent implements ResolvableTypeProvider {
+public abstract class BaseEvent<T> implements ResolvableTypeProvider {
     private boolean root;
     private Class<?> entityClass;
     private Context context;
     private EntityOp entityOp;
-
-    public BaseEvent(Object source) {
-        super(source);
-    }
 
     @Override
     public ResolvableType getResolvableType() {

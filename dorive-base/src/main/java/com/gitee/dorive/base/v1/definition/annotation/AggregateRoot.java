@@ -15,22 +15,44 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.binder.api;
+package com.gitee.dorive.base.v1.definition.annotation;
 
-import com.gitee.dorive.base.v1.executor.api.Context;
+import org.springframework.core.annotation.AliasFor;
 
-public interface Binder extends Processor {
+import java.lang.annotation.*;
 
-    String getSourceField();
+/**
+ * 聚合根
+ */
+@Entity
+@Inherited
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+public @interface AggregateRoot {
 
-    String getTargetField();
+    /**
+     * @see Entity
+     */
+    @AliasFor(annotation = Entity.class)
+    String name() default "";
 
-    Object getSourceFieldValue(Context context, Object entity);
+    /**
+     * @see Entity
+     */
+    @AliasFor(annotation = Entity.class)
+    boolean aggregate() default true;
 
-    void setSourceFieldValue(Context context, Object entity, Object value);
+    /**
+     * @see Entity
+     */
+    @AliasFor(annotation = Entity.class)
+    Class<?> repository() default Object.class;
 
-    Object getTargetFieldValue(Context context, Object entity);
-
-    void setTargetFieldValue(Context context, Object entity, Object value);
+    /**
+     * @see Entity
+     */
+    @AliasFor(annotation = Entity.class)
+    int priority() default 0;
 
 }

@@ -63,7 +63,7 @@ public @interface Repository {
     /**
      * 事件
      */
-    Class<?>[] events() default {};
+    Event[] events() default {};
 
     /**
      * 查询对象

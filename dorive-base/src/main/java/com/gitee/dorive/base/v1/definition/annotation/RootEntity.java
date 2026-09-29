@@ -15,16 +15,44 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.v1.entity.ext;
+package com.gitee.dorive.base.v1.definition.annotation;
 
-import com.gitee.dorive.event.v1.entity.ExecutorEvent;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.core.annotation.AliasFor;
 
-@Getter
-@Setter
-public class ExecutorInsertEvent<T> extends ExecutorEvent<T> {
-    public ExecutorInsertEvent(Object source) {
-        super(source);
-    }
+import java.lang.annotation.*;
+
+/**
+ * 关联根实体
+ */
+@Entity
+@Inherited
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD})
+public @interface RootEntity {
+
+    /**
+     * @see Entity
+     */
+    @AliasFor(annotation = Entity.class)
+    String name() default "";
+
+    /**
+     * @see Entity
+     */
+    @AliasFor(annotation = Entity.class)
+    boolean aggregate() default false;
+
+    /**
+     * @see Entity
+     */
+    @AliasFor(annotation = Entity.class)
+    Class<?> repository() default Object.class;
+
+    /**
+     * @see Entity
+     */
+    @AliasFor(annotation = Entity.class)
+    int priority() default 0;
+
 }

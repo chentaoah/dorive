@@ -55,17 +55,17 @@ public abstract class AbstractModuleParser implements ModuleParser {
     private final List<String> scanPackages = new ArrayList<>();
 
     @Override
-    public void parse(ApplicationArguments args) {
-        parseModuleDefinitions(args);
+    public void parse(ClassLoader classLoader, ApplicationArguments args) {
+        parseModuleDefinitions(classLoader, args);
         collectScanPackages();
         checkRequiresAndProvides();
     }
 
-    private void parseModuleDefinitions(ApplicationArguments args) {
+    private void parseModuleDefinitions(ClassLoader classLoader, ApplicationArguments args) {
         List<String> modes = args.getOptionValues("dorive.mode");
         boolean debug = modes != null && modes.contains("debug");
         try {
-            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+            ResourcePatternResolver resolver = classLoader == null ? new PathMatchingResourcePatternResolver() : new PathMatchingResourcePatternResolver(classLoader);
             Resource[] resources = resolver.getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "META-INF/MANIFEST.MF");
             for (Resource resource : resources) {
                 URL url = resource.getURL();

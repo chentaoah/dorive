@@ -35,7 +35,7 @@ public class MultiEntityKeyGenerator implements KeyGenerator {
     public String generate(Context context, Object entity) {
         StringBuilder keyBuilder = new StringBuilder();
         for (Binder binder : binders) {
-            Object boundValue = binder.getBoundValue(context, entity);
+            Object boundValue = binder.getTargetFieldValue(context, entity);
             boundValue = binder.input(context, boundValue);
             if (boundValue != null) {
                 String key = boundValue.toString();
@@ -45,7 +45,7 @@ public class MultiEntityKeyGenerator implements KeyGenerator {
                 break;
             }
         }
-        if (keyBuilder != null && keyBuilder.length() > 0) {
+        if (keyBuilder != null && !keyBuilder.isEmpty()) {
             keyBuilder.deleteCharAt(keyBuilder.length() - 1);
             return keyBuilder.toString();
         }

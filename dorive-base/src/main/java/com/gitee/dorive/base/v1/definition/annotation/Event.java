@@ -17,10 +17,10 @@
 
 package com.gitee.dorive.base.v1.definition.annotation;
 
+import org.springframework.core.annotation.AliasFor;
+
 import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -30,19 +30,30 @@ import java.lang.annotation.Target;
  */
 @Inherited
 @Documented
-@Target(ElementType.TYPE)
-@Repeatable(Events.class)
+@Target({})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Event {
 
     /**
      * 源事件
      */
-    Class<?> source();
+    @AliasFor("source")
+    Class<?> value() default Object.class;
+
+    /**
+     * 源事件
+     */
+    @AliasFor("value")
+    Class<?> source() default Object.class;
 
     /**
      * 目标事件
      */
-    Class<?> target();
+    Class<?> target() default Object.class;
+
+    /**
+     * 发布
+     */
+    Class<?> publisher() default Object.class;
 
 }

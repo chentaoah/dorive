@@ -15,38 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.definition.annotation;
+package com.gitee.dorive.event.v1.entity.repository;
 
-import org.springframework.core.annotation.AliasFor;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.lang.annotation.*;
-
-/**
- * 值对象
- */
-@Field
-@Inherited
-@Documented
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ValueObj {
-
-    /**
-     * @see Field
-     */
-    @AliasFor(annotation = Field.class)
-    String value() default "";
-
-    /**
-     * @see Field
-     */
-    @AliasFor(annotation = Field.class)
-    boolean valueObj() default true;
-
-    /**
-     * @see Field
-     */
-    @AliasFor(annotation = Field.class)
-    Class<?> converter() default Object.class;
-
+@Getter
+@Setter
+public class RepositoryDeleteEvent<T> extends RepositoryEvent<T> {
 }

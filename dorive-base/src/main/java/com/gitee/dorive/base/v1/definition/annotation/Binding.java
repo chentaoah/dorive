@@ -17,8 +17,6 @@
 
 package com.gitee.dorive.base.v1.definition.annotation;
 
-import org.springframework.core.annotation.AliasFor;
-
 import java.lang.annotation.*;
 
 /**
@@ -32,19 +30,19 @@ import java.lang.annotation.*;
 public @interface Binding {
 
     /**
-     * 字段名称
+     * 子实体源字段
      */
-    String field() default "";
+    String source() default "";
 
     /**
      * 字面值
      */
-    String value() default "";
+    String literal() default "";
 
     /**
-     * 绑定的上下文字段
+     * 父实体目标字段
      */
-    String bind() default "";
+    String target() default "";
 
     /**
      * 加工表达式
@@ -57,16 +55,8 @@ public @interface Binding {
     Class<?> processor() default Object.class;
 
     /**
-     * 绑定的真实字段
+     * 当目标字段为实体时，目标实体的字段
      */
-    @Deprecated
-    @AliasFor("targetField")
-    String bindField() default "";
-
-    /**
-     * 绑定的真实字段
-     */
-    @AliasFor("bindField")
     String targetField() default "";
 
 }

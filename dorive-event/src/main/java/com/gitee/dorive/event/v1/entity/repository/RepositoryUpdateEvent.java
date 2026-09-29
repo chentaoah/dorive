@@ -15,14 +15,12 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.base.v1.event.api;
+package com.gitee.dorive.event.v1.entity.repository;
 
-import com.gitee.dorive.base.v1.executor.api.Context;
-import com.gitee.dorive.base.v1.executor.entity.eop.EntityOp;
-import org.springframework.context.ApplicationEvent;
+import lombok.Getter;
+import lombok.Setter;
 
-public interface EventFactory {
-
-    ApplicationEvent newApplicationEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp);
-
+@Getter
+@Setter
+public class RepositoryUpdateEvent<T> extends RepositoryEvent<T> {
 }

@@ -22,10 +22,10 @@ import com.gitee.dorive.base.v1.binder.api.Binder;
 import com.gitee.dorive.base.v1.binder.api.BinderExecutor;
 import com.gitee.dorive.base.v1.binder.api.ExampleBuilder;
 import com.gitee.dorive.base.v1.binder.enums.JoinType;
-import com.gitee.dorive.base.v1.definition.annotation.Event;
+import com.gitee.dorive.base.v1.definition.def.EventDef;
 import com.gitee.dorive.base.v1.definition.def.RepositoryDef;
 import com.gitee.dorive.base.v1.definition.entity.EntityElement;
-import com.gitee.dorive.base.v1.event.api.EventFactory;
+import com.gitee.dorive.base.v1.event.api.EventPublisher;
 import com.gitee.dorive.base.v1.executor.api.ConditionHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityHandler;
 import com.gitee.dorive.base.v1.executor.api.EntityOpHandler;
@@ -41,15 +41,15 @@ import com.gitee.dorive.base.v1.repository.api.Repository;
 import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.base.v1.repository.api.RepositoryEle;
 import com.gitee.dorive.base.v1.repository.api.RepositoryItem;
+import com.gitee.dorive.binder.v1.impl.builder.BinderExecutorBuilder;
 import com.gitee.dorive.binder.v1.impl.example.MultiExampleBuilder;
 import com.gitee.dorive.binder.v1.impl.example.SingleExampleBuilder;
-import com.gitee.dorive.binder.v1.impl.builder.BinderExecutorBuilder;
-import com.gitee.dorive.event.v1.entity.ExecutorEvent;
-import com.gitee.dorive.event.v1.entity.RepositoryEvent;
-import com.gitee.dorive.event.v1.impl.factory.ExecutorEventFactory;
-import com.gitee.dorive.event.v1.impl.factory.ExecutorTargetEventFactory;
-import com.gitee.dorive.event.v1.impl.factory.RepositoryEventFactory;
-import com.gitee.dorive.event.v1.impl.factory.RepositoryTargetEventFactory;
+import com.gitee.dorive.event.v1.entity.executor.ExecutorEvent;
+import com.gitee.dorive.event.v1.entity.repository.RepositoryEvent;
+import com.gitee.dorive.event.v1.impl.publisher.ExecutorEventPublisher;
+import com.gitee.dorive.event.v1.impl.publisher.RepositoryEventPublisher;
+import com.gitee.dorive.event.v1.impl.publisher.app.SourceEventPublisher;
+import com.gitee.dorive.event.v1.impl.publisher.app.TargetEventPublisher;
 import com.gitee.dorive.executor.v1.impl.executor.ExecutorEventExecutor;
 import com.gitee.dorive.executor.v1.impl.executor.RepositoryEventExecutor;
 import com.gitee.dorive.executor.v1.impl.executor.RepositoryExecutor;
@@ -62,6 +62,7 @@ import com.gitee.dorive.executor.v1.impl.handler.qry.DefaultEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.DelegatedEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.UnionEntityHandler;
 import com.gitee.dorive.executor.v1.impl.handler.qry.ValueFilterEntityHandler;
+import com.gitee.dorive.executor.v1.impl.resolver.RepositoryDerivedResolver;
 import com.gitee.dorive.joiner.v1.impl.joiner.DefaultEntityJoiner;
 import com.gitee.dorive.mybatis.v2.impl.querier.DefaultCountQuerier;
 import com.gitee.dorive.mybatis.v2.impl.segment.DefaultSegmentExecutor;
@@ -84,13 +85,13 @@ import com.gitee.dorive.repository.v1.impl.ref.RefInjector;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractMybatisRepository;
 import com.gitee.dorive.repository.v1.impl.repository.AbstractQueryRepository;
 import com.gitee.dorive.repository.v1.impl.repository.MybatisPlusRepository;
+import com.gitee.dorive.repository.v1.impl.repository.ele.AbstractRepositoryContext;
 import com.gitee.dorive.repository.v1.impl.repository.ele.DefaultRepository;
-import com.gitee.dorive.executor.v1.impl.resolver.RepositoryDerivedResolver;
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * RepositoryContext's properties:
@@ -113,27 +114,44 @@ public class DefaultRepositoryContextBuilder implements RepositoryContextBuilder
 
     @Override
     public void determineEnableEventPublish(RepositoryContext repositoryContext) {
-        RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
-        List<EventFactory> executorEventFactories = repositoryContext.getExecutorEventFactories();
-        List<EventFactory> repositoryEventFactories = repositoryContext.getRepositoryEventFactories();
+        if (repositoryContext instanceof AbstractRepositoryContext repository) {
+            ApplicationContext applicationContext = repositoryContext.getApplicationContext();
+            RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
 
-        Class<?>[] events = repositoryDef.getEvents();
-        for (Class<?> eventClass : events) {
-            if (ExecutorEvent.class.isAssignableFrom(eventClass)) {
-                executorEventFactories.add(new ExecutorEventFactory(eventClass));
+            List<ApplicationEventPublisher> executorPublishers = new ArrayList<>();
+            List<ApplicationEventPublisher> repositoryPublishers = new ArrayList<>();
+            // 事件嵌套注解
+            List<EventDef> eventDefs = repositoryDef.getEvents();
+            for (EventDef eventDef : eventDefs) {
+                Class<?> source = eventDef.getSource();
+                Class<?> target = eventDef.getTarget();
+                Class<?> publisher = eventDef.getPublisher();
 
-            } else if (RepositoryEvent.class.isAssignableFrom(eventClass)) {
-                repositoryEventFactories.add(new RepositoryEventFactory(eventClass));
+                // 默认
+                ApplicationEventPublisher eventPublisher = applicationContext;
+                if (publisher != null && publisher != Object.class) {
+                    // 自定义
+                    eventPublisher = (ApplicationEventPublisher) applicationContext.getBean(publisher);
+
+                } else if (target != null && target != Object.class) {
+                    // 转换
+                    eventPublisher = new TargetEventPublisher(target, eventPublisher);
+                }
+                // 组合
+                eventPublisher = new SourceEventPublisher(source, eventPublisher);
+
+                if (ExecutorEvent.class.isAssignableFrom(source)) {
+                    executorPublishers.add(eventPublisher);
+
+                } else if (RepositoryEvent.class.isAssignableFrom(source)) {
+                    repositoryPublishers.add(eventPublisher);
+                }
             }
-        }
-        Set<Event> eventsAnnotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(repositoryContext.getClass(), Event.class);
-        for (Event eventsAnnotation : eventsAnnotations) {
-            Class<?> source = eventsAnnotation.source();
-            if (ExecutorEvent.class.isAssignableFrom(source)) {
-                executorEventFactories.add(new ExecutorTargetEventFactory(source, eventsAnnotation.target()));
-
-            } else if (RepositoryEvent.class.isAssignableFrom(source)) {
-                repositoryEventFactories.add(new RepositoryTargetEventFactory(source, eventsAnnotation.target()));
+            if (!executorPublishers.isEmpty()) {
+                repository.setExecutorEventPublisher(new ExecutorEventPublisher(executorPublishers));
+            }
+            if (!repositoryPublishers.isEmpty()) {
+                repository.setRepositoryEventPublisher(new RepositoryEventPublisher(repositoryPublishers));
             }
         }
     }
@@ -146,8 +164,8 @@ public class DefaultRepositoryContextBuilder implements RepositoryContextBuilder
             repositoryEle = new MybatisPlusRepositoryBuilder((MybatisPlusRepository<?, ?>) repositoryContext).newRepositoryEle(entityElement);
         }
         // 事件
-        List<EventFactory> executorEventFactories = repositoryContext.getExecutorEventFactories();
-        if (!executorEventFactories.isEmpty() && repositoryEle instanceof DefaultRepository defaultRepository) {
+        EventPublisher executorEventPublisher = repositoryContext.getExecutorEventPublisher();
+        if (executorEventPublisher != null && repositoryEle instanceof DefaultRepository defaultRepository) {
             Executor executor = new ExecutorEventExecutor(repositoryContext, defaultRepository.getEntityElement(), defaultRepository.getExecutor());
             defaultRepository.setExecutor(executor);
         }
@@ -173,8 +191,8 @@ public class DefaultRepositoryContextBuilder implements RepositoryContextBuilder
         // 创建上下文执行器
         Executor executor = new RepositoryExecutor(repositoryContext, entityHandler, entityOpHandler, conditionHandler);
         // 仓储事件执行器
-        List<EventFactory> repositoryEventFactories = repositoryContext.getRepositoryEventFactories();
-        if (!repositoryEventFactories.isEmpty()) {
+        EventPublisher repositoryEventPublisher = repositoryContext.getRepositoryEventPublisher();
+        if (repositoryEventPublisher != null) {
             executor = new RepositoryEventExecutor(repositoryContext, executor);
         }
         return executor;

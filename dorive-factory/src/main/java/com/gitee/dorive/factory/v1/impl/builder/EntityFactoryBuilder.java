@@ -22,7 +22,6 @@ import com.gitee.dorive.base.v1.definition.entity.EntityElement;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityDeserializer;
 import com.gitee.dorive.base.v1.factory.api.entity.EntityFactory;
 import com.gitee.dorive.base.v1.factory.api.entity.EntitySerializer;
-import com.gitee.dorive.base.v1.repository.api.RepositoryContext;
 import com.gitee.dorive.factory.v1.api.EntityMapperManager;
 import com.gitee.dorive.factory.v1.api.InitializingObject;
 import com.gitee.dorive.factory.v1.impl.factory.DefaultEntityFactory;
@@ -39,7 +38,8 @@ import org.springframework.lang.NonNull;
 @AllArgsConstructor
 public class EntityFactoryBuilder {
 
-    private RepositoryContext repositoryContext;
+    private RepositoryDef repositoryDef;
+    private ApplicationContext applicationContext;
     private EntityElement entityElement;
     private Class<?> entityType;
     private Class<?> pojoType;
@@ -56,9 +56,6 @@ public class EntityFactoryBuilder {
 
     @NonNull
     private EntityDeserializer newEntityDeserializer() {
-        RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
-        ApplicationContext applicationContext = repositoryContext.getApplicationContext();
-
         Class<?> deserializerClass = repositoryDef.getDeserializer();
         EntityDeserializer entityDeserializer;
         if (deserializerClass == Object.class) {
@@ -82,9 +79,6 @@ public class EntityFactoryBuilder {
 
     @NonNull
     private EntitySerializer newEntitySerializer() {
-        RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
-        ApplicationContext applicationContext = repositoryContext.getApplicationContext();
-
         Class<?> serializerClass = repositoryDef.getSerializer();
         EntitySerializer entitySerializer;
         if (serializerClass == Object.class) {
@@ -107,9 +101,6 @@ public class EntityFactoryBuilder {
 
     @NonNull
     private EntityFactory newEntityFactory(EntityDeserializer entityDeserializer, EntitySerializer entitySerializer) {
-        RepositoryDef repositoryDef = repositoryContext.getRepositoryDef();
-        ApplicationContext applicationContext = repositoryContext.getApplicationContext();
-
         Class<?> factoryClass = repositoryDef.getFactory();
         EntityFactory entityFactory;
         if (factoryClass == Object.class) {

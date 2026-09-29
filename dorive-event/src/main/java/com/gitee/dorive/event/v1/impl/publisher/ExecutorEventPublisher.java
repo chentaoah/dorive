@@ -15,49 +15,60 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.v1.impl.factory;
+package com.gitee.dorive.event.v1.impl.publisher;
 
+import com.gitee.dorive.base.v1.event.api.EventPublisher;
 import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.eop.Delete;
+import com.gitee.dorive.base.v1.executor.entity.eop.EntityOp;
 import com.gitee.dorive.base.v1.executor.entity.eop.Insert;
 import com.gitee.dorive.base.v1.executor.entity.eop.Update;
-import com.gitee.dorive.base.v1.executor.entity.eop.EntityOp;
-import com.gitee.dorive.base.v1.event.api.EventFactory;
 import com.gitee.dorive.event.v1.entity.BaseEvent;
-import com.gitee.dorive.event.v1.entity.ext.RepositoryDeleteEvent;
-import com.gitee.dorive.event.v1.entity.ext.RepositoryInsertEvent;
-import com.gitee.dorive.event.v1.entity.ext.RepositoryUpdateEvent;
+import com.gitee.dorive.event.v1.entity.executor.ExecutorDeleteEvent;
+import com.gitee.dorive.event.v1.entity.executor.ExecutorInsertEvent;
+import com.gitee.dorive.event.v1.entity.executor.ExecutorUpdateEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
+
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class RepositoryEventFactory implements EventFactory {
+public class ExecutorEventPublisher implements EventPublisher {
 
-    private final Class<?> source;
+    private final List<ApplicationEventPublisher> publishers;
 
     @Override
-    public ApplicationEvent newApplicationEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
+    public void publishEvent(Class<?> entityClass, Context context, EntityOp entityOp) {
+        Object event = newEvent(entityClass, context, entityOp);
+        if (event != null) {
+            for (ApplicationEventPublisher publisher : publishers) {
+                publisher.publishEvent(event);
+            }
+        }
+    }
+
+    private Object newEvent(Class<?> entityClass, Context context, EntityOp entityOp) {
         BaseEvent<?> baseEvent = null;
         if (entityOp instanceof Insert) {
-            baseEvent = new RepositoryInsertEvent<>(source);
+            baseEvent = new ExecutorInsertEvent<>();
 
         } else if (entityOp instanceof Update) {
-            baseEvent = new RepositoryUpdateEvent<>(source);
+            baseEvent = new ExecutorUpdateEvent<>();
 
         } else if (entityOp instanceof Delete) {
-            baseEvent = new RepositoryDeleteEvent<>(source);
+            baseEvent = new ExecutorDeleteEvent<>();
         }
         if (baseEvent != null) {
-            baseEvent.setRoot(root);
+            baseEvent.setRoot(entityOp.isRoot());
             baseEvent.setEntityClass(entityClass);
             baseEvent.setContext(context);
             baseEvent.setEntityOp(entityOp);
         }
-        return baseEvent != null && this.source.isAssignableFrom(baseEvent.getClass()) ? baseEvent : null;
+        return baseEvent;
     }
 
 }

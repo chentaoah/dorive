@@ -15,41 +15,40 @@
  * limitations under the License.
  */
 
-package com.gitee.dorive.event.v1.impl.factory;
+package com.gitee.dorive.event.v1.impl.publisher.app;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ReflectUtil;
-import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.eop.EntityOp;
+import com.gitee.dorive.event.v1.entity.BaseEvent;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
 @Getter
 @Setter
-public class RepositoryTargetEventFactory extends RepositoryEventFactory {
+@AllArgsConstructor
+public class TargetEventPublisher implements ApplicationEventPublisher {
 
     private final Class<?> target;
-
-    public RepositoryTargetEventFactory(Class<?> source, Class<?> target) {
-        super(source);
-        this.target = target;
-    }
+    private final ApplicationEventPublisher publisher;
 
     @Override
-    public ApplicationEvent newApplicationEvent(Object source, boolean root, Class<?> entityClass, Context context, EntityOp entityOp) {
-        ApplicationEvent applicationEvent = super.newApplicationEvent(source, root, entityClass, context, entityOp);
-        if (applicationEvent != null) {
-            List<?> entities = entityOp.getEntities();
-            if (entities.size() == 1) {
-                ApplicationEvent newApplicationEvent = (ApplicationEvent) ReflectUtil.newInstance(target, source);
-                BeanUtil.copyProperties(entities.get(0), newApplicationEvent);
-                return newApplicationEvent;
+    public void publishEvent(@NonNull Object event) {
+        BaseEvent<?> baseEvent = (BaseEvent<?>) event;
+        EntityOp entityOp = baseEvent.getEntityOp();
+        List<?> entities = entityOp.getEntities();
+        if (entities != null && !entities.isEmpty()) {
+            for (Object entity : entities) {
+                Object newEvent = BeanUtil.copyProperties(entity, target);
+                if (newEvent != null) {
+                    publisher.publishEvent(newEvent);
+                }
             }
         }
-        return null;
     }
 
 }

@@ -31,7 +31,7 @@ public class SingleFieldKeyGenerator implements KeyGenerator {
 
     @Override
     public String generate(Context context, Object entity) {
-        Object fieldValue = binder.getFieldValue(context, entity);
+        Object fieldValue = binder.getSourceFieldValue(context, entity);
         return fieldValue != null ? fieldValue.toString() : null;
     }
 

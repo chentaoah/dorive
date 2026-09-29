@@ -35,7 +35,7 @@ public class MultiFieldKeyGenerator implements KeyGenerator {
     public String generate(Context context, Object entity) {
         StringBuilder keyBuilder = new StringBuilder();
         for (Binder binder : binders) {
-            Object fieldValue = binder.getFieldValue(context, entity);
+            Object fieldValue = binder.getSourceFieldValue(context, entity);
             if (fieldValue != null) {
                 String key = fieldValue.toString();
                 keyBuilder.append("(").append(key.length()).append(")").append(key).append(",");
@@ -44,7 +44,7 @@ public class MultiFieldKeyGenerator implements KeyGenerator {
                 break;
             }
         }
-        if (keyBuilder != null && keyBuilder.length() > 0) {
+        if (keyBuilder != null && !keyBuilder.isEmpty()) {
             keyBuilder.deleteCharAt(keyBuilder.length() - 1);
             return keyBuilder.toString();
         }

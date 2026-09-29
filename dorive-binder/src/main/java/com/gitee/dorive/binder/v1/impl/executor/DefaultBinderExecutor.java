@@ -64,7 +64,7 @@ public class DefaultBinderExecutor implements BinderExecutor {
         for (Binder weakBinder : weakBinders) {
             Object boundValue = weakBinder.input(context, null);
             if (boundValue != null) {
-                String field = weakBinder.getField();
+                String field = weakBinder.getSourceField();
                 example.eq(field, boundValue);
             }
         }
@@ -74,10 +74,10 @@ public class DefaultBinderExecutor implements BinderExecutor {
     @Override
     public void appendFilterValue(Context context, Example example) {
         for (Binder valueFilterBinder : valueFilterBinders) {
-            Object boundValue = valueFilterBinder.getBoundValue(context, null);
+            Object boundValue = valueFilterBinder.getTargetFieldValue(context, null);
             boundValue = valueFilterBinder.input(context, boundValue);
             if (boundValue != null) {
-                String field = valueFilterBinder.getField();
+                String field = valueFilterBinder.getSourceField();
                 example.eq(field, boundValue);
             }
         }
@@ -87,11 +87,11 @@ public class DefaultBinderExecutor implements BinderExecutor {
     public void getBoundValue(Context context, Object rootEntity, Collection<?> entities) {
         for (Object entity : entities) {
             for (Binder strongBinder : getStrongBinders()) {
-                Object fieldValue = strongBinder.getFieldValue(context, entity);
+                Object fieldValue = strongBinder.getSourceFieldValue(context, entity);
                 if (fieldValue == null) {
-                    Object boundValue = strongBinder.getBoundValue(context, rootEntity);
+                    Object boundValue = strongBinder.getTargetFieldValue(context, rootEntity);
                     if (boundValue != null) {
-                        strongBinder.setFieldValue(context, entity, boundValue);
+                        strongBinder.setSourceFieldValue(context, entity, boundValue);
                     }
                 }
             }
@@ -102,11 +102,11 @@ public class DefaultBinderExecutor implements BinderExecutor {
     public void setBoundId(Context context, Object rootEntity, Object entity) {
         Binder boundIdBinder = getBoundIdBinder();
         if (boundIdBinder != null) {
-            Object boundValue = boundIdBinder.getBoundValue(context, rootEntity);
+            Object boundValue = boundIdBinder.getTargetFieldValue(context, rootEntity);
             if (boundValue == null) {
-                Object primaryKey = boundIdBinder.getFieldValue(context, entity);
+                Object primaryKey = boundIdBinder.getSourceFieldValue(context, entity);
                 if (primaryKey != null) {
-                    boundIdBinder.setBoundValue(context, rootEntity, primaryKey);
+                    boundIdBinder.setTargetFieldValue(context, rootEntity, primaryKey);
                 }
             }
         }
