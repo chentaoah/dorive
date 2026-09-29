@@ -9,11 +9,9 @@
 
 ### 🎯项目概述
 
-🔥🔥🔥dorive是一个**轻量化、模块化、渐进式领域驱动开发框架**，帮助开发者，开发**可持续演进的复杂应用**。 
+**Dorive** 是一个**轻量化、模块化、渐进式**的领域驱动开发框架，专为构建**可持续演进的复杂应用**而设计。
 
-dorive提供了**模块化、模型化**的解决方案，以应对复杂应用的**僵化、腐化**问题。
-
-
+它通过提供**模块化**与**模型化**的系统性解决方案，帮助开发团队有效应对复杂业务系统在长期迭代中普遍面临的**僵化**与**腐化**问题，让软件架构随业务发展保持清晰、灵活与可维护。
 
 ### ✨为什么僵化、腐化？
 
@@ -25,8 +23,6 @@ dorive提供了**模块化、模型化**的解决方案，以应对复杂应用�
 
 - **重视敏捷，轻视治理**：赶工期，大量采用硬编码与临时方案，形成了难阅读、难修改的历史代码。忽视文档输出、代码审查等流程，导致代码逻辑隐晦，质量下降，隐性技术负债不断滚雪球。
 
-
-
 ###  🏗️解决方案
 
 - **需求结构化、业务建模**：统一认知差异。
@@ -37,15 +33,11 @@ dorive提供了**模块化、模型化**的解决方案，以应对复杂应用�
 
 - **模块、模型治理**：全生命周期管理。
 
-
-
 ### 📖参考资料
 
-- 项目文档：/docs
+- 项目文档：[dorive-docs](https://gitee.com/digital-engine/dorive-docs)
 
 - 测试案例：[dorive-example](https://gitee.com/digital-engine/dorive-example)
-
-
 
 ### 🚅快速开始
 
@@ -53,11 +45,9 @@ dorive提供了**模块化、模型化**的解决方案，以应对复杂应用�
 <dependency>
     <groupId>com.gitee.digital-engine</groupId>
     <artifactId>dorive-launcher</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.3</version>
 </dependency>
 ```
-
-
 
 ### 🤝依赖项
 
@@ -72,15 +62,11 @@ dorive提供了**模块化、模型化**的解决方案，以应对复杂应用�
 | hutool-all                        | 5.8.43  | 工具库          |
 | mybatis-plus-spring-boot3-starter | 3.5.13  | 数据库框架      |
 
-
-
 ### 🐞bug反馈与建议
 
 提交问题反馈请说明正在使用的JDK版本、dorive版本，以及依赖库版本。
 
 页面地址：[Gitee issue](https://gitee.com/digital-engine/dorive/issues)
-
-
 
 ### 🙏🏻特别感谢
 
