@@ -1,5 +1,5 @@
 <h1 align="center">Dorive</h1>
-<h3 align="center">轻量化、模块化、渐进式领域驱动开发框架</h3>
+<h3 align="center">轻量化、渐进式的微应用开发框架</h3>
 <p align="center">
   <img src="https://img.shields.io/github/license/chentaoah/dorive" alt="license">
   <img src="https://img.shields.io/github/v/release/chentaoah/dorive?display_name=tag&include_prereleases" alt="release">
@@ -9,9 +9,7 @@
 
 ### 🎯项目概述
 
-**Dorive** 是一个**轻量化、渐进式**的微应用开发框架，专为构建**可持续演进的复杂应用**而设计。
-
-它通过提供**模块化**与**模型化**的系统性解决方案，帮助开发团队有效应对复杂业务系统在长期迭代中普遍面临的**僵化**与**腐化**问题，让软件架构随业务发展保持清晰、灵活与可维护。
+**Dorive** 是一个**轻量化、渐进式**的微应用开发框架，专为构建**可持续演进的复杂应用**而设计。它通过提供**模块化**与**模型化**的系统性解决方案，帮助开发团队有效应对复杂业务系统在长期迭代中普遍面临的**僵化**与**腐化**问题，让软件架构随业务发展保持清晰、灵活与可维护。
 
 ### ✨特性
 
