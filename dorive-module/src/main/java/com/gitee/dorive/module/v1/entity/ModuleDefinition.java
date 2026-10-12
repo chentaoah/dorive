@@ -10,8 +10,11 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gitee.dorive.module.v1.impl.util.NameUtils;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -48,6 +51,8 @@ public class ModuleDefinition {
     private String tablePrefix;
     private String requestPrefix;
 
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private List<String> paths;
 
     public ModuleDefinition(Manifest manifest) {
