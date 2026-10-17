@@ -6,7 +6,9 @@
 package com.gitee.dorive.event.v1.impl.publisher.app;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.gitee.dorive.base.v1.executor.api.Context;
 import com.gitee.dorive.base.v1.executor.entity.eop.EntityOp;
+import com.gitee.dorive.event.v1.api.ContextAware;
 import com.gitee.dorive.event.v1.entity.BaseEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,11 +29,15 @@ public class TargetEventPublisher implements ApplicationEventPublisher {
     @Override
     public void publishEvent(@NonNull Object event) {
         BaseEvent<?> baseEvent = (BaseEvent<?>) event;
+        Context context = baseEvent.getContext();
         EntityOp entityOp = baseEvent.getEntityOp();
         List<?> entities = entityOp.getEntities();
         if (entities != null && !entities.isEmpty()) {
             for (Object entity : entities) {
                 Object newEvent = BeanUtil.copyProperties(entity, target);
+                if (newEvent instanceof ContextAware) {
+                    ((ContextAware) newEvent).setContext(context);
+                }
                 if (newEvent != null) {
                     publisher.publishEvent(newEvent);
                 }
