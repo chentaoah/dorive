@@ -173,7 +173,7 @@ public class ModuleDefinition {
                 activeProfiles = new ArrayList<>(configs.size());
             }
             for (String config : configs) {
-                if (config.startsWith("application-") && config.endsWith(".yml")) {
+                if (config.startsWith("application-") && (config.endsWith(".yml") || config.endsWith(".yaml"))) {
                     String profile = config.substring(12, config.length() - 4);
                     activeProfiles.add(profile);
                 }
