@@ -174,7 +174,7 @@ public class ModuleDefinition {
             }
             for (String config : configs) {
                 if (config.startsWith("application-") && (config.endsWith(".yml") || config.endsWith(".yaml"))) {
-                    String profile = config.substring(12, config.length() - 4);
+                    String profile = config.substring(config.indexOf('-') + 1, config.lastIndexOf('.'));
                     activeProfiles.add(profile);
                 }
             }
