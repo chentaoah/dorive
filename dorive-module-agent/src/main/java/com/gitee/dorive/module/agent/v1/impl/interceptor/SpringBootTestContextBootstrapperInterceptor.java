@@ -5,16 +5,20 @@
 
 package com.gitee.dorive.module.agent.v1.impl.interceptor;
 
-import com.gitee.dorive.module.test.v1.impl.SpringBootModularContextLoader;
+import com.gitee.dorive.module.agent.v1.impl.SpringApplicationAgent;
 import net.bytebuddy.implementation.bind.annotation.Argument;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 
 public class SpringBootTestContextBootstrapperInterceptor {
 
+    public static final String CLASS_NAME = "com.gitee.dorive.module.test.v1.impl.SpringBootModularContextLoader";
+
     @RuntimeType
-    public static Object intercept(@Argument(0) Class<?> testClass) {
+    public static Object intercept(@Argument(0) Class<?> testClass) throws Exception {
         System.out.printf("[Test Agent] Intercepting method. Test class: %s%n", testClass.getName());
-        return SpringBootModularContextLoader.class;
+
+        ClassLoader classLoader = SpringApplicationAgent.getClassLoader(testClass);
+        return Class.forName(CLASS_NAME, true, classLoader);
     }
 
 }
