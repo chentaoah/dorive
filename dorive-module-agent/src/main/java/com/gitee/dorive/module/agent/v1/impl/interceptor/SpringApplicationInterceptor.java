@@ -5,7 +5,7 @@
 
 package com.gitee.dorive.module.agent.v1.impl.interceptor;
 
-import com.gitee.dorive.module.agent.v1.impl.SpringApplicationAgent;
+import com.gitee.dorive.module.agent.v1.impl.util.ClassUtil;
 import net.bytebuddy.implementation.bind.annotation.Argument;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 
@@ -20,8 +20,7 @@ public class SpringApplicationInterceptor {
     @RuntimeType
     public static Object intercept(@Argument(0) Class<?> primarySource, @Argument(1) String[] args) throws Exception {
         System.out.printf("[Agent] Intercepting method. Primary source: %s, args: %s%n", primarySource.getName(), Arrays.toString(args));
-
-        ClassLoader classLoader = SpringApplicationAgent.getClassLoader(primarySource);
+        ClassLoader classLoader = ClassUtil.getClassLoader(primarySource);
         Class<?> clazz = Class.forName(CLASS_NAME, true, classLoader);
         Method method = clazz.getMethod(METHOD_NAME, Class.class, String[].class);
         return method.invoke(null, primarySource, args);

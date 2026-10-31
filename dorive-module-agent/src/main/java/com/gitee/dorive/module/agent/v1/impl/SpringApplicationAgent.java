@@ -40,12 +40,4 @@ public class SpringApplicationAgent {
                 .installOn(inst);
     }
 
-    public static ClassLoader getClassLoader(Class<?> clazz) {
-        ClassLoader classLoader = clazz.getClassLoader();
-        if (classLoader == null) {
-            classLoader = Thread.currentThread().getContextClassLoader();
-        }
-        return classLoader;
-    }
-
 }
